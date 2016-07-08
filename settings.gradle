@@ -1,1 +1,1 @@
-include ':testpress'
+include ':core'
