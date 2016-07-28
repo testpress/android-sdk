@@ -21,3 +21,17 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+ext {
+    compileSdkVersion = 23
+    targetSdkVersion = 24
+    buildToolsVersion = '23.0.3'
+
+    junit = 'junit:junit:4.12'
+    appcompat = 'com.android.support:appcompat-v7:24.1.0'
+    retrofit = 'com.squareup.retrofit:retrofit:1.9.0'
+    okHttp = 'com.squareup.okhttp:okhttp:2.3.0'
+    okHttpUrlConnection = 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
+    gson = 'com.google.code.gson:gson:2.6.2'
+    design = 'com.android.support:design:24.1.0'
+}
