@@ -19,10 +19,11 @@ android {
 }
 
 dependencies {
-    testCompile rootProject.junit
+    compile project(':core')
     compile rootProject.appcompat
     compile rootProject.retrofit
     compile rootProject.okHttp
     compile rootProject.okHttpUrlConnection
     compile rootProject.gson
+    compile rootProject.design
 }

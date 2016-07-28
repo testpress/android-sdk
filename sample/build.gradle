@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "in.testpress.sample"
-        minSdkVersion 9
+        minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 1
         versionName "1.0"
@@ -21,6 +21,7 @@ android {
 
 dependencies {
     compile project(':core')
+    compile project(':exam')
     testCompile rootProject.junit
     compile rootProject.appcompat
     compile rootProject.design
