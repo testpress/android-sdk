@@ -27,12 +27,12 @@ public class  ExamsListActivity extends AppCompatActivity {
             // Need to authenticate
             AuthenticateFragment fragment = new AuthenticateFragment();
             fragment.setArguments(getIntent().getBundleExtra(CREDENTIALS));
-            getFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, fragment)
                     .commit();
             return;
         }
-        ExamsListFragment.show(this, R.id.fragment_container);
+        CarouselFragment.show(this, R.id.fragment_container);
     }
 
 }

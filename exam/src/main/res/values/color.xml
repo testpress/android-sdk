@@ -7,4 +7,11 @@
     <color name="testpress_color_primary">#2196F3</color>
     <color name="testpress_color_primary_dark">#1976D2</color>
 
+    <color name="testpress_pager_background">#F4F4F4</color>
+    <color name="testpress_pager_background_alternate">#E7E7E7</color>
+
+    <color name="testpress_tab_text_color">#888888</color>
+    <color name="testpress_tab_background_color">@color/testpress_white</color>
+    <color name="testpress_tab_indicator_color">@color/testpress_color_primary</color>
+
 </resources>

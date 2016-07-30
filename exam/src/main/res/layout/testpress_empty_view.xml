@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
+    android:background="@color/testpress_white"
     android:id="@+id/empty_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,7 +18,8 @@
         android:textColor="@color/testpress_black"
         android:textSize="18sp"
         android:layout_gravity="center"
-        android:drawableLeft="@drawable/ic_error_outline_black_24dp"
+        android:drawableLeft="@drawable/ic_error_outline_black_18dp"
+        android:drawableStart="@drawable/ic_error_outline_black_18dp"
         android:drawablePadding="3dp"/>
 
     <TextView

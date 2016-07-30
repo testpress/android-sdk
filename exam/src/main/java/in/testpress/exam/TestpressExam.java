@@ -1,12 +1,12 @@
 package in.testpress.exam;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.FragmentActivity;
 
 import in.testpress.exam.ui.AuthenticateFragment;
+import in.testpress.exam.ui.CarouselFragment;
 import in.testpress.exam.ui.ExamsListActivity;
-import in.testpress.exam.ui.ExamsListFragment;
 
 public class TestpressExam {
 
@@ -27,8 +27,8 @@ public class TestpressExam {
      * @param activity Activity that has the container
      * @param containerViewId Container view id in which fragment needs to be replace
      */
-    public static void show(Activity activity, int containerViewId) {
-        ExamsListFragment.show(activity, containerViewId);
+    public static void show(FragmentActivity activity, int containerViewId) {
+        CarouselFragment.show(activity, containerViewId);
     }
 
     /**
@@ -45,8 +45,8 @@ public class TestpressExam {
      * @param username Username
      * @param password Password
      */
-    public static void show(Activity activity, int containerViewId, String baseUrl, String username,
-                            String password) {
+    public static void show(FragmentActivity activity, int containerViewId, String baseUrl,
+                            String username, String password) {
         AuthenticateFragment.show(activity, containerViewId, baseUrl, username, password);
     }
 
