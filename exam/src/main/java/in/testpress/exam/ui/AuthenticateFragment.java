@@ -46,7 +46,7 @@ public class AuthenticateFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         containerViewId = container.getId();
-        return inflater.inflate(R.layout.fragment_testpress_exam, container, false);
+        return inflater.inflate(R.layout.testpress_fragment_authenticate, container, false);
     }
 
     @Override
@@ -79,9 +79,11 @@ public class AuthenticateFragment extends Fragment {
                     @Override
                     public void onException(Exception e) {
                         if (e.getCause() instanceof IOException) {
-                            setEmptyText(R.string.network_error, R.string.no_internet_try_again);
+                            setEmptyText(R.string.testpress_network_error,
+                                    R.string.testpress_no_internet_try_again);
                         } else {
-                            setEmptyText(R.string.loading_failed, R.string.some_thing_went_wrong_try_again);
+                            setEmptyText(R.string.testpress_loading_failed,
+                                    R.string.testpress_some_thing_went_wrong_try_again);
                         }
                     }
                 });

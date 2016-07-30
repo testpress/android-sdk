@@ -44,7 +44,7 @@ public final class TestpressSdk {
     public static void initialize(Context context, String baseUrl, String username, String password,
                                   final TestpressCallback<TestpressAuthToken> callback) {
         final ProgressDialog progressDialog = new ProgressDialog(context);
-        progressDialog.setMessage(context.getResources().getString(R.string.please_wait));
+        progressDialog.setMessage(context.getResources().getString(R.string.testpress_please_wait));
         progressDialog.setCancelable(false);
         progressDialog.show();
         BASE_URL = baseUrl;

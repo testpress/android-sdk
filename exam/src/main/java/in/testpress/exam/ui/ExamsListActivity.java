@@ -22,7 +22,7 @@ public class  ExamsListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.container_layout);
+        setContentView(R.layout.testpress_container_layout);
         if (getIntent().getBundleExtra(CREDENTIALS) != null) {
             // Need to authenticate
             AuthenticateFragment fragment = new AuthenticateFragment();
