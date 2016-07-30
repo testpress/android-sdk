@@ -18,7 +18,7 @@
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:text="New Activity"
-            android:background="@color/color_primary"
+            android:background="@drawable/primary_button"
             android:textColor="@color/white"
             android:onClick="showNewActivity"
             android:id="@+id/new_activity_button" />
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
             android:text="Fragment"
-            android:background="@color/color_primary"
+            android:background="@drawable/primary_button"
             android:textColor="@color/white"
             android:onClick="showExamsInFragment"
             android:id="@+id/fragment_button" />
