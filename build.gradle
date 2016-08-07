@@ -35,5 +35,7 @@ ext {
     okHttpUrlConnection = 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
     gson = 'com.google.code.gson:gson:2.6.2'
     design = 'com.android.support:design:24.1.0'
+    cardview = 'com.android.support:cardview-v7:24.1.1'
+    universalImageLoader = 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
 
 }

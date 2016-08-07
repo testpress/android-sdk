@@ -4,6 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 
+import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+
 import in.testpress.exam.ui.AuthenticateFragment;
 import in.testpress.exam.ui.CarouselFragment;
 import in.testpress.exam.ui.ExamsListActivity;
@@ -28,6 +35,7 @@ public class TestpressExam {
      * @param containerViewId Container view id in which fragment needs to be replace
      */
     public static void show(FragmentActivity activity, int containerViewId) {
+        initImageLoader(activity);
         CarouselFragment.show(activity, containerViewId);
     }
 
@@ -47,6 +55,7 @@ public class TestpressExam {
      */
     public static void show(FragmentActivity activity, int containerViewId, String baseUrl,
                             String username, String password) {
+        initImageLoader(activity);
         AuthenticateFragment.show(activity, containerViewId, baseUrl, username, password);
     }
 
@@ -67,6 +76,7 @@ public class TestpressExam {
      * @param context Context to start the new activity.
      */
     public static void show(Context context) {
+        initImageLoader(context);
         Intent intent = new Intent(context, ExamsListActivity.class);
         context.startActivity(intent);
     }
@@ -85,7 +95,22 @@ public class TestpressExam {
      * @param password Password
      */
     public static void show(Context context, String baseUrl, String username, String password) {
+        initImageLoader(context);
         context.startActivity(ExamsListActivity.getNewIntent(context, baseUrl, username, password));
+    }
+
+    public static void initImageLoader(Context context) {
+        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+                .cacheOnDisk(true).cacheInMemory(true)
+                .imageScaleType(ImageScaleType.EXACTLY)
+                .displayer(new FadeInBitmapDisplayer(300)).build();
+
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
+                .defaultDisplayImageOptions(defaultOptions)
+                .memoryCache(new WeakMemoryCache())
+                .diskCacheSize(500 * 1024 * 1024).build();
+
+        ImageLoader.getInstance().init(config);
     }
 
 }

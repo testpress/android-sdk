@@ -50,10 +50,10 @@ public class ExamsListFragment extends PagedItemFragment<Exam> {
                 return new UpcomingExamsListAdapter(getActivity(), items,
                         R.layout.upcoming_exams_list_item);
             } else if (subclass.equals(ExamsListFragment.HISTORY)) {
-                return new HistoryListAdapter(getActivity(), items, R.layout.history_exams_list_item);
+                return new HistoryListAdapter(getParentFragment(), items, R.layout.history_exams_list_item);
             }
         }
-        return new AvailableExamsListAdapter(getActivity(), items, R.layout.available_exams_list_item);
+        return new AvailableExamsListAdapter(getParentFragment(), items, R.layout.available_exams_list_item);
     }
 
     @Override

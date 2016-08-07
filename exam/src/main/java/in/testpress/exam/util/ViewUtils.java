@@ -17,8 +17,13 @@ package in.testpress.exam.util;
  */
 
 import android.app.Activity;
+import android.content.Context;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
+
+import in.testpress.exam.R;
 
 import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
@@ -75,6 +80,17 @@ public class ViewUtils {
     public static void hideSoftKeyboard(Activity activity) {
         InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+    }
+
+    public static void slide_down(Context ctx, View v){
+        Animation a = AnimationUtils.loadAnimation(ctx, R.anim.testpress_slide_down);
+        if(a != null){
+            a.reset();
+            if(v != null){
+                v.clearAnimation();
+                v.startAnimation(a);
+            }
+        }
     }
 
     private ViewUtils() {

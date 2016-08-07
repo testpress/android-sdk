@@ -10,10 +10,15 @@
 
     <string name="testpress_no_internet_try_again">Please check your internet connection &amp; try again.</string>
     <string name="testpress_tap_to_retry">Tap to retry</string>
+    <string name="testpress_server_error">Server Error</string>
     <string name="testpress_network_error">Network Error</string>
     <string name="testpress_loading_failed">Loading Failed</string>
     <string name="testpress_authentication_failed">Authentication failed</string>
     <string name="testpress_some_thing_went_wrong_try_again">Some thing went wrong, please try again later.</string>
+    <string name="testpress_exam_paused_check_internet">Exam is paused, Please check your internet connection &amp; resume again.</string>
+    <string name="testpress_exam_paused_check_internet_to_end">Exam is paused, Please check your internet connection &amp; try again.</string>
+    <string name="testpress_no_internet_connection">No internet connection</string>
+    <string name="testpress_try_again">Try again</string>
 
     <string name="testpress_loading">Loading...</string>
     <string name="testpress_no_exams">No Exams</string>
@@ -21,21 +26,62 @@
     <string name="testpress_no_attempts">No Attempts</string>
     <string name="testpress_no_attempts_description">To review, start and complete your exams.</string>
     <string name="testpress_error_loading_exams">Loading exams failed</string>
+    <string name="testpress_error_loading_attempts">Loading attempts failed</string>
+    <string name="testpress_error_loading_questions">Loading questions failed</string>
     <string name="testpress_please_login">Please login to see this exams</string>
 
     <string name="testpress_page_available_exams">Available</string>
     <string name="testpress_page_upcoming_exams">Upcoming</string>
     <string name="testpress_page_history_exams">History</string>
 
-    <string name="testpress_stop">Stop</string>
-    <string name="testpress_start">Start</string>
-    <string name="testpress_pause">Pause</string>
-    <string name="testpress_resume">Resume</string>
-    <string name="testpress_retake">Retake</string>
-    <string name="testpress_review">Review</string>
-    <string name="testpress_start_exam">Start Exam</string>
+    <string name="testpress_pause">PAUSE</string>
+    <string name="testpress_resume">RESUME</string>
+    <string name="testpress_retake">RETAKE</string>
+    <string name="testpress_review">REVIEW</string>
+    <string name="testpress_start_exam">START EXAM</string>
+    <string name="testpress_next">NEXT</string>
+    <string name="testpress_previous">PREV</string>
+    <string name="testpress_paused">PAUSED</string>
+    <string name="testpress_end">END</string>
+    <string name="testpress_pause_message">Do you want to Pause the exam?</string>
+    <string name="testpress_pause_content">You can pause the exam &amp; resume later before end date</string>
+    <string name="testpress_end_message">Do you want to End the exam?</string>
 
-    <string name="testpress_email_mcqs">Email MCQs</string>
-    <string name="testpress_email_pdf">Email PDF</string>
+    <string name="testpress_ok">OK</string>
+    <string name="testpress_cancel">Cancel</string>
+
+    <string name="testpress_email_mcqs">EMAIL MCQs</string>
+    <string name="testpress_email_pdf">EMAIL PDF</string>
+
+    <string name="testpress_mail_pdf_confirm_title">Mail PDF</string>
+    <string name="testpress_mail_pdf_confirm">PDF will be mailed to your email address. Click OK to confirm.</string>
+    <string name="testpress_mail_pdf">Initiating PDF mail</string>
+    <string name="testpress_mail_pdf_complete">PDF Request Complete</string>
+    <string name="testpress_mail_pdf_complete_description">Your PDF request has been initiated. Please wait while your PDF is generated and mailed to you.</string>
+    <string name="testpress_mail_pdf_error">PDF Request Error</string>
+    <string name="testpress_mail_pdf_error_description">There was an error in generating your PDF.</string>
+
+    <string name="testpress_all_the_best">All the best!</string>
+    <string name="testpress_no_of_questions">Number of Questions</string>
+    <string name="testpress_duration">Duration</string>
+    <string name="testpress_mark_per_question">Mark per question</string>
+    <string name="testpress_negative_mark">Negative marks</string>
+    <string name="testpress_description">Description</string>
+    <string name="testpress_questions_list">QUESTIONS LIST</string>
+
+    <string name="testpress_your_score">Your score</string>
+    <string name="testpress_correct">correct</string>
+    <string name="testpress_percentile">Percentile</string>
+    <string name="testpress_incorrect">incorrect</string>
+    <string name="testpress_time_remaining">time remaining</string>
+
+    <string name="testpress_question">Question</string>
+    <string name="testpress_review_later">Review Later</string>
+    <string name="testpress_uncategorized">Uncategorized</string>
+    <string name="testpress_attempted_on">Attempted on</string>
+    <string name="testpress_started_on">Started on</string>
+
+    <string name="testpress_show_passage">Show Passage</string>
+    <string name="testpress_hide_passage">Hide Passage</string>
 
 </resources>

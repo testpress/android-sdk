@@ -33,6 +33,7 @@ public abstract class ThrowableLoader<D> extends AsyncLoader<D> {
             return loadData();
         } catch (final Exception e) {
             Log.d("ThrowableLoader", "Exception loading data");
+            e.printStackTrace();
             exception = e;
             return data;
         }

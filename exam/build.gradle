@@ -26,4 +26,6 @@ dependencies {
     compile rootProject.okHttpUrlConnection
     compile rootProject.gson
     compile rootProject.design
+    compile rootProject.cardview
+    compile rootProject.universalImageLoader
 }

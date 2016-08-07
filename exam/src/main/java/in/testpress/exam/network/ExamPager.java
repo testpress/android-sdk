@@ -31,13 +31,8 @@ public class ExamPager extends BaseResourcePager<Exam> {
     public List<Exam> getItems(int page, int size) throws RetrofitError {
         queryParams.put(TestpressExamApiClient.STATE, subclass);
         queryParams.put(TestpressExamApiClient.PAGE, page);
-        try {
-            response = apiClient.getExamService().getExams(queryParams,
-                    TestpressExamApiClient.getAuthToken());
-            return response.getResults();
-        } catch (Exception e) {
-            throw e;
-        }
+        response = apiClient.getExams(queryParams);
+        return response.getResults();
     }
 
     @Override

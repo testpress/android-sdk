@@ -4,8 +4,17 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import in.testpress.core.TestpressSdk;
+import in.testpress.exam.models.Attempt;
+import in.testpress.exam.models.AttemptItem;
+import in.testpress.exam.models.Exam;
+import in.testpress.exam.models.TestpressApiResponse;
 import retrofit.RestAdapter;
+import retrofit.client.Response;
 import retrofit.converter.GsonConverter;
 
 public class TestpressExamApiClient {
@@ -15,7 +24,20 @@ public class TestpressExamApiClient {
     /**
      * Exams List URL
      */
-    public static final String URL_EXAMS_FRAG =  "/api/v2.2/exams/";
+    public static final String EXAMS_LIST_PATH =  "/api/v2.2/exams/";
+
+    public static final String MAIL_PDF_PATH =  "pdf/";
+    public static final String MAIL_PDF_QUESTIONS_PATH =  "pdf-questions/";
+
+    /**
+     * Start Exam URL
+     */
+    public static final String START_EXAM_PATH =  "api/v2.2/exams/start/";
+
+    /**
+     * End Exam URL
+     */
+    public static final String END_EXAM_PATH =  "end/";
 
     /**
      * Query Params
@@ -37,11 +59,59 @@ public class TestpressExamApiClient {
                 .build();
     }
 
-    public static String getAuthToken() {
+    private String getAuthToken() {
         return "JWT " + TestpressSdk.getAuthToken();
     }
 
     public ExamService getExamService() {
         return restAdapter.create(ExamService.class);
     }
+
+    public TestpressApiResponse<Exam> getExams(Map<String, Object> queryParams) {
+        return getExamService().getExams(queryParams, getAuthToken());
+    }
+
+    public Response mailQuestionsPdf(String mailPdfUrlFrag) {
+        return getExamService().mailQuestionsPdf(mailPdfUrlFrag, getAuthToken());
+    }
+
+    public Void mailExplanationsPdf(String mailPdfUrlFrag) {
+        return getExamService().mailExplanationsPdf(mailPdfUrlFrag, getAuthToken());
+    }
+
+    public Attempt createAttempt(String attemptsUrlFrag) {
+        return getExamService().createAttempt(attemptsUrlFrag, getAuthToken());
+    }
+
+    public Attempt startAttempt(String startAttemptUrlFrag) {
+        return getExamService().startAttempt(startAttemptUrlFrag, getAuthToken());
+    }
+
+    public Attempt endAttempt(String endAttemptUrlFrag) {
+        return getExamService().endExam(endAttemptUrlFrag, getAuthToken());
+    }
+
+    public TestpressApiResponse<AttemptItem> getQuestions(String questionsUrlFrag) {
+        return getExamService().getQuestions(questionsUrlFrag, getAuthToken());
+    }
+
+    public AttemptItem postAnswer(String answerUrlFrag, List<Integer> savedAnswers, Boolean review) {
+        HashMap<String, Object> answer = new HashMap<String, Object>();
+        answer.put("selected_answers", savedAnswers);
+        answer.put("review", review);
+        return getExamService().postAnswer(answerUrlFrag, getAuthToken(), answer);
+    }
+
+    public Attempt heartbeat(String heartbeatUrlFrag) {
+        return getExamService().heartbeat(heartbeatUrlFrag, getAuthToken());
+    }
+
+    public Attempt endExam(String endExamUrlFrag) {
+        return getExamService().endExam(endExamUrlFrag, getAuthToken());
+    }
+
+    public TestpressApiResponse<Attempt> getAttempts(String urlFrag, Map<String, Object> queryParams) {
+        return getExamService().getAttempts(urlFrag, queryParams, getAuthToken());
+    }
+
 }
