@@ -1,6 +1,8 @@
 package in.testpress.exam.ui;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.view.View;
 
 import java.util.List;
@@ -12,14 +14,16 @@ import in.testpress.exam.util.SingleTypeAdapter;
 public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
 
     private final Activity activity;
+    private final Fragment fragment;
 
     /**
-     * @param activity
+     * @param fragment
      * @param items
      */
-    public HistoryListAdapter(final Activity activity, final List<Exam> items, int layout) {
-        super(activity.getLayoutInflater(), layout);
-        this.activity = activity;
+    public HistoryListAdapter(final Fragment fragment, final List<Exam> items, int layout) {
+        super(fragment.getActivity().getLayoutInflater(), layout);
+        this.activity = fragment.getActivity();
+        this.fragment = fragment;
         setItems(items);
     }
 
@@ -39,20 +43,27 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
                 if (exam.getAttemptsCount() == 1 && exam.getPausedAttemptsCount() == 0) {
                     // ToDo: Go to ReviewActivity
                 } else {
-                    // ToDo: Go to AttemptsListActivity
+                    Intent intent = new Intent(activity, AttemptsListActivity.class);
+                    intent.putExtra(AttemptsListFragment.PARAM_EXAM, exam);
+                    fragment.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
                 }
             }
         });
         updater.view.findViewById(R.id.retake).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // ToDo: Go to ExamActivity
+                Intent intent = new Intent(activity, TestActivity.class);
+                intent.putExtra(TestActivity.PARAM_EXAM, exam);
+                fragment.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
             }
         });
         updater.view.findViewById(R.id.resume_exam).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // ToDo: Go to AttemptsListActivity
+                Intent intent = new Intent(activity, AttemptsListActivity.class);
+                intent.putExtra(AttemptsListFragment.PARAM_EXAM, exam);
+                intent.putExtra(AttemptsListFragment.PARAM_STATE, AttemptsListFragment.STATE_PAUSED);
+                fragment.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
             }
         });
         setText(0, exam.getTitle());

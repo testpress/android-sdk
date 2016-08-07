@@ -4,11 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 
 import in.testpress.exam.R;
 
-public class  ExamsListActivity extends AppCompatActivity {
+public class  ExamsListActivity extends BaseToolBarActivity {
     public static final String CREDENTIALS = "credentials";
 
     public static Intent getNewIntent(Context context, String baseUrl, String username, String password) {
@@ -22,7 +21,8 @@ public class  ExamsListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.testpress_container_layout);
+        setContentView(R.layout.testpress_container_layout_with_tool_bar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         if (getIntent().getBundleExtra(CREDENTIALS) != null) {
             // Need to authenticate
             AuthenticateFragment fragment = new AuthenticateFragment();
@@ -32,7 +32,11 @@ public class  ExamsListActivity extends AppCompatActivity {
                     .commit();
             return;
         }
-        CarouselFragment.show(this, R.id.fragment_container);
+        CarouselFragment fragment = new CarouselFragment();
+        fragment.setArguments(getIntent().getExtras());
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .commit();
     }
 
 }

@@ -1,6 +1,8 @@
 package in.testpress.exam.ui;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -14,10 +16,12 @@ import in.testpress.exam.util.SingleTypeAdapter;
 public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
 
     private final Activity activity;
+    private final Fragment fragment;
 
-    public AvailableExamsListAdapter(final Activity activity, final List<Exam> items, int layout) {
-        super(activity.getLayoutInflater(), layout);
-        this.activity = activity;
+    AvailableExamsListAdapter(final Fragment fragment, final List<Exam> items, int layout) {
+        super(fragment.getActivity().getLayoutInflater(), layout);
+        this.activity = fragment.getActivity();
+        this.fragment = fragment;
         setItems(items);
     }
 
@@ -39,20 +43,23 @@ public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
         setText(0, exam.getTitle());
         setText(1, exam.getDuration());
         setText(2, exam.getNumberOfQuestionsString());
-        setText(3, exam.getFormattedStartDate() + " " + getStringFromResource(activity, R.string.testpress_to)
-                + " " + exam.getFormattedEndDate());
+        setText(3, exam.getFormattedStartDate() + " " + getStringFromResource(activity,
+                R.string.testpress_to) + " " + exam.getFormattedEndDate());
         setText(4, exam.getCourse_category());
         updater.view.findViewById(R.id.start_exam).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // ToDo : Go to ExamActivity
+                Intent intent = new Intent(activity, TestActivity.class);
+                intent.putExtra("exam", exam);
+                fragment.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
             }
         });
         Button emailMcqs = (Button)updater.view.findViewById(R.id.email_mcqs);
         emailMcqs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // ToDo : Email Mcqs
+                new EmailPdfDialog(activity, R.style.TestpressAppCompatAlertDialogStyle, false,
+                        exam.getUrlFrag()).show();
             }
         });
         if (exam.getAllowPdf()) {
