@@ -1,0 +1,11 @@
+<resources>
+    <string name="testpress_app_name">Testpress Exam Sdk</string>
+    <string name="testpress_exams">Exams</string>
+
+    <string name="testpress_no_internet_try_again">Please check your internet connection &amp; try again.</string>
+    <string name="testpress_tap_to_retry">Tap to retry</string>
+    <string name="testpress_network_error">Network Error</string>
+    <string name="testpress_loading_failed">Loading Failed</string>
+    <string name="testpress_some_thing_went_wrong_try_again">Some thing went wrong, please try again later.</string>
+
+</resources>

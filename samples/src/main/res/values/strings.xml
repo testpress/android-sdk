@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Testpress Sdk Sample App</string>
+
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="clear_token">Clear Token</string>
+
+    <string name="no_internet_try_again">Please check your internet connection &amp; try again</string>
+
+    <string name="exams">Exams</string>
+    <string name="home">Home</string>
+    <string name="navigation_drawer_open">Drawer Open</string>
+    <string name="navigation_drawer_close">Drawer Close</string>
+
+</resources>

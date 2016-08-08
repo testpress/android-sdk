@@ -24,6 +24,7 @@ task clean(type: Delete) {
 
 ext {
     compileSdkVersion = 23
+    minSdkVersion = 11
     targetSdkVersion = 24
     buildToolsVersion = '23.0.3'
 
@@ -34,4 +35,5 @@ ext {
     okHttpUrlConnection = 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
     gson = 'com.google.code.gson:gson:2.6.2'
     design = 'com.android.support:design:24.1.0'
+
 }

@@ -1,10 +1,11 @@
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
 
     defaultConfig {
+        applicationId "in.testpress.sample"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 1
@@ -19,10 +20,9 @@ android {
 }
 
 dependencies {
+    compile project(':core')
+    compile project(':exam')
     testCompile rootProject.junit
     compile rootProject.appcompat
-    compile rootProject.retrofit
-    compile rootProject.okHttp
-    compile rootProject.okHttpUrlConnection
-    compile rootProject.gson
+    compile rootProject.design
 }
