@@ -94,7 +94,7 @@ public abstract class PagedItemFragment<E> extends BaseListViewFragment<E>
 
     @Override
     public void onLoadFinished(final Loader<List<E>> loader, List<E> items) {
-        if (!pager.hasMore()) {
+        if (!getPager().hasMore()) {
             if(getListAdapter().getFootersCount() != 0) {
                 // If pager reached last page remove footer if footer added already
                 getListAdapter().removeFooter(loadingLayout);
@@ -123,7 +123,7 @@ public abstract class PagedItemFragment<E> extends BaseListViewFragment<E>
 
     @Override
     protected void refreshWithProgress() {
-        pager.reset();
+        getPager().reset();
         super.refreshWithProgress();
     }
 }

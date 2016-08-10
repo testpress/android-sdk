@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ProgressBar
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:id="@+id/pb_loading"
+        android:indeterminate="true"
+        android:layout_centerInParent="true" />
+
+    <include layout="@layout/testpress_empty_view" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/tab_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:visibility="gone">
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tab_layout"
+            android:scrollbars="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/testpress_tab_background_color"
+            app:tabIndicatorHeight="4dp"
+            style="@style/TestpressTabLayout"
+            app:tabMode="scrollable"
+            app:tabIndicatorColor="@color/testpress_tab_indicator_color"
+            app:tabTextColor="@color/testpress_tab_text_color"
+            app:tabSelectedTextColor="@color/testpress_tab_indicator_color"
+            app:layout_scrollFlags="scroll|enterAlways" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#ccc" />
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/testpress_white" />
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -411,8 +411,11 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         getActivity().finish();
     }
 
-    private  void showReview() {
-        // Todo: Goto ReviewActivity
+    private void showReview() {
+        getActivity().startActivityForResult(
+                ReviewActivity.createIntent(getActivity(), exam, attempt),
+                CarouselFragment.TEST_TAKEN_REQUEST_CODE
+        );
     }
 
     private void saveResult(final int position) {
