@@ -28,4 +28,5 @@ dependencies {
     compile rootProject.design
     compile rootProject.cardview
     compile rootProject.universalImageLoader
+    compile rootProject.chart
 }
