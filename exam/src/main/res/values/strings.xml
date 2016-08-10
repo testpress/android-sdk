@@ -30,10 +30,19 @@
     <string name="testpress_error_loading_attempts">Loading attempts failed</string>
     <string name="testpress_error_loading_questions">Loading questions failed</string>
     <string name="testpress_please_login">Please login to see this exams</string>
+    <string name="testpress_no_questions">No Questions</string>
+    <string name="testpress_no_questions_to_review">There are no questions to review.</string>
 
     <string name="testpress_page_available_exams">Available</string>
     <string name="testpress_page_upcoming_exams">Upcoming</string>
     <string name="testpress_page_history_exams">History</string>
+
+    <string name="testpress_page_stats">Stats</string>
+    <string name="testpress_page_all">All</string>
+    <string name="testpress_page_correct">Correct</string>
+    <string name="testpress_page_incorrect">Incorrect</string>
+    <string name="testpress_page_unanswered">Unanswered</string>
+    <string name="testpress_page_review">Marked for Review</string>
 
     <string name="testpress_pause">PAUSE</string>
     <string name="testpress_resume">RESUME</string>
@@ -84,5 +93,16 @@
 
     <string name="testpress_show_passage">Show Passage</string>
     <string name="testpress_hide_passage">Hide Passage</string>
+
+    <string name="testpress_rank">Rank</string>
+    <string name="testpress_score">Score</string>
+    <string name="testpress_total_correct">Total correct</string>
+    <string name="testpress_total_incorrect">Total Incorrect</string>
+    <string name="testpress_total_unanswered">Total Unanswered</string>
+    <string name="testpress_time_taken">Time Taken</string>
+    <string name="testpress_correct_answer">Correct Answer</string>
+    <string name="testpress_explanation">Explanation</string>
+    <string name="testpress_review_label">Review</string>
+    <string name="testpress_your_percentile_is">Your percentile is</string>
 
 </resources>

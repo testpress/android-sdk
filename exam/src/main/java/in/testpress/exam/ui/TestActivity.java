@@ -1,5 +1,6 @@
 package in.testpress.exam.ui;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -150,7 +151,8 @@ public class TestActivity extends FragmentActivity implements LoaderManager.Load
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, testFragment).commitAllowingStateLoss();
             } else {
-                // ToDo: Show Review when end button pressed
+                startActivityForResult(ReviewActivity.createIntent(this, exam, attempt),
+                        CarouselFragment.TEST_TAKEN_REQUEST_CODE);
             }
         } else {
             retryButton.setOnClickListener(new View.OnClickListener() {
@@ -199,6 +201,14 @@ public class TestActivity extends FragmentActivity implements LoaderManager.Load
         emptyTitleView.setText(title);
         emptyDescView.setText(description);
         retryButton.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if ((requestCode == CarouselFragment.TEST_TAKEN_REQUEST_CODE) && (Activity.RESULT_OK == resultCode)) {
+            setResult(resultCode);
+            finish();
+        }
     }
 
 }

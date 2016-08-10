@@ -18,6 +18,11 @@
             android:theme="@style/TestpressAppTheme.NoActionBar"
             android:configChanges="orientation|keyboard|screenSize" />
 
+        <activity android:name=".ui.ReviewActivity"
+            android:label="@string/testpress_review_label"
+            android:theme="@style/TestpressAppTheme.NoActionBar"
+            android:configChanges="orientation|keyboard|screenSize" />
+
     </application>
 
 </manifest>

@@ -12,6 +12,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Exam;
+import in.testpress.exam.models.ReviewItem;
 import in.testpress.exam.models.TestpressApiResponse;
 import retrofit.RestAdapter;
 import retrofit.client.Response;
@@ -112,6 +113,10 @@ public class TestpressExamApiClient {
 
     public TestpressApiResponse<Attempt> getAttempts(String urlFrag, Map<String, Object> queryParams) {
         return getExamService().getAttempts(urlFrag, queryParams, getAuthToken());
+    }
+
+    public TestpressApiResponse<ReviewItem> getReviewItems(String urlFrag, Map<String, Object> queryParams) {
+        return getExamService().getReviewItems(urlFrag, queryParams, getAuthToken());
     }
 
 }

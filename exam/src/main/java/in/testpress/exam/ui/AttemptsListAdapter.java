@@ -56,7 +56,7 @@ class AttemptsListAdapter extends SingleTypeAdapter<Attempt> {
                 () {
             @Override
             public void onClick(View v) {
-                // Todo: Goto ReviewActivity
+                activity.startActivity(ReviewActivity.createIntent(activity, exam, item));
             }
         });
         updater.view.findViewById(R.id.end).setOnClickListener(new View.OnClickListener() {
