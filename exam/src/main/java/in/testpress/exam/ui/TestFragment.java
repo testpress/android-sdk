@@ -3,6 +3,7 @@ package in.testpress.exam.ui;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,8 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AlertDialog;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +42,7 @@ import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.TestpressApiResponse;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.ThrowableLoader;
+import in.testpress.util.CircularProgressDrawable;
 import in.testpress.util.SafeAsyncTask;
 
 public class TestFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>> {
@@ -101,9 +105,14 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         spinnerContainer = (RelativeLayout) view.findViewById(R.id.spinner_container);
         apiClient = new TestpressExamApiClient();
         progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setTitle(R.string.testpress_loading);
-        progressDialog.setMessage(getResources().getString(R.string.testpress_please_wait));
+        progressDialog.setMessage(getResources().getString(R.string.testpress_loading_questions));
         progressDialog.setCancelable(false);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            float pixelWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, metrics);
+            progressDialog.setIndeterminateDrawable(new CircularProgressDrawable(
+                    getResources().getColor(R.color.testpress_color_primary), pixelWidth));
+        }
         progressDialog.show();
         previous.setVisibility(View.VISIBLE);
         next.setVisibility(View.VISIBLE);

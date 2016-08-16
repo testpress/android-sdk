@@ -1,38 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
 
+    <include layout="@layout/toolbar" />
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:gravity="center">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
+        <android.support.v7.widget.AppCompatButton
+            style="@style/Button"
             android:text="New Activity"
-            android:background="@drawable/primary_button"
-            android:textColor="@color/white"
-            android:onClick="showNewActivity"
             android:id="@+id/new_activity_button" />
 
-        <Button
+        <android.support.v7.widget.AppCompatButton
+            style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
             android:text="Fragment"
-            android:background="@drawable/primary_button"
-            android:textColor="@color/white"
-            android:onClick="showExamsInFragment"
             android:id="@+id/fragment_button" />
 
     </LinearLayout>
 
-</ScrollView>
+</LinearLayout>

@@ -11,9 +11,10 @@ import java.io.IOException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressAuthToken;
 import in.testpress.core.TestpressCallback;
+import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseToolBarActivity {
 
     EditText usernameEditText;
     EditText passwordEditText;
@@ -23,27 +24,30 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         loginView = findViewById(R.id.scroll_view);
         usernameEditText = (EditText) findViewById(R.id.username);
         passwordEditText = (EditText) findViewById(R.id.password);
-    }
-
-    public void authenticate(View view) {
-        TestpressSdk.initialize(this, "http://demo.testpress.in", usernameEditText.getText().toString().trim(),
-                passwordEditText.getText().toString().trim(), new TestpressCallback<TestpressAuthToken>() {
+        findViewById(R.id.signin_button).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onSuccess(TestpressAuthToken response) {
-                Snackbar.make(loginView, "Token Generated Successfully", Snackbar.LENGTH_LONG).show();
-            }
+            public void onClick(View view) {
+                TestpressSdk.initialize(LoginActivity.this, "http://demo.testpress.in", usernameEditText.getText().toString().trim(),
+                        passwordEditText.getText().toString().trim(), new TestpressCallback<TestpressAuthToken>() {
+                            @Override
+                            public void onSuccess(TestpressAuthToken response) {
+                                Snackbar.make(loginView, "Token Generated Successfully", Snackbar.LENGTH_LONG).show();
+                            }
 
-            @Override
-            public void onException(Exception e) {
-                if (e.getCause() instanceof IOException) {
-                    Snackbar.make(loginView, R.string.no_internet_try_again,
-                            Snackbar.LENGTH_LONG).show();
-                } else {
-                    Snackbar.make(loginView, "Token Generation Failed", Snackbar.LENGTH_LONG).show();
-                }
+                            @Override
+                            public void onException(Exception e) {
+                                if (e.getCause() instanceof IOException) {
+                                    Snackbar.make(loginView, R.string.no_internet_try_again,
+                                            Snackbar.LENGTH_LONG).show();
+                                } else {
+                                    Snackbar.make(loginView, "Token Generation Failed", Snackbar.LENGTH_LONG).show();
+                                }
+                            }
+                        });
             }
         });
     }

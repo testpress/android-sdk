@@ -1,10 +1,13 @@
 package in.testpress.exam.ui;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +21,7 @@ import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.AttemptsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.util.CircularProgressDrawable;
 import in.testpress.util.SafeAsyncTask;
 
 public class ReviewFragment extends Fragment {
@@ -45,6 +49,12 @@ public class ReviewFragment extends Fragment {
         final Exam exam = getArguments().getParcelable(PRAM_EXAM);
         Attempt attempt = getArguments().getParcelable(PRAM_ATTEMPT);
         progressBar = (ProgressBar) view.findViewById(R.id.pb_loading);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            float pixelWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, metrics);
+            progressBar.setIndeterminateDrawable(new CircularProgressDrawable(
+                    getResources().getColor(R.color.testpress_color_primary), pixelWidth));
+        }
         if (attempt == null) {
             emptyView = view.findViewById(R.id.empty_container);
             emptyTitleView = (TextView) view.findViewById(R.id.empty_title);

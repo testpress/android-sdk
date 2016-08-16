@@ -35,16 +35,11 @@
         android:text="@string/testpress_no_internet_try_again"
         android:gravity="center"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <android.support.v7.widget.AppCompatButton
+        style="@style/TestpressSmallButton"
         android:text="@string/testpress_tap_to_retry"
         android:id="@+id/retry_button"
         android:textSize="10sp"
-        android:textColor="@color/testpress_white"
-        android:minHeight="30dp"
-        android:padding="10dp"
-        android:background="@color/testpress_color_primary"
         android:layout_gravity="center_horizontal" />
 
 </LinearLayout>
