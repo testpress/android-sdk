@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -21,18 +22,22 @@ public final class TestpressSdk {
     private static SharedPreferences.Editor editor;
     private static final String KEY_TESTPRESS_AUTH_TOKEN = "testpressAuthToken";
     private static final String KEY_TESTPRESS_SHARED_PREFS = "testpressSharedPreferences";
+
     public static String BASE_URL;
 
     public static void setAuthToken(String authToken) {
+        isSdkInitialized();
         editor.putString(KEY_TESTPRESS_AUTH_TOKEN, authToken);
         editor.commit();
     }
 
     public static String getAuthToken() {
+        isSdkInitialized();
         return pref.getString(KEY_TESTPRESS_AUTH_TOKEN, null);
     }
 
     public static void clearActiveSession() {
+        isSdkInitialized();
         editor.remove(KEY_TESTPRESS_AUTH_TOKEN).commit();
     }
 
@@ -40,12 +45,39 @@ public final class TestpressSdk {
         return getAuthToken() != null;
     }
 
-    public static void initialize(Context context, String baseUrl, String username, String password) {
+    private static boolean isSdkInitialized() {
+        if (pref == null) {
+            throw new IllegalStateException("Initialize the sdk first");
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Initialize the Sdk, it will authorize the user & store the token
+     *
+     * @param context Context
+     * @param baseUrl Base url of institute
+     * @param username Username
+     * @param password Password
+     */
+    public static void initialize(@NonNull Context context, @NonNull String baseUrl,
+                                  @NonNull String username, @NonNull String password) {
         initialize(context, baseUrl, username, password, null);
     }
 
+    /**
+     * Initialize the Sdk, it will authorize the user & store the token
+     *
+     * @param context Context
+     * @param baseUrl Base url of institute
+     * @param username Username
+     * @param password Password
+     * @param callback Callback which will be call on success or failure
+     */
     // ToDo: Use params & hash for authentication instead of username & password
-    public static void initialize(Context context, String baseUrl, String username, String password,
+    public static void initialize(@NonNull Context context, @NonNull String baseUrl,
+                                  @NonNull String username, @NonNull String password,
                                   final TestpressCallback<TestpressAuthToken> callback) {
         final ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setMessage(context.getResources().getString(R.string.testpress_please_wait));
@@ -73,7 +105,9 @@ public final class TestpressSdk {
             protected void onException(Exception exception) throws RuntimeException {
                 super.onException(exception);
                 progressDialog.dismiss();
-                callback.onException(exception);
+                if (callback != null) {
+                    callback.onException(exception);
+                }
             }
 
             @Override
@@ -82,7 +116,9 @@ public final class TestpressSdk {
                 Log.e("authToken:", response.getToken());
                 setAuthToken(response.getToken());
                 progressDialog.dismiss();
-                callback.onSuccess(response);
+                if (callback != null) {
+                    callback.onSuccess(response);
+                }
             }
         }.execute();
     }

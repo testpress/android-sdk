@@ -2,6 +2,8 @@ package in.testpress.exam;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
@@ -34,7 +36,7 @@ public class TestpressExam {
      * @param activity Activity that has the container
      * @param containerViewId Container view id in which fragment needs to be replace
      */
-    public static void show(FragmentActivity activity, int containerViewId) {
+    public static void show(@NonNull FragmentActivity activity, @NonNull @IdRes Integer containerViewId) {
         initImageLoader(activity);
         CarouselFragment.show(activity, containerViewId);
     }
@@ -53,8 +55,8 @@ public class TestpressExam {
      * @param username Username
      * @param password Password
      */
-    public static void show(FragmentActivity activity, int containerViewId, String baseUrl,
-                            String username, String password) {
+    public static void show(@NonNull FragmentActivity activity, @NonNull @IdRes Integer containerViewId,
+                            @NonNull String baseUrl, @NonNull String username, @NonNull String password) {
         initImageLoader(activity);
         AuthenticateFragment.show(activity, containerViewId, baseUrl, username, password);
     }
@@ -75,7 +77,7 @@ public class TestpressExam {
      *
      * @param context Context to start the new activity.
      */
-    public static void show(Context context) {
+    public static void show(@NonNull Context context) {
         initImageLoader(context);
         Intent intent = new Intent(context, ExamsListActivity.class);
         context.startActivity(intent);
@@ -94,7 +96,8 @@ public class TestpressExam {
      * @param username Username
      * @param password Password
      */
-    public static void show(Context context, String baseUrl, String username, String password) {
+    public static void show(@NonNull Context context, @NonNull  String baseUrl,
+                            @NonNull  String username, @NonNull  String password) {
         initImageLoader(context);
         context.startActivity(ExamsListActivity.getNewIntent(context, baseUrl, username, password));
     }
