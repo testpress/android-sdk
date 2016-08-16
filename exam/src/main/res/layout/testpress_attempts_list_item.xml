@@ -182,42 +182,20 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp" >
 
-            <Button
-                android:layout_height="30dp"
-                android:layout_width="wrap_content"
+            <android.support.v7.widget.AppCompatButton
+                style="@style/TestpressSmallButton"
                 android:text="@string/testpress_email_pdf"
                 android:id="@+id/email_pdf"
-                android:textColor="@color/testpress_white"
-                android:drawableLeft="@drawable/ic_email_white_18dp"
-                android:drawableStart="@drawable/ic_email_white_18dp"
-                style="?android:attr/borderlessButtonStyle"
-                android:background="@drawable/testpress_primary_button"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:drawablePadding="3dp"
                 android:layout_toLeftOf="@+id/review_attempt"
                 android:layout_toStartOf="@+id/review_attempt" />
 
-            <Button
-                android:layout_height="30dp"
-                android:layout_width="wrap_content"
+            <android.support.v7.widget.AppCompatButton
+                style="@style/TestpressSmallButton"
                 android:text="@string/testpress_review"
                 android:visibility="visible"
                 android:id="@+id/review_attempt"
-                android:textColor="@color/testpress_white"
-                android:drawableLeft="@drawable/ic_zoom_in_white_18dp"
-                android:drawableStart="@drawable/ic_zoom_in_white_18dp"
-                style="?android:attr/borderlessButtonStyle"
-                android:background="@drawable/testpress_primary_button"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginStart="15dp"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:drawablePadding="3dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true" />
 
@@ -305,46 +283,22 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_marginTop="10dp"
-            android:paddingBottom="20dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp" >
+            android:paddingBottom="10dp"
+            android:layout_height="wrap_content" >
 
-            <Button
-                android:layout_height="30dp"
-                android:layout_width="wrap_content"
+            <android.support.v7.widget.AppCompatButton
+                style="@style/TestpressSmallButton"
                 android:text="@string/testpress_end"
                 android:id="@+id/end"
-                android:textColor="@color/testpress_white"
-                android:drawableLeft="@drawable/ic_block_white_18dp"
-                android:drawableStart="@drawable/ic_block_white_18dp"
-                style="?android:attr/borderlessButtonStyle"
-                android:background="@drawable/testpress_primary_button"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:drawablePadding="3dp"
                 android:layout_toLeftOf="@+id/resume_exam"
                 android:layout_toStartOf="@+id/resume_exam" />
 
-            <Button
-                android:layout_height="30dp"
-                android:layout_width="wrap_content"
+            <android.support.v7.widget.AppCompatButton
+                style="@style/TestpressSmallButton"
                 android:text="@string/testpress_resume"
-                android:visibility="visible"
                 android:id="@+id/resume_exam"
-                android:textColor="@color/testpress_white"
-                android:drawableLeft="@drawable/ic_repeat_white_18dp"
-                android:drawableStart="@drawable/ic_repeat_white_18dp"
-                style="?android:attr/borderlessButtonStyle"
-                android:background="@drawable/testpress_primary_button"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginStart="15dp"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:drawablePadding="3dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true" />
 

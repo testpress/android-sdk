@@ -16,12 +16,13 @@
         android:id="@+id/pb_loading"
         android:visibility="gone" >
         <ProgressBar
+            android:id="@+id/progress_bar"
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:indeterminate="true"
             android:layout_centerInParent="true" />
     </RelativeLayout>
-
+    
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -56,8 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:layout_marginBottom="10dp" >
+            android:layout_marginRight="12dp" >
             <View
                 android:layout_width="wrap_content"
                 android:layout_height="1dip"
@@ -71,6 +71,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:orientation="vertical" >
 
                 <LinearLayout style="@style/TestpressExamDetailRow" >
@@ -159,16 +160,15 @@
                         android:background="#cccccc" />
                 </LinearLayout>
 
-                <LinearLayout style="@style/TestpressExamDetailRow" >
+                <LinearLayout style="@style/TestpressExamDetailRow"
+                    android:layout_marginBottom="20dp" >
 
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:tint="#666666"
-                        android:layout_marginTop="10dp"
                         android:layout_marginRight="10dp"
                         android:layout_marginEnd="10dp"
-                        android:layout_marginBottom="10dp"
                         android:src="@drawable/ic_thumb_up_black_18dp" />
 
                     <TextView
@@ -176,8 +176,6 @@
                         android:layout_height="wrap_content"
                         android:textColor="#666666"
                         android:textSize="@dimen/testpress_text_size_xlarge"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="10dp"
                         android:textStyle="normal"
                         android:text="@string/testpress_all_the_best" />
 
@@ -190,7 +188,6 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="10dp"
             android:layout_marginLeft="12dp"
             android:layout_marginRight="12dp" >
             <View
@@ -199,22 +196,18 @@
                 android:background="#cccccc" />
         </LinearLayout>
 
-        <Button
+        <android.support.v7.widget.AppCompatButton
+            style="@style/TestpressButton"
             android:id="@+id/start_exam"
             android:visibility="gone"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:text="@string/testpress_start_exam"
-            android:textStyle="bold"
-            android:background="@drawable/testpress_green_button"
-            android:textColor="#fff"
-            android:textSize="@dimen/testpress_text_size_large"
-            android:layout_gravity="center" />
+            android:background="@drawable/testpress_green_button" />
 
         <LinearLayout
             android:id="@+id/attempt_actions"
-            style="?@android:attr/buttonBarStyle"
             android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -222,31 +215,23 @@
             android:layout_gravity="center"
             android:layout_margin="10dp" >
 
-            <Button
-                style="?@android:attr/buttonBarButtonStyle"
+            <android.support.v7.widget.AppCompatButton
+                style="@style/TestpressButton"
                 android:id="@+id/end_exam"
                 android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:text="@string/testpress_end"
-                android:textStyle="bold"
-                android:background="@drawable/testpress_red_button"
-                android:textColor="#fff"
-                android:textSize="@dimen/testpress_text_size_xmedium" />
+                android:background="@drawable/testpress_red_button" />
 
-            <Button
-                style="?@android:attr/buttonBarButtonStyle"
+            <android.support.v7.widget.AppCompatButton
+                style="@style/TestpressButton"
                 android:id="@+id/resume_exam"
                 android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
                 android:text="@string/testpress_resume"
-                android:textStyle="bold"
-                android:background="@drawable/testpress_green_button"
-                android:textColor="#fff"
-                android:textSize="@dimen/testpress_text_size_xmedium" />
+                android:background="@drawable/testpress_green_button" />
 
         </LinearLayout>
 

@@ -137,42 +137,20 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp">
 
-            <Button
-                android:layout_height="30dp"
-                android:layout_width="wrap_content"
+            <android.support.v7.widget.AppCompatButton
+                style="@style/TestpressSmallButton"
                 android:text="@string/testpress_email_mcqs"
                 android:id="@+id/email_mcqs"
-                android:textColor="@color/testpress_white"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:drawableLeft="@drawable/ic_email_white_18dp"
-                android:drawableStart="@drawable/ic_email_white_18dp"
-                style="?android:attr/borderlessButtonStyle"
-                android:background="@drawable/testpress_primary_button"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:drawablePadding="3dp"
                 android:layout_toLeftOf="@+id/start_exam"
                 android:layout_toStartOf="@+id/start_exam" />
 
-            <Button
-                android:layout_height="30dp"
-                android:layout_width="wrap_content"
+            <android.support.v7.widget.AppCompatButton
+                style="@style/TestpressSmallButton"
                 android:text="@string/testpress_start_exam"
                 android:visibility="visible"
                 android:id="@+id/start_exam"
-                android:textColor="@color/testpress_white"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:drawableLeft="@drawable/ic_assignment_white_18dp"
-                android:drawableStart="@drawable/ic_assignment_white_18dp"
-                style="?android:attr/borderlessButtonStyle"
-                android:background="@drawable/testpress_primary_button"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginStart="15dp"
-                android:drawablePadding="3dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true" />
 

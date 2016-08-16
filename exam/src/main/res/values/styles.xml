@@ -1,20 +1,17 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="TestpressAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/testpress_color_primary</item>
-        <item name="colorPrimaryDark">@color/testpress_color_primary_dark</item>
+    <style name="TestpressAppThemeDark" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/testpress_actionbar_background</item>
         <item name="colorAccent">@color/testpress_color_primary</item>
-    </style>
-
-    <style name="TestpressAppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="colorControlNormal">@color/testpress_actionbar_text</item>
+        <item name="android:textColorPrimary">@color/testpress_actionbar_text</item>
+        <item name="colorButtonNormal">@color/testpress_color_primary</item>
     </style>
 
-    <style name="TestpressAppTheme.NoActionBar.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-    <style name="TestpressAppTheme.NoActionBar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="TestpressAppThemeDark.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="TestpressTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabTextAppearance">@style/TestpressTabTextAppearance</item>
@@ -81,6 +78,34 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginLeft">8dp</item>
         <item name="android:layout_marginRight">8dp</item>
+    </style>
+
+    <style name="TestpressButton">
+        <item name="android:paddingTop">15dp</item>
+        <item name="android:paddingBottom">15dp</item>
+        <item name="android:paddingRight">20dp</item>
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/testpress_text_size_xmedium</item>
+        <item name="textAllCaps">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/testpress_white</item>
+    </style>
+
+    <style name="TestpressSmallButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">13sp</item>
+        <item name="textAllCaps">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/testpress_button_text_color</item>
+    </style>
+
+    <style name="TestpressAppThemeDark.NoToolBar">
+        <item name="colorControlNormal">#808080</item>
     </style>
 
 </resources>
