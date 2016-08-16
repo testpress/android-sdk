@@ -8,7 +8,6 @@ import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.os.OperationCanceledException;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AlertDialog;
@@ -21,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
@@ -61,6 +61,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private ProgressDialog progressDialog;
     private Attempt attempt;
     private Exam exam;
+    private URL questionsUrl;
     private List<AttemptItem> attemptItemList = new ArrayList<AttemptItem>();
     private CountDownTimer countDownTimer;
     private long millisRemaining;
@@ -78,6 +79,10 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         super.onCreate(savedInstanceState);
         attempt = getArguments().getParcelable(PARAM_ATTEMPT);
         exam = getArguments().getParcelable(PARAM_EXAM);
+        try {
+            questionsUrl = new URL(attempt.getQuestionsUrl());
+        } catch (MalformedURLException e) {
+        }
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -292,32 +297,22 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         return new ThrowableLoader<List<AttemptItem>>(getActivity(), attemptItemList) {
             @Override
             public List<AttemptItem> loadData() throws Exception {
-                List<AttemptItem> attemptItems = null;
                 TestpressApiResponse<AttemptItem> response;
                 String fragment;
-                URL url = new URL(attempt.getQuestionsUrl());
                 do {
-                    try {
-                        fragment = url.getFile().substring(1);
-                    } catch (Exception e) {
-                        return null;
+                    fragment = questionsUrl.getFile().substring(1);
+                    response = apiClient.getQuestions(fragment);
+                    if (attemptItemList != null) {
+                        attemptItemList.addAll(response.getResults());
+                    } else {
+                        attemptItemList = response.getResults();
                     }
-                    try {
-                        response = apiClient.getQuestions(fragment);
-                        if (attemptItems != null) {
-                            attemptItems.addAll(response.getResults());
-                        } else {
-                            attemptItems = response.getResults();
-                        }
-                        String next = response.getNext();
-                        if (next != null) {
-                            url = new URL(response.getNext());
-                        }
-                    } catch (OperationCanceledException e) {
-                        return null;
+                    String next = response.getNext();
+                    if (next != null) {
+                        questionsUrl = new URL(response.getNext());
                     }
                 } while (response.getNext() != null);
-                return attemptItems;
+                return attemptItemList;
             }
         };
     }
@@ -327,7 +322,31 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         if (progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
-
+        Exception exception = ((ThrowableLoader<List<AttemptItem>>) loader).clearException();
+        if(exception != null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+                    R.style.TestpressAppCompatAlertDialogStyle);
+            builder.setPositiveButton(R.string.testpress_retry_again, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    progressDialog.show();
+                    getLoaderManager().restartLoader(loader.getId(), null, TestFragment.this);
+                }
+            });
+            if((exception.getMessage() != null) && (exception.getMessage()).equals("403 FORBIDDEN")) {
+                builder.setTitle(R.string.testpress_authentication_failed);
+                builder.setMessage(R.string.testpress_please_login);
+            } else if (exception.getCause() instanceof IOException) {
+                builder.setTitle(R.string.testpress_network_error);
+                builder.setMessage(R.string.testpress_no_internet_try_again);
+            } else {
+                builder.setTitle(R.string.testpress_error_loading_questions);
+                builder.setMessage(R.string.testpress_some_thing_went_wrong_try_again);
+            }
+            builder.setCancelable(false);
+            builder.show();
+            return;
+        }
         if(exam.getTemplateType() == 2) {  // For IBPS templates only
             /**
              * Used to get subjects in order as it fetched
@@ -355,6 +374,8 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                     subjectsList.add(item.getAttemptQuestion().getSubject());
                 }
             }
+            // Clear the previous data stored while loading which might be unordered
+            attemptItemList.clear();
             // Store each set of subject items to attemptItemList
             for (String subject : subjectsList) {
                 subjectsOffset.put(subject, attemptItemList.size()); // Add subjects & it starting point
@@ -368,11 +389,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             }
             subjectFilter.setSelection(0); // Set 1st item as default selection
             selectedSubjectOffset = 0;
-        } else {
-            attemptItemList = items;
         }
         pagerAdapter = new TestQuestionPagerAdapter(getFragmentManager(), attemptItemList);
-        pagerAdapter. setCount(attemptItemList.size());
+        pagerAdapter.setCount(attemptItemList.size());
         pager.setAdapter(pagerAdapter);
         pagerAdapter.notifyDataSetChanged();
         for (int i = 0; i< attemptItemList.size(); i++) {
