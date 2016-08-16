@@ -2,13 +2,17 @@ package in.testpress.exam.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -20,6 +24,7 @@ import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
 
 import in.testpress.exam.util.ThrowableLoader;
+import in.testpress.util.CircularProgressDrawable;
 
 /**
  * Activity of Test Engine
@@ -87,6 +92,13 @@ public class TestActivity extends FragmentActivity implements LoaderManager.Load
                 progressBar.setVisibility(View.VISIBLE);
             }
         });
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            float pixelWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, metrics);
+            ((ProgressBar) findViewById(R.id.progress_bar)).setIndeterminateDrawable(
+                    new CircularProgressDrawable(getResources().getColor(
+                            R.color.testpress_color_primary), pixelWidth));
+        }
         apiClient = new TestpressExamApiClient();
         final Intent intent = getIntent();
         Bundle data = intent.getExtras();

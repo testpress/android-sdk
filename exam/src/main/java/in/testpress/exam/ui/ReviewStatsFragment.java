@@ -1,12 +1,16 @@
 package in.testpress.exam.ui;
 
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
@@ -19,7 +23,6 @@ import java.util.ArrayList;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
-import in.testpress.exam.network.TestpressExamApiClient;
 
 public class ReviewStatsFragment extends Fragment {
 
@@ -51,10 +54,17 @@ public class ReviewStatsFragment extends Fragment {
         TextView subScore = (TextView) view.findViewById(R.id.sub_score);
         PieChart chart = (PieChart) view.findViewById(R.id.chart);
         View emailPdfContainer = view.findViewById(R.id.email_pdf_container);
+        Button emailPdfButton = (Button) view.findViewById(R.id.email_pdf);
         Exam exam = getArguments().getParcelable(PRAM_EXAM);
         final Attempt attempt = getArguments().getParcelable(PRAM_ATTEMPT);
         if (attempt != null) {
-            view.findViewById(R.id.email_pdf).setOnClickListener(new View.OnClickListener() {
+            Drawable drawable = getResources().getDrawable(R.drawable.ic_email_white_18dp);
+            drawable.setColorFilter(new PorterDuffColorFilter(getResources().getColor(
+                    R.color.testpress_button_text_color), PorterDuff.Mode.MULTIPLY));
+            emailPdfButton.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+            emailPdfButton.setCompoundDrawablePadding((int) getResources().getDimension(
+                    R.dimen.testpress_button_left_drawable_padding));
+            emailPdfButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     new EmailPdfDialog(getActivity(), R.style.TestpressAppCompatAlertDialogStyle,

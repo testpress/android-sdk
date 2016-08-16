@@ -22,6 +22,7 @@
     <string name="testpress_try_again">Try again</string>
 
     <string name="testpress_loading">Loading...</string>
+    <string name="testpress_loading_questions">Loading questions</string>
     <string name="testpress_no_exams">No Exams</string>
     <string name="testpress_no_exams_description">You can buy exams from the store.</string>
     <string name="testpress_no_attempts">No Attempts</string>

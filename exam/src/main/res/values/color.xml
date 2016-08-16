@@ -5,7 +5,6 @@
     <color name="testpress_black">#333333</color>
 
     <color name="testpress_color_primary">#2196F3</color>
-    <color name="testpress_color_primary_dark">#1976D2</color>
 
     <color name="testpress_pager_background">#F4F4F4</color>
     <color name="testpress_pager_background_alternate">#E7E7E7</color>
@@ -24,5 +23,9 @@
     <color name="testpress_blue_light_background_transparent">#80b6dcfb</color>
     <color name="testpress_red">#d9534f</color>
     <color name="testpress_green">#18be99</color>
+
+    <color name="testpress_actionbar_background">@color/testpress_color_primary</color>
+    <color name="testpress_actionbar_text">#fff</color>
+    <color name="testpress_button_text_color">#fff</color>
 
 </resources>
