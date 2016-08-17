@@ -1,9 +1,9 @@
 package in.testpress.exam.ui;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,15 +29,15 @@ public class AuthenticateFragment extends Fragment {
     Button retryButton;
     int containerViewId;
 
-    public static void show(Activity activity, int containerViewId, String baseUrl, String username,
-                            String password) {
+    public static void show(FragmentActivity activity, int containerViewId, String baseUrl,
+                            String username, String password) {
         AuthenticateFragment fragment = new AuthenticateFragment();
         Bundle bundle = new Bundle();
         bundle.putString(BASE_URL, baseUrl);
         bundle.putString(USER_NAME, username);
         bundle.putString(PASSWORD, password);
         fragment.setArguments(bundle);
-        activity.getFragmentManager().beginTransaction()
+        activity.getSupportFragmentManager().beginTransaction()
                 .replace(containerViewId, fragment)
                 .commit();
     }
@@ -73,7 +73,7 @@ public class AuthenticateFragment extends Fragment {
                 new TestpressCallback<TestpressAuthToken>() {
                     @Override
                     public void onSuccess(TestpressAuthToken response) {
-                        ExamsListFragment.show(getActivity(), containerViewId);
+                        CarouselFragment.show(getActivity(), containerViewId);
                     }
 
                     @Override

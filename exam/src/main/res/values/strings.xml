@@ -2,10 +2,40 @@
     <string name="testpress_app_name">Testpress Exam Sdk</string>
     <string name="testpress_exams">Exams</string>
 
+    <string name="testpress_course">Course</string>
+    <string name="testpress_questions">Questions</string>
+    <string name="testpress_attempt">attempt</string>
+    <string name="testpress_attempts">attempts</string>
+    <string name="testpress_to">to</string>
+
     <string name="testpress_no_internet_try_again">Please check your internet connection &amp; try again.</string>
     <string name="testpress_tap_to_retry">Tap to retry</string>
     <string name="testpress_network_error">Network Error</string>
     <string name="testpress_loading_failed">Loading Failed</string>
+    <string name="testpress_authentication_failed">Authentication failed</string>
     <string name="testpress_some_thing_went_wrong_try_again">Some thing went wrong, please try again later.</string>
+
+    <string name="testpress_loading">Loading...</string>
+    <string name="testpress_no_exams">No Exams</string>
+    <string name="testpress_no_exams_description">You can buy exams from the store.</string>
+    <string name="testpress_no_attempts">No Attempts</string>
+    <string name="testpress_no_attempts_description">To review, start and complete your exams.</string>
+    <string name="testpress_error_loading_exams">Loading exams failed</string>
+    <string name="testpress_please_login">Please login to see this exams</string>
+
+    <string name="testpress_page_available_exams">Available</string>
+    <string name="testpress_page_upcoming_exams">Upcoming</string>
+    <string name="testpress_page_history_exams">History</string>
+
+    <string name="testpress_stop">Stop</string>
+    <string name="testpress_start">Start</string>
+    <string name="testpress_pause">Pause</string>
+    <string name="testpress_resume">Resume</string>
+    <string name="testpress_retake">Retake</string>
+    <string name="testpress_review">Review</string>
+    <string name="testpress_start_exam">Start Exam</string>
+
+    <string name="testpress_email_mcqs">Email MCQs</string>
+    <string name="testpress_email_pdf">Email PDF</string>
 
 </resources>
