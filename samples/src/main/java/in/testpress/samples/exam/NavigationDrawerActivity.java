@@ -60,7 +60,7 @@ public class NavigationDrawerActivity extends AppCompatActivity {
     }
 
     private void displayHome() {
-        getFragmentManager().beginTransaction()
+        getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new HomeFragment())
                 .commit();
     }
