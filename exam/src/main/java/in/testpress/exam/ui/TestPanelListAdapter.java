@@ -9,16 +9,18 @@ import java.util.List;
 
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
+import in.testpress.exam.util.SingleTypeAdapter;
 
 /**
  * Adapter that used to show the list of questions in test engine
  */
-class TestPanelListAdapter extends AlternatingColorListAdapter<AttemptItem> {
+class TestPanelListAdapter extends SingleTypeAdapter<AttemptItem> {
 
     private int currentAttemptItemIndex = 1;
 
     TestPanelListAdapter(final LayoutInflater inflater, final List<AttemptItem> items, int layout) {
-        super(layout, inflater, items);
+        super(inflater, layout);
+        setItems(items);
     }
 
     @Override
