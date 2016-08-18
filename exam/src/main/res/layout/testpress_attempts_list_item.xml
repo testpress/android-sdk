@@ -13,7 +13,7 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:textColor="@color/testpress_text_color"
+            android:textColor="@color/testpress_black"
             android:layout_height="wrap_content"
             android:gravity="top"
             android:textSize="@dimen/testpress_text_size_large"
@@ -42,12 +42,12 @@
                     android:textSize="@dimen/testpress_text_size_medium"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:textColor="@color/testpress_text_color"
+                    android:textColor="@color/testpress_black"
                     android:layout_gravity="center" />
 
                 <TextView
                     android:id="@+id/score"
-                    android:textColor="@color/testpress_text_color"
+                    android:textColor="@color/testpress_black"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="20"
@@ -76,7 +76,7 @@
                     android:textStyle="bold"
                     android:id="@+id/correct_count"
                     android:text="20"
-                    android:textColor="@color/testpress_text_color"
+                    android:textColor="@color/testpress_black"
                     android:layout_gravity="bottom" />
 
                 <TextView
@@ -89,7 +89,7 @@
                     android:textSize="@dimen/testpress_text_size_small"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:textColor="@color/testpress_text_color"
+                    android:textColor="@color/testpress_black"
                     android:layout_gravity="bottom" />
 
             </LinearLayout>
@@ -117,7 +117,7 @@
                     android:textSize="@dimen/testpress_text_size_medium"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:textColor="@color/testpress_text_color" />
+                    android:textColor="@color/testpress_black" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -131,7 +131,7 @@
                     android:layout_marginLeft="@dimen/testpress_margin_normal"
                     android:layout_marginStart="@dimen/testpress_margin_normal"
                     android:text="20"
-                    android:textColor="@color/testpress_text_color" />
+                    android:textColor="@color/testpress_black" />
 
             </LinearLayout>
 
@@ -154,7 +154,7 @@
                     android:textStyle="bold"
                     android:id="@+id/incorrect_count"
                     android:text="20"
-                    android:textColor="@color/testpress_text_color"
+                    android:textColor="@color/testpress_black"
                     android:layout_gravity="bottom" />
 
                 <TextView
@@ -167,7 +167,7 @@
                     android:textSize="@dimen/testpress_text_size_small"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:textColor="@color/testpress_text_color"
+                    android:textColor="@color/testpress_black"
                     android:layout_gravity="bottom" />
 
             </LinearLayout>
@@ -220,7 +220,7 @@
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:textColor="@color/testpress_text_color"
+                    android:textColor="@color/testpress_black"
                     android:layout_height="wrap_content"
                     android:gravity="top"
                     android:textSize="@dimen/testpress_text_size_large"
@@ -246,7 +246,7 @@
                         android:textStyle="bold"
                         android:id="@+id/remaining_time"
                         android:text="00:30:00"
-                        android:textColor="@color/testpress_text_color"
+                        android:textColor="@color/testpress_black"
                         android:layout_gravity="bottom" />
 
                     <TextView
@@ -258,7 +258,7 @@
                         android:textSize="@dimen/testpress_text_size_small"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:textColor="@color/testpress_text_color"
+                        android:textColor="@color/testpress_black"
                         android:layout_gravity="bottom" />
 
                 </LinearLayout>
