@@ -1,5 +1,7 @@
 package in.testpress.network;
 
+import android.content.Context;
+
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -12,14 +14,14 @@ public class TestpressApiClient {
 
     final RestAdapter restAdapter;
 
-    public TestpressApiClient() {
+    public TestpressApiClient(Context context) {
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
 
         restAdapter = new RestAdapter.Builder()
-                .setEndpoint(TestpressSdk.BASE_URL)
+                .setEndpoint(TestpressSdk.getBaseUrl(context))
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setConverter(new GsonConverter(gson))
                 .build();

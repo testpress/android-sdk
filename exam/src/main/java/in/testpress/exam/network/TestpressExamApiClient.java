@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import in.testpress.core.TestpressSdk;
+import in.testpress.core.TestpressSession;
+import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Exam;
@@ -21,6 +22,7 @@ import retrofit.converter.GsonConverter;
 public class TestpressExamApiClient {
 
     private final RestAdapter restAdapter;
+    private final TestpressSession testpressSession;
 
     /**
      * Exams List URL
@@ -29,11 +31,6 @@ public class TestpressExamApiClient {
 
     public static final String MAIL_PDF_PATH =  "pdf/";
     public static final String MAIL_PDF_QUESTIONS_PATH =  "pdf-questions/";
-
-    /**
-     * Start Exam URL
-     */
-    public static final String START_EXAM_PATH =  "api/v2.2/exams/start/";
 
     /**
      * End Exam URL
@@ -48,20 +45,21 @@ public class TestpressExamApiClient {
     public static final String PAGE = "page";
 
     public TestpressExamApiClient() {
+        testpressSession = TestpressExam.getTestpressSession();
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
 
         restAdapter = new RestAdapter.Builder()
-                .setEndpoint(TestpressSdk.BASE_URL)
+                .setEndpoint(testpressSession.getBaseUrl())
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setConverter(new GsonConverter(gson))
                 .build();
     }
 
     private String getAuthToken() {
-        return "JWT " + TestpressSdk.getAuthToken();
+        return "JWT " + testpressSession.getToken();
     }
 
     public ExamService getExamService() {

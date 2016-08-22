@@ -1,5 +1,6 @@
 package in.testpress.samples.exam;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,11 +12,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.facebook.login.LoginManager;
+
+import in.testpress.core.TestpressSdk;
 import in.testpress.exam.TestpressExam;
 import in.testpress.samples.R;
+import in.testpress.samples.core.TestpressCoreSampleActivity;
 
 public class NavigationDrawerActivity extends AppCompatActivity {
 
+    public static final int AUTHENTICATE_REQUEST_CODE = 1111;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ActionBarDrawerToggle drawerToggle;
@@ -29,6 +35,9 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        if (!TestpressSdk.hasActiveSession(this)) {
+           navigationView.getMenu().getItem(2).setVisible(false);
+        }
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -51,9 +60,18 @@ public class NavigationDrawerActivity extends AppCompatActivity {
                 selectedItem = 0;
                 break;
             case R.id.exams:
-                TestpressExam.show(this, R.id.fragment_container, "http://demo.testpress.in",
-                        "testpress", "demo");
+                if (TestpressSdk.hasActiveSession(this)) {
+                    displayExams();
+                } else {
+                    Intent intent = new Intent(NavigationDrawerActivity.this, TestpressCoreSampleActivity.class);
+                    startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
+                }
                 selectedItem = 1;
+                break;
+            case R.id.logout:
+                TestpressSdk.clearActiveSession(this);
+                LoginManager.getInstance().logOut();
+                finish();
                 break;
         }
         drawerLayout.closeDrawers();
@@ -63,6 +81,19 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new HomeFragment())
                 .commit();
+    }
+
+    private void displayExams() {
+        TestpressExam.show(this, R.id.fragment_container, TestpressSdk.getTestpressSession(this));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == AUTHENTICATE_REQUEST_CODE && resultCode == RESULT_OK) {
+            displayExams();
+            navigationView.getMenu().getItem(2).setVisible(true);
+        }
     }
 
     @Override
