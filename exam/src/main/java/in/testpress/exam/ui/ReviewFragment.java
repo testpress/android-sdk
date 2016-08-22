@@ -84,7 +84,9 @@ public class ReviewFragment extends Fragment {
     }
 
     private void fetchAndRenderAttempt(final View view, final Exam exam) {
-        final AttemptsPager attemptsPager = new AttemptsPager(exam, new TestpressExamApiClient());
+        final AttemptsPager attemptsPager = new AttemptsPager(exam,
+                new TestpressExamApiClient(getActivity()));
+
         new SafeAsyncTask<Attempt>() {
             @Override
             public Attempt call() throws Exception {

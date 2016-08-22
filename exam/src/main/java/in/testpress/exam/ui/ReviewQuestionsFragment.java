@@ -46,7 +46,7 @@ public class ReviewQuestionsFragment extends PagedItemFragment<ReviewItem> {
     @Override
     protected ReviewQuestionsPager getPager() {
         if (pager == null) {
-            pager = new ReviewQuestionsPager(attempt, filter, new TestpressExamApiClient());
+            pager = new ReviewQuestionsPager(attempt, filter, new TestpressExamApiClient(getActivity()));
         }
         return (ReviewQuestionsPager) pager;
     }
