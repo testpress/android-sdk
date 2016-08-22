@@ -25,7 +25,7 @@ public class AttemptsListFragment extends PagedItemFragment<Attempt> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         exam = getArguments().getParcelable(PARAM_EXAM);
-        apiClient = new TestpressExamApiClient();
+        apiClient = new TestpressExamApiClient(getActivity());
         super.onCreate(savedInstanceState);
     }
 

@@ -4,6 +4,6 @@ public abstract class TestpressCallback<T> {
 
     public abstract void onSuccess(T result);
 
-    public abstract void onException(Exception exception);
+    public abstract void onException(TestpressException exception);
 
 }
