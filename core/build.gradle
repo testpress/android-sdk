@@ -20,6 +20,7 @@ android {
 
 dependencies {
     testCompile rootProject.junit
+    testCompile rootProject.mockito
     compile rootProject.appcompat
     compile rootProject.retrofit
     compile rootProject.okHttp
