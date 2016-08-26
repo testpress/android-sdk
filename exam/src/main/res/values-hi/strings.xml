@@ -1,0 +1,106 @@
+<resources>
+    <string name="testpress_exams">परीक्षा</string>
+
+    <string name="testpress_course">कोर्स</string>
+    <string name="testpress_questions">प्रशन</string>
+    <string name="testpress_attempt">प्रयास</string>
+    <string name="testpress_attempts">प्रयास को</string>
+
+    <string name="testpress_no_internet_try_again">कृपया अपने इंटरनेट कनेक्शन की जाँच करें &amp; पुनः प्रयास करें .</string>
+    <string name="testpress_retry_again">फिर पुन: प्रयास करें</string>
+    <string name="testpress_network_error">नेटवर्क त्रुटि </string>
+    <string name="testpress_loading_failed">लोड हो रहा है विफल</string>
+    <string name="testpress_authentication_failed">प्रमाणीकरण विफल होना</string>
+    <string name="testpress_some_thing_went_wrong_try_again">कुछ गलत हो गया है। कृपया बाद में दोबारा प्रयास करें</string>
+    <string name="testpress_exam_paused_check_internet">परीक्षा रुका हुआ है, कृपया अपने इंटरनेट कनेक्शन की जाँच &amp; फिर से फिर से शुरू.</string>
+    <string name="testpress_exam_paused_check_internet_to_end">परीक्षा रुका हुआ है, कृपया अपने इंटरनेट कनेक्शन की जाँच &amp; पुनः प्रयास करें</string>
+    <string name="testpress_no_internet_connection">कोई इंटरनेट कनेक्शन नहीं</string>
+    <string name="testpress_try_again">पुनः प्रयास करें</string>
+
+    <string name="testpress_loading">लोड हो रहा है...</string>
+    <string name="testpress_loading_questions">सवाल लोड हो रहा है</string>
+    <string name="testpress_no_exams">कोई परीक्षा</string>
+    <string name="testpress_no_exams_description">आप की दुकान से खरीद सकते हैं परीक्षा</string>
+    <string name="testpress_no_attempts">कोई प्रयास</string>
+    <string name="testpress_no_attempts_description">की समीक्षा करने के लिए, शुरू करते हैं और अपनी परीक्षा को पूरा</string>
+    <string name="testpress_error_loading_exams">लोड हो रहा है परीक्षा में विफल रहा है</string>
+    <string name="testpress_error_loading_attempts">लोड हो रहा है प्रयास विफल</string>
+    <string name="testpress_error_loading_questions">सवाल लोड हो रहा है विफल रहा है</string>
+    <string name="testpress_please_login">लॉग इन करें इस परीक्षा देखने के लिए</string>
+    <string name="testpress_no_questions">कोई सवाल नहीं</string>
+    <string name="testpress_no_questions_to_review">वहाँ कोई सवाल की समीक्षा करने के लिए कर रहे हैं</string>
+
+    <string name="testpress_page_available_exams">उपलब्ध</string>
+    <string name="testpress_page_upcoming_exams">आगामी</string>
+    <string name="testpress_page_history_exams">इतिहास</string>
+
+    <string name="testpress_page_stats">आँकड़े</string>
+    <string name="testpress_page_all">सब</string>
+    <string name="testpress_page_correct">सही</string>
+    <string name="testpress_page_incorrect">ग़लत</string>
+    <string name="testpress_page_unanswered">अनुत्तरित</string>
+    <string name="testpress_page_review">समीक्षा के लिए चिह्नित</string>
+
+    <string name="testpress_pause">रोकें</string>
+    <string name="testpress_resume">बायोडाटा</string>
+    <string name="testpress_retake">फिर से लें</string>
+    <string name="testpress_review">समीक्षा</string>
+    <string name="testpress_start_exam">स्टार्ट परीक्षा</string>
+    <string name="testpress_next">अगला</string>
+    <string name="testpress_previous">पिछला</string>
+    <string name="testpress_paused">रोके गए</string>
+    <string name="testpress_end">समाप्त</string>
+    <string name="testpress_pause_message">आप परीक्षा रोकें करना चाहते हैं?</string>
+    <string name="testpress_pause_content">परीक्षा को रोक सकते हैं &amp; अंतिम तिथि से पहले बाद में फिर से शुरू</string>
+    <string name="testpress_end_message">आप परीक्षा समाप्त करने के लिए करना चाहते हैं?</string>
+
+    <string name="testpress_ok">ठीक</string>
+    <string name="testpress_cancel">रद्द करना</string>
+
+    <string name="testpress_email_mcqs">ईमेल एमसीक्यू</string>
+    <string name="testpress_email_pdf">ईमेल पीडीएफ</string>
+
+    <string name="testpress_mail_pdf_confirm_title">मेल पीडीएफ</string>
+    <string name="testpress_mail_pdf_confirm">पीडीएफ आपके ईमेल पते पर भेज दिया जाएगा। इस बात की पुष्टि करने के लिए ठीक क्लिक करें</string>
+    <string name="testpress_mail_pdf">शुरुआत पीडीएफ मेल</string>
+    <string name="testpress_mail_pdf_complete">पीडीएफ अनुरोध को पूरा</string>
+    <string name="testpress_mail_pdf_complete_description">अपने पीडीएफ अनुरोध शुरू की गई है। जबकि अपने पीडीएफ उत्पन्न होता है और आप के लिए भेज दिया है कृपया प्रतीक्षा करें</string>
+    <string name="testpress_mail_pdf_error">PDF अनुरोध त्रुटि</string>
+    <string name="testpress_mail_pdf_error_description">अपने पीडीएफ पैदा करने में त्रुटि थी</string>
+
+    <string name="testpress_all_the_best">शुभकामनाएं!</string>
+    <string name="testpress_no_of_questions">प्रश्नों की संख्या</string>
+    <string name="testpress_duration">अवधि</string>
+    <string name="testpress_mark_per_question">सवाल प्रति मार्क</string>
+    <string name="testpress_negative_mark">नकारात्मक अंक</string>
+    <string name="testpress_description">विवरण</string>
+    <string name="testpress_questions_list">प्रश्न सूची</string>
+
+    <string name="testpress_your_score">अपने स्कोर</string>
+    <string name="testpress_correct">सही</string>
+    <string name="testpress_percentile">प्रतिशतक</string>
+    <string name="testpress_incorrect">ग़लत</string>
+    <string name="testpress_time_remaining">समय शेष</string>
+
+    <string name="testpress_question">सवाल</string>
+    <string name="testpress_review_later">बाद में समीक्षा</string>
+    <string name="testpress_uncategorized">संयुक्त राष्ट्र वर्गीकृत</string>
+    <string name="testpress_attempted_on">पर प्रयास</string>
+    <string name="testpress_started_on">को प्रारंभ करें</string>
+
+    <string name="testpress_show_passage">शो पारित</string>
+    <string name="testpress_hide_passage">पैसेज मिटायें</string>
+
+    <string name="testpress_rank">श्रेणी</string>
+    <string name="testpress_score">स्कोर</string>
+    <string name="testpress_total_correct">कुल सही</string>
+    <string name="testpress_total_incorrect">कुल गलत</string>
+    <string name="testpress_total_unanswered">कुल अनुत्तरित</string>
+    <string name="testpress_time_taken">समय लगेगा</string>
+    <string name="testpress_correct_answer">सही उत्तर</string>
+    <string name="testpress_explanation">व्याख्या</string>
+    <string name="testpress_review_label">समीक्षा</string>
+    <string name="testpress_your_percentile_is">आपका प्रतिशतक है</string>
+    <string name="testpress_scored_less_than">उपयोगकर्ताओं के लिए अपने स्कोर की तुलना में कम रन बनाए </string>
+
+</resources>
