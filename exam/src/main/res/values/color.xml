@@ -3,6 +3,7 @@
 
     <color name="testpress_white">#FFFFFF</color>
     <color name="testpress_black">#333333</color>
+    <color name="testpress_table_text">#484848</color>
 
     <color name="testpress_color_primary">#2196F3</color>
 

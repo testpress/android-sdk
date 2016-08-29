@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.util.DisplayMetrics;
@@ -29,7 +28,7 @@ import in.testpress.util.CircularProgressDrawable;
 /**
  * Activity of Test Engine
  */
-public class TestActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Attempt>  {
+public class TestActivity extends BaseToolBarActivity implements LoaderManager.LoaderCallbacks<Attempt>  {
 
     static final String PARAM_EXAM = "exam";
     static final String PARAM_ATTEMPT = "attempt";
@@ -39,7 +38,7 @@ public class TestActivity extends FragmentActivity implements LoaderManager.Load
     private Exam exam;
     private Attempt attempt;
     private RelativeLayout progressBar;
-    private LinearLayout examDetailsContainer;
+    private View examDetailsContainer;
     private LinearLayout fragmentContainer;
     private View emptyView;
     private TextView emptyTitleView;
@@ -50,7 +49,7 @@ public class TestActivity extends FragmentActivity implements LoaderManager.Load
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_test);
-        examDetailsContainer = (LinearLayout) findViewById(R.id.exam_details);
+        examDetailsContainer = findViewById(R.id.exam_details);
         fragmentContainer = (LinearLayout) findViewById(R.id.fragment_container);
         progressBar = (RelativeLayout) findViewById(R.id.pb_loading);
         emptyView = findViewById(R.id.empty_container);
@@ -66,12 +65,7 @@ public class TestActivity extends FragmentActivity implements LoaderManager.Load
         TextView negativeMarks = (TextView) findViewById(R.id.negative_marks);
         LinearLayout description = (LinearLayout) findViewById(R.id.description);
         TextView descriptionContent = (TextView) findViewById(R.id.descriptionContent);
-        findViewById(R.id.exam_back_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         findViewById(R.id.start_exam).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,6 +99,7 @@ public class TestActivity extends FragmentActivity implements LoaderManager.Load
         exam = data.getParcelable(PARAM_EXAM);
         attempt = data.getParcelable(PARAM_ATTEMPT);
         if (attempt != null) {
+            getSupportActionBar().setTitle(getString(R.string.testpress_resume_exam));
             attemptActions.setVisibility(View.VISIBLE);
         } else {
             startExam.setVisibility(View.VISIBLE);
@@ -116,7 +111,7 @@ public class TestActivity extends FragmentActivity implements LoaderManager.Load
         negativeMarks.setText(exam.getNegativeMarks());
         if ((exam.getDescription() != null) && !exam.getDescription().trim().isEmpty()) {
             description.setVisibility(View.VISIBLE);
-            descriptionContent.setText(exam.getDescription());
+            descriptionContent.setText("    " + exam.getDescription());
         }
         String action = data.getString(PARAM_ACTION);
         if (action != null && action.equals(PARAM_VALUE_ACTION_END)) {
@@ -155,6 +150,9 @@ public class TestActivity extends FragmentActivity implements LoaderManager.Load
         if(exception == null) {
             fragmentContainer.setVisibility(View.VISIBLE);
             if (attempt.getState().equals("Running")) {
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().hide();
+                }
                 TestFragment testFragment = new TestFragment();
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(TestFragment.PARAM_ATTEMPT, attempt);
