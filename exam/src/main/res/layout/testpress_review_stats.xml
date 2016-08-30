@@ -64,21 +64,10 @@
                     style="@style/TestpressExamDetailSubHeading"
                     android:text="" />
 
-                <Button
-                    android:layout_height="30dp"
-                    android:layout_width="wrap_content"
+                <android.support.v7.widget.AppCompatButton
+                    style="@style/TestpressSmallButton"
                     android:text="@string/testpress_email_pdf"
-                    android:id="@+id/email_pdf"
-                    android:textColor="@color/testpress_white"
-                    android:drawableLeft="@drawable/ic_email_white_18dp"
-                    android:drawableStart="@drawable/ic_email_white_18dp"
-                    style="?android:attr/borderlessButtonStyle"
-                    android:background="@drawable/testpress_primary_button"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:drawablePadding="3dp" />
+                    android:id="@+id/email_pdf" />
 
             </LinearLayout>
 

@@ -9,21 +9,26 @@ import android.view.View;
 import in.testpress.samples.core.LoginActivity;
 import in.testpress.samples.exam.ExamSampleActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseToolBarActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        findViewById(R.id.core).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+        findViewById(R.id.exam).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, ExamSampleActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
-    public void core(View view) {
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-    }
-
-    public void exam(View view) {
-        Intent intent = new Intent(this, ExamSampleActivity.class);
-        startActivity(intent);
-    }
 }

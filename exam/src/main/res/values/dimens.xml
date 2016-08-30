@@ -15,4 +15,6 @@
     <dimen name="testpress_explore_spinner_width">200dp</dimen>
     <dimen name="testpress_spinner_left_padding">16dp</dimen>
 
+    <dimen name="testpress_button_left_drawable_padding">5dip</dimen>
+
 </resources>

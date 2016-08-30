@@ -3,12 +3,16 @@ package in.testpress.exam.ui;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.StyleRes;
 import android.support.v7.app.AlertDialog;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 
 import in.testpress.exam.R;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.util.CircularProgressDrawable;
 import in.testpress.util.SafeAsyncTask;
 
 class EmailPdfDialog extends AlertDialog.Builder {
@@ -29,14 +33,17 @@ class EmailPdfDialog extends AlertDialog.Builder {
         setPositiveButton(R.string.testpress_ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
                 final ProgressDialog progressDialog = new ProgressDialog(context);
-                progressDialog.setTitle(R.string.testpress_mail_pdf);
-                progressDialog.setMessage(context.getString(R.string.testpress_please_wait));
+                progressDialog.setMessage(context.getString(R.string.testpress_mail_pdf));
                 progressDialog.setCancelable(false);
-                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+                    float pixelWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, metrics);
+                    progressDialog.setIndeterminateDrawable(new CircularProgressDrawable(
+                            context.getResources().getColor(R.color.testpress_color_primary), pixelWidth));
+                }
                 progressDialog.setIndeterminate(true);
-                progressDialog.setProgressNumberFormat(null);
-                progressDialog.setProgressPercentFormat(null);
                 progressDialog.show();
                 new SafeAsyncTask<Void>() {
                     @Override
@@ -74,9 +81,6 @@ class EmailPdfDialog extends AlertDialog.Builder {
                         builder.show();
                     }
 
-                    @Override
-                    protected void onFinally() {
-                    }
                 }.execute();
             }
         });
