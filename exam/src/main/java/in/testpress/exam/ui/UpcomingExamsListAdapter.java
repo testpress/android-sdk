@@ -6,8 +6,9 @@ import java.util.List;
 
 import in.testpress.exam.R;
 import in.testpress.exam.models.Exam;
+import in.testpress.exam.util.SingleTypeAdapter;
 
-public class UpcomingExamsListAdapter extends AlternatingColorListAdapter<Exam> {
+public class UpcomingExamsListAdapter extends SingleTypeAdapter<Exam> {
 
     private final Activity activity;
 
@@ -16,7 +17,8 @@ public class UpcomingExamsListAdapter extends AlternatingColorListAdapter<Exam> 
      * @param items
      */
     public UpcomingExamsListAdapter(final Activity activity, final List<Exam> items, int layout) {
-        super(layout, activity.getLayoutInflater(), items);
+        super(activity, layout);
+        setItems(items);
         this.activity = activity;
     }
 
@@ -28,7 +30,6 @@ public class UpcomingExamsListAdapter extends AlternatingColorListAdapter<Exam> 
 
     @Override
     protected void update(final int position, final Exam item) {
-        super.update(position, item);
         setText(0, item.getTitle());
         setText(1, item.getDuration());
         setText(2, item.getNumberOfQuestionsString());
