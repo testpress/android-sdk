@@ -1,7 +1,14 @@
 package in.testpress.exam.ui;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ListView;
 
 import java.io.IOException;
@@ -27,6 +34,16 @@ public class ExamsListFragment extends PagedItemFragment<Exam> {
         subclass = getArguments().getString(ExamsListFragment.SUBCLASS);
         apiClient = new TestpressExamApiClient(getActivity());
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.testpress_search, menu);
+        MenuItem searchMenu = menu.findItem(R.id.search);
+        Drawable searchIcon = searchMenu.getIcon();
+        searchIcon.mutate().setColorFilter(ContextCompat.getColor(getActivity(),
+                R.color.testpress_actionbar_text), PorterDuff.Mode.SRC_IN);
+        searchMenu.setIcon(searchIcon);
     }
 
     @Override
@@ -82,6 +99,17 @@ public class ExamsListFragment extends PagedItemFragment<Exam> {
             setEmptyText(R.string.testpress_no_exams, R.string.testpress_no_exams_description,
                     R.drawable.ic_error_outline_black_18dp);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (R.id.search == item.getItemId()) {
+            Intent intent = new Intent(getActivity(), SearchActivity.class);
+            intent.putExtra(SearchFragment.SUBCLASS, subclass);
+            startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }
