@@ -24,6 +24,11 @@
             android:theme="@style/TestpressAppThemeDark"
             android:configChanges="orientation|keyboard|screenSize" />
 
+        <activity android:name=".ui.SearchActivity"
+            android:windowSoftInputMode="stateVisible"
+            android:theme="@style/TestpressAppThemeDark"
+            android:configChanges="orientation|keyboard|screenSize" />
+
     </application>
 
 </manifest>
