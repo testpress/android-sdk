@@ -99,7 +99,7 @@ public class TestActivity extends FragmentActivity implements LoaderManager.Load
                     new CircularProgressDrawable(getResources().getColor(
                             R.color.testpress_color_primary), pixelWidth));
         }
-        apiClient = new TestpressExamApiClient();
+        apiClient = new TestpressExamApiClient(this);
         final Intent intent = getIntent();
         Bundle data = intent.getExtras();
         exam = data.getParcelable(PARAM_EXAM);

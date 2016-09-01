@@ -103,7 +103,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         pager = (ViewPager) view.findViewById(R.id.pager);
         slidingPaneLayout = (SlidingPaneLayout) view.findViewById(R.id.sliding_layout);
         spinnerContainer = (RelativeLayout) view.findViewById(R.id.spinner_container);
-        apiClient = new TestpressExamApiClient();
+        apiClient = new TestpressExamApiClient(getActivity());
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage(getResources().getString(R.string.testpress_loading_questions));
         progressDialog.setCancelable(false);

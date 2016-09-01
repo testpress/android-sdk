@@ -25,7 +25,7 @@ public class ExamsListFragment extends PagedItemFragment<Exam> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         subclass = getArguments().getString(ExamsListFragment.SUBCLASS);
-        apiClient = new TestpressExamApiClient();
+        apiClient = new TestpressExamApiClient(getActivity());
         super.onCreate(savedInstanceState);
     }
 

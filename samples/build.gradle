@@ -1,18 +1,29 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias "sample"
+            keyPassword "sample"
+            storeFile file("testpress_sdk_sample.jks")
+            storePassword "sample"
+        }
+    }
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
-
     defaultConfig {
-        applicationId "in.testpress.sample"
-        minSdkVersion rootProject.minSdkVersion
+        applicationId "in.testpress.samples"
+        minSdkVersion 15
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 1
         versionName "1.0"
     }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.config
+        }
         release {
+            signingConfig signingConfigs.config
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -25,4 +36,6 @@ dependencies {
     testCompile rootProject.junit
     compile rootProject.appcompat
     compile rootProject.design
+    compile 'com.google.android.gms:play-services-auth:9.4.0'
+    compile 'com.facebook.android:facebook-android-sdk:4.14.1'
 }

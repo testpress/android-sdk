@@ -19,45 +19,27 @@
             android:paddingLeft="24dp"
             android:paddingRight="24dp" >
 
-            <android.support.design.widget.TextInputLayout
-                android:theme="@style/EditText"
-                android:layout_width="match_parent"
+            <com.facebook.login.widget.LoginButton
+                android:id="@+id/login_button"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp">
-                <android.support.v7.widget.AppCompatEditText
-                    android:id="@+id/username"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:hint="@string/username" />
-            </android.support.design.widget.TextInputLayout>
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp" />
 
-            <android.support.design.widget.TextInputLayout
-                android:theme="@style/EditText"
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="10dp">
-                <android.support.v7.widget.AppCompatEditText
-                    android:id="@+id/password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:inputType="textPassword"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:hint="@string/password"/>
-            </android.support.design.widget.TextInputLayout>
+                android:layout_gravity="center_horizontal"
+                android:text="or"
+                android:id="@+id/textView" />
 
-            <android.support.v7.widget.AppCompatButton
-                style="@style/Button"
-                android:id="@+id/signin_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
-                android:text="@string/login" />
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/sign_in_button"
+                android:layout_marginTop="30dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 

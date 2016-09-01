@@ -49,10 +49,10 @@ class EmailPdfDialog extends AlertDialog.Builder {
                     @Override
                     public Void call() throws Exception {
                         if (isExplanation) {
-                            new TestpressExamApiClient().mailExplanationsPdf(urlFrag +
+                            new TestpressExamApiClient(context).mailExplanationsPdf(urlFrag +
                                     TestpressExamApiClient.MAIL_PDF_PATH);
                         } else {
-                            new TestpressExamApiClient().mailQuestionsPdf(urlFrag +
+                            new TestpressExamApiClient(context).mailQuestionsPdf(urlFrag +
                                     TestpressExamApiClient.MAIL_PDF_QUESTIONS_PATH);
                         }
                         return null;
