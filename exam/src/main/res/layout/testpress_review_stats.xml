@@ -35,7 +35,7 @@
                 android:layout_gravity="center" >
 
                 <TextView
-                    style="@style/TestpressExamDetailHeading"
+                    style="@style/TestpressReviewStatHeading"
                     android:layout_width="wrap_content"
                     android:text="Aptitude Analytical Maths (NBE Template)"
                     android:id="@+id/exam_title" />
@@ -55,13 +55,13 @@
             </LinearLayout>
 
             <LinearLayout
-                style="@style/TestpressExamDetailRow"
+                style="@style/TestpressReviewStatRow"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
                 android:id="@+id/email_pdf_container" >
 
                 <TextView
-                    style="@style/TestpressExamDetailSubHeading"
+                    style="@style/TestpressReviewStatSubHeading"
                     android:text="" />
 
                 <android.support.v7.widget.AppCompatButton
@@ -94,62 +94,62 @@
                     android:background="#cccccc" />
             </LinearLayout>
 
-            <LinearLayout style="@style/TestpressExamDetailRow">
+            <LinearLayout style="@style/TestpressReviewStatRow">
                 <TextView
-                    style="@style/TestpressExamDetailSubHeading"
+                    style="@style/TestpressReviewStatSubHeading"
                     android:text="@string/testpress_rank" />
                 <TextView
-                    style="@style/TestpressExamDetailValue"
+                    style="@style/TestpressReviewStatValue"
                     android:id="@+id/rank"
                     android:text="1"/>
             </LinearLayout>
 
-            <LinearLayout style="@style/TestpressExamDetailRow">
+            <LinearLayout style="@style/TestpressReviewStatRow">
                 <TextView
-                    style="@style/TestpressExamDetailSubHeading"
+                    style="@style/TestpressReviewStatSubHeading"
                     android:text="@string/testpress_score" />
                 <TextView
-                    style="@style/TestpressExamDetailValue"
+                    style="@style/TestpressReviewStatValue"
                     android:id="@+id/score"
                     android:text="1"/>
             </LinearLayout>
 
-            <LinearLayout style="@style/TestpressExamDetailRow">
+            <LinearLayout style="@style/TestpressReviewStatRow">
                 <TextView
-                    style="@style/TestpressExamDetailSubHeading"
+                    style="@style/TestpressReviewStatSubHeading"
                     android:text="@string/testpress_total_correct"/>
                 <TextView
-                    style="@style/TestpressExamDetailValue"
+                    style="@style/TestpressReviewStatValue"
                     android:id="@+id/total_correct"
                     android:text="100"/>
             </LinearLayout>
 
-            <LinearLayout style="@style/TestpressExamDetailRow">
+            <LinearLayout style="@style/TestpressReviewStatRow">
                 <TextView
-                    style="@style/TestpressExamDetailSubHeading"
+                    style="@style/TestpressReviewStatSubHeading"
                     android:text="@string/testpress_total_incorrect" />
                 <TextView
-                    style="@style/TestpressExamDetailValue"
+                    style="@style/TestpressReviewStatValue"
                     android:id="@+id/total_incorrect"
                     android:text="0:30:00"/>
             </LinearLayout>
 
-            <LinearLayout style="@style/TestpressExamDetailRow">
+            <LinearLayout style="@style/TestpressReviewStatRow">
                 <TextView
-                    style="@style/TestpressExamDetailSubHeading"
+                    style="@style/TestpressReviewStatSubHeading"
                     android:text="@string/testpress_total_unanswered" />
                 <TextView
-                    style="@style/TestpressExamDetailValue"
+                    style="@style/TestpressReviewStatValue"
                     android:id="@+id/total_unanswered"
                     android:text="1"/>
             </LinearLayout>
 
-            <LinearLayout style="@style/TestpressExamDetailRow">
+            <LinearLayout style="@style/TestpressReviewStatRow">
                 <TextView
-                    style="@style/TestpressExamDetailSubHeading"
+                    style="@style/TestpressReviewStatSubHeading"
                     android:text="@string/testpress_time_taken" />
                 <TextView
-                    style="@style/TestpressExamDetailValue"
+                    style="@style/TestpressReviewStatValue"
                     android:id="@+id/time_taken"
                     android:text="0:28:05"/>
             </LinearLayout>
@@ -180,7 +180,7 @@
                     android:textStyle="normal"
                     android:text="@string/testpress_your_percentile_is" />
                 <TextView
-                    style="@style/TestpressExamDetailValue"
+                    style="@style/TestpressReviewStatValue"
                     android:textSize="@dimen/testpress_text_size_xlarge"
                     android:layout_marginTop="0dp"
                     android:layout_marginBottom="0dp"

@@ -2,7 +2,7 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <include layout="@layout/testpress_toolbar" />
 
@@ -43,8 +43,9 @@
                 card_view:cardBackgroundColor="@android:color/white"
                 card_view:cardPreventCornerOverlap="false"
                 card_view:cardUseCompatPadding="true"
-                android:layout_marginLeft="6dp"
-                android:layout_marginRight="6dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
                 card_view:cardElevation="4dp"
                 card_view:cardCornerRadius="2dp"
                 card_view:contentPadding="5dp"
@@ -57,16 +58,15 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_marginBottom="4dp"
-                    android:padding="5dp">
+                    android:padding="30dp">
 
                     <TextView
                         android:layout_height="wrap_content"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:textSize="20sp"
-                        android:gravity="center"
-                        android:layout_margin="10dp"
                         android:textColor="@color/testpress_black"
                         android:text="SBI PO Mock Test 1"
+                        android:layout_gravity="center"
                         android:id="@+id/exam_title"/>
 
                     <LinearLayout
@@ -74,113 +74,112 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:id="@+id/test_details"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="20dp"
                         android:layout_marginBottom="20dp">
 
                         <LinearLayout
-                            style="@style/TestpressExamInfoRow"
-                            android:layout_marginBottom="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
                             android:layout_gravity="center">
-                            <ImageView
-                                android:layout_height="match_parent"
-                                style="@style/TestpressExamInfoSubHeading"
-                                android:layout_weight="0.2"
-                                android:src="@drawable/testpress_questions_large"/>
-                            <TextView
-                                android:layout_height="match_parent"
-                                style="@style/TestpressExamInfoSubHeading"
-                                android:layout_weight="0.5"
-                                android:text="@string/testpress_questions"/>
-                            <TextView
-                                android:id="@+id/number_of_questions"
-                                style="@style/TestpressExamInfoValue"
-                                android:layout_weight="0.2"
-                                android:textStyle="bold"
-                                android:text="200"/>
-                        </LinearLayout>
 
-                        <LinearLayout
-                            style="@style/TestpressExamInfoRow"
-                            android:layout_marginBottom="5dp"
-                            android:layout_gravity="center">
-                            <ImageView
-                                android:layout_height="match_parent"
-                                style="@style/TestpressExamInfoSubHeading"
-                                android:layout_weight="0.2"
-                                android:src="@drawable/testpress_duration_large"/>
-                            <TextView
-                                android:layout_height="match_parent"
-                                style="@style/TestpressExamInfoSubHeading"
-                                android:layout_weight="0.5"
-                                android:text="@string/testpress_duration"/>
-                            <TextView
-                                android:id="@+id/exam_duration"
-                                style="@style/TestpressExamInfoValue"
-                                android:layout_weight="0.2"
-                                android:textStyle="bold"
-                                android:text="02:00:00"/>
-                        </LinearLayout>
+                            <LinearLayout
+                                style="@style/TestpressExamInfoRow"
+                                android:layout_marginBottom="5dp"
+                                android:layout_gravity="center">
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_marginRight="20dp"
+                                    android:layout_height="match_parent"
+                                    android:src="@drawable/testpress_questions_large"/>
+                                <TextView
+                                    android:layout_height="match_parent"
+                                    style="@style/TestpressTabExamInfoSubHeading"
+                                    android:text="@string/testpress_questions"/>
+                                <TextView
+                                    android:id="@+id/number_of_questions"
+                                    style="@style/TestpressTabExamInfoValue"
+                                    android:textStyle="bold"
+                                    android:text="200"/>
+                            </LinearLayout>
 
-                        <LinearLayout
-                            style="@style/TestpressExamInfoRow"
-                            android:layout_marginBottom="5dp"
-                            android:layout_gravity="center">
-                            <ImageView
-                                android:layout_height="match_parent"
-                                style="@style/TestpressExamInfoSubHeading"
-                                android:layout_weight="0.2"
-                                android:src="@drawable/testpress_marks_large"/>
-                            <TextView
-                                android:layout_height="match_parent"
-                                style="@style/TestpressExamInfoSubHeading"
-                                android:layout_weight="0.5"
-                                android:text="@string/testpress_mark_per_question"/>
-                            <TextView
-                                android:id="@+id/mark_per_question"
-                                style="@style/TestpressExamInfoValue"
-                                android:layout_weight="0.2"
-                                android:textStyle="bold"
-                                android:text="200"/>
-                        </LinearLayout>
+                            <LinearLayout
+                                style="@style/TestpressExamInfoRow"
+                                android:layout_marginBottom="5dp"
+                                android:layout_gravity="center">
+                                <ImageView
+                                    android:layout_height="match_parent"
+                                    android:layout_width="20dp"
+                                    android:layout_marginRight="20dp"
+                                    android:src="@drawable/testpress_duration_large"/>
+                                <TextView
+                                    android:layout_height="match_parent"
+                                    style="@style/TestpressTabExamInfoSubHeading"
+                                    android:text="@string/testpress_duration"/>
+                                <TextView
+                                    android:id="@+id/exam_duration"
+                                    style="@style/TestpressTabExamInfoValue"
+                                    android:textStyle="bold"
+                                    android:text="02:00:00"/>
+                            </LinearLayout>
 
-                        <LinearLayout
-                            style="@style/TestpressExamInfoRow"
-                            android:layout_marginBottom="5dp"
-                            android:layout_gravity="center">
-                            <ImageView
-                                android:layout_height="match_parent"
-                                style="@style/TestpressExamInfoSubHeading"
-                                android:layout_weight="0.2"
-                                android:src="@drawable/testpress_negative_large"/>
-                            <TextView
-                                android:layout_height="match_parent"
-                                style="@style/TestpressExamInfoSubHeading"
-                                android:layout_weight="0.5"
-                                android:text="@string/testpress_negative_mark"/>
-                            <TextView
-                                android:id="@+id/negative_marks"
-                                style="@style/TestpressExamInfoValue"
-                                android:layout_weight="0.2"
-                                android:textStyle="bold"
-                                android:text="200"/>
+                            <LinearLayout
+                                style="@style/TestpressExamInfoRow"
+                                android:layout_marginBottom="5dp"
+                                android:layout_gravity="center">
+                                <ImageView
+                                    android:layout_height="match_parent"
+                                    android:layout_width="20dp"
+                                    android:layout_marginRight="20dp"
+                                    android:src="@drawable/testpress_marks_large"/>
+                                <TextView
+                                    android:layout_height="match_parent"
+                                    style="@style/TestpressTabExamInfoSubHeading"
+                                    android:text="@string/testpress_mark_per_question"/>
+                                <TextView
+                                    android:id="@+id/mark_per_question"
+                                    style="@style/TestpressTabExamInfoValue"
+                                    android:textStyle="bold"
+                                    android:text="200"/>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                style="@style/TestpressExamInfoRow"
+                                android:layout_marginBottom="5dp"
+                                android:layout_gravity="center">
+                                <ImageView
+                                    android:layout_height="match_parent"
+                                    android:layout_width="20dp"
+                                    android:layout_marginRight="20dp"
+                                    android:src="@drawable/testpress_negative_large"/>
+                                <TextView
+                                    android:layout_height="match_parent"
+                                    style="@style/TestpressTabExamInfoSubHeading"
+                                    android:text="@string/testpress_negative_mark"/>
+                                <TextView
+                                    android:id="@+id/negative_marks"
+                                    style="@style/TestpressTabExamInfoValue"
+                                    android:textStyle="bold"
+                                    android:text="200"/>
+                            </LinearLayout>
+
                         </LinearLayout>
 
                         <LinearLayout
                             android:orientation="vertical"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:gravity="start"
-                            android:paddingLeft="20dp"
-                            android:paddingRight="20dp"
+                            android:layout_gravity="center"
+                            android:minWidth="320dp"
                             android:visibility="gone"
                             android:id="@+id/description" >
 
                             <LinearLayout
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_gravity="center"
-                                android:layout_marginBottom="10dp" >
+                                android:layout_marginBottom="20dp" >
                                 <View
                                     android:layout_width="wrap_content"
                                     android:layout_height="1dip"
@@ -191,15 +190,16 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/testpress_color_primary"
-                                android:textSize="@dimen/testpress_text_size_medium"
+                                android:textSize="@dimen/testpress_text_size_large"
                                 android:text="@string/testpress_description" />
 
                             <TextView
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:id="@+id/descriptionContent"
-                                android:layout_marginTop="5dp"
-                                android:textSize="@dimen/testpress_text_size_medium"
+                                android:layout_marginTop="10dp"
+                                android:lineSpacingMultiplier="1.2"
+                                android:textSize="@dimen/testpress_text_size_large"
                                 android:text="Abdul Kalam (15 October 1931 – 27 July 2015) was the 11th President of India from 2002 to 2007. A career scientist turned reluctant politician, Kalam was born and raised in Rameswaram, Tamil Nadu, and studied physics and aerospace engineering. He spent the next four decades as a scientist and science administrator, mainly at the Defence Research and Development Organisation (DRDO) and Indian Space Research Organisation (ISRO) and was intimately involved in India's civilian space program and military missile development efforts"/>
 
                         </LinearLayout>
