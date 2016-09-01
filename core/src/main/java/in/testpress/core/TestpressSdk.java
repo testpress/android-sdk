@@ -45,6 +45,9 @@ public final class TestpressSdk {
 
     public static void setTestpressSession(@NonNull Context context,
                                             @NonNull TestpressSession testpressSession) {
+        if (testpressSession == null) {
+            throw new IllegalArgumentException("TestpressSession must not be null.");
+        }
         SharedPreferences.Editor editor = getPreferenceEditor(context);
         editor.putString(KEY_TESTPRESS_AUTH_TOKEN, TestpressSession.serialize(testpressSession));
         editor.apply();
