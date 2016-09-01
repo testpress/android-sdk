@@ -15,6 +15,7 @@ import in.testpress.core.TestpressSession;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Exam;
+import in.testpress.exam.models.ExamCourse;
 import in.testpress.exam.models.ReviewItem;
 import in.testpress.exam.models.TestpressApiResponse;
 import retrofit.RestAdapter;
@@ -31,6 +32,11 @@ public class TestpressExamApiClient {
      */
     public static final String EXAMS_LIST_PATH =  "/api/v2.2/exams/";
 
+    /**
+     * Exam Courses URL
+     */
+    public static final String EXAM_COURSES_PATH =  "/api/v2.2/users/courses/";
+
     public static final String MAIL_PDF_PATH =  "pdf/";
     public static final String MAIL_PDF_QUESTIONS_PATH =  "pdf-questions/";
 
@@ -45,6 +51,7 @@ public class TestpressExamApiClient {
     public static final String SEARCH_QUERY = "q";
     public static final String STATE = "state";
     public static final String PAGE = "page";
+    public static final String COURSE = "course";
 
     public TestpressExamApiClient(Context context) {
         testpressSession = TestpressSdk.getTestpressSession(context);
@@ -70,6 +77,10 @@ public class TestpressExamApiClient {
 
     public TestpressApiResponse<Exam> getExams(Map<String, Object> queryParams) {
         return getExamService().getExams(queryParams, getAuthToken());
+    }
+
+    public TestpressApiResponse<ExamCourse> getExamCourses() {
+        return getExamService().getExamCourses(getAuthToken());
     }
 
     public Response mailQuestionsPdf(String mailPdfUrlFrag) {

@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/filter"
+        android:title="@string/testpress_courses"
+        app:actionLayout="@layout/testpress_filter_view"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/search"
         android:icon="@drawable/ic_search_white_24dp"
         app:showAsAction="always"

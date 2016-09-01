@@ -6,6 +6,7 @@ import java.util.Map;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Exam;
+import in.testpress.exam.models.ExamCourse;
 import in.testpress.exam.models.ReviewItem;
 import in.testpress.exam.models.TestpressApiResponse;
 import retrofit.client.Response;
@@ -22,6 +23,9 @@ public interface ExamService {
     @GET(TestpressExamApiClient.EXAMS_LIST_PATH)
     TestpressApiResponse<Exam> getExams(@QueryMap Map<String, Object> options,
                                         @Header("Authorization") String authorization);
+
+    @GET(TestpressExamApiClient.EXAM_COURSES_PATH)
+    TestpressApiResponse<ExamCourse> getExamCourses(@Header("Authorization") String authorization);
 
     @GET("/{mail_pdf_url}")
     Response mailQuestionsPdf(@Path(value = "mail_pdf_url", encode = false) String mailPdfUrlFrag,

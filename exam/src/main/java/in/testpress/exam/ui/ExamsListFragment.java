@@ -4,21 +4,30 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import in.testpress.exam.R;
 import in.testpress.exam.models.Exam;
+import in.testpress.exam.models.ExamCourse;
 import in.testpress.exam.network.ExamPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.SingleTypeAdapter;
+import in.testpress.util.SafeAsyncTask;
 
 public class ExamsListFragment extends PagedItemFragment<Exam> {
 
@@ -28,22 +37,131 @@ public class ExamsListFragment extends PagedItemFragment<Exam> {
     public static final String UPCOMING = "upcoming";
     public static final String HISTORY = "history";
     public static final String SUBCLASS = "subclass";
+    public static final String COURSES = "courses";
+    private MenuItem filterMenu;
+    private Spinner spinner;
+    private ExploreSpinnerAdapter spinnerAdapter;
+    private ArrayList<ExamCourse> courses;
+    /**
+     * When spinnerAdapter is set to spinner, the spinner itself select first item as default,
+     * so onItemSelected callback will be called with position 0, we need to omit this callback
+     */
+    private Boolean firstTimeCallback = true;
+    private int selectedCoursePosition = -1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         subclass = getArguments().getString(ExamsListFragment.SUBCLASS);
         apiClient = new TestpressExamApiClient(getActivity());
         super.onCreate(savedInstanceState);
+        spinnerAdapter = new ExploreSpinnerAdapter(getActivity().getLayoutInflater(),
+                getActivity().getResources(), true);
+        spinnerAdapter.setHideSelectedItem(true);
+        spinnerAdapter.addItem("", getString(R.string.testpress_all_exams), false, 0);
+        spinnerAdapter.addHeader(getString(R.string.testpress_courses));
+        courses = getArguments().getParcelableArrayList(COURSES);
+        if (courses != null && courses.size() > 1) {
+            for (ExamCourse course : courses) {
+                spinnerAdapter.addItem(course.getName(), course.getName(), true, 0);
+            }
+        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.testpress_search, menu);
+        inflater.inflate(R.menu.testpress_filter_search, menu);
         MenuItem searchMenu = menu.findItem(R.id.search);
         Drawable searchIcon = searchMenu.getIcon();
         searchIcon.mutate().setColorFilter(ContextCompat.getColor(getActivity(),
                 R.color.testpress_actionbar_text), PorterDuff.Mode.SRC_IN);
         searchMenu.setIcon(searchIcon);
+        filterMenu = menu.findItem(R.id.filter);
+        if (courses != null && courses.size() > 1) {
+            View actionView = MenuItemCompat.getActionView(filterMenu);
+            final View circle = actionView.findViewById(R.id.circle);
+            spinner = (Spinner) actionView.findViewById(R.id.spinner);
+            firstTimeCallback = true;
+            spinner.setAdapter(spinnerAdapter);
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> spinner, View view, int position, long itemId) {
+                    if (position == 0) {
+                        circle.setVisibility(View.GONE);
+                    } else {
+                        circle.setVisibility(View.VISIBLE);
+                    }
+                    if (firstTimeCallback) {
+                        firstTimeCallback = false;
+                    } else if ((selectedCoursePosition != position)) {
+                        // Omit callback if position is already selected position
+                        selectedCoursePosition = position;
+                        String filter = spinnerAdapter.getTag(position);
+                        if (filter.isEmpty()) {
+                            getPager().removeQueryParams(TestpressExamApiClient.COURSE);
+                        } else {
+                            getPager().setQueryParams(TestpressExamApiClient.COURSE, filter);
+                        }
+                        ExamsListFragment.super.refreshWithProgress();
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+                }
+            });
+            if (selectedCoursePosition == -1) {
+                selectedCoursePosition = 0;
+            } else {
+                spinner.setSelection(selectedCoursePosition);
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                ((Spinner) spinner).setBackgroundTintList(ContextCompat.getColorStateList(
+                        getActivity(), R.color.testpress_actionbar_text));
+            } else {
+                ViewCompat.setBackgroundTintList(spinner, ContextCompat.getColorStateList(
+                        getActivity(), R.color.testpress_actionbar_text));
+            }
+        } else {
+            filterMenu.setVisible(false);
+        }
+    }
+
+    void loadExamCategories() {
+        new SafeAsyncTask<List<ExamCourse>>() {
+            public List<ExamCourse> call() throws Exception {
+                return new TestpressExamApiClient(getActivity()).getExamCourses().getResults();
+            }
+
+            @Override
+            protected void onException(final Exception exception) throws RuntimeException {
+                getErrorMessage(exception);
+            }
+
+            @Override
+            public void onSuccess(final List<ExamCourse> coursesList) {
+                spinnerAdapter.clear();
+                courses = new ArrayList<ExamCourse>(coursesList);
+                if (courses.size() > 1) {
+                    spinnerAdapter.addItem("", getString(R.string.testpress_all_exams), false, 0);
+                    spinnerAdapter.addHeader(getString(R.string.testpress_courses));
+                    for (ExamCourse course : courses) {
+                        spinnerAdapter.addItem(course.getName(), course.getName(), true, 0);
+                    }
+                    if (selectedCoursePosition == -1) {
+                        selectedCoursePosition = 0;
+                        spinnerAdapter.notifyDataSetChanged();
+                    } else {
+                        spinnerAdapter.notifyDataSetChanged();
+                        spinner.setSelection(spinnerAdapter.getItemPosition(
+                                spinner.getSelectedItem().toString()));
+                    }
+                } else {
+                    filterMenu.setVisible(false);
+                    spinnerAdapter.notifyDataSetChanged();
+                }
+            }
+
+        }.execute();
     }
 
     @Override
@@ -110,6 +228,12 @@ public class ExamsListFragment extends PagedItemFragment<Exam> {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void refreshWithProgress() {
+        super.refreshWithProgress();
+        loadExamCategories();
     }
 
 }

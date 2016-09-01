@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="24dp"
+    android:layout_height="26dp">
+
+    <Spinner
+        android:layout_width="22dp"
+        android:layout_height="20dp"
+        android:id="@+id/spinner"
+        android:layout_centerInParent="true"
+        android:background="@drawable/testpress_filter_icon"/>
+
+    <View
+        android:visibility="gone"
+        android:id="@+id/circle"
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/testpress_small_red_circle"/>
+
+</RelativeLayout>

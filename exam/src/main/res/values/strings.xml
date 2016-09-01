@@ -107,6 +107,9 @@
     <string name="testpress_review_label">Review</string>
     <string name="testpress_your_percentile_is">Your percentile is</string>
 
+    <string name="testpress_all_exams">All Exams</string>
+    <string name="testpress_courses">Courses</string>
+
     <string name="testpress_search">Search</string>
     <string name="testpress_search_hint">Search...</string>
     <string name="testpress_no_results_found">Sorry, No results found</string>
