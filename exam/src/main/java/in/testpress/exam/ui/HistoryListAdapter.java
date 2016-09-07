@@ -2,10 +2,6 @@ package in.testpress.exam.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.DrawableRes;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +11,7 @@ import java.util.List;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.util.SingleTypeAdapter;
+import in.testpress.exam.util.ViewUtils;
 
 public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
 
@@ -43,7 +40,7 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
     protected void update(final int position, final Exam item) {
         final Exam exam = getItem(position);
         Button reviewButton = (Button) updater.view.findViewById(R.id.review_attempt);
-        setLeftDrawable(reviewButton, R.drawable.ic_zoom_in_white_18dp);
+        ViewUtils.setLeftDrawable(activity, reviewButton, R.drawable.ic_zoom_in_white_18dp);
         reviewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,7 +54,7 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
             }
         });
         Button retakeButton = (Button) updater.view.findViewById(R.id.retake);
-        setLeftDrawable(retakeButton, R.drawable.ic_replay_white_18dp);
+        ViewUtils.setLeftDrawable(activity, retakeButton, R.drawable.ic_replay_white_18dp);
         retakeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,7 +64,7 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
             }
         });
         Button resumeButton = (Button) updater.view.findViewById(R.id.resume_exam);
-        setLeftDrawable(resumeButton, R.drawable.ic_repeat_white_18dp);
+        ViewUtils.setLeftDrawable(activity, resumeButton, R.drawable.ic_repeat_white_18dp);
         resumeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,15 +94,6 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
             setText(6, R.string.testpress_retake);
         }
         setGone(8, (exam.getPausedAttemptsCount() <= 0));
-    }
-
-    public void setLeftDrawable(Button button, @DrawableRes int drawableRes) {
-        Drawable drawable = activity.getResources().getDrawable(drawableRes);
-        drawable.setColorFilter(new PorterDuffColorFilter(activity.getResources().getColor(
-                R.color.testpress_button_text_color), PorterDuff.Mode.MULTIPLY));
-        button.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
-        button.setCompoundDrawablePadding((int) activity.getResources().getDimension(
-                R.dimen.testpress_button_left_drawable_padding));
     }
 
 }

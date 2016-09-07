@@ -3,11 +3,8 @@ package in.testpress.core;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,8 +12,8 @@ import java.util.HashMap;
 import in.testpress.network.AuthorizationErrorResponse;
 import in.testpress.network.TestpressApiClient;
 import in.testpress.R;
-import in.testpress.util.CircularProgressDrawable;
 import in.testpress.util.SafeAsyncTask;
+import in.testpress.util.UIUtils;
 import retrofit.RetrofitError;
 
 public final class TestpressSdk {
@@ -107,12 +104,7 @@ public final class TestpressSdk {
         final ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setMessage(context.getString(R.string.testpress_please_wait));
         progressDialog.setCancelable(false);
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-            float pixelWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, metrics);
-            progressDialog.setIndeterminateDrawable(new CircularProgressDrawable(
-                    context.getResources().getColor(R.color.testpress_color_primary), pixelWidth));
-        }
+        UIUtils.setIndeterminateDrawable(context, progressDialog, 4);
         progressDialog.show();
         final HashMap<String, String> credentials = new HashMap<String, String>();
         credentials.put("provider", provider.name());

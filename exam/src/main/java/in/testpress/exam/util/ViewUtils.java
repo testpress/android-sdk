@@ -18,10 +18,16 @@ package in.testpress.exam.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.DrawableRes;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 
 import in.testpress.exam.R;
 
@@ -91,6 +97,15 @@ public class ViewUtils {
                 v.startAnimation(a);
             }
         }
+    }
+
+    public static void setLeftDrawable(Context context, Button button, @DrawableRes int drawableRes) {
+        Drawable drawable = ContextCompat.getDrawable(context, drawableRes);
+        drawable.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(context,
+                R.color.testpress_button_text_color), PorterDuff.Mode.MULTIPLY));
+        button.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+        button.setCompoundDrawablePadding((int) context.getResources().getDimension(
+                R.dimen.testpress_button_left_drawable_padding));
     }
 
     private ViewUtils() {

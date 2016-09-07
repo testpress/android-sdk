@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
+import in.testpress.exam.util.ViewUtils;
 
 public class ReviewStatsFragment extends Fragment {
 
@@ -58,12 +59,7 @@ public class ReviewStatsFragment extends Fragment {
         Exam exam = getArguments().getParcelable(PRAM_EXAM);
         final Attempt attempt = getArguments().getParcelable(PRAM_ATTEMPT);
         if (attempt != null) {
-            Drawable drawable = getResources().getDrawable(R.drawable.ic_email_white_18dp);
-            drawable.setColorFilter(new PorterDuffColorFilter(getResources().getColor(
-                    R.color.testpress_button_text_color), PorterDuff.Mode.MULTIPLY));
-            emailPdfButton.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
-            emailPdfButton.setCompoundDrawablePadding((int) getResources().getDimension(
-                    R.dimen.testpress_button_left_drawable_padding));
+            ViewUtils.setLeftDrawable(getActivity(), emailPdfButton, R.drawable.ic_email_white_18dp);
             emailPdfButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

@@ -2,9 +2,7 @@ package in.testpress.exam.ui;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -17,14 +15,11 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.CardView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -46,7 +41,7 @@ import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.SingleTypeAdapter;
 import in.testpress.exam.util.ThrowableLoader;
 import in.testpress.exam.util.ViewUtils;
-import in.testpress.util.CircularProgressDrawable;
+import in.testpress.util.UIUtils;
 
 public class SearchFragment extends Fragment implements AbsListView.OnScrollListener,
         LoaderManager.LoaderCallbacks<List<Exam>> {
@@ -82,12 +77,7 @@ public class SearchFragment extends Fragment implements AbsListView.OnScrollList
         ViewGroup view = (ViewGroup) inflater.inflate(R.layout.testpress_fragment_search,
                 container, false);
         progressBar = (ProgressBar) view.findViewById(R.id.pb_loading);
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            DisplayMetrics metrics = getResources().getDisplayMetrics();
-            float pixelWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, metrics);
-            progressBar.setIndeterminateDrawable(new CircularProgressDrawable(ContextCompat
-                    .getColor(getActivity(), R.color.testpress_color_primary), pixelWidth));
-        }
+        UIUtils.setIndeterminateDrawable(getActivity(), progressBar, 4);
         searchBar = (EditText) view.findViewById(R.id.search_bar);
         leftDrawable = (ImageView) view.findViewById(R.id.left_drawable);
         rightDrawable = (ImageView) view.findViewById(R.id.right_drawable);

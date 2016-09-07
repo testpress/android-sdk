@@ -3,10 +3,6 @@ package in.testpress.exam.ui;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.DrawableRes;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
@@ -17,6 +13,7 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.util.SingleTypeAdapter;
+import in.testpress.exam.util.ViewUtils;
 
 class AttemptsListAdapter extends SingleTypeAdapter<Attempt> {
 
@@ -57,7 +54,7 @@ class AttemptsListAdapter extends SingleTypeAdapter<Attempt> {
             setText(6, "" + item.getScore());
         }
         Button reviewButton = (Button) updater.view.findViewById(R.id.review_attempt);
-        setLeftDrawable(reviewButton, R.drawable.ic_zoom_in_white_18dp);
+        ViewUtils.setLeftDrawable(activity, reviewButton, R.drawable.ic_zoom_in_white_18dp);
         reviewButton.setOnClickListener(new View.OnClickListener
                 () {
             @Override
@@ -66,7 +63,7 @@ class AttemptsListAdapter extends SingleTypeAdapter<Attempt> {
             }
         });
         Button endButton = (Button) updater.view.findViewById(R.id.end);
-        setLeftDrawable(endButton, R.drawable.ic_block_white_18dp);
+        ViewUtils.setLeftDrawable(activity, endButton, R.drawable.ic_block_white_18dp);
         endButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,7 +86,7 @@ class AttemptsListAdapter extends SingleTypeAdapter<Attempt> {
             }
         });
         Button resumeButton = (Button) updater.view.findViewById(R.id.resume_exam);
-        setLeftDrawable(resumeButton, R.drawable.ic_repeat_white_18dp);
+        ViewUtils.setLeftDrawable(activity, resumeButton, R.drawable.ic_repeat_white_18dp);
         resumeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,7 +97,7 @@ class AttemptsListAdapter extends SingleTypeAdapter<Attempt> {
             }
         });
         Button emailPdf = (Button) updater.view.findViewById(R.id.email_pdf);
-        setLeftDrawable(emailPdf, R.drawable.ic_email_white_18dp);
+        ViewUtils.setLeftDrawable(activity, emailPdf, R.drawable.ic_email_white_18dp);
         emailPdf.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -115,12 +112,4 @@ class AttemptsListAdapter extends SingleTypeAdapter<Attempt> {
         }
     }
 
-    public void setLeftDrawable(Button button, @DrawableRes int drawableRes) {
-        Drawable drawable = activity.getResources().getDrawable(drawableRes);
-        drawable.setColorFilter(new PorterDuffColorFilter(activity.getResources().getColor(
-                R.color.testpress_button_text_color), PorterDuff.Mode.MULTIPLY));
-        button.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
-        button.setCompoundDrawablePadding((int) activity.getResources().getDimension(
-                R.dimen.testpress_button_left_drawable_padding));
-    }
 }

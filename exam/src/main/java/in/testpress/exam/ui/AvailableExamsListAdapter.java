@@ -2,10 +2,6 @@ package in.testpress.exam.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.DrawableRes;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +12,7 @@ import java.util.List;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.util.SingleTypeAdapter;
+import in.testpress.exam.util.ViewUtils;
 
 public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
 
@@ -51,7 +48,7 @@ public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
                 R.string.testpress_to) + " " + exam.getFormattedEndDate());
         setText(4, exam.getCourse_category());
         Button startExamButton = (Button)updater.view.findViewById(R.id.start_exam);
-        setLeftDrawable(startExamButton, R.drawable.ic_assignment_white_18dp);
+        ViewUtils.setLeftDrawable(activity, startExamButton, R.drawable.ic_assignment_white_18dp);
         startExamButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,7 +58,7 @@ public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
             }
         });
         Button emailMcqs = (Button)updater.view.findViewById(R.id.email_mcqs);
-        setLeftDrawable(emailMcqs, R.drawable.ic_email_white_18dp);
+        ViewUtils.setLeftDrawable(activity, emailMcqs, R.drawable.ic_email_white_18dp);
         emailMcqs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,12 +73,4 @@ public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
         }
     }
 
-    public void setLeftDrawable(Button button, @DrawableRes int drawableRes) {
-        Drawable drawable = activity.getResources().getDrawable(drawableRes);
-        drawable.setColorFilter(new PorterDuffColorFilter(activity.getResources().getColor(
-                R.color.testpress_button_text_color), PorterDuff.Mode.MULTIPLY));
-        button.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
-        button.setCompoundDrawablePadding((int) activity.getResources().getDimension(
-                R.dimen.testpress_button_left_drawable_padding));
-    }
 }
