@@ -238,7 +238,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         if (slidingPaneLayout.isOpen()) {
             slidingPaneLayout.closePane();
         }
-        if(exam.getTemplateType() == 2) {
+        if(subjectSpinnerAdapter.getCount() > 1) {
             String currentSubject = attemptItemList.get(pager.getCurrentItem()).getAttemptQuestion()
                     .getSubject();
             if (selectedSubjectOffset != subjectsOffset.get(currentSubject)) {
@@ -356,33 +356,33 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             builder.show();
             return;
         }
-        if(exam.getTemplateType() == 2) {  // For IBPS templates only
-            /**
-             * Used to get subjects in order as it fetched
-             */
-            List<String> subjectsList = new ArrayList<>();
-            /*
-             * To Populate the spinner with the subjects
-             */
-            HashMap<String, List<AttemptItem>> subjectsWiseItems = new HashMap<>();
-            for (AttemptItem item : items) {
-                if (item.getAttemptQuestion().getSubject() == null || item.getAttemptQuestion()
-                        .getSubject().isEmpty()) { // If subject is empty, subject = "Uncategorized"
-
-                    item.getAttemptQuestion().setSubject(getResources()
-                            .getString(R.string.testpress_uncategorized));
-                }
-                if (subjectsWiseItems.containsKey(item.getAttemptQuestion().getSubject())) {
-                    // Check subject is already added if added simply add the item it
-                    subjectsWiseItems.get(item.getAttemptQuestion().getSubject()).add(item);
-                } else {
-                    // Add the subject & then add item to it
-                    subjectsWiseItems.put(item.getAttemptQuestion().getSubject(),
-                            new ArrayList<AttemptItem>());
-                    subjectsWiseItems.get(item.getAttemptQuestion().getSubject()).add(item);
-                    subjectsList.add(item.getAttemptQuestion().getSubject());
-                }
+        /**
+         * Used to get subjects in order as it fetched
+         */
+        List<String> subjectsList = new ArrayList<>();
+        /*
+         * To Populate the spinner with the subjects
+         */
+        HashMap<String, List<AttemptItem>> subjectsWiseItems = new HashMap<>();
+        for (AttemptItem item : items) {
+            if (item.getAttemptQuestion().getSubject() == null || item.getAttemptQuestion()
+                    .getSubject().isEmpty()) {
+                // If subject is empty, subject = "Uncategorized"
+                item.getAttemptQuestion().setSubject(getResources()
+                        .getString(R.string.testpress_uncategorized));
             }
+            if (subjectsWiseItems.containsKey(item.getAttemptQuestion().getSubject())) {
+                // Check subject is already added if added simply add the item it
+                subjectsWiseItems.get(item.getAttemptQuestion().getSubject()).add(item);
+            } else {
+                // Add the subject & then add item to it
+                subjectsWiseItems.put(item.getAttemptQuestion().getSubject(),
+                        new ArrayList<AttemptItem>());
+                subjectsWiseItems.get(item.getAttemptQuestion().getSubject()).add(item);
+                subjectsList.add(item.getAttemptQuestion().getSubject());
+            }
+        }
+        if (subjectsList.size() > 1) {
             // Clear the previous data stored while loading which might be unordered
             attemptItemList.clear();
             // Store each set of subject items to attemptItemList
@@ -391,7 +391,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 attemptItemList.addAll(subjectsWiseItems.get(subject));
                 subjectSpinnerAdapter.addItem(subject, subject, true, 0);
             }
-            if ((spinnerContainer.getVisibility() == View.GONE) && subjectsWiseItems.size() > 1) {
+            if ((spinnerContainer.getVisibility() == View.GONE)) {
                 // Show spinner only if #subjects > 1
                 subjectSpinnerAdapter.notifyDataSetChanged();
                 spinnerContainer.setVisibility(View.VISIBLE);
