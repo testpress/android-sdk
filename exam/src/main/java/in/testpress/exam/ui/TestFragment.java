@@ -457,7 +457,14 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                                         progressDialog.show();
                                         saveResult(position);
                                     }
-                        })
+                                })
+                        .setNegativeButton(R.string.testpress_not_now,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        returnToHistory();
+                                    }
+                                })
                         .show();
             }
 
@@ -499,6 +506,13 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                                     sendHeartBeat.execute();
                                 }
                             })
+                    .setNegativeButton(R.string.testpress_not_now,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    returnToHistory();
+                                }
+                            })
                     .show();
         }
 
@@ -533,6 +547,13 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     progressDialog.show();
                                     endExam.execute();
+                                }
+                            })
+                    .setNegativeButton(R.string.testpress_not_now,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    returnToHistory();
                                 }
                             })
                     .show();
