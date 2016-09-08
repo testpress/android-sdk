@@ -26,7 +26,7 @@ public final class TestpressSdk {
     private static final String KEY_TESTPRESS_AUTH_TOKEN = "testpressAuthToken";
     private static final String KEY_TESTPRESS_SHARED_PREFS = "testpressSharedPreferences";
     private static final String KEY_USER_ID = "userId";
-    public enum Provider { FACEBOOK, GOOGLE }
+    public enum Provider { FACEBOOK, GOOGLE, TESTPRESS }
 
     private static SharedPreferences getPreferences(Context context) {
         if (pref == null) {
@@ -70,13 +70,15 @@ public final class TestpressSdk {
     }
 
     /**
-     * Initialize the Sdk, it will authorize the user & store the token
+     * Authorize the user and store the testpress session
      *
      * @param context Context
      * @param baseUrl Base url of institute
-     * @param userId User social account id
-     * @param accessToken User social account access token
-     * @param provider Provider.FACEBOOK or Provider.GOOGLE
+     * @param userId User's social account id (if provider is fb or google)
+     *               or testpress username(for Provider.TESTPRESS)
+     * @param accessToken User's social account access token(if provider is fb or google)
+     *                    or testpress password(for Provider.TESTPRESS)
+     * @param provider Provider.FACEBOOK or Provider.GOOGLE or Provider.TESTPRESS
      */
     public static void initialize(@NonNull Context context, @NonNull String baseUrl,
                                   @NonNull String userId, @NonNull String accessToken,
@@ -85,18 +87,20 @@ public final class TestpressSdk {
     }
 
     /**
-     * Initialize the Sdk, it will authorize the user & store the token
+     * Authorize the user and store the testpress session
      *
      * @param context Context
      * @param baseUrl Base url of institute
-     * @param userId User social account id
-     * @param accessToken User social account access token
-     * @param provider Provider.FACEBOOK or Provider.GOOGLE
+     * @param userId User's social account id (if provider is fb or google)
+     *               or testpress username(for Provider.TESTPRESS)
+     * @param accessToken User's social account access token(if provider is fb or google)
+     *                    or testpress password(for Provider.TESTPRESS)
+     * @param provider Provider.FACEBOOK or Provider.GOOGLE or Provider.TESTPRESS
      * @param callback Callback which will be call on success or failure
      */
-    public static void initialize(@NonNull final Context context, final @NonNull String baseUrl,
-                                  @NonNull final String userId, @NonNull String accessToken,
-                                  @NonNull Provider provider,
+    public static void initialize(@NonNull final Context context, @NonNull final String baseUrl,
+                                  @NonNull final String userId, @NonNull final String accessToken,
+                                  @NonNull final Provider provider,
                                   final TestpressCallback<TestpressSession> callback) {
         validateContext(context);
         if (userId == null || accessToken == null || provider == null) {
@@ -122,14 +126,22 @@ public final class TestpressSdk {
                     context.getResources().getColor(R.color.testpress_color_primary), pixelWidth));
         }
         progressDialog.show();
-        final HashMap<String, String> credentials = new HashMap<String, String>();
-        credentials.put("provider", provider.name());
-        credentials.put("user_id", userId);
-        credentials.put("access_token", accessToken);
         new SafeAsyncTask<TestpressSession>() {
             @Override
             public TestpressSession call() throws Exception {
-                return new TestpressApiClient(baseUrl).getAuthenticationService().authenticate(credentials);
+                String urlPath;
+                HashMap<String, String> credentials = new HashMap<String, String>();
+                if (provider == Provider.TESTPRESS) {
+                    urlPath = TestpressApiClient.TESTPRESS_AUTH_PATH;
+                    credentials.put("username", userId);
+                    credentials.put("password", accessToken);
+                } else {
+                    urlPath = TestpressApiClient.SOCIAL_AUTH_PATH;
+                    credentials.put("provider", provider.name());
+                    credentials.put("user_id", userId);
+                    credentials.put("access_token", accessToken);
+                }
+                return new TestpressApiClient(baseUrl).authenticate(urlPath, credentials);
             }
 
             @Override

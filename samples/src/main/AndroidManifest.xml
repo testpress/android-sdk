@@ -21,6 +21,7 @@
         </activity>
 
         <activity android:name=".core.TestpressCoreSampleActivity"
+            android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation|keyboard|screenSize"
             android:label="Testpress Core Example" />
 

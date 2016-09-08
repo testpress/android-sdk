@@ -1,18 +1,21 @@
 package in.testpress.network;
 
-import android.content.Context;
-
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import in.testpress.core.TestpressSdk;
+import java.util.HashMap;
+
+import in.testpress.core.TestpressSession;
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
 
 public class TestpressApiClient {
 
-    final RestAdapter restAdapter;
+    private final RestAdapter restAdapter;
+
+    public static final String SOCIAL_AUTH_PATH= "api/v2.2/social-auth/";
+    public static final String TESTPRESS_AUTH_PATH= "api/v2.2/auth-token/";
 
     public TestpressApiClient(String baseUrl) {
         Gson gson = new GsonBuilder()
@@ -27,7 +30,11 @@ public class TestpressApiClient {
                 .build();
     }
 
-    public AuthenticationService getAuthenticationService() {
+    private AuthenticationService getAuthenticationService() {
         return restAdapter.create(AuthenticationService.class);
+    }
+
+    public TestpressSession authenticate(String authenticateUrlFrag, HashMap<String, String> arguments) {
+        return getAuthenticationService().authenticate(authenticateUrlFrag, arguments);
     }
 }
