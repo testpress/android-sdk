@@ -1,10 +1,7 @@
 package in.testpress.exam.ui;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AbsListView;
@@ -16,7 +13,7 @@ import java.util.List;
 import in.testpress.exam.R;
 import in.testpress.exam.network.BaseResourcePager;
 import in.testpress.exam.util.ThrowableLoader;
-import in.testpress.util.CircularProgressDrawable;
+import in.testpress.util.UIUtils;
 
 public abstract class PagedItemFragment<E> extends BaseListViewFragment<E>
         implements AbsListView.OnScrollListener {
@@ -43,12 +40,7 @@ public abstract class PagedItemFragment<E> extends BaseListViewFragment<E>
         super.onCreate(savedInstanceState);
         loadingLayout = LayoutInflater.from(getActivity()).inflate(R.layout.testpress_loading_layout, null);
         ProgressBar progressBar = (ProgressBar) loadingLayout.findViewById(R.id.progress_bar);
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            DisplayMetrics metrics = getResources().getDisplayMetrics();
-            float pixelWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, metrics);
-            progressBar.setIndeterminateDrawable(new CircularProgressDrawable(
-                    getResources().getColor(R.color.testpress_color_primary), pixelWidth));
-        }
+        UIUtils.setIndeterminateDrawable(getActivity(), progressBar, 3);
     }
 
     @Override
