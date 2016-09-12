@@ -51,6 +51,7 @@
     <string name="testpress_review">REVIEW</string>
     <string name="testpress_start_exam">Start Exam</string>
     <string name="testpress_resume_exam">Resume Exam</string>
+    <string name="testpress_not_now">Not Now</string>
     <string name="testpress_next">NEXT</string>
     <string name="testpress_previous">PREV</string>
     <string name="testpress_paused">PAUSED</string>
