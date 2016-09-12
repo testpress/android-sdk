@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -66,14 +67,14 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
                 })
                 .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
                 .build();
-        findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.google_sign_in_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
                 startActivityForResult(signInIntent, REQUEST_CODE_GOOGLE_SIGN_IN);
             }
         });
-        LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
+        LoginButton loginButton = (LoginButton) findViewById(R.id.fb_login_button);
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -93,6 +94,15 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
                     Snackbar.make(loginView, "Facebook sign in error, please check the key hashes",
                             Snackbar.LENGTH_LONG).show();
                 }
+            }
+        });
+        final EditText usernameEditText = (EditText) findViewById(R.id.username);
+        final EditText passwordEditText = (EditText) findViewById(R.id.password);
+        findViewById(R.id.testpress_login_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                authenticate(usernameEditText.getText().toString().trim(),
+                        passwordEditText.getText().toString().trim(), TestpressSdk.Provider.TESTPRESS);
             }
         });
         loginView = findViewById(R.id.scroll_view);

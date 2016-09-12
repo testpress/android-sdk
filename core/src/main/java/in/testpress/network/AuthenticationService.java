@@ -5,10 +5,13 @@ import java.util.HashMap;
 import in.testpress.core.TestpressSession;
 import retrofit.http.Body;
 import retrofit.http.POST;
+import retrofit.http.Path;
 
 public interface AuthenticationService {
 
-    @POST("/api/v2.2/social-auth/")
-    TestpressSession authenticate(@Body HashMap<String, String> arguments);
+    @POST("/{authenticate_url}")
+    TestpressSession authenticate(
+            @Path(value = "authenticate_url", encode = false) String authenticateUrlFrag,
+            @Body HashMap<String, String> arguments);
 
 }
