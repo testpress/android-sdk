@@ -22,6 +22,7 @@ public final class TestpressSdk {
     private static SharedPreferences.Editor editor;
     private static final String KEY_TESTPRESS_AUTH_TOKEN = "testpressAuthToken";
     private static final String KEY_TESTPRESS_SHARED_PREFS = "testpressSharedPreferences";
+    private static final String KEY_USER_ID = "userId";
     public enum Provider { FACEBOOK, GOOGLE }
 
     private static SharedPreferences getPreferences(Context context) {
@@ -91,7 +92,7 @@ public final class TestpressSdk {
      * @param callback Callback which will be call on success or failure
      */
     public static void initialize(@NonNull final Context context, final @NonNull String baseUrl,
-                                  @NonNull String userId, @NonNull String accessToken,
+                                  @NonNull final String userId, @NonNull String accessToken,
                                   @NonNull Provider provider,
                                   final TestpressCallback<TestpressSession> callback) {
         validateContext(context);
@@ -100,6 +101,13 @@ public final class TestpressSdk {
         }
         if (baseUrl == null || baseUrl.isEmpty()) {
             throw new IllegalArgumentException("BaseUrl must not be null or Empty.");
+        }
+        if (userId.equals(getPreferences(context).getString(KEY_USER_ID, null)) &&
+                hasActiveSession(context)) {
+            if (callback != null) {
+                callback.onSuccess(getTestpressSession(context));
+            }
+            return;
         }
         final ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setMessage(context.getString(R.string.testpress_please_wait));
@@ -152,6 +160,9 @@ public final class TestpressSdk {
                 super.onSuccess(testpressSession);
                 testpressSession.setBaseUrl(baseUrl);
                 setTestpressSession(context, testpressSession);
+                SharedPreferences.Editor editor = getPreferenceEditor(context);
+                editor.putString(KEY_USER_ID, userId);
+                editor.apply();
                 progressDialog.dismiss();
                 if (callback != null) {
                     callback.onSuccess(testpressSession);
