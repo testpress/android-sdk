@@ -1,27 +1,20 @@
 package in.testpress.exam.network;
 
-import java.util.List;
+import java.io.IOException;
 
-import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.ReviewItem;
 import in.testpress.exam.models.TestpressApiResponse;
+import retrofit2.Response;
 
 public class ReviewQuestionsPager extends BaseResourcePager<ReviewItem> {
 
-    private Attempt attempt;
+    private String reviewUrlFrag;
     private String filter;
-    private TestpressApiResponse<ReviewItem> response;
 
-    public ReviewQuestionsPager(Attempt attempt, String filter, TestpressExamApiClient service) {
+    public ReviewQuestionsPager(String reviewUrlFrag, String filter, TestpressExamApiClient service) {
         super(service);
-        this.attempt = attempt;
+        this.reviewUrlFrag = reviewUrlFrag;
         this.filter = filter;
-    }
-
-    @Override
-    public BaseResourcePager<ReviewItem> clear() {
-        response = null;
-        return super.clear();
     }
 
     @Override
@@ -30,19 +23,14 @@ public class ReviewQuestionsPager extends BaseResourcePager<ReviewItem> {
     }
 
     @Override
-    public List<ReviewItem> getItems(int page, int size) {
+    public Response<TestpressApiResponse<ReviewItem>> getItems(int page, int size) throws IOException {
         if (!filter.equals("all")) {
             queryParams.put(TestpressExamApiClient.STATE, filter);
         } else {
             queryParams.remove(TestpressExamApiClient.STATE);
         }
         queryParams.put(TestpressExamApiClient.PAGE, page);
-        response = apiClient.getReviewItems(attempt.getReviewFrag(), queryParams);
-        return response.getResults();
+        return apiClient.getReviewItems(reviewUrlFrag, queryParams).execute();
     }
 
-    @Override
-    public boolean hasNext() {
-        return response == null || response.getNext() != null;
-    }
 }

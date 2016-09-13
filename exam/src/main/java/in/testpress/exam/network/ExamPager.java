@@ -1,25 +1,18 @@
 package in.testpress.exam.network;
 
-import java.util.List;
+import java.io.IOException;
 
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.TestpressApiResponse;
-import retrofit.RetrofitError;
+import retrofit2.Response;
 
 public class ExamPager extends BaseResourcePager<Exam> {
 
     private final String subclass;
-    private TestpressApiResponse<Exam> response;
 
     public ExamPager(String subclass, TestpressExamApiClient apiClient) {
         super(apiClient);
         this.subclass = subclass;
-    }
-
-    @Override
-    public BaseResourcePager<Exam> clear() {
-        response = null;
-        return super.clear();
     }
 
     @Override
@@ -28,16 +21,10 @@ public class ExamPager extends BaseResourcePager<Exam> {
     }
 
     @Override
-    public List<Exam> getItems(int page, int size) throws RetrofitError {
+    public Response<TestpressApiResponse<Exam>> getItems(int page, int size) throws IOException {
         queryParams.put(TestpressExamApiClient.STATE, subclass);
         queryParams.put(TestpressExamApiClient.PAGE, page);
-        response = apiClient.getExams(queryParams);
-        return response.getResults();
-    }
-
-    @Override
-    public boolean hasNext() {
-        return response == null || response.getNext() != null;
+        return apiClient.getExams(queryParams).execute();
     }
 
 }

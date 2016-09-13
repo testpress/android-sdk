@@ -29,11 +29,10 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
 
+import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.ExamPager;
@@ -216,7 +215,7 @@ public class SearchFragment extends Fragment implements AbsListView.OnScrollList
         return new ThrowableLoader<List<Exam>>(getActivity(), items) {
 
             @Override
-            public List<Exam> loadData() throws IOException {
+            public List<Exam> loadData() throws TestpressException {
                 pager.setQueryParams(TestpressExamApiClient.SEARCH_QUERY, queryText);
                 pager.next();
                 return pager.getResources();
@@ -232,7 +231,7 @@ public class SearchFragment extends Fragment implements AbsListView.OnScrollList
                 getListAdapter().removeFooter(loadingLayout);
             }
         }
-        final Exception exception = getException(loader);
+        final TestpressException exception = getException(loader);
         if (exception != null) {
             if (!items.isEmpty()) {
                 Snackbar.make(searchLayout, getErrorMessage(exception), Snackbar.LENGTH_LONG).show();
@@ -309,10 +308,10 @@ public class SearchFragment extends Fragment implements AbsListView.OnScrollList
         }
     }
 
-    private int getErrorMessage(Exception exception) {
-        if((exception.getMessage() != null) && (exception.getMessage()).equals("403 FORBIDDEN")) {
+    private int getErrorMessage(TestpressException exception) {
+        if(exception.isUnauthenticated()) {
             return R.string.testpress_authentication_failed;
-        } else if (exception.getCause() instanceof UnknownHostException) {
+        } else if (exception.isNetworkError()) {
             setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again,
                     R.drawable.ic_error_outline_black_18dp);
             return R.string.testpress_no_internet_try_again;
@@ -339,7 +338,7 @@ public class SearchFragment extends Fragment implements AbsListView.OnScrollList
                 .getAdapter();
     }
 
-    private Exception getException(final Loader<List<Exam>> loader) {
+    private TestpressException getException(final Loader<List<Exam>> loader) {
         if (loader instanceof ThrowableLoader) {
             return ((ThrowableLoader<List<Exam>>) loader).clearException();
         } else {

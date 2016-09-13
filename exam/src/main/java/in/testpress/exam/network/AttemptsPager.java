@@ -1,25 +1,18 @@
 package in.testpress.exam.network;
 
-import java.util.List;
+import java.io.IOException;
 
 import in.testpress.exam.models.Attempt;
-import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.TestpressApiResponse;
+import retrofit2.Response;
 
 public class AttemptsPager extends BaseResourcePager<Attempt> {
 
-    Exam exam;
-    TestpressApiResponse<Attempt> response;
+    private final String attemptsUrlFrag;
 
-    public AttemptsPager(Exam exam, TestpressExamApiClient service) {
+    public AttemptsPager(String attemptsUrlFrag, TestpressExamApiClient service) {
         super(service);
-        this.exam = exam;
-    }
-
-    @Override
-    public BaseResourcePager<Attempt> clear() {
-        response = null;
-        return super.clear();
+        this.attemptsUrlFrag = attemptsUrlFrag;
     }
 
     @Override
@@ -28,14 +21,9 @@ public class AttemptsPager extends BaseResourcePager<Attempt> {
     }
 
     @Override
-    public List<Attempt> getItems(int page, int size) {
+    public Response<TestpressApiResponse<Attempt>> getItems(int page, int size) throws IOException {
         queryParams.put(TestpressExamApiClient.PAGE, page);
-        response = apiClient.getAttempts(exam.getAttemptsFrag(), queryParams);
-        return response.getResults();
+        return apiClient.getAttempts(attemptsUrlFrag, queryParams).execute();
     }
 
-    @Override
-    public boolean hasNext() {
-        return response == null || response.getNext() != null;
-    }
 }

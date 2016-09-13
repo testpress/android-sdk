@@ -92,7 +92,7 @@ public class TestQuestionFragment extends Fragment {
                 default:
                     break;
             }
-            review.setChecked((attemptItem.getReview() != null) ? attemptItem.getReview() : false);
+            review.setChecked(attemptItem.getReview());
             attemptItem.saveAnswers(attemptItem.getSelectedAnswers());
             attemptItem.setCurrentReview(attemptItem.getReview());
             if (attemptQuestion.getDirection() == null || attemptQuestion.getDirection().isEmpty()) {

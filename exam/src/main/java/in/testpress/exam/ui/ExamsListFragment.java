@@ -11,9 +11,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
 
-import java.io.IOException;
 import java.util.List;
 
+import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.ExamPager;
@@ -74,12 +74,12 @@ public class ExamsListFragment extends PagedItemFragment<Exam> {
     }
 
     @Override
-    protected int getErrorMessage(Exception exception) {
-        if((exception.getMessage() != null) && (exception.getMessage()).equals("403 FORBIDDEN")) {
+    protected int getErrorMessage(TestpressException exception) {
+        if (exception.isUnauthenticated()) {
             setEmptyText(R.string.testpress_authentication_failed, R.string.testpress_please_login,
                     R.drawable.ic_error_outline_black_18dp);
             return R.string.testpress_authentication_failed;
-        } else if (exception.getCause() instanceof IOException) {
+        } else if (exception.isNetworkError()) {
             setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again,
                     R.drawable.ic_error_outline_black_18dp);
             return R.string.testpress_no_internet_try_again;
@@ -106,7 +106,7 @@ public class ExamsListFragment extends PagedItemFragment<Exam> {
         if (R.id.search == item.getItemId()) {
             Intent intent = new Intent(getActivity(), SearchActivity.class);
             intent.putExtra(SearchFragment.SUBCLASS, subclass);
-            startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
+            getParentFragment().startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
             return true;
         }
         return super.onOptionsItemSelected(item);

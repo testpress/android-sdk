@@ -7,9 +7,9 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ProgressBar;
 
-import java.io.IOException;
 import java.util.List;
 
+import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.network.BaseResourcePager;
 import in.testpress.exam.util.ThrowableLoader;
@@ -111,7 +111,7 @@ public abstract class PagedItemFragment<E> extends BaseListViewFragment<E>
     public Loader<List<E>> onCreateLoader(int id, Bundle bundle) {
         return new ThrowableLoader<List<E>>(getActivity(), items) {
             @Override
-            public List<E> loadData() throws IOException {
+            public List<E> loadData() throws TestpressException {
                 getPager().next();
                 return getPager().getResources();
             }

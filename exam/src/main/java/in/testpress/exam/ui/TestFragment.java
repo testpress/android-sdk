@@ -20,9 +20,6 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,14 +29,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
+import in.testpress.core.TestpressCallback;
+import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Exam;
-import in.testpress.exam.models.TestpressApiResponse;
+import in.testpress.exam.network.TestQuestionsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.ThrowableLoader;
-import in.testpress.util.SafeAsyncTask;
 import in.testpress.util.UIUtils;
 
 public class TestFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>> {
@@ -62,7 +60,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private ProgressDialog progressDialog;
     private Attempt attempt;
     private Exam exam;
-    private URL questionsUrl;
+    private TestQuestionsPager questionsPager;
     private List<AttemptItem> attemptItemList = new ArrayList<AttemptItem>();
     private CountDownTimer countDownTimer;
     private long millisRemaining;
@@ -80,10 +78,8 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         super.onCreate(savedInstanceState);
         attempt = getArguments().getParcelable(PARAM_ATTEMPT);
         exam = getArguments().getParcelable(PARAM_EXAM);
-        try {
-            questionsUrl = new URL(attempt.getQuestionsUrl());
-        } catch (MalformedURLException e) {
-        }
+        questionsPager = new TestQuestionsPager(attempt.getQuestionsUrlFrag(),
+                new TestpressExamApiClient(getActivity()));
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -205,12 +201,6 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
     private void showNextQuestion() {
         if (next.getText().equals(getResources().getString(R.string.testpress_end))) {
-            if (attemptItemList.isEmpty()) {
-                return;
-            }
-            if (attemptItemList.get(pager.getCurrentItem()).hasChanged()) {
-                saveResult(pager.getCurrentItem());
-            }
             endExamAlert();
         } else if (pager.getCurrentItem() < (pagerAdapter.getCount() - 1)) {
             goToQuestion(pager.getCurrentItem() + 1);
@@ -221,10 +211,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         if (attemptItemList.isEmpty()) {
             return;
         }
-
-        if (attemptItemList.get(pager.getCurrentItem()).hasChanged()) {
-            saveResult(pager.getCurrentItem());
-        }
+        saveResult(pager.getCurrentItem(), false);
         pager.setCurrentItem(position);
         panelListAdapter.setCurrentAttemptItemIndex(position + 1);
         if (slidingPaneLayout.isOpen()) {
@@ -271,7 +258,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 .setPositiveButton(R.string.testpress_end, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                       endExam.execute();
+                        endExam();
                     }
                 })
                 .setNegativeButton(R.string.testpress_cancel, null)
@@ -297,22 +284,11 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     public Loader<List<AttemptItem>> onCreateLoader(int id, final Bundle args) {
         return new ThrowableLoader<List<AttemptItem>>(getActivity(), attemptItemList) {
             @Override
-            public List<AttemptItem> loadData() throws Exception {
-                TestpressApiResponse<AttemptItem> response;
-                String fragment;
+            public List<AttemptItem> loadData() throws TestpressException {
                 do {
-                    fragment = questionsUrl.getFile().substring(1);
-                    response = apiClient.getQuestions(fragment);
-                    if (attemptItemList != null) {
-                        attemptItemList.addAll(response.getResults());
-                    } else {
-                        attemptItemList = response.getResults();
-                    }
-                    String next = response.getNext();
-                    if (next != null) {
-                        questionsUrl = new URL(response.getNext());
-                    }
-                } while (response.getNext() != null);
+                    questionsPager.next();
+                    attemptItemList = questionsPager.getResources();
+                } while (questionsPager.hasNext());
                 return attemptItemList;
             }
         };
@@ -323,7 +299,8 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         if (progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
-        Exception exception = ((ThrowableLoader<List<AttemptItem>>) loader).clearException();
+        //noinspection ThrowableResultOfMethodCallIgnored
+        TestpressException exception = ((ThrowableLoader<List<AttemptItem>>) loader).clearException();
         if(exception != null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
                     R.style.TestpressAppCompatAlertDialogStyle);
@@ -334,16 +311,22 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                     getLoaderManager().restartLoader(loader.getId(), null, TestFragment.this);
                 }
             });
-            if((exception.getMessage() != null) && (exception.getMessage()).equals("403 FORBIDDEN")) {
+            if (exception.isUnauthenticated()) {
                 builder.setTitle(R.string.testpress_authentication_failed);
                 builder.setMessage(R.string.testpress_please_login);
-            } else if (exception.getCause() instanceof IOException) {
+            } else if (exception.isNetworkError()) {
                 builder.setTitle(R.string.testpress_network_error);
                 builder.setMessage(R.string.testpress_no_internet_try_again);
             } else {
                 builder.setTitle(R.string.testpress_error_loading_questions);
                 builder.setMessage(R.string.testpress_some_thing_went_wrong_try_again);
             }
+            builder.setNegativeButton(R.string.testpress_cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    returnToHistory();
+                }
+            });
             builder.setCancelable(false);
             builder.show();
             return;
@@ -419,147 +402,113 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         );
     }
 
-    private void saveResult(final int position) {
+    private void saveResult(final int position, final boolean endExam) {
         final AttemptItem attemptItem = attemptItemList.get(position);
-        new SafeAsyncTask<AttemptItem>() {
-            @Override
-            public AttemptItem call() throws Exception {
-                String fragment= null;
-                try {
-                    URL urlFrag = new URL(attemptItem.getUrl());
-                    fragment = urlFrag.getFile().substring(1);
-                } catch (MalformedURLException e) {
-                }
-                return apiClient.postAnswer(fragment, attemptItem.getSavedAnswers(),
-                        attemptItem.getCurrentReview());
-            }
+        if (attemptItem.hasChanged()) {
+            apiClient.postAnswer(attemptItem.getUrlFrag(), attemptItem.getSavedAnswers(),
+                    attemptItem.getCurrentReview())
+                    .enqueue(new TestpressCallback<AttemptItem>() {
+                        @Override
+                        public void onSuccess(AttemptItem newAttemptItem) {
+                            attemptItem.setSelectedAnswers(newAttemptItem.getSelectedAnswers());
+                            attemptItem.setReview(newAttemptItem.getReview());
+                            attemptItemList.set(position, attemptItem);
+                            if (endExam) {
+                                endExam();
+                            } else {
+                                if (progressDialog.isShowing()) {
+                                    startCountDownTimer(millisRemaining);
+                                    progressDialog.dismiss();
+                                }
+                                pagerAdapter.notifyDataSetChanged();
+                                updatePanel();
+                            }
+                        }
 
-            @Override
-            protected void onException(Exception e) {
-                super.onException(e);
-                countDownTimer.cancel();
-                new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
-                        .setTitle(R.string.testpress_no_internet_connection)
-                        .setMessage(R.string.testpress_exam_paused_check_internet)
-                        .setCancelable(false)
-                        .setPositiveButton(R.string.testpress_resume,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        progressDialog.show();
-                                        saveResult(position);
-                                    }
-                                })
-                        .setNegativeButton(R.string.testpress_not_now,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        returnToHistory();
-                                    }
-                                })
-                        .show();
-            }
+                        @Override
+                        public void onException(TestpressException exception) {
+                            countDownTimer.cancel();
+                            TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception) {
+                                @Override
+                                protected void onRetry() {
+                                    saveResult(position, endExam);
+                                }
+                            };
+                            alertDialog.show();
+                        }
+                    });
+        }
+    }
 
+    private void sendHeartBeat() {
+        apiClient.heartbeat(attempt.getHeartBeatUrlFrag()).enqueue(new TestpressCallback<Attempt>() {
             @Override
-            protected void onSuccess(AttemptItem newAttemptItem) throws Exception {
-                super.onSuccess(newAttemptItem);
+            public void onSuccess(Attempt result) {
                 if (progressDialog.isShowing()) {
                     startCountDownTimer(millisRemaining);
                     progressDialog.dismiss();
                 }
-                attemptItem.setSelectedAnswers(newAttemptItem.getSelectedAnswers());
-                attemptItem.setReview(newAttemptItem.getReview());
-                attemptItemList.set(position, attemptItem);
-                pagerAdapter.notifyDataSetChanged();
-                updatePanel();
             }
-        }.execute();
+
+            @Override
+            public void onException(TestpressException exception) {
+                countDownTimer.cancel();
+                TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception) {
+                    @Override
+                    protected void onRetry() {
+                        sendHeartBeat();
+                    }
+                };
+                alertDialog.show();
+            }
+        });
     }
 
-    private SafeAsyncTask<Attempt> sendHeartBeat = new SafeAsyncTask<Attempt>() {
-        @Override
-        public Attempt call() throws Exception {
-            return  apiClient.heartbeat(attempt.getHeartBeatUrlFrag());
-        }
-
-        @Override
-        protected void onException(Exception e) {
-            super.onException(e);
+    private void endExam() {
+        if (countDownTimer != null) {
             countDownTimer.cancel();
-            new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
-                    .setTitle(R.string.testpress_no_internet_connection)
-                    .setMessage(R.string.testpress_exam_paused_check_internet)
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.testpress_resume,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    progressDialog.show();
-                                    sendHeartBeat.execute();
-                                }
-                            })
-                    .setNegativeButton(R.string.testpress_not_now,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    returnToHistory();
-                                }
-                            })
-                    .show();
         }
+        if (!progressDialog.isShowing()) {
+            progressDialog.setMessage(getString(R.string.testpress_loading));
+            progressDialog.show();
+        }
+        // Save attemptItem, if option or review is changed
+        final AttemptItem attemptItem = attemptItemList.get(pager.getCurrentItem());
+        if (attemptItem.hasChanged()) {
+           saveResult(pager.getCurrentItem(), true);
+            return;
+        }
+        apiClient.endExam(attempt.getUrlFrag() + TestpressExamApiClient.END_EXAM_PATH)
+                .enqueue(new TestpressCallback<Attempt>() {
+                    @Override
+                    public void onSuccess(Attempt attempt) {
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
+                        TestFragment.this.attempt = attempt;
+                        showReview();
+                    }
 
-        @Override
-        protected void onSuccess(Attempt attempt) throws Exception {
-            super.onSuccess(attempt);
-            if (progressDialog.isShowing()) {
-                startCountDownTimer(millisRemaining);
-                progressDialog.dismiss();
-            }
-        }
-    };
-
-    private SafeAsyncTask<Attempt> endExam = new SafeAsyncTask<Attempt>() {
-        @Override
-        public Attempt call() throws Exception {
-            countDownTimer.cancel();
-            attempt = apiClient.endExam(attempt.getUrlFrag() + TestpressExamApiClient.END_EXAM_PATH);
-            return attempt;
-        }
-
-        @Override
-        protected void onException(Exception e) {
-            super.onException(e);
-            new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
-                    .setTitle(R.string.testpress_no_internet_connection)
-                    .setMessage(R.string.testpress_exam_paused_check_internet_to_end)
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.testpress_try_again,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    progressDialog.show();
-                                    endExam.execute();
-                                }
-                            })
-                    .setNegativeButton(R.string.testpress_not_now,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    returnToHistory();
-                                }
-                            })
-                    .show();
-        }
-
-        @Override
-        protected void onSuccess(Attempt attempt) throws Exception {
-            super.onSuccess(attempt);
-            if (progressDialog.isShowing()) {
-                progressDialog.dismiss();
-            }
-            showReview();
-        }
-    };
+                    @Override
+                    public void onException(TestpressException exception) {
+                        TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception);
+                        if (exception.isNetworkError()) {
+                            alertDialog.setMessage(R.string.testpress_exam_paused_check_internet_to_end);
+                            alertDialog.setPositiveButton(R.string.testpress_end,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            progressDialog.setMessage(getString(
+                                                    R.string.testpress_loading));
+                                            progressDialog.show();
+                                            endExam();
+                                        }
+                                    });
+                        }
+                        alertDialog.show();
+                    }
+                });
+    }
 
     private static String formatTime(final long millis) {
         return String.format("%02d:%02d:%02d",
@@ -582,7 +531,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
     private void onExpandPanel() {
         if (attemptItemList.get(pager.getCurrentItem()).hasChanged()) {
-            saveResult(pager.getCurrentItem());
+            saveResult(pager.getCurrentItem(), false);
         }
         previous.setVisibility(View.INVISIBLE);
         next.setVisibility(View.INVISIBLE);
@@ -656,14 +605,54 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 final String formattedTime = formatTime(millisUntilFinished);
                 timer.setText(formattedTime);
                 if(((millisUntilFinished / 1000) % 60) == 0) {
-                    sendHeartBeat.execute();
+                    sendHeartBeat();
                 }
             }
 
             public void onFinish() {
-                endExam.execute();
+                endExam();
             }
         }.start();
     }
 
+    class TestEngineAlertDialog extends AlertDialog.Builder {
+
+        public TestEngineAlertDialog(TestpressException exception) {
+            super(getActivity(), R.style.TestpressAppCompatAlertDialogStyle);
+            setCancelable(false);
+            if (exception.isNetworkError()) {
+                setTitle(R.string.testpress_no_internet_connection)
+                        .setMessage(R.string.testpress_exam_paused_check_internet)
+                        .setPositiveButton(R.string.testpress_resume,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        progressDialog.setMessage(getString(
+                                                R.string.testpress_loading));
+                                        progressDialog.show();
+                                        onRetry();
+                                    }
+                                })
+                        .setNegativeButton(R.string.testpress_not_now,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        returnToHistory();
+                                    }
+                                });
+            } else {
+                setTitle(R.string.testpress_loading_failed)
+                        .setMessage(R.string.testpress_some_thing_went_wrong_try_again)
+                        .setPositiveButton(R.string.testpress_ok,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        returnToHistory();
+                                    }
+                                });
+            }
+        }
+
+        protected void onRetry() {}
+    }
 }

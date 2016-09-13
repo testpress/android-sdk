@@ -6,9 +6,11 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
@@ -17,13 +19,19 @@ import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.ReviewItem;
 import in.testpress.exam.models.TestpressApiResponse;
-import retrofit.RestAdapter;
-import retrofit.client.Response;
-import retrofit.converter.GsonConverter;
+import in.testpress.network.ErrorHandlingCallAdapterFactory;
+import in.testpress.network.RetrofitCall;
+import in.testpress.util.UserAgentProvider;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TestpressExamApiClient {
 
-    private final RestAdapter restAdapter;
+    private final Retrofit retrofit;
     private final TestpressSession testpressSession;
 
     /**
@@ -46,77 +54,101 @@ public class TestpressExamApiClient {
     public static final String STATE = "state";
     public static final String PAGE = "page";
 
-    public TestpressExamApiClient(Context context) {
+    public TestpressExamApiClient(final Context context) {
         testpressSession = TestpressSdk.getTestpressSession(context);
+        if (testpressSession == null) {
+            throw new IllegalStateException("TestpressSession must not be null.");
+        }
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
 
-        restAdapter = new RestAdapter.Builder()
-                .setEndpoint(testpressSession.getBaseUrl())
-                .setLogLevel(RestAdapter.LogLevel.FULL)
-                .setConverter(new GsonConverter(gson))
+        // Set headers for all network requests
+        Interceptor interceptor = new Interceptor() {
+            @Override
+            public okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
+                Request newRequest = chain.request().newBuilder()
+                        .addHeader("User-Agent", UserAgentProvider.get(context))
+                        .addHeader("Authorization", "JWT " + testpressSession.getToken())
+                        .build();
+                return chain.proceed(newRequest);
+            }
+        };
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.connectTimeout(2, TimeUnit.MINUTES).readTimeout(2, TimeUnit.MINUTES);
+        httpClient.addInterceptor(interceptor);
+
+        // Set log level
+        HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        httpClient.addInterceptor(httpLoggingInterceptor);
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl(testpressSession.getBaseUrl())
+                .addCallAdapterFactory(new ErrorHandlingCallAdapterFactory())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(httpClient.build())
                 .build();
     }
-
-    private String getAuthToken() {
-        return "JWT " + testpressSession.getToken();
-    }
-
+    
     public ExamService getExamService() {
-        return restAdapter.create(ExamService.class);
+        return retrofit.create(ExamService.class);
     }
 
-    public TestpressApiResponse<Exam> getExams(Map<String, Object> queryParams) {
-        return getExamService().getExams(queryParams, getAuthToken());
+    public RetrofitCall<TestpressApiResponse<Exam>> getExams(Map<String, Object> queryParams) {
+        return getExamService().getExams(queryParams);
     }
 
-    public Response mailQuestionsPdf(String mailPdfUrlFrag) {
-        return getExamService().mailQuestionsPdf(mailPdfUrlFrag, getAuthToken());
+    public RetrofitCall<Void> mailQuestionsPdf(String mailPdfUrlFrag) {
+        return getExamService().mailQuestionsPdf(mailPdfUrlFrag);
     }
 
-    public Void mailExplanationsPdf(String mailPdfUrlFrag) {
-        return getExamService().mailExplanationsPdf(mailPdfUrlFrag, getAuthToken());
+    public RetrofitCall<Void> mailExplanationsPdf(String mailPdfUrlFrag) {
+        return getExamService().mailExplanationsPdf(mailPdfUrlFrag);
     }
 
-    public Attempt createAttempt(String attemptsUrlFrag) {
-        return getExamService().createAttempt(attemptsUrlFrag, getAuthToken());
+    public RetrofitCall<Attempt> createAttempt(String attemptsUrlFrag) {
+        return getExamService().createAttempt(attemptsUrlFrag);
     }
 
-    public Attempt startAttempt(String startAttemptUrlFrag) {
-        return getExamService().startAttempt(startAttemptUrlFrag, getAuthToken());
+    public RetrofitCall<Attempt> startAttempt(String startAttemptUrlFrag) {
+        return getExamService().startAttempt(startAttemptUrlFrag);
     }
 
-    public Attempt endAttempt(String endAttemptUrlFrag) {
-        return getExamService().endExam(endAttemptUrlFrag, getAuthToken());
+    public RetrofitCall<Attempt> endAttempt(String endAttemptUrlFrag) {
+        return getExamService().endExam(endAttemptUrlFrag);
     }
 
-    public TestpressApiResponse<AttemptItem> getQuestions(String questionsUrlFrag) {
-        return getExamService().getQuestions(questionsUrlFrag, getAuthToken());
+    public RetrofitCall<TestpressApiResponse<AttemptItem>> getQuestions(
+            String questionsUrlFrag, Map<String, Object> queryParams) {
+        return getExamService().getQuestions(questionsUrlFrag, queryParams);
     }
 
-    public AttemptItem postAnswer(String answerUrlFrag, List<Integer> savedAnswers, Boolean review) {
+    public RetrofitCall<TestpressApiResponse<Attempt>> getAttempts(String urlFrag,
+                                                                   Map<String, Object> queryParams) {
+        return getExamService().getAttempts(urlFrag, queryParams);
+    }
+
+    public RetrofitCall<TestpressApiResponse<ReviewItem>> getReviewItems(
+            String urlFrag, Map<String, Object> queryParams) {
+        return getExamService().getReviewItems(urlFrag, queryParams);
+    }
+
+    public RetrofitCall<AttemptItem> postAnswer(String answerUrlFrag, List<Integer> savedAnswers,
+                                                Boolean review) {
         HashMap<String, Object> answer = new HashMap<String, Object>();
         answer.put("selected_answers", savedAnswers);
         answer.put("review", review);
-        return getExamService().postAnswer(answerUrlFrag, getAuthToken(), answer);
+        return getExamService().postAnswer(answerUrlFrag, answer);
     }
 
-    public Attempt heartbeat(String heartbeatUrlFrag) {
-        return getExamService().heartbeat(heartbeatUrlFrag, getAuthToken());
+    public RetrofitCall<Attempt> heartbeat(String heartbeatUrlFrag) {
+        return getExamService().heartbeat(heartbeatUrlFrag);
     }
 
-    public Attempt endExam(String endExamUrlFrag) {
-        return getExamService().endExam(endExamUrlFrag, getAuthToken());
-    }
-
-    public TestpressApiResponse<Attempt> getAttempts(String urlFrag, Map<String, Object> queryParams) {
-        return getExamService().getAttempts(urlFrag, queryParams, getAuthToken());
-    }
-
-    public TestpressApiResponse<ReviewItem> getReviewItems(String urlFrag, Map<String, Object> queryParams) {
-        return getExamService().getReviewItems(urlFrag, queryParams, getAuthToken());
+    public RetrofitCall<Attempt> endExam(String endExamUrlFrag) {
+        return getExamService().endExam(endExamUrlFrag);
     }
 
 }
