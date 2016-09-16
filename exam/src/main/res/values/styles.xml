@@ -82,31 +82,37 @@
     <style name="TestpressReviewStatHeading">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/testpress_color_primary</item>
-        <item name="android:textSize">@dimen/testpress_text_size_xxlarge</item>
+        <item name="android:textSize">@dimen/testpress_text_size_xlarge</item>
         <item name="android:textStyle">normal</item>
         <item name="android:layout_marginTop">5dp</item>
         <item name="android:layout_marginBottom">5dp</item>
     </style>
 
     <style name="TestpressReviewStatSubHeading">
-        <item name="android:layout_width">200dp</item>
+        <item name="android:layout_width">150dp</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/testpress_color_primary</item>
-        <item name="android:textSize">@dimen/testpress_text_size_large</item>
+        <item name="android:textColor">@color/testpress_text_gray</item>
         <item name="android:capitalize">characters</item>
         <item name="android:textStyle">normal</item>
         <item name="android:layout_marginTop">5dp</item>
         <item name="android:layout_marginBottom">5dp</item>
     </style>
 
+    <style name="TestpressReviewStatSubHeading.Tab">
+        <item name="android:textSize">@dimen/testpress_text_size_xmedium</item>
+    </style>
+
     <style name="TestpressReviewStatValue">
-        <item name="android:layout_width">80dp</item>
+        <item name="android:layout_width">60dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">#333</item>
-        <item name="android:textSize">@dimen/testpress_text_size_large</item>
         <item name="android:textStyle">bold</item>
         <item name="android:layout_marginTop">5dp</item>
         <item name="android:layout_marginBottom">5dp</item>
+    </style>
+
+    <style name="TestpressReviewStatValue.Tab">
+        <item name="android:textSize">@dimen/testpress_text_size_xmedium</item>
     </style>
 
     <style name="Widget.Testpress.HeaderBar.Spinner.Base" parent="Widget.AppCompat.Light.Spinner.DropDown.ActionBar">
@@ -144,6 +150,9 @@
         <item name="android:textSize">13sp</item>
         <item name="textAllCaps">true</item>
         <item name="android:gravity">center</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">80dp</item>
+        <item name="android:padding">12dp</item>
         <item name="android:textColor">@color/testpress_button_text_color</item>
     </style>
 

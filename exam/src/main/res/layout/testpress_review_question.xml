@@ -25,7 +25,6 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textColor="@color/testpress_black"
-                android:textSize="@dimen/testpress_text_size_xmedium"
                 android:textStyle="bold"
                 android:text="1." />
 
@@ -44,7 +43,7 @@
                     android:paddingRight="15dp"
                     android:lineSpacingExtra="5sp"
                     android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                    android:textSize="@dimen/testpress_text_size_xmedium" />
+                    />
 
                 <LinearLayout
                     android:orientation="vertical"
@@ -61,11 +60,12 @@
                     android:background="@color/testpress_color_primary"
                     android:textColor="@color/testpress_button_text_color"
                     android:textStyle="bold"
+                    android:textSize="12sp"
                     android:layout_marginTop="15dp"
-                    android:paddingLeft="15dp"
-                    android:paddingRight="15dp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp" />
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp" />
 
                 <LinearLayout
                     android:orientation="horizontal"
@@ -78,7 +78,6 @@
                         android:id="@+id/correct_option"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
-                        android:textSize="@dimen/testpress_text_size_xmedium"
                         android:textColor="#ffffff"
                         android:background="@drawable/testpress_round_background"
                         android:text="a"
@@ -98,12 +97,13 @@
                     android:background="@color/testpress_color_primary"
                     android:textColor="@color/testpress_button_text_color"
                     android:textStyle="bold"
+                    android:textSize="12sp"
                     android:layout_marginTop="15dp"
                     android:layout_marginBottom="10dp"
-                    android:paddingLeft="15dp"
-                    android:paddingRight="15dp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"/>
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -115,7 +115,7 @@
                     android:layout_marginStart="5dp"
                     android:id="@+id/explanation"
                     android:text="Lorem ipsum dolor sit amet,  ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                    android:textSize="@dimen/testpress_text_size_xmedium" />
+                    />
 
             </LinearLayout>
 
