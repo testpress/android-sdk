@@ -3,6 +3,7 @@ package in.testpress.exam.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -257,6 +258,15 @@ public class Attempt implements Parcelable {
      */
     public String getQuestionsUrl() {
         return questionsUrl;
+    }
+
+    public String getQuestionsUrlFrag() {
+        try {
+            URL url = new URL(questionsUrl);
+            return url.getFile().substring(1);
+        } catch (MalformedURLException e) {
+            return null;
+        }
     }
 
     /**

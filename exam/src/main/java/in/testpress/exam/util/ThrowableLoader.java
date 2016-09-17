@@ -3,6 +3,8 @@ package in.testpress.exam.util;
 import android.content.Context;
 import android.util.Log;
 
+import in.testpress.core.TestpressException;
+
 /**
  * Loader that support throwing an exception when loading in the background
  *
@@ -12,7 +14,7 @@ public abstract class ThrowableLoader<D> extends AsyncLoader<D> {
 
     private final D data;
 
-    private Exception exception;
+    private TestpressException exception;
 
     /**
      * Create loader for context and seeded with initial data
@@ -31,7 +33,7 @@ public abstract class ThrowableLoader<D> extends AsyncLoader<D> {
         exception = null;
         try {
             return loadData();
-        } catch (final Exception e) {
+        } catch (final TestpressException e) {
             Log.d("ThrowableLoader", "Exception loading data");
             e.printStackTrace();
             exception = e;
@@ -42,7 +44,7 @@ public abstract class ThrowableLoader<D> extends AsyncLoader<D> {
     /**
      * @return exception
      */
-    public Exception getException() {
+    public TestpressException getException() {
         return exception;
     }
 
@@ -51,8 +53,8 @@ public abstract class ThrowableLoader<D> extends AsyncLoader<D> {
      *
      * @return exception
      */
-    public Exception clearException() {
-        final Exception throwable = exception;
+    public TestpressException clearException() {
+        final TestpressException throwable = exception;
         exception = null;
         return throwable;
     }
@@ -61,7 +63,7 @@ public abstract class ThrowableLoader<D> extends AsyncLoader<D> {
      * Load data
      *
      * @return data
-     * @throws Exception
+     * @throws TestpressException
      */
-    public abstract D loadData() throws Exception;
+    public abstract D loadData() throws TestpressException;
 }

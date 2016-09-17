@@ -1,6 +1,5 @@
 package in.testpress.exam.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -18,8 +17,4 @@ public class SearchActivity extends AppCompatActivity {
                 .replace(R.id.fragment_container, searchFragment).commitAllowingStateLoss();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
 }

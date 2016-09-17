@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.ListView;
 
-import java.io.IOException;
 import java.util.List;
 
+import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.ReviewItem;
@@ -46,7 +46,8 @@ public class ReviewQuestionsFragment extends PagedItemFragment<ReviewItem> {
     @Override
     protected ReviewQuestionsPager getPager() {
         if (pager == null) {
-            pager = new ReviewQuestionsPager(attempt, filter, new TestpressExamApiClient(getActivity()));
+            pager = new ReviewQuestionsPager(attempt.getReviewFrag(), filter,
+                    new TestpressExamApiClient(getActivity()));
         }
         return (ReviewQuestionsPager) pager;
     }
@@ -58,12 +59,12 @@ public class ReviewQuestionsFragment extends PagedItemFragment<ReviewItem> {
     }
 
     @Override
-    protected int getErrorMessage(Exception exception) {
-        if((exception.getMessage() != null) && (exception.getMessage()).equals("403 FORBIDDEN")) {
+    protected int getErrorMessage(TestpressException exception) {
+        if (exception.isUnauthenticated()) {
             setEmptyText(R.string.testpress_authentication_failed, R.string.testpress_please_login,
                     R.drawable.ic_error_outline_black_18dp);
             return R.string.testpress_authentication_failed;
-        } else if (exception.getCause() instanceof IOException) {
+        } else  if (exception.isNetworkError()) {
             setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again,
                     R.drawable.ic_error_outline_black_18dp);
             return R.string.testpress_no_internet_try_again;

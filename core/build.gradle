@@ -22,10 +22,9 @@ dependencies {
     testCompile rootProject.junit
     testCompile rootProject.mockito
     compile rootProject.appcompat
-    compile rootProject.retrofit
-    compile rootProject.okHttp
-    compile rootProject.okHttpUrlConnection
-    compile rootProject.gson
+    compile rootProject.retrofit2
+    compile rootProject.gsonConverter
+    compile rootProject.httpLogInterceptor
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

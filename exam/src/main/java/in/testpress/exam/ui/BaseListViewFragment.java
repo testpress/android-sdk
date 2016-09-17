@@ -1,9 +1,7 @@
 package in.testpress.exam.ui;
 
 import android.app.Activity;
-
 import android.os.Bundle;
-
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -11,7 +9,6 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -24,6 +21,7 @@ import android.widget.TextView;
 import java.util.Collections;
 import java.util.List;
 
+import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.util.SingleTypeAdapter;
 import in.testpress.exam.util.ThrowableLoader;
@@ -76,7 +74,7 @@ public abstract class BaseListViewFragment<E> extends Fragment
      */
     protected boolean listShown;
 
-    protected Exception exception;
+    protected TestpressException exception;
     boolean firstCallBack = true;
     boolean needRetryButton;
 
@@ -207,10 +205,10 @@ public abstract class BaseListViewFragment<E> extends Fragment
      * @param exception
      * @return string resource id
      */
-    protected abstract int getErrorMessage(final Exception exception);
+    protected abstract int getErrorMessage(final TestpressException exception);
 
     public void onLoadFinished(final Loader<List<E>> loader, final List<E> items) {
-        final Exception exception = getException(loader);
+        final TestpressException exception = getException(loader);
         if (exception != null) {
             this.exception = exception;
             int errorMessage = getErrorMessage(exception);
@@ -282,7 +280,7 @@ public abstract class BaseListViewFragment<E> extends Fragment
      * @param loader
      * @return exception or null if none provided
      */
-    protected Exception getException(final Loader<List<E>> loader) {
+    protected TestpressException getException(final Loader<List<E>> loader) {
         if (loader instanceof ThrowableLoader) {
             return ((ThrowableLoader<List<E>>) loader).clearException();
         } else {

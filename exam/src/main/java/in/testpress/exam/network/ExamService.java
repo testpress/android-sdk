@@ -8,65 +8,62 @@ import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.ReviewItem;
 import in.testpress.exam.models.TestpressApiResponse;
-import retrofit.client.Response;
-import retrofit.http.Body;
-import retrofit.http.GET;
-import retrofit.http.Header;
-import retrofit.http.POST;
-import retrofit.http.PUT;
-import retrofit.http.Path;
-import retrofit.http.QueryMap;
+import in.testpress.network.RetrofitCall;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
+import retrofit2.http.QueryMap;
 
 public interface ExamService {
 
     @GET(TestpressExamApiClient.EXAMS_LIST_PATH)
-    TestpressApiResponse<Exam> getExams(@QueryMap Map<String, Object> options,
-                                        @Header("Authorization") String authorization);
+    RetrofitCall<TestpressApiResponse<Exam>> getExams(@QueryMap Map<String, Object> options);
 
     @GET("/{mail_pdf_url}")
-    Response mailQuestionsPdf(@Path(value = "mail_pdf_url", encode = false) String mailPdfUrlFrag,
-                              @Header("Authorization") String authorization);
+    RetrofitCall<Void> mailQuestionsPdf(
+            @Path(value = "mail_pdf_url", encoded = true) String mailPdfUrlFrag);
 
     @PUT("/{mail_pdf_url}")
-    Void mailExplanationsPdf(@Path(value = "mail_pdf_url", encode = false) String mailPdfUrlFrag,
-                 @Header("Authorization") String authorization);
+    RetrofitCall<Void> mailExplanationsPdf(
+            @Path(value = "mail_pdf_url", encoded = true) String mailPdfUrlFrag);
 
     @GET("/{questions_url}")
-    TestpressApiResponse<AttemptItem> getQuestions(
-            @Path(value = "questions_url", encode = false) String questionsUrlFrag,
-            @Header("Authorization") String authorization);
-
+    RetrofitCall<TestpressApiResponse<AttemptItem>> getQuestions(
+            @Path(value = "questions_url", encoded = true) String questionsUrlFrag,
+            @QueryMap Map<String, Object> options);
 
     @POST("/{attempts_url}")
-    Attempt createAttempt(@Path(value = "attempts_url", encode = false) String attemptsUrlFrag,
-                          @Header("Authorization") String authorization);
+    RetrofitCall<Attempt> createAttempt(
+            @Path(value = "attempts_url", encoded = true) String attemptsUrlFrag);
 
     @PUT("/{start_attempt_url}")
-    Attempt startAttempt(@Path(value = "start_attempt_url", encode = false) String startAttemptUrlFrag,
-                         @Header("Authorization") String authorization);
+    RetrofitCall<Attempt> startAttempt(
+            @Path(value = "start_attempt_url", encoded = true) String startAttemptUrlFrag);
 
     @PUT("/{answer_url}")
-    AttemptItem postAnswer(@Path(value = "answer_url", encode = false) String answerUrlFrag,
-                           @Header("Authorization") String authorization,
-                           @Body HashMap<String, Object> arguments);
+    RetrofitCall<AttemptItem> postAnswer(
+            @Path(value = "answer_url", encoded = true) String answerUrlFrag,
+            @Body HashMap<String, Object> arguments);
 
     @PUT("/{heartbeat_url}")
-    Attempt heartbeat(@Path(value = "heartbeat_url", encode = false) String heartbeatUrlFrag,
-                      @Header("Authorization") String authorization);
+    RetrofitCall<Attempt> heartbeat(
+            @Path(value = "heartbeat_url", encoded = true) String heartbeatUrlFrag);
 
     @PUT("/{end_exam_url}")
-    Attempt endExam(@Path(value = "end_exam_url", encode = false) String endExamUrlFrag,
-                    @Header("Authorization") String authorization);
+    RetrofitCall<Attempt> endExam(
+            @Path(value = "end_exam_url", encoded = true) String endExamUrlFrag);
 
     @GET("/{attempts_url}")
-    TestpressApiResponse<Attempt> getAttempts(
-            @Path(value = "attempts_url", encode = false) String attemptsUrlFrag,
-            @QueryMap Map<String, Object> options, @Header("Authorization") String authorization);
+    RetrofitCall<TestpressApiResponse<Attempt>> getAttempts(
+            @Path(value = "attempts_url", encoded = true) String attemptsUrlFrag,
+            @QueryMap Map<String, Object> options);
 
     @GET("/{review_url}")
-    TestpressApiResponse<ReviewItem> getReviewItems(
-            @Path(value = "review_url", encode = false) String reviewUrlFrag,
-            @QueryMap Map<String, Object> options, @Header("Authorization") String authorization);
+    RetrofitCall<TestpressApiResponse<ReviewItem>> getReviewItems(
+            @Path(value = "review_url", encoded = true) String reviewUrlFrag,
+            @QueryMap Map<String, Object> options);
 
 }
 

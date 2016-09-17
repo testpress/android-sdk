@@ -101,8 +101,11 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
         findViewById(R.id.testpress_login_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                authenticate(usernameEditText.getText().toString().trim(),
-                        passwordEditText.getText().toString().trim(), TestpressSdk.Provider.TESTPRESS);
+                if (!usernameEditText.getText().toString().trim().isEmpty() &&
+                        !passwordEditText.getText().toString().trim().isEmpty()) {
+                    authenticate(usernameEditText.getText().toString().trim(),
+                            passwordEditText.getText().toString().trim(), TestpressSdk.Provider.TESTPRESS);
+                }
             }
         });
         loginView = findViewById(R.id.scroll_view);
@@ -124,18 +127,14 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
 
                     @Override
                     public void onException(TestpressException e) {
-                        switch (e.getStatusCode()) {
-                            case TestpressException.NETWORK_ERROR:
-                                Snackbar.make(loginView, R.string.no_internet_try_again,
-                                        Snackbar.LENGTH_LONG).show();
-                                break;
-                            case TestpressException.BAD_REQUEST:
-                                Snackbar.make(loginView, e.getMessage(), Snackbar.LENGTH_LONG).show();
-                                break;
-                            default:
-                                Snackbar.make(loginView, "Token Generation Failed",
-                                        Snackbar.LENGTH_LONG).show();
-                                break;
+                        if (e.isNetworkError()) {
+                            Snackbar.make(loginView, R.string.no_internet_try_again,
+                                    Snackbar.LENGTH_LONG).show();
+                        } else if (e.isClientError()) {
+                            Snackbar.make(loginView, e.getMessage(), Snackbar.LENGTH_LONG).show();
+                        } else {
+                            Snackbar.make(loginView, "Token Generation Failed",
+                                    Snackbar.LENGTH_LONG).show();
                         }
                     }
                 });

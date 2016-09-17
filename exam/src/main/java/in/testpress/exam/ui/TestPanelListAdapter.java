@@ -34,8 +34,7 @@ class TestPanelListAdapter extends SingleTypeAdapter<AttemptItem> {
     @Override
     protected void update(final int position, final AttemptItem item) {
         String question = Html.fromHtml(item.getAttemptQuestion().getQuestionHtml()).toString();
-        if((item.getReview() != null && item.getReview()) ||
-                (item.getCurrentReview() != null && item.getCurrentReview())) {
+        if(item.getReview() || item.getCurrentReview()) {
             // Marked question
             updater.view.findViewById(R.id.all_question).setVisibility(View.GONE);
             updater.view.findViewById(R.id.answered_question).setVisibility(View.GONE);

@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 
+import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
@@ -20,6 +21,8 @@ import in.testpress.exam.network.TestpressExamApiClient;
 
 import in.testpress.exam.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
+import in.testpress.network.RetrofitCall;
+import retrofit2.Response;
 
 /**
  * Activity of Test Engine
@@ -89,8 +92,15 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         exam = data.getParcelable(PARAM_EXAM);
         attempt = data.getParcelable(PARAM_ATTEMPT);
         if (attempt != null) {
-            getSupportActionBar().setTitle(getString(R.string.testpress_resume_exam));
-            attemptActions.setVisibility(View.VISIBLE);
+            String action = data.getString(PARAM_ACTION);
+            if (action != null && action.equals(PARAM_VALUE_ACTION_END)) {
+                getSupportActionBar().setTitle(getString(R.string.testpress_end_exam));
+                endExam();
+                return;
+            } else {
+                getSupportActionBar().setTitle(getString(R.string.testpress_resume_exam));
+                attemptActions.setVisibility(View.VISIBLE);
+            }
         } else {
             startExam.setVisibility(View.VISIBLE);
         }
@@ -103,31 +113,45 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
             description.setVisibility(View.VISIBLE);
             descriptionContent.setText("    " + exam.getDescription());
         }
-        String action = data.getString(PARAM_ACTION);
-        if (action != null && action.equals(PARAM_VALUE_ACTION_END)) {
-            endExam();
-        }
     }
 
     private void endExam() {
-        getSupportLoaderManager().initLoader(2, null, TestActivity.this);
         progressBar.setVisibility(View.VISIBLE);
+        getSupportLoaderManager().initLoader(2, null, TestActivity.this);
     }
 
     @Override
     public Loader<Attempt> onCreateLoader(final int id, final Bundle args) {
         return new ThrowableLoader<Attempt>(TestActivity.this, attempt) {
             @Override
-            public Attempt loadData() throws Exception {
+            public Attempt loadData() throws TestpressException {
+                RetrofitCall<Attempt> call = null;
                 switch (id) {
                     case 0:
-                        return apiClient.createAttempt(exam.getAttemptsFrag());
+                        call = apiClient.createAttempt(exam.getAttemptsFrag());
+                        break;
                     case 1:
-                        return apiClient.startAttempt(attempt.getStartUrlFrag());
+                        call = apiClient.startAttempt(attempt.getStartUrlFrag());
+                        break;
                     case 2:
-                        return apiClient.endAttempt(attempt.getEndUrlFrag());
-                    default:
-                        return null;
+                        call = apiClient.endAttempt(attempt.getEndUrlFrag());
+                        break;
+                }
+                try {
+                    if (call != null) {
+                        Response<Attempt> response = call.execute();
+                        if (response.isSuccessful()) {
+                            return response.body();
+                        } else {
+                            throw TestpressException.httpError(response);
+                        }
+                    } else {
+                        throw new IllegalStateException("Invalid loader id");
+                    }
+                } catch (IOException e) {
+                    throw TestpressException.networkError(e);
+                } catch (Exception e) {
+                    throw TestpressException.unexpectedError(e);
                 }
             }
         };
@@ -136,7 +160,8 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     public void onLoadFinished(final Loader<Attempt> loader, final Attempt attempt) {
         progressBar.setVisibility(View.GONE);
         examDetailsContainer.setVisibility(View.GONE);
-        Exception exception = ((ThrowableLoader<Attempt>) loader).clearException();
+        //noinspection ThrowableResultOfMethodCallIgnored
+        TestpressException exception = ((ThrowableLoader<Attempt>) loader).clearException();
         if(exception == null) {
             fragmentContainer.setVisibility(View.VISIBLE);
             if (attempt.getState().equals("Running")) {
@@ -163,9 +188,9 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                     getSupportLoaderManager().restartLoader(loader.getId(), null, TestActivity.this);
                 }
             });
-            if((exception.getMessage() != null) && (exception.getMessage()).equals("403 FORBIDDEN")) {
+            if (exception.isUnauthenticated()) {
                 setEmptyText(R.string.testpress_authentication_failed, R.string.testpress_please_login);
-            } else if (exception.getCause() instanceof IOException) {
+            } else if (exception.isNetworkError()) {
                 setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again);
             } else {
                 setEmptyText(R.string.testpress_error_loading_questions,

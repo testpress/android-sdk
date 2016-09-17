@@ -7,9 +7,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StyleRes;
 import android.support.v7.app.AlertDialog;
 
+import in.testpress.core.TestpressCallback;
+import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.network.TestpressExamApiClient;
-import in.testpress.util.SafeAsyncTask;
+import in.testpress.network.RetrofitCall;
 import in.testpress.util.UIUtils;
 
 class EmailPdfDialog extends AlertDialog.Builder {
@@ -37,32 +39,33 @@ class EmailPdfDialog extends AlertDialog.Builder {
                 progressDialog.setIndeterminate(true);
                 UIUtils.setIndeterminateDrawable(context, progressDialog, 4);
                 progressDialog.show();
-                new SafeAsyncTask<Void>() {
+                RetrofitCall<Void> call;
+                if (isExplanation) {
+                    call = new TestpressExamApiClient(context).mailExplanationsPdf(urlFrag +
+                            TestpressExamApiClient.MAIL_PDF_PATH);
+                } else {
+                    call = new TestpressExamApiClient(context).mailQuestionsPdf(urlFrag +
+                            TestpressExamApiClient.MAIL_PDF_QUESTIONS_PATH);
+                }
+                call.enqueue(new TestpressCallback<Void>() {
                     @Override
-                    public Void call() throws Exception {
-                        if (isExplanation) {
-                            new TestpressExamApiClient(context).mailExplanationsPdf(urlFrag +
-                                    TestpressExamApiClient.MAIL_PDF_PATH);
-                        } else {
-                            new TestpressExamApiClient(context).mailQuestionsPdf(urlFrag +
-                                    TestpressExamApiClient.MAIL_PDF_QUESTIONS_PATH);
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    protected void onException(Exception e) {
+                    public void onException(TestpressException exception) {
                         progressDialog.dismiss();
                         AlertDialog.Builder builder = new AlertDialog.Builder(context,
                                 R.style.TestpressAppCompatAlertDialogStyle);
-                        builder.setTitle(R.string.testpress_mail_pdf_error);
-                        builder.setMessage(R.string.testpress_mail_pdf_error_description);
+                        if (exception.isNetworkError()) {
+                            builder.setTitle(R.string.testpress_network_error);
+                            builder.setMessage(R.string.testpress_no_internet_try_again);
+                        } else {
+                            builder.setTitle(R.string.testpress_mail_pdf_error);
+                            builder.setMessage(R.string.testpress_mail_pdf_error_description);
+                        }
                         builder.setPositiveButton(R.string.testpress_ok, null);
                         builder.show();
                     }
 
                     @Override
-                    protected void onSuccess(Void arg) {
+                    public void onSuccess(Void result) {
                         progressDialog.dismiss();
                         AlertDialog.Builder builder = new AlertDialog.Builder(context,
                                 R.style.TestpressAppCompatAlertDialogStyle);
@@ -73,7 +76,7 @@ class EmailPdfDialog extends AlertDialog.Builder {
                         builder.show();
                     }
 
-                }.execute();
+                });
             }
         });
         setNegativeButton(R.string.testpress_cancel, null);

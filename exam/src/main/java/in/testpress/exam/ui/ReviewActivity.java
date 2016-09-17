@@ -17,8 +17,8 @@ public class ReviewActivity extends BaseToolBarActivity {
     static Intent createIntent(Activity activity, Exam exam, Attempt attempt) {
         Intent intent = new Intent(activity, ReviewActivity.class);
         intent.putExtra(ReviewActivity.PRAM_PREVIOUS_ACTIVITY, activity.getClass().getName());
-        intent.putExtra(ReviewFragment.PRAM_EXAM, exam);
-        intent.putExtra(ReviewFragment.PRAM_ATTEMPT, attempt);
+        intent.putExtra(ReviewActivity.PRAM_EXAM, exam);
+        intent.putExtra(ReviewActivity.PRAM_ATTEMPT, attempt);
         return intent;
     }
 

@@ -6,15 +6,12 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.io.IOException;
 import java.util.HashMap;
 
 import in.testpress.network.AuthorizationErrorResponse;
 import in.testpress.network.TestpressApiClient;
 import in.testpress.R;
-import in.testpress.util.SafeAsyncTask;
 import in.testpress.util.UIUtils;
-import retrofit.RetrofitError;
 
 public final class TestpressSdk {
 
@@ -118,69 +115,57 @@ public final class TestpressSdk {
         progressDialog.setCancelable(false);
         UIUtils.setIndeterminateDrawable(context, progressDialog, 4);
         progressDialog.show();
-        new SafeAsyncTask<TestpressSession>() {
-            @Override
-            public TestpressSession call() throws Exception {
-                String urlPath;
-                HashMap<String, String> credentials = new HashMap<String, String>();
-                if (provider == Provider.TESTPRESS) {
-                    urlPath = TestpressApiClient.TESTPRESS_AUTH_PATH;
-                    credentials.put("username", userId);
-                    credentials.put("password", accessToken);
-                } else {
-                    urlPath = TestpressApiClient.SOCIAL_AUTH_PATH;
-                    credentials.put("provider", provider.name());
-                    credentials.put("user_id", userId);
-                    credentials.put("access_token", accessToken);
-                }
-                return new TestpressApiClient(baseUrl).authenticate(urlPath, credentials);
-            }
 
-            @Override
-            protected void onException(Exception exception) throws RuntimeException {
-                super.onException(exception);
-                progressDialog.dismiss();
-                if (callback != null) {
-                    TestpressException  testpressException = new TestpressException(exception.getCause());
-                    if (exception.getCause() instanceof IOException) {
-                        testpressException.setStatusCode(TestpressException.NETWORK_ERROR);
-                    } else if((exception instanceof RetrofitError) &&
-                            ((RetrofitError) exception).getResponse().getStatus() ==
-                                    TestpressException.BAD_REQUEST) {
-
-                        AuthorizationErrorResponse errorResponse = (AuthorizationErrorResponse)
-                                ((RetrofitError) exception).getBodyAs(AuthorizationErrorResponse.class);
-                        String message = "";
-                        if(!errorResponse.getUserId().isEmpty()) {
-                            message = errorResponse.getUserId().get(0);
-                        } else if(!errorResponse.getAccessToken().isEmpty()) {
-                            message = errorResponse.getAccessToken().get(0);
-                        } else if(!errorResponse.getProvider().isEmpty()) {
-                            message = errorResponse.getProvider().get(0);
-                        } else if (!errorResponse.getNonFieldErrors().isEmpty()) {
-                            message = errorResponse.getNonFieldErrors().get(0);
+        String urlPath;
+        HashMap<String, String> credentials = new HashMap<String, String>();
+        if (provider == Provider.TESTPRESS) {
+            urlPath = TestpressApiClient.TESTPRESS_AUTH_PATH;
+            credentials.put("username", userId);
+            credentials.put("password", accessToken);
+        } else {
+            urlPath = TestpressApiClient.SOCIAL_AUTH_PATH;
+            credentials.put("provider", provider.name());
+            credentials.put("user_id", userId);
+            credentials.put("access_token", accessToken);
+        }
+        new TestpressApiClient(baseUrl, context).authenticate(urlPath, credentials)
+                .enqueue(new TestpressCallback<TestpressSession>() {
+                    @Override
+                    public void onSuccess(TestpressSession testpressSession) {
+                        testpressSession.setBaseUrl(baseUrl);
+                        setTestpressSession(context, testpressSession);
+                        SharedPreferences.Editor editor = getPreferenceEditor(context);
+                        editor.putString(KEY_USER_ID, userId);
+                        editor.apply();
+                        progressDialog.dismiss();
+                        if (callback != null) {
+                            callback.onSuccess(testpressSession);
                         }
-                        testpressException = new TestpressException(message, exception.getCause());
-                        testpressException.setStatusCode(TestpressException.BAD_REQUEST);
                     }
-                    callback.onException(testpressException);
-                }
-            }
 
-            @Override
-            protected void onSuccess(TestpressSession testpressSession) throws Exception {
-                super.onSuccess(testpressSession);
-                testpressSession.setBaseUrl(baseUrl);
-                setTestpressSession(context, testpressSession);
-                SharedPreferences.Editor editor = getPreferenceEditor(context);
-                editor.putString(KEY_USER_ID, userId);
-                editor.apply();
-                progressDialog.dismiss();
-                if (callback != null) {
-                    callback.onSuccess(testpressSession);
-                }
-            }
-        }.execute();
+                    @Override
+                    public void onException(TestpressException testpressException) {
+                        progressDialog.dismiss();
+                        if (callback != null) {
+                            if (testpressException.isClientError()) {
+                                AuthorizationErrorResponse errorResponse = testpressException.getErrorBodyAs(
+                                        testpressException.getResponse(), AuthorizationErrorResponse.class);
+                                String message = "";
+                                if (!errorResponse.getUserId().isEmpty()) {
+                                    message = errorResponse.getUserId().get(0);
+                                } else if (!errorResponse.getAccessToken().isEmpty()) {
+                                    message = errorResponse.getAccessToken().get(0);
+                                } else if (!errorResponse.getProvider().isEmpty()) {
+                                    message = errorResponse.getProvider().get(0);
+                                } else if (!errorResponse.getNonFieldErrors().isEmpty()) {
+                                    message = errorResponse.getNonFieldErrors().get(0);
+                                }
+                                testpressException.setMessage(message);
+                            }
+                            callback.onException(testpressException);
+                        }
+                    }
+                });
     }
 
     private static void validateContext(Context context) {

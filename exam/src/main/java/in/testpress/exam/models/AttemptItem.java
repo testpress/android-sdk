@@ -3,6 +3,8 @@ package in.testpress.exam.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +71,7 @@ public class AttemptItem implements Parcelable {
     }
 
     public Boolean hasChanged() {
-        return !savedAnswers.equals(selectedAnswers) || currentReview != review;
+        return !savedAnswers.equals(selectedAnswers) || !getCurrentReview().equals(getReview());
     }
 
     /**
@@ -79,6 +81,15 @@ public class AttemptItem implements Parcelable {
      */
     public String getUrl() {
         return url;
+    }
+
+    public String getUrlFrag() {
+        try {
+            URL urlFrag = new URL(url);
+            return urlFrag.getFile().substring(1);
+        } catch (MalformedURLException e) {
+            return null;
+        }
     }
 
     /**
@@ -150,7 +161,7 @@ public class AttemptItem implements Parcelable {
      * The review
      */
     public Boolean getReview() {
-        return review;
+        return Boolean.TRUE.equals(review);
     }
 
     /**
@@ -159,11 +170,7 @@ public class AttemptItem implements Parcelable {
      * The review
      */
     public void setReview(Boolean review) {
-        if(review != null) {
-            this.review = review;
-        } else {
-            this.review = false;
-        }
+        this.review = review;
     }
 
     public void setCurrentReview(Boolean currentReview) {
@@ -171,7 +178,7 @@ public class AttemptItem implements Parcelable {
     }
 
     public Boolean getCurrentReview() {
-        return currentReview;
+        return Boolean.TRUE.equals(currentReview);
     }
 
 }

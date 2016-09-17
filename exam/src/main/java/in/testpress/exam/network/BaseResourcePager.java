@@ -7,6 +7,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import in.testpress.core.TestpressException;
+import in.testpress.exam.models.TestpressApiResponse;
+import retrofit2.Response;
+
 
 /**
  * Generic resource pager for elements with an id that can be paged
@@ -15,7 +19,8 @@ import java.util.Map;
  */
 public abstract class BaseResourcePager<E> {
 
-    TestpressExamApiClient apiClient;
+    protected TestpressExamApiClient apiClient;
+    protected TestpressApiResponse<E> response;
 
     /**
      * Next page to request
@@ -67,6 +72,7 @@ public abstract class BaseResourcePager<E> {
         count = Math.max(1, page - 1);
         page = 1;
         resources.clear();
+        response = null;
         hasMore = true;
         return this;
     }
@@ -93,13 +99,21 @@ public abstract class BaseResourcePager<E> {
      * Get the next page of resources
      *
      * @return true if more pages
-     * @throws IOException
+     * @throws TestpressException
      */
-    public boolean next() throws IOException {
+    public boolean next() throws TestpressException {
         boolean emptyPage = false;
         try {
             for (int i = 0; i < count && hasNext(); i++) {
-                List<E> resourcePage = getItems(page, -1);
+                Response<TestpressApiResponse<E>> retrofitResponse = getItems(page, -1);
+                List<E> resourcePage;
+                if (retrofitResponse.isSuccessful()) {
+                    response = retrofitResponse.body();
+                    resourcePage = response.getResults();
+                } else {
+                    hasMore = false;
+                    throw TestpressException.httpError(retrofitResponse);
+                }
                 emptyPage = resourcePage.isEmpty();
                 if (emptyPage)
                     break;
@@ -118,10 +132,18 @@ public abstract class BaseResourcePager<E> {
 
         } catch (Exception e) {
             hasMore = false;
-            throw e;
+            if (e instanceof IOException) {
+                throw TestpressException.networkError((IOException) e);
+            } else {
+                throw TestpressException.unexpectedError(e);
+            }
         }
         hasMore = hasNext() && !emptyPage;
         return hasMore;
+    }
+
+    public boolean hasNext() {
+        return response == null || response.getNext() != null;
     }
 
     /**
@@ -170,9 +192,8 @@ public abstract class BaseResourcePager<E> {
      * @param size
      * @return iterator
      */
-    public abstract List<E> getItems(final int page, final int size);
-
-    public abstract  boolean hasNext();
+    public abstract Response<TestpressApiResponse<E>> getItems(final int page, final int size)
+            throws IOException;
 
     public Object getQueryParams(String key) {
         return queryParams.get(key);

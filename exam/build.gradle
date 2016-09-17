@@ -22,10 +22,9 @@ android {
 dependencies {
     compile project(':core')
     compile rootProject.appcompat
-    compile rootProject.retrofit
-    compile rootProject.okHttp
-    compile rootProject.okHttpUrlConnection
-    compile rootProject.gson
+    compile rootProject.retrofit2
+    compile rootProject.gsonConverter
+    compile rootProject.httpLogInterceptor
     compile rootProject.design
     compile rootProject.cardview
     compile rootProject.universalImageLoader

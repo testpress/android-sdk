@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.ListView;
 
-import java.io.IOException;
 import java.util.List;
 
+import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
@@ -39,7 +39,7 @@ public class AttemptsListFragment extends PagedItemFragment<Attempt> {
     protected AttemptsPager getPager() {
         if (pager == null) {
             String state = getArguments().getString(PARAM_STATE);
-            pager = new AttemptsPager(exam, apiClient);
+            pager = new AttemptsPager(exam.getAttemptsFrag(), apiClient);
             if (state != null && state.equals(STATE_PAUSED)) {
                 pager.setQueryParams(PARAM_STATE, STATE_PAUSED);
             }
@@ -53,11 +53,15 @@ public class AttemptsListFragment extends PagedItemFragment<Attempt> {
     }
 
     @Override
-    protected int getErrorMessage(Exception exception) {
-        if (exception.getCause() instanceof IOException) {
+    protected int getErrorMessage(TestpressException exception) {
+        if (exception.isNetworkError()) {
             setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again,
                     R.drawable.ic_error_outline_black_18dp);
             return R.string.testpress_no_internet_try_again;
+        } else if (exception.isUnauthenticated()) {
+            setEmptyText(R.string.testpress_authentication_failed, R.string.testpress_please_login,
+                    R.drawable.ic_error_outline_black_18dp);
+            return R.string.testpress_authentication_failed;
         } else {
             setEmptyText(R.string.testpress_error_loading_attempts,
                     R.string.testpress_some_thing_went_wrong_try_again,
