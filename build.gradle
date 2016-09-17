@@ -40,5 +40,5 @@ ext {
     design = 'com.android.support:design:24.1.0'
     cardview = 'com.android.support:cardview-v7:24.1.1'
     universalImageLoader = 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    chart = 'com.github.PhilJay:MPAndroidChart:v2.1.0'
+    chart = 'com.github.PhilJay:MPAndroidChart:v3.0.0-beta1'
 }

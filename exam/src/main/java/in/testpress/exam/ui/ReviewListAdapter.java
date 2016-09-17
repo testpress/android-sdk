@@ -103,7 +103,7 @@ class ReviewListAdapter extends SingleTypeAdapter<ReviewItem> {
                 textParams.setMargins(0, 0, 5, 0);
                 correctOption.setLayoutParams(textParams);
                 correctOption.setGravity(Gravity.CENTER);
-                correctOption.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                correctOption.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
                 correctOption.setTextColor(Color.WHITE);
                 if(Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
                     correctOption.setBackgroundResource(R.drawable.testpress_round_background);
