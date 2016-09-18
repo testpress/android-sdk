@@ -32,6 +32,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="@dimen/testpress_text_size_normal"
                 android:textColor="#333333"
                 android:id="@+id/question_all"
                 android:layout_alignParentTop="true"
@@ -72,6 +73,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="@dimen/testpress_text_size_normal"
                 android:textColor="#333333"
                 android:id="@+id/question_marked"
                 android:layout_alignParentTop="true"
@@ -112,6 +114,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="@dimen/testpress_text_size_normal"
                 android:textColor="#333333"
                 android:id="@+id/question_answered"
                 android:layout_alignParentTop="true"

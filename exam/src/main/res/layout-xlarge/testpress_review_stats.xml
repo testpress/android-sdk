@@ -1,11 +1,12 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/scroll_view" >
+    android:id="@+id/scroll_view">
 
     <RelativeLayout android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dp" >
+        android:orientation="vertical"
+        android:paddingBottom="20dp">
 
         <LinearLayout
             android:orientation="vertical"
@@ -26,196 +27,170 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:id="@+id/exam_details"
-            android:layout_marginTop="5dp">
-
-            <TextView
-                style="@style/TestpressReviewStatHeading"
-                android:layout_width="match_parent"
-                android:text="Aptitude Analytical Maths (NBE Template)"
-                android:gravity="center_horizontal"
-                android:textSize="26sp"
-                android:layout_marginTop="30dp"
-                android:layout_marginBottom="30dp"
-                android:id="@+id/exam_title" />
+            android:layout_marginTop="5dp" >
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:layout_gravity="center" >
+
+                <TextView
+                    style="@style/TestpressReviewStatHeading"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Aptitude Analytical Maths (NBE Template)"
+                    android:padding="15dp"
+                    android:textSize="25sp"
+                    android:id="@+id/exam_title" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="5dp">
+                <View
+                    android:layout_width="450dp"
+                    android:layout_height="1dip"
+                    android:background="#cccccc" />
+            </LinearLayout>
+
+            <com.github.testpress.mikephil.charting.charts.PieChart
+                android:id="@+id/chart"
+                android:layout_width="325dp"
+                android:layout_height="175dp"
+                android:layout_marginBottom="35dp"
+                android:layout_gravity="center" />
+
+            <LinearLayout style="@style/TestpressReviewStatRow"
+                android:id="@+id/rank_layout">
+                <TextView
+                    style="@style/TestpressReviewStatSubHeading.Tab"
+                    android:text="@string/testpress_rank" />
+                <TextView
+                    style="@style/TestpressReviewStatValue.Tab"
+                    android:id="@+id/rank"
+                    android:text="1"/>
+            </LinearLayout>
+
+            <LinearLayout style="@style/TestpressReviewStatRow">
+                <TextView
+                    style="@style/TestpressReviewStatSubHeading.Tab"
+                    android:text="@string/testpress_score" />
+                <TextView
+                    style="@style/TestpressReviewStatValue.Tab"
+                    android:id="@+id/score"
+                    android:text="1"/>
+            </LinearLayout>
+
+            <LinearLayout style="@style/TestpressReviewStatRow">
+                <TextView
+                    style="@style/TestpressReviewStatSubHeading.Tab"
+                    android:text="@string/testpress_time_taken" />
+                <TextView
+                    style="@style/TestpressReviewStatValue.Tab"
+                    android:id="@+id/time_taken"
+                    android:text="0:28:05"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/percentile_layout"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" >
 
                 <LinearLayout
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginTop="20dp">
+                    <View
+                        android:layout_width="450dp"
+                        android:layout_height="1dip"
+                        android:background="#cccccc" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="15dp"
-                    android:layout_marginEnd="15dp"
-                    android:orientation="vertical">
+                    android:paddingLeft="45dp"
+                    android:paddingStart="45dp"
+                    android:layout_gravity="center" >
 
-                    <LinearLayout style="@style/TestpressReviewStatRow"
-                        android:layout_marginBottom="5dp">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
                         <TextView
-                            style="@style/TestpressReviewStatSubHeading.Tab"
-                            android:text="@string/testpress_rank" />
-                        <TextView
-                            style="@style/TestpressReviewStatValue.Tab"
-                            android:layout_width="70dp"
-                            android:id="@+id/rank"
-                            android:text="1"/>
-                    </LinearLayout>
-                    <LinearLayout style="@style/TestpressReviewStatRow"
-                        android:layout_marginBottom="5dp">
-                        <TextView
-                            style="@style/TestpressReviewStatSubHeading.Tab"
-                            android:text="@string/testpress_score" />
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:textSize="@dimen/testpress_text_size_xxlarge"
+                            android:textStyle="normal"
+                            android:text="@string/testpress_your_percentile_is" />
                         <TextView
                             style="@style/TestpressReviewStatValue.Tab"
-                            android:layout_width="70dp"
-                            android:id="@+id/score"
-                            android:text="1"/>
-                    </LinearLayout>
-                    <LinearLayout style="@style/TestpressReviewStatRow">
-                        <TextView
-                            style="@style/TestpressReviewStatSubHeading.Tab"
-                            android:text="@string/testpress_time_taken" />
-                        <TextView
-                            style="@style/TestpressReviewStatValue.Tab"
-                            android:layout_width="70dp"
-                            android:id="@+id/time_taken"
-                            android:text="0:28:05"/>
+                            android:textSize="@dimen/testpress_text_size_xxlarge"
+                            android:layout_marginTop="0dp"
+                            android:layout_marginBottom="0dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
+                            android:id="@+id/percentile"
+                            android:text="22%" />
+
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:layout_marginTop="20dp"
-                        android:orientation="vertical">
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp" >
 
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_height="wrap_content">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/testpress_text_gray"
-                                android:textSize="@dimen/testpress_text_size_large"
-                                android:textStyle="normal"
-                                android:text="@string/testpress_your_percentile_is" />
-
-                            <TextView
-                                style="@style/TestpressReviewStatValue.Tab"
-                                android:layout_width="wrap_content"
-                                android:textSize="@dimen/testpress_text_size_large"
-                                android:layout_marginTop="0dp"
-                                android:layout_marginBottom="0dp"
-                                android:layout_marginLeft="5dp"
-                                android:layout_marginStart="5dp"
-                                android:id="@+id/percentile"
-                                android:text="22%"/>
-
-                        </LinearLayout>
-
-                        <LinearLayout
+                        <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_marginTop="5dp" >
+                            android:textColor="#333333"
+                            android:textStyle="normal"
+                            android:text="\u2014" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="#555"
-                                android:textSize="13sp"
-                                android:textStyle="normal"
-                                android:text="\u2014" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:textStyle="normal"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
+                            android:id="@+id/sub_percentile"
+                            android:text="22%" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="#555"
-                                android:textSize="13sp"
-                                android:textStyle="normal"
-                                android:layout_marginLeft="5dp"
-                                android:layout_marginStart="5dp"
-                                android:id="@+id/sub_percentile"
-                                android:text="22%" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:textStyle="normal"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
+                            android:text="of users scored less than your score of " />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="#555"
-                                android:textSize="13sp"
-                                android:textStyle="normal"
-                                android:layout_marginLeft="5dp"
-                                android:layout_marginStart="5dp"
-                                android:text="of users scored less than your score of " />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="#555"
-                                android:textSize="13sp"
-                                android:textStyle="normal"
-                                android:layout_marginLeft="5dp"
-                                android:layout_marginStart="5dp"
-                                android:id="@+id/sub_score"
-                                android:text="20" />
-
-                        </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:textStyle="normal"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
+                            android:id="@+id/sub_score"
+                            android:text="20" />
 
                     </LinearLayout>
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_height="match_parent"
-                    android:layout_width="wrap_content"
-                    android:paddingRight="20dp"
-                    android:paddingLeft="20dp"
-                    android:layout_gravity="center">
-                    <View
-                        android:layout_width="1dip"
-                        android:layout_height="match_parent"
-                        android:background="#dddddd" />
-                </LinearLayout>
-
-                <RelativeLayout
-                    android:layout_width="300dp"
-                    android:orientation="vertical"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_gravity="center">
-
-                        <android.support.v7.widget.AppCompatButton
-                            style="@style/TestpressSmallButton"
-                            android:text="@string/testpress_email_pdf"
-                            android:layout_alignParentRight="true"
-                            android:layout_alignParentEnd="true"
-                            android:id="@+id/email_pdf" />
-
-                    <com.github.mikephil.charting.charts.PieChart
-                        android:id="@+id/chart"
-                        android:layout_marginTop="30dp"
-                        android:layout_width="300dp"
-                        android:layout_height="200dp" />
-
-                </RelativeLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_height="match_parent"
-                android:layout_width="wrap_content"
-                android:layout_marginTop="30dp"
-                android:gravity="center"
-                android:layout_gravity="center" >
-                <View
-                    android:layout_width="700dp"
-                    android:layout_height="1dip"
-                    android:background="#dddddd" />
             </LinearLayout>
 
         </LinearLayout>

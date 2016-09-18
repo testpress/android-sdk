@@ -1,11 +1,17 @@
 package in.testpress.exam.ui;
 
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -30,6 +36,9 @@ public class ReviewFragment extends Fragment {
     private View emptyView;
     private TextView emptyTitleView;
     private TextView emptyDescView;
+    private Attempt attempt;
+    private Exam exam;
+    private MenuItem emailPdfMenu;
 
     static ReviewFragment getInstance(Exam exam, Attempt attempt) {
         ReviewFragment fragment = new ReviewFragment();
@@ -41,11 +50,30 @@ public class ReviewFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.testpress_email_pdf, menu);
+        emailPdfMenu = menu.findItem(R.id.email_pdf);
+        Drawable emailPdfIcon = emailPdfMenu.getIcon();
+        emailPdfIcon.mutate().setColorFilter(ContextCompat.getColor(getActivity(),
+                R.color.testpress_actionbar_text), PorterDuff.Mode.SRC_IN);
+        emailPdfMenu.setIcon(emailPdfIcon);
+        if (!exam.getAllowPdf() || attempt == null) {
+            emailPdfMenu.setVisible(false);
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.testpress_fragment_review, container, false);
-        final Exam exam = getArguments().getParcelable(PRAM_EXAM);
-        Attempt attempt = getArguments().getParcelable(PRAM_ATTEMPT);
+        exam = getArguments().getParcelable(PRAM_EXAM);
+        attempt = getArguments().getParcelable(PRAM_ATTEMPT);
         progressBar = (ProgressBar) view.findViewById(R.id.pb_loading);
         UIUtils.setIndeterminateDrawable(getActivity(), progressBar, 4);
         if (attempt == null) {
@@ -82,7 +110,11 @@ public class ReviewFragment extends Fragment {
                 .enqueue(new TestpressCallback<TestpressApiResponse<Attempt>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Attempt> response) {
-                        setViewPager(view, exam, response.getResults().get(0));
+                        attempt = response.getResults().get(0);
+                        if (exam.getAllowPdf()) {
+                            emailPdfMenu.setVisible(true);
+                        }
+                        setViewPager(view, exam, attempt);
                     }
 
                     @Override
@@ -98,6 +130,16 @@ public class ReviewFragment extends Fragment {
                         }
                     }
                 });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (R.id.email_pdf == item.getItemId()) {
+            new EmailPdfDialog(getActivity(), R.style.TestpressAppCompatAlertDialogStyle, true,
+                    attempt.getUrlFrag()).show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     protected void setEmptyText(final int title, final int description) {

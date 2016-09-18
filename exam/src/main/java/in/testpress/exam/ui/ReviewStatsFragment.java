@@ -7,22 +7,21 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.github.mikephil.charting.animation.Easing;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
+import com.github.testpress.mikephil.charting.animation.Easing;
+import com.github.testpress.mikephil.charting.charts.PieChart;
+import com.github.testpress.mikephil.charting.components.Legend;
+import com.github.testpress.mikephil.charting.data.PieData;
+import com.github.testpress.mikephil.charting.data.PieDataSet;
+import com.github.testpress.mikephil.charting.data.PieEntry;
 
 import java.util.ArrayList;
 
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
-import in.testpress.exam.util.ViewUtils;
 
 public class ReviewStatsFragment extends Fragment {
 
@@ -38,6 +37,7 @@ public class ReviewStatsFragment extends Fragment {
         return fragment;
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -50,26 +50,27 @@ public class ReviewStatsFragment extends Fragment {
         TextView subPercentile = (TextView) view.findViewById(R.id.sub_percentile);
         TextView subScore = (TextView) view.findViewById(R.id.sub_score);
         PieChart chart = (PieChart) view.findViewById(R.id.chart);
-        Button emailPdfButton = (Button) view.findViewById(R.id.email_pdf);
+        LinearLayout rankLayout = (LinearLayout) view.findViewById(R.id.rank_layout);
+        LinearLayout percentileLayout = (LinearLayout) view.findViewById(R.id.percentile_layout);
         Exam exam = getArguments().getParcelable(PRAM_EXAM);
         final Attempt attempt = getArguments().getParcelable(PRAM_ATTEMPT);
         if (attempt != null) {
-            ViewUtils.setLeftDrawable(getActivity(), emailPdfButton, R.drawable.ic_email_white_18dp);
-            emailPdfButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    new EmailPdfDialog(getActivity(), R.style.TestpressAppCompatAlertDialogStyle,
-                            true, attempt.getUrlFrag()).show();
-                }
-            });
             Integer unanswered = attempt.getTotalQuestions() - (attempt.getCorrectCount() +
                     attempt.getIncorrectCount());
             timeTaken.setText(attempt.getTimeTaken());
-            rank.setText(attempt.getRank());
+            if (attempt.getRank().equals("NA")) {
+                rankLayout.setVisibility(View.GONE);
+            } else {
+                rank.setText(attempt.getRank());
+            }
             score.setText(attempt.getScore());
-            percentile.setText(attempt.getPercentile());
-            subScore.setText(attempt.getScore());
-            subPercentile.setText(attempt.getPercentile());
+            if (attempt.getPercentile().equals("NA")) {
+               percentileLayout.setVisibility(View.GONE);
+            } else {
+                percentile.setText(attempt.getPercentile());
+                subScore.setText(attempt.getScore());
+                subPercentile.setText(attempt.getPercentile());
+            }
             ArrayList<PieEntry> entries = new ArrayList<>();
             entries.add(new PieEntry(attempt.getCorrectCount(), 0));
             entries.add(new PieEntry(attempt.getIncorrectCount(), 1));
@@ -105,11 +106,6 @@ public class ReviewStatsFragment extends Fragment {
         }
         if (exam != null) {
             examTitle.setText(exam.getTitle());
-            if (exam.getAllowPdf()) {
-                emailPdfButton.setVisibility(View.VISIBLE);
-            } else {
-                emailPdfButton.setVisibility(View.GONE);
-            }
         }
         return view;
     }

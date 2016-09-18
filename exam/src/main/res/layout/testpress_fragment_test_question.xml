@@ -150,6 +150,7 @@
                             android:id="@+id/question_index"
                             android:layout_width="wrap_content"
                             android:layout_height="fill_parent"
+                            android:textSize="@dimen/testpress_text_size_normal"
                             android:textColor="#333333"
                             android:textStyle="bold"
                             android:layout_marginRight="5dp"
@@ -159,6 +160,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textSize="@dimen/testpress_text_size_normal"
                             android:textColor="#333333"
                             android:id="@+id/question" />
 

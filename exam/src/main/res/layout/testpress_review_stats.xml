@@ -29,58 +29,17 @@
             android:id="@+id/exam_details"
             android:layout_marginTop="5dp" >
 
-            <TextView
-                style="@style/TestpressReviewStatHeading"
-                android:layout_width="match_parent"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:gravity="center"
-                android:text="Aptitude Analytical Maths (NBE Template)"
-                android:id="@+id/exam_title" />
-
             <LinearLayout
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="5dp">
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dip"
-                    android:background="#e7e7e7" />
-            </LinearLayout>
+                android:layout_gravity="center" >
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="15dp"
-                android:layout_marginEnd="15dp"
-                android:gravity="end"
-                android:id="@+id/email_pdf_container" >
+                <TextView
+                    style="@style/TestpressReviewStatHeading"
+                    android:layout_width="wrap_content"
+                    android:text="Aptitude Analytical Maths (NBE Template)"
+                    android:id="@+id/exam_title" />
 
-                <android.support.v7.widget.AppCompatButton
-                    style="@style/TestpressSmallButton"
-                    android:textSize="10sp"
-                    android:minHeight="0dp"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:text="@string/testpress_email_pdf"
-                    android:id="@+id/email_pdf" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="275dp"
-                android:layout_height="125dp"
-                android:layout_marginBottom="10dp"
-                android:layout_gravity="center">
-                <com.github.mikephil.charting.charts.PieChart
-                    android:id="@+id/chart"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
             </LinearLayout>
 
             <LinearLayout
@@ -88,14 +47,22 @@
                 android:layout_width="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="10dp"
-                android:layout_marginTop="5dp">
+                android:layout_marginTop="10dp">
                 <View
-                    android:layout_width="275dp"
+                    android:layout_width="320dp"
                     android:layout_height="1dip"
-                    android:background="#e7e7e7" />
+                    android:background="#cccccc" />
             </LinearLayout>
 
-            <LinearLayout style="@style/TestpressReviewStatRow">
+            <com.github.testpress.mikephil.charting.charts.PieChart
+                android:id="@+id/chart"
+                android:layout_width="275dp"
+                android:layout_height="125dp"
+                android:layout_marginBottom="30dp"
+                android:layout_gravity="center" />
+
+            <LinearLayout style="@style/TestpressReviewStatRow"
+                android:id="@+id/rank_layout">
                 <TextView
                     style="@style/TestpressReviewStatSubHeading"
                     android:text="@string/testpress_rank" />
@@ -122,91 +89,109 @@
                 <TextView
                     style="@style/TestpressReviewStatValue"
                     android:id="@+id/time_taken"
-                    android:text="00:28:05"/>
+                    android:text="0:28:05"/>
             </LinearLayout>
 
             <LinearLayout
-                android:layout_height="wrap_content"
+                android:id="@+id/percentile_layout"
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="10dp">
-                <View
-                    android:layout_width="275dp"
-                    android:layout_height="1dip"
-                    android:background="#e7e7e7" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="275dp"
-                android:layout_marginTop="10dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center" >
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/testpress_text_size_xmedium"
-                    android:textStyle="normal"
-                    android:text="@string/testpress_your_percentile_is" />
-                <TextView
-                    style="@style/TestpressReviewStatValue"
-                    android:textSize="@dimen/testpress_text_size_xmedium"
-                    android:layout_marginTop="0dp"
-                    android:layout_marginBottom="0dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginStart="5dp"
-                    android:id="@+id/percentile"
-                    android:text="22%" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="275dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="5dp" >
-
-                <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/testpress_text_gray"
-                    android:textSize="@dimen/testpress_text_size_small"
-                    android:textStyle="normal"
-                    android:text="\u2014" />
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginTop="15dp">
+                    <View
+                        android:layout_width="320dp"
+                        android:layout_height="1dip"
+                        android:background="#cccccc" />
+                </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/testpress_text_gray"
-                    android:textSize="@dimen/testpress_text_size_small"
-                    android:textStyle="normal"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginStart="5dp"
-                    android:id="@+id/sub_percentile"
-                    android:text="22%" />
+                    <LinearLayout
+                        android:layout_marginLeft="22dp"
+                        android:layout_marginStart="22dp"
+                        android:orientation="vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center" >
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/testpress_text_gray"
-                    android:textSize="@dimen/testpress_text_size_small"
-                    android:textStyle="normal"
-                    android:layout_marginLeft="3dp"
-                    android:layout_marginStart="3dp"
-                    android:text="of users scored less than your score of " />
+                    <LinearLayout
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center" >
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/testpress_text_gray"
-                    android:textSize="@dimen/testpress_text_size_small"
-                    android:textStyle="normal"
-                    android:layout_marginLeft="3dp"
-                    android:layout_marginStart="3dp"
-                    android:id="@+id/sub_score"
-                    android:text="20" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:textSize="@dimen/testpress_text_size_xlarge"
+                            android:textStyle="normal"
+                            android:text="@string/testpress_your_percentile_is" />
+                        <TextView
+                            style="@style/TestpressReviewStatValue"
+                            android:textSize="@dimen/testpress_text_size_xlarge"
+                            android:layout_marginTop="0dp"
+                            android:layout_marginBottom="0dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
+                            android:id="@+id/percentile"
+                            android:text="22%" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="5dp" >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:textSize="@dimen/testpress_text_size_small"
+                            android:textStyle="normal"
+                            android:text="\u2014" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:textSize="@dimen/testpress_text_size_small"
+                            android:textStyle="normal"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
+                            android:id="@+id/sub_percentile"
+                            android:text="22%" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:textSize="@dimen/testpress_text_size_small"
+                            android:textStyle="normal"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
+                            android:text="of users scored less than your score of " />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:textSize="@dimen/testpress_text_size_small"
+                            android:textStyle="normal"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
+                            android:id="@+id/sub_score"
+                            android:text="20" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
 

@@ -24,6 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:textSize="@dimen/testpress_text_size_normal"
                 android:textColor="@color/testpress_black"
                 android:textStyle="bold"
                 android:text="1." />
@@ -39,6 +40,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/testpress_black"
+                    android:textSize="@dimen/testpress_text_size_normal"
                     android:id="@+id/question"
                     android:paddingRight="15dp"
                     android:lineSpacingExtra="5sp"
@@ -109,6 +111,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:lineSpacingExtra="5sp"
+                    android:textSize="@dimen/testpress_text_size_normal"
                     android:textColor="@color/testpress_black"
                     android:paddingRight="15dp"
                     android:layout_marginLeft="5dp"
