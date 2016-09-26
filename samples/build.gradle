@@ -31,7 +31,6 @@ android {
 }
 
 dependencies {
-    compile project(':core')
     compile project(':exam')
     testCompile rootProject.junit
     compile rootProject.appcompat

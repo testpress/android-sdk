@@ -34,13 +34,15 @@ afterEvaluate { project ->
     user = bin_user
     key = bin_key
     configurations = ['archives']
-    publish = true
+    publish = false
     pkg {
-      repo = 'maven'
+      repo = REPO
       name = POM_ARTIFACT_ID
+      userOrg = USER_ORG
       desc = POM_DESCRIPTION
       websiteUrl = POM_URL
       vcsUrl = GIT_URL
+      licenses = ['Apache-2.0']
       version {
         name = VERSION_NAME
         vcsTag = VERSION_NAME
@@ -76,6 +78,14 @@ afterEvaluate { project ->
             url POM_SCM_URL
             connection POM_SCM_CONNECTION
             developerConnection POM_SCM_DEV_CONNECTION
+          }
+
+          licenses {
+            license {
+              name POM_LICENCE_NAME
+              url POM_LICENCE_URL
+              distribution POM_LICENCE_DIST
+            }
           }
 
         }
