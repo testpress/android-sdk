@@ -5,125 +5,103 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <LinearLayout
-        android:orientation="horizontal"
+    <RelativeLayout
+        android:id="@+id/all_question"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/all_question" >
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp" >
 
-        <RelativeLayout
-            android:orientation="horizontal"
+        <TextView
+            android:id="@+id/question_index_all"
+            android:minWidth="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:background="#808080"
+            android:textColor="#ffffff"
+            android:textStyle="bold" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp" >
+            android:textSize="@dimen/testpress_text_size_normal"
+            android:textColor="#333333"
+            android:id="@+id/question_all"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/question_index_all"
+            android:layout_toEndOf="@+id/question_index_all"
+            android:layout_centerVertical="true"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp" />
 
-            <TextView
-                android:id="@+id/question_index_all"
-                android:minWidth="30dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:gravity="center"
-                android:background="#808080"
-                android:textColor="#ffffff"
-                android:textStyle="bold" />
+    </RelativeLayout>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/testpress_text_size_normal"
-                android:textColor="#333333"
-                android:id="@+id/question_all"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/question_index_all"
-                android:layout_toEndOf="@+id/question_index_all"
-                android:layout_centerVertical="true"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp" />
-
-        </RelativeLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
+    <RelativeLayout
+        android:id="@+id/marked_question"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/marked_question" >
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp" >
 
-        <RelativeLayout
-            android:orientation="horizontal"
+        <TextView
+            android:id="@+id/question_index_marked"
+            android:minWidth="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:background="#d9534f"
+            android:textColor="#ffffff"
+            android:textStyle="bold" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp" >
+            android:textSize="@dimen/testpress_text_size_normal"
+            android:textColor="#333333"
+            android:id="@+id/question_marked"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/question_index_marked"
+            android:layout_toEndOf="@+id/question_index_marked"
+            android:layout_centerVertical="true"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp" />
 
-            <TextView
-                android:id="@+id/question_index_marked"
-                android:minWidth="30dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:gravity="center"
-                android:background="#d9534f"
-                android:textColor="#ffffff"
-                android:textStyle="bold" />
+    </RelativeLayout>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/testpress_text_size_normal"
-                android:textColor="#333333"
-                android:id="@+id/question_marked"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/question_index_marked"
-                android:layout_toEndOf="@+id/question_index_marked"
-                android:layout_centerVertical="true"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp" />
-
-        </RelativeLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
+    <RelativeLayout
+        android:id="@+id/answered_question"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/answered_question" >
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp" >
 
-        <RelativeLayout
-            android:orientation="horizontal"
+        <TextView
+            android:id="@+id/question_index_answered"
+            android:minWidth="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:background="#08AE9E"
+            android:textColor="#ffffff"
+            android:textStyle="bold" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp" >
+            android:textSize="@dimen/testpress_text_size_normal"
+            android:textColor="#333333"
+            android:id="@+id/question_answered"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/question_index_answered"
+            android:layout_toEndOf="@+id/question_index_answered"
+            android:layout_centerVertical="true"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp" />
 
-            <TextView
-                android:id="@+id/question_index_answered"
-                android:minWidth="30dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:gravity="center"
-                android:background="#08AE9E"
-                android:textColor="#ffffff"
-                android:textStyle="bold" />
+    </RelativeLayout>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/testpress_text_size_normal"
-                android:textColor="#333333"
-                android:id="@+id/question_answered"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/question_index_answered"
-                android:layout_toEndOf="@+id/question_index_answered"
-                android:layout_centerVertical="true"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp" />
-
-        </RelativeLayout>
-    </LinearLayout>
-    </LinearLayout>
+</LinearLayout>

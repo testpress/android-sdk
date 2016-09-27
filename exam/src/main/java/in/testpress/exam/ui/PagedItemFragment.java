@@ -1,5 +1,6 @@
 package in.testpress.exam.ui;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
@@ -35,6 +36,7 @@ public abstract class PagedItemFragment<E> extends BaseListViewFragment<E>
     int lastFirstVisibleItemTop;
     boolean isScrollingUp;
 
+    @SuppressLint("InflateParams")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

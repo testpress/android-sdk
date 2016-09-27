@@ -1,8 +1,10 @@
 package in.testpress.exam.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.CardView;
 import android.text.Html;
@@ -59,6 +61,7 @@ public class TestQuestionFragment extends Fragment {
         index = getArguments().getInt(PARAM_QUESTION_INDEX);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         List<AttemptAnswer> attemptAnswers = attemptItem.getAttemptQuestion().getAttemptAnswers();
@@ -149,7 +152,7 @@ public class TestQuestionFragment extends Fragment {
             if(!selectedAnswers.isEmpty()) {
                 if (selectedAnswers.get(0).equals(attemptAnswers.get(i).getId())) {
                     option.setChecked(true);
-                    option.setBackgroundColor(getResources().getColor(
+                    option.setBackgroundColor(ContextCompat.getColor(getActivity(),
                             R.color.testpress_blue_light_background_transparent));
                 }
             }
@@ -159,11 +162,12 @@ public class TestQuestionFragment extends Fragment {
                 public void onCheckedChanged(CompoundButton option, boolean checked) {
                     List<AttemptAnswer> attemptAnswers = attemptItem.getAttemptQuestion().getAttemptAnswers();
                     if(checked) {
-                        option.setBackgroundColor(getResources().getColor(
+                        option.setBackgroundColor(ContextCompat.getColor(getActivity(),
                                 R.color.testpress_blue_light_background_transparent));
                         savedAnswers.add(attemptAnswers.get(option.getId()).getId());
                     } else {
-                        option.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                        option.setBackgroundColor(ContextCompat.getColor(getActivity(),
+                                android.R.color.transparent));
                         savedAnswers.remove(attemptAnswers.get(option.getId()).getId());
                     }
                     attemptItem.saveAnswers(savedAnswers);
@@ -172,6 +176,7 @@ public class TestQuestionFragment extends Fragment {
         }
     }
 
+    @SuppressLint("InflateParams")
     private void createRadioButtonView(List<AttemptAnswer> attemptAnswers, AttemptQuestion attemptQuestion) {
         for(int i = 0 ; i < attemptQuestion.getAttemptAnswers().size() ; i++) {
             LayoutInflater inflater = (LayoutInflater) getActivity()
@@ -192,7 +197,7 @@ public class TestQuestionFragment extends Fragment {
                 if (selectedAnswers.get(0).equals(attemptAnswers.get(i).getId())) {
                     option.setChecked(true);
                     selectedRadioButton = option;
-                    option.setBackgroundColor(getResources().getColor(
+                    option.setBackgroundColor(ContextCompat.getColor(getContext(),
                             R.color.testpress_blue_light_background_transparent));
                 }
             }
@@ -203,15 +208,16 @@ public class TestQuestionFragment extends Fragment {
                     if (option == selectedRadioButton) {
                         answersView.clearCheck();
                         selectedRadioButton = null;
-                        option.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                        option.setBackgroundColor(ContextCompat.getColor(getContext(),
+                                android.R.color.transparent));
                         attemptItem.saveAnswers(Collections.<Integer>emptyList());
                     } else {
                         if (selectedRadioButton != null) {
-                            selectedRadioButton.setBackgroundColor(getResources().getColor(
-                                    android.R.color.transparent));
+                            selectedRadioButton.setBackgroundColor(ContextCompat.getColor(
+                                    getContext(), android.R.color.transparent));
                         }
                         selectedRadioButton = option;
-                        option.setBackgroundColor(getResources().getColor(
+                        option.setBackgroundColor(ContextCompat.getColor(getContext(),
                                 R.color.testpress_blue_light_background_transparent));
                         List<AttemptAnswer> attemptAnswers = attemptItem.getAttemptQuestion()
                                 .getAttemptAnswers();

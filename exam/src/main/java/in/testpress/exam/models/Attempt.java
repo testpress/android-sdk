@@ -1,5 +1,6 @@
 package in.testpress.exam.models;
 
+import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -148,6 +149,7 @@ public class Attempt implements Parcelable {
         return formatDate(date);
     }
 
+    @SuppressLint("SimpleDateFormat")
     public String formatDate(String inputString) {
         Date date = null;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");

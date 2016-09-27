@@ -39,7 +39,7 @@
         style="@style/TestpressSmallButton"
         android:text="@string/testpress_tap_to_retry"
         android:id="@+id/retry_button"
-        android:textSize="10sp"
+        android:textSize="12sp"
         android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

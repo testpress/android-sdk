@@ -1,4 +1,5 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="UnusedResources">
     <string name="testpress_app_name">Testpress Exam Sdk</string>
     <string name="testpress_exams">Exams</string>
 
@@ -21,7 +22,7 @@
     <string name="testpress_no_internet_connection">No internet connection</string>
     <string name="testpress_try_again">Try again</string>
 
-    <string name="testpress_loading">Loading...</string>
+    <string name="testpress_loading">Loading…</string>
     <string name="testpress_loading_questions">Loading questions</string>
     <string name="testpress_no_exams">No Exams</string>
     <string name="testpress_no_exams_description">You can buy exams from the store.</string>
@@ -110,7 +111,7 @@
     <string name="testpress_your_percentile_is">Your percentile is</string>
 
     <string name="testpress_search">Search</string>
-    <string name="testpress_search_hint">Search...</string>
+    <string name="testpress_search_hint">Search…</string>
     <string name="testpress_no_results_found">Sorry, No results found</string>
     <string name="testpress_try_with_other_keyword">Please try with some other keywords</string>
     <string name="testpress_speech_recognition_not_supported">Opps! Your device doesn\'t support Speech to Text</string>

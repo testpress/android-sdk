@@ -1,9 +1,11 @@
 package in.testpress.exam.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
@@ -42,6 +44,7 @@ class ReviewListAdapter extends SingleTypeAdapter<ReviewItem> {
         return new int[] { R.id.question, R.id.answer, R.id.explanation };
     }
 
+    @SuppressLint({"SetTextI18n", "InflateParams"})
     @Override
     protected void update(final int position, final ReviewItem item) {
         TextView questionsView = textView(0);
@@ -83,15 +86,15 @@ class ReviewListAdapter extends SingleTypeAdapter<ReviewItem> {
                     if(Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
                         optionTextView.setBackgroundResource(R.drawable.testpress_round_green_background);
                     } else {
-                        optionTextView.setBackground(inflater.getContext().getResources()
-                                .getDrawable(R.drawable.testpress_round_green_background));
+                        optionTextView.setBackground(ContextCompat.getDrawable(activity,
+                                R.drawable.testpress_round_green_background));
                     }
                 } else {
                     if(Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
                         optionTextView.setBackgroundResource(R.drawable.testpress_round_red_background);
                     } else {
-                        optionTextView.setBackground(inflater.getContext().getResources()
-                                .getDrawable(R.drawable.testpress_round_red_background));
+                        optionTextView.setBackground(ContextCompat.getDrawable(activity,
+                                R.drawable.testpress_round_red_background));
                     }
                 }
             }
@@ -108,7 +111,7 @@ class ReviewListAdapter extends SingleTypeAdapter<ReviewItem> {
                 if(Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
                     correctOption.setBackgroundResource(R.drawable.testpress_round_background);
                 } else {
-                    correctOption.setBackground(inflater.getContext().getResources().getDrawable(
+                    correctOption.setBackground(ContextCompat.getDrawable(activity,
                             R.drawable.testpress_round_background));
                 }
                 correctOption.setTypeface(Typeface.DEFAULT_BOLD);

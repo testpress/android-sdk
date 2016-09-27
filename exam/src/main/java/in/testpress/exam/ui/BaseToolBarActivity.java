@@ -11,7 +11,7 @@ import in.testpress.exam.R;
  * Activity that extends this activity must needs to include the #layout/testpress_toolbar
  * in its view.
  */
-class BaseToolBarActivity extends AppCompatActivity {
+abstract class BaseToolBarActivity extends AppCompatActivity {
 
     @Override
     public void setContentView(final int layoutResId) {

@@ -1,6 +1,5 @@
 <resources>
-    <string name="testpress_app_name">Testpress</string>
 
-    <string name="testpress_please_wait">Please Wait...</string>
+    <string name="testpress_please_wait">Please Wait…</string>
 
 </resources>

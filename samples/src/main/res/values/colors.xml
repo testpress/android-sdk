@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="UnusedResources">
     <color name="color_primary">#2196F3</color>
     <color name="color_primary_text">#ffffff</color>
     <color name="actionbar_background">#2196F3</color>

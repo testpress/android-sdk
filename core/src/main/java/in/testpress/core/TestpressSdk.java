@@ -1,5 +1,6 @@
 package in.testpress.core;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -30,6 +31,7 @@ public final class TestpressSdk {
         return pref;
     }
 
+    @SuppressLint("CommitPrefEdits")
     private static SharedPreferences.Editor getPreferenceEditor(Context context) {
         if (editor == null) {
             validateContext(context);

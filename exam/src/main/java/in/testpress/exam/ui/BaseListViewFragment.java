@@ -106,7 +106,7 @@ public abstract class BaseListViewFragment<E> extends Fragment
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.testpress_list, null);
+        return inflater.inflate(R.layout.testpress_list, container, false);
     }
 
     /**

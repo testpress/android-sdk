@@ -1,5 +1,6 @@
 package in.testpress.exam.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SlidingPaneLayout;
@@ -230,18 +232,18 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         if (position == 0) {
             // Reached first question
             previous.setClickable(false);
-            previous.setTextColor(getResources().getColor(R.color.testpress_nav_button_disabled));
+            previous.setTextColor(ContextCompat.getColor(getActivity(), R.color.testpress_nav_button_disabled));
         } else {
             previous.setClickable(true);
-            previous.setTextColor(getResources().getColor(R.color.testpress_color_primary));
+            previous.setTextColor(ContextCompat.getColor(getActivity(), R.color.testpress_color_primary));
         }
 
         if ((position + 1) == attemptItemList.size()) {
             // Reached last question
-            next.setTextColor(getResources().getColor(R.color.testpress_red));
+            next.setTextColor(ContextCompat.getColor(getActivity(), R.color.testpress_red));
             next.setText(R.string.testpress_end);
         } else {
-            next.setTextColor(getResources().getColor(R.color.testpress_color_primary));
+            next.setTextColor(ContextCompat.getColor(getActivity(), R.color.testpress_color_primary));
             next.setText(R.string.testpress_next);
         }
     }
@@ -510,6 +512,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 });
     }
 
+    @SuppressLint("DefaultLocale")
     private static String formatTime(final long millis) {
         return String.format("%02d:%02d:%02d",
                 millis / (1000 * 60 * 60),
@@ -518,6 +521,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         );
     }
 
+    @SuppressLint("SimpleDateFormat")
     private long formatMillisecond(String inputString) {
         Date date = null;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");

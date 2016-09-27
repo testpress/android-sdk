@@ -1,5 +1,6 @@
 package in.testpress.exam.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -71,6 +72,7 @@ public class SearchFragment extends Fragment implements AbsListView.OnScrollList
         pager = new ExamPager(subclass, new TestpressExamApiClient(getActivity()));
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup view = (ViewGroup) inflater.inflate(R.layout.testpress_fragment_search,

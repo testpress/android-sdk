@@ -1,5 +1,6 @@
 package in.testpress.exam.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private TextView emptyDescView;
     private Button retryButton;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

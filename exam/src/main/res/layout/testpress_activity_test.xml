@@ -1,5 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -208,7 +209,8 @@
 
                     <LinearLayout style="@style/TestpressExamInfoRow"
                         android:gravity="center"
-                        android:layout_marginBottom="20dp" >
+                        android:layout_marginBottom="20dp"
+                        tools:ignore="UseCompoundDrawables">
 
                         <ImageView
                             android:layout_width="18dp"
