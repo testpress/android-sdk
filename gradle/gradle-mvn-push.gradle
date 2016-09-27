@@ -17,14 +17,19 @@
 apply plugin: 'maven'
 apply plugin: 'com.jfrog.bintray'
 
+
 version = VERSION_NAME
 group = GROUP
 
 def bin_user = ""
 def bin_key = ""
+def pom_developer_id = ""
+def pom_developer_name = ""
 try {
   bin_user = BINTRAY_USER
   bin_key = BINTRAY_KEY
+  pom_developer_id = POM_DEVELOPER_ID
+  pom_developer_name = POM_DEVELOPER_NAME
 } catch (Exception ignored) {
   println 'Failed to find credentials. Maven deploy disabled'
 }
@@ -34,7 +39,8 @@ afterEvaluate { project ->
     user = bin_user
     key = bin_key
     configurations = ['archives']
-    publish = false
+    publish = true
+    dryRun = false
     pkg {
       repo = REPO
       name = POM_ARTIFACT_ID
@@ -88,6 +94,25 @@ afterEvaluate { project ->
             }
           }
 
+          developers {
+            developer {
+              id pom_developer_id
+              name pom_developer_name
+            }
+          }
+
+        }
+
+        pom.withXml {
+          def dependenciesNode = asNode().appendNode('dependencies')
+
+          //Iterate over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
+          configurations.compile.allDependencies.each {
+            def dependencyNode = dependenciesNode.appendNode('dependency')
+            dependencyNode.appendNode('groupId', it.group)
+            dependencyNode.appendNode('artifactId', it.name)
+            dependencyNode.appendNode('version', it.version)
+          }
         }
       }
     }
