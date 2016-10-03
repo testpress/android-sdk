@@ -20,7 +20,8 @@ import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
 
-import in.testpress.exam.util.ThrowableLoader;
+import in.testpress.util.ThrowableLoader;
+import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.UIUtils;
 import in.testpress.network.RetrofitCall;
 import retrofit2.Response;
@@ -45,6 +46,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private TextView emptyDescView;
     private Button retryButton;
 
+    @SuppressWarnings("ConstantConditions")
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -66,7 +68,6 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         TextView negativeMarks = (TextView) findViewById(R.id.negative_marks);
         LinearLayout description = (LinearLayout) findViewById(R.id.description);
         TextView descriptionContent = (TextView) findViewById(R.id.descriptionContent);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         findViewById(R.id.start_exam).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

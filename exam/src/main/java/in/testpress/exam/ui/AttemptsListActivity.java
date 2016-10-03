@@ -6,16 +6,16 @@ import android.os.Bundle;
 
 import in.testpress.exam.R;
 import in.testpress.exam.models.Exam;
+import in.testpress.ui.BaseToolBarActivity;
 
 public class AttemptsListActivity extends BaseToolBarActivity {
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.testpress_container_layout_with_tool_bar);
+        setContentView(R.layout.testpress_container_layout);
         AttemptsListFragment attemptsListFragment = new AttemptsListFragment();
         Bundle bundle = getIntent().getExtras();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Exam exam = bundle.getParcelable("exam");
         getSupportActionBar().setTitle(exam.getTitle());
         attemptsListFragment.setArguments(bundle);

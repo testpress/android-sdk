@@ -38,9 +38,10 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.ExamPager;
 import in.testpress.exam.network.TestpressExamApiClient;
-import in.testpress.exam.util.SingleTypeAdapter;
-import in.testpress.exam.util.ThrowableLoader;
-import in.testpress.exam.util.ViewUtils;
+import in.testpress.ui.HeaderFooterListAdapter;
+import in.testpress.util.SingleTypeAdapter;
+import in.testpress.util.ThrowableLoader;
+import in.testpress.util.ViewUtils;
 import in.testpress.util.UIUtils;
 
 public class SearchFragment extends Fragment implements AbsListView.OnScrollListener,

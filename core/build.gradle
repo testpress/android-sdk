@@ -16,7 +16,6 @@ android {
         }
     }
     lintOptions {
-        disable 'InvalidPackage'
         abortOnError false
     }
 }
@@ -25,9 +24,11 @@ dependencies {
     testCompile rootProject.junit
     testCompile rootProject.mockito
     compile rootProject.appcompat
+    compile rootProject.design
     compile rootProject.retrofit2
     compile rootProject.gsonConverter
     compile rootProject.httpLogInterceptor
+    compile rootProject.universalImageLoader
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

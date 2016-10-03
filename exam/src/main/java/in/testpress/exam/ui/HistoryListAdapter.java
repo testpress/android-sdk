@@ -10,8 +10,8 @@ import java.util.List;
 
 import in.testpress.exam.R;
 import in.testpress.exam.models.Exam;
-import in.testpress.exam.util.SingleTypeAdapter;
-import in.testpress.exam.util.ViewUtils;
+import in.testpress.util.SingleTypeAdapter;
+import in.testpress.util.ViewUtils;
 
 public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
 

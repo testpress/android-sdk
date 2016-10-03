@@ -18,7 +18,8 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.ExamPager;
 import in.testpress.exam.network.TestpressExamApiClient;
-import in.testpress.exam.util.SingleTypeAdapter;
+import in.testpress.ui.PagedItemFragment;
+import in.testpress.util.SingleTypeAdapter;
 
 public class ExamsListFragment extends PagedItemFragment<Exam> {
 

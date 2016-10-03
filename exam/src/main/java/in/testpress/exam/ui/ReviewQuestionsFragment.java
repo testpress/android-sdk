@@ -12,7 +12,8 @@ import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.ReviewItem;
 import in.testpress.exam.network.ReviewQuestionsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
-import in.testpress.exam.util.SingleTypeAdapter;
+import in.testpress.ui.PagedItemFragment;
+import in.testpress.util.SingleTypeAdapter;
 
 public class ReviewQuestionsFragment extends PagedItemFragment<ReviewItem> {
 

@@ -30,9 +30,9 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptAnswer;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.AttemptQuestion;
-import in.testpress.exam.util.UILImageGetter;
-import in.testpress.exam.util.ViewUtils;
-import in.testpress.exam.util.ZoomableImageString;
+import in.testpress.util.UILImageGetter;
+import in.testpress.util.ViewUtils;
+import in.testpress.util.ZoomableImageString;
 
 public class TestQuestionFragment extends Fragment {
 

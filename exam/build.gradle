@@ -23,18 +23,11 @@ android {
 
 dependencies {
     compile project(':core')
-    compile rootProject.appcompat
-    compile rootProject.retrofit2
-    compile rootProject.gsonConverter
-    compile rootProject.httpLogInterceptor
     compile rootProject.design
     compile rootProject.cardview
-    compile rootProject.universalImageLoader
     compile rootProject.chart
     testCompile rootProject.junit
     testCompile rootProject.mockito
-    androidTestCompile rootProject.junit
-    androidTestCompile rootProject.testRunner
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

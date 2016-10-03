@@ -4,14 +4,14 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import in.testpress.exam.R;
+import in.testpress.ui.BaseToolBarActivity;
 
 public class  ExamsListActivity extends BaseToolBarActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.testpress_container_layout_with_tool_bar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setContentView(R.layout.testpress_container_layout);
         CarouselFragment fragment = new CarouselFragment();
         fragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction()

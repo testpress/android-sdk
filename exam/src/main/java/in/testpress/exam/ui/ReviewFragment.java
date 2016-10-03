@@ -24,8 +24,8 @@ import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
-import in.testpress.exam.models.TestpressApiResponse;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.model.TestpressApiResponse;
 import in.testpress.util.UIUtils;
 
 public class ReviewFragment extends Fragment {

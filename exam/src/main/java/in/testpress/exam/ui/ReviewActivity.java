@@ -7,6 +7,7 @@ import android.os.Bundle;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
+import in.testpress.ui.BaseToolBarActivity;
 
 public class ReviewActivity extends BaseToolBarActivity {
 
@@ -25,8 +26,7 @@ public class ReviewActivity extends BaseToolBarActivity {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.testpress_container_layout_with_tool_bar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setContentView(R.layout.testpress_container_layout);
         Exam exam = getIntent().getParcelableExtra(PRAM_EXAM);
         Attempt attempt = getIntent().getParcelableExtra(PRAM_ATTEMPT);
         getSupportFragmentManager().beginTransaction()

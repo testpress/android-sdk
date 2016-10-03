@@ -22,9 +22,9 @@ import java.util.List;
 import in.testpress.exam.R;
 import in.testpress.exam.models.ReviewAnswer;
 import in.testpress.exam.models.ReviewItem;
-import in.testpress.exam.util.SingleTypeAdapter;
-import in.testpress.exam.util.UILImageGetter;
-import in.testpress.exam.util.ZoomableImageString;
+import in.testpress.util.SingleTypeAdapter;
+import in.testpress.util.UILImageGetter;
+import in.testpress.util.ZoomableImageString;
 
 class ReviewListAdapter extends SingleTypeAdapter<ReviewItem> {
 

@@ -24,9 +24,37 @@ public class TestpressApiClient {
     public static final String SOCIAL_AUTH_PATH= "api/v2.2/social-auth/";
     public static final String TESTPRESS_AUTH_PATH= "api/v2.2/auth-token/";
 
-    private final Retrofit retrofit;
+    protected final Retrofit retrofit;
 
+    /**
+     * Used to make the network calls without
+     * authentication header.
+     *
+     * @param baseUrl
+     * @param context
+     */
     public TestpressApiClient(String baseUrl, final Context context) {
+        this(context, baseUrl, null);
+    }
+
+    /**
+     * Use when testpress session is available, to add the authentication header
+     *
+     * @param testpressSession
+     * @param context
+     */
+    public TestpressApiClient(final Context context, TestpressSession testpressSession) {
+        this(context, checkTestpressSessionIsNull(testpressSession).getBaseUrl(), testpressSession);
+    }
+
+    private TestpressApiClient(final Context context, String baseUrl,
+                              final TestpressSession testpressSession) {
+        if (context == null) {
+            throw new IllegalArgumentException("Context must not be null.");
+        }
+        if (baseUrl == null || baseUrl.isEmpty()) {
+            throw new IllegalArgumentException("BaseUrl must not be null or Empty.");
+        }
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
@@ -36,10 +64,12 @@ public class TestpressApiClient {
         Interceptor interceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
-                Request newRequest = chain.request().newBuilder()
-                        .addHeader("User-Agent", UserAgentProvider.get(context))
-                        .build();
-                return chain.proceed(newRequest);
+                Request.Builder header = chain.request().newBuilder()
+                        .addHeader("User-Agent", UserAgentProvider.get(context));
+                if (testpressSession != null) {
+                    header.addHeader("Authorization", "JWT " + testpressSession.getToken());
+                }
+                return chain.proceed(header.build());
             }
         };
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
@@ -57,6 +87,13 @@ public class TestpressApiClient {
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(httpClient.build())
                 .build();
+    }
+
+    public static TestpressSession checkTestpressSessionIsNull(TestpressSession testpressSession) {
+        if (testpressSession == null) {
+            throw new IllegalArgumentException("TestpressSession must not be null.");
+        }
+        return testpressSession;
     }
 
     private AuthenticationService getAuthenticationService() {

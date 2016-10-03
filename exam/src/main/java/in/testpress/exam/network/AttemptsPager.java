@@ -3,15 +3,17 @@ package in.testpress.exam.network;
 import java.io.IOException;
 
 import in.testpress.exam.models.Attempt;
-import in.testpress.exam.models.TestpressApiResponse;
+import in.testpress.model.TestpressApiResponse;
+import in.testpress.network.BaseResourcePager;
 import retrofit2.Response;
 
 public class AttemptsPager extends BaseResourcePager<Attempt> {
 
+    private TestpressExamApiClient apiClient;
     private final String attemptsUrlFrag;
 
-    public AttemptsPager(String attemptsUrlFrag, TestpressExamApiClient service) {
-        super(service);
+    public AttemptsPager(String attemptsUrlFrag, TestpressExamApiClient apiClient) {
+        this.apiClient = apiClient;
         this.attemptsUrlFrag = attemptsUrlFrag;
     }
 

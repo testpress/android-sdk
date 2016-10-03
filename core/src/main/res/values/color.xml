@@ -1,6 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="UnusedResources">
 
     <color name="testpress_color_primary">#2196F3</color>
+
+    <color name="testpress_white">#FFFFFF</color>
+    <color name="testpress_black">#333333</color>
+
+    <color name="testpress_table_text">#484848</color>
+    <color name="testpress_text_gray">#777</color>
+
+    <color name="testpress_actionbar_background">@color/testpress_color_primary</color>
+    <color name="testpress_actionbar_text">#fff</color>
+    <color name="testpress_button_text_color">#fff</color>
+
+    <color name="testpress_pager_background">#F4F4F4</color>
+    <color name="testpress_pager_background_alternate">#E7E7E7</color>
+
+    <color name="testpress_tab_text_color">#888888</color>
+    <color name="testpress_tab_background_color">@color/testpress_white</color>
+    <color name="testpress_tab_indicator_color">@color/testpress_color_primary</color>
+
+    <color name="testpress_nav_button_disabled">#646464</color>
+
+    <color name="testpress_dropdown_list_divider_color">#92a3a3a3</color>
+    <color name="testpress_body_text">#60000000</color>
+
+    <color name="testpress_color_primary_blue">#2196F3</color>
+
+    <color name="testpress_blue_light_background_transparent">#80b6dcfb</color>
+    <color name="testpress_red">#d9534f</color>
+    <color name="testpress_green">#18be99</color>
 
 </resources>

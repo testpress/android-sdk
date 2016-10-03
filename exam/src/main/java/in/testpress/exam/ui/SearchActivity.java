@@ -10,7 +10,7 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.testpress_container_layout);
+        setContentView(R.layout.testpress_container_layout_without_toolbar);
         SearchFragment searchFragment = new SearchFragment();
         searchFragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction()

@@ -12,7 +12,8 @@ import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.AttemptsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
-import in.testpress.exam.util.SingleTypeAdapter;
+import in.testpress.ui.PagedItemFragment;
+import in.testpress.util.SingleTypeAdapter;
 
 public class AttemptsListFragment extends PagedItemFragment<Attempt> {
 

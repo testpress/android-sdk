@@ -39,7 +39,8 @@ import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.TestQuestionsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
-import in.testpress.exam.util.ThrowableLoader;
+import in.testpress.ui.ExploreSpinnerAdapter;
+import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 
 public class TestFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>> {

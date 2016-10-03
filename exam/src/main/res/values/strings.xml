@@ -1,5 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="UnusedResources">
+
     <string name="testpress_app_name">Testpress Exam Sdk</string>
     <string name="testpress_exams">Exams</string>
 
@@ -9,20 +10,13 @@
     <string name="testpress_attempts">attempts</string>
     <string name="testpress_to">to</string>
 
-    <string name="testpress_no_internet_try_again">Please check your internet connection &amp; try again.</string>
-    <string name="testpress_tap_to_retry">Tap to retry</string>
     <string name="testpress_retry_again">Retry Again</string>
-    <string name="testpress_server_error">Server Error</string>
-    <string name="testpress_network_error">Network Error</string>
-    <string name="testpress_loading_failed">Loading Failed</string>
-    <string name="testpress_authentication_failed">Authentication failed</string>
-    <string name="testpress_some_thing_went_wrong_try_again">Some thing went wrong, please try again later.</string>
+
     <string name="testpress_exam_paused_check_internet">Exam is paused, Please check your internet connection &amp; resume again.</string>
     <string name="testpress_exam_paused_check_internet_to_end">Exam is paused, Please check your internet connection &amp; try again.</string>
     <string name="testpress_no_internet_connection">No internet connection</string>
     <string name="testpress_try_again">Try again</string>
 
-    <string name="testpress_loading">Loading…</string>
     <string name="testpress_loading_questions">Loading questions</string>
     <string name="testpress_no_exams">No Exams</string>
     <string name="testpress_no_exams_description">You can buy exams from the store.</string>
@@ -61,9 +55,6 @@
     <string name="testpress_pause_message">Do you want to Pause the exam?</string>
     <string name="testpress_pause_content">You can pause the exam &amp; resume later before end date</string>
     <string name="testpress_end_message">Do you want to End the exam?</string>
-
-    <string name="testpress_ok">OK</string>
-    <string name="testpress_cancel">Cancel</string>
 
     <string name="testpress_email_mcqs">EMAIL MCQs</string>
     <string name="testpress_email_pdf">EMAIL PDF</string>

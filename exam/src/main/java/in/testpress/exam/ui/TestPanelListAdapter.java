@@ -9,7 +9,7 @@ import java.util.List;
 
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
-import in.testpress.exam.util.SingleTypeAdapter;
+import in.testpress.util.SingleTypeAdapter;
 
 /**
  * Adapter that used to show the list of questions in test engine

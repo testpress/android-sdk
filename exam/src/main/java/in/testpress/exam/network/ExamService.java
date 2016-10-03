@@ -7,7 +7,7 @@ import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.ReviewItem;
-import in.testpress.exam.models.TestpressApiResponse;
+import in.testpress.model.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
