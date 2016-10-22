@@ -12,18 +12,17 @@
         android:background="@drawable/testpress_round_background"
         android:text="a"
         android:textStyle="bold"
+        android:typeface="normal"
         android:gravity="center"
         android:clickable="false" />
 
-    <TextView
+    <in.testpress.ui.view.TestpressTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:lineSpacingExtra="5sp"
         android:textColor="#333333"
         android:layout_marginLeft="5dp"
         android:layout_marginStart="5dp"
         android:id="@+id/answer_text"
-        android:textSize="@dimen/testpress_text_size_normal"
         android:text="Lorem ipsum dolor sit amet,  ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
         android:layout_toRightOf="@+id/option"
         android:layout_toEndOf="@+id/option"

@@ -3,7 +3,6 @@ package in.testpress.exam.ui;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 
@@ -12,6 +11,7 @@ import java.util.List;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
+import in.testpress.ui.view.TestpressAlertDialog;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ViewUtils;
 
@@ -67,7 +67,7 @@ class AttemptsListAdapter extends SingleTypeAdapter<Attempt> {
         endButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AlertDialog.Builder(activity, R.style.TestpressAppCompatAlertDialogStyle)
+                new TestpressAlertDialog(activity)
                         .setTitle(R.string.testpress_end_message)
                         .setPositiveButton(R.string.testpress_end, new DialogInterface.OnClickListener() {
                             @Override

@@ -64,7 +64,7 @@
                     <TextView
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textColor="@color/testpress_black"
                         android:text="SBI PO Mock Test 1"
                         android:layout_gravity="center"
@@ -75,7 +75,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:id="@+id/test_details"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="25dp"
                         android:layout_marginBottom="20dp">
 
                         <LinearLayout
