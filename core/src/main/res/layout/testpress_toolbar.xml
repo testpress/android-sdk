@@ -8,14 +8,15 @@
     android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:theme="@style/TestpressAppThemeDark">
+    android:theme="@style/TestpressTheme">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        app:popupTheme="@style/TestpressAppThemeDark.PopupOverlay"
+        app:titleTextAppearance="@style/TestpressToolbarText"
+        app:popupTheme="@style/TestpressTheme.PopupOverlay"
         app:layout_scrollFlags="scroll|enterAlways" />
 
 </android.support.design.widget.AppBarLayout>

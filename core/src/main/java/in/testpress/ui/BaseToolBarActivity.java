@@ -5,6 +5,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import in.testpress.R;
+import in.testpress.core.TestpressSdk;
+import in.testpress.util.FontUtils;
 
 /**
  * Base activity used to support the toolbar & handle backpress.
@@ -15,6 +17,8 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
 
     @Override
     public void setContentView(final int layoutResId) {
+        FontUtils.replaceFont("MONOSPACE", TestpressSdk.getTestpressFont(getApplicationContext())
+                .getTypeface(getApplicationContext()));
         super.setContentView(layoutResId);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -31,4 +35,5 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
         }
         return false;
     }
+
 }

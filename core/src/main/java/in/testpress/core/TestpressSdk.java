@@ -21,6 +21,7 @@ public final class TestpressSdk {
     private static final String KEY_TESTPRESS_AUTH_TOKEN = "testpressAuthToken";
     private static final String KEY_TESTPRESS_SHARED_PREFS = "testpressSharedPreferences";
     private static final String KEY_USER_ID = "userId";
+    private static final String KEY_TESTPRESS_FONT = "font";
     public enum Provider { FACEBOOK, GOOGLE, TESTPRESS }
 
     private static SharedPreferences getPreferences(Context context) {
@@ -63,6 +64,30 @@ public final class TestpressSdk {
 
     public static boolean hasActiveSession(@NonNull Context context) {
         return getTestpressSession(context) != null;
+    }
+
+    /**
+     * Set {@link TestpressFont} to customize the font.
+     *
+     * @param context Context
+     * @param testpressFont TestpressFont
+     */
+    public static void setTestpressFont(@NonNull Context context, TestpressFont testpressFont) {
+        SharedPreferences.Editor editor = getPreferenceEditor(context);
+        editor.putString(KEY_TESTPRESS_FONT, TestpressFont.serialize(testpressFont));
+        editor.apply();
+    }
+
+    /**
+     * Get {@link TestpressFont} from SharedPreferences if exist, TestpressFont initialized with
+     * default values otherwise.
+     *
+     * @param context Context
+     * @return TestpressFont
+     */
+    public static TestpressFont getTestpressFont(@NonNull Context context) {
+        SharedPreferences pref = getPreferences(context);
+        return TestpressFont.deserialize(pref.getString(KEY_TESTPRESS_FONT, null));
     }
 
     /**

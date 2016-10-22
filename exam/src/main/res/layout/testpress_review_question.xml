@@ -18,13 +18,14 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" >
 
-            <TextView
+            <in.testpress.ui.view.TestpressTextView
                 android:id="@+id/question_index"
                 android:minWidth="30dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textSize="@dimen/testpress_text_size_normal"
                 android:textColor="@color/testpress_black"
                 android:textStyle="bold"
                 android:text="1." />
@@ -36,14 +37,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" >
 
-                <TextView
+                <in.testpress.ui.view.TestpressTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/testpress_black"
-                    android:textSize="@dimen/testpress_text_size_normal"
                     android:id="@+id/question"
                     android:paddingRight="15dp"
-                    android:lineSpacingExtra="5sp"
                     android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
                     />
 
@@ -62,7 +61,7 @@
                     android:background="@color/testpress_color_primary"
                     android:textColor="@color/testpress_button_text_color"
                     android:textStyle="bold"
-                    android:textSize="12sp"
+                    android:typeface="normal"
                     android:layout_marginTop="15dp"
                     android:paddingLeft="12dp"
                     android:paddingRight="12dp"
@@ -99,7 +98,7 @@
                     android:background="@color/testpress_color_primary"
                     android:textColor="@color/testpress_button_text_color"
                     android:textStyle="bold"
-                    android:textSize="12sp"
+                    android:typeface="normal"
                     android:layout_marginTop="15dp"
                     android:layout_marginBottom="10dp"
                     android:paddingLeft="12dp"
@@ -107,11 +106,9 @@
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp"/>
 
-                <TextView
+                <in.testpress.ui.view.TestpressTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:lineSpacingExtra="5sp"
-                    android:textSize="@dimen/testpress_text_size_normal"
                     android:textColor="@color/testpress_black"
                     android:paddingRight="15dp"
                     android:layout_marginLeft="5dp"

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import in.testpress.core.TestpressFont;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.TestpressExam;
 import in.testpress.samples.BaseToolBarActivity;
@@ -41,7 +42,9 @@ public class ExamSampleActivity extends BaseToolBarActivity {
     }
 
     private void displayExams() {
-        TestpressExam.show(this, TestpressSdk.getTestpressSession(this));
+        //noinspection ConstantConditions
+        TestpressExam.show(this, TestpressSdk.getTestpressSession(this),
+                new TestpressFont(TestpressFont.TestpressTypeface.SERIF));
     }
 
     @Override

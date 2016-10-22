@@ -12,7 +12,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SlidingPaneLayout;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +39,7 @@ import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.TestQuestionsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.ui.ExploreSpinnerAdapter;
+import in.testpress.ui.view.TestpressAlertDialog;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 
@@ -256,7 +256,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     private void endExamAlert() {
-        new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
+        new TestpressAlertDialog(getActivity())
                 .setTitle(R.string.testpress_end_message)
                 .setPositiveButton(R.string.testpress_end, new DialogInterface.OnClickListener() {
                     @Override
@@ -269,7 +269,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     void pauseExam() {
-        new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
+        new TestpressAlertDialog(getActivity())
                 .setTitle(R.string.testpress_pause_message)
                 .setMessage(R.string.testpress_pause_content)
                 .setPositiveButton(R.string.testpress_pause, new DialogInterface.OnClickListener() {
@@ -305,8 +305,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         //noinspection ThrowableResultOfMethodCallIgnored
         TestpressException exception = ((ThrowableLoader<List<AttemptItem>>) loader).clearException();
         if(exception != null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
-                    R.style.TestpressAppCompatAlertDialogStyle);
+            TestpressAlertDialog builder = new TestpressAlertDialog(getActivity());
             builder.setPositiveButton(R.string.testpress_retry_again, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -620,7 +619,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         }.start();
     }
 
-    class TestEngineAlertDialog extends AlertDialog.Builder {
+    class TestEngineAlertDialog extends TestpressAlertDialog {
 
         public TestEngineAlertDialog(TestpressException exception) {
             super(getActivity(), R.style.TestpressAppCompatAlertDialogStyle);

@@ -12,9 +12,10 @@ import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.network.RetrofitCall;
+import in.testpress.ui.view.TestpressAlertDialog;
 import in.testpress.util.UIUtils;
 
-class EmailPdfDialog extends AlertDialog.Builder {
+class EmailPdfDialog extends TestpressAlertDialog {
 
     /**
      * @param context the parent context
