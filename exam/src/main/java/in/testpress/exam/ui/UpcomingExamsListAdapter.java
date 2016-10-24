@@ -1,11 +1,13 @@
 package in.testpress.exam.ui;
 
 import android.app.Activity;
+import android.view.ViewGroup;
 
 import java.util.List;
 
 import in.testpress.exam.R;
 import in.testpress.exam.models.Exam;
+import in.testpress.util.FontUtils;
 import in.testpress.util.SingleTypeAdapter;
 
 public class UpcomingExamsListAdapter extends SingleTypeAdapter<Exam> {
@@ -35,5 +37,6 @@ public class UpcomingExamsListAdapter extends SingleTypeAdapter<Exam> {
         setText(2, item.getNumberOfQuestionsString());
         setText(3, item.getFormattedStartDate() + " " + getStringFromResource(activity, R.string.testpress_to)
                 + " " + item.getFormattedEndDate());
+        FontUtils.applyTestpressFont(activity, (ViewGroup) updater.view);
     }
 }

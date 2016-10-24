@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptAnswer;
 import in.testpress.exam.models.AttemptItem;
@@ -145,6 +146,7 @@ public class TestQuestionFragment extends Fragment {
             Spanned htmlSpan = Html.fromHtml(attemptAnswers.get(i).getTextHtml(),
                     new UILImageGetter(option, getActivity()), null);
             ZoomableImageString zoomableImageOption = new ZoomableImageString(getActivity());
+            option.setTextAppearance(getActivity(), R.style.TestpressText);
             option.setText(zoomableImageOption.convertString(htmlSpan));
             option.setMovementMethod(LinkMovementMethod.getInstance());
                  option.setPadding(0, 10, 0, 10);

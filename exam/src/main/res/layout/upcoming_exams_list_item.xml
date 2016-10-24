@@ -48,6 +48,7 @@
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="end"
                 android:layout_marginBottom="@dimen/testpress_margin_normal" >
 
                 <TextView

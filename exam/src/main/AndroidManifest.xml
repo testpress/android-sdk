@@ -7,26 +7,26 @@
 
         <activity android:name=".ui.ExamsListActivity"
             android:label="@string/testpress_exams"
-            android:theme="@style/TestpressAppThemeDark"
+            android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
         <activity android:name=".ui.TestActivity"
             android:label="@string/testpress_start_exam"
-            android:theme="@style/TestpressAppThemeDark.NoToolBar"
+            android:theme="@style/TestpressTheme.NoToolBar"
             android:configChanges="orientation|keyboard|screenSize" />
 
         <activity android:name=".ui.AttemptsListActivity"
-            android:theme="@style/TestpressAppThemeDark"
+            android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
         <activity android:name=".ui.ReviewActivity"
             android:label="@string/testpress_review_label"
-            android:theme="@style/TestpressAppThemeDark"
+            android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
         <activity android:name=".ui.SearchActivity"
             android:windowSoftInputMode="stateVisible"
-            android:theme="@style/TestpressAppThemeDark"
+            android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
     </application>

@@ -14,6 +14,7 @@ import android.view.MenuItem;
 
 import com.facebook.login.LoginManager;
 
+import in.testpress.core.TestpressFont;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.TestpressExam;
 import in.testpress.samples.R;
@@ -84,7 +85,9 @@ public class NavigationDrawerActivity extends AppCompatActivity {
     }
 
     private void displayExams() {
-        TestpressExam.show(this, R.id.fragment_container, TestpressSdk.getTestpressSession(this));
+        //noinspection ConstantConditions
+        TestpressExam.show(this, R.id.fragment_container, TestpressSdk.getTestpressSession(this),
+                new TestpressFont(TestpressFont.TestpressTypeface.SERIF));
     }
 
     @Override

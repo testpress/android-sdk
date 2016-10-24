@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -20,6 +21,7 @@ import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
 
+import in.testpress.util.FontUtils;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.UIUtils;
@@ -116,6 +118,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
             description.setVisibility(View.VISIBLE);
             descriptionContent.setText("    " + exam.getDescription());
         }
+        FontUtils.applyTestpressFont(this, (ViewGroup) findViewById(android.R.id.content));
     }
 
     private void endExam() {
