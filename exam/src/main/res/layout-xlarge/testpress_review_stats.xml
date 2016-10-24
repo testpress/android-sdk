@@ -166,26 +166,7 @@
                             android:layout_marginLeft="5dp"
                             android:layout_marginStart="5dp"
                             android:id="@+id/sub_percentile"
-                            android:text="22%" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#333333"
-                            android:textStyle="normal"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginStart="5dp"
-                            android:text="of users scored less than your score of " />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#333333"
-                            android:textStyle="normal"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginStart="5dp"
-                            android:id="@+id/sub_score"
-                            android:text="20" />
+                            android:text="22% of users scored less than your score of 50.00" />
 
                     </LinearLayout>
 

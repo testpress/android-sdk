@@ -11,6 +11,7 @@ import java.util.List;
 
 import in.testpress.exam.R;
 import in.testpress.exam.models.Exam;
+import in.testpress.util.FontUtils;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ViewUtils;
 
@@ -30,12 +31,6 @@ public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
     protected int[] getChildViewIds() {
         return new int[]{R.id.exam_title, R.id.exam_duration, R.id.number_of_questions,
                 R.id.exam_date, R.id.course_category};
-    }
-
-    @Override
-    public View getView(final int position, View convertView, final ViewGroup parent) {
-        convertView = super.getView(position, convertView, parent);
-        return convertView;
     }
 
     @Override
@@ -71,6 +66,7 @@ public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
         } else {
             emailMcqs.setVisibility(View.GONE);
         }
+        FontUtils.applyTestpressFont(activity, (ViewGroup) updater.view);
     }
 
 }

@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
+import in.testpress.util.FontUtils;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ViewUtils;
 
@@ -110,6 +112,7 @@ class AttemptsListAdapter extends SingleTypeAdapter<Attempt> {
         } else {
             emailPdf.setVisibility(View.GONE);
         }
+        FontUtils.applyTestpressFont(activity, (ViewGroup) updater.view);
     }
 
 }

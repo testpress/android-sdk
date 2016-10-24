@@ -19,9 +19,11 @@ import com.github.testpress.mikephil.charting.data.PieEntry;
 
 import java.util.ArrayList;
 
+import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
+import in.testpress.util.FontUtils;
 
 public class ReviewStatsFragment extends Fragment {
 
@@ -37,7 +39,6 @@ public class ReviewStatsFragment extends Fragment {
         return fragment;
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -48,7 +49,6 @@ public class ReviewStatsFragment extends Fragment {
         TextView rank = (TextView) view.findViewById(R.id.rank);
         TextView percentile = (TextView) view.findViewById(R.id.percentile);
         TextView subPercentile = (TextView) view.findViewById(R.id.sub_percentile);
-        TextView subScore = (TextView) view.findViewById(R.id.sub_score);
         PieChart chart = (PieChart) view.findViewById(R.id.chart);
         LinearLayout rankLayout = (LinearLayout) view.findViewById(R.id.rank_layout);
         LinearLayout percentileLayout = (LinearLayout) view.findViewById(R.id.percentile_layout);
@@ -68,8 +68,8 @@ public class ReviewStatsFragment extends Fragment {
                percentileLayout.setVisibility(View.GONE);
             } else {
                 percentile.setText(attempt.getPercentile());
-                subScore.setText(attempt.getScore());
-                subPercentile.setText(attempt.getPercentile());
+                subPercentile.setText(attempt.getPercentile() +
+                        getString(R.string.testpress_scored_less_than) + attempt.getScore());
             }
             ArrayList<PieEntry> entries = new ArrayList<>();
             entries.add(new PieEntry(attempt.getCorrectCount(), 0));
@@ -97,6 +97,7 @@ public class ReviewStatsFragment extends Fragment {
             chart.animateY(1400, Easing.EasingOption.EaseInOutQuart);
             Legend l = chart.getLegend();
             l.setPosition(Legend.LegendPosition.RIGHT_OF_CHART_CENTER);
+            l.setTypeface(TestpressSdk.getTestpressFont(getContext()).getTypeface(getContext()));
             l.setYEntrySpace(5);
             l.setFormToTextSpace(8);
             l.setTextSize(14f);
@@ -107,6 +108,7 @@ public class ReviewStatsFragment extends Fragment {
         if (exam != null) {
             examTitle.setText(exam.getTitle());
         }
+        FontUtils.applyTestpressFont(getContext(), view);
         return view;
     }
 

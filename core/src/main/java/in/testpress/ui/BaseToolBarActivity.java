@@ -5,6 +5,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import in.testpress.R;
+import in.testpress.util.FontUtils;
 
 /**
  * Base activity used to support the toolbar & handle backpress.
@@ -18,6 +19,7 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
         super.setContentView(layoutResId);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        FontUtils.applyTestpressFont(getApplicationContext(), toolbar, true);
         //noinspection ConstantConditions
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

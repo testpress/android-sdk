@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 
 import java.util.List;
 
 import in.testpress.exam.R;
 import in.testpress.exam.models.Exam;
+import in.testpress.util.FontUtils;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ViewUtils;
 
@@ -94,6 +96,7 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
             setText(6, R.string.testpress_retake);
         }
         setGone(8, (exam.getPausedAttemptsCount() <= 0));
+        FontUtils.applyTestpressFont(activity, (ViewGroup) updater.view);
     }
 
 }

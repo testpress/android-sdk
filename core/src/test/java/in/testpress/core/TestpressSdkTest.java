@@ -64,6 +64,27 @@ public class TestpressSdkTest {
     }
 
     @Test
+    public void testGetTestpressFont_withNullContext() throws Exception {
+        try {
+            TestpressSdk.getTestpressFont(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Context must not be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSetTestpressFont_withNullContext() throws Exception {
+        try {
+            TestpressFont testpressFont = mock(TestpressFont.class);
+            TestpressSdk.setTestpressFont(null, testpressFont);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Context must not be null.", e.getMessage());
+        }
+    }
+
+    @Test
     public void testInitializingSdk_withNullValues() throws Exception {
         TestpressSdk.Provider provider = TestpressSdk.Provider.FACEBOOK;
         try {
