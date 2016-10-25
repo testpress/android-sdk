@@ -28,6 +28,9 @@ dependencies {
     compile rootProject.chart
     testCompile rootProject.junit
     testCompile rootProject.mockito
+    androidTestCompile rootProject.junit
+    androidTestCompile rootProject.testRunner
+    androidTestCompile rootProject.espressoCore
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
