@@ -27,24 +27,28 @@
             android:layout_marginBottom="@dimen/testpress_margin_normal"
             android:id="@+id/exam_title"/>
 
-        <RelativeLayout
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_marginTop="5dp"
             android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/exam_date"
                 android:textColor="@color/testpress_black"
-                android:layout_width="wrap_content"
+                android:layout_weight="0.7"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="19th Dec 2015 to 31 Jan 2015"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:layout_marginTop="5dp"
                 android:textSize="@dimen/testpress_text_size_small" />
 
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_width="match_parent"
+                android:layout_weight="0.3"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="end">
 
@@ -76,7 +80,7 @@
 
             </LinearLayout>
 
-        </RelativeLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
@@ -84,6 +88,7 @@
             android:layout_height="wrap_content">
 
             <LinearLayout
+                android:id="@+id/course_category_layout"
                 android:orientation="horizontal"
                 android:layout_width="0dp"
                 android:layout_weight="7"
@@ -143,6 +148,8 @@
                 style="@style/TestpressSmallButton"
                 android:text="@string/testpress_email_mcqs"
                 android:id="@+id/email_mcqs"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:layout_toLeftOf="@+id/start_exam"
                 android:layout_toStartOf="@+id/start_exam" />
 

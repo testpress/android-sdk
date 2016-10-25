@@ -64,7 +64,7 @@
                     <TextView
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textColor="@color/testpress_black"
                         android:text="SBI PO Mock Test 1"
                         android:layout_gravity="center"
@@ -75,7 +75,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:id="@+id/test_details"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="25dp"
                         android:layout_marginBottom="20dp">
 
                         <LinearLayout
@@ -96,11 +96,11 @@
                                     android:src="@drawable/testpress_questions_large"/>
                                 <TextView
                                     android:layout_height="match_parent"
-                                    style="@style/TestpressTabExamInfoSubHeading"
+                                    style="@style/TestpressExamInfoSubHeading.Tab"
                                     android:text="@string/testpress_questions"/>
                                 <TextView
                                     android:id="@+id/number_of_questions"
-                                    style="@style/TestpressTabExamInfoValue"
+                                    style="@style/TestpressExamInfoValue.Tab"
                                     android:textStyle="bold"
                                     android:text="200"/>
                             </LinearLayout>
@@ -117,11 +117,11 @@
                                     android:src="@drawable/testpress_duration_large"/>
                                 <TextView
                                     android:layout_height="match_parent"
-                                    style="@style/TestpressTabExamInfoSubHeading"
+                                    style="@style/TestpressExamInfoSubHeading.Tab"
                                     android:text="@string/testpress_duration"/>
                                 <TextView
                                     android:id="@+id/exam_duration"
-                                    style="@style/TestpressTabExamInfoValue"
+                                    style="@style/TestpressExamInfoValue.Tab"
                                     android:textStyle="bold"
                                     android:text="02:00:00"/>
                             </LinearLayout>
@@ -138,11 +138,11 @@
                                     android:src="@drawable/testpress_marks_large"/>
                                 <TextView
                                     android:layout_height="match_parent"
-                                    style="@style/TestpressTabExamInfoSubHeading"
+                                    style="@style/TestpressExamInfoSubHeading.Tab"
                                     android:text="@string/testpress_mark_per_question"/>
                                 <TextView
                                     android:id="@+id/mark_per_question"
-                                    style="@style/TestpressTabExamInfoValue"
+                                    style="@style/TestpressExamInfoValue.Tab"
                                     android:textStyle="bold"
                                     android:text="200"/>
                             </LinearLayout>
@@ -159,11 +159,11 @@
                                     android:src="@drawable/testpress_negative_large"/>
                                 <TextView
                                     android:layout_height="match_parent"
-                                    style="@style/TestpressTabExamInfoSubHeading"
+                                    style="@style/TestpressExamInfoSubHeading.Tab"
                                     android:text="@string/testpress_negative_mark"/>
                                 <TextView
                                     android:id="@+id/negative_marks"
-                                    style="@style/TestpressTabExamInfoValue"
+                                    style="@style/TestpressExamInfoValue.Tab"
                                     android:textStyle="bold"
                                     android:text="200"/>
                             </LinearLayout>

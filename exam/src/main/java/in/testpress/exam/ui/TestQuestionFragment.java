@@ -145,6 +145,7 @@ public class TestQuestionFragment extends Fragment {
             Spanned htmlSpan = Html.fromHtml(attemptAnswers.get(i).getTextHtml(),
                     new UILImageGetter(option, getActivity()), null);
             ZoomableImageString zoomableImageOption = new ZoomableImageString(getActivity());
+            option.setTextAppearance(getActivity(), R.style.TestpressText);
             option.setText(zoomableImageOption.convertString(htmlSpan));
             option.setMovementMethod(LinkMovementMethod.getInstance());
                  option.setPadding(0, 10, 0, 10);
@@ -184,8 +185,9 @@ public class TestQuestionFragment extends Fragment {
             final RadioButton option = (RadioButton) inflater.inflate(
                     R.layout.testpress_radio_button, null);
             option.setId(i);
-            option.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT));
+            RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(getContext(), null);
+            params.setMargins(0, 10, 0, 10);
+            option.setLayoutParams(params);
             Spanned htmlSpan = Html.fromHtml(attemptAnswers.get(i).getTextHtml(),
                     new UILImageGetter(option, getActivity()), null);
 

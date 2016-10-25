@@ -37,7 +37,6 @@ public class ReviewStatsFragment extends Fragment {
         return fragment;
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -48,7 +47,6 @@ public class ReviewStatsFragment extends Fragment {
         TextView rank = (TextView) view.findViewById(R.id.rank);
         TextView percentile = (TextView) view.findViewById(R.id.percentile);
         TextView subPercentile = (TextView) view.findViewById(R.id.sub_percentile);
-        TextView subScore = (TextView) view.findViewById(R.id.sub_score);
         PieChart chart = (PieChart) view.findViewById(R.id.chart);
         LinearLayout rankLayout = (LinearLayout) view.findViewById(R.id.rank_layout);
         LinearLayout percentileLayout = (LinearLayout) view.findViewById(R.id.percentile_layout);
@@ -68,8 +66,9 @@ public class ReviewStatsFragment extends Fragment {
                percentileLayout.setVisibility(View.GONE);
             } else {
                 percentile.setText(attempt.getPercentile());
-                subScore.setText(attempt.getScore());
-                subPercentile.setText(attempt.getPercentile());
+                //noinspection SetTextI18n
+                subPercentile.setText(attempt.getPercentile() +
+                        getString(R.string.testpress_scored_less_than) + attempt.getScore());
             }
             ArrayList<PieEntry> entries = new ArrayList<>();
             entries.add(new PieEntry(attempt.getCorrectCount(), 0));
