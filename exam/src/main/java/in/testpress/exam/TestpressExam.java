@@ -6,17 +6,11 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 
-import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
-
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.ui.CarouselFragment;
 import in.testpress.exam.ui.ExamsListActivity;
+import in.testpress.util.ImageUtils;
 
 public class TestpressExam {
 
@@ -40,13 +34,11 @@ public class TestpressExam {
     public static void show(@NonNull FragmentActivity activity,
                             @NonNull @IdRes Integer containerViewId,
                             @NonNull TestpressSession testpressSession) {
+        //noinspection ConstantConditions
         if (activity == null) {
             throw new IllegalArgumentException("Activity must not be null.");
-        } else if (testpressSession == null) {
-            throw new IllegalArgumentException("TestpressSession must not be null.");
         }
-        TestpressSdk.setTestpressSession(activity, testpressSession);
-        initImageLoader(activity);
+        init(activity, testpressSession);
         CarouselFragment.show(activity, containerViewId);
     }
 
@@ -67,29 +59,21 @@ public class TestpressExam {
      * @param testpressSession TestpressSession got from the core module.
      */
     public static void show(@NonNull Context context, @NonNull TestpressSession testpressSession) {
+        //noinspection ConstantConditions
         if (context == null) {
             throw new IllegalArgumentException("Context must not be null.");
-        } else if (testpressSession == null) {
-            throw new IllegalArgumentException("TestpressSession must not be null.");
         }
-        TestpressSdk.setTestpressSession(context, testpressSession);
-        initImageLoader(context);
+        init(context, testpressSession);
         Intent intent = new Intent(context, ExamsListActivity.class);
         context.startActivity(intent);
     }
 
-    public static void initImageLoader(Context context) {
-        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
-                .cacheOnDisk(true).cacheInMemory(true)
-                .imageScaleType(ImageScaleType.EXACTLY)
-                .displayer(new FadeInBitmapDisplayer(300)).build();
-
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
-                .defaultDisplayImageOptions(defaultOptions)
-                .memoryCache(new WeakMemoryCache())
-                .diskCacheSize(500 * 1024 * 1024).build();
-
-        ImageLoader.getInstance().init(config);
+    private static void init(Context context, TestpressSession testpressSession) {
+        if (testpressSession == null) {
+            throw new IllegalArgumentException("TestpressSession must not be null.");
+        }
+        TestpressSdk.setTestpressSession(context, testpressSession);
+        ImageUtils.initImageLoader(context);
     }
 
 }
