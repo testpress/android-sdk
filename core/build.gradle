@@ -8,6 +8,7 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionName VERSION_NAME
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -29,6 +30,8 @@ dependencies {
     compile rootProject.gsonConverter
     compile rootProject.httpLogInterceptor
     compile rootProject.universalImageLoader
+    androidTestCompile rootProject.junit
+    androidTestCompile rootProject.testRunner
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
