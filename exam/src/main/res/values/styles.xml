@@ -92,7 +92,7 @@
         <item name="android:textSize">@dimen/testpress_text_size_xlarge</item>
     </style>
 
-    <style name="TestpressAppThemeDark.NoToolBar">
+    <style name="TestpressTheme.NoToolBar">
         <item name="colorControlNormal">#808080</item>
     </style>
 

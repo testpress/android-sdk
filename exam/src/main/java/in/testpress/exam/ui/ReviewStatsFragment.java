@@ -25,14 +25,14 @@ import in.testpress.exam.models.Exam;
 
 public class ReviewStatsFragment extends Fragment {
 
-    public static final String PRAM_EXAM = "exam";
-    public static final String PRAM_ATTEMPT = "attempt";
+    public static final String PARAM_EXAM = "exam";
+    public static final String PARAM_ATTEMPT = "attempt";
 
     public static ReviewStatsFragment getInstance(Exam exam, Attempt attempt) {
         ReviewStatsFragment fragment = new ReviewStatsFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(PRAM_EXAM, exam);
-        bundle.putParcelable(PRAM_ATTEMPT, attempt);
+        bundle.putParcelable(PARAM_EXAM, exam);
+        bundle.putParcelable(PARAM_ATTEMPT, attempt);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -50,8 +50,8 @@ public class ReviewStatsFragment extends Fragment {
         PieChart chart = (PieChart) view.findViewById(R.id.chart);
         LinearLayout rankLayout = (LinearLayout) view.findViewById(R.id.rank_layout);
         LinearLayout percentileLayout = (LinearLayout) view.findViewById(R.id.percentile_layout);
-        Exam exam = getArguments().getParcelable(PRAM_EXAM);
-        final Attempt attempt = getArguments().getParcelable(PRAM_ATTEMPT);
+        Exam exam = getArguments().getParcelable(PARAM_EXAM);
+        final Attempt attempt = getArguments().getParcelable(PARAM_ATTEMPT);
         if (attempt != null) {
             Integer unanswered = attempt.getTotalQuestions() - (attempt.getCorrectCount() +
                     attempt.getIncorrectCount());

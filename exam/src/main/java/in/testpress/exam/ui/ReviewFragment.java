@@ -2,6 +2,7 @@ package in.testpress.exam.ui;
 
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -30,8 +31,11 @@ import in.testpress.util.UIUtils;
 
 public class ReviewFragment extends Fragment {
 
-    static final String PRAM_EXAM = "exam";
-    static final String PRAM_ATTEMPT = "attempt";
+    static final String PARAM_EXAM = "exam";
+    static final String PARAM_ATTEMPT = "attempt";
+    private View tabContainer;
+    private TabLayout tabLayout;
+    private ViewPager pager;
     private ProgressBar progressBar;
     private View emptyView;
     private TextView emptyTitleView;
@@ -43,8 +47,8 @@ public class ReviewFragment extends Fragment {
     static ReviewFragment getInstance(Exam exam, Attempt attempt) {
         ReviewFragment fragment = new ReviewFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(PRAM_EXAM, exam);
-        bundle.putParcelable(PRAM_ATTEMPT, attempt);
+        bundle.putParcelable(PARAM_EXAM, exam);
+        bundle.putParcelable(PARAM_ATTEMPT, attempt);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -52,6 +56,8 @@ public class ReviewFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        exam = getArguments().getParcelable(PARAM_EXAM);
+        attempt = getArguments().getParcelable(PARAM_ATTEMPT);
         setHasOptionsMenu(true);
     }
 
@@ -72,10 +78,11 @@ public class ReviewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.testpress_fragment_review, container, false);
-        exam = getArguments().getParcelable(PRAM_EXAM);
-        attempt = getArguments().getParcelable(PRAM_ATTEMPT);
         progressBar = (ProgressBar) view.findViewById(R.id.pb_loading);
         UIUtils.setIndeterminateDrawable(getActivity(), progressBar, 4);
+        tabContainer = view.findViewById(R.id.tab_container);
+        tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
+        pager = (ViewPager) view.findViewById(R.id.viewpager);
         if (attempt == null) {
             emptyView = view.findViewById(R.id.empty_container);
             emptyTitleView = (TextView) view.findViewById(R.id.empty_title);
@@ -85,36 +92,48 @@ public class ReviewFragment extends Fragment {
                 public void onClick(View v) {
                     progressBar.setVisibility(View.VISIBLE);
                     emptyView.setVisibility(View.GONE);
-                    fetchAndRenderAttempt(view, exam);
+                    fetchAndRenderAttempt(exam);
                 }
             });
-            fetchAndRenderAttempt(view, exam);
-        } else {
-            setViewPager(view, exam, attempt);
         }
         return view;
     }
 
-    private void setViewPager(View view, Exam exam, Attempt attempt) {
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (attempt == null) {
+            fetchAndRenderAttempt(exam);
+        } else {
+            setViewPager(exam, attempt);
+        }
+    }
+
+    private void setViewPager(Exam exam, Attempt attempt) {
         progressBar.setVisibility(View.GONE);
-        view.findViewById(R.id.tab_container).setVisibility(View.VISIBLE);
-        TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
-        ViewPager pager = (ViewPager) view.findViewById(R.id.viewpager);
+        tabContainer.setVisibility(View.VISIBLE);
         pager.setAdapter(new ReviewPagerAdapter(this, exam, attempt));
         tabLayout.setupWithViewPager(pager);
     }
 
-    private void fetchAndRenderAttempt(final View view, final Exam exam) {
+    private void fetchAndRenderAttempt(final Exam exam) {
         new TestpressExamApiClient(getActivity()).getAttempts(exam.getAttemptsFrag(),
                 new HashMap<String, Object>())
                 .enqueue(new TestpressCallback<TestpressApiResponse<Attempt>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Attempt> response) {
+                        if (getActivity() == null) {
+                            return;
+                        }
                         attempt = response.getResults().get(0);
                         if (exam.getAllowPdf()) {
-                            emailPdfMenu.setVisible(true);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                                getActivity().invalidateOptionsMenu();
+                            } else {
+                                getActivity().supportInvalidateOptionsMenu();
+                            }
                         }
-                        setViewPager(view, exam, attempt);
+                        setViewPager(exam, attempt);
                     }
 
                     @Override

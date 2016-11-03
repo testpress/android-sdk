@@ -3,7 +3,7 @@
     tools:ignore="UnusedResources">
 
     <!-- Base application theme. -->
-    <style name="TestpressAppThemeDark" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="TestpressTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/testpress_actionbar_background</item>
         <item name="colorAccent">@color/testpress_color_primary</item>
         <item name="windowActionBar">false</item>
@@ -13,7 +13,7 @@
         <item name="colorButtonNormal">@color/testpress_color_primary</item>
     </style>
 
-    <style name="TestpressAppThemeDark.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="TestpressTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="TestpressAppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="colorAccent">#08AE9E</item>

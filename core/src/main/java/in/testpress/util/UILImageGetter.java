@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 public class UILImageGetter implements Html.ImageGetter {
@@ -33,7 +32,7 @@ public class UILImageGetter implements Html.ImageGetter {
     public Drawable getDrawable(String source) {
         UrlImageDownloader urlDrawable = new UrlImageDownloader(activity.getApplicationContext()
                 .getResources(), source);
-        ImageLoader.getInstance().loadImage(source, new SimpleListener(urlDrawable));
+        ImageUtils.initImageLoader(activity).loadImage(source, new SimpleListener(urlDrawable));
         return urlDrawable;
     }
 

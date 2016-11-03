@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.android.tools.build:gradle:2.2.2'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
         classpath 'com.google.gms:google-services:3.0.0'
         // NOTE: Do not place your application dependencies here; they belong
@@ -33,6 +33,7 @@ ext {
     junit = 'junit:junit:4.12'
     mockito = 'org.mockito:mockito-core:1.10.19'
     testRunner = 'com.android.support.test:runner:0.5'
+    espressoCore = 'com.android.support.test.espresso:espresso-core:2.2.2'
     appcompat = 'com.android.support:appcompat-v7:24.1.0'
     retrofit2 = 'com.squareup.retrofit2:retrofit:2.1.0'
     gsonConverter = 'com.squareup.retrofit2:converter-gson:2.1.0'
