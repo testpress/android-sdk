@@ -20,14 +20,14 @@
             android:layout_margin="5dp"
             android:gravity="center"
             android:background="#808080"
+            android:typeface="normal"
             android:textColor="#ffffff"
             android:textStyle="bold" />
 
         <TextView
+            style="@style/TestpressText.PanelListItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/testpress_text_size_normal"
-            android:textColor="#333333"
             android:id="@+id/question_all"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/question_index_all"
@@ -53,14 +53,14 @@
             android:layout_margin="5dp"
             android:gravity="center"
             android:background="#d9534f"
+            android:typeface="normal"
             android:textColor="#ffffff"
             android:textStyle="bold" />
 
         <TextView
+            style="@style/TestpressText.PanelListItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/testpress_text_size_normal"
-            android:textColor="#333333"
             android:id="@+id/question_marked"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/question_index_marked"
@@ -86,14 +86,14 @@
             android:layout_margin="5dp"
             android:gravity="center"
             android:background="#08AE9E"
+            android:typeface="normal"
             android:textColor="#ffffff"
             android:textStyle="bold" />
 
         <TextView
+            style="@style/TestpressText.PanelListItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/testpress_text_size_normal"
-            android:textColor="#333333"
             android:id="@+id/question_answered"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/question_index_answered"

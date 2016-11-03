@@ -68,12 +68,12 @@
                     android:background="#ddd" />
 
                     <TextView
+                        style="@style/TestpressText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/direction_text"
                         android:clickable="true"
-                        android:padding="15dp"
-                        android:textColor="@android:color/black" />
+                        android:padding="15dp" />
 
                 </LinearLayout>
 
@@ -147,21 +147,20 @@
                         android:layout_height="wrap_content" >
 
                         <TextView
+                            style="@style/TestpressText"
                             android:id="@+id/question_index"
                             android:layout_width="wrap_content"
                             android:layout_height="fill_parent"
-                            android:textSize="@dimen/testpress_text_size_normal"
-                            android:textColor="#333333"
+                            android:typeface="normal"
                             android:textStyle="bold"
                             android:layout_marginRight="5dp"
                             android:layout_marginEnd="5dp"
                             android:text="1." />
 
                         <TextView
+                            style="@style/TestpressText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="@dimen/testpress_text_size_normal"
-                            android:textColor="#333333"
                             android:id="@+id/question" />
 
                     </LinearLayout>

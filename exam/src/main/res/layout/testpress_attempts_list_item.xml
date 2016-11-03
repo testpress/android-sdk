@@ -210,29 +210,30 @@
         android:layout_height="wrap_content"
         android:id="@+id/paused_attempt" >
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:textColor="@color/testpress_black"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:textSize="@dimen/testpress_text_size_large"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Started on 20 Dec 2015"
+                android:layout_marginBottom="@dimen/testpress_margin_normal"
+                android:id="@+id/paused_attempt_date" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:textColor="@color/testpress_black"
-                    android:layout_height="wrap_content"
-                    android:gravity="top"
-                    android:textSize="@dimen/testpress_text_size_large"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:text="Started on 20 Dec 2015"
-                    android:layout_marginBottom="@dimen/testpress_margin_normal"
-                    android:id="@+id/paused_attempt_date" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginTop="5dp" >
@@ -264,21 +265,18 @@
 
                 </LinearLayout>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="0dp"
+                    android:text="@string/testpress_paused"
+                    android:background="@drawable/testpress_stroke_background"
+                    android:textColor="@color/testpress_color_primary"
+                    android:textSize="@dimen/testpress_text_size_medium" />
+
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="0dp"
-                android:text="@string/testpress_paused"
-                android:background="@drawable/testpress_stroke_background"
-                android:textColor="@color/testpress_color_primary"
-                android:textSize="@dimen/testpress_text_size_medium"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true" />
-
-        </RelativeLayout>
+        </LinearLayout>
 
         <RelativeLayout
             android:orientation="horizontal"

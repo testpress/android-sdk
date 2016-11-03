@@ -3,6 +3,7 @@ package in.testpress.exam.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -29,7 +30,7 @@ public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
     @Override
     protected int[] getChildViewIds() {
         return new int[]{R.id.exam_title, R.id.exam_duration, R.id.number_of_questions,
-                R.id.exam_date, R.id.course_category};
+                R.id.exam_date, R.id.course_category, R.id.course_category_layout};
     }
 
     @Override
@@ -46,7 +47,12 @@ public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
         setText(2, exam.getNumberOfQuestionsString());
         setText(3, exam.getFormattedStartDate() + " " + getStringFromResource(activity,
                 R.string.testpress_to) + " " + exam.getFormattedEndDate());
-        setText(4, exam.getCourse_category());
+        if (TextUtils.isEmpty(exam.getCourse_category())) {
+            setGone(5, true);
+        } else {
+            setGone(5, false);
+            setText(4, exam.getCourse_category());
+        }
         Button startExamButton = (Button)updater.view.findViewById(R.id.start_exam);
         ViewUtils.setLeftDrawable(activity, startExamButton, R.drawable.ic_assignment_white_18dp);
         startExamButton.setOnClickListener(new View.OnClickListener() {

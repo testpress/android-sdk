@@ -95,7 +95,7 @@
                             <TextView
                                 android:id="@+id/number_of_questions"
                                 style="@style/TestpressExamInfoValue"
-                                android:layout_weight="0.2"
+                                android:layout_weight="0.3"
                                 android:textStyle="bold"
                                 android:text="200"/>
                         </LinearLayout>
@@ -117,7 +117,7 @@
                             <TextView
                                 android:id="@+id/exam_duration"
                                 style="@style/TestpressExamInfoValue"
-                                android:layout_weight="0.2"
+                                android:layout_weight="0.3"
                                 android:textStyle="bold"
                                 android:text="02:00:00"/>
                         </LinearLayout>
@@ -139,7 +139,7 @@
                             <TextView
                                 android:id="@+id/mark_per_question"
                                 style="@style/TestpressExamInfoValue"
-                                android:layout_weight="0.2"
+                                android:layout_weight="0.3"
                                 android:textStyle="bold"
                                 android:text="200"/>
                         </LinearLayout>
@@ -161,7 +161,7 @@
                             <TextView
                                 android:id="@+id/negative_marks"
                                 style="@style/TestpressExamInfoValue"
-                                android:layout_weight="0.2"
+                                android:layout_weight="0.3"
                                 android:textStyle="bold"
                                 android:text="200"/>
                         </LinearLayout>
