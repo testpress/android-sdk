@@ -31,8 +31,8 @@ import in.testpress.util.UIUtils;
 
 public class ReviewFragment extends Fragment {
 
-    static final String PRAM_EXAM = "exam";
-    static final String PRAM_ATTEMPT = "attempt";
+    static final String PARAM_EXAM = "exam";
+    static final String PARAM_ATTEMPT = "attempt";
     private View tabContainer;
     private TabLayout tabLayout;
     private ViewPager pager;
@@ -47,8 +47,8 @@ public class ReviewFragment extends Fragment {
     static ReviewFragment getInstance(Exam exam, Attempt attempt) {
         ReviewFragment fragment = new ReviewFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(PRAM_EXAM, exam);
-        bundle.putParcelable(PRAM_ATTEMPT, attempt);
+        bundle.putParcelable(PARAM_EXAM, exam);
+        bundle.putParcelable(PARAM_ATTEMPT, attempt);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -56,8 +56,8 @@ public class ReviewFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        exam = getArguments().getParcelable(PRAM_EXAM);
-        attempt = getArguments().getParcelable(PRAM_ATTEMPT);
+        exam = getArguments().getParcelable(PARAM_EXAM);
+        attempt = getArguments().getParcelable(PARAM_ATTEMPT);
         setHasOptionsMenu(true);
     }
 

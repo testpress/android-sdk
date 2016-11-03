@@ -74,7 +74,7 @@ public class ReviewActivityTest extends ActivityTestRule<ReviewActivity> {
         Gson gson = new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
-        intent.putExtra(ReviewActivity.PRAM_EXAM, gson.fromJson(examJson, Exam.class));
+        intent.putExtra(ReviewActivity.PARAM_EXAM, gson.fromJson(examJson, Exam.class));
         return intent;
     }
 

@@ -17,24 +17,24 @@ import in.testpress.util.SingleTypeAdapter;
 
 public class ReviewQuestionsFragment extends PagedItemFragment<ReviewItem> {
 
-    public static final String PRAM_ATTEMPT = "attempt";
-    public static final String PRAM_FILTER = "filter";
+    public static final String PARAM_ATTEMPT = "attempt";
+    public static final String PARAM_FILTER = "filter";
     private Attempt attempt;
     private String filter;
 
     public static ReviewQuestionsFragment getInstance(Attempt attempt, String filter) {
         ReviewQuestionsFragment fragment = new ReviewQuestionsFragment();
         Bundle bundle = new Bundle();
-        bundle.putString(PRAM_FILTER, filter);
-        bundle.putParcelable(PRAM_ATTEMPT, attempt);
+        bundle.putString(PARAM_FILTER, filter);
+        bundle.putParcelable(PARAM_ATTEMPT, attempt);
         fragment.setArguments(bundle);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        attempt = getArguments().getParcelable(PRAM_ATTEMPT);
-        filter = getArguments().getString(PRAM_FILTER);
+        attempt = getArguments().getParcelable(PARAM_ATTEMPT);
+        filter = getArguments().getString(PARAM_FILTER);
         super.onCreate(savedInstanceState);
     }
 

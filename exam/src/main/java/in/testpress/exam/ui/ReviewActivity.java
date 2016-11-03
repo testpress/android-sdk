@@ -11,15 +11,15 @@ import in.testpress.ui.BaseToolBarActivity;
 
 public class ReviewActivity extends BaseToolBarActivity {
 
-    static final String PRAM_PREVIOUS_ACTIVITY = "previousActivity";
-    static final String PRAM_EXAM = "exam";
-    static final String PRAM_ATTEMPT = "attempt";
+    static final String PARAM_PREVIOUS_ACTIVITY = "previousActivity";
+    static final String PARAM_EXAM = "exam";
+    static final String PARAM_ATTEMPT = "attempt";
 
     static Intent createIntent(Activity activity, Exam exam, Attempt attempt) {
         Intent intent = new Intent(activity, ReviewActivity.class);
-        intent.putExtra(ReviewActivity.PRAM_PREVIOUS_ACTIVITY, activity.getClass().getName());
-        intent.putExtra(ReviewActivity.PRAM_EXAM, exam);
-        intent.putExtra(ReviewActivity.PRAM_ATTEMPT, attempt);
+        intent.putExtra(ReviewActivity.PARAM_PREVIOUS_ACTIVITY, activity.getClass().getName());
+        intent.putExtra(ReviewActivity.PARAM_EXAM, exam);
+        intent.putExtra(ReviewActivity.PARAM_ATTEMPT, attempt);
         return intent;
     }
 
@@ -27,8 +27,8 @@ public class ReviewActivity extends BaseToolBarActivity {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_container_layout);
-        Exam exam = getIntent().getParcelableExtra(PRAM_EXAM);
-        Attempt attempt = getIntent().getParcelableExtra(PRAM_ATTEMPT);
+        Exam exam = getIntent().getParcelableExtra(PARAM_EXAM);
+        Attempt attempt = getIntent().getParcelableExtra(PARAM_ATTEMPT);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, ReviewFragment.getInstance(exam, attempt))
                 .commitAllowingStateLoss();
@@ -36,7 +36,7 @@ public class ReviewActivity extends BaseToolBarActivity {
 
     @Override
     public void onBackPressed() {
-        String previousActivity = getIntent().getStringExtra(PRAM_PREVIOUS_ACTIVITY);
+        String previousActivity = getIntent().getStringExtra(PARAM_PREVIOUS_ACTIVITY);
         if((previousActivity != null) && previousActivity.equals(TestActivity.class.getName())) {
             // OnBackPressed go to history
             setResult(RESULT_OK);
