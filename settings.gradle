@@ -1,1 +1,1 @@
-include ':core', ':samples', ':exam'
+include ':core', ':samples', ':exam', ':course'

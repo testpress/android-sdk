@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -21,7 +22,11 @@ public final class TestpressSdk {
     private static final String KEY_TESTPRESS_AUTH_TOKEN = "testpressAuthToken";
     private static final String KEY_TESTPRESS_SHARED_PREFS = "testpressSharedPreferences";
     private static final String KEY_USER_ID = "userId";
+    private static final String RUBIK_REGULAR_FONT_PATH = "Rubik-Regular.ttf";
+    private static final String RUBIK_MEDIUM_FONT_PATH = "Rubik-Medium.ttf";
     public enum Provider { FACEBOOK, GOOGLE, TESTPRESS }
+    private static Typeface sRubikRegular;
+    private static Typeface sRubikMedium;
 
     private static SharedPreferences getPreferences(Context context) {
         if (pref == null) {
@@ -63,6 +68,50 @@ public final class TestpressSdk {
 
     public static boolean hasActiveSession(@NonNull Context context) {
         return getTestpressSession(context) != null;
+    }
+
+    /**
+     * Load the font from the given path.
+     *
+     * @param context Context
+     * @param fontPath path of the Typeface.
+     * @return Typeface created from the given path.
+     * @throws IllegalArgumentException if typeface couldn't be load from the given path.
+     */
+    public static Typeface getTypeface(@NonNull Context context, @NonNull String fontPath) {
+        validateContext(context);
+        //noinspection ConstantConditions
+        if (fontPath == null || fontPath.isEmpty()) {
+            throw new IllegalArgumentException("FontPath must not be null.");
+        }
+        try {
+            return Typeface.createFromAsset(context.getAssets(), fontPath);
+        } catch (Exception e) {
+            throw new IllegalStateException("Could not get typeface '" + fontPath + "' because "
+                    + e.getMessage());
+        }
+    }
+
+    /**
+     * @param context Context
+     * @return RubikRegular Typeface
+     */
+    public static Typeface getRubikRegularFont(@NonNull Context context) {
+        if (sRubikRegular == null) {
+            sRubikRegular = getTypeface(context, RUBIK_REGULAR_FONT_PATH);
+        }
+        return sRubikRegular;
+    }
+
+    /**
+     * @param context Context
+     * @return RubikMedium Typeface
+     */
+    public static Typeface getRubikMediumFont(@NonNull Context context) {
+        if (sRubikMedium == null) {
+            sRubikMedium = getTypeface(context, RUBIK_MEDIUM_FONT_PATH);
+        }
+        return sRubikMedium;
     }
 
     /**

@@ -31,5 +31,8 @@
     <color name="testpress_blue_light_background_transparent">#80b6dcfb</color>
     <color name="testpress_red">#d9534f</color>
     <color name="testpress_green">#18be99</color>
+    <color name="testpress_green_light">#00ccaa</color>
+    <color name="testpress_gray_light">#e6e6e6</color>
+    <color name="testpress_text_gray_light">#bfbfbf</color>
 
 </resources>

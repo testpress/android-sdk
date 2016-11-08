@@ -8,6 +8,9 @@
 
     <string name="no_internet_try_again">Please check your internet connection &amp; try again</string>
 
+    <string name="open_exams_in">Open Exams In</string>
+    <string name="example_fragment_in_drawer">Example Fragment In Drawer</string>
+
     <string name="exams">Exams</string>
     <string name="home">Home</string>
     <string name="navigation_drawer_open">Drawer Open</string>

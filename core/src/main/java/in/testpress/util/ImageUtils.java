@@ -9,6 +9,8 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
+import in.testpress.R;
+
 public class ImageUtils {
 
     /**
@@ -41,4 +43,12 @@ public class ImageUtils {
         }
     }
 
+    public static DisplayImageOptions getPlaceholdersOption() {
+        return new DisplayImageOptions.Builder().cacheInMemory(true)
+                .cacheOnDisk(true).resetViewBeforeLoading(true)
+                .imageScaleType(ImageScaleType.EXACTLY)
+                .showImageForEmptyUri(R.drawable.testpress_placeholder_icon)
+                .showImageOnFail(R.drawable.testpress_placeholder_icon)
+                .showImageOnLoading(R.drawable.testpress_placeholder_icon).build();
+    }
 }

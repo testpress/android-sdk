@@ -9,6 +9,7 @@ import com.facebook.FacebookSdk;
 
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.samples.exam.ExamSampleActivity;
+import in.testpress.samples.course.CourseSampleActivity;
 
 public class MainActivity extends BaseToolBarActivity {
 
@@ -28,6 +29,13 @@ public class MainActivity extends BaseToolBarActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, ExamSampleActivity.class);
+                startActivity(intent);
+            }
+        });
+        findViewById(R.id.gamified_exam).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, CourseSampleActivity.class);
                 startActivity(intent);
             }
         });

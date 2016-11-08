@@ -30,6 +30,7 @@ import in.testpress.samples.R;
 
 public class TestpressCoreSampleActivity extends BaseToolBarActivity {
 
+    public static final int AUTHENTICATE_REQUEST_CODE = 1111;
     public static final int REQUEST_CODE_GOOGLE_SIGN_IN = 2222;
     private View loginView;
     private CallbackManager callbackManager;
