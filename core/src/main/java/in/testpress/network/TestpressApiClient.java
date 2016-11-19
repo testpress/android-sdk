@@ -74,12 +74,12 @@ public class TestpressApiClient {
         };
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.connectTimeout(2, TimeUnit.MINUTES).readTimeout(2, TimeUnit.MINUTES);
-        httpClient.addInterceptor(interceptor);
+        httpClient.addNetworkInterceptor(interceptor);
 
         // Set log level
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        httpClient.addInterceptor(httpLoggingInterceptor);
+        httpClient.addNetworkInterceptor(httpLoggingInterceptor);
 
         retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
