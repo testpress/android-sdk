@@ -79,7 +79,7 @@ public class TestpressApiClient {
         // Set log level
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        httpClient.addNetworkInterceptor(httpLoggingInterceptor);
+        httpClient.addInterceptor(httpLoggingInterceptor);
 
         retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
