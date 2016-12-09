@@ -1,4 +1,4 @@
-package in.testpress.samples.exam;
+package in.testpress.samples;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

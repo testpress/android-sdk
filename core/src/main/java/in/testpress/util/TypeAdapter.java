@@ -16,6 +16,7 @@ package in.testpress.util;
  * limitations under the License.
  */
 
+import android.graphics.Typeface;
 import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
@@ -331,5 +332,11 @@ public abstract class TypeAdapter extends BaseAdapter {
     public TextView setRelativeTimeSpan(final View parentView,
                                         final int childViewIndex, final long time) {
         return updater.setRelativeTimeSpan(parentView, childViewIndex, time);
+    }
+
+    public void setFont(int[] childViewIndices, Typeface typeface) {
+        for (int childViewIndex : childViewIndices) {
+            textView(childViewIndex).setTypeface(typeface);
+        }
     }
 }

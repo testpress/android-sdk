@@ -1,4 +1,4 @@
-package in.testpress.samples.exam;
+package in.testpress.samples.course;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,7 +8,7 @@ import android.view.MenuItem;
 import com.facebook.login.LoginManager;
 
 import in.testpress.core.TestpressSdk;
-import in.testpress.exam.TestpressExam;
+import in.testpress.course.TestpressCourse;
 import in.testpress.samples.BaseNavigationDrawerActivity;
 import in.testpress.samples.HomeFragment;
 import in.testpress.samples.R;
@@ -55,7 +55,7 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
 
     private void displayExams() {
         //noinspection ConstantConditions
-        TestpressExam.show(this, R.id.fragment_container, TestpressSdk.getTestpressSession(this));
+        TestpressCourse.show(this, R.id.fragment_container, TestpressSdk.getTestpressSession(this));
     }
 
     @Override

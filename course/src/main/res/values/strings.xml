@@ -1,0 +1,10 @@
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="UnusedResources">
+
+    <string name="testpress_courses">Courses</string>
+
+    <string name="testpress_no_courses">No Courses Available</string>
+    <string name="testpress_no_courses_description">You can buy courses from the store.</string>
+    <string name="testpress_error_loading_courses">Loading courses failed</string>
+
+</resources>

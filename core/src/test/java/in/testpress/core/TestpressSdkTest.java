@@ -104,4 +104,25 @@ public class TestpressSdkTest {
             assertEquals("UserId & AccessToken & Provider must not be null.", e.getMessage());
         }
     }
+
+    @Test
+    public void testGetTypeface_withNullContext() throws Exception {
+        try {
+            TestpressSdk.getTypeface(null, "dummyPath");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Context must not be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testGetTypeface_withNullPath() throws Exception {
+        try {
+            Context context = mock(Context.class);
+            TestpressSdk.getTypeface(context, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("FontPath must not be null.", e.getMessage());
+        }
+    }
 }

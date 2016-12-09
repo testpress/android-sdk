@@ -11,13 +11,4 @@
     <issue id="RtlHardcoded" severity="ignore" />
     <issue id="InvalidPackage" severity="ignore" />
 
-    <!-- Ignore the ClickableViewAccessibility issue in the given files -->
-    <issue id="ClickableViewAccessibility">
-        <ignore regexp="java/.*/TouchImageView.java" />
-    </issue>
-
-    <issue id="UnusedResources">
-        <ignore regexp="res/.*/testpress_placeholder_icon.png" />
-    </issue>
-
 </lint>

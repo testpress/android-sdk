@@ -1,4 +1,4 @@
-package in.testpress.samples.exam;
+package in.testpress.samples.course;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,14 +6,14 @@ import android.support.annotation.Nullable;
 import android.view.View;
 
 import in.testpress.core.TestpressSdk;
-import in.testpress.exam.TestpressExam;
+import in.testpress.course.TestpressCourse;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
 
-public class ExamSampleActivity extends BaseToolBarActivity {
+public class CourseSampleActivity extends BaseToolBarActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -24,10 +24,10 @@ public class ExamSampleActivity extends BaseToolBarActivity {
         findViewById(R.id.new_activity_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (TestpressSdk.hasActiveSession(ExamSampleActivity.this)) {
+                if (TestpressSdk.hasActiveSession(CourseSampleActivity.this)) {
                     displayExams();
                 } else {
-                    Intent intent = new Intent(ExamSampleActivity.this, TestpressCoreSampleActivity.class);
+                    Intent intent = new Intent(CourseSampleActivity.this, TestpressCoreSampleActivity.class);
                     startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
                 }
             }
@@ -35,7 +35,7 @@ public class ExamSampleActivity extends BaseToolBarActivity {
         findViewById(R.id.fragment_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(ExamSampleActivity.this, NavigationDrawerActivity.class);
+                Intent intent = new Intent(CourseSampleActivity.this, NavigationDrawerActivity.class);
                 startActivity(intent);
             }
         });
@@ -43,7 +43,7 @@ public class ExamSampleActivity extends BaseToolBarActivity {
 
     private void displayExams() {
         //noinspection ConstantConditions
-        TestpressExam.show(this, TestpressSdk.getTestpressSession(this));
+        TestpressCourse.show(this, TestpressSdk.getTestpressSession(this));
     }
 
     @Override
