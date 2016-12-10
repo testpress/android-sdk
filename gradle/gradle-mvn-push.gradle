@@ -117,9 +117,15 @@ afterEvaluate { project ->
       }
     }
 
-    task androidJavadocs(type: Javadoc) {
-      source = android.sourceSets.main.java.source
+    task androidJavadocs(type: Javadoc, dependsOn: 'assembleRelease') {
       classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+      android.libraryVariants.all { variant ->
+        if (variant.name == 'release') {
+          owner.classpath += variant.javaCompile.classpath
+        }
+      }
+      source = android.sourceSets.main.java.srcDirs
+      exclude '**/R.html', '**/R.*.html', '**/index.html'
     }
 
     task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
@@ -129,7 +135,7 @@ afterEvaluate { project ->
 
     task androidSourcesJar(type: Jar) {
       classifier = 'sources'
-      from android.sourceSets.main.java.source
+      from android.sourceSets.main.java.sourceFiles
     }
   } else {
     install {
