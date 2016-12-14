@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/chapter_item_layout"
+    android:paddingBottom="10dp"
+    android:layout_width="118dp"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/thumbnail_image"
+        android:layout_width="68dp"
+        android:layout_height="68dp"
+        android:scaleType="fitXY"
+        android:layout_marginTop="23dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginBottom="10dp"
+        android:src="@android:drawable/sym_def_app_icon" />
+
+    <TextView
+        android:layout_below="@id/thumbnail_image"
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:gravity="center_horizontal"
+        android:textSize="16sp"
+        android:textColor="@color/testpress_black"
+        android:lines="2"
+        android:ellipsize="end"
+        android:id="@+id/title" />
+
+    <View
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:id="@+id/white_foreground"
+        android:background="#aaffffff"
+        android:layout_width="match_parent"
+        android:layout_height="136dp"/>
+
+    <LinearLayout
+        android:id="@+id/lock"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/testpress_round_gray_background"
+        android:gravity="center"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp">
+
+        <ImageView
+            android:layout_width="10dp"
+            android:layout_height="16dp"
+            android:scaleType="fitXY"
+            android:layout_marginLeft="13dp"
+            android:layout_marginRight="13dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/testpress_lock_outline_white" />
+
+    </LinearLayout>
+
+</RelativeLayout>
