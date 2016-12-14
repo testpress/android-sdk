@@ -6,6 +6,7 @@ import java.util.Map;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.models.Chapter;
+import in.testpress.course.models.Content;
 import in.testpress.course.models.Course;
 import in.testpress.model.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
@@ -33,5 +34,10 @@ public class TestpressCourseApiClient extends TestpressApiClient {
     public RetrofitCall<TestpressApiResponse<Chapter>> getChapters(String chaptersUrlFrag,
                                                                    Map<String, Object> queryParams) {
         return getExamService().getChapters(chaptersUrlFrag, queryParams);
+    }
+
+    public RetrofitCall<TestpressApiResponse<Content>> getContents(String chaptersUrlFrag,
+                                                                   Map<String, Object> queryParams) {
+        return getExamService().getContents(chaptersUrlFrag, queryParams);
     }
 }

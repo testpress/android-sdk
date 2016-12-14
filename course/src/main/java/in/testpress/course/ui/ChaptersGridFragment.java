@@ -80,7 +80,8 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
                                 ChaptersGridActivity.createIntent(chapter.getName(),
                                         chaptersUrlFrag, chapter.getId().toString(), getContext()));
                     } else {
-                        // TODO Display contents
+                        getActivity().startActivity(ContentsListActivity.createIntent(chapter.getName(),
+                                chapter.getContentUrlFrag(), getContext()));
                     }
                 }
             });
