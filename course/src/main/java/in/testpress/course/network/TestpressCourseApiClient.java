@@ -8,6 +8,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.course.models.Chapter;
 import in.testpress.course.models.Content;
 import in.testpress.course.models.Course;
+import in.testpress.course.models.HtmlContent;
 import in.testpress.model.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
@@ -40,4 +41,9 @@ public class TestpressCourseApiClient extends TestpressApiClient {
                                                                    Map<String, Object> queryParams) {
         return getExamService().getContents(chaptersUrlFrag, queryParams);
     }
+
+    public RetrofitCall<HtmlContent> getHtmlContent(String htmlContentUrlFrag) {
+        return getExamService().getHtmlContent(htmlContentUrlFrag);
+    }
+
 }
