@@ -1,6 +1,9 @@
 package in.testpress.course.models;
 
-public class Content {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Content implements Parcelable {
 
     private Integer order;
     private Exam exam;
@@ -23,6 +26,70 @@ public class Content {
     private String start;
     private String end;
     private Boolean hasStarted;
+
+    protected Content(Parcel in) {
+        order = in.readInt();
+        htmlContentTitle = in.readString();
+        htmlContentUrl = in.readString();
+        url = in.readString();
+        attemptsUrl = in.readString();
+        chapterSlug = in.readString();
+        chapterUrl = in.readString();
+        id = in.readInt();
+        name = in.readString();
+        image = in.readString();
+        description = in.readString();
+        isLocked = in.readByte() != 0;
+        attemptsCount = in.readInt();
+        start = in.readString();
+        end = in.readString();
+        hasStarted = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(order);
+        dest.writeString(htmlContentTitle);
+        dest.writeString(htmlContentUrl);
+        dest.writeString(url);
+        dest.writeString(attemptsUrl);
+        dest.writeString(chapterSlug);
+        dest.writeString(chapterUrl);
+        dest.writeInt(id);
+        dest.writeString(name);
+        dest.writeString(image);
+        dest.writeString(description);
+        if (isLocked == null) {
+            dest.writeByte((byte) (0));
+        } else {
+            dest.writeByte((byte) (isLocked ? 1 : 0)); //if isLocked == true, byte == 1
+        }
+        dest.writeInt(attemptsCount);
+        dest.writeString(start);
+        dest.writeString(end);
+        if (hasStarted == null) {
+            dest.writeByte((byte) (0));
+        } else {
+            dest.writeByte((byte) (hasStarted ? 1 : 0)); //if hasStarted == true, byte == 1
+        }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Content> CREATOR = new Creator<Content>() {
+        @Override
+        public Content createFromParcel(Parcel in) {
+            return new Content(in);
+        }
+
+        @Override
+        public Content[] newArray(int size) {
+            return new Content[size];
+        }
+    };
 
     /**
      *

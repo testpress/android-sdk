@@ -5,6 +5,7 @@ import java.util.Map;
 import in.testpress.course.models.Chapter;
 import in.testpress.course.models.Content;
 import in.testpress.course.models.Course;
+import in.testpress.course.models.HtmlContent;
 import in.testpress.model.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 
@@ -26,5 +27,9 @@ public interface CourseService {
     RetrofitCall<TestpressApiResponse<Content>> getContents(
             @Path(value = "contents_url", encoded = true) String contentsUrlFrag,
             @QueryMap Map<String, Object> queryParams);
+
+    @GET("{html_content_url}")
+    RetrofitCall<HtmlContent> getHtmlContent(
+            @Path(value = "html_content_url", encoded = true) String htmlContentUrlFrag);
 
 }

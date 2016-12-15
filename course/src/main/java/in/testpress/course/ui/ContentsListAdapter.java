@@ -1,6 +1,7 @@
 package in.testpress.course.ui;
 
 import android.app.Activity;
+import android.view.View;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -49,6 +50,12 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         } else {
             setGone(2, true);
             setGone(3, true);
+            view(4).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mActivity.startActivity(HtmlContentActivity.createIntent(content, mActivity));
+                }
+            });
         }
     }
 
