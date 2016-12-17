@@ -32,7 +32,7 @@ public class MainActivity extends BaseToolBarActivity {
                 startActivity(intent);
             }
         });
-        findViewById(R.id.gamified_exam).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.course).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, CourseSampleActivity.class);

@@ -37,7 +37,7 @@
 
         <activity android:name=".course.CourseSampleActivity"
             android:configChanges="orientation|keyboard|screenSize"
-            android:label="@string/open_exams_in" />
+            android:label="@string/open_courses_in" />
 
         <activity android:name=".course.NavigationDrawerActivity"
             android:configChanges="orientation|keyboard|screenSize"

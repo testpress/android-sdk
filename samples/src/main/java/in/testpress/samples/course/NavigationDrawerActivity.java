@@ -22,6 +22,7 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation_drawer);
+        navigationView.getMenu().getItem(1).setTitle(getString(R.string.courses));
     }
 
     @Override

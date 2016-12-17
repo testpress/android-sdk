@@ -26,8 +26,8 @@
         <android.support.v7.widget.AppCompatButton
             android:layout_marginTop="30dp"
             style="@style/Button"
-            android:text="Gamified Exam"
-            android:id="@+id/gamified_exam" />
+            android:text="Course"
+            android:id="@+id/course" />
 
     </LinearLayout>
 
