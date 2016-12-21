@@ -53,7 +53,8 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
             view(4).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mActivity.startActivity(HtmlContentActivity.createIntent(content, mActivity));
+                    mActivity.startActivity(HtmlContentActivity.createIntent(getItems(), position,
+                            (ContentsListActivity) mActivity));
                 }
             });
         }

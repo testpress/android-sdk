@@ -1,7 +1,6 @@
 package in.testpress.course.ui;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -9,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +25,9 @@ import android.widget.TextView;
 
 import junit.framework.Assert;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
@@ -37,21 +40,31 @@ import in.testpress.ui.ZoomableImageActivity;
 
 public class HtmlContentActivity extends BaseToolBarActivity {
 
-    public static final String CONTENT = "content";
+    public static final String ACTIONBAR_TITLE = "title";
+    public static final String CONTENTS = "contents";
+    public static final String POSITION = "position";
 
     private WebView webView;
     private SwipeRefreshLayout swipeRefresh;
+    private LinearLayout buttonLayout;
     private LinearLayout emptyContainer;
     private TextView emptyTitleView;
     private TextView emptyDescView;
     private TextView titleView;
-
+    private Button previousButton;
+    private Button nextButton;
     private boolean hasError = false;
-    private Content content;
+    private ArrayList<Content> contents;
+    private int position;
 
-    public static Intent createIntent(Content content, Context context) {
-        Intent intent = new Intent(context, HtmlContentActivity.class);
-        intent.putExtra(CONTENT, content);
+    public static Intent createIntent(List<Content> contents,
+                                      int position, AppCompatActivity activity) {
+
+        Intent intent = new Intent(activity, HtmlContentActivity.class);
+        intent.putParcelableArrayListExtra(CONTENTS, new ArrayList<Content>(contents));
+        intent.putExtra(POSITION, position);
+        //noinspection ConstantConditions
+        intent.putExtra(ACTIONBAR_TITLE, activity.getSupportActionBar().getTitle());
         return intent;
     }
 
@@ -67,29 +80,31 @@ public class HtmlContentActivity extends BaseToolBarActivity {
         emptyTitleView = (TextView) findViewById(R.id.empty_title);
         emptyDescView = (TextView) findViewById(R.id.empty_description);
         titleView = (TextView) findViewById(R.id.title);
+        buttonLayout = (LinearLayout) findViewById(R.id.button_layout);
+        previousButton = (Button) findViewById(R.id.previous);
+        nextButton = (Button) findViewById(R.id.next);
         Button retryButton = (Button) findViewById(R.id.retry_button);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        content = getIntent().getParcelableExtra(CONTENT);
-        Assert.assertNotNull("CONTENT must not be null.", content);
-        if (content.getHtmlContentTitle() == null) {
-            getSupportActionBar().setTitle(content.getName());
-            setEmptyText(R.string.testpress_content_not_available,
-                    R.string.testpress_content_not_available_description,
-                    R.drawable.ic_content_paste_black_24dp);
-            retryButton.setVisibility(View.GONE);
-            return;
+        contents = getIntent().getParcelableArrayListExtra(CONTENTS);
+        Assert.assertNotNull("CONTENTS must not be null.", contents);
+        position = getIntent().getIntExtra(POSITION, -1);
+        if (position == -1) {
+            throw new IllegalArgumentException("POSITION must not be null.");
         }
+        String title = getIntent().getStringExtra(ACTIONBAR_TITLE);
+        Assert.assertNotNull("ACTIONBAR_TITLE must not be null.", title);
         //noinspection ConstantConditions
-        getSupportActionBar().setTitle(Html.fromHtml(content.getHtmlContentTitle()));
-        titleView.setText(Html.fromHtml(content.getHtmlContentTitle()));
+        getSupportActionBar().setTitle(title);
         titleView.setTypeface(TestpressSdk.getRubikMediumFont(this));
+        previousButton.setTypeface(TestpressSdk.getRubikMediumFont(this));
+        nextButton.setTypeface(TestpressSdk.getRubikMediumFont(this));
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 loadUrl();
             }
         });
-        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_INSET);
         webView.setWebChromeClient(new WebChromeClient());
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -139,8 +154,13 @@ public class HtmlContentActivity extends BaseToolBarActivity {
                     } else {
                         webView.loadUrl(javascript, null);
                     }
-                    swipeRefresh.setVisibility(View.VISIBLE);
-                    emptyContainer.setVisibility(View.GONE);
+                    if (previousButton.getVisibility() == View.GONE &&
+                            nextButton.getVisibility() == View.GONE) {
+                        buttonLayout.setVisibility(View.GONE);
+                    } else  {
+                        buttonLayout.setVisibility(View.VISIBLE);
+                    }
+                    webView.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -164,13 +184,50 @@ public class HtmlContentActivity extends BaseToolBarActivity {
     }
 
     protected void loadUrl() {
-        hasError = false;
+        Content content = contents.get(position);
         swipeRefresh.post(new Runnable() {
             @Override
             public void run() {
                 swipeRefresh.setRefreshing(true);
             }
         });
+        buttonLayout.setVisibility(View.GONE);
+        titleView.setText(Html.fromHtml(content.getHtmlContentTitle()));
+        hasError = false;
+        // Set previous button
+        if (position == 0) {
+            previousButton.setVisibility(View.GONE);
+        } else {
+            final int previousPosition = position - 1;
+            previousButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(HtmlContentActivity.createIntent(contents, previousPosition,
+                            HtmlContentActivity.this));
+                    finish();
+                }
+            });
+            previousButton.setVisibility(View.VISIBLE);
+        }
+        // Set next button
+        if (position == (contents.size() - 1)) {
+            nextButton.setVisibility(View.GONE);
+        } else {
+            final int nextPosition = position + 1;
+            if (contents.get(nextPosition).getIsLocked()) {
+                nextButton.setVisibility(View.GONE);
+            } else {
+                nextButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(HtmlContentActivity.createIntent(contents, nextPosition,
+                                HtmlContentActivity.this));
+                        finish();
+                    }
+                });
+                nextButton.setVisibility(View.VISIBLE);
+            }
+        }
         new TestpressCourseApiClient(this).getHtmlContent(content.getHtmlContentUrl())
                 .enqueue(new TestpressCallback<HtmlContent>() {
                     @Override
@@ -181,9 +238,19 @@ public class HtmlContentActivity extends BaseToolBarActivity {
 
                     @Override
                     public void onException(TestpressException exception) {
-                        setEmptyText(R.string.testpress_network_error,
-                                R.string.testpress_no_internet_try_again,
-                                R.drawable.ic_error_outline_black_18dp);
+                        if (exception.isUnauthenticated()) {
+                            setEmptyText(R.string.testpress_authentication_failed,
+                                    R.string.testpress_please_login,
+                                    R.drawable.ic_error_outline_black_18dp);
+                        } else if (exception.isNetworkError()) {
+                            setEmptyText(R.string.testpress_network_error,
+                                    R.string.testpress_no_internet_try_again,
+                                    R.drawable.ic_error_outline_black_18dp);
+                        } else {
+                            setEmptyText(R.string.testpress_error_loading_contents,
+                                    R.string.testpress_some_thing_went_wrong_try_again,
+                                    R.drawable.ic_error_outline_black_18dp);
+                        }
                     }
                 });
     }
@@ -232,15 +299,6 @@ public class HtmlContentActivity extends BaseToolBarActivity {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (webView.canGoBack()) {
-            webView.goBack();
-        } else {
-            super.onBackPressed();
-        }
     }
 
 }

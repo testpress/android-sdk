@@ -22,7 +22,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/web_layout"
-                android:padding="20dp"
+                android:paddingTop="20dp"
+                android:paddingRight="20dp"
+                android:paddingLeft="20dp"
                 tools:ignore="ScrollViewSize">
 
                 <TextView
@@ -49,6 +51,48 @@
                     android:id="@+id/web_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#efefef"/>
+
+                <LinearLayout
+                    android:id="@+id/button_layout"
+                    android:orientation="horizontal"
+                    tools:ignore="UnusedAttribute"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <android.support.v7.widget.AppCompatButton
+                        android:id="@+id/previous"
+                        android:background="@drawable/testpress_green_stroke"
+                        android:text="@string/testpress_previous_content"
+                        android:gravity="center"
+                        android:textSize="16sp"
+                        android:textColor="@color/testpress_green_light"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginRight="10dp" />
+
+                    <android.support.v7.widget.AppCompatButton
+                        android:id="@+id/next"
+                        android:background="@drawable/testpress_green_curved_edge_background"
+                        android:text="@string/testpress_next_content"
+                        android:gravity="center"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/white"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginLeft="10dp" />
+
+                </LinearLayout>
 
             </LinearLayout>
         </ScrollView>
