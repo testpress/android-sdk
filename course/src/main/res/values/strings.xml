@@ -18,4 +18,7 @@
     <string name="testpress_content_not_available">Empty Content</string>
     <string name="testpress_content_not_available_description">Will be updated soon. Please try after some time.</string>
 
+    <string name="testpress_previous_content">Previous</string>
+    <string name="testpress_next_content">Next</string>
+
 </resources>
