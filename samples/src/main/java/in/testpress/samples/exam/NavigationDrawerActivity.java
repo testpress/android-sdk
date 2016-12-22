@@ -22,20 +22,17 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation_drawer);
+        navigationView.getMenu().getItem(2).setVisible(true);
     }
 
     @Override
     protected void onDrawerItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.exams:
-                if (TestpressSdk.hasActiveSession(this)) {
-                    displayExams();
-                } else {
-                    Intent intent = new Intent(NavigationDrawerActivity.this,
-                            TestpressCoreSampleActivity.class);
-                    startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
-                }
-                selectedItem = 1;
+                showSDK(1);
+                break;
+            case R.id.exams_categories:
+                showSDK(2);
                 break;
             case R.id.logout:
                 TestpressSdk.clearActiveSession(this);
@@ -53,17 +50,31 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                 .commit();
     }
 
-    private void displayExams() {
-        //noinspection ConstantConditions
-        TestpressExam.show(this, R.id.fragment_container, TestpressSdk.getTestpressSession(this));
+    private void showSDK(int position) {
+        selectedItem = position;
+        if (TestpressSdk.hasActiveSession(this)) {
+            if (position == 1) {
+                //noinspection ConstantConditions
+                TestpressExam.show(this, R.id.fragment_container,
+                        TestpressSdk.getTestpressSession(this));
+            } else {
+                //noinspection ConstantConditions
+                TestpressExam.showCategories(this, R.id.fragment_container,
+                        TestpressSdk.getTestpressSession(this));
+            }
+        } else {
+            Intent intent = new Intent(NavigationDrawerActivity.this,
+                    TestpressCoreSampleActivity.class);
+            startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AUTHENTICATE_REQUEST_CODE && resultCode == RESULT_OK) {
-            displayExams();
-            navigationView.getMenu().getItem(2).setVisible(true);
+            showSDK(selectedItem);
+            logoutMenu.setVisible(true);
         }
     }
 

@@ -64,7 +64,7 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AUTHENTICATE_REQUEST_CODE && resultCode == RESULT_OK) {
             displayExams();
-            navigationView.getMenu().getItem(2).setVisible(true);
+            logoutMenu.setVisible(true);
         }
     }
 
