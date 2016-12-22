@@ -195,6 +195,9 @@ public abstract class BaseGridFragment<E> extends Fragment
     protected abstract int getErrorMessage(final TestpressException exception);
 
     public void onLoadFinished(final Loader<List<E>> loader, final List<E> items) {
+        if (!isUsable()) {
+            return;
+        }
         final TestpressException exception = getException(loader);
         if (exception != null) {
             this.exception = exception;

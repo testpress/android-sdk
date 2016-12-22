@@ -23,6 +23,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.v4.content.ContextCompat;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -97,6 +98,15 @@ public class ViewUtils {
                 v.clearAnimation();
                 v.startAnimation(a);
             }
+        }
+    }
+
+    public static void setMenuIconsColor(Context context, MenuItem[] menuItems) {
+        for (MenuItem menuItem : menuItems) {
+            Drawable searchIcon = menuItem.getIcon();
+            searchIcon.mutate().setColorFilter(ContextCompat.getColor(context,
+                    R.color.testpress_actionbar_text), PorterDuff.Mode.SRC_IN);
+            menuItem.setIcon(searchIcon);
         }
     }
 
