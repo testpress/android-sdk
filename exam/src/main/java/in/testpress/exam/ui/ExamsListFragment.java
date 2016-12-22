@@ -24,15 +24,18 @@ import in.testpress.util.SingleTypeAdapter;
 public class ExamsListFragment extends PagedItemFragment<Exam> {
 
     private String subclass;
+    private String category;
     private TestpressExamApiClient apiClient;
     public static final String AVAILABLE = "available";
     public static final String UPCOMING = "upcoming";
     public static final String HISTORY = "history";
     public static final String SUBCLASS = "subclass";
+    public static final String CATEGORY = "category";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        subclass = getArguments().getString(ExamsListFragment.SUBCLASS);
+        subclass = getArguments().getString(SUBCLASS);
+        category = getArguments().getString(CATEGORY);
         apiClient = new TestpressExamApiClient(getActivity());
         super.onCreate(savedInstanceState);
     }
@@ -56,7 +59,7 @@ public class ExamsListFragment extends PagedItemFragment<Exam> {
     @Override
     protected ExamPager getPager() {
         if (pager == null) {
-            pager = new ExamPager(subclass, apiClient);
+            pager = new ExamPager(subclass, category, apiClient);
         }
         return (ExamPager)pager;
     }
@@ -107,6 +110,7 @@ public class ExamsListFragment extends PagedItemFragment<Exam> {
         if (R.id.search == item.getItemId()) {
             Intent intent = new Intent(getActivity(), SearchActivity.class);
             intent.putExtra(SearchFragment.SUBCLASS, subclass);
+            intent.putExtra(SearchFragment.CATEGORY, category);
             getParentFragment().startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
             return true;
         }
