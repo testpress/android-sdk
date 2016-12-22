@@ -43,4 +43,35 @@ public class TestpressExamTest {
             assertEquals("TestpressSession must not be null.", e.getMessage());
         }
     }
+
+    @Test
+    public void testShowCategories_withNullValues() throws Exception {
+        TestpressSession testpressSession = mock(TestpressSession.class);
+        try {
+            TestpressExam.showCategories(null, 0, testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Activity must not be null.", e.getMessage());
+        }
+        FragmentActivity activity = mock(FragmentActivity.class);
+        try {
+            TestpressExam.showCategories(activity, 0, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+        try {
+            TestpressExam.showCategories(null, testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Context must not be null.", e.getMessage());
+        }
+        Context context = mock(Context.class);
+        try {
+            TestpressExam.showCategories(context, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+    }
 }

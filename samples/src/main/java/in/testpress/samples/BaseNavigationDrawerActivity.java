@@ -11,12 +11,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import in.testpress.core.TestpressSdk;
+
 public abstract class BaseNavigationDrawerActivity extends AppCompatActivity {
 
     protected DrawerLayout drawerLayout;
     protected NavigationView navigationView;
     protected ActionBarDrawerToggle drawerToggle;
     protected int selectedItem;
+    protected MenuItem logoutMenu;
 
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
@@ -38,6 +41,8 @@ public abstract class BaseNavigationDrawerActivity extends AppCompatActivity {
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(drawerToggle);
+        logoutMenu = navigationView.getMenu().getItem(3)
+                .setVisible(TestpressSdk.hasActiveSession(this));
         displayHome();
     }
 

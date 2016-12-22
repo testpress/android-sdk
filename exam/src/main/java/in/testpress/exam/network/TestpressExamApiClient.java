@@ -9,6 +9,7 @@ import java.util.Map;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.AttemptItem;
+import in.testpress.exam.models.Category;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.ReviewItem;
 import in.testpress.model.TestpressApiResponse;
@@ -21,6 +22,11 @@ public class TestpressExamApiClient extends TestpressApiClient {
      * Exams List URL
      */
     public static final String EXAMS_LIST_PATH =  "/api/v2.2/exams/";
+
+    /**
+     * Categories URL
+     */
+    public static final String CATEGORIES_PATH =  "/api/v2.2/course_categories/";
 
     public static final String MAIL_PDF_PATH =  "pdf/";
     public static final String MAIL_PDF_QUESTIONS_PATH =  "pdf-questions/";
@@ -36,6 +42,7 @@ public class TestpressExamApiClient extends TestpressApiClient {
     public static final String SEARCH_QUERY = "q";
     public static final String STATE = "state";
     public static final String PAGE = "page";
+    public static final String PARENT = "parent";
 
     public TestpressExamApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
@@ -98,6 +105,10 @@ public class TestpressExamApiClient extends TestpressApiClient {
 
     public RetrofitCall<Attempt> endExam(String endExamUrlFrag) {
         return getExamService().endExam(endExamUrlFrag);
+    }
+
+    public RetrofitCall<TestpressApiResponse<Category>> getCategories(Map<String, Object> queryParams) {
+        return getExamService().getCategories(queryParams);
     }
 
 }

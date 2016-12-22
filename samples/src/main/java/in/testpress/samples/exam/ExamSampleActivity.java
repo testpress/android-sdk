@@ -15,21 +15,24 @@ import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE
 
 public class ExamSampleActivity extends BaseToolBarActivity {
 
+    private int selectedItem;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_open_in);
+        setContentView(R.layout.activity_open_exams_as);
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        findViewById(R.id.new_activity_button).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.exam).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (TestpressSdk.hasActiveSession(ExamSampleActivity.this)) {
-                    displayExams();
-                } else {
-                    Intent intent = new Intent(ExamSampleActivity.this, TestpressCoreSampleActivity.class);
-                    startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
-                }
+                showSDK(view.getId());
+            }
+        });
+        findViewById(R.id.categories).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showSDK(view.getId());
             }
         });
         findViewById(R.id.fragment_button).setOnClickListener(new View.OnClickListener() {
@@ -42,15 +45,29 @@ public class ExamSampleActivity extends BaseToolBarActivity {
     }
 
     private void displayExams() {
-        //noinspection ConstantConditions
-        TestpressExam.show(this, TestpressSdk.getTestpressSession(this));
+
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    private void showSDK(int id) {
+        selectedItem = id;
+        if (TestpressSdk.hasActiveSession(this)) {
+            if (id == R.id.exam) {
+                TestpressExam.show(this, TestpressSdk.getTestpressSession(this));
+            } else {
+                TestpressExam.showCategories(this, TestpressSdk.getTestpressSession(this));
+            }
+        } else {
+            Intent intent = new Intent(this, TestpressCoreSampleActivity.class);
+            startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AUTHENTICATE_REQUEST_CODE && resultCode == RESULT_OK) {
-            displayExams();
+            showSDK(selectedItem);
         }
     }
 

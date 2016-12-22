@@ -15,6 +15,12 @@
             android:title="@string/exams" />
 
         <item
+            android:visible="false"
+            android:id="@+id/exams_categories"
+            android:icon="@drawable/ic_assignment_black_24dp"
+            android:title="@string/exam_categories" />
+
+        <item
             android:id="@+id/logout"
             android:icon="@drawable/ic_power_settings_new_black_24dp"
             android:title="@string/logout" />
