@@ -5,6 +5,7 @@ import java.util.Map;
 
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.AttemptItem;
+import in.testpress.exam.models.Category;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.ReviewItem;
 import in.testpress.model.TestpressApiResponse;
@@ -64,6 +65,9 @@ public interface ExamService {
     RetrofitCall<TestpressApiResponse<ReviewItem>> getReviewItems(
             @Path(value = "review_url", encoded = true) String reviewUrlFrag,
             @QueryMap Map<String, Object> options);
+
+    @GET(TestpressExamApiClient.CATEGORIES_PATH)
+    RetrofitCall<TestpressApiResponse<Category>> getCategories(@QueryMap Map<String, Object> options);
 
 }
 

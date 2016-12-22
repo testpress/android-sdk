@@ -28,6 +28,9 @@
     <string name="testpress_please_login">Please login to see this exams</string>
     <string name="testpress_no_questions">No Questions</string>
     <string name="testpress_no_questions_to_review">There are no questions to review.</string>
+    <string name="testpress_no_categories">No Categories</string>
+    <string name="testpress_no_categories_description">We\'ll be adding new categories here soon.\nCheck back later. Thanks!</string>
+    <string name="testpress_error_loading_categories">Loading categories failed</string>
 
     <string name="testpress_page_available_exams">Available</string>
     <string name="testpress_page_upcoming_exams">Upcoming</string>

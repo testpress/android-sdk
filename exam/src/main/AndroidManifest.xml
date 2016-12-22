@@ -29,6 +29,9 @@
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
+        <activity android:name=".ui.CategoryGridActivity"
+            android:theme="@style/TestpressTheme" />
+
     </application>
 
 </manifest>
