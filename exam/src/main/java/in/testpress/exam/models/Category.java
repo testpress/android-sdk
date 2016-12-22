@@ -7,6 +7,7 @@ public class Category {
     private String name;
     private String description;
     private String slug;
+    private String image;
     private String parentUrl;
     private Boolean leaf;
     private String parentSlug;
@@ -102,6 +103,14 @@ public class Category {
      */
     public void setSlug(String slug) {
         this.slug = slug;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     /**

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TableRow;
 import android.widget.TextView;
 
@@ -58,7 +59,9 @@ public class CategoriesGridFragment extends BaseGridFragment<Category> {
         View view = getActivity().getLayoutInflater().inflate(R.layout.testpress_category_grid_item,
                 null, false);
         TextView name = (TextView) view.findViewById(R.id.title);
+        ImageView thumbnailImage = (ImageView) view.findViewById(R.id.thumbnail_image);
         name.setText(category.getName());
+        mImageLoader.displayImage(category.getImage(), thumbnailImage, mOptions);
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,7 +72,7 @@ public class CategoriesGridFragment extends BaseGridFragment<Category> {
                 } else {
                     getActivity().startActivity(
                             CategoryGridActivity.createIntent(category.getName(),
-                                    category.getId().toString(), getContext()));
+                                    category.getId().toString(), category.getSlug(), getContext()));
                 }
             }
         });
