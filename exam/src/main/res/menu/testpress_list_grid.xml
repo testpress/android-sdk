@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/list"
+        android:icon="@drawable/ic_format_list_bulleted_black_24dp"
+        app:showAsAction="always"
+        android:title="@string/testpress_show_as_list" >
+    </item>
+
+    <item
+        android:id="@+id/grid"
+        android:visible="false"
+        android:icon="@drawable/ic_dialpad_black_24dp"
+        app:showAsAction="always"
+        android:title="@string/testpress_show_as_grid" >
+    </item>
+
+</menu>
