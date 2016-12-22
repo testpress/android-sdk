@@ -1,5 +1,6 @@
 package in.testpress.exam.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -62,7 +63,9 @@ public class CategoriesGridFragment extends BaseGridFragment<Category> {
             @Override
             public void onClick(View v) {
                 if (category.getLeaf()) {
-                    // ToDo Filter exams
+                    Intent intent = new Intent(getActivity(), ExamsListActivity.class);
+                    intent.putExtra(ExamsListFragment.CATEGORY, category.getSlug());
+                    getActivity().startActivity(intent);
                 } else {
                     getActivity().startActivity(
                             CategoryGridActivity.createIntent(category.getName(),

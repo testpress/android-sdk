@@ -48,6 +48,7 @@ public class SearchFragment extends Fragment implements AbsListView.OnScrollList
         LoaderManager.LoaderCallbacks<List<Exam>> {
 
     public static final String SUBCLASS = "subclass";
+    public static final String CATEGORY = "category";
     private static final int SPEECH_RESULT = 111;
     private ProgressBar progressBar;
     private EditText searchBar;
@@ -70,7 +71,8 @@ public class SearchFragment extends Fragment implements AbsListView.OnScrollList
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         subclass = getArguments().getString(SUBCLASS);
-        pager = new ExamPager(subclass, new TestpressExamApiClient(getActivity()));
+        String category = getArguments().getString(CATEGORY);
+        pager = new ExamPager(subclass, category, new TestpressExamApiClient(getActivity()));
     }
 
     @SuppressLint("InflateParams")

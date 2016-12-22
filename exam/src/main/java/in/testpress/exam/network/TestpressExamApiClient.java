@@ -43,6 +43,7 @@ public class TestpressExamApiClient extends TestpressApiClient {
     public static final String STATE = "state";
     public static final String PAGE = "page";
     public static final String PARENT = "parent";
+    public static final String CATEGORY = "course_slug";
 
     public TestpressExamApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
