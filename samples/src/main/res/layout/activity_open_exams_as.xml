@@ -17,8 +17,15 @@
         <android.support.v7.widget.AppCompatButton
             style="@style/Button"
             android:layout_width="match_parent"
-            android:text="Exams"
+            android:text="Exam"
             android:id="@+id/exam" />
+
+        <android.support.v7.widget.AppCompatButton
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_marginTop="40dp"
+            android:text="Exams List"
+            android:id="@+id/exam_list" />
 
         <android.support.v7.widget.AppCompatButton
             style="@style/Button"
