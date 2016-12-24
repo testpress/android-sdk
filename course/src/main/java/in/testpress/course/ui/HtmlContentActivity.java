@@ -165,14 +165,6 @@ public class HtmlContentActivity extends BaseToolBarActivity {
             }
 
             @Override
-            public void onReceivedError(WebView view, WebResourceRequest request,
-                                        WebResourceError error) {
-                super.onReceivedError(view, request, error);
-                setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again,
-                        R.drawable.ic_error_outline_black_18dp);
-            }
-
-            @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(intent);
