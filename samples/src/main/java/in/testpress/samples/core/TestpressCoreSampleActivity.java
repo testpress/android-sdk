@@ -113,7 +113,7 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
     }
 
     private void authenticate(String userId, String accessToken, TestpressSdk.Provider provider) {
-        TestpressSdk.initialize(this, "http://demo.testpress.in", userId, accessToken, provider,
+        TestpressSdk.initialize(this, "http://sandbox.testpress.in", userId, accessToken, provider,
                 new TestpressCallback<TestpressSession>() {
                     @Override
                     public void onSuccess(TestpressSession response) {
