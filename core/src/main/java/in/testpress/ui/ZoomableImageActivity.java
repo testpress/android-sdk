@@ -35,7 +35,7 @@ public class ZoomableImageActivity extends Activity {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_zoomable_image);
+        setContentView(R.layout.testpress_activity_zoomable_image);
         progressBar = (ProgressBar) findViewById(R.id.pb_loading);
         UIUtils.setIndeterminateDrawable(this, progressBar, 4);
         findViewById(R.id.image).setBackgroundColor(Color.BLACK);
