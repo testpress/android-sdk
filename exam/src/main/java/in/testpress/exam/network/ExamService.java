@@ -22,6 +22,9 @@ public interface ExamService {
     @GET(TestpressExamApiClient.EXAMS_LIST_PATH)
     RetrofitCall<TestpressApiResponse<Exam>> getExams(@QueryMap Map<String, Object> options);
 
+    @GET(TestpressExamApiClient.EXAMS_LIST_PATH + "{exam_slug}")
+    RetrofitCall<Exam> getExam(@Path(value = "exam_slug", encoded = true) String examSlug);
+
     @GET("/{mail_pdf_url}")
     RetrofitCall<Void> mailQuestionsPdf(
             @Path(value = "mail_pdf_url", encoded = true) String mailPdfUrlFrag);

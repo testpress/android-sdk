@@ -11,7 +11,7 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="EditText" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="TextInputLayoutTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:textSize">14sp</item>
         <!--Bar Color in False State-->
         <item name="colorControlNormal">#c5c5c5</item>
@@ -33,6 +33,16 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/color_primary_text</item>
+    </style>
+
+    <style name="EditTextStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:autoText">false</item>
+        <item name="android:capitalize">none</item>
+        <item name="android:scrollHorizontally">true</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:imeOptions">actionNext</item>
     </style>
 
 </resources>
