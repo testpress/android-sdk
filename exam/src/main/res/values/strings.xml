@@ -17,12 +17,14 @@
     <string name="testpress_no_internet_connection">No internet connection</string>
     <string name="testpress_try_again">Try again</string>
 
+    <string name="testpress_exam_no_permission">You do not have permission to view this exam.</string>
     <string name="testpress_loading_questions">Loading questions</string>
     <string name="testpress_no_exams">No Exams</string>
     <string name="testpress_no_exams_description">You can buy exams from the store.</string>
     <string name="testpress_no_attempts">No Attempts</string>
     <string name="testpress_no_attempts_description">To review, start and complete your exams.</string>
     <string name="testpress_error_loading_exams">Loading exams failed</string>
+    <string name="testpress_error_loading_exam">Loading exam failed</string>
     <string name="testpress_error_loading_attempts">Loading attempts failed</string>
     <string name="testpress_error_loading_questions">Loading questions failed</string>
     <string name="testpress_please_login">Please login to see this exams</string>
@@ -31,6 +33,8 @@
     <string name="testpress_no_categories">No Categories</string>
     <string name="testpress_no_categories_description">We\'ll be adding new categories here soon.\nCheck back later. Thanks!</string>
     <string name="testpress_error_loading_categories">Loading categories failed</string>
+    <string name="testpress_exam_not_available">Exam not available</string>
+    <string name="testpress_exam_not_available_description">This is no longer available or not published yet.</string>
 
     <string name="testpress_page_available_exams">Available</string>
     <string name="testpress_page_upcoming_exams">Upcoming</string>

@@ -57,6 +57,10 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getExamService().getExams(queryParams);
     }
 
+    public RetrofitCall<Exam> getExam(String examSlug) {
+        return getExamService().getExam(examSlug);
+    }
+
     public RetrofitCall<Void> mailQuestionsPdf(String mailPdfUrlFrag) {
         return getExamService().mailQuestionsPdf(mailPdfUrlFrag);
     }

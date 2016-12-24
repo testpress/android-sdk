@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -13,24 +14,32 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.util.HashMap;
 
+import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
 
+import in.testpress.model.TestpressApiResponse;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.UIUtils;
 import in.testpress.network.RetrofitCall;
 import retrofit2.Response;
 
+import static in.testpress.exam.TestpressExam.ACTION_PRESSED_HOME;
+import static in.testpress.exam.ui.AttemptsListFragment.PARAM_STATE;
+import static in.testpress.exam.ui.AttemptsListFragment.STATE_PAUSED;
+
 /**
  * Activity of Test Engine
  */
 public class TestActivity extends BaseToolBarActivity implements LoaderManager.LoaderCallbacks<Attempt>  {
 
+    public static final String PARAM_EXAM_SLUG = "slug";
     static final String PARAM_EXAM = "exam";
     static final String PARAM_ATTEMPT = "attempt";
     static final String PARAM_ACTION = "action";
@@ -46,8 +55,6 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private TextView emptyDescView;
     private Button retryButton;
 
-    @SuppressWarnings("ConstantConditions")
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,19 +66,12 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         emptyTitleView = (TextView) findViewById(R.id.empty_title);
         emptyDescView = (TextView) findViewById(R.id.empty_description);
         retryButton = (Button) findViewById(R.id.retry_button);
-        Button startExam = (Button) findViewById(R.id.start_exam);
-        LinearLayout attemptActions = (LinearLayout) findViewById(R.id.attempt_actions);
-        TextView examTitle = (TextView) findViewById(R.id.exam_title);
-        TextView numberOfQuestions = (TextView) findViewById(R.id.number_of_questions);
-        TextView examDuration = (TextView) findViewById(R.id.exam_duration);
-        TextView markPerQuestion = (TextView) findViewById(R.id.mark_per_question);
-        TextView negativeMarks = (TextView) findViewById(R.id.negative_marks);
-        LinearLayout description = (LinearLayout) findViewById(R.id.description);
-        TextView descriptionContent = (TextView) findViewById(R.id.descriptionContent);
+        examDetailsContainer.setVisibility(View.GONE);
         findViewById(R.id.start_exam).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getSupportLoaderManager().initLoader(0, null, TestActivity.this);
+                examDetailsContainer.setVisibility(View.GONE);
                 progressBar.setVisibility(View.VISIBLE);
             }
         });
@@ -85,6 +85,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
             @Override
             public void onClick(View view) {
                 getSupportLoaderManager().initLoader(1, null, TestActivity.this);
+                examDetailsContainer.setVisibility(View.GONE);
                 progressBar.setVisibility(View.VISIBLE);
             }
         });
@@ -94,8 +95,106 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         Bundle data = intent.getExtras();
         exam = data.getParcelable(PARAM_EXAM);
         attempt = data.getParcelable(PARAM_ATTEMPT);
+        if (exam == null) {
+            String examSlug = data.getString(PARAM_EXAM_SLUG);
+            if (examSlug == null || examSlug.isEmpty()) {
+                throw new IllegalArgumentException("PARAM_EXAM_SLUG must not be null or empty.");
+            }
+            loadExam(examSlug);
+            return;
+        }
+        displayStartExamScreen();
+    }
+
+    void loadExam(final String examSlug) {
+        progressBar.setVisibility(View.VISIBLE);
+        new TestpressExamApiClient(this).getExam(examSlug)
+                .enqueue(new TestpressCallback<Exam>() {
+                    @Override
+                    public void onSuccess(Exam exam) {
+                        TestActivity.this.exam = exam;
+                        if (exam.getPausedAttemptsCount() > 0) {
+                            loadAttempt(exam.getAttemptsFrag());
+                        } else {
+                            displayStartExamScreen();
+                        }
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        if (exception.isUnauthenticated()) {
+                            setEmptyText(R.string.testpress_authentication_failed,
+                                    R.string.testpress_exam_no_permission);
+                            retryButton.setVisibility(View.GONE);
+                        } else if (exception.isNetworkError()) {
+                            setEmptyText(R.string.testpress_network_error,
+                                    R.string.testpress_no_internet_try_again);
+                            retryButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    progressBar.setVisibility(View.VISIBLE);
+                                    emptyView.setVisibility(View.GONE);
+                                    loadExam(examSlug);
+                                }
+                            });
+                        } else if (exception.getResponse().code() == 404) {
+                            setEmptyText(R.string.testpress_exam_not_available,
+                                    R.string.testpress_exam_not_available_description);
+                            retryButton.setVisibility(View.GONE);
+                        } else  {
+                            setEmptyText(R.string.testpress_error_loading_exam,
+                                    R.string.testpress_some_thing_went_wrong_try_again);
+                            retryButton.setVisibility(View.GONE);
+                        }
+                    }
+                });
+    }
+
+    void loadAttempt(final String attemptUrlFrag) {
+        progressBar.setVisibility(View.VISIBLE);
+        HashMap<String, Object> queryParams = new HashMap<>();
+        queryParams.put(PARAM_STATE, STATE_PAUSED);
+        new TestpressExamApiClient(this).getAttempts(attemptUrlFrag, queryParams)
+                .enqueue(new TestpressCallback<TestpressApiResponse<Attempt>>() {
+                    @Override
+                    public void onSuccess(TestpressApiResponse<Attempt> response) {
+                        TestActivity.this.attempt = response.getResults().get(0);
+                        displayStartExamScreen();
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        if (exception.isUnauthenticated()) {
+                            setEmptyText(R.string.testpress_authentication_failed,
+                                    R.string.testpress_please_login);
+                            retryButton.setVisibility(View.GONE);
+                        } else if (exception.isNetworkError()) {
+                            setEmptyText(R.string.testpress_network_error,
+                                    R.string.testpress_no_internet_try_again);
+                            retryButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    progressBar.setVisibility(View.VISIBLE);
+                                    emptyView.setVisibility(View.GONE);
+                                    loadAttempt(attemptUrlFrag);
+                                }
+                            });
+                        } else {
+                            setEmptyText(R.string.testpress_error_loading_attempts,
+                                    R.string.testpress_some_thing_went_wrong_try_again);
+                            retryButton.setVisibility(View.GONE);
+                        }
+                    }
+                });
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @SuppressLint("SetTextI18n")
+    void displayStartExamScreen() {
+        Button startExam = (Button) findViewById(R.id.start_exam);
+        LinearLayout attemptActions = (LinearLayout) findViewById(R.id.attempt_actions);
         if (attempt != null) {
-            String action = data.getString(PARAM_ACTION);
+            String action = getIntent().getStringExtra(PARAM_ACTION);
             if (action != null && action.equals(PARAM_VALUE_ACTION_END)) {
                 getSupportActionBar().setTitle(getString(R.string.testpress_end_exam));
                 endExam();
@@ -107,6 +206,13 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         } else {
             startExam.setVisibility(View.VISIBLE);
         }
+        TextView examTitle = (TextView) findViewById(R.id.exam_title);
+        TextView numberOfQuestions = (TextView) findViewById(R.id.number_of_questions);
+        TextView examDuration = (TextView) findViewById(R.id.exam_duration);
+        TextView markPerQuestion = (TextView) findViewById(R.id.mark_per_question);
+        TextView negativeMarks = (TextView) findViewById(R.id.negative_marks);
+        LinearLayout description = (LinearLayout) findViewById(R.id.description);
+        TextView descriptionContent = (TextView) findViewById(R.id.descriptionContent);
         examTitle.setText(exam.getTitle());
         numberOfQuestions.setText(exam.getNumberOfQuestions().toString());
         examDuration.setText(exam.getDuration());
@@ -116,6 +222,8 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
             description.setVisibility(View.VISIBLE);
             descriptionContent.setText("    " + exam.getDescription());
         }
+        progressBar.setVisibility(View.GONE);
+        examDetailsContainer.setVisibility(View.VISIBLE);
     }
 
     private void endExam() {
@@ -162,7 +270,6 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
 
     public void onLoadFinished(final Loader<Attempt> loader, final Attempt attempt) {
         progressBar.setVisibility(View.GONE);
-        examDetailsContainer.setVisibility(View.GONE);
         //noinspection ThrowableResultOfMethodCallIgnored
         TestpressException exception = ((ThrowableLoader<Attempt>) loader).clearException();
         if(exception == null) {
@@ -207,6 +314,16 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     }
 
     @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        if(item.getItemId() == android.R.id.home) {
+            setResult(RESULT_CANCELED, new Intent().putExtra(ACTION_PRESSED_HOME, true));
+            super.onBackPressed();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public void onBackPressed() {
         TestFragment testFragment = null;
         try {
@@ -220,6 +337,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 testFragment.pauseExam();
             }
         } else {
+            setResult(RESULT_CANCELED, new Intent().putExtra(ACTION_PRESSED_HOME, false));
             super.onBackPressed();
         }
     }
@@ -229,6 +347,8 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         emptyTitleView.setText(title);
         emptyDescView.setText(description);
         retryButton.setVisibility(View.VISIBLE);
+        examDetailsContainer.setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
     }
 
     @Override

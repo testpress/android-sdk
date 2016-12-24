@@ -74,4 +74,34 @@ public class TestpressExamTest {
             assertEquals("TestpressSession must not be null.", e.getMessage());
         }
     }
+
+    @Test
+    public void testStartExam_withNullValues() throws Exception {
+        TestpressSession testpressSession = mock(TestpressSession.class);
+        try {
+            TestpressExam.startExam(null, "DummySlug", testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Activity must not be null.", e.getMessage());
+        }
+        FragmentActivity activity = mock(FragmentActivity.class);
+        try {
+            TestpressExam.startExam(activity, "DummySlug", null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+        try {
+            TestpressExam.startExam(activity, null, testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("PARAM_EXAM_SLUG must not be null or empty.", e.getMessage());
+        }
+        try {
+            TestpressExam.startExam(activity, "", testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("PARAM_EXAM_SLUG must not be null or empty.", e.getMessage());
+        }
+    }
 }
