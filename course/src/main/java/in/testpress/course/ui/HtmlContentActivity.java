@@ -250,7 +250,7 @@ public class HtmlContentActivity extends BaseToolBarActivity {
     String getHeader() {
         return "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\" />" +
                 "<link rel=\"stylesheet\" type=\"text/css\" href=\"typebase.css\" />" +
-                "<style>img{display: inline;height: auto;max-width: 100%;}</style>";
+                "<style>img{display: inline; height: auto !important; width: auto !important; max-width: 100%;}</style>";
     }
 
     class ImageHandler {
