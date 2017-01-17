@@ -31,6 +31,7 @@ public class Exam implements Parcelable {
     private Integer templateType;
     private Boolean allowRetake;
     private Boolean allowPdf;
+    private Boolean showAnswers;
     private Integer maxRetakes;
     private String attemptsUrl;
 
@@ -53,6 +54,7 @@ public class Exam implements Parcelable {
         templateType        = parcel.readInt();
         allowRetake         = parcel.readByte() != 0;
         allowPdf            = parcel.readByte() != 0;
+        showAnswers         = parcel.readByte() != 0;
         maxRetakes          = parcel.readInt();
         attemptsUrl         = parcel.readString();
     }
@@ -82,12 +84,17 @@ public class Exam implements Parcelable {
         if (allowRetake == null) {
             parcel.writeByte((byte) (0));
         } else {
-            parcel.writeByte((byte) (allowRetake ? 1 : 0)); //if review == true, byte == 1
+            parcel.writeByte((byte) (allowRetake ? 1 : 0));
         }
         if (allowPdf == null) {
             parcel.writeByte((byte) (0));
         } else {
-            parcel.writeByte((byte) (allowPdf ? 1 : 0)); //if review == true, byte == 1
+            parcel.writeByte((byte) (allowPdf ? 1 : 0));
+        }
+        if (showAnswers == null) {
+            parcel.writeByte((byte) (0));
+        } else {
+            parcel.writeByte((byte) (showAnswers ? 1 : 0));
         }
         parcel.writeInt(maxRetakes);
         parcel.writeString(attemptsUrl);
@@ -445,6 +452,14 @@ public class Exam implements Parcelable {
      */
     public void setAllowPdf(Boolean allowPdf) {
         this.allowPdf = allowPdf;
+    }
+
+    public Boolean getShowAnswers() {
+        return showAnswers;
+    }
+
+    public void setShowAnswers(Boolean showAnswers) {
+        this.showAnswers = showAnswers;
     }
 
     public Integer getMaxRetakes() {

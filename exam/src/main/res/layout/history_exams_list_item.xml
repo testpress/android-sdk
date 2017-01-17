@@ -128,11 +128,12 @@
 
     </RelativeLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_marginTop="5dp"
         android:paddingBottom="15dp"
+        android:gravity="right"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp" >
 
@@ -140,28 +141,21 @@
             style="@style/TestpressSmallButton"
             android:text="@string/testpress_resume"
             android:id="@+id/resume_exam"
-            android:layout_toLeftOf="@+id/review_attempt"
-            android:layout_toStartOf="@+id/review_attempt"
             android:visibility="gone"/>
 
         <android.support.v7.widget.AppCompatButton
             style="@style/TestpressSmallButton"
             android:text="@string/testpress_retake"
-            android:id="@+id/retake"
-            android:layout_toLeftOf="@+id/review_attempt"
-            android:layout_toStartOf="@+id/review_attempt"/>
+            android:id="@+id/retake" />
 
         <android.support.v7.widget.AppCompatButton
             style="@style/TestpressSmallButton"
             android:text="@string/testpress_review"
-            android:visibility="visible"
             android:id="@+id/review_attempt"
             android:layout_marginLeft="15dp"
-            android:layout_marginStart="15dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
+            android:layout_marginStart="15dp" />
 
-    </RelativeLayout>
+    </LinearLayout>
 
     <View
         android:layout_width="fill_parent"
