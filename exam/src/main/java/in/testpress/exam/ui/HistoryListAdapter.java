@@ -93,6 +93,7 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
             setGone(6, false);
             setText(6, R.string.testpress_retake);
         }
+        setGone(7, !exam.getShowAnswers());
         setGone(8, (exam.getPausedAttemptsCount() <= 0));
     }
 
