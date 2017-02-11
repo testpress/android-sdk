@@ -103,9 +103,12 @@
     <string name="testpress_total_incorrect">Total Incorrect</string>
     <string name="testpress_total_unanswered">Total Unanswered</string>
     <string name="testpress_time_taken">Time Taken</string>
+    <string name="testpress_speed">Speed</string>
+    <string name="testpress_accuracy">Accuracy</string>
     <string name="testpress_correct_answer">Correct Answer</string>
     <string name="testpress_explanation">Explanation</string>
     <string name="testpress_review_label">Review</string>
+    <string name="testpress_resume_label">Resume</string>
     <string name="testpress_your_percentile_is">Your percentile is</string>
     <string name="testpress_scored_less_than">\u0020of users scored less than your score of\u0020</string>
 
@@ -117,5 +120,8 @@
 
     <string name="testpress_show_as_grid">Grid</string>
     <string name="testpress_show_as_list">List</string>
+
+    <string name="testpress_date">Date</string>
+    <string name="testpress_action">Action</string>
 
 </resources>

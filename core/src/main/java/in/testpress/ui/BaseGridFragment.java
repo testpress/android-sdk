@@ -113,6 +113,10 @@ public abstract class BaseGridFragment<E> extends Fragment
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        initItems();
+    }
+
+    protected void initItems() {
         // Init loader only for the first time of creating the fragment after that if user come to
         // the same tab don't init the loader
         if (firstCallBack) {
@@ -181,6 +185,7 @@ public abstract class BaseGridFragment<E> extends Fragment
         if (!isUsable()) {
             return;
         }
+        getPager().reset();
         swipeRefreshLayout.setEnabled(true);
         showGrid(false);
         getLoaderManager().restartLoader(0, args, this);
@@ -211,50 +216,64 @@ public abstract class BaseGridFragment<E> extends Fragment
         }
         this.exception = null;
         this.items = items;
+        displayItems();
+        showGrid();
+    }
+
+    protected List<E> getItems() {
+        return items;
+    }
+
+    protected void displayItems() {
+        if (!isUsable()) {
+            return;
+        }
+        List<E> items = getItems();
+        tableLayout.removeAllViews();
         if (items.isEmpty()) {
             setEmptyText();
             if (!needRetryButton) {
                 retryButton.setVisibility(View.GONE);
             }
-        }
-        int noOfItemsAvailable = items.size();    //Number of items Available
-        int itemPosition = 0;   // Item position in grid
-        int tableWidth = getContext().getResources().getDisplayMetrics().widthPixels;
-        int tableRowWidth = tableWidth - (tableLayout.getPaddingLeft() + tableLayout.getPaddingRight());
-        // Get column spacing based on screen density (column spacing - 20dp)
-        int columnSpacing = (int) UIUtils.getPixelFromDp(getActivity(), 20);
-        // Calculate number of columns can be add in a row
-        int noOfColumns = tableRowWidth / (getChildColumnWidth() + columnSpacing);
-        int noOfColumnsInLastRow = noOfItemsAvailable % noOfColumns;
-        int noOfRows = (noOfItemsAvailable / noOfColumns) + (noOfColumnsInLastRow != 0 ? 1 : 0);
-        tableLayout.removeAllViews();
-        tableLayout.setGravity(Gravity.CENTER_HORIZONTAL);
-        for (int j = 0; j < noOfRows; j++) {
-            TableRow row= new TableRow(getActivity());
-            TableRow.LayoutParams lp;
-            if (noOfColumnsInLastRow != 0 && j == noOfRows-1) {
-                lp = new TableRow.LayoutParams(noOfColumnsInLastRow);
-            } else {
-                lp = new TableRow.LayoutParams(noOfColumns);
-            }
-            row.setLayoutParams(lp);
-            for (int i = 1; i <= noOfColumns; i++) {
-                if (noOfItemsAvailable == itemPosition) {
-                    break;
+        } else {
+            int noOfItemsAvailable = items.size();    //Number of items Available
+            int itemPosition = 0;   // Item position in grid
+            int tableWidth = getContext().getResources().getDisplayMetrics().widthPixels;
+            int tableRowWidth =
+                    tableWidth - (tableLayout.getPaddingLeft() + tableLayout.getPaddingRight());
+            // Get column spacing based on screen density (column spacing - 20dp)
+            int columnSpacing = (int) UIUtils.getPixelFromDp(getActivity(), 20);
+            // Calculate number of columns can be add in a row
+            int noOfColumns = tableRowWidth / (getChildColumnWidth() + columnSpacing);
+            int noOfColumnsInLastRow = noOfItemsAvailable % noOfColumns;
+            int noOfRows = (noOfItemsAvailable / noOfColumns) + (noOfColumnsInLastRow != 0 ? 1 : 0);
+            tableLayout.setGravity(Gravity.CENTER_HORIZONTAL);
+            for (int j = 0; j < noOfRows; j++) {
+                TableRow row = new TableRow(getActivity());
+                TableRow.LayoutParams lp;
+                if (noOfColumnsInLastRow != 0 && j == noOfRows - 1) {
+                    lp = new TableRow.LayoutParams(noOfColumnsInLastRow);
+                } else {
+                    lp = new TableRow.LayoutParams(noOfColumns);
                 }
-                View childView = getChildView(items.get(itemPosition));
-                TableRow.LayoutParams params = getLayoutParams();
-                if (i != 1) {
-                    params.leftMargin = columnSpacing;
+                row.setLayoutParams(lp);
+                for (int i = 1; i <= noOfColumns; i++) {
+                    if (noOfItemsAvailable == itemPosition) {
+                        break;
+                    }
+                    View childView = getChildView(items.get(itemPosition));
+                    TableRow.LayoutParams params = getLayoutParams();
+                    if (i != 1) {
+                        params.leftMargin = columnSpacing;
+                    }
+                    childView.setLayoutParams(params);
+                    row.addView(childView);
+                    itemPosition++;
                 }
-                childView.setLayoutParams(params);
-                row.addView(childView);
-                itemPosition++;
+                row.setGravity(Gravity.CENTER_HORIZONTAL);
+                tableLayout.addView(row, j);
             }
-            row.setGravity(Gravity.CENTER_HORIZONTAL);
-            tableLayout.addView(row, j);
         }
-        showGrid();
     }
 
     /**
@@ -262,6 +281,10 @@ public abstract class BaseGridFragment<E> extends Fragment
      */
     protected void showGrid() {
         showGrid(true);
+    }
+
+    protected boolean isItemsEmpty() {
+        return items.isEmpty();
     }
 
     /**
@@ -276,7 +299,7 @@ public abstract class BaseGridFragment<E> extends Fragment
         }
         gridShown = show;
         if (show) {
-            if (items.isEmpty()) {
+            if (isItemsEmpty()) {
                 show(emptyView);
             } else {
                 hide(emptyView).show(tableLayout);
@@ -300,6 +323,9 @@ public abstract class BaseGridFragment<E> extends Fragment
      * @param message
      */
     protected void showError(final int message) {
+        if (!isUsable()) {
+            return;
+        }
         Snackbar.make(swipeRefreshLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 
@@ -354,7 +380,9 @@ public abstract class BaseGridFragment<E> extends Fragment
      */
     protected BaseGridFragment<E> setEmptyText(final int title, final int description, final int left) {
         if (emptyView != null) {
-            swipeRefreshLayout.setEnabled(false);
+            if (isItemsEmpty()) {
+                swipeRefreshLayout.setEnabled(false);
+            }
             emptyTitleView.setText(title);
             emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0);
             emptyDescView.setText(description);

@@ -21,4 +21,9 @@
     <string name="testpress_previous_content">Previous</string>
     <string name="testpress_next_content">Next</string>
 
+    <string name="testpress_start">Start</string>
+    <string name="testpress_download_attachment">Download Attachment</string>
+
+    <string name="testpress_menu">Menu</string>
+
 </resources>

@@ -15,7 +15,7 @@ public class ReviewActivity extends BaseToolBarActivity {
     static final String PARAM_EXAM = "exam";
     static final String PARAM_ATTEMPT = "attempt";
 
-    static Intent createIntent(Activity activity, Exam exam, Attempt attempt) {
+    public static Intent createIntent(Activity activity, Exam exam, Attempt attempt) {
         Intent intent = new Intent(activity, ReviewActivity.class);
         intent.putExtra(ReviewActivity.PARAM_PREVIOUS_ACTIVITY, activity.getClass().getName());
         intent.putExtra(ReviewActivity.PARAM_EXAM, exam);

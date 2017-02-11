@@ -22,6 +22,7 @@ public final class TestpressSdk {
     private static final String KEY_TESTPRESS_AUTH_TOKEN = "testpressAuthToken";
     private static final String KEY_TESTPRESS_SHARED_PREFS = "testpressSharedPreferences";
     private static final String KEY_USER_ID = "userId";
+    private static final String KEY_COURSE_DATABASE_SESSION = "courseDatabaseSession";
     private static final String RUBIK_REGULAR_FONT_PATH = "Rubik-Regular.ttf";
     private static final String RUBIK_MEDIUM_FONT_PATH = "Rubik-Medium.ttf";
     public enum Provider { FACEBOOK, GOOGLE, TESTPRESS }
@@ -68,6 +69,34 @@ public final class TestpressSdk {
 
     public static boolean hasActiveSession(@NonNull Context context) {
         return getTestpressSession(context) != null;
+    }
+
+    public static void setTestpressCourseDBSession(@NonNull Context context,
+                                                   @NonNull String sessionToken) {
+        //noinspection ConstantConditions
+        if (sessionToken == null || sessionToken.isEmpty()) {
+            throw new IllegalArgumentException("SessionToken must not be null or Empty.");
+        }
+        SharedPreferences.Editor editor = getPreferenceEditor(context);
+        editor.putString(KEY_COURSE_DATABASE_SESSION, sessionToken);
+        editor.apply();
+    }
+
+    @Nullable
+    private static String getTestpressCourseDBSession(@NonNull Context context) {
+        SharedPreferences pref = getPreferences(context);
+        return pref.getString(KEY_COURSE_DATABASE_SESSION, null);
+    }
+
+    public static boolean isNewCourseDBSession(@NonNull Context context,
+                                               @NonNull String sessionToken) {
+        //noinspection ConstantConditions
+        if (sessionToken == null || sessionToken.isEmpty()) {
+            throw new IllegalArgumentException("SessionToken must not be null or Empty.");
+        }
+        String existingDBSessionToken = getTestpressCourseDBSession(context);
+        return existingDBSessionToken == null ||
+                !sessionToken.equals(existingDBSessionToken);
     }
 
     /**
