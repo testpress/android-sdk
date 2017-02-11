@@ -6,6 +6,7 @@ import java.util.Map;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
+import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.ReviewItem;
 import in.testpress.model.TestpressApiResponse;
@@ -42,6 +43,10 @@ public interface ExamService {
     RetrofitCall<Attempt> createAttempt(
             @Path(value = "attempts_url", encoded = true) String attemptsUrlFrag);
 
+    @POST("{attempt_url}")
+    RetrofitCall<CourseAttempt> createContentAttempt(
+            @Path(value = "attempt_url", encoded = true) String attemptUrl);
+
     @PUT("/{start_attempt_url}")
     RetrofitCall<Attempt> startAttempt(
             @Path(value = "start_attempt_url", encoded = true) String startAttemptUrlFrag);
@@ -59,8 +64,17 @@ public interface ExamService {
     RetrofitCall<Attempt> endExam(
             @Path(value = "end_exam_url", encoded = true) String endExamUrlFrag);
 
+    @PUT("{end_exam_url}")
+    RetrofitCall<CourseAttempt> endContentAttempt(
+            @Path(value = "end_exam_url", encoded = true) String endExamUrlFrag);
+
     @GET("/{attempts_url}")
     RetrofitCall<TestpressApiResponse<Attempt>> getAttempts(
+            @Path(value = "attempts_url", encoded = true) String attemptsUrlFrag,
+            @QueryMap Map<String, Object> options);
+
+    @GET("{attempts_url}")
+    RetrofitCall<TestpressApiResponse<CourseAttempt>> getContentAttempts(
             @Path(value = "attempts_url", encoded = true) String attemptsUrlFrag,
             @QueryMap Map<String, Object> options);
 

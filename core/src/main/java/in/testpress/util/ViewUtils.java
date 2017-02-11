@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.v4.content.ContextCompat;
@@ -29,6 +30,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.TextView;
 
 import in.testpress.R;
 
@@ -107,6 +109,12 @@ public class ViewUtils {
             searchIcon.mutate().setColorFilter(ContextCompat.getColor(context,
                     R.color.testpress_actionbar_text), PorterDuff.Mode.SRC_IN);
             menuItem.setIcon(searchIcon);
+        }
+    }
+
+    public static void setTypeface(TextView[] textViews, Typeface typeface) {
+        for (TextView view : textViews) {
+            view.setTypeface(typeface);
         }
     }
 

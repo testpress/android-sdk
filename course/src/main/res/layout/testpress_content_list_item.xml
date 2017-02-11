@@ -30,13 +30,14 @@
 
         <LinearLayout
             android:id="@+id/lock"
+            android:visibility="gone"
             android:background="@drawable/testpress_round_gray_background"
             android:gravity="center"
-            android:layout_marginRight="9dp"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
+            android:layout_marginRight="13dp"
             android:layout_marginEnd="13dp">
 
             <ImageView
@@ -48,6 +49,24 @@
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
                 android:src="@drawable/testpress_lock_outline_white" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/attempted_tick"
+            android:gravity="center"
+            android:layout_marginRight="10dp"
+            android:layout_width="30dp"
+            android:layout_height="25dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" >
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:background="@drawable/testpress_white_circle_background"
+                android:tint="@color/testpress_green"
+                android:src="@drawable/testpress_tick" />
 
         </LinearLayout>
 
@@ -69,6 +88,49 @@
             android:maxLines="2"
             android:ellipsize="end"
             android:id="@+id/content_title" />
+
+        <LinearLayout
+            android:layout_marginTop="10dp"
+            android:id="@+id/exam_info_layout"
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="15dp"
+                android:src="@drawable/testpress_clock"/>
+
+            <TextView
+                android:layout_marginLeft="5dp"
+                android:text="3:00:00"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:lineSpacingExtra="4dp"
+                android:textColor="@color/testpress_text_gray_medium"
+                android:maxLines="1"
+                android:id="@+id/duration" />
+
+            <ImageView
+                android:layout_marginLeft="25dp"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/testpress_question_tag"/>
+
+            <TextView
+                android:layout_marginLeft="5dp"
+                android:text="50 Qs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:lineSpacingExtra="4dp"
+                android:textColor="@color/testpress_text_gray_medium"
+                android:maxLines="1"
+                android:id="@+id/no_of_questions" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

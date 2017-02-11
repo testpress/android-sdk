@@ -6,11 +6,10 @@ import android.view.View;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import java.util.List;
-
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
-import in.testpress.course.models.Course;
+import in.testpress.course.models.greendao.Course;
+import in.testpress.course.models.greendao.CourseDao;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -19,13 +18,30 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     private final Activity mActivity;
     private ImageLoader mImageLoader;
     private DisplayImageOptions mOptions;
+    private CourseDao mCourseDao;
 
-    CourseListAdapter(Activity activity, final List<Course> items, int layout) {
-        super(activity.getLayoutInflater(), layout);
+    CourseListAdapter(Activity activity, CourseDao courseDao) {
+        super(activity.getLayoutInflater(), R.layout.testpress_course_list_item);
         mActivity = activity;
         mImageLoader = ImageUtils.initImageLoader(activity);
         mOptions = ImageUtils.getPlaceholdersOption();
-        setItems(items);
+        mCourseDao = courseDao;
+    }
+
+    @Override
+    public int getCount() {
+        return (int) mCourseDao.queryBuilder().count();
+    }
+
+    @Override
+    public Course getItem(int position) {
+        return mCourseDao.queryBuilder().orderAsc(CourseDao.Properties.Id).listLazy().get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return mCourseDao.queryBuilder().orderAsc(CourseDao.Properties.Id).listLazy().get(position)
+                .getId();
     }
 
     @Override
@@ -47,8 +63,13 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         view(3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mActivity.startActivity(ChaptersGridActivity.createIntent(course.getTitle(),
-                        course.getChaptersUrlFrag(), null, mActivity));
+                if (course.getChaptersCount() > 0) {
+                    mActivity.startActivity(ChaptersGridActivity.createIntent(course.getTitle(),
+                            course.getId().toString(), null, mActivity));
+                } else {
+                    mActivity.startActivity(ContentsListActivity.createIntent(course.getTitle(),
+                            course.getContentsUrl(), mActivity));
+                }
             }
         });
         // ToDo: Set completed percentage in the progress bar

@@ -15,7 +15,7 @@ public class CourseListActivity extends BaseToolBarActivity {
         CourseListFragment fragment = new CourseListFragment();
         fragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
-                .commit();
+                .commitAllowingStateLoss();
     }
 
 }

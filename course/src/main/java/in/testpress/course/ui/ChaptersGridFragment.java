@@ -1,6 +1,7 @@
 package in.testpress.course.ui;
 
 import android.os.Bundle;
+import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TableRow;
@@ -9,10 +10,17 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import org.greenrobot.greendao.query.QueryBuilder;
+import org.greenrobot.greendao.query.WhereCondition;
+
+import java.util.List;
+
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
-import in.testpress.course.models.Chapter;
+import in.testpress.course.TestpressCourse;
+import in.testpress.course.models.greendao.Chapter;
+import in.testpress.course.models.greendao.ChapterDao;
 import in.testpress.course.network.ChapterPager;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.ui.BaseGridFragment;
@@ -21,20 +29,21 @@ import in.testpress.util.UIUtils;
 
 public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
 
-    public static final String CHAPTERS_URL_FRAG = "chaptersUrlFrag";
+    public static final String COURSE_ID = "courseId";
     public static final String PARENT_ID = "parentId";
     private TestpressCourseApiClient mApiClient;
-    private String chaptersUrlFrag;
+    private String courseId;
     private String parentId = "null";
     private DisplayImageOptions mOptions;
     private ImageLoader mImageLoader;
+    private ChapterDao chapterDao;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        chaptersUrlFrag =  getArguments().getString(CHAPTERS_URL_FRAG);
-        if (getArguments() == null || chaptersUrlFrag == null || chaptersUrlFrag.isEmpty()) {
-            throw new IllegalArgumentException("CHAPTERS_URL_FRAG must not be null or empty");
+        courseId =  getArguments().getString(COURSE_ID);
+        if (getArguments() == null || courseId == null || courseId.isEmpty()) {
+            throw new IllegalArgumentException("COURSE_ID must not be null or empty");
         }
         if (getArguments().getString(PARENT_ID) != null) {
             parentId = getArguments().getString(PARENT_ID);
@@ -42,14 +51,76 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
         mApiClient = new TestpressCourseApiClient(getActivity());
         mOptions = ImageUtils.getPlaceholdersOption();
         mImageLoader = ImageUtils.initImageLoader(getActivity());
+        chapterDao = TestpressCourse.getChapterDao(getActivity());
+    }
+
+    @Override
+    protected void initItems() {
+        if (parentId.equals("null")) {
+            getLoaderManager().initLoader(0, null, this);
+        } else {
+            showGrid();
+        }
+        displayItems();
+    }
+
+    private QueryBuilder<Chapter> getQueryBuilder() {
+        WhereCondition parentCondition;
+        if (parentId.equals("null")) {
+            parentCondition = ChapterDao.Properties.ParentId.isNull();
+        } else {
+            parentCondition = ChapterDao.Properties.ParentId.eq(parentId);
+        }
+        return chapterDao.queryBuilder()
+                .where(parentCondition, ChapterDao.Properties.CourseId.eq(courseId));
+    }
+
+    @Override
+    protected List<Chapter> getItems() {
+        return getQueryBuilder().orderAsc(ChapterDao.Properties.Order).list();
     }
 
     @Override
     protected ChapterPager getPager() {
         if (pager == null) {
-            pager = new ChapterPager(chaptersUrlFrag, parentId, mApiClient);
+            pager = new ChapterPager(courseId, mApiClient);
+            QueryBuilder<Chapter> queryBuilder =
+                    chapterDao.queryBuilder().where(ChapterDao.Properties.CourseId.eq(courseId));
+            if (queryBuilder.count() > 0) {
+                Chapter latest = queryBuilder.orderDesc(ChapterDao.Properties.ModifiedDate)
+                        .list().get(0);
+                ((ChapterPager) pager).setLatestModifiedDate(latest.getModified());
+            }
         }
         return (ChapterPager)pager;
+    }
+
+    @Override
+    public void onLoadFinished(final Loader<List<Chapter>> loader, final List<Chapter> items) {
+        final TestpressException exception = getException(loader);
+        if (exception != null) {
+            this.exception = exception;
+            int errorMessage = getErrorMessage(exception);
+            if (!isItemsEmpty()) {
+                showError(errorMessage);
+            }
+            showGrid();
+            getLoaderManager().destroyLoader(loader.getId());
+            return;
+        }
+
+        this.exception = null;
+        this.items = items;
+        if (!items.isEmpty()) {
+            chapterDao.insertOrReplaceInTx(items);
+        }
+        displayItems();
+        showGrid();
+    }
+
+    @Override
+    protected boolean isItemsEmpty() {
+        return getQueryBuilder().count() == 0;
     }
 
     @Override
@@ -78,10 +149,10 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
                     if (chapter.getChildrenCount() > 0) {
                         getActivity().startActivity(
                                 ChaptersGridActivity.createIntent(chapter.getName(),
-                                        chaptersUrlFrag, chapter.getId().toString(), getContext()));
+                                        courseId, chapter.getId().toString(), getContext()));
                     } else {
-                        getActivity().startActivity(ContentsListActivity.createIntent(chapter.getName(),
-                                chapter.getContentUrlFrag(), getContext()));
+                        getActivity().startActivity(ContentsListActivity.createIntent(
+                                chapter.getName(), chapter.getContentUrl(), getContext()));
                     }
                 }
             });

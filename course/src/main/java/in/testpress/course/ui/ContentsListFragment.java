@@ -23,7 +23,7 @@ public class ContentsListFragment extends PagedItemFragment<Content> {
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
                 .replace(containerViewId, new ContentsListFragment())
-                .commit();
+                .commitAllowingStateLoss();
     }
 
     @Override

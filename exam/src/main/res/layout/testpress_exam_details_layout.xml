@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/test_details"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp">
+
+        <LinearLayout
+            style="@style/TestpressExamInfoRow"
+            android:layout_marginBottom="5dp"
+            android:layout_gravity="center">
+            <ImageView
+                android:layout_height="match_parent"
+                style="@style/TestpressExamInfoSubHeading"
+                android:layout_weight="0.2"
+                android:src="@drawable/testpress_questions_large"/>
+            <TextView
+                android:layout_height="match_parent"
+                style="@style/TestpressExamInfoSubHeading"
+                android:id="@+id/questions_label"
+                android:layout_weight="0.5"
+                android:text="@string/testpress_questions"/>
+            <TextView
+                android:id="@+id/number_of_questions"
+                style="@style/TestpressExamInfoValue"
+                android:layout_weight="0.3"
+                android:textStyle="bold"
+                android:text="200"/>
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/TestpressExamInfoRow"
+            android:layout_marginBottom="5dp"
+            android:layout_gravity="center">
+            <ImageView
+                android:layout_height="match_parent"
+                style="@style/TestpressExamInfoSubHeading"
+                android:layout_weight="0.2"
+                android:src="@drawable/testpress_duration_large"/>
+            <TextView
+                android:layout_height="match_parent"
+                android:id="@+id/duration_label"
+                style="@style/TestpressExamInfoSubHeading"
+                android:layout_weight="0.5"
+                android:text="@string/testpress_duration"/>
+            <TextView
+                android:id="@+id/exam_duration"
+                style="@style/TestpressExamInfoValue"
+                android:layout_weight="0.3"
+                android:textStyle="bold"
+                android:text="02:00:00"/>
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/TestpressExamInfoRow"
+            android:layout_marginBottom="5dp"
+            android:layout_gravity="center">
+            <ImageView
+                android:layout_height="match_parent"
+                style="@style/TestpressExamInfoSubHeading"
+                android:layout_weight="0.2"
+                android:src="@drawable/testpress_marks_large"/>
+            <TextView
+                android:layout_height="match_parent"
+                android:id="@+id/mark_per_question_label"
+                style="@style/TestpressExamInfoSubHeading"
+                android:layout_weight="0.5"
+                android:text="@string/testpress_mark_per_question"/>
+            <TextView
+                android:id="@+id/mark_per_question"
+                style="@style/TestpressExamInfoValue"
+                android:layout_weight="0.3"
+                android:textStyle="bold"
+                android:text="200"/>
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/TestpressExamInfoRow"
+            android:layout_marginBottom="5dp"
+            android:layout_gravity="center">
+            <ImageView
+                android:layout_height="match_parent"
+                style="@style/TestpressExamInfoSubHeading"
+                android:layout_weight="0.2"
+                android:src="@drawable/testpress_negative_large"/>
+            <TextView
+                android:layout_height="match_parent"
+                android:id="@+id/negative_marks_label"
+                style="@style/TestpressExamInfoSubHeading"
+                android:layout_weight="0.5"
+                android:text="@string/testpress_negative_mark"/>
+            <TextView
+                android:id="@+id/negative_marks"
+                style="@style/TestpressExamInfoValue"
+                android:layout_weight="0.3"
+                android:textStyle="bold"
+                android:text="200"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="start"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:visibility="gone"
+            android:id="@+id/description" >
+
+            <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp" >
+                <View
+                    android:layout_width="wrap_content"
+                    android:layout_height="1dip"
+                    android:background="#cccccc" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/descriptionContent"
+                android:layout_marginTop="5dp"
+                android:textSize="@dimen/testpress_text_size_medium"
+                android:text="Abdul Kalam (15 October 1931 – 27 July 2015) was the 11th President of India from 2002 to 2007. A career scientist turned reluctant politician, Kalam was born and raised in Rameswaram, Tamil Nadu, and studied physics and aerospace engineering. He spent the next four decades as a scientist and science administrator, mainly at the Defence Research and Development Organisation (DRDO) and Indian Space Research Organisation (ISRO) and was intimately involved in India's civilian space program and military missile development efforts"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout style="@style/TestpressExamInfoRow"
+        android:gravity="center"
+        android:layout_marginBottom="20dp"
+        tools:ignore="UseCompoundDrawables">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:tint="@color/testpress_black"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/ic_thumb_up_black_18dp"
+            android:id="@+id/imageView" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/testpress_black"
+            android:textSize="@dimen/testpress_text_size_large"
+            android:textStyle="normal"
+            android:text="@string/testpress_all_the_best" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,5 +1,6 @@
 package in.testpress.exam.ui;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -37,6 +38,7 @@ public class ReviewStatsFragment extends Fragment {
         return fragment;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -47,6 +49,8 @@ public class ReviewStatsFragment extends Fragment {
         TextView rank = (TextView) view.findViewById(R.id.rank);
         TextView percentile = (TextView) view.findViewById(R.id.percentile);
         TextView subPercentile = (TextView) view.findViewById(R.id.sub_percentile);
+        TextView speed = (TextView) view.findViewById(R.id.speed);
+        TextView accuracy = (TextView) view.findViewById(R.id.accuracy);
         PieChart chart = (PieChart) view.findViewById(R.id.chart);
         LinearLayout rankLayout = (LinearLayout) view.findViewById(R.id.rank_layout);
         LinearLayout percentileLayout = (LinearLayout) view.findViewById(R.id.percentile_layout);
@@ -70,6 +74,8 @@ public class ReviewStatsFragment extends Fragment {
                 subPercentile.setText(attempt.getPercentile() +
                         getString(R.string.testpress_scored_less_than) + attempt.getScore());
             }
+            speed.setText(attempt.getSpeed().toString());
+            accuracy.setText(attempt.getAccuracy().toString());
             ArrayList<PieEntry> entries = new ArrayList<>();
             entries.add(new PieEntry(attempt.getCorrectCount(), 0));
             entries.add(new PieEntry(attempt.getIncorrectCount(), 1));
