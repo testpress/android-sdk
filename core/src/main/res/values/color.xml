@@ -9,6 +9,7 @@
 
     <color name="testpress_table_text">#484848</color>
     <color name="testpress_text_gray">#777</color>
+    <color name="testpress_text_gray_medium">#999999</color>
 
     <color name="testpress_actionbar_background">@color/testpress_color_primary</color>
     <color name="testpress_actionbar_text">#fff</color>

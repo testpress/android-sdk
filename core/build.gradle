@@ -30,6 +30,7 @@ dependencies {
     compile rootProject.gsonConverter
     compile rootProject.httpLogInterceptor
     compile rootProject.universalImageLoader
+    compile rootProject.greendao
     androidTestCompile rootProject.junit
     androidTestCompile rootProject.testRunner
 }

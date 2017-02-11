@@ -6,6 +6,8 @@ import android.support.v4.app.FragmentActivity;
 import org.junit.Test;
 
 import in.testpress.core.TestpressSession;
+import in.testpress.exam.models.CourseAttempt;
+import in.testpress.exam.models.CourseContent;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -102,6 +104,96 @@ public class TestpressExamTest {
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("PARAM_EXAM_SLUG must not be null or empty.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testStartCourseExam_withNullValues() throws Exception {
+        TestpressSession testpressSession = mock(TestpressSession.class);
+        CourseContent courseContent = mock(CourseContent.class);
+        FragmentActivity activity = mock(FragmentActivity.class);
+        try {
+            TestpressExam.startCourseExam(null, courseContent, false, testpressSession);
+            fail();
+        } catch (AssertionError e) {
+            assertEquals("Activity must not be null.", e.getMessage());
+        }
+        try {
+            TestpressExam.startCourseExam(activity, null, false, testpressSession);
+            fail();
+        } catch (AssertionError e) {
+            assertEquals("PARAM_COURSE_CONTENT must not be null.", e.getMessage());
+        }
+        try {
+            TestpressExam.startCourseExam(activity, courseContent, false, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testResumeCourseAttempt_withNullValues() throws Exception {
+        TestpressSession testpressSession = mock(TestpressSession.class);
+        CourseContent courseContent = mock(CourseContent.class);
+        CourseAttempt courseAttempt = mock(CourseAttempt.class);
+        FragmentActivity activity = mock(FragmentActivity.class);
+        try {
+            TestpressExam.resumeCourseAttempt(null, courseContent, courseAttempt, false,
+                    testpressSession);
+            fail();
+        } catch (AssertionError e) {
+            assertEquals("Activity must not be null.", e.getMessage());
+        }
+        try {
+            TestpressExam.resumeCourseAttempt(activity, null, courseAttempt, false, testpressSession);
+            fail();
+        } catch (AssertionError e) {
+            assertEquals("PARAM_COURSE_CONTENT must not be null.", e.getMessage());
+        }
+        try {
+            TestpressExam.resumeCourseAttempt(activity, courseContent, null, false, testpressSession);
+            fail();
+        } catch (AssertionError e) {
+            assertEquals("PARAM_COURSE_ATTEMPT must not be null.", e.getMessage());
+        }
+        try {
+            TestpressExam.resumeCourseAttempt(activity, courseContent, courseAttempt, false, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testEndCourseAttempt_withNullValues() throws Exception {
+        TestpressSession testpressSession = mock(TestpressSession.class);
+        CourseContent courseContent = mock(CourseContent.class);
+        CourseAttempt courseAttempt = mock(CourseAttempt.class);
+        FragmentActivity activity = mock(FragmentActivity.class);
+        try {
+            TestpressExam.endCourseAttempt(null, courseContent, courseAttempt, testpressSession);
+            fail();
+        } catch (AssertionError e) {
+            assertEquals("Activity must not be null.", e.getMessage());
+        }
+        try {
+            TestpressExam.endCourseAttempt(activity, null, courseAttempt, testpressSession);
+            fail();
+        } catch (AssertionError e) {
+            assertEquals("PARAM_COURSE_CONTENT must not be null.", e.getMessage());
+        }
+        try {
+            TestpressExam.endCourseAttempt(activity, courseContent, null, testpressSession);
+            fail();
+        } catch (AssertionError e) {
+            assertEquals("PARAM_COURSE_ATTEMPT must not be null.", e.getMessage());
+        }
+        try {
+            TestpressExam.endCourseAttempt(activity, courseContent, courseAttempt, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
         }
     }
 }

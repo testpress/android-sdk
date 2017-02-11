@@ -10,18 +10,18 @@ import junit.framework.Assert;
 import in.testpress.course.R;
 import in.testpress.ui.BaseToolBarActivity;
 
-import static in.testpress.course.ui.ChaptersGridFragment.CHAPTERS_URL_FRAG;
+import static in.testpress.course.ui.ChaptersGridFragment.COURSE_ID;
 import static in.testpress.course.ui.ChaptersGridFragment.PARENT_ID;
 
 public class ChaptersGridActivity extends BaseToolBarActivity {
 
     public static final String ACTIONBAR_TITLE = "title";
 
-    public static Intent createIntent(String title, String chaptersUrlFrag, String parentId,
+    public static Intent createIntent(String title, String courseId, String parentId,
                                       Context context) {
         Intent intent = new Intent(context, ChaptersGridActivity.class);
         intent.putExtra(ACTIONBAR_TITLE, title);
-        intent.putExtra(CHAPTERS_URL_FRAG, chaptersUrlFrag);
+        intent.putExtra(COURSE_ID, courseId);
         intent.putExtra(PARENT_ID, parentId);
         return intent;
     }
@@ -38,7 +38,7 @@ public class ChaptersGridActivity extends BaseToolBarActivity {
         getSupportActionBar().setTitle(title);
         fragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
-                .commit();
+                .commitAllowingStateLoss();
     }
 
 }

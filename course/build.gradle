@@ -23,6 +23,7 @@ android {
 
 dependencies {
     compile project(':core')
+    compile project(':exam')
     compile rootProject.design
     testCompile rootProject.junit
     testCompile rootProject.mockito

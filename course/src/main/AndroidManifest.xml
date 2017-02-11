@@ -17,7 +17,7 @@
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
-        <activity android:name=".ui.HtmlContentActivity"
+        <activity android:name=".ui.ContentActivity"
             android:theme="@style/TestpressTheme" />
 
     </application>

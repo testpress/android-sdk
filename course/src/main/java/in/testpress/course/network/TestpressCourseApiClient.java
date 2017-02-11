@@ -5,10 +5,10 @@ import android.content.Context;
 import java.util.Map;
 
 import in.testpress.core.TestpressSdk;
-import in.testpress.course.models.Chapter;
 import in.testpress.course.models.Content;
-import in.testpress.course.models.Course;
 import in.testpress.course.models.HtmlContent;
+import in.testpress.course.models.greendao.Chapter;
+import in.testpress.course.models.greendao.Course;
 import in.testpress.model.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
@@ -20,6 +20,8 @@ public class TestpressCourseApiClient extends TestpressApiClient {
      */
     public static final String COURSE_LIST_PATH =  "/api/v2.2/courses/";
 
+    public static final String CHAPTERS_PATH =  "/chapters/";
+
     public TestpressCourseApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
     }
@@ -28,13 +30,15 @@ public class TestpressCourseApiClient extends TestpressApiClient {
         return retrofit.create(CourseService.class);
     }
 
-    public RetrofitCall<TestpressApiResponse<Course>> getCourses(Map<String, Object> queryParams) {
-        return getExamService().getCourses(queryParams);
+    public RetrofitCall<TestpressApiResponse<Course>> getCourses(Map<String, Object> queryParams,
+                                                                 String latestModifiedDate) {
+        return getExamService().getCourses(queryParams, latestModifiedDate);
     }
 
-    public RetrofitCall<TestpressApiResponse<Chapter>> getChapters(String chaptersUrlFrag,
-                                                                   Map<String, Object> queryParams) {
-        return getExamService().getChapters(chaptersUrlFrag, queryParams);
+    public RetrofitCall<TestpressApiResponse<Chapter>> getChapters(String courseId,
+                                                                   Map<String, Object> queryParams,
+                                                                   String latestModifiedDate) {
+        return getExamService().getChapters(courseId, queryParams, latestModifiedDate);
     }
 
     public RetrofitCall<TestpressApiResponse<Content>> getContents(String chaptersUrlFrag,
@@ -46,4 +50,7 @@ public class TestpressCourseApiClient extends TestpressApiClient {
         return getExamService().getHtmlContent(htmlContentUrlFrag);
     }
 
+    public RetrofitCall<Content> getContent(String contentUrl) {
+        return getExamService().getContent(contentUrl);
+    }
 }

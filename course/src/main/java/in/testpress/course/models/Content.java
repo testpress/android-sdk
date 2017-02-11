@@ -1,7 +1,10 @@
 package in.testpress.course.models;
 
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import in.testpress.exam.models.Exam;
 
 public class Content implements Parcelable {
 
@@ -16,10 +19,10 @@ public class Content implements Parcelable {
     private String chapterSlug;
     private String chapterUrl;
     private Integer id;
-    private Object video;
+    private Video video;
     private String name;
     private String image;
-    private Object attachment;
+    private Attachment attachment;
     private String description;
     private Boolean isLocked;
     private Integer attemptsCount;
@@ -44,6 +47,9 @@ public class Content implements Parcelable {
         start = in.readString();
         end = in.readString();
         hasStarted = in.readByte() != 0;
+        exam = in.readParcelable(Exam.class.getClassLoader());
+        video = in.readParcelable(Video.class.getClassLoader());
+        attachment = in.readParcelable(Attachment.class.getClassLoader());
     }
 
     @Override
@@ -72,6 +78,9 @@ public class Content implements Parcelable {
         } else {
             dest.writeByte((byte) (hasStarted ? 1 : 0)); //if hasStarted == true, byte == 1
         }
+        dest.writeParcelable(exam, flags);
+        dest.writeParcelable(video, flags);
+        dest.writeParcelable(attachment, flags);
     }
 
     @Override
@@ -294,7 +303,7 @@ public class Content implements Parcelable {
      * @return
      * The video
      */
-    public Object getVideo() {
+    public Video getVideo() {
         return video;
     }
 
@@ -303,7 +312,7 @@ public class Content implements Parcelable {
      * @param video
      * The video
      */
-    public void setVideo(Object video) {
+    public void setVideo(Video video) {
         this.video = video;
     }
 
@@ -348,7 +357,7 @@ public class Content implements Parcelable {
      * @return
      * The attachment
      */
-    public Object getAttachment() {
+    public Attachment getAttachment() {
         return attachment;
     }
 
@@ -357,7 +366,7 @@ public class Content implements Parcelable {
      * @param attachment
      * The attachment
      */
-    public void setAttachment(Object attachment) {
+    public void setAttachment(Attachment attachment) {
         this.attachment = attachment;
     }
 
