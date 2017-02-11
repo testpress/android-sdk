@@ -36,6 +36,7 @@ import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.AttemptItem;
+import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.TestQuestionsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
@@ -43,10 +44,13 @@ import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 
+import static in.testpress.exam.ui.TestActivity.PARAM_DISCARD_EXAM_DETAILS;
+
 public class TestFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>> {
 
     static final String PARAM_EXAM = "exam";
     static final String PARAM_ATTEMPT = "attempt";
+    static final String PARAM_CONTENT_ATTEMPT_END_URL = "contentAttemptEndUrl";
     SlidingPaneLayout slidingPaneLayout;
     private TestpressExamApiClient apiClient;
     private TextView previous;
@@ -60,6 +64,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private TestQuestionPagerAdapter pagerAdapter;
     private List<AttemptItem> filterItems = new ArrayList<>();
     private TestPanelListAdapter panelListAdapter;
+    private String contentAttemptEndUrl;
     private ProgressDialog progressDialog;
     private Attempt attempt;
     private Exam exam;
@@ -75,12 +80,14 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
      * Map of subjects & its starting point(first question index)
      */
     private HashMap<String, Integer> subjectsOffset = new HashMap<>();
+    private enum Action { PAUSE, END, UPDATE_ANSWER }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         attempt = getArguments().getParcelable(PARAM_ATTEMPT);
         exam = getArguments().getParcelable(PARAM_EXAM);
+        contentAttemptEndUrl = getArguments().getString(PARAM_CONTENT_ATTEMPT_END_URL);
         questionsPager = new TestQuestionsPager(attempt.getQuestionsUrlFrag(),
                 new TestpressExamApiClient(getActivity()));
         getLoaderManager().initLoader(0, null, this);
@@ -214,7 +221,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         if (attemptItemList.isEmpty()) {
             return;
         }
-        saveResult(pager.getCurrentItem(), false);
+        saveResult(pager.getCurrentItem(), Action.UPDATE_ANSWER);
         pager.setCurrentItem(position);
         panelListAdapter.setCurrentAttemptItemIndex(position + 1);
         if (slidingPaneLayout.isOpen()) {
@@ -276,7 +283,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         countDownTimer.cancel();
-                        returnToHistory();
+                        saveResult(pager.getCurrentItem(), Action.PAUSE);
                     }
                 })
                 .setNegativeButton(R.string.testpress_cancel, null)
@@ -405,7 +412,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         );
     }
 
-    private void saveResult(final int position, final boolean endExam) {
+    private void saveResult(final int position, final Action action) {
         final AttemptItem attemptItem = attemptItemList.get(position);
         if (attemptItem.hasChanged()) {
             apiClient.postAnswer(attemptItem.getUrlFrag(), attemptItem.getSavedAnswers(),
@@ -416,7 +423,10 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                             attemptItem.setSelectedAnswers(newAttemptItem.getSelectedAnswers());
                             attemptItem.setReview(newAttemptItem.getReview());
                             attemptItemList.set(position, attemptItem);
-                            if (endExam) {
+                            if (action.equals(Action.PAUSE)) {
+                                progressDialog.dismiss();
+                                returnToHistory();
+                            } else if (action.equals(Action.END)) {
                                 endExam();
                             } else {
                                 if (progressDialog.isShowing()) {
@@ -430,16 +440,24 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
                         @Override
                         public void onException(TestpressException exception) {
+                            if (action.equals(Action.PAUSE)) {
+                                progressDialog.dismiss();
+                                returnToHistory();
+                                return;
+                            }
                             countDownTimer.cancel();
                             TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception) {
                                 @Override
                                 protected void onRetry() {
-                                    saveResult(position, endExam);
+                                    saveResult(position, action);
                                 }
                             };
                             alertDialog.show();
                         }
                     });
+        } else if (action.equals(Action.PAUSE)) {
+            progressDialog.dismiss();
+            returnToHistory();
         }
     }
 
@@ -471,46 +489,73 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
-        if (!progressDialog.isShowing()) {
-            progressDialog.setMessage(getString(R.string.testpress_loading));
-            progressDialog.show();
-        }
+        showProgress();
         // Save attemptItem, if option or review is changed
         final AttemptItem attemptItem = attemptItemList.get(pager.getCurrentItem());
         if (attemptItem.hasChanged()) {
-           saveResult(pager.getCurrentItem(), true);
+           saveResult(pager.getCurrentItem(), Action.END);
             return;
         }
-        apiClient.endExam(attempt.getUrlFrag() + TestpressExamApiClient.END_EXAM_PATH)
-                .enqueue(new TestpressCallback<Attempt>() {
-                    @Override
-                    public void onSuccess(Attempt attempt) {
-                        if (progressDialog.isShowing()) {
-                            progressDialog.dismiss();
+        if (contentAttemptEndUrl != null) {
+            apiClient.endContentAttempt(contentAttemptEndUrl)
+                    .enqueue(new TestpressCallback<CourseAttempt>() {
+                        @Override
+                        public void onSuccess(CourseAttempt courseAttempt) {
+                            if (progressDialog.isShowing()) {
+                                progressDialog.dismiss();
+                            }
+                            returnToHistory();
                         }
-                        TestFragment.this.attempt = attempt;
-                        showReview();
-                    }
 
-                    @Override
-                    public void onException(TestpressException exception) {
-                        TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception);
-                        if (exception.isNetworkError()) {
-                            alertDialog.setMessage(R.string.testpress_exam_paused_check_internet_to_end);
-                            alertDialog.setPositiveButton(R.string.testpress_end,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            progressDialog.setMessage(getString(
-                                                    R.string.testpress_loading));
-                                            progressDialog.show();
-                                            endExam();
-                                        }
-                                    });
+                        @Override
+                        public void onException(TestpressException exception) {
+                            TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception);
+                            if (exception.isNetworkError()) {
+                                alertDialog.setMessage(R.string.testpress_exam_paused_check_internet_to_end);
+                                alertDialog.setPositiveButton(R.string.testpress_end,
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                showProgress();
+                                                endExam();
+                                            }
+                                        });
+                            }
+                            alertDialog.show();
                         }
-                        alertDialog.show();
-                    }
-                });
+                    });
+        } else {
+            apiClient.endExam(attempt.getEndUrlFrag())
+                    .enqueue(new TestpressCallback<Attempt>() {
+                        @Override
+                        public void onSuccess(Attempt attempt) {
+                            if (progressDialog.isShowing()) {
+                                progressDialog.dismiss();
+                            }
+                            TestFragment.this.attempt = attempt;
+                            showReview();
+                        }
+
+                        @Override
+                        public void onException(TestpressException exception) {
+                            TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception);
+                            if (exception.isNetworkError()) {
+                                alertDialog.setMessage(R.string.testpress_exam_paused_check_internet_to_end);
+                                alertDialog.setPositiveButton(R.string.testpress_end,
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                progressDialog.setMessage(getString(
+                                                        R.string.testpress_loading));
+                                                progressDialog.show();
+                                                endExam();
+                                            }
+                                        });
+                            }
+                            alertDialog.show();
+                        }
+                    });
+        }
     }
 
     @SuppressLint("DefaultLocale")
@@ -536,7 +581,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
     private void onExpandPanel() {
         if (attemptItemList.get(pager.getCurrentItem()).hasChanged()) {
-            saveResult(pager.getCurrentItem(), false);
+            saveResult(pager.getCurrentItem(), Action.UPDATE_ANSWER);
         }
         previous.setVisibility(View.INVISIBLE);
         next.setVisibility(View.INVISIBLE);
@@ -659,5 +704,12 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         }
 
         protected void onRetry() {}
+    }
+
+    private void showProgress() {
+        if (!progressDialog.isShowing()) {
+            progressDialog.setMessage(getString(R.string.testpress_please_wait));
+            progressDialog.show();
+        }
     }
 }

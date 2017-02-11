@@ -92,6 +92,53 @@
                     android:text="0:28:05"/>
             </LinearLayout>
 
+            <LinearLayout style="@style/TestpressReviewStatRow">
+
+                <TextView
+                    style="@style/TestpressReviewStatSubHeading"
+                    android:text="@string/testpress_speed" />
+
+                <LinearLayout
+                    style="@style/TestpressReviewStatValue">
+
+                    <TextView
+                        style="@style/TestpressReviewStatValue"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/speed"
+                        android:text="1115"/>
+
+                    <TextView
+                        style="@style/TestpressReviewStatValue.Unit"
+                        android:text="Q/Hr"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout style="@style/TestpressReviewStatRow">
+
+                <TextView
+                    style="@style/TestpressReviewStatSubHeading"
+                    android:text="@string/testpress_accuracy" />
+
+                <LinearLayout
+                    style="@style/TestpressReviewStatValue">
+
+                    <TextView
+                        style="@style/TestpressReviewStatValue"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/accuracy"
+                        android:text="13"/>
+
+                    <TextView
+                        style="@style/TestpressReviewStatValue.Unit"
+                        android:textSize="14sp"
+                        android:text="%"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/percentile_layout"
                 android:orientation="vertical"

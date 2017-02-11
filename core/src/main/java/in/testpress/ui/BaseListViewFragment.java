@@ -342,6 +342,10 @@ public abstract class BaseListViewFragment<E> extends Fragment
         return this;
     }
 
+    protected boolean isItemsEmpty() {
+        return items.isEmpty();
+    }
+
     /**
      * Set list shown or show progress bar
      *
@@ -354,7 +358,7 @@ public abstract class BaseListViewFragment<E> extends Fragment
         }
         listShown = shown;
         if (shown) {
-            if (items.isEmpty()) {
+            if (isItemsEmpty()) {
                 show(emptyView);
             } else {
                 hide(emptyView).show(listView);
@@ -408,7 +412,9 @@ public abstract class BaseListViewFragment<E> extends Fragment
      */
     protected BaseListViewFragment<E> setEmptyText(final int title, final int description, final int left) {
         if (emptyView != null) {
-            swipeRefreshLayout.setEnabled(false);
+            if (isItemsEmpty()) {
+                swipeRefreshLayout.setEnabled(false);
+            }
             emptyTitleView.setText(title);
             emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0);
             emptyDescView.setText(description);

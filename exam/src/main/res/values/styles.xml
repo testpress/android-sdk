@@ -92,6 +92,18 @@
         <item name="android:textSize">@dimen/testpress_text_size_xlarge</item>
     </style>
 
+    <style name="TestpressReviewStatValue.Unit">
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">@dimen/testpress_text_size_small</item>
+    </style>
+
+    <style name="TestpressReviewStatValue.Unit.Tab">
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">@dimen/testpress_text_size_medium</item>
+    </style>
+
     <style name="TestpressTheme.NoToolBar">
         <item name="colorControlNormal">#808080</item>
     </style>

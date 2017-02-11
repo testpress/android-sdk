@@ -3,43 +3,61 @@ package in.testpress.course.ui;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
+import org.greenrobot.greendao.AbstractDao;
+
 import java.util.List;
 
 import in.testpress.core.TestpressException;
 import in.testpress.course.R;
-import in.testpress.course.models.Course;
+import in.testpress.course.TestpressCourse;
+import in.testpress.course.models.greendao.Course;
+import in.testpress.course.models.greendao.CourseDao;
 import in.testpress.course.network.CoursePager;
 import in.testpress.course.network.TestpressCourseApiClient;
-import in.testpress.ui.PagedItemFragment;
+import in.testpress.network.BaseResourcePager;
+import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
 
-public class CourseListFragment extends PagedItemFragment<Course> {
+public class CourseListFragment extends BaseDataBaseFragment<Course, Long> {
 
     private TestpressCourseApiClient mApiClient;
+    private CourseDao courseDao;
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
                 .replace(containerViewId, new CourseListFragment())
-                .commit();
+                .commitAllowingStateLoss();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mApiClient = new TestpressCourseApiClient(getActivity());
+        courseDao = TestpressCourse.getCourseDao(getActivity());
     }
 
     @Override
     protected CoursePager getPager() {
         if (pager == null) {
             pager = new CoursePager(mApiClient);
+            if (courseDao.count() > 0) {
+                Course latest = courseDao.queryBuilder()
+                        .orderDesc(CourseDao.Properties.ModifiedDate)
+                        .list().get(0);
+                ((CoursePager) pager).setLatestModifiedDate(latest.getModified());
+            }
         }
         return (CoursePager)pager;
     }
 
     @Override
+    protected AbstractDao<Course, Long> getDao() {
+        return courseDao;
+    }
+
+    @Override
     protected SingleTypeAdapter<Course> createAdapter(List<Course> items) {
-        return new CourseListAdapter(getActivity(), items, R.layout.testpress_course_list_item);
+        return new CourseListAdapter(getActivity(), courseDao);
     }
 
     @Override

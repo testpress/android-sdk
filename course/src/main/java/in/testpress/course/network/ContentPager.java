@@ -25,7 +25,6 @@ public class ContentPager extends BaseResourcePager<Content> {
     @Override
     public Response<TestpressApiResponse<Content>> getItems(int page, int size) throws IOException {
         queryParams.put(TestpressCourseApiClient.PAGE, page);
-        queryParams.put("content_type", "html");
         return apiClient.getContents(contentsUrlFrag, queryParams).execute();
     }
 

@@ -7,8 +7,12 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 
+import junit.framework.Assert;
+
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
+import in.testpress.exam.models.CourseContent;
+import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.ui.CarouselFragment;
 import in.testpress.exam.ui.CategoriesGridFragment;
 import in.testpress.exam.ui.CategoryGridActivity;
@@ -138,11 +142,11 @@ public class TestpressExam {
      * <p>             new TestpressCallback/<TestpressSession>() {
      * <p>             @Override
      * <p>             public void onSuccess(TestpressSession testpressSession) {
-     * <p>                 <b>TestpressExam.startExam(this, testpressSession);</b>
+     * <p>                 <b>TestpressExam.startExam(this, "my-slug", testpressSession);</b>
      * <p>             }
      * <p> });
      *
-     * @param activity Context to start the new activity.
+     * @param activity activity from which exam need to start.
      * @param examSlug Slug of the exam which need to be start.
      * @param testpressSession TestpressSession got from the core module.
      */
@@ -161,12 +165,124 @@ public class TestpressExam {
         activity.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
     }
 
+    /**
+     * Use to start a particular exam in a course.
+     *
+     * <p> Usage example:
+     *
+     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
+     * <p>             new TestpressCallback/<TestpressSession>() {
+     * <p>             @Override
+     * <p>             public void onSuccess(TestpressSession testpressSession) {
+     * <p>                 <b>TestpressExam.startCourseExam(this, courseContent, false,
+     * <p>                            testpressSession);</b>
+     * <p>             }
+     * <p> });
+     *
+     * @param activity activity from which exam need to start.
+     * @param courseContent Course content which has the exam need to be start.
+     * @param discardExamDetails True to discard the start exam screen which contains exam details,
+     *                           False to show.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    public static void startCourseExam(@NonNull Activity activity,
+                                       @NonNull CourseContent courseContent,
+                                       boolean discardExamDetails,
+                                       @NonNull TestpressSession testpressSession) {
+
+        handleCourseAttempt(activity, courseContent, null, discardExamDetails, testpressSession,
+                false);
+    }
+
+    /**
+     * Use to resume a particular attempt in a course.
+     *
+     * <p> Usage example:
+     *
+     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
+     * <p>             new TestpressCallback/<TestpressSession>() {
+     * <p>             @Override
+     * <p>             public void onSuccess(TestpressSession testpressSession) {
+     * <p>                 <b>TestpressExam.resumeCourseAttempt(this, courseContent, courseAttempt,
+     * <p>                            false, testpressSession);</b>
+     * <p>             }
+     * <p> });
+     *
+     * @param activity activity from which exam need to start.
+     * @param courseContent Course content which has the attempt's exam.
+     * @param courseAttempt courseAttempt which need to be resume.
+     * @param discardExamDetails True to discard the start exam screen which contains exam details,
+     *                           False to show.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    public static void resumeCourseAttempt(@NonNull Activity activity,
+                                           @NonNull CourseContent courseContent,
+                                           @NonNull CourseAttempt courseAttempt,
+                                           boolean discardExamDetails,
+                                           @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("PARAM_COURSE_ATTEMPT must not be null.", courseAttempt);
+        handleCourseAttempt(activity, courseContent, courseAttempt, discardExamDetails,
+                testpressSession, false);
+    }
+
+    /**
+     * Use to end a particular attempt in a course.
+     *
+     * <p> Usage example:
+     *
+     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
+     * <p>             new TestpressCallback/<TestpressSession>() {
+     * <p>             @Override
+     * <p>             public void onSuccess(TestpressSession testpressSession) {
+     * <p>                 <b>TestpressExam.endCourseAttempt(this, courseContent, courseAttempt,
+     * <p>                            testpressSession);</b>
+     * <p>             }
+     * <p> });
+     *
+     * @param activity activity from which exam need to start.
+     * @param courseContent Course content which has the attempt's exam.
+     * @param courseAttempt courseAttempt which need to be resume.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    @SuppressWarnings("ConstantConditions")
+    public static void endCourseAttempt(@NonNull Activity activity,
+                                        @NonNull CourseContent courseContent,
+                                        @NonNull CourseAttempt courseAttempt,
+                                        @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("PARAM_COURSE_ATTEMPT must not be null.", courseAttempt);
+        handleCourseAttempt(activity, courseContent, courseAttempt, true, testpressSession, true);
+    }
+
     private static void init(Context context, TestpressSession testpressSession) {
         if (testpressSession == null) {
             throw new IllegalArgumentException("TestpressSession must not be null.");
         }
         TestpressSdk.setTestpressSession(context, testpressSession);
         ImageUtils.initImageLoader(context);
+    }
+
+    private static void handleCourseAttempt(@NonNull Activity activity,
+                                            @NonNull CourseContent courseContent,
+                                            CourseAttempt courseAttempt,
+                                            boolean discardExamDetails,
+                                            @NonNull TestpressSession testpressSession,
+                                            boolean endExam) {
+
+        Assert.assertNotNull("Activity must not be null.", activity);
+        Assert.assertNotNull("PARAM_COURSE_CONTENT must not be null.", courseContent);
+        init(activity, testpressSession);
+        Intent intent = new Intent(activity, TestActivity.class);
+        intent.putExtra(TestActivity.PARAM_COURSE_CONTENT, courseContent);
+        if (courseAttempt != null) {
+            intent.putExtra(TestActivity.PARAM_COURSE_ATTEMPT, courseAttempt);
+        }
+        intent.putExtra(TestActivity.PARAM_DISCARD_EXAM_DETAILS, discardExamDetails);
+        if (endExam) {
+            intent.putExtra(TestActivity.PARAM_ACTION, TestActivity.PARAM_VALUE_ACTION_END);
+        }
+        activity.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
     }
 
 }

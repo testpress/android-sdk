@@ -29,6 +29,8 @@ public class Attempt implements Parcelable {
     private String timeTaken;
     private String state;
     private String percentile;
+    private Integer speed;
+    private Integer accuracy;
 
     // Parcelling part
     public Attempt(Parcel parcel){
@@ -47,6 +49,8 @@ public class Attempt implements Parcelable {
         timeTaken = parcel.readString();
         state = parcel.readString();
         percentile = parcel.readString();
+        speed = parcel.readInt();
+        accuracy = parcel.readInt();
     }
 
     @Override
@@ -71,6 +75,8 @@ public class Attempt implements Parcelable {
         parcel.writeString(timeTaken);
         parcel.writeString(state);
         parcel.writeString(percentile);
+        parcel.writeInt(speed);
+        parcel.writeInt(accuracy);
     }
 
     public static final Creator CREATOR = new Creator() {
@@ -158,6 +164,27 @@ public class Attempt implements Parcelable {
             date = simpleDateFormat.parse(inputString);
             DateFormat dateformat = DateFormat.getDateInstance();
             return dateformat.format(date);
+        } catch (ParseException e) {
+        }
+        return null;
+    }
+
+    public String getShortDate() {
+        return formatShortDate(date);
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    public String formatShortDate(String inputString) {
+        Date date = null;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            date = simpleDateFormat.parse(inputString);
+            simpleDateFormat = new SimpleDateFormat("dd MMM");
+            String dateMonth = simpleDateFormat.format(date);
+            simpleDateFormat = new SimpleDateFormat("yy");
+            String year = simpleDateFormat.format(date);
+            return dateMonth + " '" + year ;
         } catch (ParseException e) {
         }
         return null;
@@ -406,4 +433,19 @@ public class Attempt implements Parcelable {
         this.percentile = percentile;
     }
 
+    public Integer getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(Integer speed) {
+        this.speed = speed;
+    }
+
+    public Integer getAccuracy() {
+        return accuracy;
+    }
+
+    public void setAccuracy(Integer accuracy) {
+        this.accuracy = accuracy;
+    }
 }
