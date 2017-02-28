@@ -1,85 +1,158 @@
 package in.testpress.exam.ui;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.widget.ListView;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import junit.framework.Assert;
 
 import java.util.List;
 
-import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
-import in.testpress.exam.models.Attempt;
-import in.testpress.exam.models.ReviewItem;
-import in.testpress.exam.network.ReviewQuestionsPager;
-import in.testpress.exam.network.TestpressExamApiClient;
-import in.testpress.ui.PagedItemFragment;
-import in.testpress.util.SingleTypeAdapter;
+import in.testpress.exam.TestpressExam;
+import in.testpress.exam.models.greendao.ReviewAnswer;
+import in.testpress.exam.models.greendao.ReviewItem;
+import in.testpress.exam.models.greendao.ReviewItemDao;
+import in.testpress.exam.models.greendao.ReviewQuestion;
+import in.testpress.util.UIUtils;
+import in.testpress.util.WebViewUtils;
 
-public class ReviewQuestionsFragment extends PagedItemFragment<ReviewItem> {
+public class ReviewQuestionsFragment extends Fragment {
 
-    public static final String PARAM_ATTEMPT = "attempt";
-    public static final String PARAM_FILTER = "filter";
-    private Attempt attempt;
-    private String filter;
+    static final String PARAM_REVIEW_ITEM_ID = "reviewItemId";
+    private ReviewItem reviewItem;
+    private View emptyView;
+    private TextView emptyTitleView;
+    private TextView emptyDescView;
+    private Button retryButton;
+    private ProgressBar progressBar;
 
-    public static ReviewQuestionsFragment getInstance(Attempt attempt, String filter) {
-        ReviewQuestionsFragment fragment = new ReviewQuestionsFragment();
+    public static ReviewQuestionsFragment getInstance(long reviewItemId) {
+        ReviewQuestionsFragment reviewQuestionsFragment = new ReviewQuestionsFragment();
         Bundle bundle = new Bundle();
-        bundle.putString(PARAM_FILTER, filter);
-        bundle.putParcelable(PARAM_ATTEMPT, attempt);
-        fragment.setArguments(bundle);
-        return fragment;
+        bundle.putLong(ReviewQuestionsFragment.PARAM_REVIEW_ITEM_ID, reviewItemId);
+        reviewQuestionsFragment.setArguments(bundle);
+        return reviewQuestionsFragment;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        attempt = getArguments().getParcelable(PARAM_ATTEMPT);
-        filter = getArguments().getString(PARAM_FILTER);
+    public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    protected void configureList(Activity activity, ListView listView) {
-        super.configureList(activity, listView);
-        listView.setDividerHeight(0);
-    }
-
-    @Override
-    protected ReviewQuestionsPager getPager() {
-        if (pager == null) {
-            pager = new ReviewQuestionsPager(attempt.getReviewFrag(), filter,
-                    new TestpressExamApiClient(getActivity()));
-        }
-        return (ReviewQuestionsPager) pager;
-    }
-
-    @Override
-    protected SingleTypeAdapter<ReviewItem> createAdapter(List<ReviewItem> items) {
-        return new ReviewListAdapter(R.layout.testpress_review_question,
-                getActivity().getLayoutInflater(), items, getActivity());
-    }
-
-    @Override
-    protected int getErrorMessage(TestpressException exception) {
-        if (exception.isUnauthenticated()) {
-            setEmptyText(R.string.testpress_authentication_failed, R.string.testpress_please_login,
-                    R.drawable.ic_error_outline_black_18dp);
-            return R.string.testpress_authentication_failed;
-        } else  if (exception.isNetworkError()) {
-            setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again,
-                    R.drawable.ic_error_outline_black_18dp);
-            return R.string.testpress_no_internet_try_again;
+        long reviewItemId = getArguments().getLong(PARAM_REVIEW_ITEM_ID);
+        Assert.assertNotNull("PARAM_REVIEW_ITEM_ID must not be null", reviewItemId);
+        ReviewItemDao reviewItemDao= TestpressExam.getReviewItemDao(getContext());
+        List<ReviewItem> reviewItems = reviewItemDao.queryBuilder()
+                .where(ReviewItemDao.Properties.Id.eq(reviewItemId)).list();
+        if (!reviewItems.isEmpty()) {
+            reviewItem = reviewItems.get(0);
         } else {
             setEmptyText(R.string.testpress_error_loading_questions,
-                    R.string.testpress_some_thing_went_wrong_try_again,
-                    R.drawable.ic_error_outline_black_18dp);
+                    R.string.testpress_some_thing_went_wrong_try_again);
         }
-        return R.string.testpress_some_thing_went_wrong_try_again;
     }
 
     @Override
-    protected void setEmptyText() {
-        setEmptyText(R.string.testpress_no_questions, R.string.testpress_no_questions_to_review,
-                R.drawable.ic_error_outline_black_18dp);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.testpress_fragment_review_question, container, false);
+        progressBar = (ProgressBar) view.findViewById(R.id.pb_loading);
+        emptyView = view.findViewById(R.id.empty_container);
+        emptyTitleView = (TextView) view.findViewById(R.id.empty_title);
+        emptyDescView = (TextView) view.findViewById(R.id.empty_description);
+        retryButton = (Button) view.findViewById(R.id.retry_button);
+        UIUtils.setIndeterminateDrawable(getContext(), progressBar, 4);
+        WebView webView = (WebView) view.findViewById(R.id.web_view);
+        WebViewUtils webViewUtils = new WebViewUtils(webView) {
+            @Override
+            protected void onLoadFinished() {
+                super.onLoadFinished();
+                progressBar.setVisibility(View.GONE);
+            }
+        };
+        webViewUtils.initWebView(getHtml(), getActivity());
+        return view;
     }
+
+    /**
+     * Convert review item to HTML
+     *
+     * @return HTML as String
+     */
+    private String getHtml() {
+        String html = "<div style='padding-left: 5px; padding-right: 5px;'>";
+
+        // Add index
+        html += "<div>" +
+                "<div class='review-question-index'>" +
+                reviewItem.getIndex() +
+                "</div>";
+        ReviewQuestion reviewQuestion = reviewItem.getQuestion();
+
+        // Add direction/passage
+        String directionHtml = reviewQuestion.getDirection();
+        if (directionHtml != null && !directionHtml.isEmpty()) {
+            html += "<div class='review-question' style='padding-bottom: 0px;'>" +
+                        directionHtml +
+                    "</div>";
+        }
+
+        // Add question
+        html += "<div class='review-question'>" +
+                reviewQuestion.getQuestionHtml() +
+                "</div>";
+
+        // Add options
+        List<ReviewAnswer> reviewAnswers = reviewQuestion.getAnswers();
+        String correctAnswerHtml = "";
+        for (int j = 0; j < reviewAnswers.size(); j++) {
+            ReviewAnswer attemptAnswer = reviewAnswers.get(j);
+            int optionColor;
+            if (reviewItem.getSelectedAnswers().contains(attemptAnswer.getId().intValue())) {
+                if (attemptAnswer.getIsCorrect()) {
+                    optionColor = R.color.testpress_green;
+                } else {
+                    optionColor = R.color.testpress_red;
+                }
+            } else {
+                optionColor = android.R.color.white;
+            }
+            html += "\n" + WebViewUtils.getOptionWithTags(attemptAnswer.getTextHtml(), j,
+                    optionColor, getContext());
+            if (attemptAnswer.getIsCorrect()) {
+                correctAnswerHtml += "\n" + WebViewUtils.getCorrectAnswerIndexWithTags(j);
+            }
+        }
+
+        // Add correct answer
+        html += "<div style='display:block;'>" +
+                    WebViewUtils.getHeadingTags(getString(R.string.testpress_correct_answer)) +
+                    correctAnswerHtml +
+                "</div>";
+
+        // Add explanation
+        String explanationHtml = reviewQuestion.getExplanationHtml();
+        if (explanationHtml != null && !explanationHtml.isEmpty()) {
+            html += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation));
+            html += "<div class='review-explanation'>" +
+                        explanationHtml +
+                    "</div>";
+        }
+        return html + "</div>";
+    }
+
+    protected void setEmptyText(final int title, final int description) {
+        emptyView.setVisibility(View.VISIBLE);
+        emptyTitleView.setText(title);
+        emptyDescView.setText(description);
+        retryButton.setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
+    }
+
 }

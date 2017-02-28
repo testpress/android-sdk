@@ -97,6 +97,7 @@
     <string name="testpress_show_passage">Show Passage</string>
     <string name="testpress_hide_passage">Hide Passage</string>
 
+    <string name="testpress_test_report">Test Report</string>
     <string name="testpress_rank">Rank</string>
     <string name="testpress_score">Score</string>
     <string name="testpress_total_correct">Total correct</string>
@@ -105,8 +106,8 @@
     <string name="testpress_time_taken">Time Taken</string>
     <string name="testpress_speed">Speed</string>
     <string name="testpress_accuracy">Accuracy</string>
-    <string name="testpress_correct_answer">Correct Answer</string>
-    <string name="testpress_explanation">Explanation</string>
+    <string name="testpress_correct_answer">Correct Answer:</string>
+    <string name="testpress_explanation">Explanation:</string>
     <string name="testpress_review_label">Review</string>
     <string name="testpress_resume_label">Resume</string>
     <string name="testpress_your_percentile_is">Your percentile is</string>
@@ -123,5 +124,8 @@
 
     <string name="testpress_date">Date</string>
     <string name="testpress_action">Action</string>
+
+    <string name="testpress_filter">Filter</string>
+    <string name="testpress_solutions">Solutions</string>
 
 </resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/filter"
+        android:visible="false"
+        app:actionLayout="@layout/testpress_filter_menu_view"
+        app:showAsAction="always"
+        android:title="@string/testpress_filter" />
+
+</menu>

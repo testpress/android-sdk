@@ -23,6 +23,7 @@ public final class TestpressSdk {
     private static final String KEY_TESTPRESS_SHARED_PREFS = "testpressSharedPreferences";
     private static final String KEY_USER_ID = "userId";
     private static final String KEY_COURSE_DATABASE_SESSION = "courseDatabaseSession";
+    private static final String KEY_EXAM_DATABASE_SESSION = "examDatabaseSession";
     public static final String TESTPRESS_SDK_DATABASE = "testpressSdkDB";
     private static final String RUBIK_REGULAR_FONT_PATH = "Rubik-Regular.ttf";
     private static final String RUBIK_MEDIUM_FONT_PATH = "Rubik-Medium.ttf";
@@ -98,6 +99,34 @@ public final class TestpressSdk {
         String existingDBSessionToken = getTestpressCourseDBSession(context);
         return existingDBSessionToken == null ||
                 !sessionToken.equals(existingDBSessionToken);
+    }
+
+    public static void setTestpressExamDBSession(@NonNull Context context,
+                                                 @NonNull String sessionToken) {
+        //noinspection ConstantConditions
+        if (sessionToken == null || sessionToken.isEmpty()) {
+            throw new IllegalArgumentException("SessionToken must not be null or Empty.");
+        }
+        SharedPreferences.Editor editor = getPreferenceEditor(context);
+        editor.putString(KEY_EXAM_DATABASE_SESSION, sessionToken);
+        editor.apply();
+    }
+
+    @Nullable
+    private static String getTestpressExamDBSession(@NonNull Context context) {
+        SharedPreferences pref = getPreferences(context);
+        return pref.getString(KEY_EXAM_DATABASE_SESSION, null);
+    }
+
+    public static boolean isNewExamDBSession(@NonNull Context context,
+                                             @NonNull String sessionToken) {
+        //noinspection ConstantConditions
+        if (sessionToken == null || sessionToken.isEmpty()) {
+            throw new IllegalArgumentException("SessionToken must not be null or Empty.");
+        }
+        String existingDatabaseSessionToken = getTestpressExamDBSession(context);
+        return existingDatabaseSessionToken == null ||
+                !sessionToken.equals(existingDatabaseSessionToken);
     }
 
     /**

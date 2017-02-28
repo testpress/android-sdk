@@ -7,12 +7,21 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 
+import org.greenrobot.greendao.database.Database;
+
 import junit.framework.Assert;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.models.CourseContent;
 import in.testpress.exam.models.CourseAttempt;
+import in.testpress.exam.models.greendao.DaoMaster;
+import in.testpress.exam.models.greendao.DaoSession;
+import in.testpress.exam.models.greendao.ReviewAnswerDao;
+import in.testpress.exam.models.greendao.ReviewAttemptDao;
+import in.testpress.exam.models.greendao.ReviewItemDao;
+import in.testpress.exam.models.greendao.ReviewQuestionDao;
+import in.testpress.exam.models.greendao.SelectedAnswerDao;
 import in.testpress.exam.ui.CarouselFragment;
 import in.testpress.exam.ui.CategoriesGridFragment;
 import in.testpress.exam.ui.CategoryGridActivity;
@@ -23,6 +32,8 @@ import in.testpress.util.ImageUtils;
 public class TestpressExam {
 
     public static final String ACTION_PRESSED_HOME = "pressedHome";
+    private static DaoSession daoSession;
+    private static Database database;
 
     /**
      * Use when testpress exam need to be open in a container as a fragment.
@@ -255,14 +266,6 @@ public class TestpressExam {
         handleCourseAttempt(activity, courseContent, courseAttempt, true, testpressSession, true);
     }
 
-    private static void init(Context context, TestpressSession testpressSession) {
-        if (testpressSession == null) {
-            throw new IllegalArgumentException("TestpressSession must not be null.");
-        }
-        TestpressSdk.setTestpressSession(context, testpressSession);
-        ImageUtils.initImageLoader(context);
-    }
-
     private static void handleCourseAttempt(@NonNull Activity activity,
                                             @NonNull CourseContent courseContent,
                                             CourseAttempt courseAttempt,
@@ -285,4 +288,51 @@ public class TestpressExam {
         activity.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
     }
 
+    private static void init(Context context, TestpressSession testpressSession) {
+        if (testpressSession == null) {
+            throw new IllegalArgumentException("TestpressSession must not be null.");
+        }
+        TestpressSdk.setTestpressSession(context, testpressSession);
+        ImageUtils.initImageLoader(context);
+        initDatabase(context, testpressSession.getToken());
+    }
+
+    private static void initDatabase(Context context, String sessionToken) {
+        daoSession = getDaoSession(context);
+        if (TestpressSdk.isNewExamDBSession(context, sessionToken)) {
+            DaoMaster.dropAllTables(database, true);
+            DaoMaster.createAllTables(database, true);
+            TestpressSdk.setTestpressExamDBSession(context, sessionToken);
+        }
+    }
+
+    private static DaoSession getDaoSession(Context context) {
+        if (daoSession == null) {
+            DaoMaster.DevOpenHelper helper =
+                    new DaoMaster.DevOpenHelper(context.getApplicationContext(), "testpress-db");
+            database = helper.getWritableDb();
+            daoSession = new DaoMaster(database).newSession();
+        }
+        return daoSession;
+    }
+
+    public static ReviewAttemptDao getReviewAttemptDao(Context context) {
+        return getDaoSession(context).getReviewAttemptDao();
+    }
+
+    public static ReviewItemDao getReviewItemDao(Context context) {
+        return getDaoSession(context).getReviewItemDao();
+    }
+
+    public static ReviewQuestionDao getReviewQuestionDao(Context context) {
+        return getDaoSession(context).getReviewQuestionDao();
+    }
+
+    public static ReviewAnswerDao getReviewAnswerDao(Context context) {
+        return getDaoSession(context).getReviewAnswerDao();
+    }
+
+    public static SelectedAnswerDao getSelectedAnswerDao(Context context) {
+        return getDaoSession(context).getSelectedAnswerDao();
+    }
 }

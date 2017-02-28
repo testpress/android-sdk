@@ -40,11 +40,10 @@ import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.TestQuestionsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.ui.view.NonSwipeableViewPager;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
-
-import static in.testpress.exam.ui.TestActivity.PARAM_DISCARD_EXAM_DETAILS;
 
 public class TestFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>> {
 
@@ -59,7 +58,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private TextView timer;
     private Spinner questionsFilter;
     private Spinner subjectFilter;
-    private ViewPager pager;
+    private NonSwipeableViewPager pager;
     private RelativeLayout spinnerContainer;
     private TestQuestionPagerAdapter pagerAdapter;
     private List<AttemptItem> filterItems = new ArrayList<>();
@@ -103,7 +102,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         timer = (TextView) view.findViewById(R.id.timer);
         questionsFilter = (Spinner) view.findViewById(R.id.questions_filter);
         subjectFilter = (Spinner) view.findViewById(R.id.subject_filter);
-        pager = (ViewPager) view.findViewById(R.id.pager);
+        pager = (NonSwipeableViewPager) view.findViewById(R.id.pager);
         slidingPaneLayout = (SlidingPaneLayout) view.findViewById(R.id.sliding_layout);
         spinnerContainer = (RelativeLayout) view.findViewById(R.id.spinner_container);
         apiClient = new TestpressExamApiClient(getActivity());
@@ -126,8 +125,24 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
             @Override
             public void onPanelClosed(View panel) {
+                pager.setSwipeEnabled(true);
                 previous.setVisibility(View.VISIBLE);
                 next.setVisibility(View.VISIBLE);
+            }
+        });
+        pager.setSwipeEnabled(true);
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                goToQuestion(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
             }
         });
         view.findViewById(R.id.question_list).setOnClickListener(new View.OnClickListener() {
@@ -407,7 +422,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
     private void showReview() {
         getActivity().startActivityForResult(
-                ReviewActivity.createIntent(getActivity(), exam, attempt),
+                ReviewStatsActivity.createIntent(getActivity(), exam, attempt),
                 CarouselFragment.TEST_TAKEN_REQUEST_CODE
         );
     }
@@ -583,6 +598,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         if (attemptItemList.get(pager.getCurrentItem()).hasChanged()) {
             saveResult(pager.getCurrentItem(), Action.UPDATE_ANSWER);
         }
+        pager.setSwipeEnabled(false);
         previous.setVisibility(View.INVISIBLE);
         next.setVisibility(View.INVISIBLE);
         updatePanel();

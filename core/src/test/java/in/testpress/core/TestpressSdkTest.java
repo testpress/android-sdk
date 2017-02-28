@@ -174,4 +174,52 @@ public class TestpressSdkTest {
         }
     }
 
+    @Test
+    public void testSetExamDB_withNullValues() throws Exception {
+        try {
+            TestpressSdk.setTestpressExamDBSession(null, "DummyToken");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Context must not be null.", e.getMessage());
+        }
+        try {
+            Context context = mock(Context.class);
+            TestpressSdk.setTestpressExamDBSession(context, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("SessionToken must not be null or Empty.", e.getMessage());
+        }
+        try {
+            Context context = mock(Context.class);
+            TestpressSdk.setTestpressExamDBSession(context, "");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("SessionToken must not be null or Empty.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testIsNewExamDBSession_withNullValues() throws Exception {
+        try {
+            TestpressSdk.isNewExamDBSession(null, "DummyToken");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Context must not be null.", e.getMessage());
+        }
+        try {
+            Context context = mock(Context.class);
+            TestpressSdk.isNewExamDBSession(context, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("SessionToken must not be null or Empty.", e.getMessage());
+        }
+        try {
+            Context context = mock(Context.class);
+            TestpressSdk.isNewExamDBSession(context, "");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("SessionToken must not be null or Empty.", e.getMessage());
+        }
+    }
+
 }

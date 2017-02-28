@@ -21,7 +21,7 @@ import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.CourseContent;
 import in.testpress.exam.network.TestpressExamApiClient;
-import in.testpress.exam.ui.ReviewActivity;
+import in.testpress.exam.ui.ReviewStatsActivity;
 import in.testpress.util.ViewUtils;
 
 class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
@@ -138,7 +138,7 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 holder.completedAttemptLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mActivity.startActivity(ReviewActivity.createIntent(mActivity,
+                        mActivity.startActivity(ReviewStatsActivity.createIntent(mActivity,
                                 mContent.getExam(), attempt));
                     }
                 });
