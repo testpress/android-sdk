@@ -45,7 +45,7 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
             @Override
             public void onClick(View v) {
                 if (exam.getAttemptsCount() == 1 && exam.getPausedAttemptsCount() == 0) {
-                    activity.startActivity(ReviewActivity.createIntent(activity, exam, null));
+                    activity.startActivity(ReviewStatsActivity.createIntent(activity, exam, null));
                 } else {
                     Intent intent = new Intent(activity, AttemptsListActivity.class);
                     intent.putExtra(AttemptsListFragment.PARAM_EXAM, exam);

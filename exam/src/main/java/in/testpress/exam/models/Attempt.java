@@ -12,6 +12,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import in.testpress.exam.models.greendao.ReviewAttempt;
+
 public class Attempt implements Parcelable {
 
     private String url;
@@ -262,15 +264,6 @@ public class Attempt implements Parcelable {
         return reviewUrl;
     }
 
-    public String getReviewFrag() {
-        try {
-            URL url = new URL(reviewUrl);
-            return url.getFile().substring(1);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     /**
      *
      * @param reviewUrl
@@ -448,4 +441,11 @@ public class Attempt implements Parcelable {
     public void setAccuracy(Integer accuracy) {
         this.accuracy = accuracy;
     }
+
+    public ReviewAttempt getReviewAttempt() {
+        return new ReviewAttempt(getId().longValue(), getTotalQuestions(), getScore(), getRank(),
+                getReviewUrl(), getCorrectCount(), getIncorrectCount(), getTimeTaken(),
+                getPercentile(), getSpeed(), getAccuracy());
+    }
+
 }

@@ -8,7 +8,7 @@ import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.Exam;
-import in.testpress.exam.models.ReviewItem;
+import in.testpress.exam.models.greendao.ReviewItem;
 import in.testpress.model.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import retrofit2.http.Body;
@@ -17,6 +17,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
+import retrofit2.http.Url;
 
 public interface ExamService {
 
@@ -78,9 +79,9 @@ public interface ExamService {
             @Path(value = "attempts_url", encoded = true) String attemptsUrlFrag,
             @QueryMap Map<String, Object> options);
 
-    @GET("/{review_url}")
+    @GET
     RetrofitCall<TestpressApiResponse<ReviewItem>> getReviewItems(
-            @Path(value = "review_url", encoded = true) String reviewUrlFrag,
+            @Url String reviewUrl,
             @QueryMap Map<String, Object> options);
 
     @GET(TestpressExamApiClient.CATEGORIES_PATH)

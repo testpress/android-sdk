@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        layout="@layout/testpress_toolbar"
+        android:id="@+id/appbar_layout" />
+
+    <include
+        layout="@layout/testpress_empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/appbar_layout" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/appbar_layout"
+        android:layout_above="@+id/button_layout"
+        android:visibility="gone"
+        android:id="@+id/question_layout" >
+
+        <in.testpress.exam.ui.view.SlidingPaneLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/sliding_layout" >
+
+            <ListView
+                android:id="@+id/questions_list_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:divider="#ccc"
+                android:dividerHeight="1dp"
+                android:background="#fff" />
+
+            <in.testpress.exam.ui.view.NonSwipeableViewPager
+                android:id="@+id/pager"
+                android:background="@color/testpress_white"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </in.testpress.exam.ui.view.SlidingPaneLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/testpress_gradient_shadow_gray_top" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/button_layout"
+        android:layout_alignParentBottom="true"
+        android:background="#FFF"
+        android:visibility="gone"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/previous"
+            android:background="@android:color/transparent"
+            android:text="@string/testpress_previous"
+            android:textColor="@color/testpress_text_gray"
+            android:gravity="center_vertical"
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp"
+            android:clickable="false"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:background="@color/testpress_gray_light" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/question_list_button"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/testpress_questions_list"
+            android:layout_gravity="center"
+            android:textStyle="bold"
+            android:textColor="#ffffff"
+            android:background="@color/testpress_color_primary"
+            android:gravity="center"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_margin="10dp" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:background="@color/testpress_gray_light" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/next"
+            android:background="@android:color/transparent"
+            android:text="@string/testpress_next"
+            android:textSize="14sp"
+            android:textColor="@color/testpress_text_gray"
+            android:gravity="center_vertical"
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:indeterminate="true"
+        android:layout_centerInParent="true" />
+
+</RelativeLayout>

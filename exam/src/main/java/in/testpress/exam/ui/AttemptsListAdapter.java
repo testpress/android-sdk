@@ -59,7 +59,7 @@ class AttemptsListAdapter extends SingleTypeAdapter<Attempt> {
                 () {
             @Override
             public void onClick(View v) {
-                activity.startActivity(ReviewActivity.createIntent(activity, exam, item));
+                activity.startActivity(ReviewStatsActivity.createIntent(activity, exam, item));
             }
         });
         Button endButton = (Button) updater.view.findViewById(R.id.end);
