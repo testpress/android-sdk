@@ -376,7 +376,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, testFragment).commitAllowingStateLoss();
             } else {
-                startActivityForResult(ReviewActivity.createIntent(this, exam, attempt),
+                startActivityForResult(ReviewStatsActivity.createIntent(this, exam, attempt),
                         CarouselFragment.TEST_TAKEN_REQUEST_CODE);
             }
         } else {

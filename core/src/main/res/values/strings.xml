@@ -17,4 +17,6 @@
     <string name="testpress_ok">OK</string>
     <string name="testpress_cancel">Cancel</string>
 
+    <string name="testpress_filter">Filter</string>
+
 </resources>

@@ -18,6 +18,16 @@
 
     <issue id="UnusedResources">
         <ignore regexp="res/.*/testpress_placeholder_icon.png" />
+        <ignore regexp="res/.*/testpress_cloud_off_black.png" />
+        <ignore regexp="res/.*/testpress_filter_icon.png" />
+        <ignore regexp="res/.*/testpress_tick_black.png" />
+        <ignore regexp="res/.*/testpress_filter.xml" />
+        <ignore regexp="res/.*/testpress_empty_view_with_image.xml" />
+        <ignore regexp="res/.*/testpress_filter_menu_view.xml" />
+        <ignore regexp="res/.*/testpress_gradient_shadow_gray_top.xml" />
+        <ignore regexp="res/.*/testpress_green_curved_edge_background.xml" />
+        <ignore regexp="res/.*/testpress_green_stroke.xml" />
+        <ignore regexp="res/.*/testpress_small_red_circle.xml" />
     </issue>
 
 </lint>

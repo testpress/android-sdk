@@ -18,6 +18,7 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 
 import in.testpress.R;
 import in.testpress.ui.view.TouchImageView;
+import in.testpress.util.ImageUtils;
 import in.testpress.util.UIUtils;
 
 public class ZoomableImageActivity extends Activity {
@@ -44,7 +45,7 @@ public class ZoomableImageActivity extends Activity {
                 .cacheOnDisk(true)
                 .resetViewBeforeLoading(true)
                 .build();
-        ImageLoader.getInstance().loadImage(getIntent().getStringExtra(IMAGE_URL), options,
+        ImageUtils.initImageLoader(this).loadImage(getIntent().getStringExtra(IMAGE_URL), options,
                 new SimpleImageLoadingListener() {
                     @Override
                     public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
