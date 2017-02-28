@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="@color/testpress_white"
+    android:id="@+id/empty_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="gone"
+    android:gravity="center_vertical" >
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:alpha="0.4"
+        android:src="@drawable/testpress_cloud_off_black"
+        android:id="@+id/imageView"
+        tools:ignore="UnusedAttribute" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        android:layout_marginTop="20dp"
+        android:id="@+id/empty_title"
+        android:text="Network Error"
+        android:textStyle="bold"
+        android:textColor="@color/testpress_black"
+        android:textSize="24sp"
+        android:gravity="center" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        android:paddingBottom="10dp"
+        android:id="@+id/empty_description"
+        android:textColor="#666666"
+        android:textSize="16sp"
+        android:lineSpacingExtra="2sp"
+        android:text="@string/testpress_no_internet_try_again"
+        android:gravity="center"/>
+
+    <android.support.v7.widget.AppCompatButton
+        style="@style/TestpressSmallButton"
+        android:text="@string/testpress_tap_to_retry"
+        android:id="@+id/retry_button"
+        android:textSize="12sp"
+        android:layout_gravity="center_horizontal" />
+
+</LinearLayout>

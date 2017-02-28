@@ -12,7 +12,7 @@ import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.Exam;
-import in.testpress.exam.models.ReviewItem;
+import in.testpress.exam.models.greendao.ReviewItem;
 import in.testpress.model.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
