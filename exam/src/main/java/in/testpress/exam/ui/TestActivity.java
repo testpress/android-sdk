@@ -69,6 +69,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private RelativeLayout progressBar;
     private View examDetailsContainer;
     private LinearLayout fragmentContainer;
+    private TextView webOnlyLabel;
     private View emptyView;
     private TextView emptyTitleView;
     private TextView emptyDescView;
@@ -81,6 +82,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         examDetailsContainer = findViewById(R.id.exam_details);
         fragmentContainer = (LinearLayout) findViewById(R.id.fragment_container);
         progressBar = (RelativeLayout) findViewById(R.id.pb_loading);
+        webOnlyLabel = (TextView) findViewById(R.id.web_only_label);
         emptyView = findViewById(R.id.empty_container);
         emptyTitleView = (TextView) findViewById(R.id.empty_title);
         emptyDescView = (TextView) findViewById(R.id.empty_description);
@@ -221,7 +223,9 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         if (courseAttempt != null) {
             attempt = courseAttempt.getAssessment();
         }
-        if (exam.getPausedAttemptsCount() > 0) {
+        if (exam.getDeviceAccessControl().equals("web")) {
+            webOnlyLabel.setVisibility(View.VISIBLE);
+        } else if (exam.getPausedAttemptsCount() > 0) {
             if (attempt == null) {
                 if (courseContent != null) {
                     contentAttemptsPager = new ContentAttemptsPager(

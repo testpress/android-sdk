@@ -133,27 +133,37 @@
         android:layout_width="match_parent"
         android:layout_marginTop="5dp"
         android:paddingBottom="15dp"
-        android:gravity="right"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:layout_marginBottom="5dp" >
 
-        <android.support.v7.widget.AppCompatButton
-            style="@style/TestpressSmallButton"
-            android:text="@string/testpress_resume"
-            android:id="@+id/resume_exam"
-            android:visibility="gone"/>
+        <include layout="@layout/testpress_web_only_exam_label" />
 
-        <android.support.v7.widget.AppCompatButton
-            style="@style/TestpressSmallButton"
-            android:text="@string/testpress_retake"
-            android:id="@+id/retake" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right" >
 
-        <android.support.v7.widget.AppCompatButton
-            style="@style/TestpressSmallButton"
-            android:text="@string/testpress_review"
-            android:id="@+id/review_attempt"
-            android:layout_marginLeft="15dp"
-            android:layout_marginStart="15dp" />
+            <android.support.v7.widget.AppCompatButton
+                style="@style/TestpressSmallButton"
+                android:text="@string/testpress_resume"
+                android:id="@+id/resume_exam"
+                android:visibility="gone"/>
+
+            <android.support.v7.widget.AppCompatButton
+                style="@style/TestpressSmallButton"
+                android:text="@string/testpress_retake"
+                android:id="@+id/retake" />
+
+            <android.support.v7.widget.AppCompatButton
+                style="@style/TestpressSmallButton"
+                android:text="@string/testpress_review"
+                android:id="@+id/review_attempt"
+                android:layout_marginLeft="15dp"
+                android:layout_marginStart="15dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

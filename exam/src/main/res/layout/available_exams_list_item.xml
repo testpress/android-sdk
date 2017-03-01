@@ -144,6 +144,12 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp">
 
+            <include
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                layout="@layout/testpress_web_only_exam_label" />
+
             <android.support.v7.widget.AppCompatButton
                 style="@style/TestpressSmallButton"
                 android:text="@string/testpress_email_mcqs"
