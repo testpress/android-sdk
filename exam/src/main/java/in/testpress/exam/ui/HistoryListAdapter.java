@@ -33,12 +33,11 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
     protected int[] getChildViewIds() {
         return new int[]{R.id.exam_title, R.id.exam_duration, R.id.number_of_questions,
                 R.id.exam_date, R.id.attempts_count, R.id.attempts_string, R.id.retake,
-                R.id.review_attempt, R.id.resume_exam};
+                R.id.review_attempt, R.id.resume_exam, R.id.web_only_label};
     }
 
     @Override
-    protected void update(final int position, final Exam item) {
-        final Exam exam = getItem(position);
+    protected void update(final int position, final Exam exam) {
         Button reviewButton = (Button) updater.view.findViewById(R.id.review_attempt);
         ViewUtils.setLeftDrawable(activity, reviewButton, R.drawable.ic_zoom_in_white_18dp);
         reviewButton.setOnClickListener(new View.OnClickListener() {
@@ -54,26 +53,55 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
             }
         });
         Button retakeButton = (Button) updater.view.findViewById(R.id.retake);
-        ViewUtils.setLeftDrawable(activity, retakeButton, R.drawable.ic_replay_white_18dp);
-        retakeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(activity, TestActivity.class);
-                intent.putExtra(TestActivity.PARAM_EXAM, exam);
-                fragment.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
-            }
-        });
         Button resumeButton = (Button) updater.view.findViewById(R.id.resume_exam);
-        ViewUtils.setLeftDrawable(activity, resumeButton, R.drawable.ic_repeat_white_18dp);
-        resumeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(activity, AttemptsListActivity.class);
-                intent.putExtra(AttemptsListFragment.PARAM_EXAM, exam);
-                intent.putExtra(AttemptsListFragment.PARAM_STATE, AttemptsListFragment.STATE_PAUSED);
-                fragment.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
+        // Display retake or resume button only if exam can be taken in mobile
+        if (exam.getDeviceAccessControl().equals("web")) {
+            setGone(9, false);
+            retakeButton.setVisibility(View.GONE);
+            resumeButton.setVisibility(View.GONE);
+        } else {
+            setGone(9, true);
+            // Validate retake button
+            if (!exam.getAllowRetake()) {
+                setGone(6, true);
+            } else if (exam.getMaxRetakes() > 0 &&
+                    exam.getAttemptsCount() >= exam.getMaxRetakes() + 1) {
+
+                setGone(6, true);
+            } else if (exam.getPausedAttemptsCount() > 0) {
+                setGone(6, true);
+            } else {
+                setGone(6, false);
+                ViewUtils.setLeftDrawable(activity, retakeButton, R.drawable.ic_replay_white_18dp);
+                retakeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(activity, TestActivity.class);
+                        intent.putExtra(TestActivity.PARAM_EXAM, exam);
+                        fragment.startActivityForResult(intent,
+                                CarouselFragment.TEST_TAKEN_REQUEST_CODE);
+                    }
+                });
             }
-        });
+            // Validate resume button
+            if (exam.getPausedAttemptsCount() <= 0) {
+                setGone(8, true);
+            } else {
+                setGone(8, false);
+                ViewUtils.setLeftDrawable(activity, resumeButton, R.drawable.ic_repeat_white_18dp);
+                resumeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(activity, AttemptsListActivity.class);
+                        intent.putExtra(AttemptsListFragment.PARAM_EXAM, exam);
+                        intent.putExtra(AttemptsListFragment.PARAM_STATE,
+                                AttemptsListFragment.STATE_PAUSED);
+                        fragment.startActivityForResult(intent,
+                                CarouselFragment.TEST_TAKEN_REQUEST_CODE);
+                    }
+                });
+            }
+        }
         setText(0, exam.getTitle());
         setText(1, exam.getDuration());
         setText(2, exam.getNumberOfQuestionsString());
@@ -82,19 +110,7 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
         setText(4, "" + exam.getAttemptsCount());
         setText(5, (exam.getAttemptsCount() > 1) ? getStringFromResource(activity,
                 R.string.testpress_attempts) : getStringFromResource(activity, R.string.testpress_attempt));
-
-        if (!exam.getAllowRetake()) {
-            setGone(6, true);
-        } else if (exam.getMaxRetakes() > 0 && exam.getAttemptsCount() >= exam.getMaxRetakes() + 1) {
-            setGone(6, true);
-        } else if (exam.getPausedAttemptsCount() > 0) {
-            setGone(6, true);
-        } else {
-            setGone(6, false);
-            setText(6, R.string.testpress_retake);
-        }
         setGone(7, !exam.getShowAnswers());
-        setGone(8, (exam.getPausedAttemptsCount() <= 0));
     }
 
 }

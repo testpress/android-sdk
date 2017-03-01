@@ -25,7 +25,7 @@ public class UpcomingExamsListAdapter extends SingleTypeAdapter<Exam> {
     @Override
     protected int[] getChildViewIds() {
         return new int[]{R.id.exam_title, R.id.exam_duration,
-                R.id.number_of_questions, R.id.exam_date};
+                R.id.number_of_questions, R.id.exam_date, R.id.web_only_label};
     }
 
     @Override
@@ -35,5 +35,10 @@ public class UpcomingExamsListAdapter extends SingleTypeAdapter<Exam> {
         setText(2, item.getNumberOfQuestionsString());
         setText(3, item.getFormattedStartDate() + " " + getStringFromResource(activity, R.string.testpress_to)
                 + " " + item.getFormattedEndDate());
+        if (item.getDeviceAccessControl().equals("web")) {
+            setGone(4, false);
+        } else {
+            setGone(4, true);
+        }
     }
 }

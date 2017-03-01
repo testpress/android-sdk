@@ -34,6 +34,7 @@ public class Exam implements Parcelable {
     private Boolean showAnswers;
     private Integer maxRetakes;
     private String attemptsUrl;
+    private String deviceAccessControl;
 
     // Parcelling part
     public Exam(Parcel parcel){
@@ -57,6 +58,7 @@ public class Exam implements Parcelable {
         showAnswers         = parcel.readByte() != 0;
         maxRetakes          = parcel.readInt();
         attemptsUrl         = parcel.readString();
+        deviceAccessControl = parcel.readString();
     }
 
     @Override
@@ -98,6 +100,7 @@ public class Exam implements Parcelable {
         }
         parcel.writeInt(maxRetakes);
         parcel.writeString(attemptsUrl);
+        parcel.writeString(deviceAccessControl);
     }
 
     public static final Creator CREATOR = new Creator() {
@@ -496,4 +499,11 @@ public class Exam implements Parcelable {
         this.attemptsUrl = startUrl;
     }
 
+    public String getDeviceAccessControl() {
+        return deviceAccessControl;
+    }
+
+    public void setDeviceAccessControl(String deviceAccessControl) {
+        this.deviceAccessControl = deviceAccessControl;
+    }
 }

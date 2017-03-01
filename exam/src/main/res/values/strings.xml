@@ -128,4 +128,7 @@
     <string name="testpress_filter">Filter</string>
     <string name="testpress_solutions">Solutions</string>
 
+    <string name="testpress_web_only_exam">Web Only Exam</string>
+    <string name="testpress_web_only_exam_description">This exam can only be taken on the website.</string>
+
 </resources>
