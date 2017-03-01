@@ -30,7 +30,8 @@ public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
     @Override
     protected int[] getChildViewIds() {
         return new int[]{R.id.exam_title, R.id.exam_duration, R.id.number_of_questions,
-                R.id.exam_date, R.id.course_category, R.id.course_category_layout};
+                R.id.exam_date, R.id.course_category, R.id.course_category_layout,
+                R.id.web_only_label};
     }
 
     @Override
@@ -40,8 +41,7 @@ public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
     }
 
     @Override
-    protected void update(final int position, final Exam item) {
-        final Exam exam = getItem(position);
+    protected void update(final int position, final Exam exam) {
         setText(0, exam.getTitle());
         setText(1, exam.getDuration());
         setText(2, exam.getNumberOfQuestionsString());
@@ -54,28 +54,46 @@ public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
             setText(4, exam.getCourse_category());
         }
         Button startExamButton = (Button)updater.view.findViewById(R.id.start_exam);
-        ViewUtils.setLeftDrawable(activity, startExamButton, R.drawable.ic_assignment_white_18dp);
-        startExamButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(activity, TestActivity.class);
-                intent.putExtra("exam", exam);
-                fragment.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
-            }
-        });
-        Button emailMcqs = (Button)updater.view.findViewById(R.id.email_mcqs);
-        ViewUtils.setLeftDrawable(activity, emailMcqs, R.drawable.ic_email_white_18dp);
-        emailMcqs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new EmailPdfDialog(activity, R.style.TestpressAppCompatAlertDialogStyle, false,
-                        exam.getUrlFrag()).show();
-            }
-        });
-        if (exam.getAllowPdf()) {
-            emailMcqs.setVisibility(View.VISIBLE);
+        Button emailMcqButton = (Button)updater.view.findViewById(R.id.email_mcqs);
+        // Display start exam button only if exam can be taken in mobile
+        if (exam.getDeviceAccessControl().equals("web")) {
+            setGone(6, false);
+            view(6).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(activity, TestActivity.class);
+                    intent.putExtra("exam", exam);
+                    fragment.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
+                }
+            });
+            startExamButton.setVisibility(View.GONE);
+            emailMcqButton.setVisibility(View.GONE);
         } else {
-            emailMcqs.setVisibility(View.GONE);
+            setGone(6, true);
+            ViewUtils.setLeftDrawable(activity, startExamButton, R.drawable.ic_assignment_white_18dp);
+            startExamButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(activity, TestActivity.class);
+                    intent.putExtra("exam", exam);
+                    fragment.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
+                }
+            });
+            startExamButton.setVisibility(View.VISIBLE);
+            // Validate email mcq button
+            if (exam.getAllowPdf()) {
+                ViewUtils.setLeftDrawable(activity, emailMcqButton, R.drawable.ic_email_white_18dp);
+                emailMcqButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new EmailPdfDialog(activity, R.style.TestpressAppCompatAlertDialogStyle, false,
+                                exam.getUrlFrag()).show();
+                    }
+                });
+                emailMcqButton.setVisibility(View.VISIBLE);
+            } else {
+                emailMcqButton.setVisibility(View.GONE);
+            }
         }
     }
 
