@@ -53,6 +53,7 @@ import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.model.TestpressApiResponse;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ZoomableImageActivity;
+import in.testpress.util.FormatDate;
 import in.testpress.util.ViewUtils;
 
 import static in.testpress.exam.network.TestpressExamApiClient.STATE_PAUSED;
@@ -351,19 +352,12 @@ public class ContentActivity extends BaseToolBarActivity {
         examDuration.setText(exam.getDuration());
         markPerQuestion.setText(exam.getMarkPerQuestion());
         negativeMarks.setText(exam.getNegativeMarks());
-        if ((exam.getDescription() != null) && !exam.getDescription().trim().isEmpty()) {
-            description.setVisibility(View.VISIBLE);
-            descriptionContent.setText(exam.getDescription());
-        }
-        if (exam.getPausedAttemptsCount() > 0) {
-            startButton.setText(R.string.testpress_resume);
-        } else {
-            startButton.setText(R.string.testpress_start);
-        }
-        if (exam.getAttemptsCount() == 0 ||
-                ((exam.getAllowRetake()) &&
-                        (exam.getAttemptsCount() <= exam.getMaxRetakes() ||
-                                exam.getMaxRetakes() < 0))) {
+        if (canAttemptExam(exam)) {
+            if (exam.getPausedAttemptsCount() > 0) {
+                startButton.setText(R.string.testpress_resume);
+            } else {
+                startButton.setText(R.string.testpress_start);
+            }
             startButton.setVisibility(View.VISIBLE);
         } else {
             startButton.setVisibility(View.GONE);
@@ -378,6 +372,46 @@ public class ContentActivity extends BaseToolBarActivity {
         examDetailsLayout.setVisibility(View.VISIBLE);
         examContentLayout.setVisibility(View.VISIBLE);
         swipeRefresh.setRefreshing(false);
+    }
+
+    private boolean canAttemptExam(Exam exam) {
+        if (exam.getAttemptsCount() == 0 ||
+                ((exam.getAllowRetake()) &&
+                        (exam.getAttemptsCount() <= exam.getMaxRetakes() ||
+                                exam.getMaxRetakes() < 0))) {
+
+            if (exam.getDeviceAccessControl() != null &&
+                    exam.getDeviceAccessControl().equals("web")) {
+                TextView webOnlyLabel;
+                if (courseAttempts.isEmpty()) {
+                    webOnlyLabel = (TextView) findViewById(R.id.web_only_label);
+                } else {
+                    webOnlyLabel = (TextView) findViewById(R.id.attempt_web_only_label);
+                }
+                webOnlyLabel.setTypeface(TestpressSdk.getRubikRegularFont(this));
+                webOnlyLabel.setVisibility(View.VISIBLE);
+                return false;
+            } else if (content.getIsLocked() || !content.getHasStarted()) {
+                if (courseAttempts.isEmpty()) {
+                    TextView webOnlyLabel = (TextView) findViewById(R.id.web_only_label);
+                    if (!content.getHasStarted()) {
+                        webOnlyLabel.setText(String.format(
+                                getString(R.string.testpress_can_start_exam_only_after),
+                                FormatDate.formatDateTime(exam.getStartDate())
+                        ));
+                    } else {
+                        webOnlyLabel.setText(R.string.testpress_score_good_in_previous_exam);
+                    }
+                    webOnlyLabel.setTypeface(TestpressSdk.getRubikRegularFont(this));
+                    webOnlyLabel.setVisibility(View.VISIBLE);
+                }
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
     }
 
     private void loadAttempts() {
@@ -431,11 +465,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void displayAttemptsList() {
         final Exam exam = content.getExam();
-        if ((exam.getAllowRetake()) &&
-                        (exam.getAttemptsCount() <= exam.getMaxRetakes() ||
-                                exam.getMaxRetakes() < 0)) {
-
-            startButton.setVisibility(View.VISIBLE);
+        if (canAttemptExam(exam)) {
             final List<CourseAttempt> pausedAttempts = new ArrayList<>();
             if (exam.getPausedAttemptsCount() > 0) {
                 for (CourseAttempt attempt : courseAttempts) {
@@ -465,6 +495,7 @@ public class ContentActivity extends BaseToolBarActivity {
                     }
                 });
             }
+            startButton.setVisibility(View.VISIBLE);
         } else {
             startButton.setVisibility(View.GONE);
         }

@@ -57,38 +57,40 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
             setGone(1, false);
             mImageLoader.displayImage(content.getImage(), imageView(1), mOptions);
         }
+        Exam exam = content.getExam();
         // Validate lock
         if (content.getIsLocked() || !content.getHasStarted()) {
             setGone(2, false);
             setGone(3, false);
+            setGone(6, true);
+            view(4).setClickable(false);
         } else {
             setGone(2, true);
             setGone(3, true);
-        }
-        // Update attempted tick
-        Exam exam = content.getExam();
-        if (content.getAttemptsCount() == 0 || (content.getAttemptsCount() == 1 && exam != null &&
-                exam.getPausedAttemptsCount() > 0)) {
-            setGone(6, true);
-        } else {
-            setGone(6, false);
+            if (content.getAttemptsCount() == 0 ||
+                    (content.getAttemptsCount() == 1 && exam != null &&
+                            exam.getPausedAttemptsCount() > 0)) {
+                setGone(6, true);
+            } else {
+                setGone(6, false);
+            }
+            view(4).setClickable(true);
+            view(4).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mActivity.startActivityForResult(ContentActivity.createIntent(getItems(),
+                            position, (ContentsListActivity) mActivity), TEST_TAKEN_REQUEST_CODE);
+                }
+            });
         }
         // Update exam info
         if (exam != null) {
             setGone(5, false);
-
             setText(7, exam.getDuration());
             setText(8, exam.getNumberOfQuestions().toString() + " Qs");
         } else {
             setGone(5, true);
         }
-        view(4).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mActivity.startActivityForResult(ContentActivity.createIntent(getItems(),
-                        position, (ContentsListActivity) mActivity), TEST_TAKEN_REQUEST_CODE);
-            }
-        });
     }
 
 }

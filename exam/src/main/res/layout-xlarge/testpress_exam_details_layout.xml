@@ -146,14 +146,16 @@
     <TextView
         android:id="@+id/web_only_label"
         android:visibility="gone"
-        android:drawableLeft="@drawable/ic_error_outline_black_18dp"
-        android:drawablePadding="3dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/testpress_black"
         android:textSize="@dimen/testpress_text_size_large"
         android:text="@string/testpress_web_only_exam_description"
+        android:lineSpacingExtra="5dp"
         android:layout_marginBottom="20dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:gravity="center"
         android:layout_gravity="center" />
 
     <LinearLayout style="@style/TestpressExamInfoRow"
