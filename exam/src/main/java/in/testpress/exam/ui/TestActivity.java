@@ -223,7 +223,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         if (courseAttempt != null) {
             attempt = courseAttempt.getAssessment();
         }
-        if (exam.getDeviceAccessControl().equals("web")) {
+        if (exam.getDeviceAccessControl() != null && exam.getDeviceAccessControl().equals("web")) {
             webOnlyLabel.setVisibility(View.VISIBLE);
         } else if (exam.getPausedAttemptsCount() > 0) {
             if (attempt == null) {
