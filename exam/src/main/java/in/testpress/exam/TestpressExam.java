@@ -13,8 +13,10 @@ import junit.framework.Assert;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
+import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.CourseContent;
 import in.testpress.exam.models.CourseAttempt;
+import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.greendao.DaoMaster;
 import in.testpress.exam.models.greendao.DaoSession;
 import in.testpress.exam.models.greendao.ReviewAnswerDao;
@@ -26,6 +28,7 @@ import in.testpress.exam.ui.CarouselFragment;
 import in.testpress.exam.ui.CategoriesGridFragment;
 import in.testpress.exam.ui.CategoryGridActivity;
 import in.testpress.exam.ui.ExamsListActivity;
+import in.testpress.exam.ui.ReviewStatsActivity;
 import in.testpress.exam.ui.TestActivity;
 import in.testpress.util.ImageUtils;
 
@@ -107,8 +110,8 @@ public class TestpressExam {
      * @param testpressSession TestpressSession got from the core module
      */
     public static void showCategories(@NonNull FragmentActivity activity,
-                            @NonNull @IdRes Integer containerViewId,
-                            @NonNull TestpressSession testpressSession) {
+                                      @NonNull @IdRes Integer containerViewId,
+                                      @NonNull TestpressSession testpressSession) {
         //noinspection ConstantConditions
         if (activity == null) {
             throw new IllegalArgumentException("Activity must not be null.");
@@ -174,6 +177,36 @@ public class TestpressExam {
         Intent intent = new Intent(activity, TestActivity.class);
         intent.putExtra(TestActivity.PARAM_EXAM_SLUG, examSlug);
         activity.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
+    }
+
+    /**
+     * Display the attempt report.
+     *
+     * <p> Usage example:
+     *
+     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
+     * <p>             new TestpressCallback/<TestpressSession>() {
+     * <p>             @Override
+     * <p>             public void onSuccess(TestpressSession testpressSession) {
+     * <p>                 <b>TestpressExam.showAttemptReport(this, exam, attempt, testpressSession);</b>
+     * <p>             }
+     * <p> });
+     *
+     * @param activity activity from which exam need to start.
+     * @param exam Exam object of the attempt.
+     * @param attempt Attempt object which report need to be shown.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    public static void showAttemptReport(@NonNull Activity activity,
+                                         @NonNull Exam exam,
+                                         @NonNull Attempt attempt,
+                                         @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Activity must not be null.", activity);
+        Assert.assertNotNull("Exam must not be null.", exam);
+        Assert.assertNotNull("Attempt must not be null.", attempt);
+        init(activity, testpressSession);
+        activity.startActivity(ReviewStatsActivity.createIntent(activity, exam, attempt));
     }
 
     /**

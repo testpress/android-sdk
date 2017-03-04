@@ -138,8 +138,9 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 holder.completedAttemptLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mActivity.startActivity(ReviewStatsActivity.createIntent(mActivity,
-                                mContent.getExam(), attempt));
+                        //noinspection ConstantConditions
+                        TestpressExam.showAttemptReport(mActivity, mContent.getExam(), attempt,
+                                TestpressSdk.getTestpressSession(mActivity));
                     }
                 });
                 holder.completedAttemptLayout.setVisibility(View.VISIBLE);
