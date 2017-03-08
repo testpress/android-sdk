@@ -24,6 +24,7 @@ import in.testpress.exam.models.greendao.ReviewAttemptDao;
 import in.testpress.exam.models.greendao.ReviewItemDao;
 import in.testpress.exam.models.greendao.ReviewQuestionDao;
 import in.testpress.exam.models.greendao.SelectedAnswerDao;
+import in.testpress.exam.ui.AnalyticsActivity;
 import in.testpress.exam.ui.CarouselFragment;
 import in.testpress.exam.ui.CategoriesGridFragment;
 import in.testpress.exam.ui.CategoryGridActivity;
@@ -207,6 +208,36 @@ public class TestpressExam {
         Assert.assertNotNull("Attempt must not be null.", attempt);
         init(activity, testpressSession);
         activity.startActivity(ReviewStatsActivity.createIntent(activity, exam, attempt));
+    }
+
+    /**
+     * Display the subject wise analytics.
+     *
+     * <p> Usage example:
+     *
+     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
+     * <p>             new TestpressCallback/<TestpressSession>() {
+     * <p>             @Override
+     * <p>             public void onSuccess(TestpressSession testpressSession) {
+     * <p>                 <b>TestpressExam.showAnalytics(this, analyticsUrl, testpressSession);</b>
+     * <p>             }
+     * <p> });
+     *
+     * @param activity activity from which exam need to start.
+     * @param analyticsUrlFrag Analytics url fragment.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    public static void showAnalytics(@NonNull Activity activity,
+                                     @NonNull String analyticsUrlFrag,
+                                     @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Activity must not be null.", activity);
+        //noinspection ConstantConditions
+        if (analyticsUrlFrag == null || analyticsUrlFrag.trim().isEmpty()) {
+            throw new IllegalArgumentException("analyticsUrl must not be null or empty.");
+        }
+        init(activity, testpressSession);
+        activity.startActivity(AnalyticsActivity.createIntent(activity, analyticsUrlFrag, null, null));
     }
 
     /**

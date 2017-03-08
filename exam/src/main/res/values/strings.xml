@@ -36,6 +36,12 @@
     <string name="testpress_exam_not_available">Exam not available</string>
     <string name="testpress_exam_not_available_description">This is no longer available or not published yet.</string>
 
+    <string name="testpress_analytics">Analytics</string>
+    <string name="testpress_error_loading_analytics">Loading analytics failed</string>
+    <string name="testpress_no_analytics">No Analytics Data</string>
+    <string name="testpress_no_subjects_description">This exam doesn\'t contain any subjects.</string>
+    <string name="testpress_no_analytics_description">To review the Analytics, start and complete your exams.</string>
+
     <string name="testpress_page_available_exams">Available</string>
     <string name="testpress_page_upcoming_exams">Upcoming</string>
     <string name="testpress_page_history_exams">History</string>
@@ -132,5 +138,15 @@
     <string name="testpress_web_only_exam_description">This exam can only be attempt on the website.</string>
     <string name="testpress_can_start_exam_only_after">You can attempt this exam only after \n%1$s</string>
     <string name="testpress_score_good_in_previous_exam">You need to get good scores in the previous tests to attempt this test.</string>
+
+    <string name="testpress_strength">Strength</string>
+    <string name="testpress_weakness">Weakness</string>
+
+    <string name="testpress_strength_label">Strength / Correct</string>
+    <string name="testpress_weakness_label">Weakness / Incorrect</string>
+
+    <string name="testpress_individual_reports">Individual Reports</string>
+    <string name="testpress_overall_reports">Overall Reports</string>
+    <string name="testpress_subject_name">Subject</string>
 
 </resources>

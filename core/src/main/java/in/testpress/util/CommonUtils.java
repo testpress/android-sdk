@@ -21,4 +21,20 @@ public class CommonUtils {
         }
         return null;
     }
+
+    /**
+     * Ellipsize given text if the text length exceeds the given size.
+     *
+     * @param text
+     * @param size
+     * @return String with length less than or equal to given size.
+     */
+    public static String ellipsize(String text, int size) {
+        if (text.length() < size) {
+            return text;
+        } else {
+            return text.substring(0, (size - 3)) + "...";
+        }
+    }
+
 }

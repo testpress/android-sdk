@@ -14,8 +14,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:alpha="0.4"
-        android:src="@drawable/testpress_cloud_off_black"
-        android:id="@+id/imageView"
+        android:src="@drawable/testpress_no_wifi"
+        android:id="@+id/image_view"
         tools:ignore="UnusedAttribute" />
 
     <TextView

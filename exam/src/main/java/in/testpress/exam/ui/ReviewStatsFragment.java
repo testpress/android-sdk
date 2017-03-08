@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -46,11 +47,13 @@ public class ReviewStatsFragment extends Fragment {
     private LinearLayout reviewStatLayout;
     private ProgressBar progressBar;
     private View emptyView;
+    private ImageView emptyViewImage;
     private TextView emptyTitleView;
     private TextView emptyDescView;
     private Button retryButton;
-    private Button emailPdfButton;
+    private Button analyticsButton;
     private Button reviewQuestionsButton;
+    private TextView emailPdfButton;
     private Attempt attempt;
     private Exam exam;
 
@@ -69,6 +72,7 @@ public class ReviewStatsFragment extends Fragment {
         progressBar = (ProgressBar) view.findViewById(R.id.pb_loading);
         UIUtils.setIndeterminateDrawable(getActivity(), progressBar, 4);
         emptyView = view.findViewById(R.id.empty_container);
+        emptyViewImage = (ImageView) view.findViewById(R.id.image_view);
         emptyTitleView = (TextView) view.findViewById(R.id.empty_title);
         emptyDescView = (TextView) view.findViewById(R.id.empty_description);
         retryButton = (Button) view.findViewById(R.id.retry_button);
@@ -83,11 +87,14 @@ public class ReviewStatsFragment extends Fragment {
         rankLayout = (LinearLayout) view.findViewById(R.id.rank_layout);
         reviewStatLayout = (LinearLayout) view.findViewById(R.id.review_statistics_layout);
         reviewStatLayout.setVisibility(View.GONE);
-        emailPdfButton = (Button) view.findViewById(R.id.email_mcqs);
+        analyticsButton = (Button) view.findViewById(R.id.analytics);
+        emailPdfButton = (TextView) view.findViewById(R.id.email_mcqs);
         reviewQuestionsButton = (Button) view.findViewById(R.id.review);
-        ViewUtils.setTypeface(new TextView[] {score, rank, correct, incorrect, timeTaken, accuracy,
-                emailPdfButton, reviewQuestionsButton, emptyTitleView, retryButton},
-                TestpressSdk.getRubikMediumFont(getContext()));
+        ViewUtils.setTypeface(
+                new TextView[] {score, rank, correct, incorrect, timeTaken, accuracy,
+                        analyticsButton, reviewQuestionsButton, emptyTitleView, retryButton},
+                TestpressSdk.getRubikMediumFont(getContext())
+        );
         TextView timeTakenLabel = (TextView) view.findViewById(R.id.time_taken_label);
         TextView scoreLabel = (TextView) view.findViewById(R.id.score_label);
         TextView rankLabel = (TextView) view.findViewById(R.id.rank_label);
@@ -95,7 +102,7 @@ public class ReviewStatsFragment extends Fragment {
         TextView incorrectLabel = (TextView) view.findViewById(R.id.incorrect_label);
         TextView accuracyLabel = (TextView) view.findViewById(R.id.accuracy_label);
         ViewUtils.setTypeface(new TextView[] {scoreLabel, rankLabel, correctLabel, incorrectLabel,
-                timeTakenLabel, accuracyLabel, examTitle, attemptDate, emptyDescView},
+                timeTakenLabel, accuracyLabel, examTitle, attemptDate, emptyDescView, emailPdfButton},
                 TestpressSdk.getRubikRegularFont(getContext()));
         return view;
     }
@@ -129,15 +136,30 @@ public class ReviewStatsFragment extends Fragment {
         }
         score.setText(attempt.getScore());
         accuracy.setText(attempt.getAccuracy().toString());
-        reviewQuestionsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().startActivityForResult(
-                        ReviewQuestionsActivity.createIntent(getActivity(), attempt),
-                        CarouselFragment.TEST_TAKEN_REQUEST_CODE
-                );
-            }
-        });
+        if (exam.getShowAnswers()) {
+            reviewQuestionsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getActivity().startActivity(
+                            ReviewQuestionsActivity.createIntent(getActivity(), attempt)
+                    );
+                }
+            });
+            reviewQuestionsButton.setVisibility(View.VISIBLE);
+            analyticsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getActivity().startActivity(
+                            AnalyticsActivity.createIntent(getActivity(), attempt.getUrlFrag() +
+                                    TestpressExamApiClient.ATTEMPT_SUBJECT_ANALYTICS_PATH, null, null)
+                    );
+                }
+            });
+            analyticsButton.setVisibility(View.VISIBLE);
+        } else {
+            reviewQuestionsButton.setVisibility(View.GONE);
+            analyticsButton.setVisibility(View.GONE);
+        }
         if (exam.getAllowPdf()) {
             emailPdfButton.setVisibility(View.VISIBLE);
             emailPdfButton.setOnClickListener(new View.OnClickListener() {
@@ -186,20 +208,26 @@ public class ReviewStatsFragment extends Fragment {
                             }
                         });
                         if(exception.isUnauthenticated()) {
-                            setEmptyText(R.string.testpress_authentication_failed, R.string.testpress_please_login);
+                            setEmptyText(R.string.testpress_authentication_failed,
+                                    R.string.testpress_please_login,
+                                    R.drawable.testpress_alert_warning);
                         } else if (exception.isNetworkError()) {
-                            setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again);
+                            setEmptyText(R.string.testpress_network_error,
+                                    R.string.testpress_no_internet_try_again,
+                                    R.drawable.testpress_no_wifi);
                         } else {
                             setEmptyText(R.string.testpress_error_loading_questions,
-                                    R.string.testpress_some_thing_went_wrong_try_again);
+                                    R.string.testpress_some_thing_went_wrong_try_again,
+                                    R.drawable.testpress_alert_warning);
                         }
                     }
                 });
     }
 
-    protected void setEmptyText(final int title, final int description) {
+    protected void setEmptyText(final int title, final int description, int imageRes) {
         emptyView.setVisibility(View.VISIBLE);
         emptyTitleView.setText(title);
         emptyDescView.setText(description);
+        emptyViewImage.setImageResource(imageRes);
     }
 }
