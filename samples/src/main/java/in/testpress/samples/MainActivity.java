@@ -7,9 +7,14 @@ import android.view.View;
 
 import com.facebook.FacebookSdk;
 
+import in.testpress.core.TestpressSdk;
+import in.testpress.exam.TestpressExam;
+import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.samples.exam.ExamSampleActivity;
 import in.testpress.samples.course.CourseSampleActivity;
+
+import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
 
 public class MainActivity extends BaseToolBarActivity {
 
@@ -39,6 +44,34 @@ public class MainActivity extends BaseToolBarActivity {
                 startActivity(intent);
             }
         });
+        findViewById(R.id.analytics).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showAnalytics();
+            }
+        });
+    }
+
+    private void showAnalytics() {
+        if (TestpressSdk.hasActiveSession(MainActivity.this)) {
+            //noinspection ConstantConditions
+            TestpressExam.showAnalytics(
+                    MainActivity.this,
+                    TestpressExamApiClient.SUBJECT_ANALYTICS_PATH,
+                    TestpressSdk.getTestpressSession(MainActivity.this)
+            );
+        } else {
+            Intent intent = new Intent(MainActivity.this, TestpressCoreSampleActivity.class);
+            startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == AUTHENTICATE_REQUEST_CODE && resultCode == RESULT_OK) {
+            showAnalytics();
+        }
     }
 
 }

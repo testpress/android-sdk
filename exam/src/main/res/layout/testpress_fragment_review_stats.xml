@@ -298,9 +298,9 @@
                 android:layout_height="wrap_content">
 
                 <android.support.v7.widget.AppCompatButton
-                    android:id="@+id/email_mcqs"
+                    android:id="@+id/analytics"
                     android:background="@drawable/testpress_green_stroke"
-                    android:text="@string/testpress_email_mcqs"
+                    android:text="@string/testpress_analytics"
                     android:gravity="center"
                     android:textSize="16sp"
                     android:textColor="@color/testpress_green_light"
@@ -328,6 +328,21 @@
                     android:layout_marginTop="20dp" />
 
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/email_mcqs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="10dp"
+                android:textColor="#ffa31a"
+                android:textSize="16sp"
+                android:drawablePadding="5dp"
+                android:drawableLeft="@drawable/testpress_email_icon"
+                android:text="@string/testpress_email_mcqs" />
 
         </LinearLayout>
 

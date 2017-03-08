@@ -12,6 +12,7 @@ import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.Exam;
+import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.greendao.ReviewItem;
 import in.testpress.model.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
@@ -33,6 +34,16 @@ public class TestpressExamApiClient extends TestpressApiClient {
     public static final String MAIL_PDF_QUESTIONS_PATH =  "pdf-questions/";
 
     public static final String CONTENT_ATTEMPTS_PATH =  "/api/v2.2/content_attempts/";
+
+    /**
+     * Overall subject analytics path
+     */
+    public static final String SUBJECT_ANALYTICS_PATH = "api/v2.2/analytics/";
+
+    /**
+     * Subject analytics path for a particular attempt
+     */
+    public static final String ATTEMPT_SUBJECT_ANALYTICS_PATH =  "review/subjects/";
 
     /**
      * End Exam URL
@@ -132,6 +143,11 @@ public class TestpressExamApiClient extends TestpressApiClient {
 
     public RetrofitCall<TestpressApiResponse<Category>> getCategories(Map<String, Object> queryParams) {
         return getExamService().getCategories(queryParams);
+    }
+
+    public RetrofitCall<TestpressApiResponse<Subject>> getSubjects(String urlFrag,
+                                                                   Map<String, Object> queryParams) {
+        return getExamService().getSubjects(urlFrag, queryParams);
     }
 
 }

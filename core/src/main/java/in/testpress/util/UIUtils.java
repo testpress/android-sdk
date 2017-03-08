@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
 import android.widget.ProgressBar;
 
 import in.testpress.R;
@@ -29,6 +30,18 @@ public class UIUtils {
 
     public static float getPixelFromDp(Context context, float dp) {
         return dp * context.getResources().getDisplayMetrics().density;
+    }
+
+    public static void setGone(View[] views) {
+        for (View view : views) {
+            view.setVisibility(View.GONE);
+        }
+    }
+
+    public static void setVisible(View[] views) {
+        for (View view : views) {
+            view.setVisibility(View.VISIBLE);
+        }
     }
 
 }

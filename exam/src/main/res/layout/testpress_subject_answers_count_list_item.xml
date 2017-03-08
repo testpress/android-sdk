@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/answers_count_list_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <View
+        android:background="#eee"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <LinearLayout
+        android:id="@+id/ripple_layout"
+        android:orientation="horizontal"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:paddingLeft="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            style="@style/TestpressAnswersCountValue"
+            android:text="Computer Science"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:gravity="start"
+            android:layout_weight="@integer/testpress_subject_weight"
+            android:id="@+id/subject_name" />
+
+        <TextView
+            style="@style/TestpressAnswersCountValue"
+            android:text="100"
+            android:layout_weight="@integer/testpress_correct_weight"
+            android:id="@+id/correct" />
+
+        <TextView
+            style="@style/TestpressAnswersCountValue"
+            android:text="100"
+            android:layout_weight="@integer/testpress_incorrect_weight"
+            android:id="@+id/incorrect" />
+
+        <TextView
+            style="@style/TestpressAnswersCountValue"
+            android:text="100"
+            android:layout_weight="@integer/testpress_unanswered_weight"
+            android:id="@+id/unanswered" />
+
+        <ImageView
+            android:id="@+id/right_direction_arrow"
+            android:src="@drawable/ic_chevron_right_black_24dp"
+            android:tint="#777"
+            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_gravity="center"
+            android:layout_width="25dp"
+            android:layout_height="25dp" />
+
+    </LinearLayout>
+    
+</LinearLayout>

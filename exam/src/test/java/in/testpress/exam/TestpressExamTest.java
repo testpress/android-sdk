@@ -108,6 +108,36 @@ public class TestpressExamTest {
     }
 
     @Test
+    public void testShowAnalytics_withNullValues() throws Exception {
+        TestpressSession testpressSession = mock(TestpressSession.class);
+        FragmentActivity activity = mock(FragmentActivity.class);
+        try {
+            TestpressExam.showAnalytics(null, "DummyUrl", testpressSession);
+            fail();
+        } catch (AssertionError e) {
+            assertEquals("Activity must not be null.", e.getMessage());
+        }
+        try {
+            TestpressExam.showAnalytics(activity, null, testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("analyticsUrl must not be null or empty.", e.getMessage());
+        }
+        try {
+            TestpressExam.showAnalytics(activity, "", testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("analyticsUrl must not be null or empty.", e.getMessage());
+        }
+        try {
+            TestpressExam.showAnalytics(activity, "DummyUrl", null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+    }
+
+    @Test
     public void testStartCourseExam_withNullValues() throws Exception {
         TestpressSession testpressSession = mock(TestpressSession.class);
         CourseContent courseContent = mock(CourseContent.class);
