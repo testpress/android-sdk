@@ -8,6 +8,11 @@ html {
 }
 
 @font-face {
+    font-family: "Rubik-Regular";
+    src: url('Rubik-Regular.ttf');
+}
+
+@font-face {
     font-family: "Rubik-Medium";
     src: url('Rubik-Medium.ttf');
 }
@@ -120,9 +125,9 @@ table th {
     height: 25px;
     line-height: 25px;
     flex: 0 0 25px;
-    border:1px solid #e6e6e6;
+    border:1px solid #bbb;
     border-radius: 50%;
-    color: #ccc;
+    color: #aaa;
     background: #fff;
     margin-right: 10px;
     display: inline-block;
@@ -150,7 +155,7 @@ table th {
     padding-left: 10px;
     display: flex;
     flex-flow: row;
-    color: #666;
+    color: #444;
     font-family: 'PT-Serif-Regular', serif;
 }
 
@@ -184,6 +189,7 @@ table th {
 
 .review-question {
     font-family: 'Rubik-Medium', sans-serif;
+    color: #444;
     padding: 10px;
 }
 
