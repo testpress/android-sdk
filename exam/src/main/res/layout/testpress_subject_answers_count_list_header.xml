@@ -9,26 +9,26 @@
     android:layout_height="wrap_content">
 
     <TextView
-        style="@style/TestpressAnswersCountHeader"
+        style="@style/TestpressListItemHeader"
         android:text="@string/testpress_subject_name"
         android:layout_weight="@integer/testpress_subject_weight"
         android:gravity="start"
         android:id="@+id/subject_name" />
 
     <TextView
-        style="@style/TestpressAnswersCountHeader"
+        style="@style/TestpressListItemHeader"
         android:text="@string/testpress_page_correct"
         android:layout_weight="@integer/testpress_correct_weight"
         android:id="@+id/correct" />
 
     <TextView
-        style="@style/TestpressAnswersCountHeader"
+        style="@style/TestpressListItemHeader"
         android:text="@string/testpress_page_incorrect"
         android:layout_weight="@integer/testpress_incorrect_weight"
         android:id="@+id/incorrect" />
 
     <TextView
-        style="@style/TestpressAnswersCountHeader"
+        style="@style/TestpressListItemHeader"
         android:text="@string/testpress_page_unanswered"
         android:layout_weight="@integer/testpress_unanswered_weight"
         android:id="@+id/unanswered" />

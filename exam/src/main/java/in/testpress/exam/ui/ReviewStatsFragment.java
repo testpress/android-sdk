@@ -177,7 +177,7 @@ public class ReviewStatsFragment extends Fragment {
     }
 
     private void loadAttempt() {
-        new TestpressExamApiClient(getActivity()).getAttempts(exam.getAttemptsFrag(),
+        new TestpressExamApiClient(getActivity()).getAttempts(exam.getAttemptsUrl(),
                 new HashMap<String, Object>())
                 .enqueue(new TestpressCallback<TestpressApiResponse<Attempt>>() {
                     @Override

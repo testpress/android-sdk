@@ -274,6 +274,19 @@ public class Exam implements Parcelable {
         return startDate;
     }
 
+    @SuppressLint("SimpleDateFormat")
+    public boolean hasStarted() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            if(getStartDate() != null && !getStartDate().isEmpty()) {
+                return simpleDateFormat.parse(getStartDate()).before(new Date());
+            }
+        } catch (ParseException e) {
+        }
+        return true;
+    }
+
     /**
      *
      * @param startDate

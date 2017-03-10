@@ -85,6 +85,7 @@
     <string name="testpress_duration">Duration</string>
     <string name="testpress_mark_per_question">Mark per question</string>
     <string name="testpress_negative_mark">Negative marks</string>
+    <string name="testpress_start_date">Start &amp; End date</string>
     <string name="testpress_description">Description</string>
     <string name="testpress_questions_list">QUESTIONS LIST</string>
 

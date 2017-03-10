@@ -20,7 +20,7 @@
         android:layout_height="wrap_content">
 
         <TextView
-            style="@style/TestpressAnswersCountValue"
+            style="@style/TestpressListItemValue"
             android:text="Computer Science"
             android:maxLines="2"
             android:ellipsize="end"
@@ -29,19 +29,19 @@
             android:id="@+id/subject_name" />
 
         <TextView
-            style="@style/TestpressAnswersCountValue"
+            style="@style/TestpressListItemValue"
             android:text="100"
             android:layout_weight="@integer/testpress_correct_weight"
             android:id="@+id/correct" />
 
         <TextView
-            style="@style/TestpressAnswersCountValue"
+            style="@style/TestpressListItemValue"
             android:text="100"
             android:layout_weight="@integer/testpress_incorrect_weight"
             android:id="@+id/incorrect" />
 
         <TextView
-            style="@style/TestpressAnswersCountValue"
+            style="@style/TestpressListItemValue"
             android:text="100"
             android:layout_weight="@integer/testpress_unanswered_weight"
             android:id="@+id/unanswered" />

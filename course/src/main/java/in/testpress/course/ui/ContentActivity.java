@@ -344,14 +344,19 @@ public class ContentActivity extends BaseToolBarActivity {
         TextView questionsLabel = (TextView) findViewById(R.id.questions_label);
         TextView durationLabel = (TextView) findViewById(R.id.duration_label);
         TextView markLabel = (TextView) findViewById(R.id.mark_per_question_label);
+        TextView negativeMarkLabel = (TextView) findViewById(R.id.negative_marks_label);
         ViewUtils.setTypeface(new TextView[] {numberOfQuestions, examDuration, markPerQuestion,
                 negativeMarks}, TestpressSdk.getRubikMediumFont(this));
         ViewUtils.setTypeface(new TextView[] {descriptionContent, questionsLabel,
-                durationLabel, markLabel}, TestpressSdk.getRubikRegularFont(this));
+                durationLabel, markLabel, negativeMarkLabel}, TestpressSdk.getRubikRegularFont(this));
         numberOfQuestions.setText(exam.getNumberOfQuestions().toString());
         examDuration.setText(exam.getDuration());
         markPerQuestion.setText(exam.getMarkPerQuestion());
         negativeMarks.setText(exam.getNegativeMarks());
+        if ((exam.getDescription() != null) && !exam.getDescription().trim().isEmpty()) {
+            description.setVisibility(View.VISIBLE);
+            descriptionContent.setText(exam.getDescription());
+        }
         if (canAttemptExam(exam)) {
             if (exam.getPausedAttemptsCount() > 0) {
                 startButton.setText(R.string.testpress_resume);
@@ -365,7 +370,7 @@ public class ContentActivity extends BaseToolBarActivity {
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startCourseExam();
+                startCourseExam(true);
             }
         });
         validateAdjacentNavigationButton();
@@ -479,7 +484,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 startButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        startCourseExam();
+                        startCourseExam(false);
                     }
                 });
             } else {
@@ -596,11 +601,11 @@ public class ContentActivity extends BaseToolBarActivity {
                 "</style>";
     }
 
-    private void startCourseExam() {
+    private void startCourseExam(boolean discardExamDetails) {
         //noinspection ConstantConditions
         TestpressExam.startCourseExam(ContentActivity.this,
-                new CourseContent(content.getAttemptsUrl(), content.getExam()),
-                true, TestpressSdk.getTestpressSession(ContentActivity.this));
+                new CourseContent(content.getAttemptsUrl(), content.getExam()), discardExamDetails,
+                TestpressSdk.getTestpressSession(ContentActivity.this));
     }
 
     private void validateAdjacentNavigationButton() {

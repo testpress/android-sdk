@@ -292,11 +292,11 @@ public class SearchFragment extends Fragment implements AbsListView.OnScrollList
     private HeaderFooterListAdapter<SingleTypeAdapter<Exam>> createAdapter() {
         SingleTypeAdapter<Exam> wrapped = null;
         if (subclass == null || subclass.equals("available")) {
-            wrapped = new AvailableExamsListAdapter(this, items, R.layout.available_exams_list_item);
+            wrapped = new AvailableExamsListAdapter(this, items);
         } else if (subclass.equals("upcoming")) {
-            wrapped = new UpcomingExamsListAdapter(getActivity(), items, R.layout.upcoming_exams_list_item);
+            wrapped = new UpcomingExamsListAdapter(getActivity(), items);
         } else if (subclass.equals("history")) {
-            wrapped = new HistoryListAdapter(this, items, R.layout.history_exams_list_item);
+            wrapped = new HistoryListAdapter(this, items);
         }
         return new HeaderFooterListAdapter<SingleTypeAdapter<Exam>>(listView, wrapped);
     }

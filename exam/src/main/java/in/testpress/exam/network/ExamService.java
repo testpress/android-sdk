@@ -70,7 +70,7 @@ public interface ExamService {
     RetrofitCall<CourseAttempt> endContentAttempt(
             @Path(value = "end_exam_url", encoded = true) String endExamUrlFrag);
 
-    @GET("/{attempts_url}")
+    @GET("{attempts_url}")
     RetrofitCall<TestpressApiResponse<Attempt>> getAttempts(
             @Path(value = "attempts_url", encoded = true) String attemptsUrlFrag,
             @QueryMap Map<String, Object> options);

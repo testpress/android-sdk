@@ -20,6 +20,7 @@ import java.util.List;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
+import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.CourseContent;
@@ -29,15 +30,15 @@ import in.testpress.exam.network.ContentAttemptsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 
 import in.testpress.model.TestpressApiResponse;
+import in.testpress.util.FormatDate;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.UIUtils;
 import in.testpress.network.RetrofitCall;
+import in.testpress.util.ViewUtils;
 import retrofit2.Response;
 
 import static in.testpress.exam.TestpressExam.ACTION_PRESSED_HOME;
-import static in.testpress.exam.ui.AttemptsListFragment.PARAM_STATE;
-import static in.testpress.exam.ui.AttemptsListFragment.STATE_PAUSED;
 import static in.testpress.exam.ui.TestFragment.PARAM_CONTENT_ATTEMPT_END_URL;
 
 /**
@@ -51,6 +52,8 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     public static final String PARAM_DISCARD_EXAM_DETAILS = "showExamDetails";
     static final String PARAM_EXAM = "exam";
     static final String PARAM_ATTEMPT = "attempt";
+    static final String PARAM_STATE = "state";
+    static final String STATE_PAUSED = "paused";
     public static final String PARAM_ACTION = "action";
     public static final String PARAM_VALUE_ACTION_END = "end";
     private static final int START_ATTEMPT_LOADER = 0;
@@ -88,26 +91,31 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         emptyDescView = (TextView) findViewById(R.id.empty_description);
         retryButton = (Button) findViewById(R.id.retry_button);
         examDetailsContainer.setVisibility(View.GONE);
-        findViewById(R.id.start_exam).setOnClickListener(new View.OnClickListener() {
+        Button startButton = (Button) findViewById(R.id.start_exam);
+        startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getSupportLoaderManager().initLoader(START_ATTEMPT_LOADER, null, TestActivity.this);
                 examDetailsContainer.setVisibility(View.GONE);
             }
         });
-        findViewById(R.id.end_exam).setOnClickListener(new View.OnClickListener() {
+        Button endButton = (Button) findViewById(R.id.end_exam);
+        endButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 endExam();
             }
         });
-        findViewById(R.id.resume_exam).setOnClickListener(new View.OnClickListener() {
+        Button resumeButton = (Button) findViewById(R.id.resume_exam);
+        resumeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getSupportLoaderManager().initLoader(RESUME_ATTEMPT_LOADER, null, TestActivity.this);
                 examDetailsContainer.setVisibility(View.GONE);
             }
         });
+        ViewUtils.setTypeface(new TextView[] {startButton, resumeButton, endButton},
+                TestpressSdk.getRubikMediumFont(this));
         UIUtils.setIndeterminateDrawable(this, findViewById(R.id.progress_bar), 4);
         apiClient = new TestpressExamApiClient(this);
         final Intent intent = getIntent();
@@ -141,7 +149,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                     public void onSuccess(Exam exam) {
                         TestActivity.this.exam = exam;
                         if (exam.getPausedAttemptsCount() > 0) {
-                            loadAttempts(exam.getAttemptsFrag());
+                            loadAttempts(exam.getAttemptsUrl());
                         } else {
                             displayStartExamScreen();
                         }
@@ -225,6 +233,9 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         }
         if (exam.getDeviceAccessControl() != null && exam.getDeviceAccessControl().equals("web")) {
             webOnlyLabel.setVisibility(View.VISIBLE);
+        } else if (!exam.hasStarted()) {
+            attemptActions.setVisibility(View.GONE);
+            startExam.setVisibility(View.GONE);
         } else if (exam.getPausedAttemptsCount() > 0) {
             if (attempt == null) {
                 if (courseContent != null) {
@@ -233,7 +244,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                     getSupportLoaderManager().initLoader(PAUSED_COURSE_ATTEMPTS_LOADER, null,
                             TestActivity.this);
                 } else {
-                    loadAttempts(exam.getAttemptsFrag());
+                    loadAttempts(exam.getAttemptsUrl());
                 }
                 return;
             } else {
@@ -263,13 +274,31 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         TextView examDuration = (TextView) findViewById(R.id.exam_duration);
         TextView markPerQuestion = (TextView) findViewById(R.id.mark_per_question);
         TextView negativeMarks = (TextView) findViewById(R.id.negative_marks);
+        TextView date = (TextView) findViewById(R.id.date);
+        LinearLayout dateLayout = (LinearLayout) findViewById(R.id.date_layout);
         LinearLayout description = (LinearLayout) findViewById(R.id.description);
         TextView descriptionContent = (TextView) findViewById(R.id.descriptionContent);
+        TextView questionsLabel = (TextView) findViewById(R.id.questions_label);
+        TextView durationLabel = (TextView) findViewById(R.id.duration_label);
+        TextView markLabel = (TextView) findViewById(R.id.mark_per_question_label);
+        TextView negativeMarkLabel = (TextView) findViewById(R.id.negative_marks_label);
+        TextView dateLabel = (TextView) findViewById(R.id.date_label);
+        ViewUtils.setTypeface(new TextView[] {numberOfQuestions, examDuration, markPerQuestion,
+                negativeMarks, examTitle, date}, TestpressSdk.getRubikMediumFont(this));
+        ViewUtils.setTypeface(new TextView[] {descriptionContent, questionsLabel, webOnlyLabel,
+                durationLabel, markLabel, negativeMarkLabel, dateLabel},
+                TestpressSdk.getRubikRegularFont(this));
         examTitle.setText(exam.getTitle());
         numberOfQuestions.setText(exam.getNumberOfQuestions().toString());
         examDuration.setText(exam.getDuration());
         markPerQuestion.setText(exam.getMarkPerQuestion());
         negativeMarks.setText(exam.getNegativeMarks());
+        if (exam.getFormattedStartDate().equals("forever")) {
+            dateLayout.setVisibility(View.GONE);
+        } else {
+            date.setText(exam.getFormattedStartDate() + " - " + exam.getFormattedEndDate());
+            dateLayout.setVisibility(View.VISIBLE);
+        }
         if ((exam.getDescription() != null) && !exam.getDescription().trim().isEmpty()) {
             description.setVisibility(View.VISIBLE);
             descriptionContent.setText(exam.getDescription());
