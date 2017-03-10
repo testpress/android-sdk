@@ -18,7 +18,7 @@ public class FormatDate {
                 Date date = simpleDateFormat.parse(inputString);
                 simpleDateFormat = new SimpleDateFormat("dd MMM");
                 String dateMonth = simpleDateFormat.format(date);
-                simpleDateFormat = new SimpleDateFormat("yy  HH:mm a");
+                simpleDateFormat = new SimpleDateFormat("yy  hh:mm a");
                 String yearTime = simpleDateFormat.format(date)
                         .replace("AM", "am").replace("PM","pm");
                 return dateMonth + " '" + yearTime;

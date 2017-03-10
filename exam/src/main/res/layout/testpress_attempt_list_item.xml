@@ -19,7 +19,7 @@
         android:layout_height="wrap_content">
 
         <TextView
-            style="@style/TestpressAttemptsListValue"
+            style="@style/TestpressListItemValue"
             android:text="Jan 25, 2017"
             android:maxLines="2"
             android:ellipsize="end"
@@ -28,19 +28,19 @@
             android:id="@+id/completed_date" />
 
         <TextView
-            style="@style/TestpressAttemptsListValue"
+            style="@style/TestpressListItemValue"
             android:text="98.50"
             android:layout_weight="@integer/testpress_score_weight"
             android:id="@+id/score" />
 
         <TextView
-            style="@style/TestpressAttemptsListValue"
+            style="@style/TestpressListItemValue"
             android:text="45/50"
-            android:layout_weight="@integer/testpress_correct_weight"
+            android:layout_weight="@integer/testpress_correct_answers_weight"
             android:id="@+id/correct" />
 
         <TextView
-            style="@style/TestpressAttemptsListValue"
+            style="@style/TestpressListItemValue"
             android:text="@string/testpress_review_label"
             android:layout_weight="@integer/testpress_action_label_weight"
             android:id="@+id/review_label" />
@@ -66,7 +66,7 @@
         android:layout_height="wrap_content">
 
         <TextView
-            style="@style/TestpressAttemptsListValue"
+            style="@style/TestpressListItemValue"
             android:text="Jan 25, 2017"
             android:maxLines="2"
             android:ellipsize="end"
@@ -92,7 +92,7 @@
         </LinearLayout>
 
         <TextView
-            style="@style/TestpressAttemptsListValue"
+            style="@style/TestpressListItemValue"
             android:text="@string/testpress_resume_label"
             android:layout_weight="@integer/testpress_action_label_weight"
             android:id="@+id/resume_label" />

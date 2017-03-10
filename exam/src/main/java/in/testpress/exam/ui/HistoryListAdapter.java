@@ -4,14 +4,18 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.view.View;
-import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.List;
 
+import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Exam;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ViewUtils;
+
+import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
+import static in.testpress.exam.ui.TestActivity.PARAM_EXAM;
 
 public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
 
@@ -22,8 +26,8 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
      * @param fragment
      * @param items
      */
-    public HistoryListAdapter(final Fragment fragment, final List<Exam> items, int layout) {
-        super(fragment.getActivity().getLayoutInflater(), layout);
+    public HistoryListAdapter(final Fragment fragment, final List<Exam> items) {
+        super(fragment.getActivity().getLayoutInflater(), R.layout.testpress_content_list_item);
         this.activity = fragment.getActivity();
         this.fragment = fragment;
         setItems(items);
@@ -31,86 +35,31 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
 
     @Override
     protected int[] getChildViewIds() {
-        return new int[]{R.id.exam_title, R.id.exam_duration, R.id.number_of_questions,
-                R.id.exam_date, R.id.attempts_count, R.id.attempts_string, R.id.retake,
-                R.id.review_attempt, R.id.resume_exam, R.id.web_only_label};
+        return new int[] { R.id.content_title, R.id.white_foreground, R.id.lock,
+                R.id.content_item_layout, R.id.exam_info_layout, R.id.attempted_tick,
+                R.id.duration, R.id.no_of_questions };
     }
 
     @Override
     protected void update(final int position, final Exam exam) {
-        Button reviewButton = (Button) updater.view.findViewById(R.id.review_attempt);
-        ViewUtils.setLeftDrawable(activity, reviewButton, R.drawable.ic_zoom_in_white_18dp);
-        reviewButton.setOnClickListener(new View.OnClickListener() {
+        ViewUtils.setTypeface(new TextView[] {textView(0), textView(6), textView(7)},
+                TestpressSdk.getRubikMediumFont(activity));
+
+        setText(0, exam.getTitle());
+        setText(6, exam.getDuration());
+        setText(7, exam.getNumberOfQuestions().toString() + " Qs");
+        setGone(1, true);
+        setGone(2, true);
+        setGone(4, false);
+        setGone(5, true);
+        view(3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (exam.getAttemptsCount() == 1 && exam.getPausedAttemptsCount() == 0) {
-                    activity.startActivity(ReviewStatsActivity.createIntent(activity, exam, null));
-                } else {
-                    Intent intent = new Intent(activity, AttemptsListActivity.class);
-                    intent.putExtra(AttemptsListFragment.PARAM_EXAM, exam);
-                    fragment.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
-                }
+                Intent intent = new Intent(activity, AttemptsActivity.class);
+                intent.putExtra(PARAM_EXAM, exam);
+                fragment.startActivityForResult(intent, TEST_TAKEN_REQUEST_CODE);
             }
         });
-        Button retakeButton = (Button) updater.view.findViewById(R.id.retake);
-        Button resumeButton = (Button) updater.view.findViewById(R.id.resume_exam);
-        // Display retake or resume button only if exam can be taken in mobile
-        if (exam.getDeviceAccessControl().equals("web")) {
-            setGone(9, false);
-            retakeButton.setVisibility(View.GONE);
-            resumeButton.setVisibility(View.GONE);
-        } else {
-            setGone(9, true);
-            // Validate retake button
-            if (!exam.getAllowRetake()) {
-                setGone(6, true);
-            } else if (exam.getMaxRetakes() > 0 &&
-                    exam.getAttemptsCount() >= exam.getMaxRetakes() + 1) {
-
-                setGone(6, true);
-            } else if (exam.getPausedAttemptsCount() > 0) {
-                setGone(6, true);
-            } else {
-                setGone(6, false);
-                ViewUtils.setLeftDrawable(activity, retakeButton, R.drawable.ic_replay_white_18dp);
-                retakeButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(activity, TestActivity.class);
-                        intent.putExtra(TestActivity.PARAM_EXAM, exam);
-                        fragment.startActivityForResult(intent,
-                                CarouselFragment.TEST_TAKEN_REQUEST_CODE);
-                    }
-                });
-            }
-            // Validate resume button
-            if (exam.getPausedAttemptsCount() <= 0) {
-                setGone(8, true);
-            } else {
-                setGone(8, false);
-                ViewUtils.setLeftDrawable(activity, resumeButton, R.drawable.ic_repeat_white_18dp);
-                resumeButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(activity, AttemptsListActivity.class);
-                        intent.putExtra(AttemptsListFragment.PARAM_EXAM, exam);
-                        intent.putExtra(AttemptsListFragment.PARAM_STATE,
-                                AttemptsListFragment.STATE_PAUSED);
-                        fragment.startActivityForResult(intent,
-                                CarouselFragment.TEST_TAKEN_REQUEST_CODE);
-                    }
-                });
-            }
-        }
-        setText(0, exam.getTitle());
-        setText(1, exam.getDuration());
-        setText(2, exam.getNumberOfQuestionsString());
-        setText(3, exam.getFormattedStartDate() + " " + getStringFromResource(activity, R.string.testpress_to)
-                + " " + exam.getFormattedEndDate());
-        setText(4, "" + exam.getAttemptsCount());
-        setText(5, (exam.getAttemptsCount() > 1) ? getStringFromResource(activity,
-                R.string.testpress_attempts) : getStringFromResource(activity, R.string.testpress_attempt));
-        setGone(7, !exam.getShowAnswers());
     }
 
 }

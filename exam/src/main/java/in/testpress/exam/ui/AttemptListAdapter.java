@@ -1,8 +1,9 @@
-package in.testpress.course.ui;
+package in.testpress.exam.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,27 +15,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import in.testpress.core.TestpressSdk;
-import in.testpress.course.R;
-import in.testpress.course.models.Content;
+
+import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Attempt;
-import in.testpress.exam.models.CourseAttempt;
-import in.testpress.exam.models.CourseContent;
+import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.util.ViewUtils;
 
-class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
+class AttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
 
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
     private Activity mActivity;
-    private Content mContent;
-    private List<CourseAttempt> mAttempts = new ArrayList<>();
+    private Exam mExam;
+    private List<Attempt> mAttempts = new ArrayList<>();
 
-    ContentAttemptListAdapter(Activity activity, Content content,
-                                     final List<CourseAttempt> attempts) {
+    AttemptListAdapter(Activity activity, Exam exam, List<Attempt> attempts) {
         mActivity = activity;
-        mContent = content;
+        mExam = exam;
         mAttempts = attempts;
     }
 
@@ -115,8 +114,7 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         if (viewHolder instanceof ViewHolder) {
             final ViewHolder holder = (ViewHolder) viewHolder;
-            final CourseAttempt courseAttempt = mAttempts.get(position - 1);
-            final Attempt attempt = courseAttempt.getAssessment();
+            final Attempt attempt = mAttempts.get(position - 1);
             if (attempt.getState().equals(TestpressExamApiClient.STATE_PAUSED)) {
                 holder.completedAttemptLayout.setVisibility(View.GONE);
                 holder.pausedAttemptLayout.setVisibility(View.VISIBLE);
@@ -124,10 +122,11 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 holder.pausedAttemptLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //noinspection ConstantConditions
-                        TestpressExam.resumeCourseAttempt(mActivity,
-                                new CourseContent(mContent.getAttemptsUrl(), mContent.getExam()),
-                                courseAttempt, false, TestpressSdk.getTestpressSession(mActivity));
+                        Intent intent = new Intent(mActivity, TestActivity.class);
+                        intent.putExtra(TestActivity.PARAM_EXAM, mExam);
+                        intent.putExtra(TestActivity.PARAM_ATTEMPT, attempt);
+                        mActivity.startActivityForResult(intent,
+                                CarouselFragment.TEST_TAKEN_REQUEST_CODE);
                     }
                 });
             } else {
@@ -138,7 +137,7 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     @Override
                     public void onClick(View v) {
                         //noinspection ConstantConditions
-                        TestpressExam.showAttemptReport(mActivity, mContent.getExam(), attempt,
+                        TestpressExam.showAttemptReport(mActivity, mExam, attempt,
                                 TestpressSdk.getTestpressSession(mActivity));
                     }
                 });

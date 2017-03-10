@@ -92,7 +92,7 @@
                 android:layout_weight="0.2"
                 android:src="@drawable/testpress_negative_large"/>
             <TextView
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/negative_marks_label"
                 style="@style/TestpressExamInfoSubHeading"
                 android:layout_weight="0.5"
@@ -103,6 +103,32 @@
                 android:layout_weight="0.3"
                 android:textStyle="bold"
                 android:text="200"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/date_layout"
+            style="@style/TestpressExamInfoRow"
+            android:layout_marginBottom="5dp"
+            android:layout_gravity="center">
+            <ImageView
+                android:layout_height="20dp"
+                style="@style/TestpressExamInfoSubHeading"
+                android:layout_weight="0.2"
+                android:tint="#9900cc"
+                android:src="@drawable/testpress_calendar_icon"/>
+            <TextView
+                android:layout_height="match_parent"
+                android:id="@+id/date_label"
+                style="@style/TestpressExamInfoSubHeading"
+                android:layout_weight="0.5"
+                android:text="@string/testpress_start_date"/>
+            <TextView
+                android:id="@+id/date"
+                style="@style/TestpressExamInfoValue"
+                android:layout_weight="0.3"
+                android:textStyle="bold"
+                android:text="Nov 12, 2017 - forever"/>
         </LinearLayout>
 
         <LinearLayout

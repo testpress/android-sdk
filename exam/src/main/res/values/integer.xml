@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Subject wise analytics -->
     <integer name="testpress_subject_weight">4</integer>
     <integer name="testpress_correct_weight">2</integer>
     <integer name="testpress_incorrect_weight">3</integer>
     <integer name="testpress_unanswered_weight">3</integer>
+
+    <!-- Attempts list -->
+    <integer name="testpress_date_weight">4</integer>
+    <integer name="testpress_score_weight">3</integer>
+    <integer name="testpress_correct_answers_weight">3</integer>
+    <integer name="testpress_action_label_weight">3</integer>
+    <integer name="testpress_paused_label_weight">6</integer>
 
 </resources>

@@ -20,7 +20,7 @@
             android:scaleType="fitXY"
             android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
-            android:src="@android:drawable/sym_def_app_icon" />
+            android:src="@drawable/testpress_exam_icon" />
 
         <View
             android:id="@+id/white_foreground"
@@ -30,7 +30,6 @@
 
         <LinearLayout
             android:id="@+id/lock"
-            android:visibility="gone"
             android:background="@drawable/testpress_round_gray_background"
             android:gravity="center"
             android:layout_width="36dp"
@@ -54,6 +53,7 @@
 
         <LinearLayout
             android:id="@+id/attempted_tick"
+            android:visibility="gone"
             android:gravity="center"
             android:layout_marginRight="10dp"
             android:layout_width="30dp"

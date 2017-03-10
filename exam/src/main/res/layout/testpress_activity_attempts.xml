@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include layout="@layout/testpress_toolbar" />
+
+    <ScrollView
+        android:id="@+id/scroll_view"
+        android:layout_below="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:background="#ffffff"
+        tools:ignore="UnknownIdInLayout" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="10dp"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            tools:ignore="ScrollViewSize">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:id="@+id/exam_details_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/title"
+                    android:paddingTop="10dp"
+                    android:layout_width="match_parent"
+                    android:text="Lorem ipsum dolor sit amet, consectetur"
+                    android:gravity="center"
+                    android:lineSpacingExtra="6dp"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/testpress_black"
+                    android:layout_marginBottom="25dp"
+                    android:layout_height="wrap_content"/>
+
+                <View
+                    android:id="@+id/title_separator"
+                    android:layout_width="100dp"
+                    android:layout_height="1dp"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="5dp"
+                    android:background="#c0c0c0"/>
+
+                <include layout="@layout/testpress_exam_details_layout" />
+
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/attempt_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/attempt_web_only_label"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/testpress_black"
+                android:text="@string/testpress_web_only_exam_description"
+                android:lineSpacingExtra="5dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:gravity="center"
+                android:layout_gravity="center" />
+
+            <!-- Empty layout to keep the navigation button in bottom -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="0dp"/>
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/start_exam"
+                android:background="@drawable/testpress_green_curved_edge_background"
+                android:text="@string/testpress_start_exam"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:layout_width="match_parent"
+                android:layout_height="37dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <include
+        android:layout_below="@id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        layout="@layout/testpress_empty_view" />
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:visibility="gone"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:indeterminate="true"
+        android:layout_centerInParent="true" />
+
+</RelativeLayout>

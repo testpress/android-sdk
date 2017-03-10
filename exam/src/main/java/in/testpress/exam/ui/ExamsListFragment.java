@@ -51,12 +51,6 @@ public class ExamsListFragment extends PagedItemFragment<Exam> {
     }
 
     @Override
-    protected void configureList(Activity activity, ListView listView) {
-        super.configureList(activity, listView);
-        listView.setDividerHeight(0);
-    }
-
-    @Override
     protected ExamPager getPager() {
         if (pager == null) {
             pager = new ExamPager(subclass, category, apiClient);
@@ -68,13 +62,12 @@ public class ExamsListFragment extends PagedItemFragment<Exam> {
     protected SingleTypeAdapter<Exam> createAdapter(List<Exam> items) {
         if (subclass != null) {
             if (subclass.equals(ExamsListFragment.UPCOMING)) {
-                return new UpcomingExamsListAdapter(getActivity(), items,
-                        R.layout.upcoming_exams_list_item);
+                return new UpcomingExamsListAdapter(getActivity(), items);
             } else if (subclass.equals(ExamsListFragment.HISTORY)) {
-                return new HistoryListAdapter(getParentFragment(), items, R.layout.history_exams_list_item);
+                return new HistoryListAdapter(getParentFragment(), items);
             }
         }
-        return new AvailableExamsListAdapter(getParentFragment(), items, R.layout.available_exams_list_item);
+        return new AvailableExamsListAdapter(getParentFragment(), items);
     }
 
     @Override
