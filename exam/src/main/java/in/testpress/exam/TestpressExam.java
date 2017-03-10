@@ -33,6 +33,8 @@ import in.testpress.exam.ui.ReviewStatsActivity;
 import in.testpress.exam.ui.TestActivity;
 import in.testpress.util.ImageUtils;
 
+import static in.testpress.exam.ui.CategoryGridActivity.SHOW_EXAMS_AS_DEFAULT;
+
 public class TestpressExam {
 
     public static final String ACTION_PRESSED_HOME = "pressedHome";
@@ -56,8 +58,7 @@ public class TestpressExam {
      * @param containerViewId Container view id in which fragment needs to be replace
      * @param testpressSession TestpressSession got from the core module
      */
-    public static void show(@NonNull FragmentActivity activity,
-                            @NonNull @IdRes Integer containerViewId,
+    public static void show(@NonNull FragmentActivity activity, @IdRes int containerViewId,
                             @NonNull TestpressSession testpressSession) {
         //noinspection ConstantConditions
         if (activity == null) {
@@ -110,8 +111,7 @@ public class TestpressExam {
      * @param containerViewId Container view id in which fragment needs to be replace
      * @param testpressSession TestpressSession got from the core module
      */
-    public static void showCategories(@NonNull FragmentActivity activity,
-                                      @NonNull @IdRes Integer containerViewId,
+    public static void showCategories(@NonNull FragmentActivity activity, @IdRes int containerViewId,
                                       @NonNull TestpressSession testpressSession) {
         //noinspection ConstantConditions
         if (activity == null) {
@@ -137,7 +137,7 @@ public class TestpressExam {
      * @param context Context to start the new activity.
      * @param testpressSession TestpressSession got from the core module.
      */
-    public static void showCategories(@NonNull Context context,
+    public static void showCategories(@NonNull Context context, boolean showExamsAsDefault,
                                       @NonNull TestpressSession testpressSession) {
         //noinspection ConstantConditions
         if (context == null) {
@@ -145,6 +145,7 @@ public class TestpressExam {
         }
         init(context, testpressSession);
         Intent intent = new Intent(context, CategoryGridActivity.class);
+        intent.putExtra(SHOW_EXAMS_AS_DEFAULT, showExamsAsDefault);
         context.startActivity(intent);
     }
 

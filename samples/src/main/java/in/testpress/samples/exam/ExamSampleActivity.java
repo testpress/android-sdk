@@ -65,7 +65,7 @@ public class ExamSampleActivity extends BaseToolBarActivity {
             } else if (id == R.id.exam_list) {
                 TestpressExam.show(this, TestpressSdk.getTestpressSession(this));
             } else {
-                TestpressExam.showCategories(this, TestpressSdk.getTestpressSession(this));
+                TestpressExam.showCategories(this, false, TestpressSdk.getTestpressSession(this));
             }
         } else {
             Intent intent = new Intent(this, TestpressCoreSampleActivity.class);

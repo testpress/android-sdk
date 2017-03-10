@@ -63,14 +63,14 @@ public class TestpressExamTest {
             assertEquals("TestpressSession must not be null.", e.getMessage());
         }
         try {
-            TestpressExam.showCategories(null, testpressSession);
+            TestpressExam.showCategories(null, false, testpressSession);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("Context must not be null.", e.getMessage());
         }
         Context context = mock(Context.class);
         try {
-            TestpressExam.showCategories(context, null);
+            TestpressExam.showCategories(context, false, null);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("TestpressSession must not be null.", e.getMessage());

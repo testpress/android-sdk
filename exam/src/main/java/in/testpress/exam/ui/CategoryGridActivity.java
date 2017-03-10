@@ -17,6 +17,7 @@ import static in.testpress.exam.ui.ExamsListFragment.CATEGORY;
 
 public class CategoryGridActivity extends BaseToolBarActivity {
 
+    public static final String SHOW_EXAMS_AS_DEFAULT = "showExamsAsDefault";
     public static final String ACTIONBAR_TITLE = "title";
 
     private Fragment currentFragment;
@@ -39,7 +40,11 @@ public class CategoryGridActivity extends BaseToolBarActivity {
             //noinspection ConstantConditions
             getSupportActionBar().setTitle(title);
         }
-        currentFragment = new CategoriesGridFragment();
+        if (getIntent().getBooleanExtra(SHOW_EXAMS_AS_DEFAULT, false)) {
+            currentFragment = new CarouselFragment();
+        } else {
+            currentFragment = new CategoriesGridFragment();
+        }
         displayCurrentFragment();
     }
 
