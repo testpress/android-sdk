@@ -4,6 +4,7 @@
 
     <item
         android:id="@+id/list"
+        android:visible="false"
         android:icon="@drawable/ic_format_list_bulleted_black_24dp"
         app:showAsAction="always"
         android:title="@string/testpress_show_as_list" >
@@ -11,9 +12,8 @@
 
     <item
         android:id="@+id/grid"
-        android:visible="false"
         android:icon="@drawable/ic_dialpad_black_24dp"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:title="@string/testpress_show_as_grid" >
     </item>
 
