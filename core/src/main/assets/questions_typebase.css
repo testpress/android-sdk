@@ -218,7 +218,7 @@ table th {
 
 .radio-button-checked:after {
     display: inline-block;
-    line-height: 18px;
+    line-height: 16px;
     height: 16px;
     width: 16px;
     box-shadow: initial;
