@@ -146,6 +146,8 @@ table th {
     padding-left: 10px;
     display: flex;
     flex-flow: row;
+    color: #444;
+    font-family: 'PT-Serif-Regular', serif;
 }
 
 .review-option-item {
@@ -187,7 +189,7 @@ table th {
     font-family: 'Rubik-Medium', sans-serif;
 }
 
-.review-question {
+.question {
     font-family: 'Rubik-Medium', sans-serif;
     color: #444;
     padding: 10px;

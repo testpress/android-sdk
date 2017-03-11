@@ -98,13 +98,13 @@ public class ReviewQuestionsFragment extends Fragment {
         // Add direction/passage
         String directionHtml = reviewQuestion.getDirection();
         if (directionHtml != null && !directionHtml.isEmpty()) {
-            html += "<div class='review-question' style='padding-bottom: 0px;'>" +
+            html += "<div class='question' style='padding-bottom: 0px;'>" +
                         directionHtml +
                     "</div>";
         }
 
         // Add question
-        html += "<div class='review-question'>" +
+        html += "<div class='question'>" +
                 reviewQuestion.getQuestionHtml() +
                 "</div>";
 
