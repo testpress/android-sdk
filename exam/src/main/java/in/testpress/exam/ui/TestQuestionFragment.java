@@ -55,17 +55,11 @@ public class TestQuestionFragment extends Fragment {
     @SuppressLint({"SetTextI18n", "AddJavascriptInterface"})
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final AttemptQuestion attemptQuestion = attemptItem.getAttemptQuestion();
         if (view == null) {
             view = inflater.inflate(R.layout.testpress_fragment_test_question, container, false);
-            final ImageView directionArrow = (ImageView) view.findViewById(R.id.direction_arrow);
-            final TextView directionHeading = (TextView) view.findViewById(R.id.direction_heading);
             WebView questionsView = (WebView) view.findViewById(R.id.question);
             TextView questionIndex = (TextView) view.findViewById(R.id.question_index);
             CheckBox review = (CheckBox) view.findViewById(R.id.review);
-            WebView direction = (WebView) view.findViewById(R.id.direction_text);
-            final LinearLayout expandLayout = (LinearLayout) view.findViewById(R.id.expand_layout);
-            CardView directionLayout = (CardView) view.findViewById(R.id.direction_layout);
             questionIndex.setText(index + ".");
             final String optionType = attemptItem.getAttemptQuestion().getType();
             questionsView.addJavascriptInterface(new OptionsSelectionListener(),
@@ -94,13 +88,6 @@ public class TestQuestionFragment extends Fragment {
             review.setChecked(attemptItem.getReview());
             attemptItem.saveAnswers(attemptItem.getSelectedAnswers());
             attemptItem.setCurrentReview(attemptItem.getReview());
-            if (attemptQuestion.getDirection() == null || attemptQuestion.getDirection().isEmpty()) {
-                // If direction is empty remove slider
-                directionLayout.setVisibility(View.GONE);
-            } else {
-                WebViewUtils directionWebViewUtils = new WebViewUtils(direction);
-                directionWebViewUtils.initWebView(getDirectionHtml(), getActivity());
-            }
             ((CheckBox) view.findViewById(R.id.review)).setOnCheckedChangeListener(
                     new CompoundButton.OnCheckedChangeListener() {
                         @Override
@@ -108,32 +95,28 @@ public class TestQuestionFragment extends Fragment {
                             attemptItem.setCurrentReview(checked);
                         }
                     });
-            view.findViewById(R.id.direction_expand_button).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (expandLayout.getVisibility() == View.VISIBLE) {
-                        expandLayout.setVisibility(View.GONE);
-                        directionHeading.setText(R.string.testpress_show_passage);
-                        directionArrow.setImageResource(R.drawable.ic_expand_more_black_24dp);
-                    } else {
-                        expandLayout.setVisibility(View.VISIBLE);
-                        directionHeading.setText(R.string.testpress_hide_passage);
-                        directionArrow.setImageResource(R.drawable.ic_expand_less_black_24dp);
-                        ViewUtils.slide_down(getActivity(), expandLayout);
-                    }
-                }
-            });
         }
         return view;
     }
 
     private String getQuestionItemHtml() {
         AttemptQuestion attemptQuestion = attemptItem.getAttemptQuestion();
-        String htmlContent = "<div style='padding-left: 10px; padding-right: 10px;'>" +
-                "<table width='100%' style='margin-top:0px;'>" +
-                "<tr><td class='table-without-border'>" +
-                attemptQuestion.getQuestionHtml() +
-                "</td></tr>";
+        String htmlContent = "" +
+                "<div style='padding-left: 10px; padding-right: 10px;'>";
+        // Add direction if present
+        if (attemptQuestion.getDirection() != null && !attemptQuestion.getDirection().isEmpty()) {
+            htmlContent += "" +
+                    "<div class='question' style='padding-bottom: 0px;'>" +
+                        attemptQuestion.getDirection() +
+                    "</div>";
+        }
+        // Add question
+        htmlContent += "" +
+                "<div class='question' style='padding-bottom: 0px;'>" +
+                    attemptQuestion.getQuestionHtml() +
+                "</div>";
+        // Add options
+        htmlContent += "<table width='100%' style='margin-top:0px;'>";
         for (int i = 0; i < attemptQuestion.getAttemptAnswers().size(); i++) {
             AttemptAnswer attemptAnswer = attemptQuestion.getAttemptAnswers().get(i);
             if (attemptItem.getAttemptQuestion().getType().equals("R")) {
@@ -145,13 +128,6 @@ public class TestQuestionFragment extends Fragment {
             }
         }
         return htmlContent + "</table></div>";
-    }
-
-    private String getDirectionHtml() {
-        return "<div style='padding-left: 10px; padding-right: 10px;'>" +
-                attemptItem.getAttemptQuestion().getDirection() +
-                "</div>";
-
     }
 
     private class OptionsSelectionListener {
