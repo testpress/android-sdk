@@ -13,7 +13,7 @@ android {
     buildToolsVersion rootProject.buildToolsVersion
     defaultConfig {
         applicationId "in.testpress.samples"
-        minSdkVersion 15
+        minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 1
         versionName "1.0"
@@ -38,6 +38,9 @@ dependencies {
     testCompile rootProject.junit
     compile rootProject.appcompat
     compile rootProject.design
-    compile 'com.google.android.gms:play-services-auth:9.6.1'
-    compile 'com.facebook.android:facebook-android-sdk:4.14.1'
+    compile 'com.google.android.gms:play-services-auth:10.2.0'
+    compile 'com.facebook.android:facebook-android-sdk:4.20.0'
+    // Facebook sdk may use the different version of customtabs, To avoid the lint errors & crashes
+    // declare same version of support lib
+    compile rootProject.customtabs
 }

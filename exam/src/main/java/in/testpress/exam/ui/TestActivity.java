@@ -450,7 +450,8 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     public void onBackPressed() {
         TestFragment testFragment = null;
         try {
-             testFragment = (TestFragment) getSupportFragmentManager().getFragments().get(0);
+            //noinspection RestrictedApi
+            testFragment = (TestFragment) getSupportFragmentManager().getFragments().get(0);
         } catch (Exception e) {
         }
         if(testFragment != null) {

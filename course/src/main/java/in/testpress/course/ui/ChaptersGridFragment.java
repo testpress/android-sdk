@@ -3,6 +3,7 @@ package in.testpress.course.ui;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -124,8 +125,9 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
     }
 
     @Override
-    protected View getChildView(final Chapter chapter) {
-        View view = getActivity().getLayoutInflater().inflate(R.layout.testpress_chapter_grid_item, null, false);
+    protected View getChildView(final Chapter chapter, ViewGroup parent) {
+        View view = getActivity().getLayoutInflater().inflate(R.layout.testpress_chapter_grid_item,
+                parent, false);
         TextView name = (TextView) view.findViewById(R.id.title);
         ImageView thumbnailImage = (ImageView) view.findViewById(R.id.thumbnail_image);
         name.setText(chapter.getName());

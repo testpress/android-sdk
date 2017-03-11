@@ -1,5 +1,6 @@
 package in.testpress.samples.exam;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -91,6 +92,7 @@ public class ExamSampleActivity extends BaseToolBarActivity {
         }
     }
 
+    @SuppressLint("InflateParams")
     void getExamSlug() {
         final View dialog = getLayoutInflater().inflate(R.layout.edit_text_dialog_box, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this,

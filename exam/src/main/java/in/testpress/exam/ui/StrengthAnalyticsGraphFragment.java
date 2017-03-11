@@ -90,11 +90,7 @@ public class StrengthAnalyticsGraphFragment extends Fragment {
         weaknessLabel = (TextView) view.findViewById(R.id.weakness_label);
         unansweredLabelLayout = (LinearLayout) view.findViewById(R.id.unanswered_label_layout);
         chart = (HorizontalBarChart) view.findViewById(R.id.chart);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            getActivity().invalidateOptionsMenu();
-        } else {
-            getActivity().supportInvalidateOptionsMenu();
-        }
+        getActivity().invalidateOptionsMenu();
         setSelectedSpinnerItem(0);
         return view;
     }
