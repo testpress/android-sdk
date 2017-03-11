@@ -658,7 +658,7 @@ public class ContentActivity extends BaseToolBarActivity {
         buttonLayout.setVisibility(View.VISIBLE);
     }
 
-    class ImageHandler {
+    private class ImageHandler {
         @JavascriptInterface
         public void onClickImage(String url) {
             startActivity(ZoomableImageActivity.createIntent(url, ContentActivity.this));

@@ -26,7 +26,7 @@ task clean(type: Delete) {
 
 ext {
     compileSdkVersion = 24
-    minSdkVersion = 9
+    minSdkVersion = 15
     targetSdkVersion = 24
     buildToolsVersion = '25.0.2'
     supportLib = '25.2.0'
@@ -41,6 +41,7 @@ ext {
     httpLogInterceptor = 'com.squareup.okhttp3:logging-interceptor:3.4.1'
     design = 'com.android.support:design:' + supportLib
     cardview = 'com.android.support:cardview-v7:' + supportLib
+    customtabs = 'com.android.support:customtabs:' + supportLib
     universalImageLoader = 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     chart = 'com.github.testpress:MPAndroidChart:v3.0.0-beta2'
     greendao = 'org.greenrobot:greendao:3.2.0'

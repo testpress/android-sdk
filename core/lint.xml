@@ -15,10 +15,15 @@
     <issue id="ClickableViewAccessibility">
         <ignore regexp="java/.*/TouchImageView.java" />
     </issue>
+    <issue id="ObsoleteSdkInt">
+        <ignore regexp="java/.*/TouchImageView.java" />
+    </issue>
 
     <issue id="UnusedResources">
         <ignore regexp="res/.*/testpress_placeholder_icon.png" />
-        <ignore regexp="res/.*/testpress_cloud_off_black.png" />
+        <ignore regexp="res/.*/ic_chevron_right_black_24dp.png" />
+        <ignore regexp="res/.*/testpress_alert_warning.png" />
+        <ignore regexp="res/.*/testpress_no_wifi.png" />
         <ignore regexp="res/.*/testpress_filter_icon.png" />
         <ignore regexp="res/.*/testpress_tick_black.png" />
         <ignore regexp="res/.*/testpress_filter.xml" />

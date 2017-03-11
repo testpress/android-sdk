@@ -261,7 +261,7 @@ public abstract class BaseGridFragment<E> extends Fragment
                     if (noOfItemsAvailable == itemPosition) {
                         break;
                     }
-                    View childView = getChildView(items.get(itemPosition));
+                    View childView = getChildView(items.get(itemPosition), row);
                     TableRow.LayoutParams params = getLayoutParams();
                     if (i != 1) {
                         params.leftMargin = columnSpacing;
@@ -395,7 +395,7 @@ public abstract class BaseGridFragment<E> extends Fragment
 
     protected abstract int getChildColumnWidth();
 
-    protected abstract View getChildView(E item);
+    protected abstract View getChildView(E item, ViewGroup parent);
 
     protected abstract void setEmptyText();
 

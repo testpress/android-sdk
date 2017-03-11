@@ -187,11 +187,7 @@ public class ReviewStatsFragment extends Fragment {
                         }
                         attempt = response.getResults().get(0);
                         if (exam.getAllowPdf()) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                                getActivity().invalidateOptionsMenu();
-                            } else {
-                                getActivity().supportInvalidateOptionsMenu();
-                            }
+                            getActivity().invalidateOptionsMenu();
                         }
                         displayTestReport();
                     }

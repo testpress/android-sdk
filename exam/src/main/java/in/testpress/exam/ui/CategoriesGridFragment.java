@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -55,9 +56,9 @@ public class CategoriesGridFragment extends BaseGridFragment<Category> {
     }
 
     @Override
-    protected View getChildView(final Category category) {
+    protected View getChildView(final Category category, ViewGroup parent) {
         View view = getActivity().getLayoutInflater().inflate(R.layout.testpress_category_grid_item,
-                null, false);
+                parent, false);
         TextView name = (TextView) view.findViewById(R.id.title);
         ImageView thumbnailImage = (ImageView) view.findViewById(R.id.thumbnail_image);
         name.setText(category.getName());
