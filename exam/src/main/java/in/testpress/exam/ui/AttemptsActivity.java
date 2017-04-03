@@ -136,7 +136,7 @@ public class AttemptsActivity extends BaseToolBarActivity {
     }
 
     private boolean canAttemptExam() {
-        if (exam.getAttemptsCount() == 0 ||
+        if (exam.getAttemptsCount() == 0 || exam.getPausedAttemptsCount() != 0 ||
                 ((exam.getAllowRetake()) &&
                         (exam.getAttemptsCount() <= exam.getMaxRetakes() ||
                                 exam.getMaxRetakes() < 0))) {
