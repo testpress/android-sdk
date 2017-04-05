@@ -261,6 +261,10 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             previous.setTextColor(ContextCompat.getColor(getActivity(), R.color.testpress_color_primary));
         }
 
+        updateNextButton(position);
+    }
+
+    private void updateNextButton(int position) {
         if ((position + 1) == attemptItemList.size()) {
             // Reached last question
             next.setTextColor(ContextCompat.getColor(getActivity(), R.color.testpress_red));
@@ -408,6 +412,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         }
         panelListAdapter.setItems(attemptItemList);
         questionsListView.setAdapter(panelListAdapter);
+        updateNextButton(pager.getCurrentItem());
         startCountDownTimer(formatMillisecond(attempt.getRemainingTime()));
     }
 
