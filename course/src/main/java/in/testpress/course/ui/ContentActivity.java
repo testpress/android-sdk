@@ -320,10 +320,8 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void onExamContent() {
-        Exam exam = content.getExam();
         titleView.setText(content.getName());
-        if (content.getAttemptsCount() > 1 ||
-                (content.getAttemptsCount() == 1 && exam.getPausedAttemptsCount() == 0)) {
+        if (content.getAttemptsCount() > 0) {
             courseAttempts.clear();
             attemptsUrl = content.getAttemptsUrl();
             loadAttempts();
@@ -358,11 +356,6 @@ public class ContentActivity extends BaseToolBarActivity {
             descriptionContent.setText(exam.getDescription());
         }
         if (canAttemptExam(exam)) {
-            if (exam.getPausedAttemptsCount() > 0) {
-                startButton.setText(R.string.testpress_resume);
-            } else {
-                startButton.setText(R.string.testpress_start);
-            }
             startButton.setVisibility(View.VISIBLE);
         } else {
             startButton.setVisibility(View.GONE);

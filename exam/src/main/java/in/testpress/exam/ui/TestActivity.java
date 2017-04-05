@@ -59,13 +59,9 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private static final int START_ATTEMPT_LOADER = 0;
     private static final int RESUME_ATTEMPT_LOADER = 1;
     private static final int END_ATTEMPT_LOADER = 2;
-    private static final int PAUSED_COURSE_ATTEMPTS_LOADER = 3;
     private TestpressExamApiClient apiClient;
     private Exam exam;
     private Attempt attempt;
-    private ContentAttemptsPager contentAttemptsPager;
-    @SuppressWarnings("FieldCanBeLocal")
-    private List<CourseAttempt> courseAttempts = new ArrayList<>();
     private CourseContent courseContent;
     private CourseAttempt courseAttempt;
     private boolean discardExamDetails;
@@ -239,14 +235,11 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         } else if (exam.getPausedAttemptsCount() > 0) {
             if (attempt == null) {
                 if (courseContent != null) {
-                    contentAttemptsPager = new ContentAttemptsPager(
-                            courseContent.getAttemptsUrl(), STATE_PAUSED, apiClient);
-                    getSupportLoaderManager().initLoader(PAUSED_COURSE_ATTEMPTS_LOADER, null,
-                            TestActivity.this);
+                    startExam.setVisibility(View.VISIBLE);
                 } else {
                     loadAttempts(exam.getAttemptsUrl());
+                    return;
                 }
-                return;
             } else {
                 String action = getIntent().getStringExtra(PARAM_ACTION);
                 if (action != null && action.equals(PARAM_VALUE_ACTION_END)) {
@@ -318,9 +311,6 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         return new ThrowableLoader<Attempt>(TestActivity.this, attempt) {
             @Override
             public Attempt loadData() throws TestpressException {
-                if (id == PAUSED_COURSE_ATTEMPTS_LOADER) {
-                    return loadCourseAttempt();
-                }
                 if (courseContent != null && id != RESUME_ATTEMPT_LOADER) {
                     RetrofitCall<CourseAttempt> call = null;
                     switch (id) {
@@ -352,18 +342,6 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         };
     }
 
-    private Attempt loadCourseAttempt() {
-        do {
-            contentAttemptsPager.next();
-            courseAttempts = contentAttemptsPager.getResources();
-        } while (courseAttempts.isEmpty() && contentAttemptsPager.hasNext());
-        if (courseAttempts.isEmpty()) {
-            throw TestpressException.unexpectedError(new Throwable("No Paused Attempts Exist!"));
-        }
-        courseAttempt = courseAttempts.get(0);
-        return courseAttempt.getAssessment();
-    }
-
     private <T> T executeRetrofitCall(RetrofitCall<T> call) {
         try {
             if (call != null) {
@@ -388,10 +366,6 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         //noinspection ThrowableResultOfMethodCallIgnored
         TestpressException exception = ((ThrowableLoader<Attempt>) loader).clearException();
         if(exception == null) {
-            if (loader.getId() == PAUSED_COURSE_ATTEMPTS_LOADER) {
-                displayStartExamScreen();
-                return;
-            }
             fragmentContainer.setVisibility(View.VISIBLE);
             if (attempt.getState().equals("Running")) {
                 if (getSupportActionBar() != null) {
