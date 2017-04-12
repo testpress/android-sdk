@@ -35,13 +35,12 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
 
     @Override
     public Course getItem(int position) {
-        return mCourseDao.queryBuilder().orderAsc(CourseDao.Properties.Id).listLazy().get(position);
+        return mCourseDao.queryBuilder().orderAsc(CourseDao.Properties.Order).listLazy().get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return mCourseDao.queryBuilder().orderAsc(CourseDao.Properties.Id).listLazy().get(position)
-                .getId();
+        return getItem(position).getId();
     }
 
     @Override
