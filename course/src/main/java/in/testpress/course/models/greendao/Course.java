@@ -24,6 +24,7 @@ public class Course {
     private Integer trophiesCount;
     private Integer chaptersCount;
     private Integer contentsCount;
+    private Integer order;
 
     @Generated
     public Course() {
@@ -34,7 +35,7 @@ public class Course {
     }
 
     @Generated
-    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount) {
+    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount, Integer order) {
         this.id = id;
         this.url = url;
         this.title = title;
@@ -48,6 +49,7 @@ public class Course {
         this.trophiesCount = trophiesCount;
         this.chaptersCount = chaptersCount;
         this.contentsCount = contentsCount;
+        this.order = order;
     }
 
     public Long getId() {
@@ -152,6 +154,14 @@ public class Course {
 
     public void setContentsCount(Integer contentsCount) {
         this.contentsCount = contentsCount;
+    }
+
+    public Integer getOrder() {
+        return order;
+    }
+
+    public void setOrder(Integer order) {
+        this.order = order;
     }
 
 }
