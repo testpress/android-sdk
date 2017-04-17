@@ -40,6 +40,7 @@ public class ReviewStatsFragment extends Fragment {
     private TextView timeTaken;
     private TextView score;
     private TextView rank;
+    private TextView maxRank;
     private TextView correct;
     private TextView incorrect;
     private TextView accuracy;
@@ -81,6 +82,7 @@ public class ReviewStatsFragment extends Fragment {
         timeTaken = (TextView) view.findViewById(R.id.time_taken);
         score = (TextView) view.findViewById(R.id.score);
         rank = (TextView) view.findViewById(R.id.rank);
+        maxRank = (TextView) view.findViewById(R.id.max_rank);
         correct = (TextView) view.findViewById(R.id.correct_count);
         incorrect = (TextView) view.findViewById(R.id.incorrect_count);
         accuracy = (TextView) view.findViewById(R.id.accuracy);
@@ -101,8 +103,12 @@ public class ReviewStatsFragment extends Fragment {
         TextView correctLabel = (TextView) view.findViewById(R.id.correct_label);
         TextView incorrectLabel = (TextView) view.findViewById(R.id.incorrect_label);
         TextView accuracyLabel = (TextView) view.findViewById(R.id.accuracy_label);
-        ViewUtils.setTypeface(new TextView[] {scoreLabel, rankLabel, correctLabel, incorrectLabel,
-                timeTakenLabel, accuracyLabel, examTitle, attemptDate, emptyDescView, emailPdfButton},
+        ViewUtils.setTypeface(
+                new TextView[] {
+                        scoreLabel, rankLabel, correctLabel, incorrectLabel, timeTakenLabel,
+                        accuracyLabel, examTitle, attemptDate, emptyDescView, emailPdfButton,
+                        maxRank
+                },
                 TestpressSdk.getRubikRegularFont(getContext()));
         return view;
     }
@@ -133,6 +139,7 @@ public class ReviewStatsFragment extends Fragment {
             rankLayout.setVisibility(View.GONE);
         } else {
             rank.setText(attempt.getRank());
+            maxRank.setText(attempt.getMaxRank());
         }
         score.setText(attempt.getScore());
         accuracy.setText(attempt.getAccuracy().toString());

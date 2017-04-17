@@ -22,6 +22,7 @@ public class Attempt implements Parcelable {
     private Integer totalQuestions;
     private String score;
     private String rank;
+    private String maxRank;
     private String reviewUrl;
     private String questionsUrl;
     private Integer correctCount;
@@ -42,6 +43,7 @@ public class Attempt implements Parcelable {
         totalQuestions = parcel.readInt();
         score = parcel.readString();
         rank = parcel.readString();
+        maxRank = parcel.readString();
         reviewUrl = parcel.readString();
         questionsUrl = parcel.readString();
         correctCount = parcel.readInt();
@@ -68,6 +70,7 @@ public class Attempt implements Parcelable {
         parcel.writeInt(totalQuestions);
         parcel.writeString(score);
         parcel.writeString(rank);
+        parcel.writeString(maxRank);
         parcel.writeString(reviewUrl);
         parcel.writeString(questionsUrl);
         parcel.writeInt(correctCount);
@@ -253,6 +256,24 @@ public class Attempt implements Parcelable {
      */
     public void setRank(String rank) {
         this.rank = rank;
+    }
+
+    /**
+     *
+     * @return
+     * The rank
+     */
+    public String getMaxRank() {
+        return maxRank;
+    }
+
+    /**
+     *
+     * @param rank
+     * The rank
+     */
+    public void setMaxRank(String rank) {
+        this.maxRank = rank;
     }
 
     /**

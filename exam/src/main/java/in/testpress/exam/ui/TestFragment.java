@@ -67,6 +67,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private ProgressDialog progressDialog;
     private Attempt attempt;
     private Exam exam;
+    private int currentPosition;
     private TestQuestionsPager questionsPager;
     private List<AttemptItem> attemptItemList = new ArrayList<AttemptItem>();
     private CountDownTimer countDownTimer;
@@ -236,8 +237,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         if (attemptItemList.isEmpty()) {
             return;
         }
-        saveResult(pager.getCurrentItem(), Action.UPDATE_ANSWER);
+        saveResult(currentPosition, Action.UPDATE_ANSWER);
         pager.setCurrentItem(position);
+        currentPosition = position;
         panelListAdapter.setCurrentAttemptItemIndex(position + 1);
         if (slidingPaneLayout.isOpen()) {
             slidingPaneLayout.closePane();

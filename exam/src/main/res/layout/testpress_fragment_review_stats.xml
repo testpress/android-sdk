@@ -65,12 +65,37 @@
                     android:layout_weight="1"
                     android:layout_height="wrap_content" >
 
-                    <TextView
-                        style="@style/TestpressReviewStatValue"
-                        android:id="@+id/rank"
-                        android:text="5"
-                        android:textSize="24sp"
-                        android:layout_gravity="center" />
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center" >
+
+                        <TextView
+                            style="@style/TestpressReviewStatValue"
+                            android:id="@+id/rank"
+                            android:text="5"
+                            android:layout_gravity="bottom"
+                            android:textSize="24sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="/"
+                            android:textSize="15sp"
+                            android:layout_marginBottom="1dp"
+                            android:layout_gravity="bottom" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/max_rank"
+                            android:text="15"
+                            android:textSize="14sp"
+                            android:layout_marginBottom="1dp"
+                            android:layout_gravity="bottom" />
+
+                    </LinearLayout>
 
                     <TextView
                         style="@style/TestpressReviewStatLabel"
