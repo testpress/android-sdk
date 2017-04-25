@@ -24,7 +24,7 @@ public class CarouselFragment extends Fragment {
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
                 .replace(containerViewId, new CarouselFragment())
-                .commit();
+                .commitAllowingStateLoss();
     }
 
     @Override
@@ -54,10 +54,12 @@ public class CarouselFragment extends Fragment {
         if ((requestCode == TEST_TAKEN_REQUEST_CODE) && (Activity.RESULT_OK == resultCode)) {
             if ((viewPager.getCurrentItem() == 0)) {
                 // If current tab is available exams then refresh it & move to history tab
-                getFragmentByPosition(0).refreshWithProgress();
+                if (getFragmentByPosition(0) != null) {
+                    getFragmentByPosition(0).refreshWithProgress();
+                }
                 viewPager.setCurrentItem(2);
             }
-            if (getFragmentByPosition(2).getListView() != null) {
+            if (getFragmentByPosition(2) != null && getFragmentByPosition(2).getListView() != null) {
                 // Refresh history tab
                 getFragmentByPosition(2).refreshWithProgress();
             }

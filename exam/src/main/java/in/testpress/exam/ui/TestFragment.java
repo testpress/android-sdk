@@ -362,6 +362,10 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             builder.show();
             return;
         }
+        if (attempt.getRemainingTime() == null || attempt.getRemainingTime().equals("00:00:00")) {
+            endExam();
+            return;
+        }
         /**
          * Used to get subjects in order as it fetched
          */
@@ -442,6 +446,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                     .enqueue(new TestpressCallback<AttemptItem>() {
                         @Override
                         public void onSuccess(AttemptItem newAttemptItem) {
+                            if (getActivity() == null) {
+                                return;
+                            }
                             attemptItem.setSelectedAnswers(newAttemptItem.getSelectedAnswers());
                             attemptItem.setReview(newAttemptItem.getReview());
                             attemptItemList.set(position, attemptItem);
@@ -462,6 +469,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
                         @Override
                         public void onException(TestpressException exception) {
+                            if (getActivity() == null) {
+                                return;
+                            }
                             if (action.equals(Action.PAUSE)) {
                                 progressDialog.dismiss();
                                 returnToHistory();
@@ -487,6 +497,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         apiClient.heartbeat(attempt.getHeartBeatUrlFrag()).enqueue(new TestpressCallback<Attempt>() {
             @Override
             public void onSuccess(Attempt result) {
+                if (getActivity() == null) {
+                    return;
+                }
                 if (progressDialog.isShowing()) {
                     startCountDownTimer(millisRemaining);
                     progressDialog.dismiss();
@@ -495,6 +508,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
             @Override
             public void onException(TestpressException exception) {
+                if (getActivity() == null) {
+                    return;
+                }
                 countDownTimer.cancel();
                 TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception) {
                     @Override
@@ -523,6 +539,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                     .enqueue(new TestpressCallback<CourseAttempt>() {
                         @Override
                         public void onSuccess(CourseAttempt courseAttempt) {
+                            if (getActivity() == null) {
+                                return;
+                            }
                             if (progressDialog.isShowing()) {
                                 progressDialog.dismiss();
                             }
@@ -531,6 +550,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
                         @Override
                         public void onException(TestpressException exception) {
+                            if (getActivity() == null) {
+                                return;
+                            }
                             TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception);
                             if (exception.isNetworkError()) {
                                 alertDialog.setMessage(R.string.testpress_exam_paused_check_internet_to_end);
@@ -551,6 +573,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                     .enqueue(new TestpressCallback<Attempt>() {
                         @Override
                         public void onSuccess(Attempt attempt) {
+                            if (getActivity() == null) {
+                                return;
+                            }
                             if (progressDialog.isShowing()) {
                                 progressDialog.dismiss();
                             }
@@ -560,6 +585,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
                         @Override
                         public void onException(TestpressException exception) {
+                            if (getActivity() == null) {
+                                return;
+                            }
                             TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception);
                             if (exception.isNetworkError()) {
                                 alertDialog.setMessage(R.string.testpress_exam_paused_check_internet_to_end);
@@ -602,7 +630,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     private void onExpandPanel() {
-        if (attemptItemList.get(pager.getCurrentItem()).hasChanged()) {
+        if (!attemptItemList.isEmpty() && attemptItemList.get(pager.getCurrentItem()).hasChanged()) {
             saveResult(pager.getCurrentItem(), Action.UPDATE_ANSWER);
         }
         pager.setSwipeEnabled(false);
@@ -683,6 +711,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             }
 
             public void onFinish() {
+                if (getActivity() == null) {
+                    return;
+                }
                 endExam();
             }
         }.start();
