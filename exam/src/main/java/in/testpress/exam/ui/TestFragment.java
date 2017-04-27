@@ -229,7 +229,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         if (next.getText().equals(getResources().getString(R.string.testpress_end))) {
             endExamAlert();
         } else if (pager.getCurrentItem() < (pagerAdapter.getCount() - 1)) {
-            goToQuestion(pager.getCurrentItem() + 1);
+            pager.setCurrentItem(pager.getCurrentItem() + 1);
         }
     }
 
@@ -238,7 +238,6 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             return;
         }
         saveResult(currentPosition, Action.UPDATE_ANSWER);
-        pager.setCurrentItem(position);
         currentPosition = position;
         panelListAdapter.setCurrentAttemptItemIndex(position + 1);
         if (slidingPaneLayout.isOpen()) {
@@ -279,7 +278,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
     private void showPreviousQuestion() {
         if (pager.getCurrentItem() != 0) {
-            goToQuestion(pager.getCurrentItem() - 1);
+            pager.setCurrentItem(pager.getCurrentItem() - 1);
         }
     }
 
