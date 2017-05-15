@@ -163,9 +163,12 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int position,
                                             long id) {
-                        goToQuestion(((AttemptItem) questionsListView.getItemAtPosition(position))
-                                .getIndex() - 1);
-            }
+
+                        int index = ((AttemptItem) questionsListView.getItemAtPosition(position))
+                                .getIndex();
+
+                        pager.setCurrentItem(index - 1);
+                    }
         });
         view.findViewById(R.id.previous).setOnClickListener(new View.OnClickListener() {
             @Override
