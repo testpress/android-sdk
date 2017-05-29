@@ -2,14 +2,14 @@ package in.testpress.exam.ui;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import java.util.Collections;
 import java.util.List;
 
 import in.testpress.exam.models.AttemptItem;
 
-class TestQuestionPagerAdapter extends FragmentPagerAdapter {
+class TestQuestionPagerAdapter extends FragmentStatePagerAdapter {
 
     private  int numberOfPages = 0;
     private  List<AttemptItem> attemptItemList = Collections.emptyList();

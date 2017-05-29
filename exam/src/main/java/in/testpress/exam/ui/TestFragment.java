@@ -208,7 +208,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                     navigationButtonPressed = false;
                 } else {
                     // Spinner item changed by selecting subject in spinner
-                    goToQuestion(subjectsOffset.get(subject));
+                    pager.setCurrentItem(subjectsOffset.get(subject));
                 }
             }
 
