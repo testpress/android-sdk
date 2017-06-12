@@ -55,7 +55,7 @@ public class ZoomableImageActivity extends Activity {
                             emptyView.setText(R.string.testpress_no_internet_try_again);
                         } else {
                             emptyView.setVisibility(View.VISIBLE);
-                            emptyView.setText(failReason.getCause().getMessage());
+                            emptyView.setText(getString(R.string.testpress_some_thing_went_wrong_try_again));
                         }
                     }
 
