@@ -364,8 +364,23 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             builder.show();
             return;
         }
+
         if (attempt.getRemainingTime() == null || attempt.getRemainingTime().equals("00:00:00")) {
             endExam();
+            return;
+        }
+        if (items.isEmpty()) { // Display alert if no questions exist
+            new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
+                    .setTitle(R.string.testpress_no_questions)
+                    .setMessage(R.string.testpress_no_questions_message)
+                    .setCancelable(false)
+                    .setNeutralButton(R.string.testpress_ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            returnToHistory();
+                        }
+                    })
+                    .show();
             return;
         }
         /**

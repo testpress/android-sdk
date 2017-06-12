@@ -189,7 +189,12 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 .enqueue(new TestpressCallback<TestpressApiResponse<Attempt>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Attempt> response) {
-                        TestActivity.this.attempt = response.getResults().get(0);
+                        List<Attempt> attempts = response.getResults();
+                        if (attempts.isEmpty()) {
+                            exam.setPausedAttemptsCount(0);
+                        } else {
+                            TestActivity.this.attempt = attempts.get(0);
+                        }
                         displayStartExamScreen();
                     }
 
