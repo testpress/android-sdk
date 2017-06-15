@@ -14,13 +14,13 @@
         android:layout_height="match_parent"
         android:fillViewport="true"
         android:background="#ffffff"
+        android:layout_above="@+id/start_button_layout"
         tools:ignore="UnknownIdInLayout" >
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="10dp"
             android:paddingRight="10dp"
             android:paddingLeft="10dp"
             tools:ignore="ScrollViewSize">
@@ -28,6 +28,7 @@
             <LinearLayout
                 android:orientation="vertical"
                 android:visibility="gone"
+                android:paddingTop="10dp"
                 android:id="@+id/exam_details_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" >
@@ -77,27 +78,36 @@
                 android:gravity="center"
                 android:layout_gravity="center" />
 
-            <!-- Empty layout to keep the navigation button in bottom -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_weight="1"
-                android:layout_height="0dp"/>
-
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/start_exam"
-                android:background="@drawable/testpress_green_curved_edge_background"
-                android:text="@string/testpress_start_exam"
-                android:gravity="center"
-                android:textSize="16sp"
-                android:textColor="@android:color/white"
-                android:layout_width="match_parent"
-                android:layout_height="37dp"
-                android:layout_marginBottom="20dp"
-                android:layout_marginTop="20dp" />
-
         </LinearLayout>
 
     </ScrollView>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/start_button_layout"
+        android:layout_marginTop="-5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@drawable/testpress_gradient_shadow_gray_top" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/start_exam"
+            android:background="@drawable/testpress_green_curved_edge_background"
+            android:text="@string/testpress_start_exam"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_margin="10dp"/>
+
+    </LinearLayout>
 
     <include
         android:layout_below="@id/appbar"
