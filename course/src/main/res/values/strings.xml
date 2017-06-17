@@ -7,4 +7,8 @@
     <string name="testpress_no_courses_description">You can buy courses from the store.</string>
     <string name="testpress_error_loading_courses">Loading courses failed</string>
 
+    <string name="testpress_no_chapter">No Chapter Available</string>
+    <string name="testpress_no_chapter_description">This course didn\'t contain any chapter now. Please try after some time.</string>
+    <string name="testpress_error_loading_chapters">Loading chapters failed</string>
+
 </resources>

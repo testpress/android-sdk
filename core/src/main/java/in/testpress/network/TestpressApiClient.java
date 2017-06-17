@@ -24,6 +24,12 @@ public class TestpressApiClient {
     public static final String SOCIAL_AUTH_PATH= "api/v2.2/social-auth/";
     public static final String TESTPRESS_AUTH_PATH= "api/v2.2/auth-token/";
 
+    /**
+     * Query Params
+     */
+    public static final String PAGE = "page";
+    public static final String PARENT = "parent";
+
     protected final Retrofit retrofit;
 
     /**

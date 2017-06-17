@@ -47,7 +47,8 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         view(3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // ToDo: Show chapters on clicking the course
+                mActivity.startActivity(ChaptersGridActivity.createIntent(course.getTitle(),
+                        course.getChaptersUrlFrag(), null, mActivity));
             }
         });
         // ToDo: Set completed percentage in the progress bar
