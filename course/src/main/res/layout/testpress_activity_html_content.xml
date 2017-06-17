@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include layout="@layout/testpress_toolbar" />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffffff" >
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/web_layout"
+                android:paddingTop="20dp"
+                android:paddingRight="20dp"
+                android:paddingLeft="20dp"
+                tools:ignore="ScrollViewSize">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="match_parent"
+                    android:text="Lorem ipsum dolor sit amet, consectetur"
+                    android:gravity="center"
+                    android:lineSpacingExtra="6dp"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/testpress_black"
+                    android:layout_marginBottom="25dp"
+                    android:layout_height="wrap_content"/>
+
+                <View
+                    android:id="@+id/title_separator"
+                    android:layout_width="100dp"
+                    android:layout_height="1dp"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="5dp"
+                    android:background="#c0c0c0"/>
+
+                <WebView
+                    android:id="@+id/web_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#efefef"/>
+
+                <LinearLayout
+                    android:id="@+id/button_layout"
+                    android:orientation="horizontal"
+                    tools:ignore="UnusedAttribute"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <android.support.v7.widget.AppCompatButton
+                        android:id="@+id/previous"
+                        android:background="@drawable/testpress_green_stroke"
+                        android:text="@string/testpress_previous_content"
+                        android:gravity="center"
+                        android:textSize="16sp"
+                        android:textColor="@color/testpress_green_light"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginRight="10dp" />
+
+                    <android.support.v7.widget.AppCompatButton
+                        android:id="@+id/next"
+                        android:background="@drawable/testpress_green_curved_edge_background"
+                        android:text="@string/testpress_next_content"
+                        android:gravity="center"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/white"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginLeft="10dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <include layout="@layout/testpress_empty_view" />
+
+</LinearLayout>

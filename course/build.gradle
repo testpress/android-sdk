@@ -29,3 +29,5 @@ dependencies {
     androidTestCompile rootProject.junit
     androidTestCompile rootProject.testRunner
 }
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

@@ -31,7 +31,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     @Override
     protected int[] getChildViewIds() {
         return new int[] { R.id.course_title, R.id.thumbnail_image, R.id.percentage,
-                R.id.course_item_layout };
+                R.id.course_item_layout,  R.id.progress_bar_layout};
     }
 
     @Override
@@ -52,6 +52,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
             }
         });
         // ToDo: Set completed percentage in the progress bar
+        setGone(4, true);
     }
 
 }

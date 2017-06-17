@@ -15,4 +15,10 @@
     <string name="testpress_no_content_description">This chapter didn\'t contain any contents now. Please try after some time.</string>
     <string name="testpress_error_loading_contents">Loading contents failed</string>
 
+    <string name="testpress_content_not_available">Empty Content</string>
+    <string name="testpress_content_not_available_description">Will be updated soon. Please try after some time.</string>
+
+    <string name="testpress_previous_content">Previous</string>
+    <string name="testpress_next_content">Next</string>
+
 </resources>
