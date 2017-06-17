@@ -3,6 +3,7 @@ package in.testpress.course.network;
 import java.util.Map;
 
 import in.testpress.course.models.Chapter;
+import in.testpress.course.models.Content;
 import in.testpress.course.models.Course;
 import in.testpress.model.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
@@ -19,6 +20,11 @@ public interface CourseService {
     @GET("{chapters_url}")
     RetrofitCall<TestpressApiResponse<Chapter>> getChapters(
             @Path(value = "chapters_url", encoded = true) String chaptersUrlFrag,
+            @QueryMap Map<String, Object> queryParams);
+
+    @GET("{contents_url}")
+    RetrofitCall<TestpressApiResponse<Content>> getContents(
+            @Path(value = "contents_url", encoded = true) String contentsUrlFrag,
             @QueryMap Map<String, Object> queryParams);
 
 }
