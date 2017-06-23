@@ -27,6 +27,7 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
         public final static Property Direction = new Property(2, String.class, "direction", false, "DIRECTION");
         public final static Property Subject = new Property(3, String.class, "subject", false, "SUBJECT");
         public final static Property ExplanationHtml = new Property(4, String.class, "explanationHtml", false, "EXPLANATION_HTML");
+        public final static Property CommentsUrl = new Property(5, String.class, "commentsUrl", false, "COMMENTS_URL");
     }
 
     private DaoSession daoSession;
@@ -49,7 +50,8 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
                 "\"QUESTION_HTML\" TEXT," + // 1: questionHtml
                 "\"DIRECTION\" TEXT," + // 2: direction
                 "\"SUBJECT\" TEXT," + // 3: subject
-                "\"EXPLANATION_HTML\" TEXT);"); // 4: explanationHtml
+                "\"EXPLANATION_HTML\" TEXT," + // 4: explanationHtml
+                "\"COMMENTS_URL\" TEXT);"); // 5: commentsUrl
     }
 
     /** Drops the underlying database table. */
@@ -86,6 +88,11 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
         if (explanationHtml != null) {
             stmt.bindString(5, explanationHtml);
         }
+ 
+        String commentsUrl = entity.getCommentsUrl();
+        if (commentsUrl != null) {
+            stmt.bindString(6, commentsUrl);
+        }
     }
 
     @Override
@@ -116,6 +123,11 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
         if (explanationHtml != null) {
             stmt.bindString(5, explanationHtml);
         }
+ 
+        String commentsUrl = entity.getCommentsUrl();
+        if (commentsUrl != null) {
+            stmt.bindString(6, commentsUrl);
+        }
     }
 
     @Override
@@ -136,7 +148,8 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // questionHtml
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // direction
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // subject
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // explanationHtml
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // explanationHtml
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // commentsUrl
         );
         return entity;
     }
@@ -148,6 +161,7 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
         entity.setDirection(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setSubject(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setExplanationHtml(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setCommentsUrl(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
      }
     
     @Override

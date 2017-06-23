@@ -514,6 +514,10 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         button.setEnabled(enable);
     }
 
+    void setNavigationBarVisible(boolean visible) {
+        buttonLayout.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
     protected void setEmptyText(final int title, final int description) {
         questionLayout.setVisibility(View.GONE);
         buttonLayout.setVisibility(View.GONE);

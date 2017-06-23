@@ -11,7 +11,7 @@ import org.greenrobot.greendao.generator.ToOne;
 public class TestpressDaoGenerator {
     // Increase the version if any modification has been made in this file.
     // Keep same version in all schemas.
-    private static final int VERSION = 3;
+    private static final int VERSION = 4;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.course.models.greendao");
@@ -106,6 +106,7 @@ public class TestpressDaoGenerator {
                 "IntegerListConverter"
         );
         reviewItem.addBooleanProperty("review");
+        reviewItem.addIntProperty("commentsCount");
         return reviewItem;
     }
 
@@ -124,6 +125,7 @@ public class TestpressDaoGenerator {
         reviewQuestion.addStringProperty("direction");
         reviewQuestion.addStringProperty("subject");
         reviewQuestion.addStringProperty("explanationHtml");
+        reviewQuestion.addStringProperty("commentsUrl");
         return reviewQuestion;
     }
 

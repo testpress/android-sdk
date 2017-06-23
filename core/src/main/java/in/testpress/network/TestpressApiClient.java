@@ -30,6 +30,10 @@ public class TestpressApiClient {
     public static final String PAGE = "page";
     public static final String PARENT = "parent";
 
+    public static final String SINCE = "since";
+    public static final String UNTIL = "until";
+    public static final String ORDER = "order";
+
     protected final Retrofit retrofit;
 
     /**

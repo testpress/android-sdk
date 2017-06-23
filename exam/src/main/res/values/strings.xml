@@ -153,4 +153,15 @@
 
     <string name="testpress_no_questions_message">No questions added to this exam till now, Please check back later or contact administrator</string>
 
+    <string name="comments_title">Comments</string>
+    <string name="write_a_comment">Write a comment...</string>
+    <string name="load_previous_comments">Load previous comments</string>
+    <string name="load_new_comments">Load new comments</string>
+    <string name="load_comments">Load comments</string>
+    <string name="comment_posted">Comment posted successfully</string>
+    <string name="no_comments">Be the first to post a comment</string>
+    <plurals name="new_comments_available">
+        <item quantity="one">Tap to view a new comment</item>
+        <item quantity="other">Tap to view %d new comments</item>
+    </plurals>
 </resources>

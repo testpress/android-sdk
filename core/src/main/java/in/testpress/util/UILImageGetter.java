@@ -30,6 +30,8 @@ public class UILImageGetter implements Html.ImageGetter {
 
     @Override
     public Drawable getDrawable(String source) {
+        // Remove \" from beginning & end if present in src.
+        source = source.replaceAll("^\\\\\"|\\\\\"$", "");
         UrlImageDownloader urlDrawable = new UrlImageDownloader(activity.getApplicationContext()
                 .getResources(), source);
         ImageUtils.initImageLoader(activity).loadImage(source, new SimpleListener(urlDrawable));
@@ -74,7 +76,8 @@ public class UILImageGetter implements Html.ImageGetter {
                         activity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
                         int screenWidth = displaymetrics.widthPixels;
                         if( width > screenWidth ) {
-                            newWidth = screenWidth;
+                            int margin = (int) in.testpress.util.UIUtils.getPixelFromDp(activity, 100);
+                            newWidth = screenWidth - margin;
                             newHeight = (newWidth * height) / width;
                         }
 
