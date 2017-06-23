@@ -1,7 +1,10 @@
 package in.testpress.util;
 
 import android.content.Context;
+import android.support.v4.content.Loader;
 import android.util.Log;
+
+import java.util.List;
 
 import in.testpress.core.TestpressException;
 
@@ -66,4 +69,17 @@ public abstract class ThrowableLoader<D> extends AsyncLoader<D> {
      * @throws TestpressException
      */
     public abstract D loadData() throws TestpressException;
+
+    /**
+     * return the stored exception in given loader and clear it.
+     *
+     * @return exception
+     */
+    public static <T> Exception getException(Loader<List<T>> loader) {
+        if (loader instanceof ThrowableLoader) {
+            return ((ThrowableLoader<List<T>>) loader).clearException();
+        } else {
+            return null;
+        }
+    }
 }

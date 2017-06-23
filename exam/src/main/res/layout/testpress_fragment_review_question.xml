@@ -1,12 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <WebView
-        android:id="@+id/web_view"
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:background="#ffffff" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/postDetails">
+
+            <WebView
+                android:id="@+id/web_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <View
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/web_view"
+                android:layout_alignBottom="@+id/web_view"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/testpress_gradient_shadow_white_right" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/comments_layout"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/web_view">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="15dp"
+                    android:background="#e6e6e6"/>
+
+                <TextView
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/testpress_black"
+                    android:text="@string/comments_title"
+                    android:textSize="16sp"
+                    android:lineSpacingExtra="4sp"
+                    android:id="@+id/comments_label" />
+
+                <LinearLayout
+                    android:id="@+id/comment_box_layout"
+                    android:visibility="gone"
+                    android:orientation="horizontal"
+                    android:background="#fff"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <in.testpress.ui.view.BackEventListeningEditText
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="40dp"
+                        android:id="@+id/comment_box"
+                        android:inputType="text|textMultiLine"
+                        android:textSize="13sp"
+                        android:textColor="@color/testpress_black"
+                        android:textColorHint="#cccccc"
+                        android:layout_gravity="center"
+                        android:gravity="left|bottom"
+                        android:background="@drawable/testpress_curved_gray_border"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="6dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:lineSpacingExtra="4dp"
+                        android:hint="@string/write_a_comment"
+                        tools:ignore="RtlHardcoded" />
+
+                    <ImageButton
+                        android:id="@+id/post_comment_button"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="10dp"
+                        android:scaleType="fitXY"
+                        android:layout_gravity="bottom"
+                        android:background="@drawable/testpress_curved_green_background"
+                        android:layout_marginLeft="10dp"
+                        android:tint="@android:color/white"
+                        android:src="@drawable/testpress_paper_plane" />
+
+                </LinearLayout>
+
+                <include
+                    layout="@layout/testpress_loading_layout_small"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:id="@+id/loading_new_comments_layout"/>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:id="@+id/load_new_comments_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:id="@+id/load_new_comments_text"
+                        android:text="@string/load_new_comments" />
+
+                </LinearLayout>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/comments_list_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:id="@+id/loading_previous_comments_layout"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#e6e6e6"/>
+
+                    <include layout="@layout/testpress_loading_layout_small" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:id="@+id/load_previous_comments_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:gravity="center" >
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#e6e6e6" />
+
+                    <TextView
+                        android:id="@+id/load_previous_comments"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="15dp"
+                        android:paddingBottom="15dp"
+                        android:textStyle="bold"
+                        android:text="@string/load_previous_comments" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </android.support.v4.widget.NestedScrollView>
 
     <include layout="@layout/testpress_empty_view" />
 

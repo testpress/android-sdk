@@ -20,6 +20,7 @@ public class ReviewQuestion {
     private String direction;
     private String subject;
     private String explanationHtml;
+    private String commentsUrl;
 
     /** Used to resolve relations */
     @Generated
@@ -43,12 +44,13 @@ public class ReviewQuestion {
     }
 
     @Generated
-    public ReviewQuestion(Long id, String questionHtml, String direction, String subject, String explanationHtml) {
+    public ReviewQuestion(Long id, String questionHtml, String direction, String subject, String explanationHtml, String commentsUrl) {
         this.id = id;
         this.questionHtml = questionHtml;
         this.direction = direction;
         this.subject = subject;
         this.explanationHtml = explanationHtml;
+        this.commentsUrl = commentsUrl;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -96,6 +98,14 @@ public class ReviewQuestion {
 
     public void setExplanationHtml(String explanationHtml) {
         this.explanationHtml = explanationHtml;
+    }
+
+    public String getCommentsUrl() {
+        return commentsUrl;
+    }
+
+    public void setCommentsUrl(String commentsUrl) {
+        this.commentsUrl = commentsUrl;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

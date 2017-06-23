@@ -1,6 +1,8 @@
 package in.testpress.exam.network;
 
 import android.content.Context;
+import android.text.Html;
+import android.text.SpannableString;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +12,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
+import in.testpress.exam.models.Comment;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.Subject;
@@ -148,6 +151,18 @@ public class TestpressExamApiClient extends TestpressApiClient {
     public RetrofitCall<TestpressApiResponse<Subject>> getSubjects(String urlFrag,
                                                                    Map<String, Object> queryParams) {
         return getExamService().getSubjects(urlFrag, queryParams);
+    }
+
+    public RetrofitCall<TestpressApiResponse<Comment>> getComments(String urlFrag,
+                                                                   Map<String, Object> queryParams) {
+        return getExamService().getComments(urlFrag, queryParams);
+    }
+
+    public RetrofitCall<Comment> postComment(String urlFrag, String comment) {
+        HashMap<String, String> params = new HashMap<String, String>();
+        //noinspection deprecation
+        params.put("comment", Html.toHtml(new SpannableString(comment)));
+        return getExamService().postComment(urlFrag, params);
     }
 
 }

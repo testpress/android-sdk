@@ -5,6 +5,7 @@
 
     <string name="testpress_loading">Loading…</string>
 
+    <string name="testpress_no_internet_connection">No internet connection</string>
     <string name="testpress_no_internet_try_again">Please check your internet connection &amp; try again.</string>
     <string name="testpress_tap_to_retry">Tap to retry</string>
 

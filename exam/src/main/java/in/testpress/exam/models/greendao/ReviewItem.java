@@ -23,6 +23,7 @@ public class ReviewItem {
     @Convert(converter = IntegerListConverter.class, columnType = String.class)
     private List<Integer> selectedAnswers;
     private Boolean review;
+    private Integer commentsCount;
     private Long attemptId;
     private Long questionId;
 
@@ -49,12 +50,13 @@ public class ReviewItem {
     }
 
     @Generated
-    public ReviewItem(Long id, Integer index, String url, List<Integer> selectedAnswers, Boolean review, Long attemptId, Long questionId) {
+    public ReviewItem(Long id, Integer index, String url, List<Integer> selectedAnswers, Boolean review, Integer commentsCount, Long attemptId, Long questionId) {
         this.id = id;
         this.index = index;
         this.url = url;
         this.selectedAnswers = selectedAnswers;
         this.review = review;
+        this.commentsCount = commentsCount;
         this.attemptId = attemptId;
         this.questionId = questionId;
     }
@@ -104,6 +106,14 @@ public class ReviewItem {
 
     public void setReview(Boolean review) {
         this.review = review;
+    }
+
+    public Integer getCommentsCount() {
+        return commentsCount;
+    }
+
+    public void setCommentsCount(Integer commentsCount) {
+        this.commentsCount = commentsCount;
     }
 
     public Long getAttemptId() {
