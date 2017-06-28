@@ -27,6 +27,7 @@
     <string name="testpress_error_loading_exam">Loading exam failed</string>
     <string name="testpress_error_loading_attempts">Loading attempts failed</string>
     <string name="testpress_error_loading_questions">Loading questions failed</string>
+    <string name="testpress_cannot_attempt_exam">Can\'t attempt this exam</string>
     <string name="testpress_please_login">Please login to see this exams</string>
     <string name="testpress_no_questions">No Questions</string>
     <string name="testpress_no_questions_to_review">There are no questions to review.</string>

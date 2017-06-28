@@ -13,6 +13,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -359,6 +362,8 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
             } else {
                 throw new IllegalStateException("Invalid loader id");
             }
+        } catch (TestpressException e) {
+            throw e;
         } catch (IOException e) {
             throw TestpressException.networkError(e);
         } catch (Exception e) {
@@ -404,9 +409,20 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 setEmptyText(R.string.testpress_authentication_failed, R.string.testpress_please_login);
             } else if (exception.isNetworkError()) {
                 setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again);
+            } else if (exception.isClientError()) {
+                setEmptyText(R.string.testpress_cannot_attempt_exam,
+                        R.string.testpress_some_thing_went_wrong_try_again);
+                try {
+                    JSONObject jsonObject = new JSONObject(exception.getResponse().errorBody().string());
+                    emptyDescView.setText(jsonObject.getString("detail"));
+                } catch (JSONException | IOException e) {
+                    e.printStackTrace();
+                }
+                retryButton.setVisibility(View.GONE);
             } else {
                 setEmptyText(R.string.testpress_error_loading_attempts,
                         R.string.testpress_some_thing_went_wrong_try_again);
+                retryButton.setVisibility(View.GONE);
             }
         }
     }
