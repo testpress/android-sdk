@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -79,7 +77,7 @@ public class WebViewUtils {
     }
 
     protected static String getTestEngineHeader() {
-        return "<script src='TestEngine.js'></script>";
+        return "<script src='TestpressTestEngine.js'></script>";
     }
 
     protected static String getRadioButtonInitializer(int selectedOption) {
@@ -92,13 +90,13 @@ public class WebViewUtils {
 
     public String getJavascript(Context context) {
         return "javascript:" +
-                CommonUtils.getStringFromAsset(context, "ImageTagHandler.js") +
-                CommonUtils.getStringFromAsset(context, "MathJaxRender.js");
+                CommonUtils.getStringFromAsset(context, "TestpressImageTagHandler.js") +
+                CommonUtils.getStringFromAsset(context, "TestpressMathJaxRender.js");
     }
 
     public String getHeader() {
         return "<!DOCTYPE html><meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no' />" +
-                "<link rel='stylesheet' type='text/css' href='questions_typebase.css' />" +
+                "<link rel='stylesheet' type='text/css' href='testpress_questions_typebase.css' />" +
                 "<style>img{display: inline; height: auto !important; width: auto !important; max-width: 100%;}</style>" +
 
                 "<link rel='stylesheet' href='katex/katex.min.css' />" +
