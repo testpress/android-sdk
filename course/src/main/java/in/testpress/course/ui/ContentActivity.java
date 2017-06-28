@@ -588,7 +588,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     String getHeader() {
         return "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\" />" +
-                "<link rel=\"stylesheet\" type=\"text/css\" href=\"typebase.css\" />" +
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"testpress_typebase.css\" />" +
                 "<style>" +
                 "   img{display: inline; height: auto !important; width: auto !important; max-width: 100%;}" +
                 "</style>";
