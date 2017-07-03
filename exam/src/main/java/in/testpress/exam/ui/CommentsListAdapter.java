@@ -28,6 +28,8 @@ import in.testpress.util.UILImageGetter;
 import in.testpress.util.ViewUtils;
 import in.testpress.util.ZoomableImageString;
 
+import static in.testpress.exam.ui.ReviewQuestionsFragment.UPDATE_TIME_SPAN;
+
 class CommentsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Activity activity;
@@ -95,16 +97,32 @@ class CommentsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             holder.comment.setText(zoomableImageQuestion.convertString(htmlSpan));
             holder.comment.setMovementMethod(LinkMovementMethod.getInstance());
 
-            //noinspection ConstantConditions
-            long submitDateMillis = FormatDate.getDate(comment.getSubmitDate(),
-                    "yyyy-MM-dd'T'HH:mm:ss", "UTC").getTime();
-
-            holder.submitDate.setText(FormatDate.getAbbreviatedTimeSpan(submitDateMillis));
+            updateTimeSpan(comment, holder);
 
             holder.userName.setTypeface(TestpressSdk.getRubikMediumFont(activity));
             ViewUtils.setTypeface(new TextView[] {holder.submitDate, holder.comment},
                     TestpressSdk.getRubikRegularFont(activity));
         }
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position,
+                                 List<Object> payloads) {
+
+        if (payloads.isEmpty() || !payloads.get(0).equals(UPDATE_TIME_SPAN)) {
+            // Perform a full update
+            onBindViewHolder(viewHolder, position);
+        } else { // Update time span only
+            updateTimeSpan(comments.get(position), (CommentsViewHolder) viewHolder);
+        }
+    }
+
+    private void updateTimeSpan(Comment comment, CommentsViewHolder holder) {
+        //noinspection ConstantConditions
+        long submitDateMillis = FormatDate.getDate(comment.getSubmitDate(),
+                "yyyy-MM-dd'T'HH:mm:ss", "UTC").getTime();
+
+        holder.submitDate.setText(FormatDate.getAbbreviatedTimeSpan(submitDateMillis));
     }
 
     void setComments(List<Comment> comments) {
@@ -114,7 +132,7 @@ class CommentsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     void addComments(List<Comment> comments) {
         this.comments.addAll(comments);
-        notifyDataSetChanged();
+        notifyItemRangeInserted(getItemCount(), comments.size());
     }
 
 }

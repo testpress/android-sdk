@@ -161,7 +161,7 @@ public class TestpressExamApiClient extends TestpressApiClient {
     public RetrofitCall<Comment> postComment(String urlFrag, String comment) {
         HashMap<String, String> params = new HashMap<String, String>();
         //noinspection deprecation
-        params.put("comment", Html.toHtml(new SpannableString(comment)));
+        params.put("comment", comment);
         return getExamService().postComment(urlFrag, params);
     }
 

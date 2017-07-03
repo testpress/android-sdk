@@ -164,4 +164,7 @@
         <item quantity="one">Tap to view a new comment</item>
         <item quantity="other">Tap to view %d new comments</item>
     </plurals>
+
+    <string name="action_cant_done_without_permission">Action can\'t be done without permission</string>
+
 </resources>
