@@ -93,8 +93,7 @@ class CommentsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             Spanned htmlSpan = Html.fromHtml(comment.getComment(),
                     new UILImageGetter(holder.comment, activity), null);
 
-            ZoomableImageString zoomableImageQuestion = new ZoomableImageString(activity);
-            holder.comment.setText(zoomableImageQuestion.convertString(htmlSpan));
+            holder.comment.setText(ZoomableImageString.convertString(htmlSpan, activity, false));
             holder.comment.setMovementMethod(LinkMovementMethod.getInstance());
 
             updateTimeSpan(comment, holder);

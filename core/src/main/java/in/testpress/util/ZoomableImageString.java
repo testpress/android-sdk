@@ -3,6 +3,7 @@ package in.testpress.util;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -18,24 +19,27 @@ import in.testpress.ui.view.TouchImageView;
 
 public class ZoomableImageString {
 
-    private Activity activity;
+    public static SpannableString convertString(Spanned spanned, Activity activity,
+                                                boolean whiteBackground) {
 
-    public ZoomableImageString(Activity activity) {
-        this.activity = activity;
-    }
-
-    public SpannableString convertString(Spanned spanned) {
         SpannableString span = new SpannableString(trim(spanned, 0, spanned.length()));
         ImageSpan[] spans = span.getSpans(0, span.length(), ImageSpan.class);
         for(ImageSpan imageSpan : spans) {
-            ClickableImageSpan clickableSpan = new ClickableImageSpan(activity, imageSpan.getDrawable());
-            span.setSpan(clickableSpan, span.getSpanStart(imageSpan), span.getSpanStart(imageSpan)+1,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            ClickableImageSpan clickableSpan =
+                    new ClickableImageSpan(activity, imageSpan.getDrawable(), whiteBackground);
+
+            span.setSpan(
+                    clickableSpan,
+                    span.getSpanStart(imageSpan),
+                    span.getSpanStart(imageSpan) + 1,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            );
         }
-        return span;    }
+        return span;
+    }
 
     // http://stackoverflow.com/a/16745540/400236
-    private CharSequence trim(CharSequence s, int start, int end) {
+    private static CharSequence trim(CharSequence s, int start, int end) {
         while (start < end && Character.isWhitespace(s.charAt(start))) {
             start++;
         }
@@ -47,31 +51,36 @@ public class ZoomableImageString {
         return s.subSequence(start, end);
     }
 
-    private class ClickableImageSpan extends ClickableSpan {
+    private static class ClickableImageSpan extends ClickableSpan {
         Drawable drawable;
         Activity activity;
+        boolean whiteBackground;
 
-        ClickableImageSpan(Activity activity, Drawable drawable){
+        ClickableImageSpan(Activity activity, Drawable drawable, boolean whiteBackground){
             this.activity = activity;
-            this.drawable= drawable;
+            this.drawable = drawable;
+            this.whiteBackground = whiteBackground;
         }
 
         @Override
         public void onClick(View textView) {
-            final ImageDialog dialog = new ImageDialog(activity, drawable);
+            final ImageDialog dialog = new ImageDialog(activity, drawable, whiteBackground);
             dialog.show();
         }
     }
 
-    private class ImageDialog extends Dialog {
+    private static class ImageDialog extends Dialog {
         UrlImageDownloader drawable;
         // Clone the drawable as the original image gets hidden
         Drawable clone;
+        boolean whiteBackground;
 
-        ImageDialog(Context context,Drawable drawable) {
-            super(context, android.R.style.Theme_Dialog);
+        ImageDialog(Context context, Drawable drawable, boolean whiteBackground) {
+            super(context, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+            this.whiteBackground = whiteBackground;
             this.drawable = (UrlImageDownloader)drawable;
-            this.clone = ((UrlImageDownloader) drawable).drawable.getConstantState().newDrawable().mutate();
+            this.clone = ((UrlImageDownloader) drawable)
+                    .drawable.getConstantState().newDrawable().mutate();
         }
 
         @Override
@@ -80,6 +89,11 @@ public class ZoomableImageString {
             setContentView(R.layout.testpress_image_view_layout);
             Log.d("ZoomableImageString", "Using TouchImageView");
             TouchImageView image=(TouchImageView)findViewById(R.id.image);
+            if (whiteBackground) {
+                image.setBackgroundColor(Color.WHITE);
+            } else {
+                image.setBackgroundColor(Color.BLACK);
+            }
             Log.d("ZoomableImageString", "Member Clone Mutate Drawable " + drawable);
             Log.d("ZoomableImageString", "Member Clone Mutate Drawable " + clone);
             image.setImageDrawable(clone);
