@@ -1,9 +1,14 @@
 package in.testpress.exam.ui;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -11,6 +16,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.SpannableString;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +27,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import junit.framework.Assert;
 
@@ -44,6 +53,7 @@ import in.testpress.exam.models.greendao.ReviewItemDao;
 import in.testpress.exam.models.greendao.ReviewQuestion;
 import in.testpress.exam.network.CommentsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.model.FileDetails;
 import in.testpress.network.TestpressApiClient;
 import in.testpress.ui.view.BackEventListeningEditText;
 import in.testpress.util.FormatDate;
@@ -52,9 +62,16 @@ import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 import in.testpress.util.WebViewUtils;
 
+import static android.app.Activity.RESULT_OK;
+import static com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE;
+import static com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE;
+import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE;
+import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE;
+
 public class ReviewQuestionsFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<List<Comment>> {
 
+    public static final String UPDATE_TIME_SPAN = "updateTimeSpan";
     private static final int NEW_COMMENT_SYNC_INTERVAL = 10000; // 10 sec
     private static final int PREVIOUS_COMMENTS_LOADER_ID = 0;
     private static final int NEW_COMMENTS_LOADER_ID = 1;
@@ -76,6 +93,7 @@ public class ReviewQuestionsFragment extends Fragment
     TextView commentsLabel;
     BackEventListeningEditText commentsEditText;
     ImageButton postCommentButton;
+    ImageButton imageCommentButton;
     View rootLayout;
     LinearLayout commentBoxLayout;
     CommentsPager previousCommentsPager;
@@ -88,12 +106,16 @@ public class ReviewQuestionsFragment extends Fragment
     List<Comment> comments = new ArrayList<>();
     @SuppressLint("UseSparseArrays")
     HashMap<Integer, Comment> uniqueComments = new HashMap<>();
+    Uri selectedCommentImageUri;
 
     private Handler newCommentsHandler;
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            commentsAdapter.notifyDataSetChanged(); // Update the time in comments
+            //noinspection ArraysAsListWithZeroOrOneArgument
+            commentsAdapter.notifyItemRangeChanged(0, commentsAdapter.getItemCount(),
+                    UPDATE_TIME_SPAN); // Update the time in comments
+
             getNewCommentsPager().reset();
             getLoaderManager().restartLoader(NEW_COMMENTS_LOADER_ID, null, ReviewQuestionsFragment.this);
         }
@@ -147,6 +169,7 @@ public class ReviewQuestionsFragment extends Fragment
         commentsEditText = (BackEventListeningEditText) view.findViewById(R.id.comment_box);
         commentBoxLayout = (LinearLayout) view.findViewById(R.id.comment_box_layout);
         postCommentButton = (ImageButton) view.findViewById(R.id.post_comment_button);
+        imageCommentButton = (ImageButton) view.findViewById(R.id.image_comment_button);
         rootLayout = view;
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage(getResources().getString(R.string.testpress_please_wait));
@@ -245,7 +268,13 @@ public class ReviewQuestionsFragment extends Fragment
         postCommentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                postComment();
+                onClickSendCommentButton();
+            }
+        });
+        imageCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickImageFromMobile();
             }
         });
         commentsEditText.setImeBackListener(new BackEventListeningEditText.EditTextImeBackListener() {
@@ -457,7 +486,7 @@ public class ReviewQuestionsFragment extends Fragment
         newCommentsHandler.postDelayed(runnable, NEW_COMMENT_SYNC_INTERVAL);
     }
 
-    void postComment() {
+    void onClickSendCommentButton() {
         final String comment = commentsEditText.getText().toString().trim();
         if (comment.isEmpty()) {
             return;
@@ -465,6 +494,11 @@ public class ReviewQuestionsFragment extends Fragment
         if (!progressDialog.isShowing()) {
             progressDialog.show();
         }
+        // noinspection deprecation
+        postComment(Html.toHtml(new SpannableString(comment))); // Convert to html to support line breaks
+    }
+
+    void postComment(String comment) {
         // Clear edit text focus to display the navigation bar
         commentsEditText.clearFocus(getActivity());
         apiClient.postComment(reviewItem.getQuestion().getCommentsUrl(), comment)
@@ -492,19 +526,82 @@ public class ReviewQuestionsFragment extends Fragment
 
                     @Override
                     public void onException(TestpressException exception) {
-                        progressDialog.dismiss();
-                        if(exception.isUnauthenticated()) {
-                            Snackbar.make(rootLayout, R.string.testpress_authentication_failed,
-                                    Snackbar.LENGTH_SHORT).show();
-                        } else if (exception.getCause() instanceof IOException) {
-                            Snackbar.make(rootLayout, R.string.testpress_no_internet_connection,
-                                    Snackbar.LENGTH_SHORT).show();
-                        } else {
-                            Snackbar.make(rootLayout, R.string.testpress_network_error,
-                                    Snackbar.LENGTH_SHORT).show();
-                        }
+                        handleExceptionOnPostComment(exception);
                     }
                 });
+    }
+
+    public void pickImageFromMobile() {
+        startActivityForResult(CropImage.getPickImageChooserIntent(getContext()),
+                PICK_IMAGE_CHOOSER_REQUEST_CODE);
+    }
+
+    @Override
+    @SuppressLint("NewApi")
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == RESULT_OK) {
+            Uri imageUri = CropImage.getPickImageResultUri(getContext(), data);
+            // For API >= 23 we need to check specifically that we have permissions to read external storage.
+            if (CropImage.isReadExternalStoragePermissionsRequired(getContext(), imageUri)) {
+                // Request permission
+                selectedCommentImageUri = imageUri;
+                requestPermissions(new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
+                        PICK_IMAGE_PERMISSIONS_REQUEST_CODE);
+            } else {
+                // No permissions required or already grunted
+                startCropImageActivity(imageUri);
+            }
+        } else if (requestCode == CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                uploadImage(result.getUri().getPath());
+            } else if (resultCode == CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                //noinspection ThrowableResultOfMethodCallIgnored
+                Exception exception = result.getError();
+                Snackbar.make(rootLayout, exception.getMessage(), Snackbar.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    void startCropImageActivity(Uri imageUri) {
+        CropImage.activity(imageUri)
+                .setAllowFlipping(false)
+                .start(getContext(), this);
+    }
+
+    void uploadImage(String imagePath) {
+        if (!progressDialog.isShowing()) {
+            progressDialog.show();
+        }
+        apiClient.upload(imagePath).enqueue(new TestpressCallback<FileDetails>() {
+            @Override
+            public void onSuccess(FileDetails fileDetails) {
+                postComment(WebViewUtils.appendImageTags(fileDetails.getUrl()));
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                handleExceptionOnPostComment(exception);
+            }
+        });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+
+        if (requestCode == PICK_IMAGE_PERMISSIONS_REQUEST_CODE) {
+            if (selectedCommentImageUri == null ||
+                    (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+
+                // Permission granted show image picker
+                startCropImageActivity(selectedCommentImageUri);
+            } else {
+                Snackbar.make(rootLayout, R.string.action_cant_done_without_permission,
+                        Snackbar.LENGTH_SHORT).show();
+            }
+        }
     }
 
     void addComments(List<Comment> commentsList) {
@@ -571,6 +668,20 @@ public class ReviewQuestionsFragment extends Fragment
     public void onResume() {
         super.onResume();
         webView.onResume();
+    }
+
+    void handleExceptionOnPostComment(TestpressException exception) {
+        progressDialog.dismiss();
+        if(exception.isUnauthenticated()) {
+            Snackbar.make(rootLayout, R.string.testpress_authentication_failed,
+                    Snackbar.LENGTH_SHORT).show();
+        } else if (exception.getCause() instanceof IOException) {
+            Snackbar.make(rootLayout, R.string.testpress_no_internet_connection,
+                    Snackbar.LENGTH_SHORT).show();
+        } else {
+            Snackbar.make(rootLayout, R.string.testpress_network_error,
+                    Snackbar.LENGTH_SHORT).show();
+        }
     }
 
     @Override

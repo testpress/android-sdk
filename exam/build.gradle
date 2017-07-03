@@ -26,6 +26,7 @@ dependencies {
     compile rootProject.design
     compile rootProject.cardview
     compile rootProject.chart
+    compile rootProject.imageCropper
     testCompile rootProject.junit
     testCompile rootProject.mockito
     androidTestCompile rootProject.junit

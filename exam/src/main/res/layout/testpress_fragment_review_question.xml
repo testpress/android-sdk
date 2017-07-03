@@ -68,6 +68,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
 
+                    <ImageButton
+                        android:id="@+id/image_comment_button"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="10dp"
+                        android:scaleType="fitXY"
+                        android:layout_gravity="bottom"
+                        android:background="@drawable/testpress_curved_green_background"
+                        android:layout_marginRight="10dp"
+                        android:tint="@android:color/white"
+                        android:src="@drawable/ic_add_a_photo_black_24dp" />
+
                     <in.testpress.ui.view.BackEventListeningEditText
                         android:layout_weight="1"
                         android:layout_width="0dp"

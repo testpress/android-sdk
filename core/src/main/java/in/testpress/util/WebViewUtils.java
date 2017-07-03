@@ -151,6 +151,10 @@ public class WebViewUtils {
                 "</tr>";
     }
 
+    public static String appendImageTags(String imageUrl) {
+        return "<img src=\"" + imageUrl + "\">";
+    }
+
     public static String getColor(Context context, int colorRes) {
         return "#" + Integer.toHexString(ContextCompat.getColor(context, colorRes) & 0x00ffffff);
     }

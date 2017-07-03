@@ -6,15 +6,20 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import in.testpress.core.TestpressSession;
+import in.testpress.model.FileDetails;
 import in.testpress.util.UserAgentProvider;
 import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -110,9 +115,20 @@ public class TestpressApiClient {
         return retrofit.create(AuthenticationService.class);
     }
 
+    private FileUploadService getFileUploadService() {
+        return retrofit.create(FileUploadService.class);
+    }
+
     public RetrofitCall<TestpressSession> authenticate(String authenticateUrlFrag,
                                                        HashMap<String, String> arguments) {
         return getAuthenticationService().authenticate(authenticateUrlFrag, arguments);
+    }
+
+    public RetrofitCall<FileDetails> upload(String filePath) {
+        File file = new File(filePath);
+        RequestBody reqFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), reqFile);
+        return getFileUploadService().upload(body);
     }
 
 }
