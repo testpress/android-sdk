@@ -37,12 +37,12 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
     protected int[] getChildViewIds() {
         return new int[] { R.id.content_title, R.id.white_foreground, R.id.lock,
                 R.id.content_item_layout, R.id.exam_info_layout, R.id.attempted_tick,
-                R.id.duration, R.id.no_of_questions };
+                R.id.duration, R.id.no_of_questions, R.id.comment_count_layout, R.id.no_of_comments };
     }
 
     @Override
     protected void update(final int position, final Exam exam) {
-        ViewUtils.setTypeface(new TextView[] {textView(0), textView(6), textView(7)},
+        ViewUtils.setTypeface(new TextView[] { textView(0), textView(6), textView(7), textView(9) },
                 TestpressSdk.getRubikMediumFont(activity));
 
         setText(0, exam.getTitle());
@@ -60,6 +60,12 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
                 fragment.startActivityForResult(intent, TEST_TAKEN_REQUEST_CODE);
             }
         });
+        if (exam.getCommentsCount() == 0) {
+            setGone(8, true);
+        } else {
+            setText(9, exam.getCommentsCount().toString());
+            setGone(8, false);
+        }
     }
 
 }
