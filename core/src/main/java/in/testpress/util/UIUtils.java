@@ -14,7 +14,7 @@ import in.testpress.R;
 public class UIUtils {
 
     public static void hideSoftKeyboard(Activity activity) {
-        if (activity.getCurrentFocus() != null) {
+        if (activity != null && activity.getCurrentFocus() != null) {
             InputMethodManager inputMethodManager =
                     (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
