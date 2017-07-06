@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -23,6 +24,7 @@ import java.util.List;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
+import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.AttemptsPager;
@@ -39,10 +41,12 @@ public class AttemptsActivity extends BaseToolBarActivity
         implements LoaderManager.LoaderCallbacks<List<Attempt>> {
 
     public static final String EXAM = "exam";
+    public static final String STATE_COMPLETED = "Completed";
 
     private ScrollView scrollView;
     private LinearLayout examDetailsLayout;
     private LinearLayout emptyView;
+    private FrameLayout testReportLayout;
     private LinearLayout startButtonLayout;
     private Button startButton;
     private TextView emptyTitleView;
@@ -60,6 +64,7 @@ public class AttemptsActivity extends BaseToolBarActivity
         setContentView(R.layout.testpress_activity_attempts);
         scrollView = (ScrollView) findViewById(R.id.scroll_view);
         examDetailsLayout = (LinearLayout) findViewById(R.id.exam_details_layout);
+        testReportLayout = (FrameLayout) findViewById(R.id.fragment_container);
         startButtonLayout = (LinearLayout) findViewById(R.id.start_button_layout);
         emptyView = (LinearLayout) findViewById(R.id.empty_container);
         startButton = (Button) findViewById(R.id.start_exam);
@@ -71,9 +76,11 @@ public class AttemptsActivity extends BaseToolBarActivity
         exam = getIntent().getParcelableExtra(EXAM);
         Assert.assertNotNull("EXAM must not be null.", exam);
         //noinspection ConstantConditions
+        getSupportActionBar().hide();
         getSupportActionBar().setTitle(exam.getTitle());
         startButton.setTypeface(TestpressSdk.getRubikMediumFont(this));
         if (exam.getAttemptsCount() == 1 && exam.getPausedAttemptsCount() == 1) {
+            // Show resume screen with exam details if only one paused attempt exist
             displayStartExamScreen();
         } else {
             retryButton.setOnClickListener(new View.OnClickListener() {
@@ -109,6 +116,7 @@ public class AttemptsActivity extends BaseToolBarActivity
                 markLabel, negativeMarkLabel, dateLabel}, TestpressSdk.getRubikRegularFont(this));
         //noinspection ConstantConditions
         getSupportActionBar().setTitle(R.string.testpress_resume_exam);
+        getSupportActionBar().show();
         titleView.setText(exam.getTitle());
         numberOfQuestions.setText(exam.getNumberOfQuestions().toString());
         examDuration.setText(exam.getDuration());
@@ -207,12 +215,20 @@ public class AttemptsActivity extends BaseToolBarActivity
             return;
         }
 
-        displayAttemptsList();
+        if (attempts.size() == 1 && attempts.get(0).getState().equals(STATE_COMPLETED)) {
+            // if only one attempt exist then show the test report of that attempt
+            testReportLayout.setVisibility(View.VISIBLE);
+            ReviewStatsFragment.showReviewStatsFragment(this, exam, attempts.get(0));
+            progressBar.setVisibility(View.GONE);
+        } else {
+            displayAttemptsList();
+        }
     }
 
     private void displayAttemptsList() {
         //noinspection ConstantConditions
         getSupportActionBar().setTitle(exam.getTitle());
+        getSupportActionBar().show();
         if (canAttemptExam()) {
             final List<Attempt> pausedAttempts = new ArrayList<>();
             if (exam.getPausedAttemptsCount() > 0) {

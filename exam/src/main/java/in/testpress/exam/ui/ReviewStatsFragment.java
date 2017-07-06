@@ -1,10 +1,12 @@
 package in.testpress.exam.ui;
 
 import android.annotation.SuppressLint;
-import android.os.Build;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +31,7 @@ import in.testpress.model.TestpressApiResponse;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 
+import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_ATTEMPT;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_EXAM;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_PREVIOUS_ACTIVITY;
@@ -52,11 +55,25 @@ public class ReviewStatsFragment extends Fragment {
     private TextView emptyTitleView;
     private TextView emptyDescView;
     private Button retryButton;
-    private Button analyticsButton;
-    private Button reviewQuestionsButton;
+    private TextView analyticsButton;
+    private TextView retakeButton;
+    private LinearLayout retakeButtonLayout;
+    private TextView reviewQuestionsButton;
     private TextView emailPdfButton;
+    private LinearLayout emailPdfButtonLayout;
     private Attempt attempt;
     private Exam exam;
+
+    public static void showReviewStatsFragment(FragmentActivity activity, Exam exam, Attempt attempt) {
+        ReviewStatsFragment fragment = new ReviewStatsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(PARAM_EXAM, exam);
+        bundle.putParcelable(PARAM_ATTEMPT, attempt);
+        fragment.setArguments(bundle);
+        activity.getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .commitAllowingStateLoss();
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,12 +106,17 @@ public class ReviewStatsFragment extends Fragment {
         rankLayout = (LinearLayout) view.findViewById(R.id.rank_layout);
         reviewStatLayout = (LinearLayout) view.findViewById(R.id.review_statistics_layout);
         reviewStatLayout.setVisibility(View.GONE);
-        analyticsButton = (Button) view.findViewById(R.id.analytics);
+        analyticsButton = (TextView) view.findViewById(R.id.analytics);
+        retakeButton = (TextView) view.findViewById(R.id.retake);
         emailPdfButton = (TextView) view.findViewById(R.id.email_mcqs);
-        reviewQuestionsButton = (Button) view.findViewById(R.id.review);
+        retakeButtonLayout = (LinearLayout) view.findViewById(R.id.retake_button_layout);
+        emailPdfButtonLayout = (LinearLayout) view.findViewById(R.id.email_mcqs_layout);
+        reviewQuestionsButton = (TextView) view.findViewById(R.id.review);
         ViewUtils.setTypeface(
-                new TextView[] {score, rank, correct, incorrect, timeTaken, accuracy,
-                        analyticsButton, reviewQuestionsButton, emptyTitleView, retryButton},
+                new TextView[] {
+                        score, rank, correct, incorrect, timeTaken, accuracy, reviewQuestionsButton,
+                        analyticsButton, emailPdfButton, retakeButton, emptyTitleView, retryButton
+                },
                 TestpressSdk.getRubikMediumFont(getContext())
         );
         TextView timeTakenLabel = (TextView) view.findViewById(R.id.time_taken_label);
@@ -106,8 +128,7 @@ public class ReviewStatsFragment extends Fragment {
         ViewUtils.setTypeface(
                 new TextView[] {
                         scoreLabel, rankLabel, correctLabel, incorrectLabel, timeTakenLabel,
-                        accuracyLabel, examTitle, attemptDate, emptyDescView, emailPdfButton,
-                        maxRank
+                        accuracyLabel, examTitle, attemptDate, emptyDescView, maxRank
                 },
                 TestpressSdk.getRubikRegularFont(getContext()));
         return view;
@@ -168,7 +189,6 @@ public class ReviewStatsFragment extends Fragment {
             analyticsButton.setVisibility(View.GONE);
         }
         if (exam.getAllowPdf()) {
-            emailPdfButton.setVisibility(View.VISIBLE);
             emailPdfButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -177,7 +197,17 @@ public class ReviewStatsFragment extends Fragment {
                 }
             });
         } else {
-            emailPdfButton.setVisibility(View.GONE);
+            emailPdfButtonLayout.setVisibility(View.GONE);
+        }
+        if (canAttemptExam()) {
+            retakeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startExam();
+                }
+            });
+        } else {
+            retakeButtonLayout.setVisibility(View.GONE);
         }
         reviewStatLayout.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
@@ -225,6 +255,26 @@ public class ReviewStatsFragment extends Fragment {
                         }
                     }
                 });
+    }
+
+    private boolean canAttemptExam() {
+        return (exam.getPausedAttemptsCount() == 0) && exam.canRetake() && exam.hasStarted() &&
+                !exam.getDeviceAccessControl().equals("web");
+    }
+
+    private void startExam() {
+        Intent intent = new Intent(getActivity(), TestActivity.class);
+        intent.putExtra(TestActivity.PARAM_EXAM, exam);
+        startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if ((requestCode == TEST_TAKEN_REQUEST_CODE) && (Activity.RESULT_OK == resultCode)) {
+            getActivity().setResult(resultCode);
+            getActivity().finish();
+        }
     }
 
     protected void setEmptyText(final int title, final int description, int imageRes) {

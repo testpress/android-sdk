@@ -530,4 +530,9 @@ public class Exam implements Parcelable {
     public void setCommentsCount(Integer commentsCount) {
         this.commentsCount = commentsCount;
     }
+
+    public boolean canRetake() {
+        return getAllowRetake() &&
+                (getAttemptsCount() <= getMaxRetakes() || getMaxRetakes() < 0);
+    }
 }

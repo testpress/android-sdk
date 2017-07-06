@@ -61,7 +61,7 @@ public class CarouselFragment extends Fragment {
             }
             if (getFragmentByPosition(2) != null && getFragmentByPosition(2).getListView() != null) {
                 // Refresh history tab
-                getFragmentByPosition(2).refreshWithProgress();
+                getFragmentByPosition(2).clearItemsAndRefresh();
             }
         }
     }
