@@ -208,7 +208,8 @@ public class TestpressExam {
         Assert.assertNotNull("Exam must not be null.", exam);
         Assert.assertNotNull("Attempt must not be null.", attempt);
         init(activity, testpressSession);
-        activity.startActivity(ReviewStatsActivity.createIntent(activity, exam, attempt));
+        activity.startActivityForResult(ReviewStatsActivity.createIntent(activity, exam, attempt),
+                CarouselFragment.TEST_TAKEN_REQUEST_CODE);
     }
 
     /**

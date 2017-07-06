@@ -199,6 +199,12 @@ public abstract class BaseListViewFragment<E> extends Fragment
         getLoaderManager().restartLoader(0, args, this);
     }
 
+    public void clearItemsAndRefresh() {
+        items.clear();
+        getListAdapter().getWrappedAdapter().setItems(items);
+        refreshWithProgress();
+    }
+
     /**
      * Get error message to display for exception
      *

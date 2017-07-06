@@ -36,6 +36,7 @@ public class ReviewStatsActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if ((requestCode == CarouselFragment.TEST_TAKEN_REQUEST_CODE)) {
             String previousActivity = getIntent().getStringExtra(PARAM_PREVIOUS_ACTIVITY);
             if((previousActivity != null) && previousActivity.equals(TestActivity.class.getName())) {

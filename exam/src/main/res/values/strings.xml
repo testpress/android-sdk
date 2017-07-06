@@ -58,6 +58,7 @@
     <string name="testpress_resume">RESUME</string>
     <string name="testpress_retake">RETAKE</string>
     <string name="testpress_review">REVIEW</string>
+    <string name="testpress_retake_exam">Retake Exam</string>
     <string name="testpress_start_exam">Start Exam</string>
     <string name="testpress_resume_exam">Resume Exam</string>
     <string name="testpress_end_exam">End Exam</string>
@@ -70,8 +71,7 @@
     <string name="testpress_pause_content">You can pause the exam &amp; resume later before end date</string>
     <string name="testpress_end_message">Do you want to End the exam?</string>
 
-    <string name="testpress_email_mcqs">EMAIL MCQs</string>
-    <string name="testpress_email_pdf">EMAIL PDF</string>
+    <string name="testpress_email_mcqs">Email MCQs</string>
 
     <string name="testpress_mail_pdf_confirm_title">Mail PDF</string>
     <string name="testpress_mail_pdf_confirm">PDF will be mailed to your email address. Click OK to confirm.</string>
