@@ -25,6 +25,7 @@ import in.testpress.exam.models.greendao.ReviewItemDao;
 import in.testpress.exam.models.greendao.ReviewQuestionDao;
 import in.testpress.exam.models.greendao.SelectedAnswerDao;
 import in.testpress.exam.ui.AnalyticsActivity;
+import in.testpress.exam.ui.AttemptsActivity;
 import in.testpress.exam.ui.CarouselFragment;
 import in.testpress.exam.ui.CategoriesGridFragment;
 import in.testpress.exam.ui.CategoryGridActivity;
@@ -37,7 +38,7 @@ import static in.testpress.exam.ui.CategoryGridActivity.SHOW_EXAMS_AS_DEFAULT;
 
 public class TestpressExam {
 
-    public static final String ACTION_PRESSED_HOME = "pressedHome";
+    public static final String PARAM_EXAM_SLUG = "examSlug";
     private static DaoSession daoSession;
     private static Database database;
 
@@ -210,6 +211,37 @@ public class TestpressExam {
         init(activity, testpressSession);
         activity.startActivityForResult(ReviewStatsActivity.createIntent(activity, exam, attempt),
                 CarouselFragment.TEST_TAKEN_REQUEST_CODE);
+    }
+
+    /**
+     * Show the exam based on its attempt(s) state.
+     *
+     * <p> Usage example:
+     *
+     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
+     * <p>             new TestpressCallback/<TestpressSession>() {
+     * <p>             @Override
+     * <p>             public void onSuccess(TestpressSession testpressSession) {
+     * <p>                 <b>TestpressExam.showExamAttemptedState(this, "exam_slug", testpressSession);</b>
+     * <p>             }
+     * <p> });
+     *
+     * @param activity activity from which exam need to show.
+     * @param examSlug Slug of the exam which need to be show.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    @SuppressWarnings("ConstantConditions")
+    public static void showExamAttemptedState(@NonNull Activity activity, @NonNull String examSlug,
+                                              @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Activity must not be null.", activity);
+        if (examSlug == null || examSlug.isEmpty()) {
+            throw new IllegalArgumentException("EXAM_SLUG must not be null or empty.");
+        }
+        init(activity, testpressSession);
+        Intent intent = new Intent(activity, AttemptsActivity.class);
+        intent.putExtra(PARAM_EXAM_SLUG, examSlug);
+        activity.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
     }
 
     /**

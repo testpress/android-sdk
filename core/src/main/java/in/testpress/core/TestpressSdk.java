@@ -19,6 +19,9 @@ public final class TestpressSdk {
 
     private static SharedPreferences pref;
     private static SharedPreferences.Editor editor;
+
+    public static final String ACTION_PRESSED_HOME = "pressedHomeButton";
+
     private static final String KEY_TESTPRESS_AUTH_TOKEN = "testpressAuthToken";
     private static final String KEY_TESTPRESS_SHARED_PREFS = "testpressSharedPreferences";
     private static final String KEY_USER_ID = "userId";

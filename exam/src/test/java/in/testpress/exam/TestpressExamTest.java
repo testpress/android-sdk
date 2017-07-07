@@ -108,6 +108,36 @@ public class TestpressExamTest {
     }
 
     @Test
+    public void testShowExamAttemptedState_withNullValues() throws Exception {
+        TestpressSession testpressSession = mock(TestpressSession.class);
+        try {
+            TestpressExam.showExamAttemptedState(null, "DummySlug", testpressSession);
+            fail();
+        } catch (AssertionError e) {
+            assertEquals("Activity must not be null.", e.getMessage());
+        }
+        FragmentActivity activity = mock(FragmentActivity.class);
+        try {
+            TestpressExam.showExamAttemptedState(activity, "DummySlug", null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+        try {
+            TestpressExam.showExamAttemptedState(activity, null, testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("EXAM_SLUG must not be null or empty.", e.getMessage());
+        }
+        try {
+            TestpressExam.showExamAttemptedState(activity, "", testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("EXAM_SLUG must not be null or empty.", e.getMessage());
+        }
+    }
+
+    @Test
     public void testShowAnalytics_withNullValues() throws Exception {
         TestpressSession testpressSession = mock(TestpressSession.class);
         FragmentActivity activity = mock(FragmentActivity.class);

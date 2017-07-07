@@ -21,10 +21,10 @@ import junit.framework.Assert;
 import java.util.ArrayList;
 import java.util.List;
 
+import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
-import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.AttemptsPager;
@@ -34,6 +34,7 @@ import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 
+import static in.testpress.exam.TestpressExam.PARAM_EXAM_SLUG;
 import static in.testpress.exam.network.TestpressExamApiClient.STATE_PAUSED;
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 
@@ -52,6 +53,7 @@ public class AttemptsActivity extends BaseToolBarActivity
     private TextView emptyTitleView;
     private TextView emptyDescView;
     private ProgressBar progressBar;
+    private Button retryButton;
     private Exam exam;
     private List<Attempt> attempts = new ArrayList<>();
     private AttemptsPager pager;
@@ -70,15 +72,24 @@ public class AttemptsActivity extends BaseToolBarActivity
         startButton = (Button) findViewById(R.id.start_exam);
         emptyTitleView = (TextView) findViewById(R.id.empty_title);
         emptyDescView = (TextView) findViewById(R.id.empty_description);
-        Button retryButton = (Button) findViewById(R.id.retry_button);
+        retryButton = (Button) findViewById(R.id.retry_button);
         progressBar = (ProgressBar) findViewById(R.id.pb_loading);
         UIUtils.setIndeterminateDrawable(this, progressBar, 4);
-        exam = getIntent().getParcelableExtra(EXAM);
-        Assert.assertNotNull("EXAM must not be null.", exam);
+        startButton.setTypeface(TestpressSdk.getRubikMediumFont(this));
         //noinspection ConstantConditions
         getSupportActionBar().hide();
-        getSupportActionBar().setTitle(exam.getTitle());
-        startButton.setTypeface(TestpressSdk.getRubikMediumFont(this));
+        exam = getIntent().getParcelableExtra(EXAM);
+        if (exam == null) {
+            String examSlug = getIntent().getStringExtra(PARAM_EXAM_SLUG);
+            // Throw exception if both exam & exam slug is null
+            Assert.assertNotNull("EXAM must not be null.", examSlug);
+            loadExam(examSlug);
+        } else {
+            checkExamState();
+        }
+    }
+
+    void checkExamState() {
         if (exam.getAttemptsCount() == 1 && exam.getPausedAttemptsCount() == 1) {
             // Show resume screen with exam details if only one paused attempt exist
             displayStartExamScreen();
@@ -177,6 +188,46 @@ public class AttemptsActivity extends BaseToolBarActivity
         }
     }
 
+    void loadExam(final String examSlug) {
+        progressBar.setVisibility(View.VISIBLE);
+        new TestpressExamApiClient(this).getExam(examSlug)
+                .enqueue(new TestpressCallback<Exam>() {
+                    @Override
+                    public void onSuccess(Exam exam) {
+                        AttemptsActivity.this.exam = exam;
+                        checkExamState();
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        if (exception.isUnauthenticated()) {
+                            setEmptyText(R.string.testpress_authentication_failed,
+                                    R.string.testpress_exam_no_permission);
+                            retryButton.setVisibility(View.GONE);
+                        } else if (exception.isNetworkError()) {
+                            setEmptyText(R.string.testpress_network_error,
+                                    R.string.testpress_no_internet_try_again);
+                            retryButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    progressBar.setVisibility(View.VISIBLE);
+                                    emptyView.setVisibility(View.GONE);
+                                    loadExam(examSlug);
+                                }
+                            });
+                        } else if (exception.getResponse().code() == 404) {
+                            setEmptyText(R.string.testpress_exam_not_available,
+                                    R.string.testpress_exam_not_available_description);
+                            retryButton.setVisibility(View.GONE);
+                        } else  {
+                            setEmptyText(R.string.testpress_error_loading_exam,
+                                    R.string.testpress_some_thing_went_wrong_try_again);
+                            retryButton.setVisibility(View.GONE);
+                        }
+                    }
+                });
+    }
+
     @Override
     public Loader<List<Attempt>> onCreateLoader(int id, Bundle args) {
         progressBar.setVisibility(View.VISIBLE);
@@ -201,16 +252,13 @@ public class AttemptsActivity extends BaseToolBarActivity
         if(exception != null) {
             if (exception.isUnauthenticated()) {
                 setEmptyText(R.string.testpress_authentication_failed,
-                        R.string.testpress_please_login,
-                        R.drawable.ic_error_outline_black_18dp);
+                        R.string.testpress_please_login);
             } else if (exception.isNetworkError()) {
                 setEmptyText(R.string.testpress_network_error,
-                        R.string.testpress_no_internet_try_again,
-                        R.drawable.ic_error_outline_black_18dp);
+                        R.string.testpress_no_internet_try_again);
             } else {
                 setEmptyText(R.string.testpress_error_loading_attempts,
-                        R.string.testpress_some_thing_went_wrong_try_again,
-                        R.drawable.ic_error_outline_black_18dp);
+                        R.string.testpress_some_thing_went_wrong_try_again);
             }
             return;
         }
@@ -288,10 +336,9 @@ public class AttemptsActivity extends BaseToolBarActivity
         startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
     }
 
-    protected void setEmptyText(final int title, final int description, final int left) {
+    protected void setEmptyText(final int title, final int description) {
         emptyView.setVisibility(View.VISIBLE);
         emptyTitleView.setText(title);
-        emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0);
         emptyDescView.setText(description);
         scrollView.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
