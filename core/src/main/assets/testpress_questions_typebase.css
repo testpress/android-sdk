@@ -189,6 +189,7 @@ table th {
 }
 
 .question {
+    text-align: justify;
     font-family: 'Rubik-Medium', sans-serif;
     color: #444;
     padding: 10px;
@@ -196,6 +197,7 @@ table th {
 
 .review-explanation {
     color: #666;
+    text-align: justify;
     font-family: 'PT-Serif-Regular', serif;
     margin-top: 10px;
     margin-bottom: 5px;

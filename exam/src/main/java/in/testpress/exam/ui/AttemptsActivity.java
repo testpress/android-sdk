@@ -90,8 +90,10 @@ public class AttemptsActivity extends BaseToolBarActivity
     }
 
     void checkExamState() {
-        if (exam.getAttemptsCount() == 1 && exam.getPausedAttemptsCount() == 1) {
-            // Show resume screen with exam details if only one paused attempt exist
+        if ((exam.getAttemptsCount() == 0) ||
+                (exam.getAttemptsCount() == 1 && exam.getPausedAttemptsCount() == 1)) {
+            // Show start exam screen with exam details if still exam is not taken or only one
+            // paused attempt exist
             displayStartExamScreen();
         } else {
             retryButton.setOnClickListener(new View.OnClickListener() {
@@ -125,8 +127,12 @@ public class AttemptsActivity extends BaseToolBarActivity
                 negativeMarks, titleView, date}, TestpressSdk.getRubikMediumFont(this));
         ViewUtils.setTypeface(new TextView[] {descriptionContent, questionsLabel, durationLabel,
                 markLabel, negativeMarkLabel, dateLabel}, TestpressSdk.getRubikRegularFont(this));
+        int buttonTextResId = (exam.getPausedAttemptsCount() > 0) ?
+                R.string.testpress_resume_exam : R.string.testpress_start_exam;
+
+        startButton.setText(buttonTextResId);
         //noinspection ConstantConditions
-        getSupportActionBar().setTitle(R.string.testpress_resume_exam);
+        getSupportActionBar().setTitle(buttonTextResId);
         getSupportActionBar().show();
         titleView.setText(exam.getTitle());
         numberOfQuestions.setText(exam.getNumberOfQuestions().toString());
@@ -143,14 +149,7 @@ public class AttemptsActivity extends BaseToolBarActivity
             description.setVisibility(View.VISIBLE);
             descriptionContent.setText(exam.getDescription());
         }
-        if (canAttemptExam()) {
-            if (exam.getPausedAttemptsCount() > 0) {
-                startButton.setText(R.string.testpress_resume);
-            }
-            startButtonLayout.setVisibility(View.VISIBLE);
-        } else {
-            startButtonLayout.setVisibility(View.GONE);
-        }
+        startButtonLayout.setVisibility(canAttemptExam() ? View.VISIBLE : View.GONE);
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
