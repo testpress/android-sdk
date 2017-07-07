@@ -30,10 +30,16 @@ public class ExamSampleActivity extends BaseToolBarActivity {
         setContentView(R.layout.activity_open_exams_as);
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        findViewById(R.id.exam).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.start_exam).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getExamSlug();
+                getExamSlug(R.id.start_exam);
+            }
+        });
+        findViewById(R.id.attempt_state).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getExamSlug(R.id.attempt_state);
             }
         });
         findViewById(R.id.exam_list).setOnClickListener(new View.OnClickListener() {
@@ -58,15 +64,23 @@ public class ExamSampleActivity extends BaseToolBarActivity {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private void showSDK(int id) {
-        selectedItem = id;
+    private void showSDK(int clickedButtonId) {
+        selectedItem = clickedButtonId;
         if (TestpressSdk.hasActiveSession(this)) {
-            if (id == R.id.exam) {
-                TestpressExam.startExam(this, examSlug, TestpressSdk.getTestpressSession(this));
-            } else if (id == R.id.exam_list) {
-                TestpressExam.show(this, TestpressSdk.getTestpressSession(this));
-            } else {
-                TestpressExam.showCategories(this, false, TestpressSdk.getTestpressSession(this));
+            switch (clickedButtonId) {
+                case R.id.start_exam:
+                    TestpressExam.startExam(this, examSlug, TestpressSdk.getTestpressSession(this));
+                    break;
+                case R.id.attempt_state:
+                    TestpressExam.showExamAttemptedState(
+                            this, examSlug,TestpressSdk.getTestpressSession(this));
+                    break;
+                case R.id.exam_list:
+                    TestpressExam.show(this, TestpressSdk.getTestpressSession(this));
+                    break;
+                default:
+                    TestpressExam.showCategories(this, false, TestpressSdk.getTestpressSession(this));
+                    break;
             }
         } else {
             Intent intent = new Intent(this, TestpressCoreSampleActivity.class);
@@ -83,7 +97,7 @@ public class ExamSampleActivity extends BaseToolBarActivity {
             if (resultCode == RESULT_OK) {
                 Toast.makeText(this, "User attempted the exam", Toast.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_CANCELED) {
-                if (data.getBooleanExtra(TestpressExam.ACTION_PRESSED_HOME, false)) {
+                if (data.getBooleanExtra(TestpressSdk.ACTION_PRESSED_HOME, false)) {
                     Toast.makeText(this, "User pressed home button", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(this, "User pressed back button", Toast.LENGTH_SHORT).show();
@@ -93,7 +107,7 @@ public class ExamSampleActivity extends BaseToolBarActivity {
     }
 
     @SuppressLint("InflateParams")
-    void getExamSlug() {
+    void getExamSlug(final int clickedButtonId) {
         final View dialog = getLayoutInflater().inflate(R.layout.edit_text_dialog_box, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this,
                 R.style.TestpressAppCompatAlertDialogStyle);
@@ -106,7 +120,7 @@ public class ExamSampleActivity extends BaseToolBarActivity {
                 if (examSlug.trim().isEmpty()) {
                     return;
                 }
-                showSDK(R.id.exam);
+                showSDK(clickedButtonId);
                 dialog.dismiss();
             }
         });

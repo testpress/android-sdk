@@ -41,7 +41,7 @@ import in.testpress.network.RetrofitCall;
 import in.testpress.util.ViewUtils;
 import retrofit2.Response;
 
-import static in.testpress.exam.TestpressExam.ACTION_PRESSED_HOME;
+import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
 import static in.testpress.exam.ui.TestFragment.PARAM_CONTENT_ATTEMPT_END_URL;
 
 /**
@@ -429,16 +429,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
 
     @Override
     public void onLoaderReset(final Loader<Attempt> loader) {
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        if(item.getItemId() == android.R.id.home) {
-            setResult(RESULT_CANCELED, new Intent().putExtra(ACTION_PRESSED_HOME, true));
-            super.onBackPressed();
-            return true;
-        }
-        return false;
+        
     }
 
     @Override
@@ -456,7 +447,6 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 testFragment.pauseExam();
             }
         } else {
-            setResult(RESULT_CANCELED, new Intent().putExtra(ACTION_PRESSED_HOME, false));
             super.onBackPressed();
         }
     }

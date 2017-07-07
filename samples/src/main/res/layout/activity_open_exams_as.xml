@@ -17,8 +17,14 @@
         <android.support.v7.widget.AppCompatButton
             style="@style/Button"
             android:layout_width="match_parent"
-            android:text="Exam"
-            android:id="@+id/exam" />
+            android:text="Start Exam"
+            android:id="@+id/start_exam" />
+
+        <android.support.v7.widget.AppCompatButton
+            style="@style/Button"
+            android:layout_marginTop="40dp"
+            android:text="Attempt State"
+            android:id="@+id/attempt_state" />
 
         <android.support.v7.widget.AppCompatButton
             style="@style/Button"
@@ -29,6 +35,7 @@
 
         <android.support.v7.widget.AppCompatButton
             style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_marginTop="40dp"
             android:text="Categories"
             android:id="@+id/categories" />
