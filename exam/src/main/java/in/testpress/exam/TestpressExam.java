@@ -407,7 +407,7 @@ public class TestpressExam {
     private static DaoSession getDaoSession(Context context) {
         if (daoSession == null) {
             DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(
-                    context.getApplicationContext(), TestpressSdk.TESTPRESS_SDK_DATABASE);
+                    context.getApplicationContext(), TestpressSdk.TESTPRESS_EXAM_SDK_DATABASE);
 
             database = helper.getWritableDb();
             daoSession = new DaoMaster(database).newSession();
