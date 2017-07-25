@@ -27,7 +27,8 @@ public final class TestpressSdk {
     private static final String KEY_USER_ID = "userId";
     private static final String KEY_COURSE_DATABASE_SESSION = "courseDatabaseSession";
     private static final String KEY_EXAM_DATABASE_SESSION = "examDatabaseSession";
-    public static final String TESTPRESS_SDK_DATABASE = "testpressSdkDB";
+    public static final String TESTPRESS_EXAM_SDK_DATABASE = "testpressExamSdkDB";
+    public static final String TESTPRESS_COURSE_SDK_DATABASE = "testpressCourseSdkDB";
     private static final String RUBIK_REGULAR_FONT_PATH = "Rubik-Regular.ttf";
     private static final String RUBIK_MEDIUM_FONT_PATH = "Rubik-Medium.ttf";
     public enum Provider { FACEBOOK, GOOGLE, TESTPRESS }
