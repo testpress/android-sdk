@@ -9,8 +9,6 @@ import android.support.v4.app.FragmentActivity;
 
 import org.greenrobot.greendao.database.Database;
 
-import junit.framework.Assert;
-
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.models.Attempt;
@@ -32,6 +30,7 @@ import in.testpress.exam.ui.CategoryGridActivity;
 import in.testpress.exam.ui.ExamsListActivity;
 import in.testpress.exam.ui.ReviewStatsActivity;
 import in.testpress.exam.ui.TestActivity;
+import in.testpress.util.Assert;
 import in.testpress.util.ImageUtils;
 
 import static in.testpress.exam.ui.CategoryGridActivity.SHOW_EXAMS_AS_DEFAULT;
@@ -43,11 +42,11 @@ public class TestpressExam {
     private static Database database;
 
     /**
-     * Use when testpress exam need to be open in a container as a fragment.
+     * Use when testpress exams need to be open in a container as a fragment.
      *
      * <p> Usage example:
      *
-     * <p> TestpressSdk.initialize(getActivity(), "baseUrl", "userId", "accessToken", provider,
+     * <p> TestpressSdk.initialize(getActivity(), instituteSettings, "userId", "accessToken", provider,
      * <p>             new TestpressCallback/<TestpressSession>() {
      * <p>             @Override
      * <p>             public void onSuccess(TestpressSession testpressSession) {
@@ -70,11 +69,11 @@ public class TestpressExam {
     }
 
     /**
-     * Use when testpress exam need to be open as a new Activity.
+     * Use when testpress exams need to be open as a new Activity.
      *
      * <p> Usage example:
      *
-     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
+     * <p> TestpressSdk.initialize(this, instituteSettings, "userId", "accessToken", provider,
      * <p>             new TestpressCallback/<TestpressSession>() {
      * <p>             @Override
      * <p>             public void onSuccess(TestpressSession testpressSession) {
@@ -100,7 +99,7 @@ public class TestpressExam {
      *
      * <p> Usage example:
      *
-     * <p> TestpressSdk.initialize(getActivity(), "baseUrl", "userId", "accessToken", provider,
+     * <p> TestpressSdk.initialize(getActivity(), instituteSettings, "userId", "accessToken", provider,
      * <p>             new TestpressCallback/<TestpressSession>() {
      * <p>             @Override
      * <p>             public void onSuccess(TestpressSession testpressSession) {
@@ -127,7 +126,7 @@ public class TestpressExam {
      *
      * <p> Usage example:
      *
-     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
+     * <p> TestpressSdk.initialize(this, instituteSettings", "userId", "accessToken", provider,
      * <p>             new TestpressCallback/<TestpressSession>() {
      * <p>             @Override
      * <p>             public void onSuccess(TestpressSession testpressSession) {
@@ -153,16 +152,6 @@ public class TestpressExam {
     /**
      * Use to start a particular exam.
      *
-     * <p> Usage example:
-     *
-     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
-     * <p>             new TestpressCallback/<TestpressSession>() {
-     * <p>             @Override
-     * <p>             public void onSuccess(TestpressSession testpressSession) {
-     * <p>                 <b>TestpressExam.startExam(this, "my-slug", testpressSession);</b>
-     * <p>             }
-     * <p> });
-     *
      * @param activity activity from which exam need to start.
      * @param examSlug Slug of the exam which need to be start.
      * @param testpressSession TestpressSession got from the core module.
@@ -185,16 +174,6 @@ public class TestpressExam {
     /**
      * Display the attempt report.
      *
-     * <p> Usage example:
-     *
-     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
-     * <p>             new TestpressCallback/<TestpressSession>() {
-     * <p>             @Override
-     * <p>             public void onSuccess(TestpressSession testpressSession) {
-     * <p>                 <b>TestpressExam.showAttemptReport(this, exam, attempt, testpressSession);</b>
-     * <p>             }
-     * <p> });
-     *
      * @param activity activity from which exam need to start.
      * @param exam Exam object of the attempt.
      * @param attempt Attempt object which report need to be shown.
@@ -215,16 +194,6 @@ public class TestpressExam {
 
     /**
      * Show the exam based on its attempt(s) state.
-     *
-     * <p> Usage example:
-     *
-     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
-     * <p>             new TestpressCallback/<TestpressSession>() {
-     * <p>             @Override
-     * <p>             public void onSuccess(TestpressSession testpressSession) {
-     * <p>                 <b>TestpressExam.showExamAttemptedState(this, "exam_slug", testpressSession);</b>
-     * <p>             }
-     * <p> });
      *
      * @param activity activity from which exam need to show.
      * @param examSlug Slug of the exam which need to be show.
@@ -247,16 +216,6 @@ public class TestpressExam {
     /**
      * Display the subject wise analytics.
      *
-     * <p> Usage example:
-     *
-     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
-     * <p>             new TestpressCallback/<TestpressSession>() {
-     * <p>             @Override
-     * <p>             public void onSuccess(TestpressSession testpressSession) {
-     * <p>                 <b>TestpressExam.showAnalytics(this, analyticsUrl, testpressSession);</b>
-     * <p>             }
-     * <p> });
-     *
      * @param activity activity from which exam need to start.
      * @param analyticsUrlFrag Analytics url fragment.
      * @param testpressSession TestpressSession got from the core module.
@@ -277,17 +236,6 @@ public class TestpressExam {
     /**
      * Use to start a particular exam in a course.
      *
-     * <p> Usage example:
-     *
-     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
-     * <p>             new TestpressCallback/<TestpressSession>() {
-     * <p>             @Override
-     * <p>             public void onSuccess(TestpressSession testpressSession) {
-     * <p>                 <b>TestpressExam.startCourseExam(this, courseContent, false,
-     * <p>                            testpressSession);</b>
-     * <p>             }
-     * <p> });
-     *
      * @param activity activity from which exam need to start.
      * @param courseContent Course content which has the exam need to be start.
      * @param discardExamDetails True to discard the start exam screen which contains exam details,
@@ -305,17 +253,6 @@ public class TestpressExam {
 
     /**
      * Use to resume a particular attempt in a course.
-     *
-     * <p> Usage example:
-     *
-     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
-     * <p>             new TestpressCallback/<TestpressSession>() {
-     * <p>             @Override
-     * <p>             public void onSuccess(TestpressSession testpressSession) {
-     * <p>                 <b>TestpressExam.resumeCourseAttempt(this, courseContent, courseAttempt,
-     * <p>                            false, testpressSession);</b>
-     * <p>             }
-     * <p> });
      *
      * @param activity activity from which exam need to start.
      * @param courseContent Course content which has the attempt's exam.
@@ -337,17 +274,6 @@ public class TestpressExam {
 
     /**
      * Use to end a particular attempt in a course.
-     *
-     * <p> Usage example:
-     *
-     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
-     * <p>             new TestpressCallback/<TestpressSession>() {
-     * <p>             @Override
-     * <p>             public void onSuccess(TestpressSession testpressSession) {
-     * <p>                 <b>TestpressExam.endCourseAttempt(this, courseContent, courseAttempt,
-     * <p>                            testpressSession);</b>
-     * <p>             }
-     * <p> });
      *
      * @param activity activity from which exam need to start.
      * @param courseContent Course content which has the attempt's exam.

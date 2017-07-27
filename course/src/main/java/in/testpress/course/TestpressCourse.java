@@ -6,8 +6,6 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 
-import junit.framework.Assert;
-
 import org.greenrobot.greendao.database.Database;
 
 import in.testpress.core.TestpressSdk;
@@ -18,6 +16,7 @@ import in.testpress.course.models.greendao.DaoMaster;
 import in.testpress.course.models.greendao.DaoSession;
 import in.testpress.course.ui.CourseListActivity;
 import in.testpress.course.ui.CourseListFragment;
+import in.testpress.util.Assert;
 import in.testpress.util.ImageUtils;
 
 public class TestpressCourse {
@@ -30,7 +29,7 @@ public class TestpressCourse {
      *
      * <p> Usage example:
      *
-     * <p> TestpressSdk.initialize(getActivity(), "baseUrl", "userId", "accessToken", provider,
+     * <p> TestpressSdk.initialize(getActivity(), instituteSettings, "userId", "accessToken", provider,
      * <p>             new TestpressCallback/<TestpressSession>() {
      * <p>             @Override
      * <p>             public void onSuccess(TestpressSession testpressSession) {
@@ -57,7 +56,7 @@ public class TestpressCourse {
      *
      * <p> Usage example:
      *
-     * <p> TestpressSdk.initialize(this, "baseUrl", "userId", "accessToken", provider,
+     * <p> TestpressSdk.initialize(this, instituteSettings, "userId", "accessToken", provider,
      * <p>             new TestpressCallback/<TestpressSession>() {
      * <p>             @Override
      * <p>             public void onSuccess(TestpressSession testpressSession) {

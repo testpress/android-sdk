@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import in.testpress.core.TestpressSdk;
+import in.testpress.core.TestpressSession;
 import in.testpress.exam.TestpressExam;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
@@ -63,23 +64,27 @@ public class ExamSampleActivity extends BaseToolBarActivity {
         });
     }
 
-    @SuppressWarnings("ConstantConditions")
     private void showSDK(int clickedButtonId) {
         selectedItem = clickedButtonId;
         if (TestpressSdk.hasActiveSession(this)) {
+            TestpressSession session = TestpressSdk.getTestpressSession(this);
+            //noinspection ConstantConditions
+            session.getInstituteSettings()
+                    .setCoursesFrontend(false)
+                    .setCoursesGamificationEnabled(false);
+            TestpressSdk.setTestpressSession(this, session);
             switch (clickedButtonId) {
                 case R.id.start_exam:
-                    TestpressExam.startExam(this, examSlug, TestpressSdk.getTestpressSession(this));
+                    TestpressExam.startExam(this, examSlug, session);
                     break;
                 case R.id.attempt_state:
-                    TestpressExam.showExamAttemptedState(
-                            this, examSlug,TestpressSdk.getTestpressSession(this));
+                    TestpressExam.showExamAttemptedState(this, examSlug, session);
                     break;
                 case R.id.exam_list:
-                    TestpressExam.show(this, TestpressSdk.getTestpressSession(this));
+                    TestpressExam.show(this, session);
                     break;
                 default:
-                    TestpressExam.showCategories(this, false, TestpressSdk.getTestpressSession(this));
+                    TestpressExam.showCategories(this, false, session);
                     break;
             }
         } else {

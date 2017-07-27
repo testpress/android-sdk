@@ -59,13 +59,16 @@ public class TestpressApiClient {
      * @param context
      */
     public TestpressApiClient(final Context context, TestpressSession testpressSession) {
-        this(context, checkTestpressSessionIsNull(testpressSession).getBaseUrl(), testpressSession);
+        this(context, null, checkTestpressSessionIsNull(testpressSession));
     }
 
     private TestpressApiClient(final Context context, String baseUrl,
                               final TestpressSession testpressSession) {
         if (context == null) {
             throw new IllegalArgumentException("Context must not be null.");
+        }
+        if (testpressSession != null) {
+            baseUrl = testpressSession.getInstituteSettings().getBaseUrl();
         }
         if (baseUrl == null || baseUrl.isEmpty()) {
             throw new IllegalArgumentException("BaseUrl must not be null or Empty.");

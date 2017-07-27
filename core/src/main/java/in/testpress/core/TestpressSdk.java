@@ -10,9 +10,11 @@ import android.support.annotation.Nullable;
 
 import java.util.HashMap;
 
+import in.testpress.model.InstituteSettings;
 import in.testpress.network.AuthorizationErrorResponse;
 import in.testpress.network.TestpressApiClient;
 import in.testpress.R;
+import in.testpress.util.Assert;
 import in.testpress.util.UIUtils;
 
 public final class TestpressSdk {
@@ -181,24 +183,24 @@ public final class TestpressSdk {
      * Authorize the user and store the testpress session
      *
      * @param context Context
-     * @param baseUrl Base url of institute
+     * @param instituteSettings Institute settings contains base url & flags to enable custom features
      * @param userId User's social account id (if provider is fb or google)
      *               or testpress username(for Provider.TESTPRESS)
      * @param accessToken User's social account access token(if provider is fb or google)
      *                    or testpress password(for Provider.TESTPRESS)
      * @param provider Provider.FACEBOOK or Provider.GOOGLE or Provider.TESTPRESS
      */
-    public static void initialize(@NonNull Context context, @NonNull String baseUrl,
+    public static void initialize(@NonNull Context context, @NonNull InstituteSettings instituteSettings,
                                   @NonNull String userId, @NonNull String accessToken,
                                   @NonNull Provider provider) {
-        initialize(context, baseUrl, userId, accessToken, provider, null);
+        initialize(context, instituteSettings, userId, accessToken, provider, null);
     }
 
     /**
      * Authorize the user and store the testpress session
      *
      * @param context Context
-     * @param baseUrl Base url of institute
+     * @param instituteSettings Institute settings contains base url & flags to enable custom features
      * @param userId User's social account id (if provider is fb or google)
      *               or testpress username(for Provider.TESTPRESS)
      * @param accessToken User's social account access token(if provider is fb or google)
@@ -206,17 +208,17 @@ public final class TestpressSdk {
      * @param provider Provider.FACEBOOK or Provider.GOOGLE or Provider.TESTPRESS
      * @param callback Callback which will be call on success or failure
      */
-    public static void initialize(@NonNull final Context context, @NonNull final String baseUrl,
-                                  @NonNull final String userId, @NonNull final String accessToken,
+    public static void initialize(@NonNull final Context context,
+                                  @NonNull final InstituteSettings instituteSettings,
+                                  @NonNull final String userId,
+                                  @NonNull final String accessToken,
                                   @NonNull final Provider provider,
                                   final TestpressCallback<TestpressSession> callback) {
         validateContext(context);
         if (userId == null || accessToken == null || provider == null) {
             throw new IllegalArgumentException("UserId & AccessToken & Provider must not be null.");
         }
-        if (baseUrl == null || baseUrl.isEmpty()) {
-            throw new IllegalArgumentException("BaseUrl must not be null or Empty.");
-        }
+        Assert.assertNotNull("InstituteSettings must not be null.", instituteSettings);
         if (userId.equals(getPreferences(context).getString(KEY_USER_ID, null)) &&
                 hasActiveSession(context)) {
             if (callback != null) {
@@ -242,11 +244,12 @@ public final class TestpressSdk {
             credentials.put("user_id", userId);
             credentials.put("access_token", accessToken);
         }
-        new TestpressApiClient(baseUrl, context).authenticate(urlPath, credentials)
+        new TestpressApiClient(instituteSettings.getBaseUrl(), context)
+                .authenticate(urlPath, credentials)
                 .enqueue(new TestpressCallback<TestpressSession>() {
                     @Override
                     public void onSuccess(TestpressSession testpressSession) {
-                        testpressSession.setBaseUrl(baseUrl);
+                        testpressSession.setInstituteSettings(instituteSettings);
                         setTestpressSession(context, testpressSession);
                         SharedPreferences.Editor editor = getPreferenceEditor(context);
                         editor.putString(KEY_USER_ID, userId);

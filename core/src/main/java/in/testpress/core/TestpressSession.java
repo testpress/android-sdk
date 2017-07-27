@@ -6,24 +6,16 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import in.testpress.model.InstituteSettings;
+import in.testpress.util.Assert;
+
 public class TestpressSession {
-    protected String baseUrl;
-    protected String token;
+    private InstituteSettings instituteSettings;
+    private String token;
 
-    public TestpressSession(@NonNull String baseUrl, @NonNull String token) {
-        setBaseUrl(baseUrl);
+    public TestpressSession(@NonNull InstituteSettings instituteSettings, @NonNull String token) {
+        setInstituteSettings(instituteSettings);
         setToken(token);
-    }
-
-    public String getBaseUrl() {
-        return baseUrl;
-    }
-
-    public void setBaseUrl(String baseUrl) {
-        if (baseUrl == null || baseUrl.isEmpty()) {
-            throw new IllegalArgumentException("BaseUrl must not be null or Empty.");
-        }
-        this.baseUrl = baseUrl;
     }
 
     public String getToken() {
@@ -35,6 +27,15 @@ public class TestpressSession {
             throw new IllegalArgumentException("AuthToken must not be null or Empty.");
         }
         this.token = token;
+    }
+
+    public InstituteSettings getInstituteSettings() {
+        return instituteSettings;
+    }
+
+    public void setInstituteSettings(@NonNull InstituteSettings instituteSettings) {
+        Assert.assertNotNull("InstituteSettings must not be null.", instituteSettings);
+        this.instituteSettings = instituteSettings;
     }
 
     public static String serialize(@NonNull TestpressSession session) {

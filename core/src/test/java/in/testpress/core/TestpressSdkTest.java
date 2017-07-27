@@ -4,6 +4,8 @@ import android.content.Context;
 
 import org.junit.Test;
 
+import in.testpress.model.InstituteSettings;
+
 import static org.mockito.Mockito.*;
 
 import static org.junit.Assert.assertEquals;
@@ -66,8 +68,9 @@ public class TestpressSdkTest {
     @Test
     public void testInitializingSdk_withNullValues() throws Exception {
         TestpressSdk.Provider provider = TestpressSdk.Provider.FACEBOOK;
+        InstituteSettings instituteSettings = mock(InstituteSettings.class);
         try {
-            TestpressSdk.initialize(null, "", "", "", provider);
+            TestpressSdk.initialize(null, instituteSettings, "", "", provider);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("Context must not be null.", e.getMessage());
@@ -77,28 +80,22 @@ public class TestpressSdkTest {
             TestpressSdk.initialize(context, null, "", "", provider);
             fail();
         } catch (IllegalArgumentException e) {
-            assertEquals("BaseUrl must not be null or Empty.", e.getMessage());
+            assertEquals("InstituteSettings must not be null.", e.getMessage());
         }
         try {
-            TestpressSdk.initialize(context, "", "", "", provider);
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertEquals("BaseUrl must not be null or Empty.", e.getMessage());
-        }
-        try {
-            TestpressSdk.initialize(context, "dummybaseurl", null, "", provider);
+            TestpressSdk.initialize(context, instituteSettings, null, "", provider);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("UserId & AccessToken & Provider must not be null.", e.getMessage());
         }
         try {
-            TestpressSdk.initialize(context, "dummybaseurl", "", null, provider);
+            TestpressSdk.initialize(context, instituteSettings, "", null, provider);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("UserId & AccessToken & Provider must not be null.", e.getMessage());
         }
         try {
-            TestpressSdk.initialize(context, "dummybaseurl", "", "", null);
+            TestpressSdk.initialize(context, instituteSettings, "", "", null);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("UserId & AccessToken & Provider must not be null.", e.getMessage());

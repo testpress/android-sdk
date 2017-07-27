@@ -19,27 +19,27 @@ public class TestpressCourseTest {
         try {
             TestpressCourse.show(null, 0, testpressSession);
             fail();
-        } catch (AssertionError e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("Activity must not be null.", e.getMessage());
         }
         FragmentActivity activity = mock(FragmentActivity.class);
         try {
             TestpressCourse.show(activity, 0, null);
             fail();
-        } catch (AssertionError e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("TestpressSession must not be null.", e.getMessage());
         }
         try {
             TestpressCourse.show(null, testpressSession);
             fail();
-        } catch (AssertionError e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("Context must not be null.", e.getMessage());
         }
         Context context = mock(Context.class);
         try {
             TestpressCourse.show(context, null);
             fail();
-        } catch (AssertionError e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("TestpressSession must not be null.", e.getMessage());
         }
     }
