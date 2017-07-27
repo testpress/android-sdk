@@ -16,8 +16,15 @@
 
         <android.support.v7.widget.AppCompatButton
             style="@style/Button"
-            android:text="New Activity"
-            android:id="@+id/new_activity_button" />
+            android:layout_width="match_parent"
+            android:text="Simple Course"
+            android:id="@+id/simple_course" />
+
+        <android.support.v7.widget.AppCompatButton
+            style="@style/Button"
+            android:layout_marginTop="40dp"
+            android:text="Gamified Course"
+            android:id="@+id/gamified_course" />
 
         <android.support.v7.widget.AppCompatButton
             style="@style/Button"

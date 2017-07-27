@@ -2,36 +2,30 @@ package in.testpress.core;
 
 import org.junit.Test;
 
+import in.testpress.model.InstituteSettings;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 public class TestpressSessionTest {
 
     @Test
-    public void testConstructor_withNullBaseUrl() throws Exception {
+    public void testConstructor_withNullInstituteSettings() throws Exception {
         try {
             new TestpressSession(null, "dummyToken");
             fail();
         } catch (IllegalArgumentException e) {
-            assertEquals("BaseUrl must not be null or Empty.", e.getMessage());
-        }
-    }
-
-    @Test
-    public void testConstructor_withEmptyBaseUrl() throws Exception {
-        try {
-            new TestpressSession("", "dummyToken");
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertEquals("BaseUrl must not be null or Empty.", e.getMessage());
+            assertEquals("InstituteSettings must not be null.", e.getMessage());
         }
     }
 
     @Test
     public void testConstructor_withNullToken() throws Exception {
+        InstituteSettings instituteSettings = mock(InstituteSettings.class);
         try {
-            new TestpressSession("dummyBaseUrl", null);
+            new TestpressSession(instituteSettings, null);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("AuthToken must not be null or Empty.", e.getMessage());
@@ -40,8 +34,9 @@ public class TestpressSessionTest {
 
     @Test
     public void testConstructor_withEmptyToken() throws Exception {
+        InstituteSettings instituteSettings = mock(InstituteSettings.class);
         try {
-            new TestpressSession("dummyBaseUrl", "");
+            new TestpressSession(instituteSettings, "");
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("AuthToken must not be null or Empty.", e.getMessage());
@@ -49,20 +44,22 @@ public class TestpressSessionTest {
     }
 
     @Test
-    public void testSetToken_withNullBaseUrl() throws Exception {
+    public void testBaseUrl_withNullBaseUrl() throws Exception {
+        InstituteSettings instituteSettings = mock(InstituteSettings.class);
         try {
-            TestpressSession session = new TestpressSession("dummyBaseUrl", "dummyToken");
-            session.setBaseUrl(null);
+            TestpressSession session = new TestpressSession(instituteSettings, "dummyToken");
+            session.setInstituteSettings(null);
             fail();
         } catch (IllegalArgumentException e) {
-            assertEquals("BaseUrl must not be null or Empty.", e.getMessage());
+            assertEquals("InstituteSettings must not be null.", e.getMessage());
         }
     }
 
     @Test
     public void testSetToken_withNullToken() throws Exception {
+        InstituteSettings instituteSettings = mock(InstituteSettings.class);
         try {
-            TestpressSession session = new TestpressSession("dummyBaseUrl", "dummyToken");
+            TestpressSession session = new TestpressSession(instituteSettings, "dummyToken");
             session.setToken(null);
             fail();
         } catch (IllegalArgumentException e) {

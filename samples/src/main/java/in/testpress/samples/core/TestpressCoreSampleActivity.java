@@ -25,6 +25,7 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.core.TestpressCallback;
+import in.testpress.model.InstituteSettings;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 
@@ -113,7 +114,8 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
     }
 
     private void authenticate(String userId, String accessToken, TestpressSdk.Provider provider) {
-        TestpressSdk.initialize(this, "http://sandbox.testpress.in", userId, accessToken, provider,
+        InstituteSettings instituteSettings = new InstituteSettings("http://sandbox.testpress.in");
+        TestpressSdk.initialize(this, instituteSettings, userId, accessToken, provider,
                 new TestpressCallback<TestpressSession>() {
                     @Override
                     public void onSuccess(TestpressSession response) {

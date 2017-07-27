@@ -113,7 +113,7 @@ public class TestpressExamTest {
         try {
             TestpressExam.showExamAttemptedState(null, "DummySlug", testpressSession);
             fail();
-        } catch (AssertionError e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("Activity must not be null.", e.getMessage());
         }
         FragmentActivity activity = mock(FragmentActivity.class);
@@ -144,7 +144,7 @@ public class TestpressExamTest {
         try {
             TestpressExam.showAnalytics(null, "DummyUrl", testpressSession);
             fail();
-        } catch (AssertionError e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("Activity must not be null.", e.getMessage());
         }
         try {
@@ -175,13 +175,13 @@ public class TestpressExamTest {
         try {
             TestpressExam.startCourseExam(null, courseContent, false, testpressSession);
             fail();
-        } catch (AssertionError e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("Activity must not be null.", e.getMessage());
         }
         try {
             TestpressExam.startCourseExam(activity, null, false, testpressSession);
             fail();
-        } catch (AssertionError e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("PARAM_COURSE_CONTENT must not be null.", e.getMessage());
         }
         try {
@@ -202,19 +202,19 @@ public class TestpressExamTest {
             TestpressExam.resumeCourseAttempt(null, courseContent, courseAttempt, false,
                     testpressSession);
             fail();
-        } catch (AssertionError e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("Activity must not be null.", e.getMessage());
         }
         try {
             TestpressExam.resumeCourseAttempt(activity, null, courseAttempt, false, testpressSession);
             fail();
-        } catch (AssertionError e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("PARAM_COURSE_CONTENT must not be null.", e.getMessage());
         }
         try {
             TestpressExam.resumeCourseAttempt(activity, courseContent, null, false, testpressSession);
             fail();
-        } catch (AssertionError e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("PARAM_COURSE_ATTEMPT must not be null.", e.getMessage());
         }
         try {
@@ -234,19 +234,19 @@ public class TestpressExamTest {
         try {
             TestpressExam.endCourseAttempt(null, courseContent, courseAttempt, testpressSession);
             fail();
-        } catch (AssertionError e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("Activity must not be null.", e.getMessage());
         }
         try {
             TestpressExam.endCourseAttempt(activity, null, courseAttempt, testpressSession);
             fail();
-        } catch (AssertionError e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("PARAM_COURSE_CONTENT must not be null.", e.getMessage());
         }
         try {
             TestpressExam.endCourseAttempt(activity, courseContent, null, testpressSession);
             fail();
-        } catch (AssertionError e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("PARAM_COURSE_ATTEMPT must not be null.", e.getMessage());
         }
         try {
