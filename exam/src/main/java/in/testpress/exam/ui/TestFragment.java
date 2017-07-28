@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
@@ -448,11 +449,8 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         getActivity().finish();
     }
 
-    private void showReview() {
-        getActivity().startActivityForResult(
-                ReviewStatsActivity.createIntent(getActivity(), exam, attempt),
-                CarouselFragment.TEST_TAKEN_REQUEST_CODE
-        );
+    private void showReview(Intent intent) {
+        getActivity().startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
     }
 
     private void saveResult(final int position, final Action action) {
@@ -562,7 +560,8 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                             if (progressDialog.isShowing()) {
                                 progressDialog.dismiss();
                             }
-                            returnToHistory();
+                            showReview(ReviewStatsActivity.createIntent(getActivity(), exam,
+                                    courseAttempt));
                         }
 
                         @Override
@@ -597,7 +596,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                                 progressDialog.dismiss();
                             }
                             TestFragment.this.attempt = attempt;
-                            showReview();
+                            showReview(ReviewStatsActivity.createIntent(getActivity(), exam, attempt));
                         }
 
                         @Override

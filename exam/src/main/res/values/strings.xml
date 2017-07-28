@@ -168,4 +168,7 @@
 
     <string name="action_cant_done_without_permission">Action can\'t be done without permission</string>
 
+    <string name="testpress_test_completed_you_earned">Test completed!\nYou’ve earned</string>
+    <string name="testpress_okay">Okay</string>
+
 </resources>
