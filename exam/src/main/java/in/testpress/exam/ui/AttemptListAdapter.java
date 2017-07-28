@@ -42,6 +42,7 @@ class AttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  
         TextView completedDate;
         TextView correct;
         TextView score;
+        LinearLayout trophiesLayout;
         TextView reviewLabel;
         LinearLayout pausedAttemptLayout;
         TextView startedDate;
@@ -55,6 +56,8 @@ class AttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  
             completedDate = ((TextView) convertView.findViewById(R.id.completed_date));
             correct = ((TextView) convertView.findViewById(R.id.correct));
             score = ((TextView) convertView.findViewById(R.id.score));
+            trophiesLayout = ((LinearLayout) convertView.findViewById(R.id.trophies_layout));
+            trophiesLayout.setVisibility(View.GONE);
             reviewLabel = ((TextView) convertView.findViewById(R.id.review_label));
             pausedAttemptLayout = (LinearLayout) convertView.findViewById(R.id.paused_attempt_layout);
             startedDate = ((TextView) convertView.findViewById(R.id.started_date));
@@ -70,13 +73,16 @@ class AttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  
         TextView correctLabel;
         TextView scoreLabel;
         TextView trophiesLabel;
+        TextView actionLabel;
 
         HeaderViewHolder(View convertView, Context context) {
             super(convertView);
             completedDateLabel = ((TextView) convertView.findViewById(R.id.date_label));
             correctLabel = ((TextView) convertView.findViewById(R.id.correct_label));
             scoreLabel = ((TextView) convertView.findViewById(R.id.score_label));
-            trophiesLabel = ((TextView) convertView.findViewById(R.id.action_label));
+            trophiesLabel = ((TextView) convertView.findViewById(R.id.trophies_label));
+            trophiesLabel.setVisibility(View.GONE);
+            actionLabel = ((TextView) convertView.findViewById(R.id.action_label));
             ViewUtils.setTypeface(new TextView[] {completedDateLabel, correctLabel, scoreLabel,
                     trophiesLabel}, TestpressSdk.getRubikMediumFont(context));
         }
