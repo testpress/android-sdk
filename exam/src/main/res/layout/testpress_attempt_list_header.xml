@@ -29,6 +29,12 @@
 
     <TextView
         style="@style/TestpressListItemHeader"
+        android:text="@string/testpress_trophies"
+        android:layout_weight="@integer/testpress_action_label_weight"
+        android:id="@+id/trophies_label" />
+
+    <TextView
+        style="@style/TestpressListItemHeader"
         android:text="@string/testpress_action"
         android:layout_weight="@integer/testpress_action_label_weight"
         android:id="@+id/action_label" />

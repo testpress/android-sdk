@@ -3,6 +3,7 @@ package in.testpress.course.ui;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.CourseContent;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.model.InstituteSettings;
 import in.testpress.util.ViewUtils;
 
 class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
@@ -43,6 +45,8 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         TextView completedDate;
         TextView correct;
         TextView score;
+        TextView trophies;
+        LinearLayout trophiesLayout;
         TextView reviewLabel;
         LinearLayout pausedAttemptLayout;
         TextView startedDate;
@@ -56,12 +60,14 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             completedDate = ((TextView) convertView.findViewById(R.id.completed_date));
             correct = ((TextView) convertView.findViewById(R.id.correct));
             score = ((TextView) convertView.findViewById(R.id.score));
+            trophies = ((TextView) convertView.findViewById(R.id.trophies));
+            trophiesLayout = ((LinearLayout) convertView.findViewById(R.id.trophies_layout));
             reviewLabel = ((TextView) convertView.findViewById(R.id.review_label));
             pausedAttemptLayout = (LinearLayout) convertView.findViewById(R.id.paused_attempt_layout);
             startedDate = ((TextView) convertView.findViewById(R.id.started_date));
             pausedLabel = ((TextView) convertView.findViewById(R.id.paused_label));
             resumeLabel = ((TextView) convertView.findViewById(R.id.resume_label));
-            ViewUtils.setTypeface(new TextView[] {completedDate, correct, score, reviewLabel,
+            ViewUtils.setTypeface(new TextView[] {completedDate, correct, score, reviewLabel, trophies,
                     startedDate, pausedLabel, resumeLabel}, TestpressSdk.getRubikRegularFont(context));
         }
     }
@@ -71,15 +77,17 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         TextView correctLabel;
         TextView scoreLabel;
         TextView trophiesLabel;
+        TextView actionLabel;
 
         HeaderViewHolder(View convertView, Context context) {
             super(convertView);
             completedDateLabel = ((TextView) convertView.findViewById(R.id.date_label));
             correctLabel = ((TextView) convertView.findViewById(R.id.correct_label));
             scoreLabel = ((TextView) convertView.findViewById(R.id.score_label));
-            trophiesLabel = ((TextView) convertView.findViewById(R.id.action_label));
+            trophiesLabel = ((TextView) convertView.findViewById(R.id.trophies_label));
+            actionLabel = ((TextView) convertView.findViewById(R.id.action_label));
             ViewUtils.setTypeface(new TextView[] {completedDateLabel, correctLabel, scoreLabel,
-                    trophiesLabel}, TestpressSdk.getRubikMediumFont(context));
+                    trophiesLabel, actionLabel}, TestpressSdk.getRubikMediumFont(context));
         }
     }
 
@@ -113,6 +121,10 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        //noinspection ConstantConditions
+        boolean isGamificationEnabled = TestpressSdk.getTestpressSession(mActivity)
+                .getInstituteSettings().isCoursesGamificationEnabled();
+
         if (viewHolder instanceof ViewHolder) {
             final ViewHolder holder = (ViewHolder) viewHolder;
             final CourseAttempt courseAttempt = mAttempts.get(position - 1);
@@ -130,6 +142,7 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                 courseAttempt, false, TestpressSdk.getTestpressSession(mActivity));
                     }
                 });
+                holder.resumeLabel.setVisibility(isGamificationEnabled ? View.GONE : View.VISIBLE);
             } else {
                 holder.completedDate.setText(attempt.getShortDate());
                 holder.correct.setText(attempt.getCorrectCount() + "/" + attempt.getTotalQuestions());
@@ -144,6 +157,29 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 });
                 holder.completedAttemptLayout.setVisibility(View.VISIBLE);
                 holder.pausedAttemptLayout.setVisibility(View.GONE);
+                if (isGamificationEnabled) {
+                    int textColor = courseAttempt.getTrophies().contains("+") ?
+                            R.color.testpress_green_light : R.color.testpress_red_incorrect;
+
+                    holder.trophies.setTextColor(ContextCompat.getColor(mActivity, textColor));
+                    holder.trophies.setText(courseAttempt.getTrophies().equals("NA") ?
+                            "0" : courseAttempt.getTrophies());
+
+                    holder.trophiesLayout.setVisibility(View.VISIBLE);
+                    holder.reviewLabel.setVisibility(View.GONE);
+                } else {
+                    holder.trophiesLayout.setVisibility(View.GONE);
+                    holder.reviewLabel.setVisibility(View.VISIBLE);
+                }
+            }
+        } else if (viewHolder instanceof HeaderViewHolder)  {
+            final HeaderViewHolder holder = (HeaderViewHolder) viewHolder;
+            if (isGamificationEnabled) {
+                holder.trophiesLabel.setVisibility(View.VISIBLE);
+                holder.actionLabel.setVisibility(View.GONE);
+            } else {
+                holder.trophiesLabel.setVisibility(View.GONE);
+                holder.actionLabel.setVisibility(View.VISIBLE);
             }
         }
     }

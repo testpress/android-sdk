@@ -39,6 +39,20 @@
             android:layout_weight="@integer/testpress_correct_answers_weight"
             android:id="@+id/correct" />
 
+        <LinearLayout
+            android:id="@+id/trophies_layout"
+            android:layout_weight="@integer/testpress_action_label_weight"
+            style="@style/TestpressListItemValue" >
+
+            <TextView
+                style="@style/TestpressListItemValue"
+                android:layout_width="35dp"
+                android:text="+55"
+                android:gravity="right"
+                android:id="@+id/trophies" />
+
+        </LinearLayout>
+
         <TextView
             style="@style/TestpressListItemValue"
             android:text="@string/testpress_review_label"
@@ -47,7 +61,7 @@
 
         <ImageView
             android:src="@drawable/ic_chevron_right_black_24dp"
-            android:tint="#777"
+            android:tint="@color/testpress_text_gray_medium"
             android:layout_marginRight="5dp"
             android:layout_marginEnd="5dp"
             android:layout_gravity="center"
