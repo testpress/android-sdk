@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scroll_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#ffffff" >
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/completed_message"
+            android:layout_marginTop="30dp"
+            android:layout_width="match_parent"
+            android:text="@string/testpress_test_completed_you_earned"
+            android:gravity="center"
+            android:lineSpacingExtra="6sp"
+            android:textSize="24sp"
+            android:textColor="@color/testpress_black"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:id="@+id/trophies_circle"
+            android:layout_below="@id/completed_message"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="90dp"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:gravity="center"
+            android:background="@drawable/testpress_circle_gray_border_2dp"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center" >
+
+                <TextView
+                    android:id="@+id/sign"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:textSize="36sp"
+                    android:textColor="@color/testpress_black"
+                    android:text="+" />
+
+                <TextView
+                    android:id="@+id/trophies"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="72sp"
+                    android:textColor="@color/testpress_black"
+                    android:text="90" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/trophies_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:textColor="#666666"
+                android:lineSpacingExtra="6sp"
+                android:text="@string/testpress_trophies" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_alignTop="@id/trophies_circle"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="-29dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/testpress_trophy"/>
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/okay_button"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/testpress_green_curved_edge_background"
+            android:text="@string/testpress_okay"
+            android:gravity="center"
+            android:letterSpacing="0.06"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginLeft="60dp"
+            android:layout_marginRight="60dp"
+            tools:targetApi="lollipop" />
+
+    </RelativeLayout>
+
+</ScrollView>

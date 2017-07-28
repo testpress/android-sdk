@@ -3,17 +3,24 @@ package in.testpress.exam.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 
+import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
+import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.Exam;
+import in.testpress.model.InstituteSettings;
 
 public class ReviewStatsActivity extends AppCompatActivity {
 
     static final String PARAM_PREVIOUS_ACTIVITY = "previousActivity";
     static final String PARAM_EXAM = "exam";
     static final String PARAM_ATTEMPT = "attempt";
+    static final String PARAM_COURSE_ATTEMPT = "courseAttempt";
+
+    boolean parentIsTestEngine;
 
     public static Intent createIntent(Activity activity, Exam exam, Attempt attempt) {
         Intent intent = new Intent(activity, ReviewStatsActivity.class);
@@ -23,11 +30,34 @@ public class ReviewStatsActivity extends AppCompatActivity {
         return intent;
     }
 
+    public static Intent createIntent(Activity activity, Exam exam, CourseAttempt courseAttempt) {
+        Intent intent = new Intent(activity, ReviewStatsActivity.class);
+        intent.putExtra(PARAM_PREVIOUS_ACTIVITY, activity.getClass().getName());
+        intent.putExtra(PARAM_EXAM, exam);
+        intent.putExtra(PARAM_COURSE_ATTEMPT, courseAttempt);
+        return intent;
+    }
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_container_layout_without_toolbar);
-        ReviewStatsFragment fragment = new ReviewStatsFragment();
+        String previousActivity = getIntent().getStringExtra(PARAM_PREVIOUS_ACTIVITY);
+        parentIsTestEngine = (previousActivity != null) &&
+                previousActivity.equals(TestActivity.class.getName());
+
+        //noinspection ConstantConditions
+        InstituteSettings instituteSettings =
+                TestpressSdk.getTestpressSession(this).getInstituteSettings();
+
+        Fragment fragment;
+        if (parentIsTestEngine && instituteSettings.isCoursesFrontend() &&
+                instituteSettings.isCoursesGamificationEnabled()) {
+
+            fragment = new TrophiesAchievedFragment();
+        } else {
+            fragment = new ReviewStatsFragment();
+        }
         fragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, fragment)
@@ -38,21 +68,14 @@ public class ReviewStatsActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if ((requestCode == CarouselFragment.TEST_TAKEN_REQUEST_CODE)) {
-            String previousActivity = getIntent().getStringExtra(PARAM_PREVIOUS_ACTIVITY);
-            if((previousActivity != null) && previousActivity.equals(TestActivity.class.getName())) {
-                // OnBackPressed go to history
-                setResult(RESULT_OK);
-                finish();
-            } else {
-                finish();
-            }
+            setResult(RESULT_OK);
+            finish();
         }
     }
 
     @Override
     public void onBackPressed() {
-        String previousActivity = getIntent().getStringExtra(PARAM_PREVIOUS_ACTIVITY);
-        if((previousActivity != null) && previousActivity.equals(TestActivity.class.getName())) {
+        if (parentIsTestEngine) {
             // OnBackPressed go to history
             setResult(RESULT_OK);
             finish();
