@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +11,6 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -23,7 +20,6 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptAnswer;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.AttemptQuestion;
-import in.testpress.util.ViewUtils;
 import in.testpress.util.WebViewUtils;
 
 public class TestQuestionFragment extends Fragment {
@@ -34,6 +30,7 @@ public class TestQuestionFragment extends Fragment {
     private Integer index;
     private List<Integer> selectedOptions;
     private View view;
+    private WebView questionsView;
 
     static TestQuestionFragment getInstance(AttemptItem attemptItem, int questionIndex) {
         TestQuestionFragment testQuestionFragment = new TestQuestionFragment();
@@ -57,7 +54,7 @@ public class TestQuestionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (view == null) {
             view = inflater.inflate(R.layout.testpress_fragment_test_question, container, false);
-            WebView questionsView = (WebView) view.findViewById(R.id.question);
+            questionsView = (WebView) view.findViewById(R.id.question);
             TextView questionIndex = (TextView) view.findViewById(R.id.question_index);
             CheckBox review = (CheckBox) view.findViewById(R.id.review);
             questionIndex.setText(index + ".");
@@ -144,6 +141,17 @@ public class TestQuestionFragment extends Fragment {
             }
             attemptItem.saveAnswers(selectedOptions);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        final ViewGroup viewGroup = (ViewGroup) questionsView.getParent();
+        if (viewGroup != null) {
+            // Remove webView from its parent before destroy to support below kitkat
+            viewGroup.removeView(questionsView);
+        }
+        questionsView.destroy();
+        super.onDestroyView();
     }
 
 }
