@@ -90,18 +90,30 @@ public class WebViewUtils {
 
     public String getJavascript(Context context) {
         return "javascript:" +
-                CommonUtils.getStringFromAsset(context, "TestpressImageTagHandler.js") +
-                CommonUtils.getStringFromAsset(context, "TestpressMathJaxRender.js");
+                CommonUtils.getStringFromAsset(context, "TestpressImageTagHandler.js");
     }
 
     public String getHeader() {
         return "<!DOCTYPE html><meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no' />" +
                 "<link rel='stylesheet' type='text/css' href='testpress_questions_typebase.css' />" +
                 "<style>img{display: inline; height: auto !important; width: auto !important; max-width: 100%;}</style>" +
-
-                "<link rel='stylesheet' href='katex/katex.min.css' />" +
-                "<script src='katex/katex.min.js'></script>" +
-                "<script src='katex/contrib/auto-render.min.js'></script>";
+                "<script type='text/x-mathjax-config'>" +
+                "    MathJax.Hub.Config({" +
+                "      messageStyle: 'none'," +
+                "      tex2jax: {" +
+                "        inlineMath: [['\\\\[','\\\\]'], ['\\\\(','\\\\)']]," +
+                "        displayMath: [ ['$$','$$'] ]," +
+                "        processEscapes: true" +
+                "      }" +
+                "    });" +
+                "</script>" +
+                "<script src='MathJax-2.7.1/MathJax.js?noContrib'></script>" +
+                "<script type='text/x-mathjax-config'>" +
+                "    MathJax.Ajax.config.path['MathJax'] = 'MathJax-2.7.1';" +
+                "    MathJax.Ajax.config.path['Contrib'] = 'MathJax-2.7.1/contrib';" +
+                "</script>" +
+                "<script src='MathJax-2.7.1/config/TeX-MML-AM_CHTML-full.js'></script>" +
+                "<script src='MathJax-2.7.1/extensions/TeX/mhchem3/mhchem.js'></script>";
     }
 
     public static String getHeadingTags(String headingText) {
