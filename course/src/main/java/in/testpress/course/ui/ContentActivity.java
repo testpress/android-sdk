@@ -449,7 +449,11 @@ public class ContentActivity extends BaseToolBarActivity {
                                    final boolean discardExamDetails) {
 
         if (pausedCourseAttempt == null && canAttemptExam(exam)) {
-            startButton.setText(R.string.testpress_retake);
+            if (courseAttempts.isEmpty()) {
+                startButton.setText(R.string.testpress_start);
+            } else {
+                startButton.setText(R.string.testpress_retake);
+            }
             startButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
