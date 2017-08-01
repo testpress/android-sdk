@@ -344,7 +344,7 @@ public class ContentActivity extends BaseToolBarActivity {
             description.setVisibility(View.VISIBLE);
             descriptionContent.setText(exam.getDescription());
         }
-        updateStartButton(exam, pausedCourseAttempt, false);
+        updateStartButton(exam, pausedCourseAttempt, true);
         validateAdjacentNavigationButton();
         examDetailsLayout.setVisibility(View.VISIBLE);
         examContentLayout.setVisibility(View.VISIBLE);
@@ -433,7 +433,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 }
             }
         }
-        updateStartButton(exam, pausedAttempts.isEmpty() ? null : pausedAttempts.get(0), true);
+        updateStartButton(exam, pausedAttempts.isEmpty() ? null : pausedAttempts.get(0), false);
         RecyclerView attemptList = (RecyclerView) findViewById(R.id.attempt_list);
         attemptList.setNestedScrollingEnabled(false);
         attemptList.setHasFixedSize(true);
