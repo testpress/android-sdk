@@ -18,9 +18,11 @@ package in.testpress.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -180,6 +182,13 @@ public abstract class SingleTypeAdapter<V> extends TypeAdapter {
             convertView = initialize(inflater.inflate(layout, null));
         update(position, convertView, getItem(position));
         return convertView;
+    }
+
+    public void setTypeface(int[] textViewsIndices, Typeface typeface) {
+        for (int index : textViewsIndices) {
+            TextView view = textView(index);
+            view.setTypeface(typeface);
+        }
     }
 
     public String getStringFromResource(Context context, int resourceId) {

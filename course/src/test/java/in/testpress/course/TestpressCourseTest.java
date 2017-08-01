@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 public class TestpressCourseTest {
 
     @Test
-    public void testShowExams_withNullValues() throws Exception {
+    public void testShowCourses_withNullValues() throws Exception {
         TestpressSession testpressSession = mock(TestpressSession.class);
         try {
             TestpressCourse.show(null, 0, testpressSession);
@@ -43,4 +43,36 @@ public class TestpressCourseTest {
             assertEquals("TestpressSession must not be null.", e.getMessage());
         }
     }
+
+    @Test
+    public void testShowLeaderboard_withNullValues() throws Exception {
+        TestpressSession testpressSession = mock(TestpressSession.class);
+        try {
+            TestpressCourse.showLeaderboard(null, 0, testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Activity must not be null.", e.getMessage());
+        }
+        FragmentActivity activity = mock(FragmentActivity.class);
+        try {
+            TestpressCourse.showLeaderboard(activity, 0, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+        try {
+            TestpressCourse.showLeaderboard(null, testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Context must not be null.", e.getMessage());
+        }
+        Context context = mock(Context.class);
+        try {
+            TestpressCourse.showLeaderboard(context, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+    }
+
 }

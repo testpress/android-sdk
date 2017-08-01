@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/home"
+            android:icon="@drawable/ic_home_black_24dp"
+            android:checked="true"
+            android:title="@string/home" />
+
+        <item
+            android:id="@+id/courses"
+            android:icon="@drawable/ic_assignment_black_24dp"
+            android:title="@string/courses" />
+
+        <item
+            android:id="@+id/leaderboard"
+            android:icon="@drawable/ic_assignment_black_24dp"
+            android:title="@string/testpress_leaderboard" />
+
+        <item
+            android:id="@+id/logout"
+            android:icon="@drawable/ic_power_settings_new_black_24dp"
+            android:title="@string/logout" />
+
+    </group>
+
+</menu>

@@ -4,6 +4,7 @@ import java.util.Map;
 
 import in.testpress.course.models.Content;
 import in.testpress.course.models.HtmlContent;
+import in.testpress.course.models.Reputation;
 import in.testpress.course.models.greendao.Chapter;
 import in.testpress.course.models.greendao.Course;
 import in.testpress.model.TestpressApiResponse;
@@ -16,6 +17,10 @@ import retrofit2.http.QueryMap;
 
 import static in.testpress.course.network.TestpressCourseApiClient.CHAPTERS_PATH;
 import static in.testpress.course.network.TestpressCourseApiClient.COURSE_LIST_PATH;
+import static in.testpress.course.network.TestpressCourseApiClient.LEADERBOARD_PATH;
+import static in.testpress.course.network.TestpressCourseApiClient.RANK_PATH;
+import static in.testpress.course.network.TestpressCourseApiClient.TARGET_PATH;
+import static in.testpress.course.network.TestpressCourseApiClient.THREAD_PATH;
 
 public interface CourseService {
 
@@ -42,5 +47,18 @@ public interface CourseService {
     @GET("{content_url}")
     RetrofitCall<Content> getContent(
             @Path(value = "content_url", encoded = true) String contentUrl);
+
+    @GET(LEADERBOARD_PATH)
+    RetrofitCall<TestpressApiResponse<Reputation>> getLeaderboard(
+            @QueryMap Map<String, Object> queryParams);
+
+    @GET(TARGET_PATH)
+    RetrofitCall<TestpressApiResponse<Reputation>> getTargets();
+
+    @GET(THREAD_PATH)
+    RetrofitCall<TestpressApiResponse<Reputation>> getThreads();
+
+    @GET(RANK_PATH)
+    RetrofitCall<Reputation> getMyRank();
 
 }

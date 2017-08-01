@@ -16,6 +16,8 @@ import in.testpress.course.models.greendao.DaoMaster;
 import in.testpress.course.models.greendao.DaoSession;
 import in.testpress.course.ui.CourseListActivity;
 import in.testpress.course.ui.CourseListFragment;
+import in.testpress.course.ui.LeaderboardActivity;
+import in.testpress.course.ui.LeaderboardFragment;
 import in.testpress.util.Assert;
 import in.testpress.util.ImageUtils;
 
@@ -72,6 +74,43 @@ public class TestpressCourse {
 
         init(context.getApplicationContext(), testpressSession);
         Intent intent = new Intent(context, CourseListActivity.class);
+        context.startActivity(intent);
+    }
+
+    /**
+     * Use when overall leaderboard need to be open in a container as a fragment.
+     *
+     * Usage example:
+     *
+     * TestpressCourse.showLeaderboard(this, R,id.fragment_container, testpressSession);
+     *
+     * @param activity Activity that has the container
+     * @param containerViewId Container view id in which fragment needs to be replace
+     * @param testpressSession TestpressSession got from the core module
+     */
+    public static void showLeaderboard(@NonNull FragmentActivity activity,
+                                       @NonNull @IdRes Integer containerViewId,
+                                       @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Activity must not be null.", activity);
+
+        init(activity.getApplicationContext(), testpressSession);
+        LeaderboardFragment.show(activity, containerViewId);
+    }
+
+    /**
+     * Use when overall leaderboard need to be open as a new Activity.
+     *
+     * @param context Context to start the new activity.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    public static void showLeaderboard(@NonNull Context context,
+                                       @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Context must not be null.", context);
+
+        init(context.getApplicationContext(), testpressSession);
+        Intent intent = new Intent(context, LeaderboardActivity.class);
         context.startActivity(intent);
     }
 

@@ -20,10 +20,8 @@ import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE
 public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_navigation_drawer);
-        navigationView.getMenu().getItem(2).setVisible(true);
+    protected int getNavigationViewMenu() {
+        return R.menu.exam_drawer_items;
     }
 
     @Override

@@ -1,8 +1,6 @@
 package in.testpress.samples.course;
 
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.MenuItem;
 
 import com.facebook.login.LoginManager;
@@ -20,24 +18,18 @@ import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE
 public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_navigation_drawer);
-        navigationView.getMenu().getItem(1).setTitle(getString(R.string.courses));
+    protected int getNavigationViewMenu() {
+        return R.menu.course_drawer_items;
     }
 
     @Override
     protected void onDrawerItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
-            case R.id.exams:
-                if (TestpressSdk.hasActiveSession(this)) {
-                    displayExams();
-                } else {
-                    Intent intent = new Intent(NavigationDrawerActivity.this,
-                            TestpressCoreSampleActivity.class);
-                    startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
-                }
-                selectedItem = 1;
+            case R.id.courses:
+                showSDK(1);
+                break;
+            case R.id.leaderboard:
+                showSDK(2);
                 break;
             case R.id.logout:
                 TestpressSdk.clearActiveSession(this);
@@ -55,21 +47,31 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                 .commit();
     }
 
-    @SuppressWarnings("ConstantConditions")
-    private void displayExams() {
-        TestpressSession session = TestpressSdk.getTestpressSession(this);
-        session.getInstituteSettings()
-                .setCoursesFrontend(true)
-                .setCoursesGamificationEnabled(true);
-        TestpressSdk.setTestpressSession(this, session);
-        TestpressCourse.show(this, R.id.fragment_container, TestpressSdk.getTestpressSession(this));
+    private void showSDK(int position) {
+        selectedItem = position;
+        if (TestpressSdk.hasActiveSession(this)) {
+            TestpressSession session = TestpressSdk.getTestpressSession(this);
+            //noinspection ConstantConditions
+            session.getInstituteSettings()
+                    .setCoursesFrontend(false)
+                    .setCoursesGamificationEnabled(false);
+            TestpressSdk.setTestpressSession(this, session);
+            if (position == 1) {
+                TestpressCourse.show(this, R.id.fragment_container, session);
+            } else {
+                TestpressCourse.showLeaderboard(this, R.id.fragment_container, session);
+            }
+        } else {
+            Intent intent = new Intent(this, TestpressCoreSampleActivity.class);
+            startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AUTHENTICATE_REQUEST_CODE && resultCode == RESULT_OK) {
-            displayExams();
+            showSDK(selectedItem);
             logoutMenu.setVisible(true);
         }
     }

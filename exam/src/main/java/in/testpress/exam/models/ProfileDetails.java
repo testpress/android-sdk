@@ -1,6 +1,9 @@
 package in.testpress.exam.models;
 
-public class ProfileDetails {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class ProfileDetails implements Parcelable {
 
     private Integer id;
     private String url;
@@ -24,6 +27,74 @@ public class ProfileDetails {
     private String state;
     private String stateChoices;
     private String phone;
+
+    protected ProfileDetails(Parcel in) {
+        id = in.readInt();
+        url = in.readString();
+        username = in.readString();
+        displayName = in.readString();
+        firstName = in.readString();
+        lastName = in.readString();
+        email = in.readString();
+        photo = in.readString();
+        largeImage = in.readString();
+        mediumImage = in.readString();
+        smallImage = in.readString();
+        xSmallImage = in.readString();
+        miniImage = in.readString();
+        birthDate = in.readString();
+        gender = in.readString();
+        address1 = in.readString();
+        address2 = in.readString();
+        city = in.readString();
+        zip = in.readString();
+        state = in.readString();
+        stateChoices = in.readString();
+        phone = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(url);
+        dest.writeString(username);
+        dest.writeString(displayName);
+        dest.writeString(firstName);
+        dest.writeString(lastName);
+        dest.writeString(email);
+        dest.writeString(photo);
+        dest.writeString(largeImage);
+        dest.writeString(mediumImage);
+        dest.writeString(smallImage);
+        dest.writeString(xSmallImage);
+        dest.writeString(miniImage);
+        dest.writeString(birthDate);
+        dest.writeString(gender);
+        dest.writeString(address1);
+        dest.writeString(address2);
+        dest.writeString(city);
+        dest.writeString(zip);
+        dest.writeString(state);
+        dest.writeString(stateChoices);
+        dest.writeString(phone);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<ProfileDetails> CREATOR = new Creator<ProfileDetails>() {
+        @Override
+        public ProfileDetails createFromParcel(Parcel in) {
+            return new ProfileDetails(in);
+        }
+
+        @Override
+        public ProfileDetails[] newArray(int size) {
+            return new ProfileDetails[size];
+        }
+    };
 
     /**
      *

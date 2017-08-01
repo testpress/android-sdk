@@ -15,7 +15,6 @@
             android:title="@string/exams" />
 
         <item
-            android:visible="false"
             android:id="@+id/exams_categories"
             android:icon="@drawable/ic_assignment_black_24dp"
             android:title="@string/exam_categories" />

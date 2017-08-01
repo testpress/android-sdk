@@ -27,13 +27,19 @@ public class CourseSampleActivity extends BaseToolBarActivity {
         findViewById(R.id.simple_course).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displayCourses(R.id.simple_course);
+                showSDK(R.id.simple_course);
             }
         });
         findViewById(R.id.gamified_course).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displayCourses(R.id.gamified_course);
+                showSDK(R.id.gamified_course);
+            }
+        });
+        findViewById(R.id.leaderboard).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showSDK(R.id.leaderboard);
             }
         });
         findViewById(R.id.fragment_button).setOnClickListener(new View.OnClickListener() {
@@ -46,7 +52,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private void displayCourses(int clickedButtonId) {
+    private void showSDK(int clickedButtonId) {
         selectedItem = clickedButtonId;
         if (TestpressSdk.hasActiveSession(this)) {
             TestpressSession session = TestpressSdk.getTestpressSession(this);
@@ -57,13 +63,22 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                             .setCoursesGamificationEnabled(false);
                     break;
                 case R.id.gamified_course:
+                case R.id.leaderboard:
                     session.getInstituteSettings()
                             .setCoursesFrontend(true)
                             .setCoursesGamificationEnabled(true);
                     break;
             }
             TestpressSdk.setTestpressSession(this, session);
-            TestpressCourse.show(this, session);
+            switch (clickedButtonId) {
+                case R.id.simple_course:
+                case R.id.gamified_course:
+                    TestpressCourse.show(this, session);
+                    break;
+                case R.id.leaderboard:
+                    TestpressCourse.showLeaderboard(this, session);
+                    break;
+            }
         } else {
             Intent intent = new Intent(this, TestpressCoreSampleActivity.class);
             startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
@@ -74,7 +89,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AUTHENTICATE_REQUEST_CODE && resultCode == RESULT_OK) {
-            displayCourses(selectedItem);
+            showSDK(selectedItem);
         }
     }
 
