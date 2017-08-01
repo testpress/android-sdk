@@ -291,7 +291,12 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 TestpressSdk.getRubikRegularFont(this));
         examTitle.setText(exam.getTitle());
         numberOfQuestions.setText(exam.getNumberOfQuestions().toString());
-        examDuration.setText(exam.getDuration());
+        if (attempt == null) {
+            examDuration.setText(exam.getDuration());
+        } else {
+            durationLabel.setText(getString(R.string.testpress_time_remaining));
+            examDuration.setText(attempt.getRemainingTime());
+        }
         markPerQuestion.setText(exam.getMarkPerQuestion());
         negativeMarks.setText(exam.getNegativeMarks());
         if (exam.getFormattedStartDate().equals("forever")) {

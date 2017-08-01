@@ -46,6 +46,7 @@ import in.testpress.course.models.HtmlContent;
 import in.testpress.course.models.Video;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.exam.TestpressExam;
+import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.CourseContent;
 import in.testpress.exam.models.Exam;
@@ -146,12 +147,6 @@ public class ContentActivity extends BaseToolBarActivity {
                 new TextView[] {titleView, previousButton, nextButton, startButton, pageNumber},
                 TestpressSdk.getRubikMediumFont(this)
         );
-        retryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                checkContentType();
-            }
-        });
         mWebChromeClient = new FullScreenChromeClient();
         webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
         webView.setWebChromeClient(mWebChromeClient);
@@ -223,6 +218,12 @@ public class ContentActivity extends BaseToolBarActivity {
                         R.string.testpress_no_internet_try_again,
                         R.drawable.ic_error_outline_black_18dp);
 
+                retryButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        checkContentType();
+                    }
+                });
                 hasError = true;
             }
 
@@ -259,12 +260,7 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void loadContentHtml() {
-        swipeRefresh.post(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefresh.setRefreshing(true);
-            }
-        });
+        showLoadingProgress();
         titleView.setText(Html.fromHtml(content.getHtmlContentTitle()));
         new TestpressCourseApiClient(this).getHtmlContent(content.getHtmlContentUrl())
                 .enqueue(new TestpressCallback<HtmlContent>() {
@@ -276,19 +272,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
                     @Override
                     public void onException(TestpressException exception) {
-                        if (exception.isUnauthenticated()) {
-                            setEmptyText(R.string.testpress_authentication_failed,
-                                    R.string.testpress_please_login,
-                                    R.drawable.ic_error_outline_black_18dp);
-                        } else if (exception.isNetworkError()) {
-                            setEmptyText(R.string.testpress_network_error,
-                                    R.string.testpress_no_internet_try_again,
-                                    R.drawable.ic_error_outline_black_18dp);
-                        } else {
-                            setEmptyText(R.string.testpress_error_loading_contents,
-                                    R.string.testpress_some_thing_went_wrong_try_again,
-                                    R.drawable.ic_error_outline_black_18dp);
-                        }
+                        handleError(exception, false);
                     }
                 });
     }
@@ -321,17 +305,17 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void onExamContent() {
         titleView.setText(content.getName());
+        courseAttempts.clear();
         if (content.getAttemptsCount() > 0) {
-            courseAttempts.clear();
             attemptsUrl = content.getAttemptsUrl();
             loadAttempts();
         } else {
-            displayStartExamScreen();
+            displayStartExamScreen(null);
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private void displayStartExamScreen() {
+    private void displayStartExamScreen(CourseAttempt pausedCourseAttempt) {
         final Exam exam = content.getExam();
         TextView numberOfQuestions = (TextView) findViewById(R.id.number_of_questions);
         TextView examDuration = (TextView) findViewById(R.id.exam_duration);
@@ -348,24 +332,19 @@ public class ContentActivity extends BaseToolBarActivity {
         ViewUtils.setTypeface(new TextView[] {descriptionContent, questionsLabel,
                 durationLabel, markLabel, negativeMarkLabel}, TestpressSdk.getRubikRegularFont(this));
         numberOfQuestions.setText(exam.getNumberOfQuestions().toString());
-        examDuration.setText(exam.getDuration());
+        if (pausedCourseAttempt == null) {
+            examDuration.setText(exam.getDuration());
+        } else {
+            durationLabel.setText(getString(R.string.testpress_time_remaining));
+            examDuration.setText(pausedCourseAttempt.getAssessment().getRemainingTime());
+        }
         markPerQuestion.setText(exam.getMarkPerQuestion());
         negativeMarks.setText(exam.getNegativeMarks());
         if ((exam.getDescription() != null) && !exam.getDescription().trim().isEmpty()) {
             description.setVisibility(View.VISIBLE);
             descriptionContent.setText(exam.getDescription());
         }
-        if (canAttemptExam(exam)) {
-            startButton.setVisibility(View.VISIBLE);
-        } else {
-            startButton.setVisibility(View.GONE);
-        }
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startCourseExam(true);
-            }
-        });
+        updateStartButton(exam, pausedCourseAttempt, false);
         validateAdjacentNavigationButton();
         examDetailsLayout.setVisibility(View.VISIBLE);
         examContentLayout.setVisibility(View.VISIBLE);
@@ -378,18 +357,7 @@ public class ContentActivity extends BaseToolBarActivity {
                         (exam.getAttemptsCount() <= exam.getMaxRetakes() ||
                                 exam.getMaxRetakes() < 0))) {
 
-            if (exam.getDeviceAccessControl() != null &&
-                    exam.getDeviceAccessControl().equals("web")) {
-                TextView webOnlyLabel;
-                if (courseAttempts.isEmpty()) {
-                    webOnlyLabel = (TextView) findViewById(R.id.web_only_label);
-                } else {
-                    webOnlyLabel = (TextView) findViewById(R.id.attempt_web_only_label);
-                }
-                webOnlyLabel.setTypeface(TestpressSdk.getRubikRegularFont(this));
-                webOnlyLabel.setVisibility(View.VISIBLE);
-                return false;
-            } else if (content.getIsLocked() || !content.getHasStarted()) {
+            if (content.getIsLocked() || !content.getHasStarted()) {
                 if (courseAttempts.isEmpty()) {
                     TextView webOnlyLabel = (TextView) findViewById(R.id.web_only_label);
                     if (!content.getHasStarted()) {
@@ -405,23 +373,31 @@ public class ContentActivity extends BaseToolBarActivity {
                 }
                 return false;
             } else {
-                return true;
+                return !isWebOnlyExam(exam) && !exam.isEnded();
             }
         } else {
             return false;
         }
     }
 
-    private void loadAttempts() {
-        if (!swipeRefresh.isRefreshing()) {
-            swipeRefresh.setVisibility(View.VISIBLE);
-            swipeRefresh.post(new Runnable() {
-                @Override
-                public void run() {
-                    swipeRefresh.setRefreshing(true);
-                }
-            });
+    private boolean isWebOnlyExam(Exam exam) {
+        if (exam.getDeviceAccessControl() != null &&
+                exam.getDeviceAccessControl().equals("web")) {
+            TextView webOnlyLabel;
+            if (courseAttempts.isEmpty()) {
+                webOnlyLabel = (TextView) findViewById(R.id.web_only_label);
+            } else {
+                webOnlyLabel = (TextView) findViewById(R.id.attempt_web_only_label);
+            }
+            webOnlyLabel.setTypeface(TestpressSdk.getRubikRegularFont(this));
+            webOnlyLabel.setVisibility(View.VISIBLE);
+            return true;
         }
+        return false;
+    }
+
+    private void loadAttempts() {
+        showLoadingProgress();
         Map<String, Object> queryParams = new HashMap<>();
         new TestpressExamApiClient(this).getContentAttempts(attemptsUrl, queryParams)
                 .enqueue(new TestpressCallback<TestpressApiResponse<CourseAttempt>>() {
@@ -431,6 +407,10 @@ public class ContentActivity extends BaseToolBarActivity {
                         if (response.getNext() != null) {
                             attemptsUrl = response.getNext();
                             loadAttempts();
+                        } else if (courseAttempts.size() == 1 &&
+                                courseAttempts.get(0).getAssessment().getState().equals(STATE_PAUSED)) {
+                            // Only one paused attempt
+                            displayStartExamScreen(courseAttempts.get(0));
                         } else {
                             displayAttemptsList();
                         }
@@ -438,65 +418,22 @@ public class ContentActivity extends BaseToolBarActivity {
 
                     @Override
                     public void onException(TestpressException exception) {
-                        if (exception.isUnauthenticated()) {
-                            setEmptyText(R.string.testpress_authentication_failed,
-                                    R.string.testpress_please_login,
-                                    R.drawable.ic_error_outline_black_18dp);
-                        } else if (exception.isNetworkError()) {
-                            setEmptyText(R.string.testpress_network_error,
-                                    R.string.testpress_no_internet_try_again,
-                                    R.drawable.ic_error_outline_black_18dp);
-                        } else {
-                            setEmptyText(R.string.testpress_error_loading_contents,
-                                    R.string.testpress_some_thing_went_wrong_try_again,
-                                    R.drawable.ic_error_outline_black_18dp);
-                        }
-                        retryButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                loadAttempts();
-                            }
-                        });
+                        handleError(exception, false);
                     }
                 });
     }
 
     private void displayAttemptsList() {
         final Exam exam = content.getExam();
-        if (canAttemptExam(exam)) {
-            final List<CourseAttempt> pausedAttempts = new ArrayList<>();
-            if (exam.getPausedAttemptsCount() > 0) {
-                for (CourseAttempt attempt : courseAttempts) {
-                    if (attempt.getAssessment().getState().equals(STATE_PAUSED)) {
-                        pausedAttempts.add(attempt);
-                    }
+        final List<CourseAttempt> pausedAttempts = new ArrayList<>();
+        if (exam.getPausedAttemptsCount() > 0) {
+            for (CourseAttempt attempt : courseAttempts) {
+                if (attempt.getAssessment().getState().equals(STATE_PAUSED)) {
+                    pausedAttempts.add(attempt);
                 }
             }
-            if (pausedAttempts.isEmpty()) {
-                startButton.setText(R.string.testpress_retake);
-                startButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startCourseExam(false);
-                    }
-                });
-            } else {
-                startButton.setText(R.string.testpress_resume);
-                startButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //noinspection ConstantConditions
-                        TestpressExam.resumeCourseAttempt(ContentActivity.this,
-                                new CourseContent(content.getAttemptsUrl(), exam),
-                                pausedAttempts.get(0), false,
-                                TestpressSdk.getTestpressSession(ContentActivity.this));
-                    }
-                });
-            }
-            startButton.setVisibility(View.VISIBLE);
-        } else {
-            startButton.setVisibility(View.GONE);
         }
+        updateStartButton(exam, pausedAttempts.isEmpty() ? null : pausedAttempts.get(0), true);
         RecyclerView attemptList = (RecyclerView) findViewById(R.id.attempt_list);
         attemptList.setNestedScrollingEnabled(false);
         attemptList.setHasFixedSize(true);
@@ -506,6 +443,37 @@ public class ContentActivity extends BaseToolBarActivity {
         examDetailsLayout.setVisibility(View.GONE);
         examContentLayout.setVisibility(View.VISIBLE);
         swipeRefresh.setRefreshing(false);
+    }
+
+    private void updateStartButton(final Exam exam, final CourseAttempt pausedCourseAttempt,
+                                   final boolean discardExamDetails) {
+
+        if (pausedCourseAttempt == null && canAttemptExam(exam)) {
+            startButton.setText(R.string.testpress_retake);
+            startButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startCourseExam(discardExamDetails);
+                }
+            });
+            startButton.setVisibility(View.VISIBLE);
+        } else if (pausedCourseAttempt != null && !isWebOnlyExam(exam)) {
+            startButton.setText(R.string.testpress_resume);
+            startButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //noinspection ConstantConditions
+                    TestpressExam.resumeCourseAttempt(ContentActivity.this,
+                            new CourseContent(content.getAttemptsUrl(), exam),
+                            pausedCourseAttempt,
+                            discardExamDetails,
+                            TestpressSdk.getTestpressSession(ContentActivity.this));
+                }
+            });
+            startButton.setVisibility(View.VISIBLE);
+        } else {
+            startButton.setVisibility(View.GONE);
+        }
     }
 
     private void createContentAttempt() {
@@ -544,13 +512,7 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void updateContent() {
-        swipeRefresh.setVisibility(View.VISIBLE);
-        swipeRefresh.post(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefresh.setRefreshing(true);
-            }
-        });
+        showLoadingProgress();
         hideContents();
         new TestpressCourseApiClient(this).getContent(content.getUrl())
                 .enqueue(new TestpressCallback<Content>() {
@@ -563,25 +525,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
                     @Override
                     public void onException(TestpressException exception) {
-                        if (exception.isUnauthenticated()) {
-                            setEmptyText(R.string.testpress_authentication_failed,
-                                    R.string.testpress_please_login,
-                                    R.drawable.ic_error_outline_black_18dp);
-                        } else if (exception.isNetworkError()) {
-                            setEmptyText(R.string.testpress_network_error,
-                                    R.string.testpress_no_internet_try_again,
-                                    R.drawable.ic_error_outline_black_18dp);
-                        } else {
-                            setEmptyText(R.string.testpress_error_loading_contents,
-                                    R.string.testpress_some_thing_went_wrong_try_again,
-                                    R.drawable.ic_error_outline_black_18dp);
-                        }
-                        retryButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                updateContent();
-                            }
-                        });
+                        handleError(exception, true);
                     }
                 });
     }
@@ -651,6 +595,37 @@ public class ContentActivity extends BaseToolBarActivity {
         buttonLayout.setVisibility(View.VISIBLE);
     }
 
+    private void handleError(TestpressException exception, final boolean onUpdateContent) {
+        if (exception.isUnauthenticated()) {
+            setEmptyText(R.string.testpress_authentication_failed,
+                    R.string.testpress_please_login,
+                    R.drawable.ic_error_outline_black_18dp);
+
+            retryButton.setVisibility(View.GONE);
+        } else if (exception.isNetworkError()) {
+            setEmptyText(R.string.testpress_network_error,
+                    R.string.testpress_no_internet_try_again,
+                    R.drawable.ic_error_outline_black_18dp);
+
+            retryButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (onUpdateContent) {
+                        updateContent();
+                    } else {
+                        checkContentType();
+                    }
+                }
+            });
+        } else {
+            setEmptyText(R.string.testpress_error_loading_contents,
+                    R.string.testpress_some_thing_went_wrong_try_again,
+                    R.drawable.ic_error_outline_black_18dp);
+
+            retryButton.setVisibility(View.GONE);
+        }
+    }
+
     private class ImageHandler {
         @JavascriptInterface
         public void onClickImage(String url) {
@@ -666,14 +641,27 @@ public class ContentActivity extends BaseToolBarActivity {
         hasError = true;
         swipeRefresh.setRefreshing(false);
         swipeRefresh.setVisibility(View.GONE);
+        retryButton.setVisibility(View.VISIBLE);
     }
 
     private void hideContents() {
         buttonLayout.setVisibility(View.GONE);
-        examContentLayout.setVisibility(View.GONE);
         attachmentContentLayout.setVisibility(View.GONE);
         webView.setVisibility(View.GONE);
         startButton.setVisibility(View.GONE);
+    }
+
+    private void showLoadingProgress() {
+        examContentLayout.setVisibility(View.GONE);
+        if (!swipeRefresh.isRefreshing()) {
+            swipeRefresh.setVisibility(View.VISIBLE);
+            swipeRefresh.post(new Runnable() {
+                @Override
+                public void run() {
+                    swipeRefresh.setRefreshing(true);
+                }
+            });
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)

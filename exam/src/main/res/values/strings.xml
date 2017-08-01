@@ -94,7 +94,7 @@
     <string name="testpress_correct">correct</string>
     <string name="testpress_percentile">Percentile</string>
     <string name="testpress_incorrect">incorrect</string>
-    <string name="testpress_time_remaining">time remaining</string>
+    <string name="testpress_time_remaining">Time Remaining</string>
 
     <string name="testpress_question">Question</string>
     <string name="testpress_review_later">Review Later</string>
