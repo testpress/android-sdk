@@ -18,6 +18,14 @@
     <string name="testpress_content_not_available">Empty Content</string>
     <string name="testpress_content_not_available_description">Will be updated soon. Please try after some time.</string>
 
+    <string name="testpress_leaderboard_not_available">Toppers under progress</string>
+    <string name="testpress_leaderboard_not_available_description">We are yet to update the leaderboard list. Check back later!</string>
+    <string name="testpress_error_loading_leaderboard">Loading leaderboard failed</string>
+
+    <string name="testpress_error_loading_rank">Loading rank failed</string>
+    <string name="testpress_error_loading_target">Loading target failed</string>
+    <string name="testpress_error_loading_thread">Loading thread failed</string>
+
     <string name="testpress_previous_content">Previous</string>
     <string name="testpress_next_content">Next</string>
 
@@ -25,5 +33,8 @@
     <string name="testpress_download_attachment">Download Attachment</string>
 
     <string name="testpress_menu">Menu</string>
+
+    <string name="testpress_leaderboard">Leaderboard</string>
+    <string name="testpress_targets_or_threads">Targets / Threats</string>
 
 </resources>

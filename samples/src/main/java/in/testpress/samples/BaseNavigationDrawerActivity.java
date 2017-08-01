@@ -3,6 +3,7 @@ package in.testpress.samples;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -22,13 +23,15 @@ public abstract class BaseNavigationDrawerActivity extends AppCompatActivity {
     protected MenuItem logoutMenu;
 
     @Override
-    public void setContentView(@LayoutRes int layoutResID) {
-        super.setContentView(layoutResID);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_navigation_drawer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.inflateMenu(getNavigationViewMenu());
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -41,7 +44,7 @@ public abstract class BaseNavigationDrawerActivity extends AppCompatActivity {
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(drawerToggle);
-        logoutMenu = navigationView.getMenu().getItem(3)
+        logoutMenu = navigationView.getMenu().findItem(R.id.logout)
                 .setVisible(TestpressSdk.hasActiveSession(this));
         displayHome();
     }
@@ -55,6 +58,8 @@ public abstract class BaseNavigationDrawerActivity extends AppCompatActivity {
         }
         drawerLayout.closeDrawers();
     }
+
+    protected abstract int getNavigationViewMenu();
 
     protected abstract void displayHome();
 

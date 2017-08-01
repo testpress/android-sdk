@@ -16,6 +16,7 @@
         app:tabIndicatorColor="@color/testpress_tab_indicator_color"
         app:tabTextColor="@color/testpress_tab_text_color"
         app:tabSelectedTextColor="@color/testpress_tab_indicator_color"
+        app:tabGravity="fill"
         app:layout_scrollFlags="scroll|enterAlways" />
 
     <View

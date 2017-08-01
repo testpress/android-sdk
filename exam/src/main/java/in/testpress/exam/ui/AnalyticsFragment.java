@@ -65,9 +65,10 @@ public class AnalyticsFragment extends Fragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-        ViewGroup view =
-                (ViewGroup) inflater.inflate(R.layout.testpress_analytics_fragment, container, false);
-        subjectsLayout = (LinearLayout) view.findViewById(R.id.subjects_layout);
+        View view = inflater.inflate(
+                R.layout.testpress_fragment_carousel_with_empty_view, container, false);
+
+        subjectsLayout = (LinearLayout) view.findViewById(R.id.fragment_carousel);
         viewPager = (ViewPager) view.findViewById(R.id.viewpager);
         tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
         emptyView = (LinearLayout) view.findViewById(R.id.empty_container);
