@@ -342,7 +342,7 @@ public class Exam implements Parcelable {
             }
         } catch (ParseException e) {
         }
-        return true;
+        return false;
     }
 
     /**

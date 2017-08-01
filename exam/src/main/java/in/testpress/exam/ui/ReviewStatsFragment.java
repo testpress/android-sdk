@@ -27,6 +27,7 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.model.InstituteSettings;
 import in.testpress.model.TestpressApiResponse;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
@@ -199,7 +200,11 @@ public class ReviewStatsFragment extends Fragment {
         } else {
             emailPdfButtonLayout.setVisibility(View.GONE);
         }
-        if (canAttemptExam()) {
+        //noinspection ConstantConditions
+        InstituteSettings settings =
+                TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
+
+        if (canAttemptExam() && !settings.isCoursesFrontend()) {
             retakeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
