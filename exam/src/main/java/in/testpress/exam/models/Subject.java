@@ -2,6 +2,7 @@ package in.testpress.exam.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -34,7 +35,8 @@ public class Subject implements Parcelable {
         unansweredPercentage = in.readFloat();
         incorrectPercentage = in.readFloat();
         leaf = in.readByte() != 0;
-        parent = in.readInt();
+        String parent = in.readString();
+        this.parent = TextUtils.isEmpty(parent) ? null : Integer.parseInt(parent);
     }
 
     @Override
@@ -49,9 +51,7 @@ public class Subject implements Parcelable {
         dest.writeFloat(unansweredPercentage);
         dest.writeFloat(incorrectPercentage);
         dest.writeByte((byte) (leaf ? 1 : 0));
-        if (parent != null) {
-            dest.writeInt(parent);
-        }
+        dest.writeString(parent + "");
     }
 
     @Override
