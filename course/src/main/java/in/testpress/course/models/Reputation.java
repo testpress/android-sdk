@@ -2,6 +2,7 @@ package in.testpress.course.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import in.testpress.exam.models.ProfileDetails;
 
@@ -18,7 +19,8 @@ public class Reputation implements Parcelable {
         user = in.readParcelable(ProfileDetails.class.getClassLoader());
         trophiesCount = in.readInt();
         rank = in.readInt();
-        difference = in.readInt();
+        String difference = in.readString();
+        this.difference = TextUtils.isEmpty(difference) ? null : Integer.parseInt(difference);
     }
 
     @Override
@@ -27,7 +29,7 @@ public class Reputation implements Parcelable {
         dest.writeParcelable(user, flags);
         dest.writeInt(trophiesCount);
         dest.writeInt(rank);
-        dest.writeInt(difference);
+        dest.writeString(difference + "");
     }
 
     @Override
