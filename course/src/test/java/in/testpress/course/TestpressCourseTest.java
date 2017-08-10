@@ -45,6 +45,23 @@ public class TestpressCourseTest {
     }
 
     @Test
+    public void testGetCoursesListFragment_withNullValues() throws Exception {
+        try {
+            TestpressCourse.getCoursesListFragment(null, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Context must not be null.", e.getMessage());
+        }
+        Context context = mock(Context.class);
+        try {
+            TestpressCourse.getCoursesListFragment(context, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+    }
+
+    @Test
     public void testShowChapters_withNullValues() throws Exception {
         TestpressSession testpressSession = mock(TestpressSession.class);
         try {
@@ -147,6 +164,23 @@ public class TestpressCourseTest {
         Context context = mock(Context.class);
         try {
             TestpressCourse.showLeaderboard(context, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testGetLeaderboardFragment_withNullValues() throws Exception {
+        try {
+            TestpressCourse.getLeaderboardFragment(null, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Context must not be null.", e.getMessage());
+        }
+        Context context = mock(Context.class);
+        try {
+            TestpressCourse.getLeaderboardFragment(context, null);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("TestpressSession must not be null.", e.getMessage());
