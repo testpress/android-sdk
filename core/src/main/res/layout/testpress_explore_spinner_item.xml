@@ -12,6 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:textColor="#ffffff"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:gravity="center_vertical"
         android:background="@color/testpress_color_primary"
         android:drawablePadding="10dp"

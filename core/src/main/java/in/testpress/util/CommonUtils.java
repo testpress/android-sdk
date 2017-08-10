@@ -37,4 +37,11 @@ public class CommonUtils {
         }
     }
 
+    public static byte getByteFromBoolean(Boolean booleanValue) {
+        if (booleanValue == null) {
+            return ((byte) 0);
+        }
+        return ((byte) (booleanValue ? 1 : 0)); // if booleanValue == true, byte == 1
+    }
+
 }

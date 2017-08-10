@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -17,7 +16,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,11 +27,10 @@ import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.CourseContent;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.Exam;
-import in.testpress.exam.network.ContentAttemptsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 
+import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.model.TestpressApiResponse;
-import in.testpress.util.FormatDate;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.UIUtils;
@@ -41,7 +38,6 @@ import in.testpress.network.RetrofitCall;
 import in.testpress.util.ViewUtils;
 import retrofit2.Response;
 
-import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
 import static in.testpress.exam.ui.TestFragment.PARAM_CONTENT_ATTEMPT_END_URL;
 
 /**
@@ -76,6 +72,8 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private TextView emptyTitleView;
     private TextView emptyDescView;
     private Button retryButton;
+    private Button resumeButton;
+    private Button startButton;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -90,14 +88,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         emptyDescView = (TextView) findViewById(R.id.empty_description);
         retryButton = (Button) findViewById(R.id.retry_button);
         examDetailsContainer.setVisibility(View.GONE);
-        Button startButton = (Button) findViewById(R.id.start_exam);
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getSupportLoaderManager().initLoader(START_ATTEMPT_LOADER, null, TestActivity.this);
-                examDetailsContainer.setVisibility(View.GONE);
-            }
-        });
+        startButton = (Button) findViewById(R.id.start_exam);
         Button endButton = (Button) findViewById(R.id.end_exam);
         endButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,14 +96,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 endExam();
             }
         });
-        Button resumeButton = (Button) findViewById(R.id.resume_exam);
-        resumeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getSupportLoaderManager().initLoader(RESUME_ATTEMPT_LOADER, null, TestActivity.this);
-                examDetailsContainer.setVisibility(View.GONE);
-            }
-        });
+        resumeButton = (Button) findViewById(R.id.resume_exam);
         ViewUtils.setTypeface(new TextView[] {startButton, resumeButton, endButton},
                 TestpressSdk.getRubikMediumFont(this));
         UIUtils.setIndeterminateDrawable(this, findViewById(R.id.progress_bar), 4);
@@ -257,9 +241,21 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 } else {
                     getSupportActionBar().setTitle(getString(R.string.testpress_resume_exam));
                     attemptActions.setVisibility(View.VISIBLE);
+                    MultiLanguagesUtil.supportMultiLanguage(this, exam, resumeButton,
+                            new MultiLanguagesUtil.LanguageSelectionListener() {
+                                @Override
+                                public void onLanguageSelected() {
+                                    startExam(true);
+                                }});
                 }
             }
         } else {
+            MultiLanguagesUtil.supportMultiLanguage(this, exam, startButton,
+                    new MultiLanguagesUtil.LanguageSelectionListener() {
+                        @Override
+                        public void onLanguageSelected() {
+                            startExam(false);
+                        }});
             startExam.setVisibility(View.VISIBLE);
         }
         if (discardExamDetails) {
@@ -284,10 +280,11 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         TextView markLabel = (TextView) findViewById(R.id.mark_per_question_label);
         TextView negativeMarkLabel = (TextView) findViewById(R.id.negative_marks_label);
         TextView dateLabel = (TextView) findViewById(R.id.date_label);
+        TextView languageLabel = (TextView) findViewById(R.id.language_label);
         ViewUtils.setTypeface(new TextView[] {numberOfQuestions, examDuration, markPerQuestion,
                 negativeMarks, examTitle, date}, TestpressSdk.getRubikMediumFont(this));
         ViewUtils.setTypeface(new TextView[] {descriptionContent, questionsLabel, webOnlyLabel,
-                durationLabel, markLabel, negativeMarkLabel, dateLabel},
+                durationLabel, markLabel, negativeMarkLabel, dateLabel, languageLabel },
                 TestpressSdk.getRubikRegularFont(this));
         examTitle.setText(exam.getTitle());
         numberOfQuestions.setText(exam.getNumberOfQuestions().toString());
@@ -454,6 +451,12 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         } else {
             super.onBackPressed();
         }
+    }
+
+    private void startExam(boolean resumeExam) {
+        int loaderId = resumeExam ? RESUME_ATTEMPT_LOADER : START_ATTEMPT_LOADER;
+        getSupportLoaderManager().initLoader(loaderId, null, TestActivity.this);
+        examDetailsContainer.setVisibility(View.GONE);
     }
 
     protected void setEmptyText(final int title, final int description) {

@@ -135,6 +135,32 @@
                     android:text="Nov 12, 2017 - forever"/>
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/language_layout"
+                style="@style/TestpressExamInfoRow"
+                android:layout_marginBottom="5dp"
+                android:layout_gravity="center">
+                <ImageView
+                    android:layout_height="24dp"
+                    android:layout_width="24dp"
+                    android:layout_marginRight="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_gravity="top|start"
+                    style="@style/TestpressExamInfoSubHeading"
+                    android:tint="@color/testpress_blue"
+                    android:src="@drawable/testpress_translate_outline"/>
+                <TextView
+                    android:layout_height="match_parent"
+                    android:id="@+id/language_label"
+                    style="@style/TestpressExamInfoSubHeading.Tab"
+                    android:text="@string/testpress_select_language"/>
+                <Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/language_spinner"
+                    style="@style/Widget.Testpress.HeaderBar.Spinner.Base" />
+            </LinearLayout>
+
         </LinearLayout>
 
         <LinearLayout

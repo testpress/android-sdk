@@ -51,6 +51,7 @@ import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.CourseContent;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.model.TestpressApiResponse;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ZoomableImageActivity;
@@ -327,9 +328,10 @@ public class ContentActivity extends BaseToolBarActivity {
         TextView durationLabel = (TextView) findViewById(R.id.duration_label);
         TextView markLabel = (TextView) findViewById(R.id.mark_per_question_label);
         TextView negativeMarkLabel = (TextView) findViewById(R.id.negative_marks_label);
+        TextView languageLabel = (TextView) findViewById(in.testpress.exam.R.id.language_label);
         ViewUtils.setTypeface(new TextView[] {numberOfQuestions, examDuration, markPerQuestion,
                 negativeMarks}, TestpressSdk.getRubikMediumFont(this));
-        ViewUtils.setTypeface(new TextView[] {descriptionContent, questionsLabel,
+        ViewUtils.setTypeface(new TextView[] {descriptionContent, questionsLabel, languageLabel,
                 durationLabel, markLabel, negativeMarkLabel}, TestpressSdk.getRubikRegularFont(this));
         numberOfQuestions.setText(exam.getNumberOfQuestions().toString());
         if (pausedCourseAttempt == null) {
@@ -454,26 +456,39 @@ public class ContentActivity extends BaseToolBarActivity {
             } else {
                 startButton.setText(R.string.testpress_retake);
             }
-            startButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startCourseExam(discardExamDetails);
-                }
-            });
+            if (discardExamDetails) {
+                MultiLanguagesUtil.supportMultiLanguage(this, exam, startButton,
+                        new MultiLanguagesUtil.LanguageSelectionListener() {
+                            @Override
+                            public void onLanguageSelected() {
+                                startCourseExam(true);
+                            }});
+            } else {
+                startButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startCourseExam(false);
+                    }
+                });
+            }
             startButton.setVisibility(View.VISIBLE);
         } else if (pausedCourseAttempt != null && !isWebOnlyExam(exam)) {
             startButton.setText(R.string.testpress_resume);
-            startButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //noinspection ConstantConditions
-                    TestpressExam.resumeCourseAttempt(ContentActivity.this,
-                            new CourseContent(content.getAttemptsUrl(), exam),
-                            pausedCourseAttempt,
-                            discardExamDetails,
-                            TestpressSdk.getTestpressSession(ContentActivity.this));
-                }
-            });
+            if (discardExamDetails) {
+                MultiLanguagesUtil.supportMultiLanguage(this, exam, startButton,
+                        new MultiLanguagesUtil.LanguageSelectionListener() {
+                            @Override
+                            public void onLanguageSelected() {
+                                resumeCourseExam(true, pausedCourseAttempt);
+                            }});
+            } else {
+                startButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        resumeCourseExam(false, pausedCourseAttempt);
+                    }
+                });
+            }
             startButton.setVisibility(View.VISIBLE);
         } else {
             startButton.setVisibility(View.GONE);
@@ -546,6 +561,15 @@ public class ContentActivity extends BaseToolBarActivity {
         //noinspection ConstantConditions
         TestpressExam.startCourseExam(ContentActivity.this,
                 new CourseContent(content.getAttemptsUrl(), content.getExam()), discardExamDetails,
+                TestpressSdk.getTestpressSession(ContentActivity.this));
+    }
+
+    private void resumeCourseExam(boolean discardExamDetails, CourseAttempt pausedCourseAttempt) {
+        //noinspection ConstantConditions
+        TestpressExam.resumeCourseAttempt(ContentActivity.this,
+                new CourseContent(content.getAttemptsUrl(), content.getExam()),
+                pausedCourseAttempt,
+                discardExamDetails,
                 TestpressSdk.getTestpressSession(ContentActivity.this));
     }
 

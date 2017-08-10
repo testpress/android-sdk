@@ -8,8 +8,10 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -36,6 +38,8 @@ public class Exam implements Parcelable {
     private String attemptsUrl;
     private String deviceAccessControl;
     private Integer commentsCount;
+    private ArrayList<Language> languages = new ArrayList<>();
+    private String selectedLanguage;
 
     // Parcelling part
     public Exam(Parcel parcel){
@@ -61,6 +65,8 @@ public class Exam implements Parcelable {
         attemptsUrl         = parcel.readString();
         deviceAccessControl = parcel.readString();
         commentsCount       = parcel.readInt();
+        parcel.readTypedList(languages, Language.CREATOR);
+        selectedLanguage    = parcel.readString();
     }
 
     @Override
@@ -104,6 +110,8 @@ public class Exam implements Parcelable {
         parcel.writeString(attemptsUrl);
         parcel.writeString(deviceAccessControl);
         parcel.writeInt(commentsCount);
+        parcel.writeTypedList(languages);
+        parcel.writeString(selectedLanguage);
     }
 
     public static final Creator CREATOR = new Creator() {
@@ -547,5 +555,21 @@ public class Exam implements Parcelable {
     public boolean canRetake() {
         return getAllowRetake() &&
                 (getAttemptsCount() <= getMaxRetakes() || getMaxRetakes() < 0);
+    }
+
+    public ArrayList<Language> getLanguages() {
+        return languages;
+    }
+
+    public void setLanguages(ArrayList<Language> languages) {
+        this.languages = languages;
+    }
+
+    public String getSelectedLanguage() {
+        return selectedLanguage;
+    }
+
+    public void setSelectedLanguage(String selectedLanguage) {
+        this.selectedLanguage = selectedLanguage;
     }
 }

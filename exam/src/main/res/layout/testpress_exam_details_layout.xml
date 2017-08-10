@@ -31,7 +31,7 @@
             <TextView
                 android:id="@+id/number_of_questions"
                 style="@style/TestpressExamInfoValue"
-                android:layout_weight="0.3"
+                android:layout_weight="0.4"
                 android:textStyle="bold"
                 android:text="200"/>
         </LinearLayout>
@@ -54,7 +54,7 @@
             <TextView
                 android:id="@+id/exam_duration"
                 style="@style/TestpressExamInfoValue"
-                android:layout_weight="0.3"
+                android:layout_weight="0.4"
                 android:textStyle="bold"
                 android:text="02:00:00"/>
         </LinearLayout>
@@ -77,7 +77,7 @@
             <TextView
                 android:id="@+id/mark_per_question"
                 style="@style/TestpressExamInfoValue"
-                android:layout_weight="0.3"
+                android:layout_weight="0.4"
                 android:textStyle="bold"
                 android:text="200"/>
         </LinearLayout>
@@ -100,7 +100,7 @@
             <TextView
                 android:id="@+id/negative_marks"
                 style="@style/TestpressExamInfoValue"
-                android:layout_weight="0.3"
+                android:layout_weight="0.4"
                 android:textStyle="bold"
                 android:text="200"/>
         </LinearLayout>
@@ -126,9 +126,34 @@
             <TextView
                 android:id="@+id/date"
                 style="@style/TestpressExamInfoValue"
-                android:layout_weight="0.3"
+                android:layout_weight="0.4"
                 android:textStyle="bold"
                 android:text="Nov 12, 2017 - forever"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/language_layout"
+            style="@style/TestpressExamInfoRow"
+            android:layout_marginBottom="5dp"
+            android:layout_gravity="center">
+            <ImageView
+                android:layout_height="20dp"
+                style="@style/TestpressExamInfoSubHeading"
+                android:layout_weight="0.2"
+                android:tint="@color/testpress_blue"
+                android:src="@drawable/testpress_translate_outline"/>
+            <TextView
+                android:layout_height="match_parent"
+                android:id="@+id/language_label"
+                style="@style/TestpressExamInfoSubHeading"
+                android:layout_weight="0.5"
+                android:text="@string/testpress_select_language"/>
+            <Spinner
+                android:layout_weight="0.4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/language_spinner"
+                style="@style/Widget.Testpress.HeaderBar.Spinner.Base" />
         </LinearLayout>
 
         <LinearLayout

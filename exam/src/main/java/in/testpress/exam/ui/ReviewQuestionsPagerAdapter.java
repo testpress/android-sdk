@@ -3,16 +3,18 @@ package in.testpress.exam.ui;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
 
 import java.util.Collections;
 import java.util.List;
 
+import in.testpress.exam.models.Language;
 import in.testpress.exam.models.greendao.ReviewItem;
 
 class ReviewQuestionsPagerAdapter extends FragmentStatePagerAdapter {
 
     private  List<ReviewItem> reviewItems = Collections.emptyList();
+    private Language selectedLanguage;
+    private boolean positionsModified;
 
     public ReviewQuestionsPagerAdapter(FragmentManager fragmentManager,
                                        List<ReviewItem> reviewItems) {
@@ -22,11 +24,15 @@ class ReviewQuestionsPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return ReviewQuestionsFragment.getInstance(reviewItems.get(position).getId());
+        return ReviewQuestionsFragment.getInstance(reviewItems.get(position).getId(), selectedLanguage);
     }
 
     public void setReviewItems(List<ReviewItem> reviewItems) {
         this.reviewItems = reviewItems;
+    }
+
+    void setSelectedLanguage(Language selectedLanguage) {
+        this.selectedLanguage = selectedLanguage;
     }
 
     @Override
@@ -34,9 +40,19 @@ class ReviewQuestionsPagerAdapter extends FragmentStatePagerAdapter {
         return reviewItems.size();
     }
 
+    //This method will call when we call notifyDataSetChanged
     @Override
-    public int getItemPosition(Object object){
-        return PagerAdapter.POSITION_NONE;
+    public int getItemPosition(Object object) {
+        // Clear the fragments only if positions modified, just update the content otherwise.
+        if (positionsModified) {
+            return POSITION_NONE;
+        }
+        ((ReviewQuestionsFragment) object).update();
+        return super.getItemPosition(object);
     }
 
+    void notifyDataSetChanged(boolean positionsModified) {
+        this.positionsModified = positionsModified;
+        super.notifyDataSetChanged();
+    }
 }

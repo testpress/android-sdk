@@ -3,11 +3,9 @@ package in.testpress.exam.ui;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.view.Menu;
@@ -34,14 +32,20 @@ import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Attempt;
+import in.testpress.exam.models.Exam;
+import in.testpress.exam.models.Language;
 import in.testpress.exam.models.greendao.ReviewAnswer;
 import in.testpress.exam.models.greendao.ReviewAnswerDao;
+import in.testpress.exam.models.greendao.ReviewAnswerTranslation;
+import in.testpress.exam.models.greendao.ReviewAnswerTranslationDao;
 import in.testpress.exam.models.greendao.ReviewAttempt;
 import in.testpress.exam.models.greendao.ReviewAttemptDao;
 import in.testpress.exam.models.greendao.ReviewItem;
 import in.testpress.exam.models.greendao.ReviewItemDao;
 import in.testpress.exam.models.greendao.ReviewQuestion;
 import in.testpress.exam.models.greendao.ReviewQuestionDao;
+import in.testpress.exam.models.greendao.ReviewQuestionTranslation;
+import in.testpress.exam.models.greendao.ReviewQuestionTranslationDao;
 import in.testpress.exam.models.greendao.SelectedAnswer;
 import in.testpress.exam.models.greendao.SelectedAnswerDao;
 import in.testpress.exam.network.TestpressExamApiClient;
@@ -50,15 +54,18 @@ import in.testpress.model.TestpressApiResponse;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.UIUtils;
+import in.testpress.util.ViewUtils;
 
 public class ReviewQuestionsActivity extends BaseToolBarActivity {
 
     static final String PARAM_ATTEMPT = "attempt";
+    static final String PARAM_EXAM = "exam";
     public static final String FILTER_ALL = "all";
     public static final String FILTER_CORRECT = "correct";
     public static final String FILTER_INCORRECT = "incorrect";
     public static final String FILTER_UNANSWERED = "unanswered";
     public static final String FILTER_MARKED = "marked";
+    private Exam exam;
     private Attempt attempt;
     private ReviewAttempt reviewAttempt;
     private List<ReviewItem> reviewItems = new ArrayList<>();
@@ -68,6 +75,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     private ReviewQuestionsPagerAdapter pagerAdapter;
     private ReviewPanelListAdapter panelListAdapter;
     private Spinner spinner;
+    private Spinner languageSpinner;
     private View questionLayout;
     private View buttonLayout;
     private ListView questionsListView;
@@ -80,8 +88,11 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     private Button questionsListButton;
     private ProgressBar progressBar;
     private MenuItem filterMenu;
+    private MenuItem selectLanguageMenu;
     private ReviewItemDao reviewItemDao;
     private ReviewAttemptDao attemptDao;
+    private Language selectedLanguage;;
+    private ExploreSpinnerAdapter languageSpinnerAdapter;
     protected ExploreSpinnerAdapter spinnerAdapter;
     /**
      * When spinnerAdapter is set to spinner, the spinner itself select first item as default,
@@ -90,8 +101,9 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     protected Boolean spinnerDefaultCallback = true;
     protected int selectedItemPosition = -1;
 
-    public static Intent createIntent(Activity activity, Attempt attempt) {
+    public static Intent createIntent(Activity activity, Exam exam, Attempt attempt) {
         Intent intent = new Intent(activity, ReviewQuestionsActivity.class);
+        intent.putExtra(ReviewQuestionsActivity.PARAM_EXAM, exam);
         intent.putExtra(ReviewQuestionsActivity.PARAM_ATTEMPT, attempt);
         return intent;
     }
@@ -100,6 +112,8 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_review_question);
+        exam = getIntent().getParcelableExtra(PARAM_EXAM);
+        Assert.assertNotNull("PARAM_EXAM must not be null", exam);
         attempt = getIntent().getParcelableExtra(PARAM_ATTEMPT);
         Assert.assertNotNull("PARAM_ATTEMPT must not be null", attempt);
         questionsListView = (ListView) findViewById(R.id.questions_list_view);
@@ -187,18 +201,54 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        final ArrayList<Language> languages = exam.getLanguages();
+        if (languages.size() > 1) {
+            getMenuInflater().inflate(R.menu.testpress_select_language_menu, menu);
+            selectLanguageMenu = menu.findItem(R.id.select_language);
+            View actionView = MenuItemCompat.getActionView(selectLanguageMenu);
+            languageSpinner = (Spinner) actionView.findViewById(R.id.language_spinner);
+            ViewUtils.setSpinnerIconColor(this, languageSpinner);
+            if (languageSpinnerAdapter == null) {
+                languageSpinnerAdapter =
+                        new ExploreSpinnerAdapter(getLayoutInflater(), getResources(), false);
+
+                languageSpinnerAdapter.hideSpinner(true);
+                for (Language language : languages) {
+                    languageSpinnerAdapter.addItem(language.getCode(), language.getTitle(), true, 0);
+                }
+                languageSpinner.setAdapter(languageSpinnerAdapter);
+                languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position,
+                                               long id) {
+
+                        // Update existing object so that update will reflect in ReviewQuestionFragment also
+                        selectedLanguage.update(languages.get(position));
+                        exam.setSelectedLanguage(selectedLanguage.getCode());
+                        pagerAdapter.notifyDataSetChanged(false);
+                        panelListAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
+                String selectedLanguageCode = exam.getSelectedLanguage();
+                if (selectedLanguageCode != null && !selectedLanguageCode.isEmpty()) {
+                    int selectedPosition =
+                            languageSpinnerAdapter.getItemPositionFromTag(selectedLanguageCode);
+
+                    initSelectedLanguage(languages.get(selectedPosition));
+                    languageSpinner.setSelection(selectedPosition);
+                }
+            }
+        }
         getMenuInflater().inflate(in.testpress.R.menu.testpress_filter, menu);
         filterMenu = menu.findItem(R.id.filter);
         View actionView = MenuItemCompat.getActionView(filterMenu);
         final View circle = actionView.findViewById(in.testpress.R.id.filter_applied_sticky_tick);
         spinner = (Spinner) actionView.findViewById(in.testpress.R.id.spinner);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            spinner.setBackgroundTintList(ContextCompat.getColorStateList(
-                    this, in.testpress.R.color.testpress_actionbar_text));
-        } else {
-            ViewCompat.setBackgroundTintList(spinner, ContextCompat.getColorStateList(
-                    this, in.testpress.R.color.testpress_actionbar_text));
-        }
+        ViewUtils.setSpinnerIconColor(this, spinner);
         spinnerDefaultCallback = true;
         spinner.setAdapter(spinnerAdapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -260,35 +310,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
                         if (response.getNext() != null) {
                             loadReviewItemsFromServer(reviewAttempt, response.getNext());
                         } else {
-                            for (int i = 0; i < reviewItems.size(); i++) {
-                                ReviewItem reviewItem = reviewItems.get(i);
-                                ReviewQuestion reviewQuestion = reviewItem.question;
-                                // Store selected answers.
-                                for (int selectedAnswerId : reviewItem.getSelectedAnswers()) {
-                                    SelectedAnswerDao selectedAnswersDao =
-                                            TestpressExam.getSelectedAnswerDao(ReviewQuestionsActivity.this);
-                                    SelectedAnswer selectedAnswer = new SelectedAnswer();
-                                    selectedAnswer.setAnswerId(selectedAnswerId);
-                                    selectedAnswer.setReviewItemId(reviewItem.getId());
-                                    selectedAnswersDao.insertOrReplace(selectedAnswer);
-                                }
-                                // Store question.
-                                ReviewQuestionDao reviewQuestionDao =
-                                        TestpressExam.getReviewQuestionDao(ReviewQuestionsActivity.this);
-                                reviewQuestionDao.insertOrReplace(reviewQuestion);
-                                // Store answers.
-                                for (ReviewAnswer reviewAnswer : reviewQuestion.getAnswers()) {
-                                    ReviewAnswerDao reviewAnswerDao =
-                                            TestpressExam.getReviewAnswerDao(ReviewQuestionsActivity.this);
-                                    reviewAnswer.setQuestionId(reviewQuestion.getId());
-                                    reviewAnswerDao.insertOrReplace(reviewAnswer);
-                                }
-                                // Store review item.
-                                reviewItem.setQuestionId(reviewQuestion.getId());
-                                reviewItem.setAttemptId(reviewAttempt.getId());
-                                reviewItem.setIndex(i + 1);
-                                reviewItemDao.insertOrReplace(reviewItem);
-                            }
+                            saveReviewItems();
                             addFilterItemsInSpinner();
                             onSpinnerItemSelected(0);
                         }
@@ -317,6 +339,54 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
                         }
                     }
                 });
+    }
+
+    private void saveReviewItems() {
+        for (int i = 0; i < reviewItems.size(); i++) {
+            ReviewItem reviewItem = reviewItems.get(i);
+            ReviewQuestion reviewQuestion = reviewItem.question;
+            // Store selected answers
+            for (int selectedAnswerId : reviewItem.getSelectedAnswers()) {
+                SelectedAnswerDao selectedAnswersDao = TestpressExam.getSelectedAnswerDao(this);
+                SelectedAnswer selectedAnswer = new SelectedAnswer();
+                selectedAnswer.setAnswerId(selectedAnswerId);
+                selectedAnswer.setReviewItemId(reviewItem.getId());
+                selectedAnswersDao.insertOrReplace(selectedAnswer);
+            }
+            // Store question
+            ReviewQuestionDao reviewQuestionDao = TestpressExam.getReviewQuestionDao(this);
+            ReviewAnswerDao reviewAnswerDao = TestpressExam.getReviewAnswerDao(this);
+            reviewQuestionDao.insertOrReplace(reviewQuestion);
+            // Store answers
+            for (ReviewAnswer reviewAnswer : reviewQuestion.getAnswers()) {
+                reviewAnswer.setQuestionId(reviewQuestion.getId());
+                reviewAnswerDao.insertOrReplace(reviewAnswer);
+            }
+            // Store translations
+            for (ReviewQuestionTranslation translation : reviewQuestion.getTranslations()) {
+                translation.setQuestionId(reviewQuestion.getId());
+                ReviewQuestionTranslationDao translationDao =
+                        TestpressExam.getReviewQuestionTranslationDao(this);
+
+                translationDao.insertOrReplace(translation);
+                for (ReviewAnswerTranslation answerTranslation : translation.getAnswers()) {
+                    ReviewAnswer answer = reviewAnswerDao.queryBuilder()
+                            .where(ReviewAnswerDao.Properties.Id.eq(answerTranslation.getId()))
+                            .list().get(0);
+                    answerTranslation.setIsCorrect(answer.getIsCorrect());
+                    answerTranslation.setQuestionTranslationId(translation.getId());
+                    ReviewAnswerTranslationDao reviewAnswerTranslationDao =
+                            TestpressExam.getReviewAnswerTranslationDao(this);
+
+                    reviewAnswerTranslationDao.insertOrReplace(answerTranslation);
+                }
+            }
+            // Store review item
+            reviewItem.setQuestionId(reviewQuestion.getId());
+            reviewItem.setAttemptId(reviewAttempt.getId());
+            reviewItem.setIndex(i + 1);
+            reviewItemDao.insertOrReplace(reviewItem);
+        }
     }
 
     /**
@@ -407,7 +477,18 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
             } else {
                 panelListAdapter.setItems(reviewItems);
                 pagerAdapter.setReviewItems(reviewItems);
-                pagerAdapter.notifyDataSetChanged();
+                ArrayList<Language> languages = exam.getLanguages();
+                if (languages.size() > 1) {
+                    if (selectedLanguage == null) {
+                        int selectedPosition = languageSpinnerAdapter
+                                .getItemPositionFromTag(reviewItems.get(0).getQuestion().getLanguage());
+
+                        initSelectedLanguage(languages.get(selectedPosition));
+                        languageSpinner.setSelection(selectedPosition);
+                    }
+                    selectLanguageMenu.setVisible(true);
+                }
+                pagerAdapter.notifyDataSetChanged(true);
                 goToQuestion(0);
                 filterMenu.setVisible(true);
                 questionLayout.setVisibility(View.VISIBLE);
@@ -512,6 +593,13 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
             button.setTextColor(ContextCompat.getColor(this, R.color.testpress_gray_light));
         }
         button.setEnabled(enable);
+    }
+
+    private void initSelectedLanguage(Language language) {
+        // Create new object so that we can update it without affecting original language list
+        selectedLanguage = new Language(language);
+        pagerAdapter.setSelectedLanguage(selectedLanguage);
+        panelListAdapter.setSelectedLanguage(selectedLanguage);
     }
 
     void setNavigationBarVisible(boolean visible) {

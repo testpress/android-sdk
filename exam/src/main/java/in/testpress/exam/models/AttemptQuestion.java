@@ -13,6 +13,8 @@ public class AttemptQuestion implements Parcelable {
     private String subject;
     private String direction;
     private String type;
+    private String language;
+    private ArrayList<AttemptQuestion> translations = new ArrayList<>();
 
     // Parcelling part
     public AttemptQuestion(Parcel parcel){
@@ -21,6 +23,8 @@ public class AttemptQuestion implements Parcelable {
         questionHtml = parcel.readString();
         subject = parcel.readString();
         type = parcel.readString();
+        language = parcel.readString();
+        parcel.readTypedList(translations, AttemptQuestion.CREATOR);
     }
 
     @Override
@@ -34,9 +38,11 @@ public class AttemptQuestion implements Parcelable {
         parcel.writeString(questionHtml);
         parcel.writeString(subject);
         parcel.writeString(type);
+        parcel.writeString(language);
+        parcel.writeTypedList(translations);
     }
 
-    public static final Creator CREATOR = new Creator() {
+    public static final Creator<AttemptQuestion> CREATOR = new Creator<AttemptQuestion>() {
         public AttemptQuestion createFromParcel(Parcel parcel) {
             return new AttemptQuestion(parcel);
         }
@@ -127,4 +133,19 @@ public class AttemptQuestion implements Parcelable {
         this.direction = direction;
     }
 
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public ArrayList<AttemptQuestion> getTranslations() {
+        return translations;
+    }
+
+    public void setTranslations(ArrayList<AttemptQuestion> translations) {
+        this.translations = translations;
+    }
 }

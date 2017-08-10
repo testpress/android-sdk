@@ -8,6 +8,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import in.testpress.util.CommonUtils;
+
 public class AttemptItem implements Parcelable {
 
     private String url;
@@ -32,6 +34,7 @@ public class AttemptItem implements Parcelable {
         savedAnswers = new ArrayList<Integer>();
         parcel.readList(savedAnswers, List.class.getClassLoader());
         review = parcel.readByte() != 0;
+        currentReview = parcel.readByte() != 0;
     }
 
     @Override
@@ -45,11 +48,8 @@ public class AttemptItem implements Parcelable {
         parcel.writeString(url);
         parcel.writeList(selectedAnswers);
         parcel.writeList(savedAnswers);
-        if (review == null) {
-            parcel.writeByte((byte) (0));
-        } else {
-            parcel.writeByte((byte) (review ? 1 : 0)); //if review == true, byte == 1
-        }
+        parcel.writeByte(CommonUtils.getByteFromBoolean(review));
+        parcel.writeByte(CommonUtils.getByteFromBoolean(currentReview));
     }
 
     public static final Creator CREATOR = new Creator() {
