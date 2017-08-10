@@ -80,6 +80,21 @@ public class TestpressCourse {
     }
 
     /**
+     * Get instance of Course list fragment.
+     *
+     * @param context Context
+     * @param testpressSession TestpressSession got from the core module
+     */
+    public static CourseListFragment getCoursesListFragment(@NonNull Context context,
+                                                            @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Context must not be null.", context);
+
+        init(context.getApplicationContext(), testpressSession);
+        return new CourseListFragment();
+    }
+
+    /**
      * Show chapters of a specific course as new Activity.
      *
      * @param context Context to start the new activity.
@@ -157,6 +172,21 @@ public class TestpressCourse {
         init(context.getApplicationContext(), testpressSession);
         Intent intent = new Intent(context, LeaderboardActivity.class);
         context.startActivity(intent);
+    }
+
+    /**
+     * Get instance of Leaderboard fragment.
+     *
+     * @param context Context
+     * @param testpressSession TestpressSession got from the core module
+     */
+    public static LeaderboardFragment getLeaderboardFragment(@NonNull Context context,
+                                                             @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Context must not be null.", context);
+
+        init(context.getApplicationContext(), testpressSession);
+        return new LeaderboardFragment();
     }
 
     private static void init(Context applicationContext, TestpressSession testpressSession) {
