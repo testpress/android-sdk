@@ -217,7 +217,7 @@ public class ReviewQuestionsFragment extends Fragment
             for (ReviewQuestionTranslation translation : translations) {
                 if (translation.getLanguage().equals(selectedLanguage.getCode())) {
                     htmlContent = getHtml(translation.getDirection(), translation.getQuestionHtml(),
-                            translation.getAnswers(), translation.getExplanationHtml());
+                            translation.getAnswers(), translation.getExplanation());
                 }
             }
         }

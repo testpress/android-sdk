@@ -18,7 +18,7 @@ public class ReviewQuestionTranslation {
     private Long id;
     private String questionHtml;
     private String direction;
-    private String explanationHtml;
+    private String explanation;
     private String language;
     private Long questionId;
 
@@ -44,11 +44,11 @@ public class ReviewQuestionTranslation {
     }
 
     @Generated
-    public ReviewQuestionTranslation(Long id, String questionHtml, String direction, String explanationHtml, String language, Long questionId) {
+    public ReviewQuestionTranslation(Long id, String questionHtml, String direction, String explanation, String language, Long questionId) {
         this.id = id;
         this.questionHtml = questionHtml;
         this.direction = direction;
-        this.explanationHtml = explanationHtml;
+        this.explanation = explanation;
         this.language = language;
         this.questionId = questionId;
     }
@@ -84,12 +84,12 @@ public class ReviewQuestionTranslation {
         this.direction = direction;
     }
 
-    public String getExplanationHtml() {
-        return explanationHtml;
+    public String getExplanation() {
+        return explanation;
     }
 
-    public void setExplanationHtml(String explanationHtml) {
-        this.explanationHtml = explanationHtml;
+    public void setExplanation(String explanation) {
+        this.explanation = explanation;
     }
 
     public String getLanguage() {
