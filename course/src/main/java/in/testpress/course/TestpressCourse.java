@@ -14,6 +14,8 @@ import in.testpress.course.models.greendao.ChapterDao;
 import in.testpress.course.models.greendao.CourseDao;
 import in.testpress.course.models.greendao.DaoMaster;
 import in.testpress.course.models.greendao.DaoSession;
+import in.testpress.course.ui.ChaptersGridActivity;
+import in.testpress.course.ui.ContentsListActivity;
 import in.testpress.course.ui.CourseListActivity;
 import in.testpress.course.ui.CourseListFragment;
 import in.testpress.course.ui.LeaderboardActivity;
@@ -75,6 +77,49 @@ public class TestpressCourse {
         init(context.getApplicationContext(), testpressSession);
         Intent intent = new Intent(context, CourseListActivity.class);
         context.startActivity(intent);
+    }
+
+    /**
+     * Show chapters of a specific course as new Activity.
+     *
+     * @param context Context to start the new activity.
+     * @param courseName Course name to be displayed in the action bar of new activity.
+     * @param courseId Id of the Course which chapters need to be display.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    public static void showChapters(@NonNull Context context,
+                                    @NonNull String courseName,
+                                    @NonNull Integer courseId,
+                                    @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Context must not be null.", context);
+        Assert.assertNotNullAndNotEmpty("courseName must not be null or empty.", courseName);
+        Assert.assertNotNull("courseId must not be null.", courseId);
+
+        init(context.getApplicationContext(), testpressSession);
+        context.startActivity(
+                ChaptersGridActivity.createIntent(courseName, courseId.toString(), null, context));
+    }
+
+    /**
+     * Load contents from given url & show in new Activity.
+     *
+     * @param context Context to start the new activity.
+     * @param title Text to be displayed in the action bar of new activity.
+     * @param contentsUrl Url from which contents can be load.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    public static void showContents(@NonNull Context context,
+                                    @NonNull String title,
+                                    @NonNull String contentsUrl,
+                                    @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Context must not be null.", context);
+        Assert.assertNotNullAndNotEmpty("title must not be null or empty.", title);
+        Assert.assertNotNullAndNotEmpty("contentsUrl must not be null or empty.", contentsUrl);
+
+        init(context.getApplicationContext(), testpressSession);
+        context.startActivity(ContentsListActivity.createIntent(title, contentsUrl, context));
     }
 
     /**
