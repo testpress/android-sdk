@@ -20,23 +20,30 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptAnswer;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.AttemptQuestion;
+import in.testpress.exam.models.Language;
 import in.testpress.util.WebViewUtils;
 
 public class TestQuestionFragment extends Fragment {
 
     static final String PARAM_ATTEMPT_ITEM = "attemptItem";
     static final String PARAM_QUESTION_INDEX = "questionIndex";
+    static final String PARAM_SELECTED_LANGUAGE = "selectedLanguage";
     private AttemptItem attemptItem;
     private Integer index;
     private List<Integer> selectedOptions;
     private View view;
     private WebView questionsView;
+    private WebViewUtils webViewUtils;
+    private Language selectedLanguage;
 
-    static TestQuestionFragment getInstance(AttemptItem attemptItem, int questionIndex) {
+    static TestQuestionFragment getInstance(AttemptItem attemptItem, int questionIndex,
+                                            Language selectedLanguage) {
+
         TestQuestionFragment testQuestionFragment = new TestQuestionFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(TestQuestionFragment.PARAM_ATTEMPT_ITEM, attemptItem);
         bundle.putInt(TestQuestionFragment.PARAM_QUESTION_INDEX, questionIndex);
+        bundle.putParcelable(TestQuestionFragment.PARAM_SELECTED_LANGUAGE, selectedLanguage);
         testQuestionFragment.setArguments(bundle);
         return testQuestionFragment;
     }
@@ -46,6 +53,7 @@ public class TestQuestionFragment extends Fragment {
         super.onCreate(savedInstanceState);
         attemptItem = getArguments().getParcelable(PARAM_ATTEMPT_ITEM);
         index = getArguments().getInt(PARAM_QUESTION_INDEX);
+        selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
         selectedOptions = new ArrayList<>(attemptItem.getSelectedAnswers());
     }
 
@@ -61,7 +69,10 @@ public class TestQuestionFragment extends Fragment {
             final String optionType = attemptItem.getAttemptQuestion().getType();
             questionsView.addJavascriptInterface(new OptionsSelectionListener(),
                     "OptionsSelectionListener");
-            WebViewUtils webViewUtils = new WebViewUtils(questionsView) {
+
+            attemptItem.saveAnswers(attemptItem.getSelectedAnswers());
+            attemptItem.setCurrentReview(attemptItem.getReview());
+            webViewUtils = new WebViewUtils(questionsView) {
                 @Override
                 public String getHeader() {
                     return super.getHeader() + getTestEngineHeader();
@@ -70,7 +81,7 @@ public class TestQuestionFragment extends Fragment {
                 @Override
                 public String getJavascript(Context context) {
                     String javascript = super.getJavascript(context);
-                    List<Integer> selectedAnswers = attemptItem.getSelectedAnswers();
+                    List<Integer> selectedAnswers = attemptItem.getSavedAnswers();
                     if (!selectedAnswers.isEmpty()) {
                         if (optionType.equals("R")) {
                             javascript += getRadioButtonInitializer(selectedAnswers.get(0));
@@ -82,10 +93,8 @@ public class TestQuestionFragment extends Fragment {
                 }
             };
             webViewUtils.initWebView(getQuestionItemHtml(), getActivity());
-            review.setChecked(attemptItem.getReview());
-            attemptItem.saveAnswers(attemptItem.getSelectedAnswers());
-            attemptItem.setCurrentReview(attemptItem.getReview());
-            ((CheckBox) view.findViewById(R.id.review)).setOnCheckedChangeListener(
+            review.setChecked(attemptItem.getCurrentReview());
+            review.setOnCheckedChangeListener(
                     new CompoundButton.OnCheckedChangeListener() {
                         @Override
                         public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
@@ -98,6 +107,16 @@ public class TestQuestionFragment extends Fragment {
 
     private String getQuestionItemHtml() {
         AttemptQuestion attemptQuestion = attemptItem.getAttemptQuestion();
+        ArrayList<AttemptQuestion> translations = attemptQuestion.getTranslations();
+        if (translations.size() > 0 && selectedLanguage != null &&
+                !selectedLanguage.getCode().equals(attemptQuestion.getLanguage())) {
+
+            for (AttemptQuestion translation : translations) {
+                if (translation.getLanguage().equals(selectedLanguage.getCode())) {
+                    attemptQuestion = translation;
+                }
+            }
+        }
         String htmlContent = "" +
                 "<div style='padding-left: 10px; padding-right: 10px;'>";
         // Add direction if present
@@ -152,6 +171,10 @@ public class TestQuestionFragment extends Fragment {
         }
         questionsView.destroy();
         super.onDestroyView();
+    }
+
+    public void update() {
+        webViewUtils.loadHtml(getQuestionItemHtml());
     }
 
 }

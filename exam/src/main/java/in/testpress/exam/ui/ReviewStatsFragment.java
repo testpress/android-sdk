@@ -170,7 +170,7 @@ public class ReviewStatsFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     getActivity().startActivity(
-                            ReviewQuestionsActivity.createIntent(getActivity(), attempt)
+                            ReviewQuestionsActivity.createIntent(getActivity(), exam, attempt)
                     );
                 }
             });

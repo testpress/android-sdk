@@ -47,10 +47,13 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Comment;
+import in.testpress.exam.models.Language;
 import in.testpress.exam.models.greendao.ReviewAnswer;
+import in.testpress.exam.models.greendao.ReviewAnswerTranslation;
 import in.testpress.exam.models.greendao.ReviewItem;
 import in.testpress.exam.models.greendao.ReviewItemDao;
 import in.testpress.exam.models.greendao.ReviewQuestion;
+import in.testpress.exam.models.greendao.ReviewQuestionTranslation;
 import in.testpress.exam.network.CommentsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.model.FileDetails;
@@ -76,6 +79,7 @@ public class ReviewQuestionsFragment extends Fragment
     private static final int PREVIOUS_COMMENTS_LOADER_ID = 0;
     private static final int NEW_COMMENTS_LOADER_ID = 1;
     static final String PARAM_REVIEW_ITEM_ID = "reviewItemId";
+    static final String PARAM_SELECTED_LANGUAGE = "selectedLanguage";
     private ReviewItem reviewItem;
     private View emptyView;
     private TextView emptyTitleView;
@@ -107,7 +111,8 @@ public class ReviewQuestionsFragment extends Fragment
     @SuppressLint("UseSparseArrays")
     HashMap<Integer, Comment> uniqueComments = new HashMap<>();
     Uri selectedCommentImageUri;
-
+    private WebViewUtils webViewUtils;
+    private Language selectedLanguage;
     private Handler newCommentsHandler;
     private Runnable runnable = new Runnable() {
         @Override
@@ -121,10 +126,11 @@ public class ReviewQuestionsFragment extends Fragment
         }
     };
 
-    public static ReviewQuestionsFragment getInstance(long reviewItemId) {
+    public static ReviewQuestionsFragment getInstance(long reviewItemId, Language selectedLanguage) {
         ReviewQuestionsFragment reviewQuestionsFragment = new ReviewQuestionsFragment();
         Bundle bundle = new Bundle();
         bundle.putLong(ReviewQuestionsFragment.PARAM_REVIEW_ITEM_ID, reviewItemId);
+        bundle.putParcelable(PARAM_SELECTED_LANGUAGE, selectedLanguage);
         reviewQuestionsFragment.setArguments(bundle);
         return reviewQuestionsFragment;
     }
@@ -135,6 +141,7 @@ public class ReviewQuestionsFragment extends Fragment
         apiClient = new TestpressExamApiClient(getContext());
         long reviewItemId = getArguments().getLong(PARAM_REVIEW_ITEM_ID);
         Assert.assertNotNull("PARAM_REVIEW_ITEM_ID must not be null", reviewItemId);
+        selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
         ReviewItemDao reviewItemDao= TestpressExam.getReviewItemDao(getContext());
         List<ReviewItem> reviewItems = reviewItemDao.queryBuilder()
                 .where(ReviewItemDao.Properties.Id.eq(reviewItemId)).list();
@@ -181,15 +188,17 @@ public class ReviewQuestionsFragment extends Fragment
         );
         ViewUtils.setTypeface(new TextView[] { commentsEditText },
                 TestpressSdk.getRubikRegularFont(getContext()));
-        WebViewUtils webViewUtils = new WebViewUtils(webView) {
+        webViewUtils = new WebViewUtils(webView) {
             @Override
             protected void onLoadFinished() {
                 super.onLoadFinished();
                 progressBar.setVisibility(View.GONE);
-                displayComments();
+                if (commentsAdapter == null) {
+                    displayComments();
+                }
             }
         };
-        webViewUtils.initWebView(getHtml(), getActivity());
+        webViewUtils.initWebView(getReviewItemAsHtml(), getActivity());
         return view;
     }
 
@@ -198,7 +207,30 @@ public class ReviewQuestionsFragment extends Fragment
      *
      * @return HTML as String
      */
-    private String getHtml() {
+    private String getReviewItemAsHtml() {
+        String htmlContent = null;
+        ReviewQuestion reviewQuestion = reviewItem.getQuestion();
+        List<ReviewQuestionTranslation> translations = reviewQuestion.getTranslations();
+        if (translations.size() > 0 && selectedLanguage != null &&
+                !selectedLanguage.getCode().equals(reviewQuestion.getLanguage())) {
+
+            for (ReviewQuestionTranslation translation : translations) {
+                if (translation.getLanguage().equals(selectedLanguage.getCode())) {
+                    htmlContent = getHtml(translation.getDirection(), translation.getQuestionHtml(),
+                            translation.getAnswers(), translation.getExplanationHtml());
+                }
+            }
+        }
+        if (htmlContent == null) {
+            htmlContent = getHtml(reviewQuestion.getDirection(), reviewQuestion.getQuestionHtml(),
+                    reviewQuestion.getAnswers(), reviewQuestion.getExplanationHtml());
+        }
+        return htmlContent;
+    }
+
+    private String getHtml(String directionHtml, String questionHtml,
+                           Object answers, String explanationHtml) {
+
         String html = "<div style='padding-left: 2px; padding-right: 4px;'>";
 
         // Add index
@@ -206,10 +238,8 @@ public class ReviewQuestionsFragment extends Fragment
                 "<div class='review-question-index'>" +
                 reviewItem.getIndex() +
                 "</div>";
-        ReviewQuestion reviewQuestion = reviewItem.getQuestion();
 
         // Add direction/passage
-        String directionHtml = reviewQuestion.getDirection();
         if (directionHtml != null && !directionHtml.isEmpty()) {
             html += "<div class='question' style='padding-bottom: 0px;'>" +
                         directionHtml +
@@ -218,14 +248,27 @@ public class ReviewQuestionsFragment extends Fragment
 
         // Add question
         html += "<div class='question'>" +
-                reviewQuestion.getQuestionHtml() +
+                questionHtml +
                 "</div>";
 
         // Add options
-        List<ReviewAnswer> reviewAnswers = reviewQuestion.getAnswers();
         String correctAnswerHtml = "";
+        //noinspection unchecked
+        List<Object> reviewAnswers = (List<Object>) answers;
         for (int j = 0; j < reviewAnswers.size(); j++) {
-            ReviewAnswer attemptAnswer = reviewAnswers.get(j);
+            ReviewAnswer attemptAnswer;
+            if (reviewAnswers.get(j) instanceof ReviewAnswer) {
+                attemptAnswer = (ReviewAnswer) reviewAnswers.get(j);
+            } else {
+                ReviewAnswerTranslation answerTranslation = (ReviewAnswerTranslation) reviewAnswers.get(j);
+                attemptAnswer = new ReviewAnswer(
+                        answerTranslation.getId(),
+                        answerTranslation.getTextHtml(),
+                        answerTranslation.getIsCorrect(),
+                        null
+                );
+            }
+
             int optionColor;
             if (reviewItem.getSelectedAnswers().contains(attemptAnswer.getId().intValue())) {
                 if (attemptAnswer.getIsCorrect()) {
@@ -250,7 +293,6 @@ public class ReviewQuestionsFragment extends Fragment
                 "</div>";
 
         // Add explanation
-        String explanationHtml = reviewQuestion.getExplanationHtml();
         if (explanationHtml != null && !explanationHtml.isEmpty()) {
             html += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation));
             html += "<div class='review-explanation'>" +
@@ -682,6 +724,10 @@ public class ReviewQuestionsFragment extends Fragment
             Snackbar.make(rootLayout, R.string.testpress_network_error,
                     Snackbar.LENGTH_SHORT).show();
         }
+    }
+
+    public void update() {
+        webViewUtils.loadHtml(getReviewItemAsHtml());
     }
 
     @Override

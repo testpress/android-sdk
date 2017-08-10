@@ -18,9 +18,11 @@ import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.greendao.DaoMaster;
 import in.testpress.exam.models.greendao.DaoSession;
 import in.testpress.exam.models.greendao.ReviewAnswerDao;
+import in.testpress.exam.models.greendao.ReviewAnswerTranslationDao;
 import in.testpress.exam.models.greendao.ReviewAttemptDao;
 import in.testpress.exam.models.greendao.ReviewItemDao;
 import in.testpress.exam.models.greendao.ReviewQuestionDao;
+import in.testpress.exam.models.greendao.ReviewQuestionTranslationDao;
 import in.testpress.exam.models.greendao.SelectedAnswerDao;
 import in.testpress.exam.ui.AnalyticsActivity;
 import in.testpress.exam.ui.AttemptsActivity;
@@ -355,6 +357,14 @@ public class TestpressExam {
 
     public static ReviewAnswerDao getReviewAnswerDao(Context context) {
         return getDaoSession(context).getReviewAnswerDao();
+    }
+
+    public static ReviewQuestionTranslationDao getReviewQuestionTranslationDao(Context context) {
+        return getDaoSession(context).getReviewQuestionTranslationDao();
+    }
+
+    public static ReviewAnswerTranslationDao getReviewAnswerTranslationDao(Context context) {
+        return getDaoSession(context).getReviewAnswerTranslationDao();
     }
 
     public static SelectedAnswerDao getSelectedAnswerDao(Context context) {
