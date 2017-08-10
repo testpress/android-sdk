@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressExamDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 4;
+    private static final int VERSION = 5;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.exam.models.greendao");
@@ -19,10 +19,14 @@ public class TestpressExamDaoGenerator {
         Entity reviewItem = addReviewItem(schema);
         Entity reviewQuestion = addReviewQuestion(schema);
         Entity reviewAnswer = addReviewAnswer(schema);
+        Entity reviewQuestionTranslation = addReviewQuestionTranslation(schema);
+        Entity reviewAnswerTranslation = addReviewAnswerTranslation(schema);
         addSelectedAnswer(schema);
         addAttemptToReviewItem(attempt, reviewItem);
         addReviewItemToQuestion(reviewItem, reviewQuestion);
         addReviewQuestionToAnswers(reviewQuestion, reviewAnswer);
+        addTranslationsToReviewQuestion(reviewQuestion, reviewQuestionTranslation);
+        addAnswersToReviewTranslations(reviewQuestionTranslation, reviewAnswerTranslation);
 
         new DaoGenerator().generateAll(schema, "exam/src/main/java");
     }
@@ -73,7 +77,18 @@ public class TestpressExamDaoGenerator {
         reviewQuestion.addStringProperty("subject");
         reviewQuestion.addStringProperty("explanationHtml");
         reviewQuestion.addStringProperty("commentsUrl");
+        reviewQuestion.addStringProperty("language");
         return reviewQuestion;
+    }
+
+    private static Entity addReviewQuestionTranslation(Schema schema) {
+        Entity reviewQuestionTranslation = schema.addEntity("ReviewQuestionTranslation");
+        reviewQuestionTranslation.addIdProperty().autoincrement();
+        reviewQuestionTranslation.addStringProperty("questionHtml");
+        reviewQuestionTranslation.addStringProperty("direction");
+        reviewQuestionTranslation.addStringProperty("explanationHtml");
+        reviewQuestionTranslation.addStringProperty("language");
+        return reviewQuestionTranslation;
     }
 
     private static Entity addReviewAnswer(Schema schema) {
@@ -82,6 +97,15 @@ public class TestpressExamDaoGenerator {
         reviewAnswer.addStringProperty("textHtml");
         reviewAnswer.addBooleanProperty("isCorrect");
         return reviewAnswer;
+    }
+
+    private static Entity addReviewAnswerTranslation(Schema schema) {
+        Entity reviewAnswerTranslation = schema.addEntity("ReviewAnswerTranslation");
+        reviewAnswerTranslation.addLongProperty("translationAnswerId").primaryKey().autoincrement();
+        reviewAnswerTranslation.addLongProperty("id");
+        reviewAnswerTranslation.addStringProperty("textHtml");
+        reviewAnswerTranslation.addBooleanProperty("isCorrect");
+        return reviewAnswerTranslation;
     }
 
     private static void addAttemptToReviewItem(Entity attempt, Entity reviewItem) {
@@ -99,6 +123,18 @@ public class TestpressExamDaoGenerator {
     private static void addReviewQuestionToAnswers(Entity reviewQuestion, Entity reviewAnswer) {
         Property reviewQuestionId = reviewAnswer.addLongProperty("questionId").getProperty();
         ToMany questionToAnswers = reviewQuestion.addToMany(reviewAnswer, reviewQuestionId);
+        questionToAnswers.setName("answers");
+    }
+
+    private static void addTranslationsToReviewQuestion(Entity reviewQuestion, Entity translation) {
+        Property reviewQuestionId = translation.addLongProperty("questionId").getProperty();
+        ToMany questionToTranslations = reviewQuestion.addToMany(translation, reviewQuestionId);
+        questionToTranslations.setName("translations");
+    }
+
+    private static void addAnswersToReviewTranslations(Entity questionTranslation, Entity answerTranslation) {
+        Property reviewQuestionId = answerTranslation.addLongProperty("questionTranslationId").getProperty();
+        ToMany questionToAnswers = questionTranslation.addToMany(answerTranslation, reviewQuestionId);
         questionToAnswers.setName("answers");
     }
 }

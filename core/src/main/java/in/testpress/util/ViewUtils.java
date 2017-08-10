@@ -22,14 +22,17 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.DrawableRes;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import in.testpress.R;
@@ -109,6 +112,16 @@ public class ViewUtils {
             searchIcon.mutate().setColorFilter(ContextCompat.getColor(context,
                     R.color.testpress_actionbar_text), PorterDuff.Mode.SRC_IN);
             menuItem.setIcon(searchIcon);
+        }
+    }
+
+    public static void setSpinnerIconColor(Context context, Spinner spinner) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            spinner.setBackgroundTintList(
+                    ContextCompat.getColorStateList(context, R.color.testpress_actionbar_text));
+        } else {
+            ViewCompat.setBackgroundTintList(spinner,
+                    ContextCompat.getColorStateList(context, R.color.testpress_actionbar_text));
         }
     }
 

@@ -27,8 +27,10 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
+import in.testpress.exam.models.Language;
 import in.testpress.exam.network.AttemptsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
@@ -123,10 +125,16 @@ public class AttemptsActivity extends BaseToolBarActivity
         TextView markLabel = (TextView) findViewById(R.id.mark_per_question_label);
         TextView negativeMarkLabel = (TextView) findViewById(R.id.negative_marks_label);
         TextView dateLabel = (TextView) findViewById(R.id.date_label);
+        TextView languageLabel = (TextView) findViewById(R.id.language_label);
         ViewUtils.setTypeface(new TextView[] {numberOfQuestions, examDuration, markPerQuestion,
                 negativeMarks, titleView, date}, TestpressSdk.getRubikMediumFont(this));
-        ViewUtils.setTypeface(new TextView[] {descriptionContent, questionsLabel, durationLabel,
-                markLabel, negativeMarkLabel, dateLabel}, TestpressSdk.getRubikRegularFont(this));
+        ViewUtils.setTypeface(
+                new TextView[] {
+                        descriptionContent, questionsLabel, durationLabel, markLabel,
+                        negativeMarkLabel, dateLabel, languageLabel
+                },
+                TestpressSdk.getRubikRegularFont(this)
+        );
         int buttonTextResId = (exam.getPausedAttemptsCount() > 0) ?
                 R.string.testpress_resume_exam : R.string.testpress_start_exam;
 
@@ -149,13 +157,17 @@ public class AttemptsActivity extends BaseToolBarActivity
             description.setVisibility(View.VISIBLE);
             descriptionContent.setText(exam.getDescription());
         }
-        startButtonLayout.setVisibility(canAttemptExam() ? View.VISIBLE : View.GONE);
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startExam(true);
-            }
-        });
+        if (canAttemptExam()) {
+            MultiLanguagesUtil.supportMultiLanguage(this, exam, startButton,
+                    new MultiLanguagesUtil.LanguageSelectionListener() {
+                        @Override
+                        public void onLanguageSelected() {
+                            startExam(true);
+                        }});
+            startButtonLayout.setVisibility(View.VISIBLE);
+        } else {
+            startButtonLayout.setVisibility(View.GONE);
+        }
         examDetailsLayout.setVisibility(View.VISIBLE);
         scrollView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);

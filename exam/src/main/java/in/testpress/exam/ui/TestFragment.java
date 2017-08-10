@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -37,8 +36,10 @@ import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.AttemptItem;
+import in.testpress.exam.models.AttemptQuestion;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.Exam;
+import in.testpress.exam.models.Language;
 import in.testpress.exam.network.TestQuestionsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
@@ -59,8 +60,8 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private TextView timer;
     private Spinner questionsFilter;
     private Spinner subjectFilter;
+    private Spinner languageSpinner;
     private NonSwipeableViewPager pager;
-    private RelativeLayout spinnerContainer;
     private TestQuestionPagerAdapter pagerAdapter;
     private List<AttemptItem> filterItems = new ArrayList<>();
     private TestPanelListAdapter panelListAdapter;
@@ -74,6 +75,8 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private CountDownTimer countDownTimer;
     private long millisRemaining;
     private ExploreSpinnerAdapter subjectSpinnerAdapter;
+    private ExploreSpinnerAdapter languageSpinnerAdapter;
+    private Language selectedLanguage;
     private Boolean fistTimeCallback = false;
     private int selectedSubjectOffset;
     private boolean navigationButtonPressed;
@@ -104,9 +107,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         timer = (TextView) view.findViewById(R.id.timer);
         questionsFilter = (Spinner) view.findViewById(R.id.questions_filter);
         subjectFilter = (Spinner) view.findViewById(R.id.subject_filter);
+        languageSpinner = (Spinner) view.findViewById(R.id.language_spinner);
         pager = (NonSwipeableViewPager) view.findViewById(R.id.pager);
         slidingPaneLayout = (SlidingPaneLayout) view.findViewById(R.id.sliding_layout);
-        spinnerContainer = (RelativeLayout) view.findViewById(R.id.spinner_container);
         apiClient = new TestpressExamApiClient(getActivity());
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage(getResources().getString(R.string.testpress_loading_questions));
@@ -217,7 +220,6 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             public void onNothingSelected(AdapterView<?> adapterView) {
             }
         });
-        spinnerContainer.setVisibility(View.GONE);
         return view;
     }
 
@@ -419,15 +421,51 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 attemptItemList.addAll(subjectsWiseItems.get(subject));
                 subjectSpinnerAdapter.addItem(subject, subject, true, 0);
             }
-            if ((spinnerContainer.getVisibility() == View.GONE)) {
-                // Show spinner only if #subjects > 1
-                subjectSpinnerAdapter.notifyDataSetChanged();
-                spinnerContainer.setVisibility(View.VISIBLE);
-            }
+            subjectSpinnerAdapter.notifyDataSetChanged();
             subjectFilter.setSelection(0); // Set 1st item as default selection
+            subjectFilter.setVisibility(View.VISIBLE);
             selectedSubjectOffset = 0;
         }
-        pagerAdapter = new TestQuestionPagerAdapter(getFragmentManager(), attemptItemList);
+
+        final ArrayList<Language> languages = exam.getLanguages();
+        if (languages.size() > 1) {
+            languageSpinnerAdapter = new ExploreSpinnerAdapter(getActivity().getLayoutInflater(),
+                    getResources(), false);
+
+            for (Language language : languages) {
+                languageSpinnerAdapter.addItem(language.getCode(), language.getTitle()+"lqierrvblaeiuvlnaipehblailebliszhnblizdkbl", true, 0);
+            }
+            languageSpinner.setAdapter(languageSpinnerAdapter);
+            languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    // Update existing object so that update will reflect in TestQuestionFragment also
+                    selectedLanguage.update(languages.get(position));
+                    exam.setSelectedLanguage(selectedLanguage.getCode());
+                    pagerAdapter.notifyDataSetChanged();
+                    panelListAdapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
+            String selectedLanguageCode = exam.getSelectedLanguage();
+            if (selectedLanguageCode != null && !selectedLanguageCode.isEmpty()) {
+                int selectedPosition =
+                        languageSpinnerAdapter.getItemPositionFromTag(selectedLanguageCode);
+
+                // Create new object so that we can update it without affecting original language list
+                selectedLanguage = new Language(languages.get(selectedPosition));
+                panelListAdapter.setSelectedLanguage(selectedLanguage);
+                languageSpinner.setSelection(selectedPosition);
+            }
+            languageSpinner.setVisibility(View.VISIBLE);
+        }
+
+        pagerAdapter =
+                new TestQuestionPagerAdapter(getFragmentManager(), attemptItemList, selectedLanguage);
+
         pagerAdapter.setCount(attemptItemList.size());
         pager.setAdapter(pagerAdapter);
         pagerAdapter.notifyDataSetChanged();
@@ -477,7 +515,6 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                                     startCountDownTimer(millisRemaining);
                                     progressDialog.dismiss();
                                 }
-                                pagerAdapter.notifyDataSetChanged();
                                 updatePanel();
                             }
                         }

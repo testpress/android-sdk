@@ -87,6 +87,7 @@
     <string name="testpress_mark_per_question">Mark per question</string>
     <string name="testpress_negative_mark">Negative marks</string>
     <string name="testpress_start_date">Start &amp; End date</string>
+    <string name="testpress_select_language">Select Language</string>
     <string name="testpress_description">Description</string>
     <string name="testpress_questions_list">QUESTIONS LIST</string>
 
@@ -170,5 +171,7 @@
 
     <string name="testpress_test_completed_you_earned">Test completed!\nYou’ve earned</string>
     <string name="testpress_okay">Okay</string>
+
+    <string name="testpress_continue">Continue</string>
 
 </resources>

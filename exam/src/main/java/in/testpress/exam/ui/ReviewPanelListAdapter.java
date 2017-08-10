@@ -11,8 +11,11 @@ import java.util.List;
 
 import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
+import in.testpress.exam.models.Language;
 import in.testpress.exam.models.greendao.ReviewAnswer;
 import in.testpress.exam.models.greendao.ReviewItem;
+import in.testpress.exam.models.greendao.ReviewQuestion;
+import in.testpress.exam.models.greendao.ReviewQuestionTranslation;
 import in.testpress.exam.models.greendao.SelectedAnswer;
 import in.testpress.exam.models.greendao.SelectedAnswerDao;
 import in.testpress.util.SingleTypeAdapter;
@@ -24,6 +27,7 @@ class ReviewPanelListAdapter extends SingleTypeAdapter<ReviewItem> {
 
     private int currentItemPosition = 1;
     private SelectedAnswerDao selectedAnswerDao;
+    private Language selectedLanguage;
 
     ReviewPanelListAdapter(final LayoutInflater inflater, final List<ReviewItem> items, int layout) {
         super(inflater, layout);
@@ -41,7 +45,21 @@ class ReviewPanelListAdapter extends SingleTypeAdapter<ReviewItem> {
 
     @Override
     protected void update(final int position, final ReviewItem item) {
-        String question = Html.fromHtml(item.getQuestion().getQuestionHtml()).toString();
+        String question = null;
+        ReviewQuestion reviewQuestion = item.getQuestion();
+        List<ReviewQuestionTranslation> translations = reviewQuestion.getTranslations();
+        if (translations.size() > 0 && selectedLanguage != null &&
+                !selectedLanguage.getCode().equals(reviewQuestion.getLanguage())) {
+
+            for (ReviewQuestionTranslation translation : translations) {
+                if (translation.getLanguage().equals(selectedLanguage.getCode())) {
+                    question = Html.fromHtml(translation.getQuestionHtml()).toString();
+                }
+            }
+        }
+        if (question == null) {
+            question = Html.fromHtml(reviewQuestion.getQuestionHtml()).toString();
+        }
         updater.view.findViewById(R.id.marked_question).setVisibility(View.GONE);
         updater.view.findViewById(R.id.answered_question).setVisibility(View.GONE);
         updater.view.findViewById(R.id.all_question).setVisibility(View.VISIBLE);
@@ -89,5 +107,9 @@ class ReviewPanelListAdapter extends SingleTypeAdapter<ReviewItem> {
 
     public void setCurrentItemPosition(int currentItemPosition) {
         this.currentItemPosition = currentItemPosition;
+    }
+
+    public void setSelectedLanguage(Language selectedLanguage) {
+        this.selectedLanguage = selectedLanguage;
     }
 }

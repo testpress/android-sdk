@@ -122,22 +122,47 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" >
 
-                <RelativeLayout
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/spinner_container" >
+                    android:layout_height="wrap_content" >
 
-                    <Spinner
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" >
+
+                        <Spinner
+                            android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/language_spinner"
+                            style="@style/Widget.Testpress.HeaderBar.Spinner.Base"
+                            android:padding="5dp" />
+
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:id="@+id/subject_filter"
-                        style="@style/Widget.Testpress.HeaderBar.Spinner.Base"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignParentEnd="true"
-                        android:gravity="end"
-                        android:padding="5dp" />
+                        android:id="@+id/subject_filter_container" >
 
-                </RelativeLayout>
+                        <Spinner
+                            android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/subject_filter"
+                            style="@style/Widget.Testpress.HeaderBar.Spinner.Base"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"
+                            android:gravity="end"
+                            android:padding="5dp" />
+
+                    </RelativeLayout>
+
+                </LinearLayout>
 
                 <View
                     android:layout_width="fill_parent"

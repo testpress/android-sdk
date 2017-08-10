@@ -9,6 +9,8 @@ import java.util.List;
 
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
+import in.testpress.exam.models.AttemptQuestion;
+import in.testpress.exam.models.Language;
 import in.testpress.util.SingleTypeAdapter;
 
 /**
@@ -17,6 +19,7 @@ import in.testpress.util.SingleTypeAdapter;
 class TestPanelListAdapter extends SingleTypeAdapter<AttemptItem> {
 
     private int currentAttemptItemIndex = 1;
+    private Language selectedLanguage;
 
     TestPanelListAdapter(final LayoutInflater inflater, final List<AttemptItem> items, int layout) {
         super(inflater, layout);
@@ -33,7 +36,18 @@ class TestPanelListAdapter extends SingleTypeAdapter<AttemptItem> {
 
     @Override
     protected void update(final int position, final AttemptItem item) {
-        String question = Html.fromHtml(item.getAttemptQuestion().getQuestionHtml()).toString();
+        AttemptQuestion attemptQuestion = item.getAttemptQuestion();
+        List<AttemptQuestion> translations = attemptQuestion.getTranslations();
+        if (translations.size() > 0 && selectedLanguage != null &&
+                !selectedLanguage.getCode().equals(attemptQuestion.getLanguage())) {
+
+            for (AttemptQuestion translation : translations) {
+                if (translation.getLanguage().equals(selectedLanguage.getCode())) {
+                    attemptQuestion = translation;
+                }
+            }
+        }
+        String question = Html.fromHtml(attemptQuestion.getQuestionHtml()).toString();
         if(item.getReview() || item.getCurrentReview()) {
             // Marked question
             updater.view.findViewById(R.id.all_question).setVisibility(View.GONE);
@@ -64,5 +78,9 @@ class TestPanelListAdapter extends SingleTypeAdapter<AttemptItem> {
 
     public void setCurrentAttemptItemIndex(int currentAttemptItemIndex) {
         this.currentAttemptItemIndex = currentAttemptItemIndex;
+    }
+
+    public void setSelectedLanguage(Language selectedLanguage) {
+        this.selectedLanguage = selectedLanguage;
     }
 }
