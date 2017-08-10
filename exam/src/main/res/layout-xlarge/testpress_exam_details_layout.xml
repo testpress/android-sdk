@@ -147,7 +147,7 @@
                     android:layout_marginEnd="30dp"
                     android:layout_gravity="top|start"
                     style="@style/TestpressExamInfoSubHeading"
-                    android:tint="@color/testpress_color_primary"
+                    android:tint="@color/testpress_blue"
                     android:src="@drawable/testpress_translate_outline"/>
                 <TextView
                     android:layout_height="match_parent"

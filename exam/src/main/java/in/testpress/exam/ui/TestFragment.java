@@ -433,7 +433,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                     getResources(), false);
 
             for (Language language : languages) {
-                languageSpinnerAdapter.addItem(language.getCode(), language.getTitle()+"lqierrvblaeiuvlnaipehblailebliszhnblizdkbl", true, 0);
+                languageSpinnerAdapter.addItem(language.getCode(), language.getTitle(), true, 0);
             }
             languageSpinner.setAdapter(languageSpinnerAdapter);
             languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

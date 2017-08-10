@@ -38,5 +38,6 @@
 
     <color name="testpress_red_incorrect">#E65C6C</color>
     <color name="testpress_yellow">#FFA319</color>
+    <color name="testpress_blue">#3333ff</color>
 
 </resources>

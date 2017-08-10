@@ -44,7 +44,6 @@
                 android:layout_height="match_parent"
                 style="@style/TestpressExamInfoSubHeading"
                 android:layout_weight="0.2"
-                android:tint="#6200EA"
                 android:src="@drawable/testpress_duration_large"/>
             <TextView
                 android:layout_height="match_parent"
@@ -141,7 +140,7 @@
                 android:layout_height="20dp"
                 style="@style/TestpressExamInfoSubHeading"
                 android:layout_weight="0.2"
-                android:tint="@color/testpress_color_primary"
+                android:tint="@color/testpress_blue"
                 android:src="@drawable/testpress_translate_outline"/>
             <TextView
                 android:layout_height="match_parent"

@@ -28,7 +28,7 @@ public class ReviewQuestionTranslationDao extends AbstractDao<ReviewQuestionTran
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property QuestionHtml = new Property(1, String.class, "questionHtml", false, "QUESTION_HTML");
         public final static Property Direction = new Property(2, String.class, "direction", false, "DIRECTION");
-        public final static Property ExplanationHtml = new Property(3, String.class, "explanationHtml", false, "EXPLANATION_HTML");
+        public final static Property Explanation = new Property(3, String.class, "explanation", false, "EXPLANATION");
         public final static Property Language = new Property(4, String.class, "language", false, "LANGUAGE");
         public final static Property QuestionId = new Property(5, Long.class, "questionId", false, "QUESTION_ID");
     }
@@ -53,7 +53,7 @@ public class ReviewQuestionTranslationDao extends AbstractDao<ReviewQuestionTran
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"QUESTION_HTML\" TEXT," + // 1: questionHtml
                 "\"DIRECTION\" TEXT," + // 2: direction
-                "\"EXPLANATION_HTML\" TEXT," + // 3: explanationHtml
+                "\"EXPLANATION\" TEXT," + // 3: explanation
                 "\"LANGUAGE\" TEXT," + // 4: language
                 "\"QUESTION_ID\" INTEGER);"); // 5: questionId
     }
@@ -83,9 +83,9 @@ public class ReviewQuestionTranslationDao extends AbstractDao<ReviewQuestionTran
             stmt.bindString(3, direction);
         }
  
-        String explanationHtml = entity.getExplanationHtml();
-        if (explanationHtml != null) {
-            stmt.bindString(4, explanationHtml);
+        String explanation = entity.getExplanation();
+        if (explanation != null) {
+            stmt.bindString(4, explanation);
         }
  
         String language = entity.getLanguage();
@@ -118,9 +118,9 @@ public class ReviewQuestionTranslationDao extends AbstractDao<ReviewQuestionTran
             stmt.bindString(3, direction);
         }
  
-        String explanationHtml = entity.getExplanationHtml();
-        if (explanationHtml != null) {
-            stmt.bindString(4, explanationHtml);
+        String explanation = entity.getExplanation();
+        if (explanation != null) {
+            stmt.bindString(4, explanation);
         }
  
         String language = entity.getLanguage();
@@ -151,7 +151,7 @@ public class ReviewQuestionTranslationDao extends AbstractDao<ReviewQuestionTran
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // questionHtml
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // direction
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // explanationHtml
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // explanation
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // language
             cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5) // questionId
         );
@@ -163,7 +163,7 @@ public class ReviewQuestionTranslationDao extends AbstractDao<ReviewQuestionTran
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setQuestionHtml(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setDirection(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setExplanationHtml(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setExplanation(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setLanguage(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setQuestionId(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
      }
