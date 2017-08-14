@@ -206,6 +206,7 @@ table th {
 }
 
 .radio-button-unchecked {
+    display: inline-block;
     height: 16px;
     width: 16px;
     border:1px solid #ccc;
@@ -213,13 +214,14 @@ table th {
     border-radius: 50%;
     background: #fff;
     flex: 0 0 16px;
+    float: left;
     margin-right: 10px;
     margin-top: 4px;
 }
 
 .radio-button-checked:after {
     display: inline-block;
-    line-height: 16px;
+    line-height: 15px;
     height: 16px;
     width: 16px;
     box-shadow: initial;
@@ -238,6 +240,7 @@ table th {
 }
 
 .checkbox-unchecked {
+    display: inline-block;
     height: 13px;
     width: 13px;
     border-style: solid;
@@ -246,6 +249,7 @@ table th {
     border-radius: 2px;
     background: #fff;
     flex: 0 0 13px;
+    float: left;
     margin-right:10px;
     margin-top: 4px;
 }
