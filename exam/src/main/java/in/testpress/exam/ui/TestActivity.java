@@ -241,21 +241,9 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 } else {
                     getSupportActionBar().setTitle(getString(R.string.testpress_resume_exam));
                     attemptActions.setVisibility(View.VISIBLE);
-                    MultiLanguagesUtil.supportMultiLanguage(this, exam, resumeButton,
-                            new MultiLanguagesUtil.LanguageSelectionListener() {
-                                @Override
-                                public void onLanguageSelected() {
-                                    startExam(true);
-                                }});
                 }
             }
         } else {
-            MultiLanguagesUtil.supportMultiLanguage(this, exam, startButton,
-                    new MultiLanguagesUtil.LanguageSelectionListener() {
-                        @Override
-                        public void onLanguageSelected() {
-                            startExam(false);
-                        }});
             startExam.setVisibility(View.VISIBLE);
         }
         if (discardExamDetails) {
@@ -289,8 +277,20 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         examTitle.setText(exam.getTitle());
         numberOfQuestions.setText(exam.getNumberOfQuestions().toString());
         if (attempt == null) {
+            MultiLanguagesUtil.supportMultiLanguage(this, exam, startButton,
+                    new MultiLanguagesUtil.LanguageSelectionListener() {
+                        @Override
+                        public void onLanguageSelected() {
+                            startExam(false);
+                        }});
             examDuration.setText(exam.getDuration());
         } else {
+            MultiLanguagesUtil.supportMultiLanguage(this, exam, resumeButton,
+                    new MultiLanguagesUtil.LanguageSelectionListener() {
+                        @Override
+                        public void onLanguageSelected() {
+                            startExam(true);
+                        }});
             durationLabel.setText(getString(R.string.testpress_time_remaining));
             examDuration.setText(attempt.getRemainingTime());
         }
