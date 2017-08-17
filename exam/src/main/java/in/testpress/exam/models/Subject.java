@@ -36,7 +36,7 @@ public class Subject implements Parcelable {
         incorrectPercentage = in.readFloat();
         leaf = in.readByte() != 0;
         String parent = in.readString();
-        this.parent = TextUtils.isEmpty(parent) ? null : Integer.parseInt(parent);
+        this.parent = parent.equals("null") ? null : Integer.parseInt(parent);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class Subject implements Parcelable {
         dest.writeFloat(unansweredPercentage);
         dest.writeFloat(incorrectPercentage);
         dest.writeByte((byte) (leaf ? 1 : 0));
-        dest.writeString(parent + "");
+        dest.writeString(String.valueOf(parent));
     }
 
     @Override
