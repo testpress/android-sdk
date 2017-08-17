@@ -356,7 +356,7 @@ public class ContentActivity extends BaseToolBarActivity {
     private boolean canAttemptExam(Exam exam) {
         if (exam.getAttemptsCount() == 0 ||
                 ((exam.getAllowRetake()) &&
-                        (exam.getAttemptsCount() <= exam.getMaxRetakes() ||
+                        ((exam.getAttemptsCount() + exam.getPausedAttemptsCount()) <= exam.getMaxRetakes() ||
                                 exam.getMaxRetakes() < 0))) {
 
             if (content.getIsLocked() || !content.getHasStarted()) {
