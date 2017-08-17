@@ -20,7 +20,7 @@ public class Reputation implements Parcelable {
         trophiesCount = in.readInt();
         rank = in.readInt();
         String difference = in.readString();
-        this.difference = TextUtils.isEmpty(difference) ? null : Integer.parseInt(difference);
+        this.difference = difference.equals("null") ? null : Integer.parseInt(difference);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class Reputation implements Parcelable {
         dest.writeParcelable(user, flags);
         dest.writeInt(trophiesCount);
         dest.writeInt(rank);
-        dest.writeString(difference + "");
+        dest.writeString(String.valueOf(difference));
     }
 
     @Override
