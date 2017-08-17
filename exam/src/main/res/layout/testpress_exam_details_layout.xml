@@ -132,6 +132,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:visibility="gone"
             android:id="@+id/language_layout"
             style="@style/TestpressExamInfoRow"
             android:layout_marginBottom="5dp"
