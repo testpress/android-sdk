@@ -33,12 +33,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.util.GraphAxisLabelFormatter;
 import in.testpress.exam.util.GraphAxisPercentValueFormatter;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.UIUtils;
+import in.testpress.util.ViewUtils;
 
 import static in.testpress.exam.ui.AnalyticsFragment.SUBJECTS;
 
@@ -89,6 +91,10 @@ public class StrengthAnalyticsGraphFragment extends Fragment {
         weaknessLabelLayout = (LinearLayout) view.findViewById(R.id.weakness_label_layout);
         weaknessLabel = (TextView) view.findViewById(R.id.weakness_label);
         unansweredLabelLayout = (LinearLayout) view.findViewById(R.id.unanswered_label_layout);
+        TextView unansweredLabel = (TextView) view.findViewById(R.id.unanswered_label);
+        ViewUtils.setTypeface(new TextView[] {strengthLabel, weaknessLabel, unansweredLabel},
+                TestpressSdk.getRubikRegularFont(getContext()));
+
         chart = (HorizontalBarChart) view.findViewById(R.id.chart);
         getActivity().invalidateOptionsMenu();
         setSelectedSpinnerItem(0);
@@ -258,16 +264,19 @@ public class StrengthAnalyticsGraphFragment extends Fragment {
             labels.add(subject.getName());
         }
         labels.add("");
-        xAxis.setTextSize(14);
-        xAxis.setTypeface(Typeface.DEFAULT_BOLD);
+        xAxis.setTextSize(13);
+        xAxis.setTypeface(TestpressSdk.getRubikMediumFont(getContext()));
         xAxis.setAvoidFirstLastClipping(true);
         xAxis.setXOffset(10);
         xAxis.setTextColor(ContextCompat.getColor(getActivity(), R.color.testpress_black));
         xAxis.setValueFormatter(new GraphAxisLabelFormatter(labels, 1));
         xAxis.setAxisMinValue(0);
         xAxis.setAxisMaxValue(subjects.size() + 1);
-        chart.setMinimumHeight(Math.max(200, subjects.size() * 100));
-        data.setBarWidth(0.5f);
+        xAxis.setAxisLineColor(Color.parseColor("#cccccc"));
+        chart.setMinimumHeight((int)
+                UIUtils.getPixelFromDp(getContext(), Math.max(200, (subjects.size() + 2) * 50)));
+
+        data.setBarWidth(0.4f);
 
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.setDrawAxisLine(false);
@@ -299,12 +308,14 @@ public class StrengthAnalyticsGraphFragment extends Fragment {
             rightAxis.setDrawLabels(true);
             rightAxis.setDrawAxisLine(true);
             rightAxis.setDrawGridLines(true);
+            rightAxis.setTypeface(TestpressSdk.getRubikRegularFont(getContext()));
             rightAxis.setTextColor(ContextCompat.getColor(getActivity(), R.color.testpress_text_gray));
             rightAxis.setGridColor(Color.parseColor("#cccccc"));
             chart.setDrawValueAboveBar(true);
             chart.setExtraOffsets(0, 0, 50, 0);
         }
 
+        data.setValueTypeface(TestpressSdk.getRubikMediumFont(getContext()));
         chart.setData(data);
         chart.setDescription("");
         chart.setFitBars(true);

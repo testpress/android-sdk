@@ -32,8 +32,8 @@
 
                 <View
                     android:background="@drawable/testpress_round_green_background"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"/>
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"/>
 
                 <TextView
                     android:id="@+id/strength_label"
@@ -44,7 +44,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textColor="@color/testpress_black" />
 
             </LinearLayout>
@@ -59,8 +59,8 @@
 
                 <View
                     android:background="@drawable/testpress_round_red_background"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"/>
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"/>
 
                 <TextView
                     android:id="@+id/weakness_label"
@@ -71,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textColor="@color/testpress_black" />
 
             </LinearLayout>
@@ -86,10 +86,11 @@
 
                 <View
                     android:background="@drawable/testpress_round_yellow_background"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"/>
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"/>
 
                 <TextView
+                    android:id="@+id/unanswered_label"
                     android:layout_marginLeft="5dp"
                     android:layout_marginStart="5dp"
                     android:text="@string/testpress_page_unanswered"
@@ -97,7 +98,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textColor="@color/testpress_black" />
 
             </LinearLayout>
