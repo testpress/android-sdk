@@ -28,10 +28,11 @@ import in.testpress.ui.BaseGridFragment;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.UIUtils;
 
+import static in.testpress.course.TestpressCourse.COURSE_ID;
+import static in.testpress.course.TestpressCourse.PARENT_ID;
+
 public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
 
-    public static final String COURSE_ID = "courseId";
-    public static final String PARENT_ID = "parentId";
     private TestpressCourseApiClient mApiClient;
     private String courseId;
     private String parentId = "null";
@@ -57,7 +58,7 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
 
     @Override
     protected void initItems() {
-        if (parentId.equals("null")) {
+        if (parentId.equals("null") || getCourseChaptersQueryBuilder().count() == 0) {
             getLoaderManager().initLoader(0, null, this);
         } else {
             showGrid();
@@ -65,28 +66,30 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
         displayItems();
     }
 
-    private QueryBuilder<Chapter> getQueryBuilder() {
+    private QueryBuilder<Chapter> getCourseChaptersQueryBuilder() {
+        return chapterDao.queryBuilder().where(ChapterDao.Properties.CourseId.eq(courseId));
+    }
+
+    private QueryBuilder<Chapter> getParentChaptersQueryBuilder() {
         WhereCondition parentCondition;
         if (parentId.equals("null")) {
             parentCondition = ChapterDao.Properties.ParentId.isNull();
         } else {
             parentCondition = ChapterDao.Properties.ParentId.eq(parentId);
         }
-        return chapterDao.queryBuilder()
-                .where(parentCondition, ChapterDao.Properties.CourseId.eq(courseId));
+        return getCourseChaptersQueryBuilder().where(parentCondition);
     }
 
     @Override
     protected List<Chapter> getItems() {
-        return getQueryBuilder().orderAsc(ChapterDao.Properties.Order).list();
+        return getParentChaptersQueryBuilder().orderAsc(ChapterDao.Properties.Order).list();
     }
 
     @Override
     protected ChapterPager getPager() {
         if (pager == null) {
             pager = new ChapterPager(courseId, mApiClient);
-            QueryBuilder<Chapter> queryBuilder =
-                    chapterDao.queryBuilder().where(ChapterDao.Properties.CourseId.eq(courseId));
+            QueryBuilder<Chapter> queryBuilder = getCourseChaptersQueryBuilder();
             if (queryBuilder.count() > 0) {
                 Chapter latest = queryBuilder.orderDesc(ChapterDao.Properties.ModifiedDate)
                         .list().get(0);
@@ -121,7 +124,7 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
 
     @Override
     protected boolean isItemsEmpty() {
-        return getQueryBuilder().count() == 0;
+        return getParentChaptersQueryBuilder().count() == 0;
     }
 
     @Override

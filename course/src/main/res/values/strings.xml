@@ -10,13 +10,15 @@
     <string name="testpress_no_chapter">No Chapter Available</string>
     <string name="testpress_no_chapter_description">This course didn\'t contain any chapter now. Please try after some time.</string>
     <string name="testpress_error_loading_chapters">Loading chapters failed</string>
+    <string name="testpress_chapter_not_available">Chapter not available</string>
+    <string name="testpress_chapter_not_available_description">Chapter is no longer available or not published yet.</string>
 
     <string name="testpress_no_content">No Content Available</string>
     <string name="testpress_no_content_description">This chapter didn\'t contain any contents now. Please try after some time.</string>
     <string name="testpress_error_loading_contents">Loading contents failed</string>
 
-    <string name="testpress_content_not_available">Empty Content</string>
-    <string name="testpress_content_not_available_description">Will be updated soon. Please try after some time.</string>
+    <string name="testpress_content_not_available">Content not available</string>
+    <string name="testpress_content_not_available_description">Content is no longer available or not published yet.</string>
 
     <string name="testpress_leaderboard_not_available">Toppers under progress</string>
     <string name="testpress_leaderboard_not_available_description">We are yet to update the leaderboard list. Check back later!</string>

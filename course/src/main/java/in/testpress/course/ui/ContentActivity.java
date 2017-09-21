@@ -1,6 +1,7 @@
 package in.testpress.course.ui;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -58,6 +59,8 @@ import in.testpress.ui.ZoomableImageActivity;
 import in.testpress.util.FormatDate;
 import in.testpress.util.ViewUtils;
 
+import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
+import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.exam.network.TestpressExamApiClient.STATE_PAUSED;
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 
@@ -67,6 +70,7 @@ public class ContentActivity extends BaseToolBarActivity {
     public static final String TESTPRESS_CONTENT_SHARED_PREFS = "testpressContentSharedPreferences";
     public static final String FORCE_REFRESH = "forceRefreshContentList";
     public static final String GO_TO_MENU = "gotoMenu";
+    public static final String CONTENT_ID = "contentId";
     public static final String CONTENTS = "contents";
     public static final String POSITION = "position";
 
@@ -85,11 +89,13 @@ public class ContentActivity extends BaseToolBarActivity {
     private TextView emptyDescView;
     private Button retryButton;
     private TextView titleView;
+    private LinearLayout titleLayout;
     private Button previousButton;
     private Button nextButton;
     private boolean hasError = false;
     private ArrayList<Content> contents;
     private Content content;
+    private String contentId;
     private String attemptsUrl;
     private ArrayList<CourseAttempt> courseAttempts = new ArrayList<>();
     private int position;
@@ -105,6 +111,12 @@ public class ContentActivity extends BaseToolBarActivity {
         intent.putExtra(POSITION, position);
         //noinspection ConstantConditions
         intent.putExtra(ACTIONBAR_TITLE, activity.getSupportActionBar().getTitle());
+        return intent;
+    }
+
+    public static Intent createIntent(String contentId, Context context) {
+        Intent intent = new Intent(context, ContentActivity.class);
+        intent.putExtra(CONTENT_ID, contentId);
         return intent;
     }
 
@@ -126,24 +138,13 @@ public class ContentActivity extends BaseToolBarActivity {
         emptyTitleView = (TextView) findViewById(R.id.empty_title);
         emptyDescView = (TextView) findViewById(R.id.empty_description);
         titleView = (TextView) findViewById(R.id.title);
+        titleLayout = (LinearLayout) findViewById(R.id.title_layout);
         buttonLayout = (LinearLayout) findViewById(R.id.button_layout);
         previousButton = (Button) findViewById(R.id.previous);
         nextButton = (Button) findViewById(R.id.next);
         retryButton = (Button) findViewById(R.id.retry_button);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        contents = getIntent().getParcelableArrayListExtra(CONTENTS);
-        Assert.assertNotNull("CONTENTS must not be null.", contents);
-        position = getIntent().getIntExtra(POSITION, -1);
-        if (position == -1) {
-            throw new IllegalArgumentException("POSITION must not be null.");
-        }
-        content = contents.get(position);
-        String title = getIntent().getStringExtra(ACTIONBAR_TITLE);
-        Assert.assertNotNull("ACTIONBAR_TITLE must not be null.", title);
-        //noinspection ConstantConditions
-        getSupportActionBar().setTitle(title);
         TextView pageNumber = (TextView) findViewById(R.id.page_number);
-        pageNumber.setText(String.format("%d/%d", position + 1, contents.size()));
         ViewUtils.setTypeface(
                 new TextView[] {titleView, previousButton, nextButton, startButton, pageNumber},
                 TestpressSdk.getRubikMediumFont(this)
@@ -236,7 +237,26 @@ public class ContentActivity extends BaseToolBarActivity {
             }
 
         });
-        checkContentType();
+        contents = getIntent().getParcelableArrayListExtra(CONTENTS);
+        if (contents == null) {
+            contentId = getIntent().getStringExtra(CONTENT_ID);
+            if (contentId == null) {
+                Assert.assertNotNull("contentId must not be null.", contents);
+            } else {
+                updateContent();
+            }
+        } else {
+            position = getIntent().getIntExtra(POSITION, -1);
+            if (position == -1) {
+                throw new IllegalArgumentException("POSITION must not be null.");
+            }
+            content = contents.get(position);
+            String title = getIntent().getStringExtra(ACTIONBAR_TITLE);
+            Assert.assertNotNull("ACTIONBAR_TITLE must not be null.", title);
+            getSupportActionBar().setTitle(title);
+            pageNumber.setText(String.format("%d/%d", position + 1, contents.size()));
+            checkContentType();
+        }
     }
 
     private void checkContentType() {
@@ -245,7 +265,7 @@ public class ContentActivity extends BaseToolBarActivity {
             loadContentHtml();
         } else if (content.getVideo() != null) {
             Video video = content.getVideo();
-            titleView.setText(video.getTitle());
+            setContentTitle(video.getTitle());
             webView.loadDataWithBaseURL("file:///android_asset/", getHeader() +
                     "<div class='videoWrapper'>" + video.getEmbedCode() + "</div>",
                     "text/html", "UTF-8", null);
@@ -262,7 +282,8 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void loadContentHtml() {
         showLoadingProgress();
-        titleView.setText(Html.fromHtml(content.getHtmlContentTitle()));
+        //noinspection deprecation
+        setContentTitle(Html.fromHtml(content.getHtmlContentTitle()));
         new TestpressCourseApiClient(this).getHtmlContent(content.getHtmlContentUrl())
                 .enqueue(new TestpressCallback<HtmlContent>() {
                     @Override
@@ -279,7 +300,7 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void displayAttachmentContent() {
-        titleView.setText(content.getName());
+        setContentTitle(content.getName());
         TextView description = (TextView) findViewById(R.id.attachment_description);
         final Attachment attachment = content.getAttachment();
         if (attachment.getDescription() != null) {
@@ -305,7 +326,7 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void onExamContent() {
-        titleView.setText(content.getName());
+        setContentTitle(content.getName());
         courseAttempts.clear();
         if (content.getAttemptsCount() > 0) {
             attemptsUrl = content.getAttemptsUrl();
@@ -533,11 +554,19 @@ public class ContentActivity extends BaseToolBarActivity {
     private void updateContent() {
         showLoadingProgress();
         hideContents();
-        new TestpressCourseApiClient(this).getContent(content.getUrl())
+        String contentUrl;
+        if (content != null) {
+            contentUrl = content.getUrl();
+        } else {
+            contentUrl = TestpressCourseApiClient.CONTENTS_PATH + contentId;
+        }
+        new TestpressCourseApiClient(this).getContent(contentUrl)
                 .enqueue(new TestpressCallback<Content>() {
                     @Override
                     public void onSuccess(Content content) {
-                        contents.set(position, content);
+                        if (contents != null) {
+                            contents.set(position, content);
+                        }
                         ContentActivity.this.content = content;
                         checkContentType();
                     }
@@ -574,6 +603,10 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void validateAdjacentNavigationButton() {
+        if (contents == null) {
+            // Discard navigation buttons if deep linked
+            return;
+        }
         // Set previous button
         if (position == 0) {
             previousButton.setVisibility(View.INVISIBLE);
@@ -645,6 +678,12 @@ public class ContentActivity extends BaseToolBarActivity {
                     }
                 }
             });
+        }  else if (exception.getResponse().code() == 404) {
+            setEmptyText(R.string.testpress_content_not_available,
+                    R.string.testpress_content_not_available_description,
+                    R.drawable.ic_error_outline_black_18dp);
+
+            retryButton.setVisibility(View.GONE);
         } else {
             setEmptyText(R.string.testpress_error_loading_contents,
                     R.string.testpress_some_thing_went_wrong_try_again,
@@ -692,6 +731,11 @@ public class ContentActivity extends BaseToolBarActivity {
         }
     }
 
+    private void setContentTitle(CharSequence title) {
+        titleView.setText(title);
+        titleLayout.setVisibility(View.VISIBLE);
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
     public void onPause() {
@@ -709,7 +753,18 @@ public class ContentActivity extends BaseToolBarActivity {
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         if(item.getItemId() == android.R.id.home) {
-            super.onBackPressed();
+            // Set result with home button pressed true if activity is called by startActivityForResult
+            if (getCallingActivity() != null) {
+                Intent intent = new Intent();
+                intent.putExtra(ACTION_PRESSED_HOME, true);
+                if (content != null) {
+                    intent.putExtra(CHAPTER_URL, content.getChapterUrl());
+                }
+                setResult(RESULT_CANCELED, intent);
+                finish();
+            } else {
+                super.onBackPressed();
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);

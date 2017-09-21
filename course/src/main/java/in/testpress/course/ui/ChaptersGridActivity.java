@@ -5,13 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import junit.framework.Assert;
+import java.util.List;
 
 import in.testpress.course.R;
+import in.testpress.course.TestpressCourse;
+import in.testpress.course.models.greendao.Chapter;
+import in.testpress.course.models.greendao.ChapterDao;
 import in.testpress.ui.BaseToolBarActivity;
 
-import static in.testpress.course.ui.ChaptersGridFragment.COURSE_ID;
-import static in.testpress.course.ui.ChaptersGridFragment.PARENT_ID;
+import static in.testpress.course.TestpressCourse.COURSE_ID;
+import static in.testpress.course.TestpressCourse.PARENT_ID;
 
 public class ChaptersGridActivity extends BaseToolBarActivity {
 
@@ -33,12 +36,41 @@ public class ChaptersGridActivity extends BaseToolBarActivity {
         ChaptersGridFragment fragment = new ChaptersGridFragment();
         Bundle bundle = getIntent().getExtras();
         String title = bundle.getString(ACTIONBAR_TITLE);
-        Assert.assertNotNull("ACTIONBAR_TITLE must not be null.", title);
-        //noinspection ConstantConditions
-        getSupportActionBar().setTitle(title);
+        if (title != null && !title.isEmpty()) {
+            //noinspection ConstantConditions
+            getSupportActionBar().setTitle(title);
+        }
         fragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                 .commitAllowingStateLoss();
+    }
+
+    @Override
+    protected Bundle getDataToSetResult() {
+        Bundle data = super.getDataToSetResult();
+        // If chapter list have parent then pass parent's parent id & course id
+        List<Chapter> chapters = null;
+        try {
+            //noinspection RestrictedApi
+            ChaptersGridFragment fragment =
+                    (ChaptersGridFragment) getSupportFragmentManager().getFragments().get(0);
+
+            chapters = fragment.getItems();
+        } catch (Exception e) {
+        }
+        if (chapters != null && !chapters.isEmpty()) {
+            Integer parentId = chapters.get(0).getParentId();
+            if (parentId != null) {
+                ChapterDao chapterDao = TestpressCourse.getChapterDao(this);
+                Chapter parentChapter = chapterDao.queryBuilder()
+                        .where(ChapterDao.Properties.Id.eq(parentId))
+                        .list().get(0);
+
+                data.putString(COURSE_ID, parentChapter.getCourseId().toString());
+                data.putString(PARENT_ID, String.valueOf(parentChapter.getParentId()));
+            }
+        }
+        return data;
     }
 
 }

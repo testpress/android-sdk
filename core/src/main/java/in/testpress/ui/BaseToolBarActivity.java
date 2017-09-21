@@ -1,6 +1,7 @@
 package in.testpress.ui;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -40,7 +41,7 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
             if (getCallingActivity() == null) {
                 onBackPressed();
             } else {
-                setResult(RESULT_CANCELED, new Intent().putExtra(ACTION_PRESSED_HOME, true));
+                setResult(RESULT_CANCELED, new Intent().putExtras(getDataToSetResult()));
                 super.onBackPressed();
             }
             return true;
@@ -59,6 +60,12 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
             setResult(RESULT_CANCELED, new Intent().putExtra(ACTION_PRESSED_HOME, false));
         }
         super.onBackPressed();
+    }
+
+    protected Bundle getDataToSetResult() {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ACTION_PRESSED_HOME, true);
+        return bundle;
     }
 
 }

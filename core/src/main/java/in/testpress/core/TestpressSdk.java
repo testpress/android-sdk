@@ -22,6 +22,10 @@ public final class TestpressSdk {
     private static SharedPreferences pref;
     private static SharedPreferences.Editor editor;
 
+    public static final int COURSE_CHAPTER_REQUEST_CODE = 1002;
+    public static final int COURSE_CONTENT_LIST_REQUEST_CODE = 1003;
+    public static final int COURSE_CONTENT_DETAIL_REQUEST_CODE = 1004;
+
     public static final String ACTION_PRESSED_HOME = "pressedHomeButton";
 
     private static final String KEY_TESTPRESS_AUTH_TOKEN = "testpressAuthToken";

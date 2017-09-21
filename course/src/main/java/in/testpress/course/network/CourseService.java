@@ -35,6 +35,9 @@ public interface CourseService {
             @QueryMap Map<String, Object> queryParams,
             @Header("If-Modified-Since") String latestModifiedDate);
 
+    @GET("{chapter_url}")
+    RetrofitCall<Chapter> getChapter(@Path(value = "chapter_url", encoded = true) String chapterUrl);
+
     @GET("{contents_url}")
     RetrofitCall<TestpressApiResponse<Content>> getContents(
             @Path(value = "contents_url", encoded = true) String contentsUrlFrag,
