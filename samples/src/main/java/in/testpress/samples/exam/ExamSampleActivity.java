@@ -16,6 +16,7 @@ import in.testpress.exam.TestpressExam;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
+import in.testpress.samples.util.ViewUtils;
 
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
@@ -111,26 +112,15 @@ public class ExamSampleActivity extends BaseToolBarActivity {
         }
     }
 
-    @SuppressLint("InflateParams")
     void getExamSlug(final int clickedButtonId) {
-        final View dialog = getLayoutInflater().inflate(R.layout.edit_text_dialog_box, null);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this,
-                R.style.TestpressAppCompatAlertDialogStyle);
-        builder.setTitle("Enter exam slug");
-        builder.setView(dialog);
-        final EditText editText = (EditText) dialog.findViewById(R.id.edit_text);
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                examSlug = editText.getText().toString();
-                if (examSlug.trim().isEmpty()) {
-                    return;
-                }
-                showSDK(clickedButtonId);
-                dialog.dismiss();
-            }
+        ViewUtils.showInputDialogBox(this, "Enter Exam Slug",
+                new ViewUtils.OnInputCompletedListener() {
+                    @Override
+                    public void onInputComplete(String inputText) {
+                        examSlug = inputText;
+                        showSDK(clickedButtonId);
+                    }
         });
-        builder.setNegativeButton("Cancel", null);
-        builder.create().show();
     }
 
 }

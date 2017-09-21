@@ -1,5 +1,6 @@
 package in.testpress.course;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 
@@ -65,7 +66,7 @@ public class TestpressCourseTest {
     public void testShowChapters_withNullValues() throws Exception {
         TestpressSession testpressSession = mock(TestpressSession.class);
         try {
-            TestpressCourse.showChapters(null, "", null, testpressSession);
+            TestpressCourse.showChapters(null, "", 0, testpressSession);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("Context must not be null.", e.getMessage());
@@ -91,6 +92,36 @@ public class TestpressCourseTest {
         }
         try {
             TestpressCourse.showChapters(context, "DummyTitle", 0, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testShowChaptersOfParent_withNullValues() throws Exception {
+        TestpressSession testpressSession = mock(TestpressSession.class);
+        try {
+            TestpressCourse.showChapters(null, "", "", testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Activity must not be null.", e.getMessage());
+        }
+        Activity activity = mock(Activity.class);
+        try {
+            TestpressCourse.showChapters(activity, null, "", testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("courseId must not be null or empty.", e.getMessage());
+        }
+        try {
+            TestpressCourse.showChapters(activity, "", "", testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("courseId must not be null or empty.", e.getMessage());
+        }
+        try {
+            TestpressCourse.showChapters(activity, "1", "1", null);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("TestpressSession must not be null.", e.getMessage());
@@ -133,6 +164,66 @@ public class TestpressCourseTest {
         }
         try {
             TestpressCourse.showContents(context, "DummyTitle", "DummyUrl", null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testShowContentsOfChapter_withNullValues() throws Exception {
+        TestpressSession testpressSession = mock(TestpressSession.class);
+        try {
+            TestpressCourse.showContents(null, "", testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Activity must not be null.", e.getMessage());
+        }
+        Activity activity = mock(Activity.class);
+        try {
+            TestpressCourse.showContents(activity, null, testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("chapterUrl must not be null or empty.", e.getMessage());
+        }
+        try {
+            TestpressCourse.showContents(activity, "", testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("chapterUrl must not be null or empty.", e.getMessage());
+        }
+        try {
+            TestpressCourse.showContents(activity, "DummyUrl", null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testShowContentDetail_withNullValues() throws Exception {
+        TestpressSession testpressSession = mock(TestpressSession.class);
+        try {
+            TestpressCourse.showContentDetail(null, "", testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Activity must not be null.", e.getMessage());
+        }
+        Activity activity = mock(Activity.class);
+        try {
+            TestpressCourse.showContentDetail(activity, null, testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("contentId must not be null or empty.", e.getMessage());
+        }
+        try {
+            TestpressCourse.showContentDetail(activity, "", testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("contentId must not be null or empty.", e.getMessage());
+        }
+        try {
+            TestpressCourse.showContentDetail(activity, "1", null);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("TestpressSession must not be null.", e.getMessage());

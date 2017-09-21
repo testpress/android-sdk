@@ -38,25 +38,34 @@
                     android:paddingLeft="10dp"
                     tools:ignore="ScrollViewSize">
 
-                    <TextView
-                        android:id="@+id/title"
+                    <LinearLayout
+                        android:visibility="gone"
+                        android:id="@+id/title_layout"
+                        android:orientation="vertical"
                         android:layout_width="match_parent"
-                        android:text="Lorem ipsum dolor sit amet, consectetur"
-                        android:gravity="center"
-                        android:lineSpacingExtra="6dp"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/testpress_black"
-                        android:layout_marginBottom="25dp"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content">
 
-                    <View
-                        android:id="@+id/title_separator"
-                        android:layout_width="100dp"
-                        android:layout_height="1dp"
-                        android:layout_gravity="center"
-                        android:layout_marginBottom="5dp"
-                        android:background="#c0c0c0"/>
+                        <TextView
+                            android:id="@+id/title"
+                            android:layout_width="match_parent"
+                            android:text="Lorem ipsum dolor sit amet, consectetur"
+                            android:gravity="center"
+                            android:lineSpacingExtra="6dp"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/testpress_black"
+                            android:layout_marginBottom="25dp"
+                            android:layout_height="wrap_content"/>
+
+                        <View
+                            android:id="@+id/title_separator"
+                            android:layout_width="100dp"
+                            android:layout_height="1dp"
+                            android:layout_gravity="center"
+                            android:layout_marginBottom="5dp"
+                            android:background="#c0c0c0"/>
+
+                    </LinearLayout>
 
                     <LinearLayout
                         android:visibility="gone"

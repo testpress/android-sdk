@@ -1,5 +1,6 @@
 package in.testpress.course;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.IdRes;
@@ -15,6 +16,7 @@ import in.testpress.course.models.greendao.CourseDao;
 import in.testpress.course.models.greendao.DaoMaster;
 import in.testpress.course.models.greendao.DaoSession;
 import in.testpress.course.ui.ChaptersGridActivity;
+import in.testpress.course.ui.ContentActivity;
 import in.testpress.course.ui.ContentsListActivity;
 import in.testpress.course.ui.CourseListActivity;
 import in.testpress.course.ui.CourseListFragment;
@@ -23,7 +25,15 @@ import in.testpress.course.ui.LeaderboardFragment;
 import in.testpress.util.Assert;
 import in.testpress.util.ImageUtils;
 
+import static in.testpress.core.TestpressSdk.COURSE_CHAPTER_REQUEST_CODE;
+import static in.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE;
+import static in.testpress.core.TestpressSdk.COURSE_CONTENT_LIST_REQUEST_CODE;
+
 public class TestpressCourse {
+
+    public static final String COURSE_ID = "courseId";
+    public static final String PARENT_ID = "parentId";
+    public static final String CHAPTER_URL = "chapterUrl";
 
     private static DaoSession daoSession;
     private static Database database;
@@ -117,6 +127,29 @@ public class TestpressCourse {
     }
 
     /**
+     * Show sub chapters of a parent chapter as new Activity.
+     *
+     * @param activity activity from which chapters need to show.
+     * @param courseId Id of the Course which chapters need to be display.
+     * @param parentId Id of the parent chapter.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    public static void showChapters(@NonNull Activity activity,
+                                    @NonNull String courseId,
+                                    @NonNull String parentId,
+                                    @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Activity must not be null.", activity);
+        Assert.assertNotNullAndNotEmpty("courseId must not be null or empty.", courseId);
+
+        init(activity.getApplicationContext(), testpressSession);
+        activity.startActivityForResult(
+                ChaptersGridActivity.createIntent(null, courseId, parentId, activity),
+                COURSE_CHAPTER_REQUEST_CODE
+        );
+    }
+
+    /**
      * Load contents from given url & show in new Activity.
      *
      * @param context Context to start the new activity.
@@ -135,6 +168,48 @@ public class TestpressCourse {
 
         init(context.getApplicationContext(), testpressSession);
         context.startActivity(ContentsListActivity.createIntent(title, contentsUrl, context));
+    }
+
+    /**
+     * Display contents list of the chapter in new Activity.
+     *
+     * @param activity activity from which contents list needs to show.
+     * @param chapterUrl Url of the chapter which contents needs to show.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    public static void showContents(@NonNull Activity activity,
+                                    @NonNull String chapterUrl,
+                                    @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Activity must not be null.", activity);
+        Assert.assertNotNullAndNotEmpty("chapterUrl must not be null or empty.", chapterUrl);
+
+        init(activity.getApplicationContext(), testpressSession);
+        activity.startActivityForResult(
+                ContentsListActivity.createIntent(chapterUrl, activity),
+                COURSE_CONTENT_LIST_REQUEST_CODE
+        );
+    }
+
+    /**
+     * Load content from given content id & show in new Activity.
+     *
+     * @param activity activity from which content detail need to show.
+     * @param contentId id of the content.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    public static void showContentDetail(@NonNull Activity activity,
+                                         @NonNull String contentId,
+                                         @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Activity must not be null.", activity);
+        Assert.assertNotNullAndNotEmpty("contentId must not be null or empty.", contentId);
+
+        init(activity.getApplicationContext(), testpressSession);
+        activity.startActivityForResult(
+                ContentActivity.createIntent(contentId, activity),
+                COURSE_CONTENT_DETAIL_REQUEST_CODE
+        );
     }
 
     /**
