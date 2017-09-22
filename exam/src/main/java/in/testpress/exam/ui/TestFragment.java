@@ -332,6 +332,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onLoadFinished(final Loader<List<AttemptItem>> loader, final List<AttemptItem> items) {
+        if (getActivity() == null) {
+            return;
+        }
         if (progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
@@ -483,6 +486,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     private  void returnToHistory() {
+        if (getActivity() == null) {
+            return;
+        }
         getActivity().setResult(Activity.RESULT_OK);
         getActivity().finish();
     }

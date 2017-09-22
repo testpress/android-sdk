@@ -193,7 +193,7 @@ public class ReviewQuestionsFragment extends Fragment
             protected void onLoadFinished() {
                 super.onLoadFinished();
                 progressBar.setVisibility(View.GONE);
-                if (commentsAdapter == null) {
+                if (commentsAdapter == null && getActivity() != null) {
                     displayComments();
                 }
             }
@@ -418,6 +418,9 @@ public class ReviewQuestionsFragment extends Fragment
 
     @Override
     public void onLoadFinished(Loader<List<Comment>> loader, List<Comment> comments) {
+        if (getActivity() == null) {
+            return;
+        }
         switch (loader.getId()) {
             case PREVIOUS_COMMENTS_LOADER_ID:
                 onPreviousCommentsLoadFinished(loader, comments);
@@ -451,7 +454,7 @@ public class ReviewQuestionsFragment extends Fragment
             return;
         }
 
-        if (!previousComments.isEmpty()) {
+        if (previousComments != null && !previousComments.isEmpty()) {
             // Add the comments to the hash map
             addComments(previousComments);
             // Append the comments to the comments in adapter
