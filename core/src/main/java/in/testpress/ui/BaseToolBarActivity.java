@@ -59,7 +59,11 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
         if (getCallingActivity() != null) {
             setResult(RESULT_CANCELED, new Intent().putExtra(ACTION_PRESSED_HOME, false));
         }
-        super.onBackPressed();
+        try {
+            super.onBackPressed();
+        } catch (IllegalStateException e) {
+            supportFinishAfterTransition();
+        }
     }
 
     protected Bundle getDataToSetResult() {

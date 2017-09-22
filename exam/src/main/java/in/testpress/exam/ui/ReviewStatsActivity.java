@@ -51,8 +51,9 @@ public class ReviewStatsActivity extends AppCompatActivity {
                 TestpressSdk.getTestpressSession(this).getInstituteSettings();
 
         Fragment fragment;
+        CourseAttempt courseAttempt = getIntent().getParcelableExtra(PARAM_COURSE_ATTEMPT);
         if (parentIsTestEngine && instituteSettings.isCoursesFrontend() &&
-                instituteSettings.isCoursesGamificationEnabled()) {
+                instituteSettings.isCoursesGamificationEnabled() && courseAttempt != null) {
 
             fragment = new TrophiesAchievedFragment();
         } else {
