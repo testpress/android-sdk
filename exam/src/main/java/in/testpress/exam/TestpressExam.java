@@ -176,7 +176,7 @@ public class TestpressExam {
     /**
      * Display the attempt report.
      *
-     * @param activity activity from which exam need to start.
+     * @param activity activity to which result of review activity need to pass.
      * @param exam Exam object of the attempt.
      * @param attempt Attempt object which report need to be shown.
      * @param testpressSession TestpressSession got from the core module.
@@ -197,7 +197,7 @@ public class TestpressExam {
     /**
      * Show the exam based on its attempt(s) state.
      *
-     * @param activity activity from which exam need to show.
+     * @param activity activity to which result of attempts activity need to pass.
      * @param examSlug Slug of the exam which need to be show.
      * @param testpressSession TestpressSession got from the core module.
      */
@@ -218,7 +218,7 @@ public class TestpressExam {
     /**
      * Display the subject wise analytics.
      *
-     * @param activity activity from which exam need to start.
+     * @param activity activity to which result of analytics activity need to pass.
      * @param analyticsUrlFrag Analytics url fragment.
      * @param testpressSession TestpressSession got from the core module.
      */
@@ -256,7 +256,7 @@ public class TestpressExam {
     /**
      * Use to resume a particular attempt in a course.
      *
-     * @param activity activity from which exam need to start.
+     * @param activity activity to which result of test activity need to pass.
      * @param courseContent Course content which has the attempt's exam.
      * @param courseAttempt courseAttempt which need to be resume.
      * @param discardExamDetails True to discard the start exam screen which contains exam details,
@@ -277,7 +277,7 @@ public class TestpressExam {
     /**
      * Use to end a particular attempt in a course.
      *
-     * @param activity activity from which exam need to start.
+     * @param activity activity to which result of test activity need to pass.
      * @param courseContent Course content which has the attempt's exam.
      * @param courseAttempt courseAttempt which need to be resume.
      * @param testpressSession TestpressSession got from the core module.

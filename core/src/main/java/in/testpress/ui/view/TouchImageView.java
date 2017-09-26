@@ -400,7 +400,7 @@ public class TouchImageView extends AppCompatImageView {
     /**
      * Set zoom parameters equal to another TouchImageView. Including scale, position,
      * and ScaleType.
-     * @param TouchImageView
+     * @param img TouchImageView
      */
     public void setZoom(TouchImageView img) {
         PointF center = img.getScrollPosition();

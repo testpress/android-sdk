@@ -156,7 +156,7 @@
     <string name="testpress_no_questions_message">No questions added to this exam till now, Please check back later or contact administrator</string>
 
     <string name="comments_title">Comments</string>
-    <string name="write_a_comment">Write a comment...</string>
+    <string name="write_a_comment">Write a comment&#8230;</string>
     <string name="load_previous_comments">Load previous comments</string>
     <string name="load_new_comments">Load new comments</string>
     <string name="load_comments">Load comments</string>
