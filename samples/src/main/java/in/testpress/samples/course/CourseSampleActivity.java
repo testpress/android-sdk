@@ -127,8 +127,6 @@ public class CourseSampleActivity extends BaseToolBarActivity {
             case COURSE_CHAPTER_REQUEST_CODE:
                 if (resultCode == RESULT_CANCELED) {
                     if (data.getBooleanExtra(TestpressSdk.ACTION_PRESSED_HOME, false)) {
-                        String courseId;
-                        String parentId;
                         switch (requestCode) {
                             case COURSE_CONTENT_DETAIL_REQUEST_CODE:
                                 String chapterUrl = data.getStringExtra(CHAPTER_URL);
@@ -138,18 +136,9 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                                 }
                                 break;
                             case COURSE_CONTENT_LIST_REQUEST_CODE:
-                                courseId = data.getStringExtra(COURSE_ID);
-                                parentId = data.getStringExtra(PARENT_ID);
-                                ViewUtils.toast(this,
-                                        "User pressed home button " + courseId + " - " + parentId);
-
-                                if (courseId != null) {
-                                    TestpressCourse.showChapters(this, courseId, parentId, session);
-                                }
-                                break;
                             case COURSE_CHAPTER_REQUEST_CODE:
-                                courseId = data.getStringExtra(COURSE_ID);
-                                parentId = data.getStringExtra(PARENT_ID);
+                                String courseId = data.getStringExtra(COURSE_ID);
+                                String parentId = data.getStringExtra(PARENT_ID);
                                 ViewUtils.toast(this,
                                         "User pressed home button " + courseId + " - " + parentId);
 

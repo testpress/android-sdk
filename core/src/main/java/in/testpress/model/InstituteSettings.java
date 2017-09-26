@@ -9,7 +9,7 @@ public class InstituteSettings {
     private Boolean coursesEnableGamification;
 
     public InstituteSettings(String baseUrl) {
-        setBaseUrl(baseUrl);
+        this(baseUrl, false, false);
     }
 
     public InstituteSettings(String baseUrl, boolean showCoursesFrontend, boolean enableGamification) {

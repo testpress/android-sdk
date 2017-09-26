@@ -64,7 +64,8 @@ public class Exam implements Parcelable {
         maxRetakes          = parcel.readInt();
         attemptsUrl         = parcel.readString();
         deviceAccessControl = parcel.readString();
-        commentsCount       = parcel.readInt();
+        String commentsCount = parcel.readString();
+        this.commentsCount = commentsCount.equals("null") ? null : Integer.parseInt(commentsCount);
         parcel.readTypedList(languages, Language.CREATOR);
         selectedLanguage    = parcel.readString();
     }
@@ -109,7 +110,7 @@ public class Exam implements Parcelable {
         parcel.writeInt(maxRetakes);
         parcel.writeString(attemptsUrl);
         parcel.writeString(deviceAccessControl);
-        parcel.writeInt(commentsCount);
+        parcel.writeString(String.valueOf(commentsCount));
         parcel.writeTypedList(languages);
         parcel.writeString(selectedLanguage);
     }

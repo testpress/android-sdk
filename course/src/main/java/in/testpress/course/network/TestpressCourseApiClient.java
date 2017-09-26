@@ -37,53 +37,53 @@ public class TestpressCourseApiClient extends TestpressApiClient {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
     }
     
-    public CourseService getExamService() {
+    public CourseService getCourseService() {
         return retrofit.create(CourseService.class);
     }
 
     public RetrofitCall<TestpressApiResponse<Course>> getCourses(Map<String, Object> queryParams,
                                                                  String latestModifiedDate) {
-        return getExamService().getCourses(queryParams, latestModifiedDate);
+        return getCourseService().getCourses(queryParams, latestModifiedDate);
     }
 
     public RetrofitCall<TestpressApiResponse<Chapter>> getChapters(String courseId,
                                                                    Map<String, Object> queryParams,
                                                                    String latestModifiedDate) {
-        return getExamService().getChapters(courseId, queryParams, latestModifiedDate);
+        return getCourseService().getChapters(courseId, queryParams, latestModifiedDate);
     }
 
     public RetrofitCall<Chapter> getChapter(String chapterUrl) {
-        return getExamService().getChapter(chapterUrl);
+        return getCourseService().getChapter(chapterUrl);
     }
 
     public RetrofitCall<TestpressApiResponse<Content>> getContents(String chaptersUrlFrag,
                                                                    Map<String, Object> queryParams) {
-        return getExamService().getContents(chaptersUrlFrag, queryParams);
+        return getCourseService().getContents(chaptersUrlFrag, queryParams);
     }
 
     public RetrofitCall<HtmlContent> getHtmlContent(String htmlContentUrlFrag) {
-        return getExamService().getHtmlContent(htmlContentUrlFrag);
+        return getCourseService().getHtmlContent(htmlContentUrlFrag);
     }
 
     public RetrofitCall<Content> getContent(String contentUrl) {
-        return getExamService().getContent(contentUrl);
+        return getCourseService().getContent(contentUrl);
     }
 
     public RetrofitCall<TestpressApiResponse<Reputation>> getLeaderboard(
             Map<String, Object> queryParams) {
 
-        return getExamService().getLeaderboard(queryParams);
+        return getCourseService().getLeaderboard(queryParams);
     }
 
     public RetrofitCall<TestpressApiResponse<Reputation>> getTargets() {
-        return getExamService().getTargets();
+        return getCourseService().getTargets();
     }
 
     public RetrofitCall<TestpressApiResponse<Reputation>> getThreads() {
-        return getExamService().getThreads();
+        return getCourseService().getThreads();
     }
 
     public RetrofitCall<Reputation> getMyRank() {
-        return getExamService().getMyRank();
+        return getCourseService().getMyRank();
     }
 }

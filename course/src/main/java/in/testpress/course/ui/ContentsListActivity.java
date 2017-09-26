@@ -42,10 +42,10 @@ public class ContentsListActivity extends BaseToolBarActivity {
     private ProgressBar progressBar;
     private Button retryButton;
 
-    public static Intent createIntent(String title, String chaptersUrlFrag, Context context) {
+    public static Intent createIntent(String title, String contentsUrlFrag, Context context) {
         Intent intent = new Intent(context, ContentsListActivity.class);
         intent.putExtra(ACTIONBAR_TITLE, title);
-        intent.putExtra(CONTENTS_URL_FRAG, chaptersUrlFrag);
+        intent.putExtra(CONTENTS_URL_FRAG, contentsUrlFrag);
         return intent;
     }
 

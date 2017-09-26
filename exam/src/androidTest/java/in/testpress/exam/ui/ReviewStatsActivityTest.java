@@ -23,6 +23,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.util.ElapsedTimeIdlingResource;
+import in.testpress.model.InstituteSettings;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -40,8 +41,9 @@ public class ReviewStatsActivityTest extends ActivityTestRule<ReviewStatsActivit
                 @Override
                 protected void beforeActivityLaunched() {
                     super.beforeActivityLaunched();
+                    InstituteSettings instituteSettings = new InstituteSettings("http://demo.testpress.in");
                     TestpressSdk.setTestpressSession(InstrumentationRegistry.getTargetContext(),
-                            new TestpressSession("http://demo.testpress.in", "eyJhbGciOiJIUzI1Ni" +
+                            new TestpressSession(instituteSettings, "eyJhbGciOiJIUzI1Ni" +
                                     "IsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6MTg4LCJ1c2VyX2lkIjoxODgs" +
                                     "ImVtYWlsIjoiZHVtbXlAbGFja21haWwucnUiLCJleHAiOjE0NzcxNDA5MzR" +
                                     "9.C1Mt3r5pxKprSKOvD-1W9IU_WgZjRHCLEM-m0jcFJY4"));
