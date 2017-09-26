@@ -28,7 +28,7 @@ ext {
     compileSdkVersion = 24
     minSdkVersion = 15
     targetSdkVersion = 24
-    buildToolsVersion = '25.0.2'
+    buildToolsVersion = '26.0.1'
     supportLib = '25.3.1'
 
     junit = 'junit:junit:4.12'
