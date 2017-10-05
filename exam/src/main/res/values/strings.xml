@@ -117,6 +117,7 @@
     <string name="testpress_accuracy">Accuracy</string>
     <string name="testpress_correct_answer">Correct Answer:</string>
     <string name="testpress_explanation">Explanation:</string>
+    <string name="testpress_subject">Subject:</string>
     <string name="testpress_review_label">Review</string>
     <string name="testpress_resume_label">Resume</string>
     <string name="testpress_your_percentile_is">Your percentile is</string>
