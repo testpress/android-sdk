@@ -217,19 +217,19 @@ public class ReviewQuestionsFragment extends Fragment
             for (ReviewQuestionTranslation translation : translations) {
                 if (translation.getLanguage().equals(selectedLanguage.getCode())) {
                     htmlContent = getHtml(translation.getDirection(), translation.getQuestionHtml(),
-                            translation.getAnswers(), translation.getExplanation());
+                            translation.getAnswers(), translation.getExplanation(), reviewQuestion.getSubject());
                 }
             }
         }
         if (htmlContent == null) {
             htmlContent = getHtml(reviewQuestion.getDirection(), reviewQuestion.getQuestionHtml(),
-                    reviewQuestion.getAnswers(), reviewQuestion.getExplanationHtml());
+                    reviewQuestion.getAnswers(), reviewQuestion.getExplanationHtml(), reviewQuestion.getSubject());
         }
         return htmlContent;
     }
 
     private String getHtml(String directionHtml, String questionHtml,
-                           Object answers, String explanationHtml) {
+                           Object answers, String explanationHtml, String subject) {
 
         String html = "<div style='padding-left: 2px; padding-right: 4px;'>";
 
@@ -297,6 +297,14 @@ public class ReviewQuestionsFragment extends Fragment
             html += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation));
             html += "<div class='review-explanation'>" +
                         explanationHtml +
+                    "</div>";
+        }
+
+        // Add subject
+        if (subject != null && !subject.isEmpty() && !subject.equals("Uncategorized")) {
+            html += "<div>" +
+                        WebViewUtils.getHeadingTags(getString(R.string.testpress_subject)) +
+                        "<div class='subject'>" + subject + "</div>" +
                     "</div>";
         }
         return html + "</div>";
