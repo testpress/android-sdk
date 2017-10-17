@@ -287,7 +287,7 @@ public class ReviewQuestionsFragment extends Fragment
         }
 
         // Add correct answer
-        html += "<div style='display:block;'>" +
+        html += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
                     WebViewUtils.getHeadingTags(getString(R.string.testpress_correct_answer)) +
                     correctAnswerHtml +
                 "</div>";

@@ -22,6 +22,16 @@ html {
     src: url('PT_Serif-Web-Regular.ttf');
 }
 
+body {
+    margin: 0px;
+}
+
+hr {
+   margin: 0px;
+   border: 0px;
+   border-bottom: 1px solid #e6e6e6;
+}
+
 /* Copy & Lists */
 p {
   line-height: 1.7rem;
@@ -112,7 +122,9 @@ table th {
     border-radius: 50%;
     *zoom: 1;
     margin-right: 10px;
-    display: inline-block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     vertical-align: middle;
     text-align: center;
     font-family: 'Rubik-Medium', sans-serif;
@@ -129,7 +141,9 @@ table th {
     color: #aaa;
     background: #fff;
     margin-right: 10px;
-    display: inline-block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     vertical-align: middle;
     text-align: center;
     font-family: 'Rubik-Medium', sans-serif;
@@ -137,21 +151,19 @@ table th {
 }
 
 .option-item {
-    margin-top: 5px;
-    margin-bottom: 5px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-right: 10px;
-    padding-left: 10px;
+    padding-top: 21px;
+    padding-bottom: 17px;
+    padding-right: 20px;
+    padding-left: 20px;
     display: flex;
     flex-flow: row;
-    color: #444;
+    color: #666666;
     font-family: 'PT-Serif-Regular', serif;
 }
 
 .review-option-item {
     padding-top: 10px;
-    padding-bottom: 10px;
+    padding-bottom: 20px;
     padding-right: 10px;
     padding-left: 10px;
     display: flex;
@@ -162,9 +174,10 @@ table th {
 
 .review-heading {
     text-transform: uppercase;
-    display: inline-block;
+    display: inline;
     color: #333;
-    margin-top: 12px;
+    margin-top: auto;
+    margin-bottom: auto;
     margin-left: 10px;
     margin-right: 5px;
     font-size: 1rem;
@@ -188,6 +201,24 @@ table th {
     font-family: 'Rubik-Medium', sans-serif;
 }
 
+.question-index {
+    display: inline-block;
+    min-width: 10px;
+    margin-top: 15px;
+    margin-left: 10px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-right: 13px;
+    padding-left: 13px;
+    border: 1px solid #00ccaa;
+    border-radius: 15px;
+    font-size: 14dp;
+    color: #ffffff;
+    background: #00ccaa;
+    text-align: center;
+    font-family: 'Rubik-Medium', sans-serif;
+}
+
 .question {
     text-align: justify;
     font-family: 'Rubik-Medium', sans-serif;
@@ -205,73 +236,29 @@ table th {
     margin-right: 10px;
 }
 
-.radio-button-unchecked {
-    display: inline-block;
-    height: 16px;
-    width: 16px;
-    border:1px solid #ccc;
-    box-shadow: inset 0px 0px 1px #000;
-    border-radius: 50%;
-    background: #fff;
-    flex: 0 0 16px;
-    float: left;
-    margin-right: 10px;
-    margin-top: 4px;
-}
+.mark-button {
+     color: #ffa31a;
+     border: 1px solid #ffa319;
+     border-radius: 100px;
+     height: 40px;
+     width: 100%;
+     font-size: 16px;
+     font-family: "Rubik-Medium";
+     background: #ffffff;
+     outline: 0;
+ }
 
-.radio-button-checked:after {
-    display: inline-block;
-    line-height: 15px;
-    height: 16px;
-    width: 16px;
-    box-shadow: initial;
-    background: #3399ff;
-    border: 1px solid #3399ff;
-    border-radius: 50%;
-    content: '\2022';
-    text-shadow: 0 0 1px #555;
-    text-align: center;
-    font-size: 1.25rem;
-    color: #fff;
-    flex: 0 0 16px;
-    float: left;
-    margin-right:10px;
-    margin-top: 4px;
-}
-
-.checkbox-unchecked {
-    display: inline-block;
-    height: 13px;
-    width: 13px;
-    border-style: solid;
-    border-width: 2px;
-    border-color: #999;
-    border-radius: 2px;
-    background: #fff;
-    flex: 0 0 13px;
-    float: left;
-    margin-right:10px;
-    margin-top: 4px;
-}
-
-.checkbox-checked:after {
-    display: inline-block;
-    line-height: 13px;
-    height: 13px;
-    width: 13px;
-    padding: 2px;
-    background: #3399ff;
-    border-color: #3399ff;
-    border-radius: 2px;
-    content:'\2714';
-    font-size:10px;
-    text-align: center;
-    color: #fff;
-    flex: 0 0 13px;
-    float: left;
-    margin-right:10px;
-    margin-top: 4px;
-}
+ .unmark-button {
+     color: #ffffff;
+     border: 0px;
+     border-radius: 100px;
+     height: 40px;
+     width: 100%;
+     font-size: 16px;
+     font-family: "Rubik-Medium";
+     background: #ffa319;
+     outline: 0;
+ }
 
 .option-item-selected {
     background-color: rgba(23, 147, 230, 0.1);
@@ -281,4 +268,31 @@ table th {
     color: #666;
     font-family: 'PT-Serif-Regular', serif;
     display: inline-block;
+}
+
+.wrapper {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  /* position relative only needed for positioning context for workaround */
+  position: relative;
+}
+
+.wrapper span {
+  text-align: center left;
+  vertical-align: middle;
+}
+
+.no-flexbox.flexboxlegacy span {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+}
+
+span {
+    outline: 0;
 }

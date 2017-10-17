@@ -96,6 +96,7 @@ public class WebViewUtils {
     public String getHeader() {
         return "<!DOCTYPE html><meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no' />" +
                 "<link rel='stylesheet' type='text/css' href='testpress_questions_typebase.css' />" +
+                "<link rel='stylesheet' type='text/css' href='icomoon/style.css' />" +
                 "<style>img{display: inline; height: auto !important; width: auto !important; max-width: 100%;}</style>" +
                 "<script type='text/x-mathjax-config'>" +
                 "    MathJax.Hub.Config({" +
@@ -125,13 +126,14 @@ public class WebViewUtils {
 
     public static String getCorrectAnswerIndexWithTags(int index) {
         return "\n" +
-                "<div class='alphabetical-option-ring-general'>" +
+                "<div class='alphabetical-option-ring-general'" +
+                "   style='-webkit-box-ordinal-group: 1; box-ordinal-group: 1;'>" +
                         ((char) (65 + index)) +
                 "</div>";
     }
 
     public static String getOptionWithTags(String optionText, int index, int colorRes, Context context) {
-        String html = "\n<div class='review-option-item'>";
+        String html = "\n<div class='review-option-item wrapper'>";
         if (colorRes == android.R.color.white) {
             html += "<div class='alphabetical-option-ring-general'>";
         } else {
@@ -139,26 +141,28 @@ public class WebViewUtils {
                     getColor(context, colorRes) + ";'>";
         }
         return html + ((char) (65 + index)) + "</div>" +
-                "    <div>" + optionText + "</div>" +
+                "    <span>" + optionText + "</span>" +
                 "</div>";
     }
 
     public static String getRadioButtonOptionWithTags(String optionText, int id) {
         return "" +
-                "<tr>" +
-                "   <td id='" + id + "' onclick='onRadioOptionClick(this)' class='option-item table-without-border'>" +
-                "       <div name='" + id + "' class='radio-button-unchecked'></div>" +
-                "       <div>" + optionText + "</div>" +
+                "<tr style='border-bottom:1px solid #e6e6e6;'>" +
+                "   <td id='" + id + "' onclick='onRadioOptionClick(this)'" +
+                "       class='option-item table-without-border wrapper'>" +
+                "           <div name='" + id + "' class='icon-radio-unchecked'></div>" +
+                "           <span style='margin-left:10px; margin-top:-2px;'>" + optionText + "</span>" +
                 "   </td>" +
                 "</tr>";
     }
 
     public static String getCheckBoxOptionWithTags(String optionText, int id) {
         return "" +
-                "<tr>" +
-                "   <td id='" + id + "' onclick='onCheckBoxOptionClick(this)' class='option-item table-without-border'>" +
-                "       <div name='" + id + "' class='checkbox-unchecked'></div>" +
-                "       <div>" + optionText + "</div>" +
+                "<tr style='border-bottom:1px solid #e6e6e6;'>" +
+                "   <td id='" + id + "' onclick='onCheckBoxOptionClick(this)'" +
+                "       class='option-item table-without-border wrapper'>" +
+                "           <div name='" + id + "' class='icon-checkbox-unchecked'></div>" +
+                "           <span style='margin-left:10px; margin-top:-2px;'>" + optionText + "</span>" +
                 "   </td>" +
                 "</tr>";
     }
