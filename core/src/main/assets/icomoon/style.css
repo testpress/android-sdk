@@ -1,0 +1,42 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('fonts/icomoon.ttf?8i9jy1') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-checkbox-checked:before {
+  content: "\ea52";
+  font-size: 1.25rem;
+  color: #3399ff;
+}
+.icon-checkbox-unchecked:before {
+  content: "\ea53";
+  font-size: 1.25rem;
+  color: #999;
+}
+.icon-radio-checked2:before {
+  content: "\ea55";
+  font-size: 1.25rem;
+  color: #3399ff;
+}
+.icon-radio-unchecked:before {
+  content: "\ea56";
+  font-size: 1.25rem;
+  color: #aaa;
+}

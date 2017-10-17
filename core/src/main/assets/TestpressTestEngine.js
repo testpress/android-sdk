@@ -27,17 +27,17 @@ function onRadioOptionClick(clickedOption) {
 function setRadioButtonState(option, check) {
     radioButton = getWidget(option);
     if (check) {
-        if (radioButton.className.match(/(?:^|\s)radio-button-unchecked(?!\S)/)) {
-            radioButton.className = radioButton.className.replace( /(?:^|\s)radio-button-unchecked(?!\S)/g , '' );
+        if (radioButton.className.match(/(?:^|\s)icon-radio-unchecked(?!\S)/)) {
+            radioButton.className = radioButton.className.replace( /(?:^|\s)icon-radio-unchecked(?!\S)/g , '' );
         }
-        radioButton.className += " radio-button-checked";
+        radioButton.className += " icon-radio-checked2";
         setSelectedOptionBackground(option);
         selectedRadioOption = option;
     } else {
-        if (radioButton.className.match(/(?:^|\s)radio-button-checked(?!\S)/)) {
-            radioButton.className = radioButton.className.replace( /(?:^|\s)radio-button-checked(?!\S)/g , '' );
+        if (radioButton.className.match(/(?:^|\s)icon-radio-checked2(?!\S)/)) {
+            radioButton.className = radioButton.className.replace( /(?:^|\s)icon-radio-checked2(?!\S)/g , '' );
         }
-        radioButton.className += " radio-button-unchecked";
+        radioButton.className += " icon-radio-unchecked";
         removeBackground(option);
     }
 }
@@ -63,19 +63,30 @@ function onCheckBoxOptionClick(option) {
     }
 }
 
+function reviewButtonClick(button) {
+    OptionsSelectionListener.onMarkStateChange();
+    if(button.innerHTML == "MARKED") {
+        button.innerHTML = "MARK FOR LATER";
+        button.className = "unmark-button";
+    } else {
+        button.innerHTML = "MARKED";
+        button.className = "mark-button";
+    }
+}
+
 function setCheckboxState(option, check) {
     checkBox = getWidget(option);
     if (check) {
-        if (checkBox.className.match(/(?:^|\s)checkbox-unchecked(?!\S)/)) {
-            checkBox.className = checkBox.className.replace( /(?:^|\s)checkbox-unchecked(?!\S)/g , '' );
+        if (checkBox.className.match(/(?:^|\s)icon-checkbox-unchecked(?!\S)/)) {
+            checkBox.className = checkBox.className.replace( /(?:^|\s)icon-checkbox-unchecked(?!\S)/g , '' );
         }
-        checkBox.className += " checkbox-checked";
+        checkBox.className += " icon-checkbox-checked";
         setSelectedOptionBackground(option);
     } else {
-        if (checkBox.className.match(/(?:^|\s)checkbox-checked(?!\S)/)) {
-            checkBox.className = checkBox.className.replace( /(?:^|\s)checkbox-checked(?!\S)/g , '' );
+        if (checkBox.className.match(/(?:^|\s)icon-checkbox-checked(?!\S)/)) {
+            checkBox.className = checkBox.className.replace( /(?:^|\s)icon-checkbox-checked(?!\S)/g , '' );
         }
-        checkBox.className += " checkbox-unchecked";
+        checkBox.className += " icon-checkbox-unchecked";
         removeBackground(option);
     }
 }
