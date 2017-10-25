@@ -311,7 +311,7 @@ public class ReviewQuestionsFragment extends Fragment
     }
 
     void displayComments() {
-        commentsAdapter = new CommentsListAdapter(getActivity());
+        commentsAdapter = new CommentsListAdapter(getActivity(), apiClient);
         commentsListView.setNestedScrollingEnabled(false);
         commentsListView.setLayoutManager(new LinearLayoutManager(getContext()));
         commentsListView.setAdapter(commentsAdapter);

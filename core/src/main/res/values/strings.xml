@@ -19,5 +19,7 @@
     <string name="testpress_cancel">Cancel</string>
 
     <string name="testpress_filter">Filter</string>
+    <string name="testpress_vote_casted">Vote casted successfully!</string>
+    <string name="testpress_self_vote_error">You can\'t vote for yourself!</string>
 
 </resources>

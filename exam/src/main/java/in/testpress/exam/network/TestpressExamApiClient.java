@@ -16,6 +16,7 @@ import in.testpress.exam.models.Comment;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.Subject;
+import in.testpress.exam.models.Vote;
 import in.testpress.exam.models.greendao.ReviewItem;
 import in.testpress.model.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
@@ -23,6 +24,7 @@ import in.testpress.network.TestpressApiClient;
 
 public class TestpressExamApiClient extends TestpressApiClient {
 
+    public static final String VOTES_PATH =  "/api/v2.3/votes/";
     /**
      * Exams List URL
      */
@@ -165,4 +167,21 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getExamService().postComment(urlFrag, params);
     }
 
+    public RetrofitCall<Vote<Comment>> voteComment(Comment comment, int typeOfVote) {
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("content_object", comment);
+        params.put("type_of_vote", typeOfVote);
+        return getExamService().voteComment(params);
+    }
+
+    public RetrofitCall<String> deleteCommentVote(Comment comment) {
+        return getExamService().deleteCommentVote(comment.getVoteId());
+    }
+
+    public RetrofitCall<Vote<Comment>> updateCommentVote(Comment comment, int typeOfVote) {
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("content_object", comment);
+        params.put("type_of_vote", typeOfVote);
+        return getExamService().updateCommentVote(comment.getVoteId(), params);
+    }
 }
