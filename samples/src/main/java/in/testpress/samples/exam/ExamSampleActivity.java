@@ -71,6 +71,7 @@ public class ExamSampleActivity extends BaseToolBarActivity {
             TestpressSession session = TestpressSdk.getTestpressSession(this);
             //noinspection ConstantConditions
             session.getInstituteSettings()
+                    .setCommentsVotingEnabled(false)
                     .setCoursesFrontend(false)
                     .setCoursesGamificationEnabled(false);
             TestpressSdk.setTestpressSession(this, session);

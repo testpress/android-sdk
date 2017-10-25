@@ -7,6 +7,7 @@ public class InstituteSettings {
     private String baseUrl;
     private Boolean showGameFrontend;
     private Boolean coursesEnableGamification;
+    private Boolean commentsVotingEnabled;
 
     public InstituteSettings(String baseUrl) {
         this(baseUrl, false, false);
@@ -46,4 +47,12 @@ public class InstituteSettings {
         return this;
     }
 
+    public Boolean isCommentsVotingEnabled() {
+        return commentsVotingEnabled;
+    }
+
+    public InstituteSettings setCommentsVotingEnabled(Boolean commentsVotingEnabled) {
+        this.commentsVotingEnabled = commentsVotingEnabled;
+        return this;
+    }
 }

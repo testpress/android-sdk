@@ -10,7 +10,11 @@ public class Comment {
     private String userUrl;
     private String comment;
     private String submitDate;
+    private Integer upvotes;
+    private Integer downvotes;
     private ContentObject contentObject;
+    private Integer typeOfVote;
+    private Integer voteId;
 
     /**
      *
@@ -174,4 +178,35 @@ public class Comment {
         this.contentObject = contentObject;
     }
 
+    public Integer getUpvotes() {
+        return upvotes;
+    }
+
+    public void setUpvotes(Integer upvotes) {
+        this.upvotes = upvotes;
+    }
+
+    public Integer getDownvotes() {
+        return downvotes;
+    }
+
+    public void setDownvotes(Integer downvotes) {
+        this.downvotes = downvotes;
+    }
+
+    public Integer getTypeOfVote() {
+        return typeOfVote;
+    }
+
+    public void setTypeOfVote(Integer typeOfVote) {
+        this.typeOfVote = typeOfVote;
+    }
+
+    public Integer getVoteId() {
+        return voteId;
+    }
+
+    public void setVoteId(Integer voteId) {
+        this.voteId = voteId;
+    }
 }

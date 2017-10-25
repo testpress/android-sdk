@@ -3,8 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:paddingBottom="10dp"
-    android:clickable="true"
-    android:background="?android:attr/selectableItemBackground"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -93,6 +91,46 @@
                 android:textColor="#666666"
                 android:text="Dummy comment"
                 android:id="@+id/comment" />
+
+            <LinearLayout
+                android:id="@+id/vote_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="15dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/vote_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12"
+                    android:textSize="13sp"
+                    android:minWidth="15dp"
+                    android:textColor="#999999"
+                    android:focusableInTouchMode="false"/>
+
+                <ImageButton
+                    android:id="@+id/upvote_button"
+                    android:layout_width="33dp"
+                    android:layout_height="18dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="5dp"
+                    android:focusableInTouchMode="false"
+                    android:background="@color/testpress_white"
+                    android:src="@drawable/ic_keyboard_arrow_up_black_18dp" />
+
+                <ImageButton
+                    android:id="@+id/downvote_button"
+                    android:layout_width="33dp"
+                    android:layout_height="18dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="10dp"
+                    android:focusableInTouchMode="false"
+                    android:background="@color/testpress_white"
+                    android:src="@drawable/ic_keyboard_arrow_down_black_18dp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

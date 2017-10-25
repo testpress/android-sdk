@@ -83,6 +83,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
             switch (clickedButtonId) {
                 case R.id.simple_course:
                     session.getInstituteSettings()
+                            .setCommentsVotingEnabled(false)
                             .setCoursesFrontend(true)
                             .setCoursesGamificationEnabled(false);
                     break;
@@ -90,6 +91,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                 case R.id.leaderboard:
                 case R.id.content_detail:
                     session.getInstituteSettings()
+                            .setCommentsVotingEnabled(false)
                             .setCoursesFrontend(true)
                             .setCoursesGamificationEnabled(true);
                     break;

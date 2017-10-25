@@ -31,6 +31,7 @@ public final class TestpressSdk {
     private static final String KEY_TESTPRESS_AUTH_TOKEN = "testpressAuthToken";
     private static final String KEY_TESTPRESS_SHARED_PREFS = "testpressSharedPreferences";
     private static final String KEY_USER_ID = "userId";
+    private static final String KEY_TESTPRESS_USER_ID = "testpressUserId";
     private static final String KEY_COURSE_DATABASE_SESSION = "courseDatabaseSession";
     private static final String KEY_EXAM_DATABASE_SESSION = "examDatabaseSession";
     public static final String TESTPRESS_EXAM_SDK_DATABASE = "testpressExamSdkDB";
@@ -76,7 +77,7 @@ public final class TestpressSdk {
 
     public static void clearActiveSession(@NonNull Context context) {
         SharedPreferences.Editor editor = getPreferenceEditor(context);
-        editor.remove(KEY_TESTPRESS_AUTH_TOKEN).apply();
+        editor.clear().commit();
     }
 
     public static boolean hasActiveSession(@NonNull Context context) {
@@ -120,6 +121,18 @@ public final class TestpressSdk {
         SharedPreferences.Editor editor = getPreferenceEditor(context);
         editor.putString(KEY_EXAM_DATABASE_SESSION, sessionToken);
         editor.apply();
+    }
+
+    public static void setTestpressUserId(@NonNull Context context, int id) {
+        getPreferenceEditor(context).putInt(KEY_TESTPRESS_USER_ID, id).apply();
+    }
+
+    public static boolean isTestpressUserIdExist(@NonNull Context context) {
+        return getPreferences(context).getInt(KEY_TESTPRESS_USER_ID, 0) != 0;
+    }
+
+    public static int getTestpressUserId(@NonNull Context context) {
+        return getPreferences(context).getInt(KEY_TESTPRESS_USER_ID, 0);
     }
 
     @Nullable

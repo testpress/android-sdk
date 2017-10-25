@@ -10,10 +10,12 @@ import in.testpress.exam.models.Comment;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.Subject;
+import in.testpress.exam.models.Vote;
 import in.testpress.exam.models.greendao.ReviewItem;
 import in.testpress.model.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -102,6 +104,16 @@ public interface ExamService {
     RetrofitCall<Comment> postComment(@Url String commentsUrl,
                                       @Body HashMap<String, String> arguments);
 
+    @POST(TestpressExamApiClient.VOTES_PATH)
+    RetrofitCall<Vote<Comment>> voteComment(@Body HashMap<String, Object> params);
+
+    @DELETE(TestpressExamApiClient.VOTES_PATH + "{vote_id}/")
+    RetrofitCall<String> deleteCommentVote(@Path(value = "vote_id") int id);
+
+    @PUT(TestpressExamApiClient.VOTES_PATH + "{vote_id}/")
+    RetrofitCall<Vote<Comment>> updateCommentVote(
+            @Path(value = "vote_id") int id,
+            @Body HashMap<String, Object> params);
 }
 
 
