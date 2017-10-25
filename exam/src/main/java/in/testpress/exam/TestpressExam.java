@@ -334,13 +334,26 @@ public class TestpressExam {
 
     private static DaoSession getDaoSession(Context context) {
         if (daoSession == null) {
+            database = getDatabase(context);
+            daoSession = new DaoMaster(database).newSession();
+        }
+        return daoSession;
+    }
+
+    public static void clearDatabase(@NonNull Context context) {
+        Database database = getDatabase(context);
+        DaoMaster.dropAllTables(database, true);
+        DaoMaster.createAllTables(database, true);
+    }
+
+    private static Database getDatabase(@NonNull Context context) {
+        if (database == null) {
             DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(
                     context.getApplicationContext(), TestpressSdk.TESTPRESS_EXAM_SDK_DATABASE);
 
             database = helper.getWritableDb();
-            daoSession = new DaoMaster(database).newSession();
         }
-        return daoSession;
+        return database;
     }
 
     public static ReviewAttemptDao getReviewAttemptDao(Context context) {
