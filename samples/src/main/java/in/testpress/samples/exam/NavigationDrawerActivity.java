@@ -36,6 +36,7 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
             case R.id.logout:
                 TestpressSdk.clearActiveSession(this);
                 LoginManager.getInstance().logOut();
+                TestpressExam.clearDatabase(this);
                 finish();
                 break;
         }

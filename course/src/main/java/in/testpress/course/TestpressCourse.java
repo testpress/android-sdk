@@ -274,10 +274,7 @@ public class TestpressCourse {
 
     private static DaoSession getDaoSession(Context context) {
         if (daoSession == null) {
-            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(
-                    context.getApplicationContext(), TestpressSdk.TESTPRESS_COURSE_SDK_DATABASE);
-
-            database = helper.getWritableDb();
+            database = getDatabase(context);
             daoSession = new DaoMaster(database).newSession();
         }
         return daoSession;
@@ -290,6 +287,22 @@ public class TestpressCourse {
             DaoMaster.createAllTables(database, true);
             TestpressSdk.setTestpressCourseDBSession(context, sessionToken);
         }
+    }
+
+    public static void clearDatabase(@NonNull Context context) {
+        Database database = getDatabase(context);
+        DaoMaster.dropAllTables(database, true);
+        DaoMaster.createAllTables(database, true);
+    }
+
+    private static Database getDatabase(@NonNull Context context) {
+        if (database == null) {
+            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(
+                    context.getApplicationContext(), TestpressSdk.TESTPRESS_COURSE_SDK_DATABASE);
+
+            database = helper.getWritableDb();
+        }
+        return database;
     }
 
     public static CourseDao getCourseDao(Context context) {
