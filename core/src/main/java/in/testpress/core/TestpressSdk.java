@@ -10,7 +10,7 @@ import android.support.annotation.Nullable;
 
 import java.util.HashMap;
 
-import in.testpress.model.InstituteSettings;
+import in.testpress.models.InstituteSettings;
 import in.testpress.network.AuthorizationErrorResponse;
 import in.testpress.network.TestpressApiClient;
 import in.testpress.R;
@@ -34,8 +34,7 @@ public final class TestpressSdk {
     private static final String KEY_TESTPRESS_USER_ID = "testpressUserId";
     private static final String KEY_COURSE_DATABASE_SESSION = "courseDatabaseSession";
     private static final String KEY_EXAM_DATABASE_SESSION = "examDatabaseSession";
-    public static final String TESTPRESS_EXAM_SDK_DATABASE = "testpressExamSdkDB";
-    public static final String TESTPRESS_COURSE_SDK_DATABASE = "testpressCourseSdkDB";
+    public static final String TESTPRESS_SDK_DATABASE = "testpressSdkDB";
     private static final String RUBIK_REGULAR_FONT_PATH = "Rubik-Regular.ttf";
     private static final String RUBIK_MEDIUM_FONT_PATH = "Rubik-Medium.ttf";
     public enum Provider { FACEBOOK, GOOGLE, TESTPRESS }

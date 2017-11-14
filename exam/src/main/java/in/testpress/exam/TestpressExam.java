@@ -12,18 +12,9 @@ import org.greenrobot.greendao.database.Database;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.models.Attempt;
-import in.testpress.exam.models.CourseContent;
 import in.testpress.exam.models.CourseAttempt;
+import in.testpress.exam.models.CourseContent;
 import in.testpress.exam.models.Exam;
-import in.testpress.exam.models.greendao.DaoMaster;
-import in.testpress.exam.models.greendao.DaoSession;
-import in.testpress.exam.models.greendao.ReviewAnswerDao;
-import in.testpress.exam.models.greendao.ReviewAnswerTranslationDao;
-import in.testpress.exam.models.greendao.ReviewAttemptDao;
-import in.testpress.exam.models.greendao.ReviewItemDao;
-import in.testpress.exam.models.greendao.ReviewQuestionDao;
-import in.testpress.exam.models.greendao.ReviewQuestionTranslationDao;
-import in.testpress.exam.models.greendao.SelectedAnswerDao;
 import in.testpress.exam.ui.AccessCodeActivity;
 import in.testpress.exam.ui.AccessCodeFragment;
 import in.testpress.exam.ui.AnalyticsActivity;
@@ -34,6 +25,15 @@ import in.testpress.exam.ui.CategoryGridActivity;
 import in.testpress.exam.ui.ExamsListActivity;
 import in.testpress.exam.ui.ReviewStatsActivity;
 import in.testpress.exam.ui.TestActivity;
+import in.testpress.models.greendao.DaoMaster;
+import in.testpress.models.greendao.DaoSession;
+import in.testpress.models.greendao.ReviewAnswerDao;
+import in.testpress.models.greendao.ReviewAnswerTranslationDao;
+import in.testpress.models.greendao.ReviewAttemptDao;
+import in.testpress.models.greendao.ReviewItemDao;
+import in.testpress.models.greendao.ReviewQuestionDao;
+import in.testpress.models.greendao.ReviewQuestionTranslationDao;
+import in.testpress.models.greendao.SelectedAnswerDao;
 import in.testpress.util.Assert;
 import in.testpress.util.ImageUtils;
 
@@ -407,7 +407,7 @@ public class TestpressExam {
     private static Database getDatabase(@NonNull Context context) {
         if (database == null) {
             DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(
-                    context.getApplicationContext(), TestpressSdk.TESTPRESS_EXAM_SDK_DATABASE);
+                    context.getApplicationContext(), TestpressSdk.TESTPRESS_SDK_DATABASE);
 
             database = helper.getWritableDb();
         }

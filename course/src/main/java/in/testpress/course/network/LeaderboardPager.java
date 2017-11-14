@@ -3,7 +3,7 @@ package in.testpress.course.network;
 import java.io.IOException;
 
 import in.testpress.course.models.Reputation;
-import in.testpress.model.TestpressApiResponse;
+import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseResourcePager;
 import retrofit2.Response;
 

@@ -23,7 +23,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.util.ElapsedTimeIdlingResource;
-import in.testpress.model.InstituteSettings;
+import in.testpress.models.InstituteSettings;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;

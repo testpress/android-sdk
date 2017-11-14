@@ -27,8 +27,8 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
-import in.testpress.model.InstituteSettings;
-import in.testpress.model.TestpressApiResponse;
+import in.testpress.models.InstituteSettings;
+import in.testpress.models.TestpressApiResponse;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 

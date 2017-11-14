@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import in.testpress.exam.models.greendao.ReviewAttempt;
+import in.testpress.models.greendao.ReviewAttempt;
 
 public class Attempt implements Parcelable {
 

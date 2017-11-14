@@ -11,10 +11,10 @@ import org.greenrobot.greendao.database.Database;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
-import in.testpress.course.models.greendao.ChapterDao;
-import in.testpress.course.models.greendao.CourseDao;
-import in.testpress.course.models.greendao.DaoMaster;
-import in.testpress.course.models.greendao.DaoSession;
+import in.testpress.models.greendao.ChapterDao;
+import in.testpress.models.greendao.CourseDao;
+import in.testpress.models.greendao.DaoMaster;
+import in.testpress.models.greendao.DaoSession;
 import in.testpress.course.ui.ChaptersGridActivity;
 import in.testpress.course.ui.ContentActivity;
 import in.testpress.course.ui.ContentsListActivity;
@@ -298,7 +298,7 @@ public class TestpressCourse {
     private static Database getDatabase(@NonNull Context context) {
         if (database == null) {
             DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(
-                    context.getApplicationContext(), TestpressSdk.TESTPRESS_COURSE_SDK_DATABASE);
+                    context.getApplicationContext(), TestpressSdk.TESTPRESS_SDK_DATABASE);
 
             database = helper.getWritableDb();
         }

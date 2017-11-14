@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import in.testpress.core.TestpressException;
-import in.testpress.model.TestpressApiResponse;
+import in.testpress.models.TestpressApiResponse;
 import retrofit2.Response;
 
 /**

@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import in.testpress.core.TestpressSession;
-import in.testpress.model.FileDetails;
+import in.testpress.models.FileDetails;
 import in.testpress.util.UserAgentProvider;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
