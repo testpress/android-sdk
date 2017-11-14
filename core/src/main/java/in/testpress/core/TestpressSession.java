@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
-import in.testpress.model.InstituteSettings;
+import in.testpress.models.InstituteSettings;
 import in.testpress.util.Assert;
 
 public class TestpressSession {

@@ -5,9 +5,9 @@ import java.util.Map;
 import in.testpress.course.models.Content;
 import in.testpress.course.models.HtmlContent;
 import in.testpress.course.models.Reputation;
-import in.testpress.course.models.greendao.Chapter;
-import in.testpress.course.models.greendao.Course;
-import in.testpress.model.TestpressApiResponse;
+import in.testpress.models.greendao.Chapter;
+import in.testpress.models.greendao.Course;
+import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 
 import retrofit2.http.GET;

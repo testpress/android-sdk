@@ -3,8 +3,8 @@ package in.testpress.course.network;
 import java.io.IOException;
 import java.text.ParseException;
 
-import in.testpress.course.models.greendao.Course;
-import in.testpress.model.TestpressApiResponse;
+import in.testpress.models.greendao.Course;
+import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseDatabaseModelPager;
 import retrofit2.Response;
 

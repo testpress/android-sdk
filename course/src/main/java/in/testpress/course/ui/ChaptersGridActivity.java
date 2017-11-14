@@ -9,8 +9,8 @@ import java.util.List;
 
 import in.testpress.course.R;
 import in.testpress.course.TestpressCourse;
-import in.testpress.course.models.greendao.Chapter;
-import in.testpress.course.models.greendao.ChapterDao;
+import in.testpress.models.greendao.Chapter;
+import in.testpress.models.greendao.ChapterDao;
 import in.testpress.ui.BaseToolBarActivity;
 
 import static in.testpress.course.TestpressCourse.COURSE_ID;
