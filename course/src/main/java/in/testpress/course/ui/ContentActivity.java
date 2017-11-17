@@ -1,7 +1,6 @@
 package in.testpress.course.ui;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,7 +26,6 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import junit.framework.Assert;
@@ -41,19 +39,18 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
-import in.testpress.course.models.Attachment;
-import in.testpress.course.models.Content;
 import in.testpress.course.models.HtmlContent;
-import in.testpress.course.models.Video;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.exam.TestpressExam;
-import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.CourseContent;
-import in.testpress.exam.models.Exam;
+import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.models.TestpressApiResponse;
+import in.testpress.models.greendao.Attachment;
+import in.testpress.models.greendao.Content;
+import in.testpress.models.greendao.Video;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ZoomableImageActivity;
 import in.testpress.util.FormatDate;
@@ -107,7 +104,8 @@ public class ContentActivity extends BaseToolBarActivity {
                                       AppCompatActivity activity) {
 
         Intent intent = new Intent(activity, ContentActivity.class);
-        intent.putParcelableArrayListExtra(CONTENTS, new ArrayList<Content>(contents));
+        // TODO : Pass id instead of list from here
+        //intent.putParcelableArrayListExtra(CONTENTS, new ArrayList<Content>(contents));
         intent.putExtra(POSITION, position);
         //noinspection ConstantConditions
         intent.putExtra(ACTIONBAR_TITLE, activity.getSupportActionBar().getTitle());
@@ -237,7 +235,7 @@ public class ContentActivity extends BaseToolBarActivity {
             }
 
         });
-        contents = getIntent().getParcelableArrayListExtra(CONTENTS);
+        // TODO: contents = getIntent().getParcelableArrayListExtra(CONTENTS);
         if (contents == null) {
             contentId = getIntent().getStringExtra(CONTENT_ID);
             if (contentId == null) {

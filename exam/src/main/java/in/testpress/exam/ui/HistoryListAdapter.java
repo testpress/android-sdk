@@ -10,7 +10,8 @@ import java.util.List;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
-import in.testpress.exam.models.Exam;
+import in.testpress.exam.TestpressExam;
+import in.testpress.models.greendao.Exam;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ViewUtils;
 
@@ -56,7 +57,8 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity, AttemptsActivity.class);
-                intent.putExtra(PARAM_EXAM, exam);
+                intent.putExtra(PARAM_EXAM, exam.getId());
+                intent.putExtra(TestpressExam.PARAM_EXAM_SLUG, exam.getSlug());
                 fragment.startActivityForResult(intent, TEST_TAKEN_REQUEST_CODE);
             }
         });

@@ -16,13 +16,12 @@ import java.util.List;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
-import in.testpress.course.models.Content;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.CourseContent;
 import in.testpress.exam.network.TestpressExamApiClient;
-import in.testpress.models.InstituteSettings;
+import in.testpress.models.greendao.Content;
 import in.testpress.util.ViewUtils;
 
 class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {

@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import in.testpress.models.greendao.Exam;
+
 public class CourseContent implements Parcelable {
 
     private String attemptsUrl;
@@ -14,15 +16,10 @@ public class CourseContent implements Parcelable {
         this.exam = exam;
     }
 
-    protected CourseContent(Parcel in) {
-        attemptsUrl = in.readString();
-        exam = in.readParcelable(Exam.class.getClassLoader());
-    }
-
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(attemptsUrl);
-        dest.writeParcelable(exam, flags);
+        dest.writeLong(exam.getId());
     }
 
     @Override
@@ -41,6 +38,11 @@ public class CourseContent implements Parcelable {
             return new CourseContent[size];
         }
     };
+
+    protected CourseContent(Parcel in) {
+        attemptsUrl = in.readString();
+        exam = in.readParcelable(Exam.class.getClassLoader());
+    }
 
     public String getAttemptsUrl() {
         return attemptsUrl;

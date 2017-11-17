@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
@@ -14,6 +15,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,9 +28,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.TimeZone;
 
 import in.testpress.core.TestpressCallback;
@@ -36,13 +41,15 @@ import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.AttemptItem;
-import in.testpress.exam.models.AttemptQuestion;
 import in.testpress.exam.models.CourseAttempt;
-import in.testpress.exam.models.Exam;
-import in.testpress.exam.models.Language;
+import in.testpress.models.Languages;
+import in.testpress.models.greendao.Exam;
+import in.testpress.models.greendao.ExamDao;
+import in.testpress.models.greendao.Language;
 import in.testpress.exam.network.TestQuestionsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
+import in.testpress.models.greendao.TestpressSDK;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
@@ -80,6 +87,129 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private Boolean fistTimeCallback = false;
     private int selectedSubjectOffset;
     private boolean navigationButtonPressed;
+    private List<Language> languages = new List<Language>() {
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return false;
+        }
+
+        @NonNull
+        @Override
+        public Iterator<Language> iterator() {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Object[] toArray() {
+            return new Object[0];
+        }
+
+        @NonNull
+        @Override
+        public <T> T[] toArray(@NonNull T[] a) {
+            return null;
+        }
+
+        @Override
+        public boolean add(Language language) {
+            return false;
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            return false;
+        }
+
+        @Override
+        public boolean containsAll(@NonNull Collection<?> c) {
+            return false;
+        }
+
+        @Override
+        public boolean addAll(@NonNull Collection<? extends Language> c) {
+            return false;
+        }
+
+        @Override
+        public boolean addAll(int index, @NonNull Collection<? extends Language> c) {
+            return false;
+        }
+
+        @Override
+        public boolean removeAll(@NonNull Collection<?> c) {
+            return false;
+        }
+
+        @Override
+        public boolean retainAll(@NonNull Collection<?> c) {
+            return false;
+        }
+
+        @Override
+        public void clear() {
+
+        }
+
+        @Override
+        public Language get(int index) {
+            return null;
+        }
+
+        @Override
+        public Language set(int index, Language element) {
+            return null;
+        }
+
+        @Override
+        public void add(int index, Language element) {
+
+        }
+
+        @Override
+        public Language remove(int index) {
+            return null;
+        }
+
+        @Override
+        public int indexOf(Object o) {
+            return 0;
+        }
+
+        @Override
+        public int lastIndexOf(Object o) {
+            return 0;
+        }
+
+        @NonNull
+        @Override
+        public ListIterator<Language> listIterator() {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public ListIterator<Language> listIterator(int index) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public List<Language> subList(int fromIndex, int toIndex) {
+            return null;
+        }
+    };
+    private Activity activity;
     /*
      * Map of subjects & its starting point(first question index)
      */
@@ -89,8 +219,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = getActivity();
         attempt = getArguments().getParcelable(PARAM_ATTEMPT);
-        exam = getArguments().getParcelable(PARAM_EXAM);
+        exam = TestpressSDK.getExamDao(getContext()).queryBuilder().where(ExamDao.Properties.Id.eq(getArguments().getLong(PARAM_EXAM))).list().get(0);
         contentAttemptEndUrl = getArguments().getString(PARAM_CONTENT_ATTEMPT_END_URL);
         questionsPager = new TestQuestionsPager(attempt.getQuestionsUrlFrag(),
                 new TestpressExamApiClient(getActivity()));
@@ -316,6 +447,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 .show();
     }
 
+    @SuppressLint("StaticFieldLeak")
     @Override
     public Loader<List<AttemptItem>> onCreateLoader(int id, final Bundle args) {
         return new ThrowableLoader<List<AttemptItem>>(getActivity(), attemptItemList) {
@@ -430,7 +562,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             selectedSubjectOffset = 0;
         }
 
-        final ArrayList<Language> languages = exam.getLanguages();
+        //TODO : exam is null
+        loadExamLanguage(exam.getSlug());
+        Log.e("languages.size()",languages.size()+"");
         if (languages.size() > 1) {
             languageSpinnerAdapter = new ExploreSpinnerAdapter(getActivity().getLayoutInflater(),
                     getResources(), false);
@@ -454,16 +588,23 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 }
             });
             String selectedLanguageCode = exam.getSelectedLanguage();
+            if(selectedLanguageCode.isEmpty() || selectedLanguageCode == null) {
+                selectedLanguageCode = "en";
+                exam.setSelectedLanguage("en");
+            }
             if (selectedLanguageCode != null && !selectedLanguageCode.isEmpty()) {
                 int selectedPosition =
                         languageSpinnerAdapter.getItemPositionFromTag(selectedLanguageCode);
 
                 // Create new object so that we can update it without affecting original language list
+                //TODO : fetch language from DB
                 selectedLanguage = new Language(languages.get(selectedPosition));
                 panelListAdapter.setSelectedLanguage(selectedLanguage);
                 languageSpinner.setSelection(selectedPosition);
             }
             languageSpinner.setVisibility(View.VISIBLE);
+        } else {
+            selectedLanguage = new Language(0l, "en", "English", exam.getSlug());
         }
 
         pagerAdapter =
@@ -479,6 +620,31 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         questionsListView.setAdapter(panelListAdapter);
         updateNextButton(pager.getCurrentItem());
         startCountDownTimer(formatMillisecond(attempt.getRemainingTime()));
+    }
+
+    void loadExamLanguage(final String examSlug) {
+        Log.e("Calling123","TF");
+        new TestpressExamApiClient(activity).getLanguages(examSlug)
+                .enqueue(new TestpressCallback<Languages>() {
+                    @Override
+                    public void onSuccess(Languages langs) {
+                        languages = langs.getResults();
+                        saveLanguagesInDB(langs.getResults(), examSlug);
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+
+                    }
+                });
+    }
+
+    void saveLanguagesInDB(List<Language> languages, String examSlug) {
+        for(Language language : languages) {
+            language.setExam_slug(examSlug);
+            TestpressSDK.getLanguageDao(activity).insertOrReplace(language);
+        }
+        Log.e("Inside","TestActivity-saveLanguagesInDB");
     }
 
     @Override
@@ -506,7 +672,6 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                         @Override
                         public void onSuccess(AttemptItem newAttemptItem) {
                             if (getActivity() == null) {
-                                return;
                             }
                             attemptItem.setSelectedAnswers(newAttemptItem.getSelectedAnswers());
                             attemptItem.setReview(newAttemptItem.getReview());
@@ -556,7 +721,6 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             @Override
             public void onSuccess(Attempt result) {
                 if (getActivity() == null) {
-                    return;
                 }
                 if (progressDialog.isShowing()) {
                     startCountDownTimer(millisRemaining);
@@ -598,7 +762,6 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                         @Override
                         public void onSuccess(CourseAttempt courseAttempt) {
                             if (getActivity() == null) {
-                                return;
                             }
                             if (progressDialog.isShowing()) {
                                 progressDialog.dismiss();
@@ -633,7 +796,6 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                         @Override
                         public void onSuccess(Attempt attempt) {
                             if (getActivity() == null) {
-                                return;
                             }
                             if (progressDialog.isShowing()) {
                                 progressDialog.dismiss();

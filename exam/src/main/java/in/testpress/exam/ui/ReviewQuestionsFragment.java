@@ -47,7 +47,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Comment;
-import in.testpress.exam.models.Language;
+import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.ReviewAnswer;
 import in.testpress.models.greendao.ReviewAnswerTranslation;
 import in.testpress.models.greendao.ReviewItem;
@@ -130,7 +130,7 @@ public class ReviewQuestionsFragment extends Fragment
         ReviewQuestionsFragment reviewQuestionsFragment = new ReviewQuestionsFragment();
         Bundle bundle = new Bundle();
         bundle.putLong(ReviewQuestionsFragment.PARAM_REVIEW_ITEM_ID, reviewItemId);
-        bundle.putParcelable(PARAM_SELECTED_LANGUAGE, selectedLanguage);
+        bundle.putLong(PARAM_SELECTED_LANGUAGE, selectedLanguage.getId());
         reviewQuestionsFragment.setArguments(bundle);
         return reviewQuestionsFragment;
     }
@@ -559,7 +559,6 @@ public class ReviewQuestionsFragment extends Fragment
                     @Override
                     public void onSuccess(Comment comment) {
                         if (getActivity() == null) {
-                            return;
                         }
                         commentsEditText.setText("");
                         progressDialog.dismiss();

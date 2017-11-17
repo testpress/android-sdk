@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.view.View;
 
 import com.facebook.FacebookSdk;
+import com.facebook.stetho.Stetho;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.TestpressExam;
@@ -22,6 +23,7 @@ public class MainActivity extends BaseToolBarActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Stetho.initializeWithDefaults(this);
         findViewById(R.id.core).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

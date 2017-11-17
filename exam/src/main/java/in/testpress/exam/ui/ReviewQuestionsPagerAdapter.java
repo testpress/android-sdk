@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import java.util.Collections;
 import java.util.List;
 
-import in.testpress.exam.models.Language;
+import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.ReviewItem;
 
 class ReviewQuestionsPagerAdapter extends FragmentStatePagerAdapter {

@@ -14,7 +14,7 @@ import in.testpress.core.TestpressSession;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.CourseContent;
 import in.testpress.exam.models.CourseAttempt;
-import in.testpress.exam.models.Exam;
+import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.DaoMaster;
 import in.testpress.models.greendao.DaoSession;
 import in.testpress.models.greendao.ReviewAnswerDao;

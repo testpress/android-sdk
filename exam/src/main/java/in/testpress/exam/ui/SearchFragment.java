@@ -35,7 +35,7 @@ import java.util.List;
 
 import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
-import in.testpress.exam.models.Exam;
+import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.ExamPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.ui.HeaderFooterListAdapter;

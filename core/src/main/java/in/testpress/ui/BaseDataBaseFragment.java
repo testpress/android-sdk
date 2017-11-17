@@ -1,5 +1,6 @@
 package in.testpress.ui;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.util.Log;
@@ -47,6 +48,7 @@ public abstract class BaseDataBaseFragment<T, K> extends BaseListViewFragment<T>
         return getDao().count() == 0;
     }
 
+    @SuppressLint("StaticFieldLeak")
     @Override
     public Loader<List<T>> onCreateLoader(int id, Bundle args) {
         return new ThrowableLoader<List<T>>(getActivity(), items) {

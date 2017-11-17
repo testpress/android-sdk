@@ -8,9 +8,11 @@ import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.Comment;
 import in.testpress.exam.models.CourseAttempt;
-import in.testpress.exam.models.Exam;
+import in.testpress.models.Languages;
+import in.testpress.models.greendao.Exam;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
+import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.ReviewItem;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
@@ -114,6 +116,9 @@ public interface ExamService {
     RetrofitCall<Vote<Comment>> updateCommentVote(
             @Path(value = "vote_id") int id,
             @Body HashMap<String, Object> params);
+
+    @GET("/api/v2.3/exams/{exam_slug}/languages/")
+    RetrofitCall<Languages> getLanguages(@Path(value = "exam_slug") String exam_slug);
 }
 
 

@@ -2,7 +2,7 @@ package in.testpress.exam.network;
 
 import java.io.IOException;
 
-import in.testpress.exam.models.Exam;
+import in.testpress.models.greendao.Exam;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseResourcePager;
 import retrofit2.Response;

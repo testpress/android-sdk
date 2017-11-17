@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import in.testpress.exam.models.AttemptItem;
-import in.testpress.exam.models.Language;
+import in.testpress.models.greendao.Language;
 
 class TestQuestionPagerAdapter extends FragmentStatePagerAdapter {
 

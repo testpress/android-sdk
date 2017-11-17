@@ -10,7 +10,7 @@ import java.util.List;
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.AttemptQuestion;
-import in.testpress.exam.models.Language;
+import in.testpress.models.greendao.Language;
 import in.testpress.util.SingleTypeAdapter;
 
 /**

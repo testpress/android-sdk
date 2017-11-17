@@ -25,10 +25,12 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
-import in.testpress.exam.models.Exam;
+import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.TestpressApiResponse;
+import in.testpress.models.greendao.ExamDao;
+import in.testpress.models.greendao.TestpressSDK;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 
@@ -68,7 +70,7 @@ public class ReviewStatsFragment extends Fragment {
     public static void showReviewStatsFragment(FragmentActivity activity, Exam exam, Attempt attempt) {
         ReviewStatsFragment fragment = new ReviewStatsFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(PARAM_EXAM, exam);
+        bundle.putLong(PARAM_EXAM, exam.getId());
         bundle.putParcelable(PARAM_ATTEMPT, attempt);
         fragment.setArguments(bundle);
         activity.getSupportFragmentManager().beginTransaction()
@@ -79,7 +81,8 @@ public class ReviewStatsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        exam = getArguments().getParcelable(PARAM_EXAM);
+        exam = TestpressSDK.getExamDao(getActivity()).queryBuilder().where(ExamDao.Properties.Id.eq(getArguments().getLong(PARAM_EXAM))).list().get(0);
+        // TODO exam coming as null
         Assert.assertNotNull("PARAM_EXAM must not be null.", exam);
         attempt = getArguments().getParcelable(PARAM_ATTEMPT);
     }
@@ -225,7 +228,6 @@ public class ReviewStatsFragment extends Fragment {
                     @Override
                     public void onSuccess(TestpressApiResponse<Attempt> response) {
                         if (getActivity() == null) {
-                            return;
                         }
                         attempt = response.getResults().get(0);
                         if (exam.getAllowPdf()) {
@@ -269,7 +271,7 @@ public class ReviewStatsFragment extends Fragment {
 
     private void startExam() {
         Intent intent = new Intent(getActivity(), TestActivity.class);
-        intent.putExtra(TestActivity.PARAM_EXAM, exam);
+        intent.putExtra(TestActivity.PARAM_EXAM, exam.getId());
         startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
     }
 

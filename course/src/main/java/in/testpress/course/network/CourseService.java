@@ -2,10 +2,10 @@ package in.testpress.course.network;
 
 import java.util.Map;
 
-import in.testpress.course.models.Content;
 import in.testpress.course.models.HtmlContent;
 import in.testpress.course.models.Reputation;
 import in.testpress.models.greendao.Chapter;
+import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;

@@ -29,7 +29,115 @@ public class TestpressSDKDaoGenerator {
         addCourse(schema);
         addChapter(schema);
 
+        Entity language = addLanguage(schema);
+        Entity video = addVideo(schema);
+        Entity attachment = addAttachment(schema);
+        Entity exam = addExam(schema);
+        Entity content = addContent(schema);
+        //addLanguageToExam(language, exam);
+        addVideoToContent(video, content);
+        addAttachmentToContent(attachment, content);
+        addExamToContent(exam, content);
+
         new DaoGenerator().generateAll(schema, "../core/src/main/java");
+    }
+
+    private static void addLanguageToExam(Entity language, Entity exam) {
+        Property examId = language.addLongProperty("examId").getProperty();
+        ToMany examToLanguages = exam.addToMany(language, examId, "languages");
+    }
+
+    private static void addExamToContent(Entity exam, Entity content) {
+        Property examId = content.addLongProperty("examId").getProperty();
+        ToOne examToContent = content.addToOne(exam, examId, "exam");
+    }
+
+    private static void addVideoToContent(Entity video, Entity content) {
+        Property videoId = content.addLongProperty("videoId").getProperty();
+        ToOne videoToContent = content.addToOne(video, videoId, "video");
+    }
+
+    private static void addAttachmentToContent(Entity attachment, Entity content) {
+        Property attachmentId = content.addLongProperty("attachmentId").getProperty();
+        ToOne attachmentToContent = content.addToOne(attachment, attachmentId, "attachment");
+    }
+
+    private static Entity addContent(Schema schema) {
+        Entity content = schema.addEntity("Content");
+        content.addIntProperty("order");
+        content.addStringProperty("htmlContentTitle");
+        content.addStringProperty("htmlContentUrl");
+        content.addStringProperty("url");
+        content.addStringProperty("attemptsUrl");
+        content.addIntProperty("chapterId");
+        content.addStringProperty("chapterSlug");
+        content.addStringProperty("chapterUrl");
+        content.addLongProperty("id").primaryKey();
+        content.addStringProperty("name");
+        content.addStringProperty("image");
+        content.addStringProperty("description");
+        content.addBooleanProperty("isLocked");
+        content.addIntProperty("attemptsCount");
+        content.addStringProperty("start");
+        content.addStringProperty("end");
+        content.addBooleanProperty("hasStarted");
+        return content;
+    }
+
+    private static Entity addAttachment(Schema schema) {
+        Entity attachment = schema.addEntity("Attachment");
+        attachment.addStringProperty("title");
+        attachment.addStringProperty("attachmentUrl");
+        attachment.addStringProperty("description");
+        attachment.addLongProperty("id").primaryKey();
+        return attachment;
+    }
+
+    private static Entity addVideo(Schema schema) {
+        Entity video = schema.addEntity("Video");
+        video.addStringProperty("title");
+        video.addStringProperty("url");
+        video.addLongProperty("id").primaryKey();
+        video.addStringProperty("embedCode");
+        return video;
+    }
+
+    private static Entity addLanguage(Schema schema) {
+        Entity language = schema.addEntity("Language");
+        language.addLongProperty("id").primaryKey().autoincrement();
+        language.addStringProperty("code");
+        language.addStringProperty("title");
+        language.addStringProperty("exam_slug");
+        return language;
+    }
+
+    private static Entity addExam(Schema schema) {
+        Entity exam = schema.addEntity("Exam");
+        exam.addStringProperty("totalMarks");
+        exam.addStringProperty("url");
+        exam.addLongProperty("id").primaryKey();
+        exam.addIntProperty("attemptsCount");
+        exam.addIntProperty("pausedAttemptsCount");
+        exam.addStringProperty("title");
+        exam.addStringProperty("description");
+        exam.addStringProperty("course_category");
+        exam.addStringProperty("startDate");
+        exam.addStringProperty("endDate");
+        exam.addStringProperty("duration");
+        exam.addIntProperty("numberOfQuestions");
+        exam.addStringProperty("negativeMarks");
+        exam.addStringProperty("markPerQuestion");
+        exam.addIntProperty("templateType");
+        exam.addBooleanProperty("allowRetake");
+        exam.addBooleanProperty("allowPdf");
+        exam.addBooleanProperty("showAnswers");
+        exam.addIntProperty("maxRetakes");
+        exam.addStringProperty("attemptsUrl");
+        exam.addStringProperty("deviceAccessControl");
+        exam.addIntProperty("commentsCount");
+        exam.addStringProperty("slug");
+        exam.addStringProperty("selectedLanguage");
+        return exam;
     }
 
     private static Entity addCourse(Schema schema) {

@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SlidingPaneLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,8 +33,10 @@ import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Attempt;
-import in.testpress.exam.models.Exam;
-import in.testpress.exam.models.Language;
+import in.testpress.models.Languages;
+import in.testpress.models.greendao.Exam;
+import in.testpress.models.greendao.ExamDao;
+import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.ReviewAnswer;
 import in.testpress.models.greendao.ReviewAnswerDao;
 import in.testpress.models.greendao.ReviewAnswerTranslation;
@@ -51,6 +54,7 @@ import in.testpress.models.greendao.SelectedAnswerDao;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
 import in.testpress.models.TestpressApiResponse;
+import in.testpress.models.greendao.TestpressSDK;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.UIUtils;
@@ -94,6 +98,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     private Language selectedLanguage;;
     private ExploreSpinnerAdapter languageSpinnerAdapter;
     protected ExploreSpinnerAdapter spinnerAdapter;
+    private Activity activity;
     /**
      * When spinnerAdapter is set to spinner, the spinner itself select first item as default,
      * so onItemSelected callback will be called with position 0, we need to omit this callback
@@ -103,7 +108,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
 
     public static Intent createIntent(Activity activity, Exam exam, Attempt attempt) {
         Intent intent = new Intent(activity, ReviewQuestionsActivity.class);
-        intent.putExtra(ReviewQuestionsActivity.PARAM_EXAM, exam);
+        intent.putExtra(ReviewQuestionsActivity.PARAM_EXAM, exam.getId());
         intent.putExtra(ReviewQuestionsActivity.PARAM_ATTEMPT, attempt);
         return intent;
     }
@@ -112,7 +117,8 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_review_question);
-        exam = getIntent().getParcelableExtra(PARAM_EXAM);
+        activity = this;
+        exam = TestpressSDK.getExamDao(this).queryBuilder().where(ExamDao.Properties.Id.eq(getIntent().getLongExtra(PARAM_EXAM, 1L))).list().get(0);
         Assert.assertNotNull("PARAM_EXAM must not be null", exam);
         attempt = getIntent().getParcelableExtra(PARAM_ATTEMPT);
         Assert.assertNotNull("PARAM_ATTEMPT must not be null", attempt);
@@ -201,7 +207,8 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        final ArrayList<Language> languages = exam.getLanguages();
+        loadExamLanguage(exam.getSlug());
+        final List<Language> languages = language;
         if (languages.size() > 1) {
             getMenuInflater().inflate(R.menu.testpress_select_language_menu, menu);
             selectLanguageMenu = menu.findItem(R.id.select_language);
@@ -279,6 +286,58 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
             onSpinnerItemSelected(0);
         }
         return super.onCreateOptionsMenu(menu);
+    }
+
+    List<Language> language;
+
+    void loadExamLanguage(final String examSlug) {
+        progressBar.setVisibility(View.VISIBLE);
+        Log.e("Calling123","RQA");
+        new TestpressExamApiClient(this).getLanguages(examSlug)
+                .enqueue(new TestpressCallback<Languages>() {
+                    @Override
+                    public void onSuccess(Languages languages) {
+                        language = languages.getResults();
+                        saveLanguagesInDB(languages.getResults(), exam.getSlug());
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        if (exception.isUnauthenticated()) {
+                            setEmptyText(R.string.testpress_authentication_failed,
+                                    R.string.testpress_exam_no_permission);
+                            retryButton.setVisibility(View.GONE);
+                        } else if (exception.isNetworkError()) {
+                            setEmptyText(R.string.testpress_network_error,
+                                    R.string.testpress_no_internet_try_again);
+                            retryButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    progressBar.setVisibility(View.VISIBLE);
+                                    emptyView.setVisibility(View.GONE);
+                                    loadExamLanguage(examSlug);
+                                }
+                            });
+                        } else if (exception.getResponse().code() == 404) {
+                            setEmptyText(R.string.testpress_exam_not_available,
+                                    R.string.testpress_exam_not_available_description);
+                            retryButton.setVisibility(View.GONE);
+                        } else  {
+                            setEmptyText(R.string.testpress_error_loading_exam,
+                                    R.string.testpress_some_thing_went_wrong_try_again);
+                            retryButton.setVisibility(View.GONE);
+                        }
+                    }
+                });
+    }
+
+    void saveLanguagesInDB(List<Language> languages, String examSlug) {
+        for(Language language : languages)
+            TestpressSDK.getLanguageDao(activity).insertOrReplace(language);
+        Log.e("Inside","TestActivity-saveLanguagesInDB");
+        for (Language language : languages) {
+            Log.e("Languages loaded",language.getTitle());
+        }
     }
 
     /**
@@ -477,7 +536,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
             } else {
                 panelListAdapter.setItems(reviewItems);
                 pagerAdapter.setReviewItems(reviewItems);
-                ArrayList<Language> languages = exam.getLanguages();
+                ArrayList<Language> languages = (ArrayList<Language>) language;
                 if (languages.size() > 1) {
                     if (selectedLanguage == null) {
                         int selectedPosition = languageSpinnerAdapter

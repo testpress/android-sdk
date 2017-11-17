@@ -8,6 +8,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -26,11 +27,11 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
-import in.testpress.exam.models.Exam;
-import in.testpress.exam.models.Language;
+import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.AttemptsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.MultiLanguagesUtil;
+import in.testpress.models.greendao.TestpressSDK;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
@@ -59,6 +60,7 @@ public class AttemptsActivity extends BaseToolBarActivity
     private Exam exam;
     private List<Attempt> attempts = new ArrayList<>();
     private AttemptsPager pager;
+    private Activity activity;
 
     @SuppressWarnings({"ConstantConditions", "deprecation"})
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface", "DefaultLocale"})
@@ -66,6 +68,7 @@ public class AttemptsActivity extends BaseToolBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_attempts);
+        activity = this;
         scrollView = (ScrollView) findViewById(R.id.scroll_view);
         examDetailsLayout = (LinearLayout) findViewById(R.id.exam_details_layout);
         testReportLayout = (FrameLayout) findViewById(R.id.fragment_container);
@@ -80,9 +83,11 @@ public class AttemptsActivity extends BaseToolBarActivity
         startButton.setTypeface(TestpressSdk.getRubikMediumFont(this));
         //noinspection ConstantConditions
         getSupportActionBar().hide();
-        exam = getIntent().getParcelableExtra(EXAM);
+        //exam = getIntent().getLongExtra(EXAM, 0);
         if (exam == null) {
             String examSlug = getIntent().getStringExtra(PARAM_EXAM_SLUG);
+            Log.e("Exam Slug",examSlug+"");
+            Log.e("Calling Activity",getCallingActivity().getClassName()+"");
             // Throw exception if both exam & exam slug is null
             Assert.assertNotNull("EXAM must not be null.", examSlug);
             loadExam(examSlug);
@@ -206,6 +211,7 @@ public class AttemptsActivity extends BaseToolBarActivity
                     @Override
                     public void onSuccess(Exam exam) {
                         AttemptsActivity.this.exam = exam;
+                        saveExamInDB(exam);
                         checkExamState();
                     }
 
@@ -239,6 +245,11 @@ public class AttemptsActivity extends BaseToolBarActivity
                 });
     }
 
+    void saveExamInDB(Exam exam) {
+        TestpressSDK.getExamDao(activity).insertOrReplace(exam);
+    }
+
+    @SuppressLint("StaticFieldLeak")
     @Override
     public Loader<List<Attempt>> onCreateLoader(int id, Bundle args) {
         progressBar.setVisibility(View.VISIBLE);
@@ -311,7 +322,7 @@ public class AttemptsActivity extends BaseToolBarActivity
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(AttemptsActivity.this, TestActivity.class);
-                        intent.putExtra(TestActivity.PARAM_EXAM, exam);
+                        intent.putExtra(TestActivity.PARAM_EXAM, exam.getId());
                         intent.putExtra(TestActivity.PARAM_ATTEMPT,
                                 pausedAttempts.get(pausedAttempts.size() - 1));
                         startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
@@ -342,7 +353,7 @@ public class AttemptsActivity extends BaseToolBarActivity
 
     private void startExam(boolean discardExamDetails) {
         Intent intent = new Intent(this, TestActivity.class);
-        intent.putExtra(TestActivity.PARAM_EXAM, exam);
+        intent.putExtra(TestActivity.PARAM_EXAM, exam.getId());
         intent.putExtra(TestActivity.PARAM_DISCARD_EXAM_DETAILS, discardExamDetails);
         startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
     }
