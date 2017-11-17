@@ -3,22 +3,28 @@ package in.testpress.course.ui;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
+import org.greenrobot.greendao.AbstractDao;
+
 import java.util.List;
 
 import in.testpress.core.TestpressException;
 import in.testpress.course.R;
-import in.testpress.course.models.Content;
+import in.testpress.course.TestpressCourse;
+import in.testpress.models.greendao.Content;
 import in.testpress.course.network.ContentPager;
 import in.testpress.course.network.TestpressCourseApiClient;
-import in.testpress.ui.PagedItemFragment;
+import in.testpress.models.greendao.ContentDao;
+import in.testpress.network.BaseResourcePager;
+import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
 
 import static in.testpress.course.ui.ContentsListActivity.CONTENTS_URL_FRAG;
 
-public class ContentsListFragment extends PagedItemFragment<Content> {
+public class ContentsListFragment extends BaseDataBaseFragment<Content,Long> {
 
     private TestpressCourseApiClient mApiClient;
     private String contentsUrlFrag;
+    private ContentDao contentDao;
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
@@ -34,15 +40,22 @@ public class ContentsListFragment extends PagedItemFragment<Content> {
             throw new IllegalArgumentException("CONTENTS_URL_FRAG must not be null or empty");
         }
         mApiClient = new TestpressCourseApiClient(getActivity());
+        contentDao = TestpressCourse.getContentDao(getActivity());
     }
 
     @Override
-    protected ContentPager getPager() {
+    protected BaseResourcePager<Content> getPager() {
         if (pager == null) {
             pager = new ContentPager(contentsUrlFrag, mApiClient);
         }
         return (ContentPager)pager;
     }
+
+    @Override
+    protected AbstractDao<Content, Long> getDao() {
+        return contentDao;
+    }
+
 
     @Override
     protected SingleTypeAdapter<Content> createAdapter(List<Content> items) {

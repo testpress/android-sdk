@@ -2,26 +2,163 @@ package in.testpress.exam.util;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
+import in.testpress.core.TestpressCallback;
+import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
-import in.testpress.exam.models.Exam;
-import in.testpress.exam.models.Language;
+import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.models.Languages;
+import in.testpress.models.greendao.Exam;
+import in.testpress.models.greendao.Language;
+import in.testpress.models.greendao.TestpressSDK;
 import in.testpress.ui.ExploreSpinnerAdapter;
 
 public class MultiLanguagesUtil {
 
+    private static List<Language> languages = new List<Language>() {
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return false;
+        }
+
+        @NonNull
+        @Override
+        public Iterator<Language> iterator() {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Object[] toArray() {
+            return new Object[0];
+        }
+
+        @NonNull
+        @Override
+        public <T> T[] toArray(@NonNull T[] a) {
+            return null;
+        }
+
+        @Override
+        public boolean add(Language language) {
+            return false;
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            return false;
+        }
+
+        @Override
+        public boolean containsAll(@NonNull Collection<?> c) {
+            return false;
+        }
+
+        @Override
+        public boolean addAll(@NonNull Collection<? extends Language> c) {
+            return false;
+        }
+
+        @Override
+        public boolean addAll(int index, @NonNull Collection<? extends Language> c) {
+            return false;
+        }
+
+        @Override
+        public boolean removeAll(@NonNull Collection<?> c) {
+            return false;
+        }
+
+        @Override
+        public boolean retainAll(@NonNull Collection<?> c) {
+            return false;
+        }
+
+        @Override
+        public void clear() {
+
+        }
+
+        @Override
+        public Language get(int index) {
+            return null;
+        }
+
+        @Override
+        public Language set(int index, Language element) {
+            return null;
+        }
+
+        @Override
+        public void add(int index, Language element) {
+
+        }
+
+        @Override
+        public Language remove(int index) {
+            return null;
+        }
+
+        @Override
+        public int indexOf(Object o) {
+            return 0;
+        }
+
+        @Override
+        public int lastIndexOf(Object o) {
+            return 0;
+        }
+
+        @NonNull
+        @Override
+        public ListIterator<Language> listIterator() {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public ListIterator<Language> listIterator(int index) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public List<Language> subList(int fromIndex, int toIndex) {
+            return null;
+        }
+    };
+    private static Activity activity;
     public static void supportMultiLanguage(final Activity activity, final Exam exam, Button startButton,
                                             final LanguageSelectionListener listener) {
 
         View languageLayout = activity.findViewById(R.id.language_layout);
-        final ArrayList<Language> languages = exam.getLanguages();
+        languages.set(0, new Language(0l, "en", "English", exam.getSlug()));
+        Log.e("Inside","MultiLanguagesUtil-before loadExamLanguage");
+        loadExamLanguage(activity, exam.getSlug());
+        Log.e("Inside","MultiLanguagesUtil-after loadExamLanguage");
         if (languages.size() > 1) {
             final ExploreSpinnerAdapter languageSpinnerAdapter =
                     new ExploreSpinnerAdapter(activity.getLayoutInflater(), activity.getResources(), false);
@@ -85,6 +222,7 @@ public class MultiLanguagesUtil {
                         Button continueButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
                         continueButton.setEnabled(false);
                     }
+
                 }
             });
         } else {
@@ -95,6 +233,35 @@ public class MultiLanguagesUtil {
                     listener.onLanguageSelected();
                 }
             });
+        }
+    }
+
+    private static void loadExamLanguage(Activity activity, final String examSlug) {
+        Log.e("Calling123","");
+        new TestpressExamApiClient(activity).getLanguages(examSlug)
+                .enqueue(new TestpressCallback<Languages>() {
+                    @Override
+                    public void onSuccess(Languages langs) {
+                        Log.e("Languages Result :",langs.toString()+"");
+                        languages = langs.getResults();
+                        saveLanguagesInDB(langs.getResults(), examSlug);
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        Log.e("Error", "Couldn't load languages successfully");
+                    }
+                });
+    }
+
+    static void saveLanguagesInDB(List<Language> languages, String examSlug) {
+        for(Language language : languages) {
+            language.setExam_slug(examSlug);
+            TestpressSDK.getLanguageDao(activity).insertOrReplace(language);
+        }
+        Log.e("Inside","TestActivity-saveLanguagesInDB");
+        for (Language language : languages) {
+            Log.e("Languages loaded",language.getTitle());
         }
     }
 

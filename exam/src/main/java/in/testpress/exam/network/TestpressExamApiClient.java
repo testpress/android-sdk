@@ -3,7 +3,9 @@ package in.testpress.exam.network;
 import android.content.Context;
 import android.text.Html;
 import android.text.SpannableString;
+import android.util.Log;
 
+import java.security.acl.LastOwnerException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +16,8 @@ import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.Comment;
 import in.testpress.exam.models.CourseAttempt;
-import in.testpress.exam.models.Exam;
+import in.testpress.models.Languages;
+import in.testpress.models.greendao.Exam;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
 import in.testpress.models.greendao.ReviewItem;
@@ -28,7 +31,7 @@ public class TestpressExamApiClient extends TestpressApiClient {
     /**
      * Exams List URL
      */
-    public static final String EXAMS_LIST_PATH =  "/api/v2.2/exams/";
+    public static final String EXAMS_LIST_PATH =  "/api/v2.3/exams/";
 
     public static final String ACCESS_CODES_PATH =  "/api/v2.2/access_codes/";
     public static final String EXAMS_PATH =  "/exams/";
@@ -191,5 +194,11 @@ public class TestpressExamApiClient extends TestpressApiClient {
         params.put("content_object", comment);
         params.put("type_of_vote", typeOfVote);
         return getExamService().updateCommentVote(comment.getVoteId(), params);
+    }
+
+    public RetrofitCall<Languages> getLanguages(String exam_slug) {
+        Log.e("Inside","TPEAC- getLanguages");
+        Log.e("Result as String",getExamService().getLanguages(exam_slug).toString());
+        return getExamService().getLanguages(exam_slug);
     }
 }

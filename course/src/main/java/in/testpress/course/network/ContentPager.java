@@ -2,8 +2,8 @@ package in.testpress.course.network;
 
 import java.io.IOException;
 
-import in.testpress.course.models.Content;
 import in.testpress.models.TestpressApiResponse;
+import in.testpress.models.greendao.Content;
 import in.testpress.network.BaseResourcePager;
 import retrofit2.Response;
 

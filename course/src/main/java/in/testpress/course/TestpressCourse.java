@@ -12,6 +12,7 @@ import org.greenrobot.greendao.database.Database;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.models.greendao.ChapterDao;
+import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.DaoMaster;
 import in.testpress.models.greendao.DaoSession;
@@ -311,6 +312,10 @@ public class TestpressCourse {
 
     public static ChapterDao getChapterDao(Context context) {
         return getDaoSession(context).getChapterDao();
+    }
+
+    public static ContentDao getContentDao(Context context) {
+        return getDaoSession(context).getContentDao();
     }
 
 }

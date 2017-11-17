@@ -10,7 +10,8 @@ import java.util.List;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
-import in.testpress.exam.models.Exam;
+import in.testpress.exam.TestpressExam;
+import in.testpress.models.greendao.Exam;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ViewUtils;
 

@@ -86,7 +86,6 @@ public class LeaderboardFragment extends Fragment {
                     @Override
                     public void onSuccess(Reputation reputation) {
                         if (getActivity() == null) {
-                            return;
                         }
                         Bundle bundle = new Bundle();
                         bundle.putParcelable(PARAM_USER_REPUTATION, reputation);

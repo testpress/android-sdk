@@ -11,7 +11,7 @@ import java.util.List;
 
 import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
-import in.testpress.exam.models.Language;
+import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.ReviewAnswer;
 import in.testpress.models.greendao.ReviewItem;
 import in.testpress.models.greendao.ReviewQuestion;

@@ -13,7 +13,7 @@ import android.widget.TextView;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.CourseAttempt;
-import in.testpress.exam.models.Exam;
+import in.testpress.models.greendao.Exam;
 import in.testpress.util.Assert;
 import in.testpress.util.ViewUtils;
 

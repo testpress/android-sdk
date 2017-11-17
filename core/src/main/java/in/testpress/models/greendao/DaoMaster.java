@@ -30,6 +30,11 @@ public class DaoMaster extends AbstractDaoMaster {
         SelectedAnswerDao.createTable(db, ifNotExists);
         CourseDao.createTable(db, ifNotExists);
         ChapterDao.createTable(db, ifNotExists);
+        LanguageDao.createTable(db, ifNotExists);
+        VideoDao.createTable(db, ifNotExists);
+        AttachmentDao.createTable(db, ifNotExists);
+        ExamDao.createTable(db, ifNotExists);
+        ContentDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
@@ -43,6 +48,11 @@ public class DaoMaster extends AbstractDaoMaster {
         SelectedAnswerDao.dropTable(db, ifExists);
         CourseDao.dropTable(db, ifExists);
         ChapterDao.dropTable(db, ifExists);
+        LanguageDao.dropTable(db, ifExists);
+        VideoDao.dropTable(db, ifExists);
+        AttachmentDao.dropTable(db, ifExists);
+        ExamDao.dropTable(db, ifExists);
+        ContentDao.dropTable(db, ifExists);
     }
 
     /**
@@ -70,6 +80,11 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(SelectedAnswerDao.class);
         registerDaoClass(CourseDao.class);
         registerDaoClass(ChapterDao.class);
+        registerDaoClass(LanguageDao.class);
+        registerDaoClass(VideoDao.class);
+        registerDaoClass(AttachmentDao.class);
+        registerDaoClass(ExamDao.class);
+        registerDaoClass(ContentDao.class);
     }
 
     public DaoSession newSession() {

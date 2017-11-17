@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +20,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Attempt;
-import in.testpress.exam.models.Exam;
+import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.util.ViewUtils;
 
@@ -129,7 +130,8 @@ class AttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(mActivity, TestActivity.class);
-                        intent.putExtra(TestActivity.PARAM_EXAM, mExam);
+                        intent.putExtra(TestActivity.PARAM_EXAM, mExam.getId());
+                        Log.e("Exam id ALA", mExam.getId()+"");
                         intent.putExtra(TestActivity.PARAM_ATTEMPT, attempt);
                         mActivity.startActivityForResult(intent,
                                 CarouselFragment.TEST_TAKEN_REQUEST_CODE);

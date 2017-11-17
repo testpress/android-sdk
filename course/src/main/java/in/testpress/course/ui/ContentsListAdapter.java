@@ -1,9 +1,7 @@
 package in.testpress.course.ui;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.view.View;
-import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -12,15 +10,11 @@ import java.util.List;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
-import in.testpress.course.models.Content;
-import in.testpress.exam.TestpressExam;
-import in.testpress.exam.models.CourseContent;
-import in.testpress.exam.models.Exam;
-import in.testpress.exam.ui.CarouselFragment;
+import in.testpress.models.greendao.Exam;
+import in.testpress.models.greendao.Content;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
 
-import static in.testpress.exam.network.TestpressExamApiClient.STATE_PAUSED;
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 
 class ContentsListAdapter extends SingleTypeAdapter<Content> {

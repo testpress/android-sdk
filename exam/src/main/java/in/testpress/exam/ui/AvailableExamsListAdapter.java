@@ -10,7 +10,7 @@ import java.util.List;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
-import in.testpress.exam.models.Exam;
+import in.testpress.models.greendao.Exam;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ViewUtils;
 
@@ -52,7 +52,7 @@ public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity, TestActivity.class);
-                intent.putExtra(PARAM_EXAM, exam);
+                intent.putExtra(PARAM_EXAM, exam.getId());
                 fragment.startActivityForResult(intent, TEST_TAKEN_REQUEST_CODE);
             }
         });

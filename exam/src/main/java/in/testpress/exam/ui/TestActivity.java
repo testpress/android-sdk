@@ -30,11 +30,16 @@ import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.CourseContent;
 import in.testpress.exam.models.CourseAttempt;
-import in.testpress.exam.models.Exam;
+import in.testpress.models.Languages;
+import in.testpress.models.greendao.Language;
+import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
 
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.models.TestpressApiResponse;
+import in.testpress.models.greendao.ExamDao;
+import in.testpress.models.greendao.LanguageDao;
+import in.testpress.models.greendao.TestpressSDK;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.UIUtils;
@@ -79,11 +84,13 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private Button retryButton;
     private Button resumeButton;
     private Button startButton;
+    private Activity activity;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_test);
+        activity = this;
         examDetailsContainer = findViewById(R.id.exam_details);
         fragmentContainer = (LinearLayout) findViewById(R.id.fragment_container);
         progressBar = (RelativeLayout) findViewById(R.id.pb_loading);
@@ -108,7 +115,10 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         apiClient = new TestpressExamApiClient(this);
         final Intent intent = getIntent();
         Bundle data = intent.getExtras();
-        exam = data.getParcelable(PARAM_EXAM);
+        Log.e("Id",data.getLong(PARAM_EXAM)+"");
+
+        exam = TestpressSDK.getExamDao(activity).queryBuilder().where(ExamDao.Properties.Id.eq(data.getLong(PARAM_EXAM))).list().get(0);
+                ;
         attempt = data.getParcelable(PARAM_ATTEMPT);
         discardExamDetails = getIntent().getBooleanExtra(PARAM_DISCARD_EXAM_DETAILS, false);
         if (exam == null) {
@@ -119,7 +129,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 displayStartExamScreen();
                 return;
             }
-            String examSlug = data.getString(PARAM_EXAM_SLUG);
+            String examSlug = exam.getSlug();
             if (examSlug == null || examSlug.isEmpty()) {
                 throw new IllegalArgumentException("PARAM_EXAM_SLUG must not be null or empty.");
             }
@@ -136,6 +146,8 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                     @Override
                     public void onSuccess(Exam exam) {
                         TestActivity.this.exam = exam;
+                        saveExamInDB(exam);
+                        loadExamLanguage(examSlug);
                         if (exam.getPausedAttemptsCount() > 0) {
                             loadAttempts(exam.getAttemptsUrl());
                         } else {
@@ -171,6 +183,64 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                         }
                     }
                 });
+    }
+
+    void loadExamLanguage(final String examSlug) {
+
+        progressBar.setVisibility(View.VISIBLE);
+        Log.e("Calling123","TA");
+        List<Language> languages = TestpressSDK.getLanguageDao(activity).queryBuilder().where(LanguageDao.Properties.Exam_slug.eq(examSlug)).list();
+        if(languages.size() == 0) {
+            new TestpressExamApiClient(this).getLanguages(examSlug)
+                    .enqueue(new TestpressCallback<Languages>() {
+                        @Override
+                        public void onSuccess(Languages languages) {
+                            saveLanguagesInDB(languages.getResults(), examSlug);
+                        }
+
+                        @Override
+                        public void onException(TestpressException exception) {
+                            if (exception.isUnauthenticated()) {
+                                setEmptyText(R.string.testpress_authentication_failed,
+                                        R.string.testpress_exam_no_permission);
+                                retryButton.setVisibility(View.GONE);
+                            } else if (exception.isNetworkError()) {
+                                setEmptyText(R.string.testpress_network_error,
+                                        R.string.testpress_no_internet_try_again);
+                                retryButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        progressBar.setVisibility(View.VISIBLE);
+                                        emptyView.setVisibility(View.GONE);
+                                        loadExamLanguage(examSlug);
+                                    }
+                                });
+                            } else if (exception.getResponse().code() == 404) {
+                                setEmptyText(R.string.testpress_exam_not_available,
+                                        R.string.testpress_exam_not_available_description);
+                                retryButton.setVisibility(View.GONE);
+                            } else {
+                                setEmptyText(R.string.testpress_error_loading_exam,
+                                        R.string.testpress_some_thing_went_wrong_try_again);
+                                retryButton.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+        } else {
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    void saveExamInDB(Exam exam) {
+        TestpressSDK.getExamDao(activity).insertOrReplace(exam);
+    }
+
+    void saveLanguagesInDB(List<Language> languages, String examSlug) {
+        for(Language language : languages) {
+            language.setExam_slug(examSlug);
+            TestpressSDK.getLanguageDao(activity).insertOrReplace(language);
+        }
+        Log.e("Inside","TestActivity-saveLanguagesInDB");
     }
 
     void loadAttempts(final String attemptUrlFrag) {
@@ -325,6 +395,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         getSupportLoaderManager().initLoader(END_ATTEMPT_LOADER, null, TestActivity.this);
     }
 
+    @SuppressLint("StaticFieldLeak")
     @Override
     public Loader<Attempt> onCreateLoader(final int id, final Bundle args) {
         progressBar.setVisibility(View.VISIBLE);
@@ -401,7 +472,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 TestFragment testFragment = new TestFragment();
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(TestFragment.PARAM_ATTEMPT, attempt);
-                bundle.putParcelable(TestFragment.PARAM_EXAM, exam);
+                bundle.putLong(TestFragment.PARAM_EXAM, exam.getId());
                 if (courseAttempt != null) {
                     bundle.putString(PARAM_CONTENT_ATTEMPT_END_URL, courseAttempt.getEndAttemptUrl());
                 }
@@ -454,6 +525,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void onBackPressed() {
         TestFragment testFragment = null;

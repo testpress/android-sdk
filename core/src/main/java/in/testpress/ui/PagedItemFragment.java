@@ -109,6 +109,7 @@ public abstract class PagedItemFragment<E> extends BaseListViewFragment<E>
         super.onLoadFinished(loader, items);
     }
 
+    @SuppressLint("StaticFieldLeak")
     @Override
     public Loader<List<E>> onCreateLoader(int id, Bundle bundle) {
         return new ThrowableLoader<List<E>>(getActivity(), items) {
