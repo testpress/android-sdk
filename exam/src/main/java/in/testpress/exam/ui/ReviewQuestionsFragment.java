@@ -48,6 +48,7 @@ import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Comment;
 import in.testpress.models.greendao.Language;
+import in.testpress.models.greendao.LanguageDao;
 import in.testpress.models.greendao.ReviewAnswer;
 import in.testpress.models.greendao.ReviewAnswerTranslation;
 import in.testpress.models.greendao.ReviewItem;
@@ -57,6 +58,7 @@ import in.testpress.models.greendao.ReviewQuestionTranslation;
 import in.testpress.exam.network.CommentsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.models.FileDetails;
+import in.testpress.models.greendao.TestpressSDK;
 import in.testpress.network.TestpressApiClient;
 import in.testpress.ui.view.BackEventListeningEditText;
 import in.testpress.util.FormatDate;
@@ -130,7 +132,9 @@ public class ReviewQuestionsFragment extends Fragment
         ReviewQuestionsFragment reviewQuestionsFragment = new ReviewQuestionsFragment();
         Bundle bundle = new Bundle();
         bundle.putLong(ReviewQuestionsFragment.PARAM_REVIEW_ITEM_ID, reviewItemId);
-        bundle.putLong(PARAM_SELECTED_LANGUAGE, selectedLanguage.getId());
+        if(selectedLanguage != null) {
+            bundle.putLong(PARAM_SELECTED_LANGUAGE, selectedLanguage.getId());
+        }
         reviewQuestionsFragment.setArguments(bundle);
         return reviewQuestionsFragment;
     }
@@ -141,7 +145,11 @@ public class ReviewQuestionsFragment extends Fragment
         apiClient = new TestpressExamApiClient(getContext());
         long reviewItemId = getArguments().getLong(PARAM_REVIEW_ITEM_ID);
         Assert.assertNotNull("PARAM_REVIEW_ITEM_ID must not be null", reviewItemId);
-        selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
+        if (getArguments().getLong(PARAM_SELECTED_LANGUAGE, -1L) != -1) {
+            selectedLanguage = TestpressSDK.getLanguageDao(getContext()).queryBuilder().where(LanguageDao.Properties.Id.eq(getArguments().getLong(PARAM_SELECTED_LANGUAGE, 1L))).list().get(0);
+        } else {
+            selectedLanguage = TestpressSDK.getLanguageDao(getContext()).queryBuilder().where(LanguageDao.Properties.Code.eq("en")).list().get(0);
+        }
         ReviewItemDao reviewItemDao= TestpressExam.getReviewItemDao(getContext());
         List<ReviewItem> reviewItems = reviewItemDao.queryBuilder()
                 .where(ReviewItemDao.Properties.Id.eq(reviewItemId)).list();

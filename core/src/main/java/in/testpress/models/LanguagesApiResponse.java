@@ -5,7 +5,7 @@ import java.util.List;
 
 import in.testpress.models.greendao.Language;
 
-public class Languages {
+public class LanguagesApiResponse {
 
     private int count;
     private int per_page;

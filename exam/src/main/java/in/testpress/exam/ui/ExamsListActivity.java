@@ -14,7 +14,6 @@ public class  ExamsListActivity extends BaseToolBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_container_layout);
         CarouselFragment fragment = new CarouselFragment();
-        //Log.e("Calling Activity",getCallingActivity().getClassName()+"");
         fragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, fragment)

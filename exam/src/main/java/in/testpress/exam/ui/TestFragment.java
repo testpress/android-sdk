@@ -42,13 +42,14 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.CourseAttempt;
-import in.testpress.models.Languages;
+import in.testpress.models.LanguagesApiResponse;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.Language;
 import in.testpress.exam.network.TestQuestionsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
+import in.testpress.models.greendao.LanguageDao;
 import in.testpress.models.greendao.TestpressSDK;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.ThrowableLoader;
@@ -596,8 +597,8 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 int selectedPosition =
                         languageSpinnerAdapter.getItemPositionFromTag(selectedLanguageCode);
 
-                // Create new object so that we can update it without affecting original language list
-                //TODO : fetch language from DB
+                // Create new object so that we can update it without affecting original languageList list
+                //TODO : fetch languageList from DB
                 selectedLanguage = new Language(languages.get(selectedPosition));
                 panelListAdapter.setSelectedLanguage(selectedLanguage);
                 languageSpinner.setSelection(selectedPosition);
@@ -623,20 +624,24 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     void loadExamLanguage(final String examSlug) {
-        Log.e("Calling123","TF");
-        new TestpressExamApiClient(activity).getLanguages(examSlug)
-                .enqueue(new TestpressCallback<Languages>() {
-                    @Override
-                    public void onSuccess(Languages langs) {
-                        languages = langs.getResults();
-                        saveLanguagesInDB(langs.getResults(), examSlug);
-                    }
+        List<Language> langs = TestpressSDK.getLanguageDao(activity).queryBuilder().where(LanguageDao.Properties.Exam_slug.eq(examSlug)).list();
+        if(langs.size() > 0) {
+            languages = langs;
+        } else {
+            new TestpressExamApiClient(activity).getLanguages(examSlug)
+                    .enqueue(new TestpressCallback<LanguagesApiResponse>() {
+                        @Override
+                        public void onSuccess(LanguagesApiResponse langs) {
+                            languages = langs.getResults();
+                            saveLanguagesInDB(langs.getResults(), examSlug);
+                        }
 
-                    @Override
-                    public void onException(TestpressException exception) {
+                        @Override
+                        public void onException(TestpressException exception) {
 
-                    }
-                });
+                        }
+                    });
+        }
     }
 
     void saveLanguagesInDB(List<Language> languages, String examSlug) {

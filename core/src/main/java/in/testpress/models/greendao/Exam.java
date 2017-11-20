@@ -28,8 +28,8 @@ public class Exam {
     private String title;
     private String description;
     private String course_category;
-    private String startDate;
-    private String endDate;
+    private java.util.Date startDate;
+    private java.util.Date endDate;
     private String duration;
     private Integer numberOfQuestions;
     private String negativeMarks;
@@ -54,7 +54,7 @@ public class Exam {
     }
 
     @Generated
-    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String course_category, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage) {
+    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String course_category, java.util.Date startDate, java.util.Date endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage) {
         this.totalMarks = totalMarks;
         this.url = url;
         this.id = id;
@@ -145,19 +145,19 @@ public class Exam {
         this.course_category = course_category;
     }
 
-    public String getStartDate() {
+    public java.util.Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(String startDate) {
+    public void setStartDate(java.util.Date startDate) {
         this.startDate = startDate;
     }
 
-    public String getEndDate() {
+    public java.util.Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(java.util.Date endDate) {
         this.endDate = endDate;
     }
 
@@ -283,18 +283,18 @@ public class Exam {
         }
     }
     public String getFormattedStartDate() {
-        return formatDate(startDate);
+        return formatDate(startDate.toString());
     }
     public String getFormattedEndDate() {
-        return formatDate(endDate);
+        return formatDate(endDate.toString());
     }
     @SuppressLint("SimpleDateFormat")
     public boolean isEnded() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         try {
-            if(getEndDate() != null && !getEndDate().isEmpty()) {
-                return simpleDateFormat.parse(getEndDate()).before(new Date());
+            if(getEndDate() != null && !getEndDate().toString().isEmpty()) {
+                return simpleDateFormat.parse(getEndDate().toString()).before(new Date());
             }
         } catch (ParseException e) {
         }
@@ -320,8 +320,8 @@ public class Exam {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         try {
-            if(getStartDate() != null && !getStartDate().isEmpty()) {
-                return simpleDateFormat.parse(getStartDate()).before(new Date());
+            if(getStartDate() != null && !getStartDate().toString().isEmpty()) {
+                return simpleDateFormat.parse(getStartDate().toString()).before(new Date());
             }
         } catch (ParseException e) {
         }
@@ -340,4 +340,5 @@ public class Exam {
         return getAllowRetake() &&
                 (getAttemptsCount() <= getMaxRetakes() || getMaxRetakes() < 0);
     }
+
 }

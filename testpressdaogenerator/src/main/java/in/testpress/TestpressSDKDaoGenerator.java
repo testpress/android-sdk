@@ -13,7 +13,6 @@ public class TestpressSDKDaoGenerator {
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
-
         Entity attempt = addAttempt(schema);
         Entity reviewItem = addReviewItem(schema);
         Entity reviewQuestion = addReviewQuestion(schema);
@@ -121,8 +120,8 @@ public class TestpressSDKDaoGenerator {
         exam.addStringProperty("title");
         exam.addStringProperty("description");
         exam.addStringProperty("course_category");
-        exam.addStringProperty("startDate");
-        exam.addStringProperty("endDate");
+        exam.addDateProperty("startDate");
+        exam.addDateProperty("endDate");
         exam.addStringProperty("duration");
         exam.addIntProperty("numberOfQuestions");
         exam.addStringProperty("negativeMarks");

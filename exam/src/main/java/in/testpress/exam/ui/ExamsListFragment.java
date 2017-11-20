@@ -11,6 +11,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
 
+import org.greenrobot.greendao.AbstractDao;
+
 import java.util.List;
 
 import in.testpress.core.TestpressException;
@@ -18,14 +20,18 @@ import in.testpress.exam.R;
 import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.ExamPager;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.models.greendao.ExamDao;
+import in.testpress.models.greendao.TestpressSDK;
+import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.ui.PagedItemFragment;
 import in.testpress.util.SingleTypeAdapter;
 
-public class ExamsListFragment extends PagedItemFragment<Exam> {
+public class ExamsListFragment extends BaseDataBaseFragment<Exam, Long> {
 
     private String subclass;
     private String category;
     private TestpressExamApiClient apiClient;
+    private ExamDao examDao;
     public static final String AVAILABLE = "available";
     public static final String UPCOMING = "upcoming";
     public static final String HISTORY = "history";
@@ -37,6 +43,7 @@ public class ExamsListFragment extends PagedItemFragment<Exam> {
         subclass = getArguments().getString(SUBCLASS);
         category = getArguments().getString(CATEGORY);
         apiClient = new TestpressExamApiClient(getActivity());
+        examDao = TestpressSDK.getExamDao(getContext());
         super.onCreate(savedInstanceState);
     }
 
@@ -54,20 +61,31 @@ public class ExamsListFragment extends PagedItemFragment<Exam> {
     protected ExamPager getPager() {
         if (pager == null) {
             pager = new ExamPager(subclass, category, apiClient);
+            if (examDao.count() > 0) {
+                Exam latest = examDao.queryBuilder()
+                        .orderDesc(ExamDao.Properties.StartDate)
+                        .list().get(0);
+                ((ExamPager) pager).setLatestModifiedDate(latest.getFormattedStartDate());
+            }
         }
         return (ExamPager)pager;
+    }
+
+    @Override
+    protected AbstractDao<Exam, Long> getDao() {
+        return examDao;
     }
 
     @Override
     protected SingleTypeAdapter<Exam> createAdapter(List<Exam> items) {
         if (subclass != null) {
             if (subclass.equals(ExamsListFragment.UPCOMING)) {
-                return new UpcomingExamsListAdapter(getActivity(), items);
+                return new UpcomingExamsListAdapter(getActivity(), items, examDao);
             } else if (subclass.equals(ExamsListFragment.HISTORY)) {
-                return new HistoryListAdapter(getParentFragment(), items);
+                return new HistoryListAdapter(getParentFragment(), items, examDao);
             }
         }
-        return new AvailableExamsListAdapter(getParentFragment(), items);
+        return new AvailableExamsListAdapter(getParentFragment(), items, examDao);
     }
 
     @Override

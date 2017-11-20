@@ -8,17 +8,17 @@ import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.Comment;
 import in.testpress.exam.models.CourseAttempt;
-import in.testpress.models.Languages;
+import in.testpress.models.LanguagesApiResponse;
 import in.testpress.models.greendao.Exam;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
-import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.ReviewItem;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -31,7 +31,9 @@ import static in.testpress.exam.network.TestpressExamApiClient.EXAMS_PATH;
 public interface ExamService {
 
     @GET(TestpressExamApiClient.EXAMS_LIST_PATH)
-    RetrofitCall<TestpressApiResponse<Exam>> getExams(@QueryMap Map<String, Object> options);
+    RetrofitCall<TestpressApiResponse<Exam>> getExams(
+            @QueryMap Map<String, Object> options,
+            @Header("If-Modified-Since") String latestModifiedDate);
 
     @GET(TestpressExamApiClient.EXAMS_LIST_PATH + "{exam_slug}")
     RetrofitCall<Exam> getExam(@Path(value = "exam_slug", encoded = true) String examSlug);
@@ -127,7 +129,7 @@ public interface ExamService {
             @Body HashMap<String, Object> params);
 
     @GET("/api/v2.3/exams/{exam_slug}/languages/")
-    RetrofitCall<Languages> getLanguages(@Path(value = "exam_slug") String exam_slug);
+    RetrofitCall<LanguagesApiResponse> getLanguages(@Path(value = "exam_slug") String exam_slug);
 }
 
 

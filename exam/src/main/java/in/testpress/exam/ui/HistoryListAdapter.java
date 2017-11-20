@@ -6,39 +6,74 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.TextView;
 
+import org.greenrobot.greendao.query.QueryBuilder;
+
+import java.util.Date;
 import java.util.List;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
-import in.testpress.exam.TestpressExam;
 import in.testpress.models.greendao.Exam;
+import in.testpress.models.greendao.ExamDao;
+import in.testpress.models.greendao.TestpressSDK;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ViewUtils;
 
 import static in.testpress.exam.ui.AccessCodeExamsFragment.ACCESS_CODE;
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 import static in.testpress.exam.ui.TestActivity.PARAM_EXAM;
+import static in.testpress.models.greendao.ExamDao.Properties;
 
 public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
 
     private final Activity activity;
     private final Fragment fragment;
     private String accessCode;
+    private ExamDao examDao;
 
     /**
      * @param fragment
      * @param items
      */
-    public HistoryListAdapter(final Fragment fragment, final List<Exam> items) {
+    public HistoryListAdapter(final Fragment fragment, final List<Exam> items, ExamDao examDao) {
+
         super(fragment.getActivity().getLayoutInflater(), R.layout.testpress_content_list_item);
         this.activity = fragment.getActivity();
         this.fragment = fragment;
+        this.examDao = examDao;
         setItems(items);
     }
 
     public HistoryListAdapter(final Fragment fragment, final List<Exam> items, String accessCode) {
-        this(fragment, items);
+        this(fragment, items, TestpressSDK.getExamDao(fragment.getActivity()));
         this.accessCode = accessCode;
+    }
+
+    @Override
+    public int getCount() {
+        Date today = new Date();
+        QueryBuilder<Exam> queryBuilder = examDao.queryBuilder();
+        return (int) queryBuilder.whereOr(
+                Properties.AttemptsCount.notEq("0"),
+                Properties.PausedAttemptsCount.notEq("0"),
+                Properties.EndDate.gt(today)
+        ).count();
+    }
+
+    @Override
+    public Exam getItem(int position) {
+        Date today = new Date();
+        return examDao.queryBuilder()
+                .whereOr(
+                        Properties.AttemptsCount.notEq("0"),
+                        Properties.PausedAttemptsCount.notEq("0"),
+                        Properties.EndDate.gt(today)
+                ).orderAsc(Properties.StartDate).listLazy().get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).getId();
     }
 
     @Override
