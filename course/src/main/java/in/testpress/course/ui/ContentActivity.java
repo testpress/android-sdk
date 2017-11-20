@@ -384,7 +384,7 @@ public class ContentActivity extends BaseToolBarActivity {
                     if (!content.getHasStarted()) {
                         webOnlyLabel.setText(String.format(
                                 getString(R.string.testpress_can_start_exam_only_after),
-                                FormatDate.formatDateTime(exam.getStartDate())
+                                FormatDate.formatDateTime(exam.getStartDate().toString())
                         ));
                     } else {
                         webOnlyLabel.setText(R.string.testpress_score_good_in_previous_exam);

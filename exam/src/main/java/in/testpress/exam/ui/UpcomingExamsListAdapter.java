@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.Date;
 import java.util.List;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.models.greendao.Exam;
+import in.testpress.models.greendao.ExamDao;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ViewUtils;
 
@@ -18,16 +20,47 @@ import static in.testpress.exam.ui.TestActivity.PARAM_EXAM;
 public class UpcomingExamsListAdapter extends SingleTypeAdapter<Exam> {
 
     private final Activity activity;
+    private ExamDao examDao;
 
     /**
      * @param activity
      * @param items
      */
-    public UpcomingExamsListAdapter(final Activity activity, final List<Exam> items) {
+    public UpcomingExamsListAdapter(final Activity activity, final List<Exam> items, ExamDao examDao) {
         super(activity, R.layout.testpress_content_list_item);
+        this.examDao = examDao;
         setItems(items);
         this.activity = activity;
     }
+
+    @Override
+    public int getCount() {
+        Date today = new Date();
+        return (int) examDao.queryBuilder()
+                .where(
+                        ExamDao.Properties.AttemptsCount.eq("0"),
+                        ExamDao.Properties.PausedAttemptsCount.eq("0"),
+                        ExamDao.Properties.StartDate.gt(today)
+                ).count();
+    }
+
+    @Override
+    public Exam getItem(int position) {
+        Date today = new Date();
+        return examDao.queryBuilder()
+                .where(
+                        ExamDao.Properties.AttemptsCount.eq("0"),
+                        ExamDao.Properties.PausedAttemptsCount.eq("0"),
+                        ExamDao.Properties.StartDate.gt(today)
+                )
+                .orderAsc(ExamDao.Properties.StartDate).listLazy().get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).getId();
+    }
+
 
     @Override
     protected int[] getChildViewIds() {

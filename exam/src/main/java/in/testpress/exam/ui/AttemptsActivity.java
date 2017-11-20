@@ -8,7 +8,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -31,6 +30,7 @@ import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.AttemptsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.MultiLanguagesUtil;
+import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.TestpressSDK;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.ThrowableLoader;
@@ -86,8 +86,6 @@ public class AttemptsActivity extends BaseToolBarActivity
         //exam = getIntent().getLongExtra(EXAM, 0);
         if (exam == null) {
             String examSlug = getIntent().getStringExtra(PARAM_EXAM_SLUG);
-            Log.e("Exam Slug",examSlug+"");
-            Log.e("Calling Activity",getCallingActivity().getClassName()+"");
             // Throw exception if both exam & exam slug is null
             Assert.assertNotNull("EXAM must not be null.", examSlug);
             loadExam(examSlug);
@@ -205,44 +203,50 @@ public class AttemptsActivity extends BaseToolBarActivity
     }
 
     void loadExam(final String examSlug) {
-        progressBar.setVisibility(View.VISIBLE);
-        new TestpressExamApiClient(this).getExam(examSlug)
-                .enqueue(new TestpressCallback<Exam>() {
-                    @Override
-                    public void onSuccess(Exam exam) {
-                        AttemptsActivity.this.exam = exam;
-                        saveExamInDB(exam);
-                        checkExamState();
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        if (exception.isUnauthenticated()) {
-                            setEmptyText(R.string.testpress_authentication_failed,
-                                    R.string.testpress_exam_no_permission);
-                            retryButton.setVisibility(View.GONE);
-                        } else if (exception.isNetworkError()) {
-                            setEmptyText(R.string.testpress_network_error,
-                                    R.string.testpress_no_internet_try_again);
-                            retryButton.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    progressBar.setVisibility(View.VISIBLE);
-                                    emptyView.setVisibility(View.GONE);
-                                    loadExam(examSlug);
-                                }
-                            });
-                        } else if (exception.getResponse().code() == 404) {
-                            setEmptyText(R.string.testpress_exam_not_available,
-                                    R.string.testpress_exam_not_available_description);
-                            retryButton.setVisibility(View.GONE);
-                        } else  {
-                            setEmptyText(R.string.testpress_error_loading_exam,
-                                    R.string.testpress_some_thing_went_wrong_try_again);
-                            retryButton.setVisibility(View.GONE);
+        List<Exam> exams = TestpressSDK.getExamDao(activity).queryBuilder().where(ExamDao.Properties.Slug.eq(examSlug)).list();
+        if(exams.size() > 0) {
+            AttemptsActivity.this.exam = exams.get(0);
+            checkExamState();
+        } else {
+            progressBar.setVisibility(View.VISIBLE);
+            new TestpressExamApiClient(this).getExam(examSlug)
+                    .enqueue(new TestpressCallback<Exam>() {
+                        @Override
+                        public void onSuccess(Exam exam) {
+                            AttemptsActivity.this.exam = exam;
+                            saveExamInDB(exam);
+                            checkExamState();
                         }
-                    }
-                });
+
+                        @Override
+                        public void onException(TestpressException exception) {
+                            if (exception.isUnauthenticated()) {
+                                setEmptyText(R.string.testpress_authentication_failed,
+                                        R.string.testpress_exam_no_permission);
+                                retryButton.setVisibility(View.GONE);
+                            } else if (exception.isNetworkError()) {
+                                setEmptyText(R.string.testpress_network_error,
+                                        R.string.testpress_no_internet_try_again);
+                                retryButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        progressBar.setVisibility(View.VISIBLE);
+                                        emptyView.setVisibility(View.GONE);
+                                        loadExam(examSlug);
+                                    }
+                                });
+                            } else if (exception.getResponse().code() == 404) {
+                                setEmptyText(R.string.testpress_exam_not_available,
+                                        R.string.testpress_exam_not_available_description);
+                                retryButton.setVisibility(View.GONE);
+                            } else {
+                                setEmptyText(R.string.testpress_error_loading_exam,
+                                        R.string.testpress_some_thing_went_wrong_try_again);
+                                retryButton.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+        }
     }
 
     void saveExamInDB(Exam exam) {

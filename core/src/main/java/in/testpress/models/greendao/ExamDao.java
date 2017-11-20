@@ -30,8 +30,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         public final static Property Title = new Property(5, String.class, "title", false, "TITLE");
         public final static Property Description = new Property(6, String.class, "description", false, "DESCRIPTION");
         public final static Property Course_category = new Property(7, String.class, "course_category", false, "COURSE_CATEGORY");
-        public final static Property StartDate = new Property(8, String.class, "startDate", false, "START_DATE");
-        public final static Property EndDate = new Property(9, String.class, "endDate", false, "END_DATE");
+        public final static Property StartDate = new Property(8, java.util.Date.class, "startDate", false, "START_DATE");
+        public final static Property EndDate = new Property(9, java.util.Date.class, "endDate", false, "END_DATE");
         public final static Property Duration = new Property(10, String.class, "duration", false, "DURATION");
         public final static Property NumberOfQuestions = new Property(11, Integer.class, "numberOfQuestions", false, "NUMBER_OF_QUESTIONS");
         public final static Property NegativeMarks = new Property(12, String.class, "negativeMarks", false, "NEGATIVE_MARKS");
@@ -69,8 +69,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
                 "\"TITLE\" TEXT," + // 5: title
                 "\"DESCRIPTION\" TEXT," + // 6: description
                 "\"COURSE_CATEGORY\" TEXT," + // 7: course_category
-                "\"START_DATE\" TEXT," + // 8: startDate
-                "\"END_DATE\" TEXT," + // 9: endDate
+                "\"START_DATE\" INTEGER," + // 8: startDate
+                "\"END_DATE\" INTEGER," + // 9: endDate
                 "\"DURATION\" TEXT," + // 10: duration
                 "\"NUMBER_OF_QUESTIONS\" INTEGER," + // 11: numberOfQuestions
                 "\"NEGATIVE_MARKS\" TEXT," + // 12: negativeMarks
@@ -137,14 +137,14 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             stmt.bindString(8, course_category);
         }
  
-        String startDate = entity.getStartDate();
+        java.util.Date startDate = entity.getStartDate();
         if (startDate != null) {
-            stmt.bindString(9, startDate);
+            stmt.bindLong(9, startDate.getTime());
         }
  
-        String endDate = entity.getEndDate();
+        java.util.Date endDate = entity.getEndDate();
         if (endDate != null) {
-            stmt.bindString(10, endDate);
+            stmt.bindLong(10, endDate.getTime());
         }
  
         String duration = entity.getDuration();
@@ -262,14 +262,14 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             stmt.bindString(8, course_category);
         }
  
-        String startDate = entity.getStartDate();
+        java.util.Date startDate = entity.getStartDate();
         if (startDate != null) {
-            stmt.bindString(9, startDate);
+            stmt.bindLong(9, startDate.getTime());
         }
  
-        String endDate = entity.getEndDate();
+        java.util.Date endDate = entity.getEndDate();
         if (endDate != null) {
-            stmt.bindString(10, endDate);
+            stmt.bindLong(10, endDate.getTime());
         }
  
         String duration = entity.getDuration();
@@ -359,8 +359,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // title
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // description
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // course_category
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // startDate
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // endDate
+            cursor.isNull(offset + 8) ? null : new java.util.Date(cursor.getLong(offset + 8)), // startDate
+            cursor.isNull(offset + 9) ? null : new java.util.Date(cursor.getLong(offset + 9)), // endDate
             cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // duration
             cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11), // numberOfQuestions
             cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // negativeMarks
@@ -389,8 +389,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         entity.setTitle(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setDescription(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setCourse_category(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setStartDate(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setEndDate(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setStartDate(cursor.isNull(offset + 8) ? null : new java.util.Date(cursor.getLong(offset + 8)));
+        entity.setEndDate(cursor.isNull(offset + 9) ? null : new java.util.Date(cursor.getLong(offset + 9)));
         entity.setDuration(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
         entity.setNumberOfQuestions(cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11));
         entity.setNegativeMarks(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));

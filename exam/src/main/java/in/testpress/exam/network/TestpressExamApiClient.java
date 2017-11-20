@@ -1,11 +1,8 @@
 package in.testpress.exam.network;
 
 import android.content.Context;
-import android.text.Html;
-import android.text.SpannableString;
 import android.util.Log;
 
-import java.security.acl.LastOwnerException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +13,7 @@ import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.Comment;
 import in.testpress.exam.models.CourseAttempt;
-import in.testpress.models.Languages;
+import in.testpress.models.LanguagesApiResponse;
 import in.testpress.models.greendao.Exam;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
@@ -31,7 +28,7 @@ public class TestpressExamApiClient extends TestpressApiClient {
     /**
      * Exams List URL
      */
-    public static final String EXAMS_LIST_PATH =  "/api/v2.3/exams/";
+    public static final String EXAMS_LIST_PATH =  "/api/v2.2/exams/";
 
     /**
      * Categories URL
@@ -77,8 +74,9 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return retrofit.create(ExamService.class);
     }
 
-    public RetrofitCall<TestpressApiResponse<Exam>> getExams(Map<String, Object> queryParams) {
-        return getExamService().getExams(queryParams);
+    public RetrofitCall<TestpressApiResponse<Exam>> getExams(Map<String, Object> queryParams,
+                                                             String latestModifiedDate) {
+        return getExamService().getExams(queryParams, latestModifiedDate);
     }
 
     public RetrofitCall<Exam> getExam(String examSlug) {
@@ -188,7 +186,7 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getExamService().updateCommentVote(comment.getVoteId(), params);
     }
 
-    public RetrofitCall<Languages> getLanguages(String exam_slug) {
+    public RetrofitCall<LanguagesApiResponse> getLanguages(String exam_slug) {
         Log.e("Inside","TPEAC- getLanguages");
         Log.e("Result as String",getExamService().getLanguages(exam_slug).toString());
         return getExamService().getLanguages(exam_slug);
