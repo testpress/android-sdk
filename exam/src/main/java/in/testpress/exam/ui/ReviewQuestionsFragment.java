@@ -148,7 +148,7 @@ public class ReviewQuestionsFragment extends Fragment
         if (getArguments().getLong(PARAM_SELECTED_LANGUAGE, -1L) != -1) {
             selectedLanguage = TestpressSDK.getLanguageDao(getContext()).queryBuilder().where(LanguageDao.Properties.Id.eq(getArguments().getLong(PARAM_SELECTED_LANGUAGE, 1L))).list().get(0);
         } else {
-            selectedLanguage = TestpressSDK.getLanguageDao(getContext()).queryBuilder().where(LanguageDao.Properties.Code.eq("en")).list().get(0);
+            selectedLanguage = new Language("en","English");
         }
         ReviewItemDao reviewItemDao= TestpressExam.getReviewItemDao(getContext());
         List<ReviewItem> reviewItems = reviewItemDao.queryBuilder()

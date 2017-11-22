@@ -2,7 +2,7 @@ package in.testpress.course.network;
 
 import java.util.Map;
 
-import in.testpress.course.models.HtmlContent;
+import in.testpress.models.greendao.HtmlContent;
 import in.testpress.course.models.Reputation;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.Content;
@@ -41,7 +41,8 @@ public interface CourseService {
     @GET("{contents_url}")
     RetrofitCall<TestpressApiResponse<Content>> getContents(
             @Path(value = "contents_url", encoded = true) String contentsUrlFrag,
-            @QueryMap Map<String, Object> queryParams);
+            @QueryMap Map<String, Object> queryParams,
+            @Header("If-Modified-Since") String latestModifiedDate);
 
     @GET("{html_content_url}")
     RetrofitCall<HtmlContent> getHtmlContent(

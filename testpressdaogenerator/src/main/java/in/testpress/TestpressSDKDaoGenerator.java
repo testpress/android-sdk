@@ -33,32 +33,41 @@ public class TestpressSDKDaoGenerator {
         Entity attachment = addAttachment(schema);
         Entity exam = addExam(schema);
         Entity content = addContent(schema);
-        //addLanguageToExam(language, exam);
-        addVideoToContent(video, content);
-        addAttachmentToContent(attachment, content);
-        addExamToContent(exam, content);
+        addLanguageToExam(exam, language);
+        addVideoToContent(content, video);
+        addAttachmentToContent(content, attachment);
+        addExamToContent(content, exam);
+        addHtmlContent(schema);
 
         new DaoGenerator().generateAll(schema, "../core/src/main/java");
     }
 
-    private static void addLanguageToExam(Entity language, Entity exam) {
+    private static void addLanguageToExam(Entity exam, Entity language) {
         Property examId = language.addLongProperty("examId").getProperty();
-        ToMany examToLanguages = exam.addToMany(language, examId, "languages");
+        exam.addToMany(language, examId, "languages");
     }
 
-    private static void addExamToContent(Entity exam, Entity content) {
+    private static void addExamToContent(Entity content, Entity exam) {
         Property examId = content.addLongProperty("examId").getProperty();
-        ToOne examToContent = content.addToOne(exam, examId, "exam");
+        content.addToOne(exam, examId, "exam");
     }
 
-    private static void addVideoToContent(Entity video, Entity content) {
+    private static void addVideoToContent(Entity content, Entity video) {
         Property videoId = content.addLongProperty("videoId").getProperty();
-        ToOne videoToContent = content.addToOne(video, videoId, "video");
+        content.addToOne(video, videoId, "video");
     }
 
-    private static void addAttachmentToContent(Entity attachment, Entity content) {
+    private static void addAttachmentToContent(Entity content, Entity attachment) {
         Property attachmentId = content.addLongProperty("attachmentId").getProperty();
-        ToOne attachmentToContent = content.addToOne(attachment, attachmentId, "attachment");
+        content.addToOne(attachment, attachmentId, "attachment");
+    }
+
+    private static Entity addHtmlContent(Schema schema) {
+        Entity htmlContent = schema.addEntity("HtmlContent");
+        htmlContent.addStringProperty("title");
+        htmlContent.addStringProperty("textHtml");
+        htmlContent.addStringProperty("sourceUrl");
+        return htmlContent;
     }
 
     private static Entity addContent(Schema schema) {
@@ -103,7 +112,7 @@ public class TestpressSDKDaoGenerator {
 
     private static Entity addLanguage(Schema schema) {
         Entity language = schema.addEntity("Language");
-        language.addLongProperty("id").primaryKey().autoincrement();
+        language.addLongProperty("id").primaryKey();
         language.addStringProperty("code");
         language.addStringProperty("title");
         language.addStringProperty("exam_slug");

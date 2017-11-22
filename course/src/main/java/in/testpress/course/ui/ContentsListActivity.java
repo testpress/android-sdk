@@ -33,6 +33,7 @@ public class ContentsListActivity extends BaseToolBarActivity {
 
     public static final String CONTENTS_URL_FRAG = "contentsUrlFrag";
     public static final String ACTIONBAR_TITLE = "title";
+    public static final String CHAPTER_ID = "chapterId";
 
     private Chapter chapter;
     private SharedPreferences prefs;
@@ -41,6 +42,14 @@ public class ContentsListActivity extends BaseToolBarActivity {
     private TextView emptyDescView;
     private ProgressBar progressBar;
     private Button retryButton;
+
+    public static Intent createIntent(String title, String contentsUrlFrag, Context context, Long idOfChapter) {
+        Intent intent = new Intent(context, ContentsListActivity.class);
+        intent.putExtra(ACTIONBAR_TITLE, title);
+        intent.putExtra(CONTENTS_URL_FRAG, contentsUrlFrag);
+        intent.putExtra(CHAPTER_ID, idOfChapter);
+        return intent;
+    }
 
     public static Intent createIntent(String title, String contentsUrlFrag, Context context) {
         Intent intent = new Intent(context, ContentsListActivity.class);

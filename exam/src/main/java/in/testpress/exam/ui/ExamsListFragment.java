@@ -6,6 +6,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.Loader;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -13,6 +14,7 @@ import android.widget.ListView;
 
 import org.greenrobot.greendao.AbstractDao;
 
+import java.util.Date;
 import java.util.List;
 
 import in.testpress.core.TestpressException;
@@ -21,6 +23,8 @@ import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.ExamPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.models.greendao.ExamDao;
+import in.testpress.models.greendao.Language;
+import in.testpress.models.greendao.LanguageDao;
 import in.testpress.models.greendao.TestpressSDK;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.ui.PagedItemFragment;
@@ -32,6 +36,7 @@ public class ExamsListFragment extends BaseDataBaseFragment<Exam, Long> {
     private String category;
     private TestpressExamApiClient apiClient;
     private ExamDao examDao;
+    private LanguageDao languageDao;
     public static final String AVAILABLE = "available";
     public static final String UPCOMING = "upcoming";
     public static final String HISTORY = "history";
@@ -40,6 +45,7 @@ public class ExamsListFragment extends BaseDataBaseFragment<Exam, Long> {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        languageDao = TestpressSDK.getLanguageDao(getContext());
         subclass = getArguments().getString(SUBCLASS);
         category = getArguments().getString(CATEGORY);
         apiClient = new TestpressExamApiClient(getActivity());
@@ -74,6 +80,68 @@ public class ExamsListFragment extends BaseDataBaseFragment<Exam, Long> {
     @Override
     protected AbstractDao<Exam, Long> getDao() {
         return examDao;
+    }
+
+    @Override
+    protected boolean isItemsEmpty() {
+        Date today = new Date();
+        if (subclass != null) {
+            if (subclass.equals(ExamsListFragment.UPCOMING)) {
+                return examDao.queryBuilder()
+                        .where(
+                                ExamDao.Properties.AttemptsCount.eq("0"),
+                                ExamDao.Properties.PausedAttemptsCount.eq("0"),
+                                ExamDao.Properties.StartDate.gt(today)
+                        ).list().isEmpty();
+            } else if (subclass.equals(ExamsListFragment.HISTORY)) {
+                return examDao.queryBuilder()
+                        .whereOr(
+                        ExamDao.Properties.AttemptsCount.notEq("0"),
+                        ExamDao.Properties.PausedAttemptsCount.notEq("0"),
+                        ExamDao.Properties.EndDate.gt(today)
+                ).list().isEmpty();
+            }
+        }
+        return examDao.queryBuilder()
+                .where(
+                        ExamDao.Properties.AttemptsCount.eq("0"),
+                        ExamDao.Properties.PausedAttemptsCount.eq("0"),
+                        ExamDao.Properties.StartDate.le(today),
+                        ExamDao.Properties.EndDate.ge(today)
+                ).list().isEmpty();
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Exam>> loader, List<Exam> exams) {
+        final TestpressException exception = getException(loader);
+        List<Language> languages;
+        if (exception != null) {
+            this.exception = exception;
+            int errorMessage = getErrorMessage(exception);
+            if (!isItemsEmpty()) {
+                showError(errorMessage);
+            }
+            showList();
+            getLoaderManager().destroyLoader(loader.getId());
+            return;
+        }
+
+        this.exception = null;
+        this.items = exams;
+        if (!exams.isEmpty()) {
+            //getDao().insertOrReplaceInTx(exams);
+            for(Exam exam : exams) {
+                languages = exam.languages;
+                for(Language language : languages) {
+                    language.setExam_slug(exam.getSlug());
+                    language.setExamId(exam.getId());
+                    languageDao.insertOrReplace(language);
+                }
+                getDao().insertOrReplace(exam);
+            }
+        }
+        displayDataFromDB();
+        showList();
     }
 
     @Override
@@ -127,5 +195,7 @@ public class ExamsListFragment extends BaseDataBaseFragment<Exam, Long> {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 
 }

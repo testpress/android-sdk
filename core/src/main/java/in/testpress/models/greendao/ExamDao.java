@@ -48,6 +48,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         public final static Property SelectedLanguage = new Property(23, String.class, "selectedLanguage", false, "SELECTED_LANGUAGE");
     }
 
+    private DaoSession daoSession;
+
 
     public ExamDao(DaoConfig config) {
         super(config);
@@ -55,6 +57,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
     
     public ExamDao(DaoConfig config, DaoSession daoSession) {
         super(config, daoSession);
+        this.daoSession = daoSession;
     }
 
     /** Creates the underlying database table. */
@@ -341,6 +344,12 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (selectedLanguage != null) {
             stmt.bindString(24, selectedLanguage);
         }
+    }
+
+    @Override
+    protected final void attachEntity(Exam entity) {
+        super.attachEntity(entity);
+        entity.__setDaoSession(daoSession);
     }
 
     @Override

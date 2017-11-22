@@ -157,7 +157,7 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
                                         courseId, chapter.getId().toString(), getContext()));
                     } else {
                         getActivity().startActivity(ContentsListActivity.createIntent(
-                                chapter.getName(), chapter.getContentUrl(), getContext()));
+                                chapter.getName(), chapter.getContentUrl(), getContext(), chapter.getId()));
                     }
                 }
             });

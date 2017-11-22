@@ -42,14 +42,12 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.CourseAttempt;
-import in.testpress.models.LanguagesApiResponse;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.Language;
 import in.testpress.exam.network.TestQuestionsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
-import in.testpress.models.greendao.LanguageDao;
 import in.testpress.models.greendao.TestpressSDK;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.ThrowableLoader;
@@ -465,6 +463,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onLoadFinished(final Loader<List<AttemptItem>> loader, final List<AttemptItem> items) {
+        //TODO : exam is null
+//        loadExamLanguage(exam.getSlug());
+
         if (getActivity() == null) {
             return;
         }
@@ -563,9 +564,6 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             selectedSubjectOffset = 0;
         }
 
-        //TODO : exam is null
-        loadExamLanguage(exam.getSlug());
-        Log.e("languages.size()",languages.size()+"");
         if (languages.size() > 1) {
             languageSpinnerAdapter = new ExploreSpinnerAdapter(getActivity().getLayoutInflater(),
                     getResources(), false);
@@ -605,7 +603,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             }
             languageSpinner.setVisibility(View.VISIBLE);
         } else {
-            selectedLanguage = new Language(0l, "en", "English", exam.getSlug());
+            selectedLanguage = new Language("en", "English", exam.getSlug());
         }
 
         pagerAdapter =
@@ -621,35 +619,6 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         questionsListView.setAdapter(panelListAdapter);
         updateNextButton(pager.getCurrentItem());
         startCountDownTimer(formatMillisecond(attempt.getRemainingTime()));
-    }
-
-    void loadExamLanguage(final String examSlug) {
-        List<Language> langs = TestpressSDK.getLanguageDao(activity).queryBuilder().where(LanguageDao.Properties.Exam_slug.eq(examSlug)).list();
-        if(langs.size() > 0) {
-            languages = langs;
-        } else {
-            new TestpressExamApiClient(activity).getLanguages(examSlug)
-                    .enqueue(new TestpressCallback<LanguagesApiResponse>() {
-                        @Override
-                        public void onSuccess(LanguagesApiResponse langs) {
-                            languages = langs.getResults();
-                            saveLanguagesInDB(langs.getResults(), examSlug);
-                        }
-
-                        @Override
-                        public void onException(TestpressException exception) {
-
-                        }
-                    });
-        }
-    }
-
-    void saveLanguagesInDB(List<Language> languages, String examSlug) {
-        for(Language language : languages) {
-            language.setExam_slug(examSlug);
-            TestpressSDK.getLanguageDao(activity).insertOrReplace(language);
-        }
-        Log.e("Inside","TestActivity-saveLanguagesInDB");
     }
 
     @Override
