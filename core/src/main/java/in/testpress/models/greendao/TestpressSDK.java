@@ -37,4 +37,20 @@ public class TestpressSDK {
     public static LanguageDao getLanguageDao(Context context) {
         return getDaoSession(context).getLanguageDao();
     }
+
+    public static ContentDao getContentDao(Context context) {
+        return getDaoSession(context).getContentDao();
+    }
+
+    public static VideoDao getVideoDao(Context context) {
+        return getDaoSession(context).getVideoDao();
+    }
+
+    public static AttachmentDao getAttachmentDao(Context context) {
+        return getDaoSession(context).getAttachmentDao();
+    }
+
+    public static HtmlContentDao getHtmlContentDao(Context context) {
+        return getDaoSession(context).getHtmlContentDao();
+    }
 }

@@ -5,7 +5,7 @@ import android.content.Context;
 import java.util.Map;
 
 import in.testpress.core.TestpressSdk;
-import in.testpress.course.models.HtmlContent;
+import in.testpress.models.greendao.HtmlContent;
 import in.testpress.course.models.Reputation;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.Content;
@@ -57,8 +57,8 @@ public class TestpressCourseApiClient extends TestpressApiClient {
     }
 
     public RetrofitCall<TestpressApiResponse<Content>> getContents(String chaptersUrlFrag,
-                                                                   Map<String, Object> queryParams) {
-        return getCourseService().getContents(chaptersUrlFrag, queryParams);
+                                Map<String, Object> queryParams, String latestModifiedDate) {
+        return getCourseService().getContents(chaptersUrlFrag, queryParams, latestModifiedDate);
     }
 
     public RetrofitCall<HtmlContent> getHtmlContent(String htmlContentUrlFrag) {

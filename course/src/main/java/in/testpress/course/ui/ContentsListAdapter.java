@@ -10,6 +10,7 @@ import java.util.List;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
+import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Content;
 import in.testpress.util.ImageUtils;
@@ -22,14 +23,51 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
     private final Activity mActivity;
     private ImageLoader mImageLoader;
     private DisplayImageOptions mOptions;
+    private ContentDao contentDao;
+    private long chapterId;
 
-    ContentsListAdapter(Activity activity, final List<Content> items, int layout) {
+    ContentsListAdapter(Activity activity, final List<Content> items, int layout,
+                        ContentDao contentDao, Long idOfChapter) {
         super(activity.getLayoutInflater(), layout);
         mActivity = activity;
         mImageLoader = ImageUtils.initImageLoader(activity);
         mOptions = ImageUtils.getPlaceholdersOption();
+        this.contentDao = contentDao;
+        chapterId = idOfChapter;
         setItems(items);
     }
+
+    @Override
+    public int getCount() {
+        return (int) contentDao.queryBuilder()
+                .where(
+                        ContentDao.Properties.ChapterId.eq(chapterId)
+                ).count();
+    }
+
+    @Override
+    public Content getItem(int position) {
+        return contentDao.queryBuilder()
+                .where(
+                        ContentDao.Properties.ChapterId.eq(chapterId)
+                )
+                .orderAsc(ContentDao.Properties.Order).listLazy().get(position);
+    }
+
+    @Override
+    public List<Content> getItems() {
+        return contentDao.queryBuilder()
+                .where(
+                        ContentDao.Properties.ChapterId.eq(chapterId)
+                )
+                .orderAsc(ContentDao.Properties.Order).list();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).getId();
+    }
+
 
     @Override
     protected int[] getChildViewIds() {
@@ -73,7 +111,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
                 @Override
                 public void onClick(View v) {
                     mActivity.startActivityForResult(ContentActivity.createIntent(getItems(),
-                            position, (ContentsListActivity) mActivity), TEST_TAKEN_REQUEST_CODE);
+                            position, chapterId, (ContentsListActivity) mActivity), TEST_TAKEN_REQUEST_CODE);
                 }
             });
         }

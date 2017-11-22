@@ -1,5 +1,6 @@
 package in.testpress.course.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -52,7 +53,7 @@ public class ChaptersGridActivity extends BaseToolBarActivity {
         List<Chapter> chapters = null;
         try {
             //noinspection RestrictedApi
-            ChaptersGridFragment fragment =
+            @SuppressLint("RestrictedApi") ChaptersGridFragment fragment =
                     (ChaptersGridFragment) getSupportFragmentManager().getFragments().get(0);
 
             chapters = fragment.getItems();

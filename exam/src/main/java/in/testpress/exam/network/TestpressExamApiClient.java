@@ -13,7 +13,6 @@ import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.Comment;
 import in.testpress.exam.models.CourseAttempt;
-import in.testpress.models.LanguagesApiResponse;
 import in.testpress.models.greendao.Exam;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
@@ -192,11 +191,5 @@ public class TestpressExamApiClient extends TestpressApiClient {
         params.put("content_object", comment);
         params.put("type_of_vote", typeOfVote);
         return getExamService().updateCommentVote(comment.getVoteId(), params);
-    }
-
-    public RetrofitCall<LanguagesApiResponse> getLanguages(String exam_slug) {
-        Log.e("Inside","TPEAC- getLanguages");
-        Log.e("Result as String",getExamService().getLanguages(exam_slug).toString());
-        return getExamService().getLanguages(exam_slug);
     }
 }

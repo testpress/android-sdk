@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -39,17 +40,20 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
-import in.testpress.course.models.HtmlContent;
+import in.testpress.models.greendao.HtmlContent;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.CourseContent;
+import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.Content;
+import in.testpress.models.greendao.HtmlContentDao;
+import in.testpress.models.greendao.TestpressSDK;
 import in.testpress.models.greendao.Video;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ZoomableImageActivity;
@@ -68,6 +72,7 @@ public class ContentActivity extends BaseToolBarActivity {
     public static final String FORCE_REFRESH = "forceRefreshContentList";
     public static final String GO_TO_MENU = "gotoMenu";
     public static final String CONTENT_ID = "contentId";
+    public static final String CHAPTER_ID = "chapterId";
     public static final String CONTENTS = "contents";
     public static final String POSITION = "position";
 
@@ -90,7 +95,7 @@ public class ContentActivity extends BaseToolBarActivity {
     private Button previousButton;
     private Button nextButton;
     private boolean hasError = false;
-    private ArrayList<Content> contents;
+    private List<Content> contents;
     private Content content;
     private String contentId;
     private String attemptsUrl;
@@ -98,17 +103,23 @@ public class ContentActivity extends BaseToolBarActivity {
     private int position;
     private FullScreenChromeClient mWebChromeClient = null;
     private WebChromeClient.CustomViewCallback mCustomViewCallback;
+    private ContentDao contentDao;
+    private HtmlContentDao htmlContentDao;
+    private Long chapterId;
 
     public static Intent createIntent(List<Content> contents,
                                       int position,
+                                      long chapterId,
                                       AppCompatActivity activity) {
 
         Intent intent = new Intent(activity, ContentActivity.class);
         // TODO : Pass id instead of list from here
+        intent.putExtra(CONTENT_ID, contents.get(position).getId());
         //intent.putParcelableArrayListExtra(CONTENTS, new ArrayList<Content>(contents));
         intent.putExtra(POSITION, position);
         //noinspection ConstantConditions
         intent.putExtra(ACTIONBAR_TITLE, activity.getSupportActionBar().getTitle());
+        intent.putExtra(CHAPTER_ID, chapterId);
         return intent;
     }
 
@@ -124,6 +135,9 @@ public class ContentActivity extends BaseToolBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_content_detail);
+        this.chapterId = getIntent().getLongExtra(CHAPTER_ID, -1L);
+        contentDao = TestpressSDK.getContentDao(this);
+        htmlContentDao = TestpressSDK.getHtmlContentDao(this);
         webView = (WebView) findViewById(R.id.web_view);
         mCustomViewContainer = (FrameLayout) findViewById(R.id.container);
         mContentView = (LinearLayout) findViewById(R.id.main_content);
@@ -235,7 +249,13 @@ public class ContentActivity extends BaseToolBarActivity {
             }
 
         });
+
         // TODO: contents = getIntent().getParcelableArrayListExtra(CONTENTS);
+        contents = contentDao.queryBuilder()
+                .where(
+                        ContentDao.Properties.ChapterId.eq(getIntent().getLongExtra(CHAPTER_ID, -1L))
+                ).list();
+
         if (contents == null) {
             contentId = getIntent().getStringExtra(CONTENT_ID);
             if (contentId == null) {
@@ -279,6 +299,26 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void loadContentHtml() {
+        HtmlContent htmlContent = fetchHtmlContentFromDB();
+        if (htmlContent != null) {
+            setContentTitle(Html.fromHtml(content.getHtmlContentTitle()));
+            webView.loadDataWithBaseURL("file:///android_asset/", getHeader() +
+                    htmlContent.getTextHtml(), "text/html", "UTF-8", null);
+        } else {
+            loadContentHtmlFromServer();
+        }
+    }
+
+    private HtmlContent fetchHtmlContentFromDB() {
+         List<HtmlContent> htmlContentList = htmlContentDao.queryBuilder().where(HtmlContentDao.Properties.SourceUrl.eq(content.getHtmlContentUrl())).list();
+         if (htmlContentList.size() == 0) {
+             return null;
+         } else {
+             return htmlContentList.get(0);
+         }
+    }
+
+    private void loadContentHtmlFromServer() {
         showLoadingProgress();
         //noinspection deprecation
         setContentTitle(Html.fromHtml(content.getHtmlContentTitle()));
@@ -286,6 +326,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 .enqueue(new TestpressCallback<HtmlContent>() {
                     @Override
                     public void onSuccess(HtmlContent htmlContent) {
+                        saveHtmlContentInDB(htmlContent);
                         webView.loadDataWithBaseURL("file:///android_asset/", getHeader() +
                                 htmlContent.getTextHtml(), "text/html", "UTF-8", null);
                     }
@@ -295,6 +336,11 @@ public class ContentActivity extends BaseToolBarActivity {
                         handleError(exception, false);
                     }
                 });
+    }
+
+    private void saveHtmlContentInDB(HtmlContent htmlContent) {
+        htmlContent.setSourceUrl(content.getHtmlContentUrl());
+        htmlContentDao.insertOrReplace(htmlContent);
     }
 
     private void displayAttachmentContent() {
@@ -461,6 +507,7 @@ public class ContentActivity extends BaseToolBarActivity {
         attemptList.setNestedScrollingEnabled(false);
         attemptList.setHasFixedSize(true);
         attemptList.setLayoutManager(new LinearLayoutManager(this));
+        //TODO you can set adapter here
         attemptList.setAdapter(new ContentAttemptListAdapter(this, content, courseAttempts));
         validateAdjacentNavigationButton();
         examDetailsLayout.setVisibility(View.GONE);
@@ -616,7 +663,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 @Override
                 public void onClick(View v) {
                     startActivity(ContentActivity.createIntent(contents, previousPosition,
-                            ContentActivity.this));
+                            chapterId, ContentActivity.this));
                     finish();
                 }
             });
@@ -646,7 +693,7 @@ public class ContentActivity extends BaseToolBarActivity {
                     public void onClick(View v) {
 
                         startActivity(ContentActivity.createIntent(contents, nextPosition,
-                                ContentActivity.this));
+                                chapterId, ContentActivity.this));
                         finish();
                     }
                 });

@@ -19,7 +19,6 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.network.TestpressExamApiClient;
-import in.testpress.models.LanguagesApiResponse;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.LanguageDao;
@@ -155,9 +154,9 @@ public class MultiLanguagesUtil {
                                             final LanguageSelectionListener listener) {
 
         View languageLayout = activity.findViewById(R.id.language_layout);
-        languages.set(0, new Language(0l, "en", "English", exam.getSlug()));
+        languages.set(0, new Language("en", "English", exam.getSlug()));
         Log.e("Inside","MultiLanguagesUtil-before loadExamLanguage");
-        loadExamLanguage(activity, exam.getSlug());
+        //loadExamLanguage(activity, exam.getSlug());
         Log.e("Inside","MultiLanguagesUtil-after loadExamLanguage");
         if (languages.size() > 1) {
             final ExploreSpinnerAdapter languageSpinnerAdapter =
@@ -233,39 +232,6 @@ public class MultiLanguagesUtil {
                     listener.onLanguageSelected();
                 }
             });
-        }
-    }
-
-    private static void loadExamLanguage(Activity activity, final String examSlug) {
-        List<Language> langs = TestpressSDK.getLanguageDao(activity).queryBuilder().where(LanguageDao.Properties.Exam_slug.eq(examSlug)).list();
-        if(langs.size() > 0) {
-            languages = langs;
-        } else {
-            new TestpressExamApiClient(activity).getLanguages(examSlug)
-                    .enqueue(new TestpressCallback<LanguagesApiResponse>() {
-                        @Override
-                        public void onSuccess(LanguagesApiResponse langs) {
-                            Log.e("LanguagesApiResponse Result :", langs.toString() + "");
-                            languages = langs.getResults();
-                            saveLanguagesInDB(langs.getResults(), examSlug);
-                        }
-
-                        @Override
-                        public void onException(TestpressException exception) {
-                            Log.e("Error", "Couldn't load languages successfully");
-                        }
-                    });
-        }
-    }
-
-    static void saveLanguagesInDB(List<Language> languages, String examSlug) {
-        for(Language language : languages) {
-            language.setExam_slug(examSlug);
-            TestpressSDK.getLanguageDao(activity).insertOrReplace(language);
-        }
-        Log.e("Inside","TestActivity-saveLanguagesInDB");
-        for (Language language : languages) {
-            Log.e("LanguagesApiResponse loaded",language.getTitle());
         }
     }
 

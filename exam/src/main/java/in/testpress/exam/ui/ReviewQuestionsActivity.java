@@ -33,7 +33,6 @@ import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Attempt;
-import in.testpress.models.LanguagesApiResponse;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.Language;
@@ -125,7 +124,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         Assert.assertNotNull("PARAM_EXAM must not be null", exam);
         progressBar = (ProgressBar) findViewById(R.id.pb_loading);
         retryButton = (Button) findViewById(R.id.retry_button);
-        loadExamLanguage(exam.getSlug());
+        //loadExamLanguage(exam.getSlug());
         attempt = getIntent().getParcelableExtra(PARAM_ATTEMPT);
         Assert.assertNotNull("PARAM_ATTEMPT must not be null", attempt);
         questionsListView = (ListView) findViewById(R.id.questions_list_view);
@@ -258,59 +257,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    void loadExamLanguage(final String examSlug) {
-        List<Language> languages = TestpressSDK.getLanguageDao(activity).queryBuilder().where(LanguageDao.Properties.Exam_slug.eq(examSlug)).list();
-        if(languages.size() > 0) {
-            languageList = languages;
-        } else {
-            progressBar.setVisibility(View.VISIBLE);
-            Log.e("Calling123", "RQA");
-            new TestpressExamApiClient(this).getLanguages(examSlug)
-                    .enqueue(new TestpressCallback<LanguagesApiResponse>() {
-                        @Override
-                        public void onSuccess(LanguagesApiResponse languages) {
-                            languageList = languages.getResults();
-                            saveLanguagesInDB(languages.getResults(), exam.getSlug());
-                            invalidateOptionsMenu();
-                            initSelectedLanguage(languageList.get(0));
-                        }
-
-                        @Override
-                        public void onException(TestpressException exception) {
-                            if (exception.isUnauthenticated()) {
-                                setEmptyText(R.string.testpress_authentication_failed,
-                                        R.string.testpress_exam_no_permission);
-                                retryButton.setVisibility(View.GONE);
-                            } else if (exception.isNetworkError()) {
-                                setEmptyText(R.string.testpress_network_error,
-                                        R.string.testpress_no_internet_try_again);
-                                retryButton.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        progressBar.setVisibility(View.VISIBLE);
-                                        emptyView.setVisibility(View.GONE);
-                                        loadExamLanguage(examSlug);
-                                    }
-                                });
-                            } else if (exception.getResponse().code() == 404) {
-                                setEmptyText(R.string.testpress_exam_not_available,
-                                        R.string.testpress_exam_not_available_description);
-                                retryButton.setVisibility(View.GONE);
-                            } else {
-                                setEmptyText(R.string.testpress_error_loading_exam,
-                                        R.string.testpress_some_thing_went_wrong_try_again);
-                                retryButton.setVisibility(View.GONE);
-                            }
-                        }
-                    });
-        }
-    }
-
-    void saveLanguagesInDB(List<Language> languages, String examSlug) {
-        for(Language language : languages)
-            TestpressSDK.getLanguageDao(activity).insertOrReplace(language);
-    }
-
     /**
      * Check ReviewAttempt with current attempt id exist in DB, store otherwise.
      *
@@ -374,7 +320,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     private void saveReviewItems() {
         for (int i = 0; i < reviewItems.size(); i++) {
             ReviewItem reviewItem = reviewItems.get(i);
-            ReviewQuestion reviewQuestion = reviewItem.question;
             // Store selected answers
             for (int selectedAnswerId : reviewItem.getSelectedAnswers()) {
                 SelectedAnswerDao selectedAnswersDao = TestpressExam.getSelectedAnswerDao(this);
@@ -386,6 +331,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
             // Store question
             ReviewQuestionDao reviewQuestionDao = TestpressExam.getReviewQuestionDao(this);
             ReviewAnswerDao reviewAnswerDao = TestpressExam.getReviewAnswerDao(this);
+            ReviewQuestion reviewQuestion = reviewItem.question;
             reviewQuestionDao.insertOrReplace(reviewQuestion);
             // Store answers
             for (ReviewAnswer reviewAnswer : reviewQuestion.getAnswers()) {
@@ -675,7 +621,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     }
 
     private void initSelectedLanguage(Language language) {
-        // Create new object so that we can update it without affecting original languageList list
+        // Create new object so that we can update it without affecting original languages list
         selectedLanguage = new Language(language);
         pagerAdapter.setSelectedLanguage(selectedLanguage);
         panelListAdapter.setSelectedLanguage(selectedLanguage);

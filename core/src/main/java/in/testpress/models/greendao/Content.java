@@ -44,19 +44,19 @@ public class Content {
     private transient ContentDao myDao;
 
     @ToOne(joinProperty = "videoId")
-    private Video video;
+    public Video video;
 
     @Generated
     private transient Long video__resolvedKey;
 
     @ToOne(joinProperty = "attachmentId")
-    private Attachment attachment;
+    public Attachment attachment;
 
     @Generated
     private transient Long attachment__resolvedKey;
 
     @ToOne(joinProperty = "examId")
-    private Exam exam;
+    public Exam exam;
 
     @Generated
     private transient Long exam__resolvedKey;
