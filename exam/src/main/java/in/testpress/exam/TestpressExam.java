@@ -9,12 +9,7 @@ import android.support.v4.app.FragmentActivity;
 
 import org.greenrobot.greendao.database.Database;
 
-import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
-import in.testpress.exam.models.Attempt;
-import in.testpress.exam.models.CourseAttempt;
-import in.testpress.exam.models.CourseContent;
-import in.testpress.exam.models.Exam;
 import in.testpress.exam.ui.AccessCodeActivity;
 import in.testpress.exam.ui.AccessCodeFragment;
 import in.testpress.exam.ui.AnalyticsActivity;
@@ -25,18 +20,14 @@ import in.testpress.exam.ui.CategoryGridActivity;
 import in.testpress.exam.ui.ExamsListActivity;
 import in.testpress.exam.ui.ReviewStatsActivity;
 import in.testpress.exam.ui.TestActivity;
-import in.testpress.models.greendao.DaoMaster;
+import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.CourseAttempt;
+import in.testpress.models.greendao.CourseContent;
 import in.testpress.models.greendao.DaoSession;
-import in.testpress.models.greendao.ReviewAnswerDao;
-import in.testpress.models.greendao.ReviewAnswerTranslationDao;
-import in.testpress.models.greendao.ReviewAttemptDao;
-import in.testpress.models.greendao.ReviewItemDao;
-import in.testpress.models.greendao.ReviewQuestionDao;
-import in.testpress.models.greendao.ReviewQuestionTranslationDao;
-import in.testpress.models.greendao.SelectedAnswerDao;
+import in.testpress.models.greendao.Exam;
 import in.testpress.util.Assert;
-import in.testpress.util.ImageUtils;
 
+import static in.testpress.core.TestpressSDKDatabase.init;
 import static in.testpress.exam.ui.CategoryGridActivity.SHOW_EXAMS_AS_DEFAULT;
 
 public class TestpressExam {
@@ -327,28 +318,6 @@ public class TestpressExam {
         handleCourseAttempt(activity, courseContent, courseAttempt, true, testpressSession, true);
     }
 
-    private static void handleCourseAttempt(@NonNull Activity activity,
-                                            @NonNull CourseContent courseContent,
-                                            CourseAttempt courseAttempt,
-                                            boolean discardExamDetails,
-                                            @NonNull TestpressSession testpressSession,
-                                            boolean endExam) {
-
-        Assert.assertNotNull("Activity must not be null.", activity);
-        Assert.assertNotNull("PARAM_COURSE_CONTENT must not be null.", courseContent);
-        init(activity, testpressSession);
-        Intent intent = new Intent(activity, TestActivity.class);
-        intent.putExtra(TestActivity.PARAM_COURSE_CONTENT, courseContent);
-        if (courseAttempt != null) {
-            intent.putExtra(TestActivity.PARAM_COURSE_ATTEMPT, courseAttempt);
-        }
-        intent.putExtra(TestActivity.PARAM_DISCARD_EXAM_DETAILS, discardExamDetails);
-        if (endExam) {
-            intent.putExtra(TestActivity.PARAM_ACTION, TestActivity.PARAM_VALUE_ACTION_END);
-        }
-        activity.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
-    }
-
     /**
      * Display the content attempt report.
      *
@@ -372,73 +341,26 @@ public class TestpressExam {
         );
     }
 
-    private static void init(Context context, TestpressSession testpressSession) {
-        if (testpressSession == null) {
-            throw new IllegalArgumentException("TestpressSession must not be null.");
+    private static void handleCourseAttempt(@NonNull Activity activity,
+                                            @NonNull CourseContent courseContent,
+                                            CourseAttempt courseAttempt,
+                                            boolean discardExamDetails,
+                                            @NonNull TestpressSession testpressSession,
+                                            boolean endExam) {
+
+        Assert.assertNotNull("Activity must not be null.", activity);
+        Assert.assertNotNull("PARAM_COURSE_CONTENT must not be null.", courseContent);
+        init(activity, testpressSession);
+        Intent intent = new Intent(activity, TestActivity.class);
+        intent.putExtra(TestActivity.PARAM_COURSE_CONTENT, courseContent);
+        if (courseAttempt != null) {
+            intent.putExtra(TestActivity.PARAM_COURSE_ATTEMPT, courseAttempt);
         }
-        TestpressSdk.setTestpressSession(context, testpressSession);
-        ImageUtils.initImageLoader(context);
-        initDatabase(context, testpressSession.getToken());
-    }
-
-    private static void initDatabase(Context context, String sessionToken) {
-        daoSession = getDaoSession(context);
-        if (TestpressSdk.isNewExamDBSession(context, sessionToken)) {
-            DaoMaster.dropAllTables(database, true);
-            DaoMaster.createAllTables(database, true);
-            TestpressSdk.setTestpressExamDBSession(context, sessionToken);
+        intent.putExtra(TestActivity.PARAM_DISCARD_EXAM_DETAILS, discardExamDetails);
+        if (endExam) {
+            intent.putExtra(TestActivity.PARAM_ACTION, TestActivity.PARAM_VALUE_ACTION_END);
         }
+        activity.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
     }
 
-    private static DaoSession getDaoSession(Context context) {
-        if (daoSession == null) {
-            database = getDatabase(context);
-            daoSession = new DaoMaster(database).newSession();
-        }
-        return daoSession;
-    }
-
-    public static void clearDatabase(@NonNull Context context) {
-        Database database = getDatabase(context);
-        DaoMaster.dropAllTables(database, true);
-        DaoMaster.createAllTables(database, true);
-    }
-
-    private static Database getDatabase(@NonNull Context context) {
-        if (database == null) {
-            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(
-                    context.getApplicationContext(), TestpressSdk.TESTPRESS_SDK_DATABASE);
-
-            database = helper.getWritableDb();
-        }
-        return database;
-    }
-
-    public static ReviewAttemptDao getReviewAttemptDao(Context context) {
-        return getDaoSession(context).getReviewAttemptDao();
-    }
-
-    public static ReviewItemDao getReviewItemDao(Context context) {
-        return getDaoSession(context).getReviewItemDao();
-    }
-
-    public static ReviewQuestionDao getReviewQuestionDao(Context context) {
-        return getDaoSession(context).getReviewQuestionDao();
-    }
-
-    public static ReviewAnswerDao getReviewAnswerDao(Context context) {
-        return getDaoSession(context).getReviewAnswerDao();
-    }
-
-    public static ReviewQuestionTranslationDao getReviewQuestionTranslationDao(Context context) {
-        return getDaoSession(context).getReviewQuestionTranslationDao();
-    }
-
-    public static ReviewAnswerTranslationDao getReviewAnswerTranslationDao(Context context) {
-        return getDaoSession(context).getReviewAnswerTranslationDao();
-    }
-
-    public static SelectedAnswerDao getSelectedAnswerDao(Context context) {
-        return getDaoSession(context).getSelectedAnswerDao();
-    }
 }

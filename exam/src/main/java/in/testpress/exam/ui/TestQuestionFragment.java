@@ -18,8 +18,6 @@ import in.testpress.exam.models.AttemptAnswer;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.AttemptQuestion;
 import in.testpress.models.greendao.Language;
-import in.testpress.models.greendao.LanguageDao;
-import in.testpress.models.greendao.TestpressSDK;
 import in.testpress.util.WebViewUtils;
 
 public class TestQuestionFragment extends Fragment {
@@ -42,8 +40,7 @@ public class TestQuestionFragment extends Fragment {
         Bundle bundle = new Bundle();
         bundle.putParcelable(TestQuestionFragment.PARAM_ATTEMPT_ITEM, attemptItem);
         bundle.putInt(TestQuestionFragment.PARAM_QUESTION_INDEX, questionIndex);
-        //TODO selectedLanguage is null
-        bundle.putString(TestQuestionFragment.PARAM_SELECTED_LANGUAGE, selectedLanguage.getCode());
+        bundle.putParcelable(TestQuestionFragment.PARAM_SELECTED_LANGUAGE, selectedLanguage);
         testQuestionFragment.setArguments(bundle);
         return testQuestionFragment;
     }
@@ -53,7 +50,7 @@ public class TestQuestionFragment extends Fragment {
         super.onCreate(savedInstanceState);
         attemptItem = getArguments().getParcelable(PARAM_ATTEMPT_ITEM);
         index = getArguments().getInt(PARAM_QUESTION_INDEX);
-        selectedLanguage = TestpressSDK.getLanguageDao(getContext()).queryBuilder().where(LanguageDao.Properties.Code.eq(getArguments().getString(PARAM_SELECTED_LANGUAGE))).list().get(0);
+        selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
         selectedOptions = new ArrayList<>(attemptItem.getSelectedAnswers());
     }
 

@@ -24,13 +24,13 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
-import in.testpress.exam.models.Attempt;
+import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.ExamDao;
-import in.testpress.models.greendao.TestpressSDK;
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 
@@ -86,7 +86,7 @@ public class ReviewStatsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        exam = TestpressSDK.getExamDao(getActivity()).queryBuilder().where(ExamDao.Properties.Id.eq(getArguments().getLong(PARAM_EXAM))).list().get(0);
+        exam = TestpressSDKDatabase.getExamDao(getActivity()).queryBuilder().where(ExamDao.Properties.Id.eq(getArguments().getLong(PARAM_EXAM))).list().get(0);
         // TODO exam coming as null
         Assert.assertNotNull("PARAM_EXAM must not be null.", exam);
         attempt = getArguments().getParcelable(PARAM_ATTEMPT);

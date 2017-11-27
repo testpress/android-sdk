@@ -1,9 +1,9 @@
 package in.testpress.course.ui;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.Loader;
-import android.util.Log;
 
 import org.greenrobot.greendao.AbstractDao;
 
@@ -19,11 +19,12 @@ import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.ExamDao;
-import in.testpress.models.greendao.TestpressSDK;
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.models.greendao.Video;
 import in.testpress.models.greendao.VideoDao;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
+import in.testpress.util.ThrowableLoader;
 
 import static in.testpress.course.ui.ContentsListActivity.CONTENTS_URL_FRAG;
 
@@ -49,7 +50,7 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
             throw new IllegalArgumentException("CONTENTS_URL_FRAG must not be null or empty");
         }
         mApiClient = new TestpressCourseApiClient(getActivity());
-        contentDao = TestpressSDK.getContentDao(getContext());
+        contentDao = TestpressSDKDatabase.getContentDao(getContext());
         chapterId = getArguments().getLong(CHAPTER_ID);
     }
 
@@ -78,9 +79,9 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
         Video video;
         Attachment attachment;
         Exam exam;
-        VideoDao videoDao = TestpressSDK.getVideoDao(getContext());
-        AttachmentDao attachmentDao = TestpressSDK.getAttachmentDao(getContext());
-        ExamDao examDao = TestpressSDK.getExamDao(getContext());
+        VideoDao videoDao = TestpressSDKDatabase.getVideoDao(getContext());
+        AttachmentDao attachmentDao = TestpressSDKDatabase.getAttachmentDao(getContext());
+        ExamDao examDao = TestpressSDKDatabase.getExamDao(getContext());
         if (exception != null) {
             this.exception = exception;
             int errorMessage = getErrorMessage(exception);

@@ -5,6 +5,7 @@ import android.view.MenuItem;
 
 import com.facebook.login.LoginManager;
 
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.TestpressExam;
@@ -33,7 +34,7 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
             case R.id.logout:
                 TestpressSdk.clearActiveSession(this);
                 LoginManager.getInstance().logOut();
-                TestpressExam.clearDatabase(this);
+                TestpressSDKDatabase.clearDatabase(this);
                 finish();
                 break;
         }

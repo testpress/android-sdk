@@ -3,11 +3,11 @@ package in.testpress.exam.network;
 import java.util.HashMap;
 import java.util.Map;
 
-import in.testpress.exam.models.Attempt;
+import in.testpress.models.greendao.Attempt;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.Comment;
-import in.testpress.exam.models.CourseAttempt;
+import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;

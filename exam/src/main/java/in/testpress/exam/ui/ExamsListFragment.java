@@ -1,6 +1,5 @@
 package in.testpress.exam.ui;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -10,7 +9,6 @@ import android.support.v4.content.Loader;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.ListView;
 
 import org.greenrobot.greendao.AbstractDao;
 
@@ -25,9 +23,8 @@ import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.LanguageDao;
-import in.testpress.models.greendao.TestpressSDK;
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.ui.BaseDataBaseFragment;
-import in.testpress.ui.PagedItemFragment;
 import in.testpress.util.SingleTypeAdapter;
 
 public class ExamsListFragment extends BaseDataBaseFragment<Exam, Long> {
@@ -45,11 +42,11 @@ public class ExamsListFragment extends BaseDataBaseFragment<Exam, Long> {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        languageDao = TestpressSDK.getLanguageDao(getContext());
+        languageDao = TestpressSDKDatabase.getLanguageDao(getContext());
         subclass = getArguments().getString(SUBCLASS);
         category = getArguments().getString(CATEGORY);
         apiClient = new TestpressExamApiClient(getActivity());
-        examDao = TestpressSDK.getExamDao(getContext());
+        examDao = TestpressSDKDatabase.getExamDao(getContext());
         super.onCreate(savedInstanceState);
     }
 
@@ -129,15 +126,16 @@ public class ExamsListFragment extends BaseDataBaseFragment<Exam, Long> {
         this.exception = null;
         this.items = exams;
         if (!exams.isEmpty()) {
-            //getDao().insertOrReplaceInTx(exams);
             for(Exam exam : exams) {
-                languages = exam.languages;
-                for(Language language : languages) {
-                    language.setExam_slug(exam.getSlug());
-                    language.setExamId(exam.getId());
-                    languageDao.insertOrReplace(language);
+                if (languageDao.queryBuilder().where(LanguageDao.Properties.Exam_slug.eq(exam.getSlug())).list().size() == 0) {
+                    languages = exam.languages;
+                    for (Language language : languages) {
+                        language.setExam_slug(exam.getSlug());
+                        language.setExamId(exam.getId());
+                        languageDao.insertOrReplace(language);
+                    }
+                    getDao().insertOrReplace(exam);
                 }
-                getDao().insertOrReplace(exam);
             }
         }
         displayDataFromDB();

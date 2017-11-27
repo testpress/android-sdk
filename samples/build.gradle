@@ -41,7 +41,6 @@ dependencies {
     compile rootProject.design
     compile 'com.google.android.gms:play-services-auth:10.2.0'
     compile 'com.facebook.android:facebook-android-sdk:4.20.0'
-    compile 'com.facebook.stetho:stetho:1.5.0'
     // Facebook sdk may use the different version of customtabs, To avoid the lint errors & crashes
     // declare same version of support lib
     compile rootProject.customtabs

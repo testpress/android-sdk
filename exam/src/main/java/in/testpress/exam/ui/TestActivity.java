@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -27,18 +26,17 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
-import in.testpress.exam.models.Attempt;
-import in.testpress.exam.models.CourseContent;
-import in.testpress.exam.models.CourseAttempt;
-import in.testpress.models.greendao.Language;
+import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.CourseContent;
+import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
 
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.ExamDao;
-import in.testpress.models.greendao.LanguageDao;
-import in.testpress.models.greendao.TestpressSDK;
+import in.testpress.core.TestpressSDKDatabase;
+import in.testpress.util.Assert;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.UIUtils;
@@ -114,17 +112,23 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         apiClient = new TestpressExamApiClient(this);
         final Intent intent = getIntent();
         Bundle data = intent.getExtras();
-        Log.e("Id",data.getLong(PARAM_EXAM)+"");
 
-        exam = TestpressSDK.getExamDao(activity).queryBuilder().where(ExamDao.Properties.Id.eq(data.getLong(PARAM_EXAM))).list().get(0);
-                ;
+        //Currently I am passing parcelled exam from ContentAttempt
+        exam = data.getParcelable(PARAM_EXAM);
+
+        //If coming through exam list then only Id will be passed
+        if(exam == null && data.getLong(PARAM_EXAM) != 0) {
+            exam = TestpressSDKDatabase.getExamDao(activity).queryBuilder()
+                    .where(ExamDao.Properties.Id.eq(data.getLong(PARAM_EXAM))).list().get(0);
+        }
+
         attempt = data.getParcelable(PARAM_ATTEMPT);
         discardExamDetails = getIntent().getBooleanExtra(PARAM_DISCARD_EXAM_DETAILS, false);
         if (exam == null) {
             courseContent = data.getParcelable(PARAM_COURSE_CONTENT);
             courseAttempt = data.getParcelable(PARAM_COURSE_ATTEMPT);
             if (courseContent != null) {
-                exam = courseContent.getExam();
+                exam = courseContent.exam;
                 displayStartExamScreen();
                 return;
             }
@@ -132,54 +136,9 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
             if (examSlug == null || examSlug.isEmpty()) {
                 throw new IllegalArgumentException("PARAM_EXAM_SLUG must not be null or empty.");
             }
-            //loadExam(examSlug);
             return;
         }
         displayStartExamScreen();
-    }
-
-    void loadExam(final String examSlug) {
-        progressBar.setVisibility(View.VISIBLE);
-            new TestpressExamApiClient(this).getExam(examSlug)
-                    .enqueue(new TestpressCallback<Exam>() {
-                        @Override
-                        public void onSuccess(Exam exam) {
-                            TestActivity.this.exam = exam;
-                            if (exam.getPausedAttemptsCount() > 0) {
-                                loadAttempts(exam.getAttemptsUrl());
-                            } else {
-                                displayStartExamScreen();
-                            }
-                        }
-
-                        @Override
-                        public void onException(TestpressException exception) {
-                            if (exception.isUnauthenticated()) {
-                                setEmptyText(R.string.testpress_authentication_failed,
-                                        R.string.testpress_exam_no_permission);
-                                retryButton.setVisibility(View.GONE);
-                            } else if (exception.isNetworkError()) {
-                                setEmptyText(R.string.testpress_network_error,
-                                        R.string.testpress_no_internet_try_again);
-                                retryButton.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        progressBar.setVisibility(View.VISIBLE);
-                                        emptyView.setVisibility(View.GONE);
-                                        loadExam(examSlug);
-                                    }
-                                });
-                            } else if (exception.getResponse().code() == 404) {
-                                setEmptyText(R.string.testpress_exam_not_available,
-                                        R.string.testpress_exam_not_available_description);
-                                retryButton.setVisibility(View.GONE);
-                            } else {
-                                setEmptyText(R.string.testpress_error_loading_exam,
-                                        R.string.testpress_some_thing_went_wrong_try_again);
-                                retryButton.setVisibility(View.GONE);
-                            }
-                        }
-                    });
     }
 
     void loadAttempts(final String attemptUrlFrag) {
@@ -231,7 +190,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         Button startExam = (Button) findViewById(R.id.start_exam);
         LinearLayout attemptActions = (LinearLayout) findViewById(R.id.attempt_actions);
         if (courseAttempt != null) {
-            attempt = courseAttempt.getAssessment();
+            attempt = courseAttempt.assessment;
         }
         if (exam.getDeviceAccessControl() != null && exam.getDeviceAccessControl().equals("web")) {
             webOnlyLabel.setVisibility(View.VISIBLE);
@@ -352,7 +311,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                             break;
                     }
                     courseAttempt = executeRetrofitCall(call);
-                    return courseAttempt.getAssessment();
+                    return courseAttempt.assessment;
                 } else {
                     RetrofitCall<Attempt> call = null;
                     switch (id) {

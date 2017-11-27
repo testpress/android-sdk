@@ -13,14 +13,14 @@ public class TestpressSDKDaoGenerator {
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
-        Entity attempt = addAttempt(schema);
+        Entity reviewAttempt = addReviewAttempt(schema);
         Entity reviewItem = addReviewItem(schema);
         Entity reviewQuestion = addReviewQuestion(schema);
         Entity reviewAnswer = addReviewAnswer(schema);
         Entity reviewQuestionTranslation = addReviewQuestionTranslation(schema);
         Entity reviewAnswerTranslation = addReviewAnswerTranslation(schema);
         addSelectedAnswer(schema);
-        addAttemptToReviewItem(attempt, reviewItem);
+        addAttemptToReviewItem(reviewAttempt, reviewItem);
         addReviewItemToQuestion(reviewItem, reviewQuestion);
         addReviewQuestionToAnswers(reviewQuestion, reviewAnswer);
         addTranslationsToReviewQuestion(reviewQuestion, reviewQuestionTranslation);
@@ -39,7 +39,75 @@ public class TestpressSDKDaoGenerator {
         addExamToContent(content, exam);
         addHtmlContent(schema);
 
+        Entity courseAttempt = addCourseAttempt(schema);
+        Entity attempt = addAttempt(schema);
+        Entity courseContent = addCourseContent(schema);
+        addExamToCourseContent(courseContent, exam);
+        addCourseContentToCourseAttempt(courseAttempt, courseContent);
+        addAttemptToCourseAttempt(courseAttempt, attempt);
+
+        schema.enableKeepSectionsByDefault();
         new DaoGenerator().generateAll(schema, "../core/src/main/java");
+    }
+
+    private static Entity addAttempt(Schema schema) {
+        Entity attempt = schema.addEntity("Attempt");
+        attempt.addStringProperty("url");
+        attempt.addLongProperty("id").primaryKey();
+        attempt.addStringProperty("date");
+        attempt.addIntProperty("totalQuestions");
+        attempt.addStringProperty("score");
+        attempt.addStringProperty("rank");
+        attempt.addStringProperty("maxRank");
+        attempt.addStringProperty("reviewUrl");
+        attempt.addStringProperty("questionsUrl");
+        attempt.addIntProperty("correctCount");
+        attempt.addIntProperty("incorrectCount");
+        attempt.addStringProperty("lastStartedTime");
+        attempt.addStringProperty("remainingTime");
+        attempt.addStringProperty("timeTaken");
+        attempt.addStringProperty("state");
+        attempt.addStringProperty("percentile");
+        attempt.addIntProperty("speed");
+        attempt.addIntProperty("accuracy");
+        attempt.addLongProperty("contentId");
+        attempt.implementsInterface("android.os.Parcelable");
+        return attempt;
+
+    }
+
+    private static Entity addCourseContent(Schema schema) {
+        Entity courseContent = schema.addEntity("CourseContent");
+        courseContent.addLongProperty("id").primaryKey();
+        courseContent.addStringProperty("attemptsUrl");
+        courseContent.implementsInterface("android.os.Parcelable");
+        return courseContent;
+    }
+
+    private static Entity addCourseAttempt(Schema schema) {
+        Entity courseAttempt = schema.addEntity("CourseAttempt");
+        courseAttempt.addLongProperty("id").primaryKey();
+        courseAttempt.addStringProperty("type");
+        courseAttempt.addIntProperty("objectId");
+        courseAttempt.addStringProperty("objectUrl");
+        courseAttempt.addStringProperty("trophies");
+        courseAttempt.implementsInterface("android.os.Parcelable");
+        return courseAttempt;
+    }
+
+    private static void addExamToCourseContent(Entity courseContent, Entity exam) {
+        Property examId = courseContent.addLongProperty("examId").getProperty();
+        courseContent.addToOne(exam, examId, "exam");
+    }
+
+    private static void addCourseContentToCourseAttempt(Entity courseAttempt, Entity courseContent) {
+        Property courseContentId = courseAttempt.addLongProperty("courseContentId").getProperty();
+        courseAttempt.addToOne(courseContent, courseContentId, "chapterContent");
+    }
+
+    private static void addAttemptToCourseAttempt(Entity courseAttempt, Entity attempt) {
+        Property attemptId = courseAttempt.addLongProperty("attemptId").getProperty();
+        courseAttempt.addToOne(attempt, attemptId, "assessment");
     }
 
     private static void addLanguageToExam(Entity exam, Entity language) {
@@ -89,6 +157,7 @@ public class TestpressSDKDaoGenerator {
         content.addStringProperty("start");
         content.addStringProperty("end");
         content.addBooleanProperty("hasStarted");
+        content.implementsInterface("android.os.Parcelable");
         return content;
     }
 
@@ -98,6 +167,7 @@ public class TestpressSDKDaoGenerator {
         attachment.addStringProperty("attachmentUrl");
         attachment.addStringProperty("description");
         attachment.addLongProperty("id").primaryKey();
+        attachment.implementsInterface("android.os.Parcelable");
         return attachment;
     }
 
@@ -107,6 +177,7 @@ public class TestpressSDKDaoGenerator {
         video.addStringProperty("url");
         video.addLongProperty("id").primaryKey();
         video.addStringProperty("embedCode");
+        video.implementsInterface("android.os.Parcelable");
         return video;
     }
 
@@ -116,6 +187,7 @@ public class TestpressSDKDaoGenerator {
         language.addStringProperty("code");
         language.addStringProperty("title");
         language.addStringProperty("exam_slug");
+        language.implementsInterface("android.os.Parcelable");
         return language;
     }
 
@@ -145,6 +217,7 @@ public class TestpressSDKDaoGenerator {
         exam.addIntProperty("commentsCount");
         exam.addStringProperty("slug");
         exam.addStringProperty("selectedLanguage");
+        exam.implementsInterface("android.os.Parcelable");
         return exam;
     }
 
@@ -193,7 +266,7 @@ public class TestpressSDKDaoGenerator {
         return chapter;
     }
 
-    private static Entity addAttempt(Schema schema) {
+    private static Entity addReviewAttempt(Schema schema) {
         Entity attempt = schema.addEntity("ReviewAttempt");
         attempt.addLongProperty("id").primaryKey();
         attempt.addIntProperty("totalQuestions");
@@ -270,9 +343,9 @@ public class TestpressSDKDaoGenerator {
         return reviewAnswerTranslation;
     }
 
-    private static void addAttemptToReviewItem(Entity attempt, Entity reviewItem) {
+    private static void addAttemptToReviewItem(Entity reviewAttempt, Entity reviewItem) {
         Property attemptId = reviewItem.addLongProperty("attemptId").getProperty();
-        ToMany attemptToReviewItems = attempt.addToMany(reviewItem, attemptId);
+        ToMany attemptToReviewItems = reviewAttempt.addToMany(reviewItem, attemptId);
         attemptToReviewItems.setName("reviewItems");
     }
 
