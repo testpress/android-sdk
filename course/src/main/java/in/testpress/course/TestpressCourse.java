@@ -270,52 +270,6 @@ public class TestpressCourse {
 
         TestpressSdk.setTestpressSession(applicationContext, testpressSession);
         ImageUtils.initImageLoader(applicationContext);
-        initDatabase(applicationContext, testpressSession.getToken());
-    }
-
-    private static DaoSession getDaoSession(Context context) {
-        if (daoSession == null) {
-            database = getDatabase(context);
-            daoSession = new DaoMaster(database).newSession();
-        }
-        return daoSession;
-    }
-
-    private static void initDatabase(Context context, String sessionToken) {
-        daoSession = getDaoSession(context);
-        if (TestpressSdk.isNewCourseDBSession(context, sessionToken)) {
-            DaoMaster.dropAllTables(database, true);
-            DaoMaster.createAllTables(database, true);
-            TestpressSdk.setTestpressCourseDBSession(context, sessionToken);
-        }
-    }
-
-    public static void clearDatabase(@NonNull Context context) {
-        Database database = getDatabase(context);
-        DaoMaster.dropAllTables(database, true);
-        DaoMaster.createAllTables(database, true);
-    }
-
-    private static Database getDatabase(@NonNull Context context) {
-        if (database == null) {
-            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(
-                    context.getApplicationContext(), TestpressSdk.TESTPRESS_SDK_DATABASE);
-
-            database = helper.getWritableDb();
-        }
-        return database;
-    }
-
-    public static CourseDao getCourseDao(Context context) {
-        return getDaoSession(context).getCourseDao();
-    }
-
-    public static ChapterDao getChapterDao(Context context) {
-        return getDaoSession(context).getChapterDao();
-    }
-
-    public static ContentDao getContentDao(Context context) {
-        return getDaoSession(context).getContentDao();
     }
 
 }

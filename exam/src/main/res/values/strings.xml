@@ -138,9 +138,10 @@
 
     <string name="testpress_filter">Filter</string>
     <string name="testpress_solutions">Solutions</string>
+    <string name="testpress_time_analytics">Time Analytics</string>
 
     <string name="testpress_web_only_exam">Web Only Exam</string>
-    <string name="testpress_web_only_exam_description">This exam can only be attempt on the website.</string>
+    <string name="testpress_web_only_exam_description">This exam can only be attempted on the website.</string>
     <string name="testpress_can_start_exam_only_after">You can attempt this exam only after \n%1$s</string>
     <string name="testpress_score_good_in_previous_exam">You need to get good scores in the previous tests to attempt this test.</string>
 

@@ -39,7 +39,7 @@ import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.ExamPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.models.greendao.ExamDao;
-import in.testpress.models.greendao.TestpressSDK;
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.ui.HeaderFooterListAdapter;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ThrowableLoader;
@@ -293,7 +293,7 @@ public class SearchFragment extends Fragment implements AbsListView.OnScrollList
 
     private HeaderFooterListAdapter<SingleTypeAdapter<Exam>> createAdapter() {
         SingleTypeAdapter<Exam> wrapped = null;
-        ExamDao examDao = TestpressSDK.getExamDao(getContext());
+        ExamDao examDao = TestpressSDKDatabase.getExamDao(getContext());
         if (subclass == null || subclass.equals("available")) {
             wrapped = new AvailableExamsListAdapter(this, items, examDao);
         } else if (subclass.equals("upcoming")) {

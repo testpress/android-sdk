@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/main_content"
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -21,7 +21,9 @@
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/swipe_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_above="@+id/button_layout"
+            android:layout_below="@+id/appbar">
 
             <android.support.v4.widget.NestedScrollView
                 android:layout_width="match_parent"
@@ -148,67 +150,85 @@
                         android:layout_marginBottom="20dp"
                         android:layout_marginTop="20dp" />
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#efefef"/>
-
-                    <LinearLayout
-                        android:id="@+id/button_layout"
-                        android:orientation="horizontal"
-                        tools:ignore="UnusedAttribute"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <Button
-                            android:id="@+id/previous"
-                            android:background="@android:color/transparent"
-                            android:text="@string/testpress_previous_content"
-                            android:gravity="center"
-                            android:textSize="14sp"
-                            android:textColor="@color/testpress_text_gray"
-                            android:drawableTint="@color/testpress_text_gray"
-                            android:drawableLeft="@drawable/ic_chevron_left_black_24dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="40dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginBottom="10dp" />
-
-                        <TextView
-                            android:id="@+id/page_number"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:text="15/20"
-                            android:gravity="center"
-                            android:layout_gravity="center"
-                            android:lineSpacingExtra="6dp"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/testpress_text_gray_light"
-                            android:layout_height="wrap_content"/>
-
-                        <Button
-                            android:id="@+id/next"
-                            android:background="@android:color/transparent"
-                            android:text="@string/testpress_next_content"
-                            android:gravity="right|center_vertical"
-                            android:textSize="14sp"
-                            android:textColor="@color/testpress_text_gray"
-                            android:drawableTint="@color/testpress_text_gray"
-                            android:drawableRight="@drawable/ic_chevron_right_black_24dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="40dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginBottom="10dp" />
-
-                    </LinearLayout>
-
                 </LinearLayout>
             </android.support.v4.widget.NestedScrollView>
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
-        <include layout="@layout/testpress_empty_view" />
+        <LinearLayout
+            android:id="@+id/button_layout"
+            android:orientation="vertical"
+            tools:ignore="UnusedAttribute"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@color/testpress_white">
 
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#efefef"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/previous"
+                android:background="@android:color/transparent"
+                android:text="@string/testpress_previous_content"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:textColor="@color/testpress_text_gray"
+                android:drawableTint="@color/testpress_text_gray"
+                android:drawableLeft="@drawable/ic_chevron_left_black_24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp" />
+
+            <TextView
+                android:id="@+id/page_number"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="15/20"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:lineSpacingExtra="6dp"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/testpress_text_gray_light"
+                android:layout_height="wrap_content"/>
+
+            <Button
+                android:id="@+id/next"
+                android:background="@android:color/transparent"
+                android:text="@string/testpress_next_content"
+                android:gravity="right|center_vertical"
+                android:textSize="14sp"
+                android:textColor="@color/testpress_text_gray"
+                android:drawableTint="@color/testpress_text_gray"
+                android:drawableRight="@drawable/ic_chevron_right_black_24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <include layout="@layout/testpress_empty_view"
+            android:layout_above="@+id/button_layout"
+            android:layout_below="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </RelativeLayout>
 </merge>

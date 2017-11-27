@@ -17,6 +17,7 @@ import org.greenrobot.greendao.query.WhereCondition;
 import java.util.List;
 
 import in.testpress.core.TestpressException;
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.course.TestpressCourse;
@@ -53,7 +54,7 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
         mApiClient = new TestpressCourseApiClient(getActivity());
         mOptions = ImageUtils.getPlaceholdersOption();
         mImageLoader = ImageUtils.initImageLoader(getActivity());
-        chapterDao = TestpressCourse.getChapterDao(getActivity());
+        chapterDao = TestpressSDKDatabase.getChapterDao(getActivity());
     }
 
     @Override

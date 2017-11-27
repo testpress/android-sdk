@@ -27,6 +27,7 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import junit.framework.Assert;
@@ -40,11 +41,16 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
+import in.testpress.models.greendao.AttachmentDao;
+import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.AttemptDao;
+import in.testpress.models.greendao.CourseAttemptDao;
+import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.HtmlContent;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.exam.TestpressExam;
-import in.testpress.exam.models.CourseAttempt;
-import in.testpress.exam.models.CourseContent;
+import in.testpress.models.greendao.CourseAttempt;
+import in.testpress.models.greendao.CourseContent;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
@@ -53,8 +59,9 @@ import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.HtmlContentDao;
-import in.testpress.models.greendao.TestpressSDK;
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.models.greendao.Video;
+import in.testpress.models.greendao.VideoDao;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ZoomableImageActivity;
 import in.testpress.util.FormatDate;
@@ -78,7 +85,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private WebView webView;
     private FrameLayout mCustomViewContainer;
-    private LinearLayout mContentView;
+    private RelativeLayout mContentView;
     private View mCustomView;
     private SwipeRefreshLayout swipeRefresh;
     private LinearLayout examContentLayout;
@@ -105,6 +112,11 @@ public class ContentActivity extends BaseToolBarActivity {
     private WebChromeClient.CustomViewCallback mCustomViewCallback;
     private ContentDao contentDao;
     private HtmlContentDao htmlContentDao;
+    private CourseAttemptDao courseAttemptDao;
+    private AttemptDao attemptDao;
+    private ExamDao examDao;
+    private VideoDao videoDao;
+    private AttachmentDao attachmentDao;
     private Long chapterId;
 
     public static Intent createIntent(List<Content> contents,
@@ -113,9 +125,8 @@ public class ContentActivity extends BaseToolBarActivity {
                                       AppCompatActivity activity) {
 
         Intent intent = new Intent(activity, ContentActivity.class);
-        // TODO : Pass id instead of list from here
         intent.putExtra(CONTENT_ID, contents.get(position).getId());
-        //intent.putParcelableArrayListExtra(CONTENTS, new ArrayList<Content>(contents));
+        intent.putParcelableArrayListExtra(CONTENTS, new ArrayList<Content>(contents));
         intent.putExtra(POSITION, position);
         //noinspection ConstantConditions
         intent.putExtra(ACTIONBAR_TITLE, activity.getSupportActionBar().getTitle());
@@ -136,11 +147,16 @@ public class ContentActivity extends BaseToolBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_content_detail);
         this.chapterId = getIntent().getLongExtra(CHAPTER_ID, -1L);
-        contentDao = TestpressSDK.getContentDao(this);
-        htmlContentDao = TestpressSDK.getHtmlContentDao(this);
+        contentDao = TestpressSDKDatabase.getContentDao(this);
+        htmlContentDao = TestpressSDKDatabase.getHtmlContentDao(this);
+        courseAttemptDao = TestpressSDKDatabase.getCourseAttemptDao(this);
+        attemptDao = TestpressSDKDatabase.getAttemptDao(this);
+        videoDao = TestpressSDKDatabase.getVideoDao(this);
+        examDao = TestpressSDKDatabase.getExamDao(this);
+        attachmentDao = TestpressSDKDatabase.getAttachmentDao(this);
         webView = (WebView) findViewById(R.id.web_view);
         mCustomViewContainer = (FrameLayout) findViewById(R.id.container);
-        mContentView = (LinearLayout) findViewById(R.id.main_content);
+        mContentView = (RelativeLayout) findViewById(R.id.main_content);
         swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         examContentLayout = (LinearLayout) findViewById(R.id.exam_content_layout);
         examDetailsLayout = (LinearLayout) findViewById(R.id.exam_details_layout);
@@ -226,7 +242,6 @@ public class ContentActivity extends BaseToolBarActivity {
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request,
                                         WebResourceError error) {
-
                 super.onReceivedError(view, request, error);
                 setEmptyText(R.string.testpress_network_error,
                         R.string.testpress_no_internet_try_again,
@@ -235,7 +250,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 retryButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        checkContentType();
+                        updateContent();
                     }
                 });
                 hasError = true;
@@ -250,11 +265,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
         });
 
-        // TODO: contents = getIntent().getParcelableArrayListExtra(CONTENTS);
-        contents = contentDao.queryBuilder()
-                .where(
-                        ContentDao.Properties.ChapterId.eq(getIntent().getLongExtra(CHAPTER_ID, -1L))
-                ).list();
+        contents = getIntent().getParcelableArrayListExtra(CONTENTS);
 
         if (contents == null) {
             contentId = getIntent().getStringExtra(CONTENT_ID);
@@ -268,7 +279,8 @@ public class ContentActivity extends BaseToolBarActivity {
             if (position == -1) {
                 throw new IllegalArgumentException("POSITION must not be null.");
             }
-            content = contents.get(position);
+            content = contentDao.queryBuilder()
+                    .where(ContentDao.Properties.Id.eq(contents.get(position).getId())).list().get(0);
             String title = getIntent().getStringExtra(ACTIONBAR_TITLE);
             Assert.assertNotNull("ACTIONBAR_TITLE must not be null.", title);
             getSupportActionBar().setTitle(title);
@@ -310,7 +322,8 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private HtmlContent fetchHtmlContentFromDB() {
-         List<HtmlContent> htmlContentList = htmlContentDao.queryBuilder().where(HtmlContentDao.Properties.SourceUrl.eq(content.getHtmlContentUrl())).list();
+         List<HtmlContent> htmlContentList = htmlContentDao.queryBuilder()
+                 .where(HtmlContentDao.Properties.SourceUrl.eq(content.getHtmlContentUrl())).list();
          if (htmlContentList.size() == 0) {
              return null;
          } else {
@@ -382,7 +395,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     @SuppressLint("SetTextI18n")
     private void displayStartExamScreen(CourseAttempt pausedCourseAttempt) {
-        final Exam exam = content.getExam();
+        final Exam exam = content.exam;
         TextView numberOfQuestions = (TextView) findViewById(R.id.number_of_questions);
         TextView examDuration = (TextView) findViewById(R.id.exam_duration);
         TextView markPerQuestion = (TextView) findViewById(R.id.mark_per_question);
@@ -464,18 +477,18 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void loadAttempts() {
-        showLoadingProgress();
+        showCourseAttemptFromDB();
         Map<String, Object> queryParams = new HashMap<>();
         new TestpressExamApiClient(this).getContentAttempts(attemptsUrl, queryParams)
                 .enqueue(new TestpressCallback<TestpressApiResponse<CourseAttempt>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<CourseAttempt> response) {
-                        courseAttempts.addAll(response.getResults());
+                        saveCourseAttemptInDB(response.getResults());
                         if (response.getNext() != null) {
                             attemptsUrl = response.getNext();
                             loadAttempts();
                         } else if (courseAttempts.size() == 1 &&
-                                courseAttempts.get(0).getAssessment().getState().equals(STATE_PAUSED)) {
+                                courseAttempts.get(0).assessment.getState().equals(STATE_PAUSED)) {
                             // Only one paused attempt
                             displayStartExamScreen(courseAttempts.get(0));
                         } else {
@@ -485,12 +498,42 @@ public class ContentActivity extends BaseToolBarActivity {
 
                     @Override
                     public void onException(TestpressException exception) {
-                        handleError(exception, false);
+                        if (courseAttempts.size() == 0) {
+                            handleError(exception, false);
+                        }
                     }
                 });
     }
 
+    private void saveCourseAttemptInDB(List<CourseAttempt> courseAttemptList) {
+        Attempt attempt;
+        for(CourseAttempt courseAttempt : courseAttemptList) {
+            attempt = courseAttempt.assessment;
+            attempt.setContentId(content.getId());
+            attemptDao.insertOrReplace(attempt);
+            courseAttempt.setAttemptId(attempt.getId());
+            courseAttempt.setCourseContentId(content.getId());
+            courseAttemptDao.insertOrReplace(courseAttempt);
+        }
+    }
+
+    private void showCourseAttemptFromDB() {
+        courseAttempts = (ArrayList<CourseAttempt>) courseAttemptDao.queryBuilder()
+                .where(CourseAttemptDao.Properties.CourseContentId.eq(content.getId())).list();
+        if(courseAttempts.size() > 0) {
+            if (courseAttempts.size() == 1 &&
+                    courseAttempts.get(0).getAssessment().getState().equals(STATE_PAUSED)) {
+                // Only one paused attempt
+                displayStartExamScreen(courseAttempts.get(0));
+            } else {
+                displayAttemptsList();
+            }
+        }
+    }
+
     private void displayAttemptsList() {
+        courseAttempts = (ArrayList<CourseAttempt>) courseAttemptDao.queryBuilder()
+                .where(CourseAttemptDao.Properties.CourseContentId.eq(content.getId())).list();
         final Exam exam = content.getExam();
         final List<CourseAttempt> pausedAttempts = new ArrayList<>();
         if (exam.getPausedAttemptsCount() > 0) {
@@ -505,7 +548,6 @@ public class ContentActivity extends BaseToolBarActivity {
         attemptList.setNestedScrollingEnabled(false);
         attemptList.setHasFixedSize(true);
         attemptList.setLayoutManager(new LinearLayoutManager(this));
-        //TODO you can set adapter here
         attemptList.setAdapter(new ContentAttemptListAdapter(this, content, courseAttempts));
         validateAdjacentNavigationButton();
         examDetailsLayout.setVisibility(View.GONE);
@@ -605,14 +647,46 @@ public class ContentActivity extends BaseToolBarActivity {
         } else {
             contentUrl = TestpressCourseApiClient.CONTENTS_PATH + contentId;
         }
+
         new TestpressCourseApiClient(this).getContent(contentUrl)
                 .enqueue(new TestpressCallback<Content>() {
                     @Override
                     public void onSuccess(Content content) {
-                        if (contents != null) {
-                            contents.set(position, content);
+
+                        examDao.queryBuilder().where(
+                                ExamDao.Properties.Id.eq(content.examId)
+                        ).buildDelete().executeDeleteWithoutDetachingEntities();
+                        videoDao.queryBuilder().where(
+                                VideoDao.Properties.Id.eq(content.videoId)
+                        ).buildDelete().executeDeleteWithoutDetachingEntities();
+                        attachmentDao.queryBuilder().where(
+                                AttachmentDao.Properties.Id.eq(content.attachmentId)
+                        ).buildDelete().executeDeleteWithoutDetachingEntities();
+                        contentDao.queryBuilder().where(
+                                ContentDao.Properties.ChapterId.eq(content.chapterId),
+                                ContentDao.Properties.Order.eq(content.order)
+                        ).buildDelete().executeDeleteWithoutDetachingEntities();
+
+                        Video video = content.video;
+                        if (video != null) {
+                            videoDao.insertOrReplace(video);
+                            content.setVideoId(video.getId());
                         }
-                        ContentActivity.this.content = content;
+                        Exam exam = content.exam;
+                        if (exam != null) {
+                            examDao.insertOrReplace(exam);
+                            content.setExamId(exam.getId());
+                        }
+                        Attachment attachment = content.attachment;
+                        if (attachment != null) {
+                            attachmentDao.insertOrReplace(attachment);
+                            content.setAttachmentId(attachment.getId());
+                        }
+                        contentDao.insertOrReplace(content);
+
+                        contents = contentDao.queryBuilder()
+                                .where(ContentDao.Properties.ChapterId.eq(content.chapterId)).list();
+                        ContentActivity.this.content = contents.get(position);
                         checkContentType();
                     }
 
@@ -754,6 +828,7 @@ public class ContentActivity extends BaseToolBarActivity {
         swipeRefresh.setRefreshing(false);
         swipeRefresh.setVisibility(View.GONE);
         retryButton.setVisibility(View.VISIBLE);
+        validateAdjacentNavigationButton();
     }
 
     private void hideContents() {

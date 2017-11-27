@@ -11,9 +11,9 @@ import org.greenrobot.greendao.database.Database;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
-import in.testpress.exam.models.Attempt;
-import in.testpress.exam.models.CourseContent;
-import in.testpress.exam.models.CourseAttempt;
+import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.CourseContent;
+import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.DaoMaster;
 import in.testpress.models.greendao.DaoSession;
@@ -35,6 +35,7 @@ import in.testpress.exam.ui.TestActivity;
 import in.testpress.util.Assert;
 import in.testpress.util.ImageUtils;
 
+import static in.testpress.core.TestpressSDKDatabase.init;
 import static in.testpress.exam.ui.CategoryGridActivity.SHOW_EXAMS_AS_DEFAULT;
 
 public class TestpressExam {
@@ -312,75 +313,5 @@ public class TestpressExam {
             intent.putExtra(TestActivity.PARAM_ACTION, TestActivity.PARAM_VALUE_ACTION_END);
         }
         activity.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
-    }
-
-    private static void init(Context context, TestpressSession testpressSession) {
-        if (testpressSession == null) {
-            throw new IllegalArgumentException("TestpressSession must not be null.");
-        }
-        TestpressSdk.setTestpressSession(context, testpressSession);
-        ImageUtils.initImageLoader(context);
-        initDatabase(context, testpressSession.getToken());
-    }
-
-    private static void initDatabase(Context context, String sessionToken) {
-        daoSession = getDaoSession(context);
-        if (TestpressSdk.isNewExamDBSession(context, sessionToken)) {
-            DaoMaster.dropAllTables(database, true);
-            DaoMaster.createAllTables(database, true);
-            TestpressSdk.setTestpressExamDBSession(context, sessionToken);
-        }
-    }
-
-    private static DaoSession getDaoSession(Context context) {
-        if (daoSession == null) {
-            database = getDatabase(context);
-            daoSession = new DaoMaster(database).newSession();
-        }
-        return daoSession;
-    }
-
-    public static void clearDatabase(@NonNull Context context) {
-        Database database = getDatabase(context);
-        DaoMaster.dropAllTables(database, true);
-        DaoMaster.createAllTables(database, true);
-    }
-
-    private static Database getDatabase(@NonNull Context context) {
-        if (database == null) {
-            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(
-                    context.getApplicationContext(), TestpressSdk.TESTPRESS_SDK_DATABASE);
-
-            database = helper.getWritableDb();
-        }
-        return database;
-    }
-
-    public static ReviewAttemptDao getReviewAttemptDao(Context context) {
-        return getDaoSession(context).getReviewAttemptDao();
-    }
-
-    public static ReviewItemDao getReviewItemDao(Context context) {
-        return getDaoSession(context).getReviewItemDao();
-    }
-
-    public static ReviewQuestionDao getReviewQuestionDao(Context context) {
-        return getDaoSession(context).getReviewQuestionDao();
-    }
-
-    public static ReviewAnswerDao getReviewAnswerDao(Context context) {
-        return getDaoSession(context).getReviewAnswerDao();
-    }
-
-    public static ReviewQuestionTranslationDao getReviewQuestionTranslationDao(Context context) {
-        return getDaoSession(context).getReviewQuestionTranslationDao();
-    }
-
-    public static ReviewAnswerTranslationDao getReviewAnswerTranslationDao(Context context) {
-        return getDaoSession(context).getReviewAnswerTranslationDao();
-    }
-
-    public static SelectedAnswerDao getSelectedAnswerDao(Context context) {
-        return getDaoSession(context).getSelectedAnswerDao();
     }
 }

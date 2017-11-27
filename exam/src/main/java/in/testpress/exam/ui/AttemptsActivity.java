@@ -8,7 +8,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -26,14 +25,14 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
-import in.testpress.exam.models.Attempt;
+import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.AttemptsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.models.greendao.ExamDao;
-import in.testpress.models.greendao.TestpressSDK;
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
@@ -205,7 +204,7 @@ public class AttemptsActivity extends BaseToolBarActivity
     }
 
     void loadExam(final String examSlug) {
-        List<Exam> exams = TestpressSDK.getExamDao(activity).queryBuilder().where(ExamDao.Properties.Slug.eq(examSlug)).list();
+        List<Exam> exams = TestpressSDKDatabase.getExamDao(activity).queryBuilder().where(ExamDao.Properties.Slug.eq(examSlug)).list();
         if(exams.size() > 0) {
             AttemptsActivity.this.exam = exams.get(0);
             checkExamState();
@@ -252,11 +251,11 @@ public class AttemptsActivity extends BaseToolBarActivity
     }
 
     void saveExamInDB(Exam exam) {
-        TestpressSDK.getExamDao(activity).insertOrReplace(exam);
+        TestpressSDKDatabase.getExamDao(activity).insertOrReplace(exam);
         for(Language language : exam.getLanguages()) {
             language.setExam_slug(exam.getSlug());
             language.setExamId(exam.getId());
-            TestpressSDK.getLanguageDao(activity).insertOrReplace(language);
+            TestpressSDKDatabase.getLanguageDao(activity).insertOrReplace(language);
         }
     }
 

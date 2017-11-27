@@ -8,8 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
-import in.testpress.exam.models.Attempt;
-import in.testpress.exam.models.CourseAttempt;
+import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.InstituteSettings;
 

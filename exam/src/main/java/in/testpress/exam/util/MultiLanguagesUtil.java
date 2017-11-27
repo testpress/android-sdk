@@ -15,14 +15,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import in.testpress.core.TestpressCallback;
-import in.testpress.core.TestpressException;
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.exam.R;
-import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.models.greendao.Exam;
+import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.LanguageDao;
-import in.testpress.models.greendao.TestpressSDK;
 import in.testpress.ui.ExploreSpinnerAdapter;
 
 public class MultiLanguagesUtil {
@@ -154,10 +152,9 @@ public class MultiLanguagesUtil {
                                             final LanguageSelectionListener listener) {
 
         View languageLayout = activity.findViewById(R.id.language_layout);
-        languages.set(0, new Language("en", "English", exam.getSlug()));
-        Log.e("Inside","MultiLanguagesUtil-before loadExamLanguage");
-        //loadExamLanguage(activity, exam.getSlug());
-        Log.e("Inside","MultiLanguagesUtil-after loadExamLanguage");
+        LanguageDao languageDao = TestpressSDKDatabase.getLanguageDao(activity);
+        languages = languageDao.queryBuilder().where(LanguageDao.Properties.ExamId.eq(exam.id)).list();
+//        languages.set(0, new Language("en", "English", exam.getSlug()));
         if (languages.size() > 1) {
             final ExploreSpinnerAdapter languageSpinnerAdapter =
                     new ExploreSpinnerAdapter(activity.getLayoutInflater(), activity.getResources(), false);

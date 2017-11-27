@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 
 import java.util.List;
 
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
 import in.testpress.course.TestpressCourse;
 import in.testpress.models.greendao.Chapter;
@@ -62,7 +63,7 @@ public class ChaptersGridActivity extends BaseToolBarActivity {
         if (chapters != null && !chapters.isEmpty()) {
             Integer parentId = chapters.get(0).getParentId();
             if (parentId != null) {
-                ChapterDao chapterDao = TestpressCourse.getChapterDao(this);
+                ChapterDao chapterDao = TestpressSDKDatabase.getChapterDao(this);
                 Chapter parentChapter = chapterDao.queryBuilder()
                         .where(ChapterDao.Properties.Id.eq(parentId))
                         .list().get(0);

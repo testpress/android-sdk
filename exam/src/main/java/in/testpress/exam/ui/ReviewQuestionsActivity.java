@@ -8,7 +8,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SlidingPaneLayout;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,7 +31,7 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
-import in.testpress.exam.models.Attempt;
+import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.Language;
@@ -54,7 +53,7 @@ import in.testpress.models.greendao.SelectedAnswerDao;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
 import in.testpress.models.TestpressApiResponse;
-import in.testpress.models.greendao.TestpressSDK;
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.UIUtils;
@@ -120,7 +119,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_review_question);
         activity = this;
-        exam = TestpressSDK.getExamDao(this).queryBuilder().where(ExamDao.Properties.Id.eq(getIntent().getLongExtra(PARAM_EXAM, 1L))).list().get(0);
+        exam = TestpressSDKDatabase.getExamDao(this).queryBuilder().where(ExamDao.Properties.Id.eq(getIntent().getLongExtra(PARAM_EXAM, 1L))).list().get(0);
         Assert.assertNotNull("PARAM_EXAM must not be null", exam);
         progressBar = (ProgressBar) findViewById(R.id.pb_loading);
         retryButton = (Button) findViewById(R.id.retry_button);
@@ -203,9 +202,9 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         });
         spinnerAdapter = new ExploreSpinnerAdapter(getLayoutInflater(), getResources(), true);
         spinnerAdapter.hideSpinner(true);
-        reviewItemDao= TestpressExam.getReviewItemDao(this);
-        attemptDao = TestpressExam.getReviewAttemptDao(this);
-        languageDao = TestpressSDK.getLanguageDao(this);
+        reviewItemDao= TestpressSDKDatabase.getReviewItemDao(this);
+        attemptDao = TestpressSDKDatabase.getReviewAttemptDao(this);
+        languageDao = TestpressSDKDatabase.getLanguageDao(this);
         reviewAttempt = getReviewAttempt();
     }
 
@@ -322,15 +321,15 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
             ReviewItem reviewItem = reviewItems.get(i);
             // Store selected answers
             for (int selectedAnswerId : reviewItem.getSelectedAnswers()) {
-                SelectedAnswerDao selectedAnswersDao = TestpressExam.getSelectedAnswerDao(this);
+                SelectedAnswerDao selectedAnswersDao = TestpressSDKDatabase.getSelectedAnswerDao(this);
                 SelectedAnswer selectedAnswer = new SelectedAnswer();
                 selectedAnswer.setAnswerId(selectedAnswerId);
                 selectedAnswer.setReviewItemId(reviewItem.getId());
                 selectedAnswersDao.insertOrReplace(selectedAnswer);
             }
             // Store question
-            ReviewQuestionDao reviewQuestionDao = TestpressExam.getReviewQuestionDao(this);
-            ReviewAnswerDao reviewAnswerDao = TestpressExam.getReviewAnswerDao(this);
+            ReviewQuestionDao reviewQuestionDao = TestpressSDKDatabase.getReviewQuestionDao(this);
+            ReviewAnswerDao reviewAnswerDao = TestpressSDKDatabase.getReviewAnswerDao(this);
             ReviewQuestion reviewQuestion = reviewItem.question;
             reviewQuestionDao.insertOrReplace(reviewQuestion);
             // Store answers
@@ -342,7 +341,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
             for (ReviewQuestionTranslation translation : reviewQuestion.getTranslations()) {
                 translation.setQuestionId(reviewQuestion.getId());
                 ReviewQuestionTranslationDao translationDao =
-                        TestpressExam.getReviewQuestionTranslationDao(this);
+                        TestpressSDKDatabase.getReviewQuestionTranslationDao(this);
 
                 translationDao.insertOrReplace(translation);
                 for (ReviewAnswerTranslation answerTranslation : translation.getAnswers()) {
@@ -352,7 +351,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
                     answerTranslation.setIsCorrect(answer.getIsCorrect());
                     answerTranslation.setQuestionTranslationId(translation.getId());
                     ReviewAnswerTranslationDao reviewAnswerTranslationDao =
-                            TestpressExam.getReviewAnswerTranslationDao(this);
+                            TestpressSDKDatabase.getReviewAnswerTranslationDao(this);
 
                     reviewAnswerTranslationDao.insertOrReplace(answerTranslation);
                 }

@@ -8,6 +8,7 @@ import org.greenrobot.greendao.AbstractDao;
 import java.util.List;
 
 import in.testpress.core.TestpressException;
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
 import in.testpress.course.TestpressCourse;
 import in.testpress.models.greendao.Course;
@@ -33,7 +34,7 @@ public class CourseListFragment extends BaseDataBaseFragment<Course, Long> {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mApiClient = new TestpressCourseApiClient(getActivity());
-        courseDao = TestpressCourse.getCourseDao(getActivity());
+        courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
     }
 
     @Override

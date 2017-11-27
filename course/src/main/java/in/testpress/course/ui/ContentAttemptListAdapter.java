@@ -17,9 +17,9 @@ import java.util.List;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.exam.TestpressExam;
-import in.testpress.exam.models.Attempt;
-import in.testpress.exam.models.CourseAttempt;
-import in.testpress.exam.models.CourseContent;
+import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.CourseAttempt;
+import in.testpress.models.greendao.CourseContent;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.models.greendao.Content;
 import in.testpress.util.ViewUtils;
@@ -137,7 +137,7 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     public void onClick(View v) {
                         //noinspection ConstantConditions
                         TestpressExam.resumeCourseAttempt(mActivity,
-                                new CourseContent(mContent.getAttemptsUrl(), mContent.getExam()),
+                                new CourseContent(mContent.getAttemptsUrl(), mContent.exam),
                                 courseAttempt, false, TestpressSdk.getTestpressSession(mActivity));
                     }
                 });
@@ -150,7 +150,7 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     @Override
                     public void onClick(View v) {
                         //noinspection ConstantConditions
-                        TestpressExam.showAttemptReport(mActivity, mContent.getExam(), attempt,
+                        TestpressExam.showAttemptReport(mActivity, mContent.exam, attempt,
                                 TestpressSdk.getTestpressSession(mActivity));
                     }
                 });
