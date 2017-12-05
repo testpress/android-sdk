@@ -31,13 +31,20 @@ public class ReviewItemDao extends AbstractDao<ReviewItem, Long> {
      */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "ID");
-        public final static Property Index = new Property(1, Integer.class, "index", false, "INDEX");
-        public final static Property Url = new Property(2, String.class, "url", false, "URL");
-        public final static Property SelectedAnswers = new Property(3, String.class, "selectedAnswers", false, "SELECTED_ANSWERS");
-        public final static Property Review = new Property(4, Boolean.class, "review", false, "REVIEW");
-        public final static Property CommentsCount = new Property(5, Integer.class, "commentsCount", false, "COMMENTS_COUNT");
-        public final static Property AttemptId = new Property(6, Long.class, "attemptId", false, "ATTEMPT_ID");
-        public final static Property QuestionId = new Property(7, Long.class, "questionId", false, "QUESTION_ID");
+        public final static Property Url = new Property(1, String.class, "url", false, "URL");
+        public final static Property Order = new Property(2, Integer.class, "order", false, "ORDER");
+        public final static Property Duration = new Property(3, String.class, "duration", false, "DURATION");
+        public final static Property BestDuration = new Property(4, String.class, "bestDuration", false, "BEST_DURATION");
+        public final static Property AverageDuration = new Property(5, String.class, "averageDuration", false, "AVERAGE_DURATION");
+        public final static Property EssayText = new Property(6, String.class, "essayText", false, "ESSAY_TEXT");
+        public final static Property EssayTopic = new Property(7, String.class, "essayTopic", false, "ESSAY_TOPIC");
+        public final static Property SelectedAnswers = new Property(8, String.class, "selectedAnswers", false, "SELECTED_ANSWERS");
+        public final static Property Review = new Property(9, Boolean.class, "review", false, "REVIEW");
+        public final static Property CommentsCount = new Property(10, Integer.class, "commentsCount", false, "COMMENTS_COUNT");
+        public final static Property CorrectPercentage = new Property(11, Integer.class, "correctPercentage", false, "CORRECT_PERCENTAGE");
+        public final static Property Index = new Property(12, Integer.class, "index", false, "INDEX");
+        public final static Property AttemptId = new Property(13, Long.class, "attemptId", false, "ATTEMPT_ID");
+        public final static Property QuestionId = new Property(14, Long.class, "questionId", false, "QUESTION_ID");
     }
 
     private DaoSession daoSession;
@@ -59,13 +66,20 @@ public class ReviewItemDao extends AbstractDao<ReviewItem, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"REVIEW_ITEM\" (" + //
                 "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
-                "\"INDEX\" INTEGER," + // 1: index
-                "\"URL\" TEXT," + // 2: url
-                "\"SELECTED_ANSWERS\" TEXT," + // 3: selectedAnswers
-                "\"REVIEW\" INTEGER," + // 4: review
-                "\"COMMENTS_COUNT\" INTEGER," + // 5: commentsCount
-                "\"ATTEMPT_ID\" INTEGER," + // 6: attemptId
-                "\"QUESTION_ID\" INTEGER);"); // 7: questionId
+                "\"URL\" TEXT," + // 1: url
+                "\"ORDER\" INTEGER," + // 2: order
+                "\"DURATION\" TEXT," + // 3: duration
+                "\"BEST_DURATION\" TEXT," + // 4: bestDuration
+                "\"AVERAGE_DURATION\" TEXT," + // 5: averageDuration
+                "\"ESSAY_TEXT\" TEXT," + // 6: essayText
+                "\"ESSAY_TOPIC\" TEXT," + // 7: essayTopic
+                "\"SELECTED_ANSWERS\" TEXT," + // 8: selectedAnswers
+                "\"REVIEW\" INTEGER," + // 9: review
+                "\"COMMENTS_COUNT\" INTEGER," + // 10: commentsCount
+                "\"CORRECT_PERCENTAGE\" INTEGER," + // 11: correctPercentage
+                "\"INDEX\" INTEGER," + // 12: index
+                "\"ATTEMPT_ID\" INTEGER," + // 13: attemptId
+                "\"QUESTION_ID\" INTEGER);"); // 14: questionId
     }
 
     /** Drops the underlying database table. */
@@ -83,39 +97,74 @@ public class ReviewItemDao extends AbstractDao<ReviewItem, Long> {
             stmt.bindLong(1, id);
         }
  
-        Integer index = entity.getIndex();
-        if (index != null) {
-            stmt.bindLong(2, index);
-        }
- 
         String url = entity.getUrl();
         if (url != null) {
-            stmt.bindString(3, url);
+            stmt.bindString(2, url);
+        }
+ 
+        Integer order = entity.getOrder();
+        if (order != null) {
+            stmt.bindLong(3, order);
+        }
+ 
+        String duration = entity.getDuration();
+        if (duration != null) {
+            stmt.bindString(4, duration);
+        }
+ 
+        String bestDuration = entity.getBestDuration();
+        if (bestDuration != null) {
+            stmt.bindString(5, bestDuration);
+        }
+ 
+        String averageDuration = entity.getAverageDuration();
+        if (averageDuration != null) {
+            stmt.bindString(6, averageDuration);
+        }
+ 
+        String essayText = entity.getEssayText();
+        if (essayText != null) {
+            stmt.bindString(7, essayText);
+        }
+ 
+        String essayTopic = entity.getEssayTopic();
+        if (essayTopic != null) {
+            stmt.bindString(8, essayTopic);
         }
  
         IntegerList selectedAnswers = entity.getSelectedAnswers();
         if (selectedAnswers != null) {
-            stmt.bindString(4, selectedAnswersConverter.convertToDatabaseValue(selectedAnswers));
+            stmt.bindString(9, selectedAnswersConverter.convertToDatabaseValue(selectedAnswers));
         }
  
         Boolean review = entity.getReview();
         if (review != null) {
-            stmt.bindLong(5, review ? 1L: 0L);
+            stmt.bindLong(10, review ? 1L: 0L);
         }
  
         Integer commentsCount = entity.getCommentsCount();
         if (commentsCount != null) {
-            stmt.bindLong(6, commentsCount);
+            stmt.bindLong(11, commentsCount);
+        }
+ 
+        Integer correctPercentage = entity.getCorrectPercentage();
+        if (correctPercentage != null) {
+            stmt.bindLong(12, correctPercentage);
+        }
+ 
+        Integer index = entity.getIndex();
+        if (index != null) {
+            stmt.bindLong(13, index);
         }
  
         Long attemptId = entity.getAttemptId();
         if (attemptId != null) {
-            stmt.bindLong(7, attemptId);
+            stmt.bindLong(14, attemptId);
         }
  
         Long questionId = entity.getQuestionId();
         if (questionId != null) {
-            stmt.bindLong(8, questionId);
+            stmt.bindLong(15, questionId);
         }
     }
 
@@ -128,39 +177,74 @@ public class ReviewItemDao extends AbstractDao<ReviewItem, Long> {
             stmt.bindLong(1, id);
         }
  
-        Integer index = entity.getIndex();
-        if (index != null) {
-            stmt.bindLong(2, index);
-        }
- 
         String url = entity.getUrl();
         if (url != null) {
-            stmt.bindString(3, url);
+            stmt.bindString(2, url);
+        }
+ 
+        Integer order = entity.getOrder();
+        if (order != null) {
+            stmt.bindLong(3, order);
+        }
+ 
+        String duration = entity.getDuration();
+        if (duration != null) {
+            stmt.bindString(4, duration);
+        }
+ 
+        String bestDuration = entity.getBestDuration();
+        if (bestDuration != null) {
+            stmt.bindString(5, bestDuration);
+        }
+ 
+        String averageDuration = entity.getAverageDuration();
+        if (averageDuration != null) {
+            stmt.bindString(6, averageDuration);
+        }
+ 
+        String essayText = entity.getEssayText();
+        if (essayText != null) {
+            stmt.bindString(7, essayText);
+        }
+ 
+        String essayTopic = entity.getEssayTopic();
+        if (essayTopic != null) {
+            stmt.bindString(8, essayTopic);
         }
  
         IntegerList selectedAnswers = entity.getSelectedAnswers();
         if (selectedAnswers != null) {
-            stmt.bindString(4, selectedAnswersConverter.convertToDatabaseValue(selectedAnswers));
+            stmt.bindString(9, selectedAnswersConverter.convertToDatabaseValue(selectedAnswers));
         }
  
         Boolean review = entity.getReview();
         if (review != null) {
-            stmt.bindLong(5, review ? 1L: 0L);
+            stmt.bindLong(10, review ? 1L: 0L);
         }
  
         Integer commentsCount = entity.getCommentsCount();
         if (commentsCount != null) {
-            stmt.bindLong(6, commentsCount);
+            stmt.bindLong(11, commentsCount);
+        }
+ 
+        Integer correctPercentage = entity.getCorrectPercentage();
+        if (correctPercentage != null) {
+            stmt.bindLong(12, correctPercentage);
+        }
+ 
+        Integer index = entity.getIndex();
+        if (index != null) {
+            stmt.bindLong(13, index);
         }
  
         Long attemptId = entity.getAttemptId();
         if (attemptId != null) {
-            stmt.bindLong(7, attemptId);
+            stmt.bindLong(14, attemptId);
         }
  
         Long questionId = entity.getQuestionId();
         if (questionId != null) {
-            stmt.bindLong(8, questionId);
+            stmt.bindLong(15, questionId);
         }
     }
 
@@ -179,13 +263,20 @@ public class ReviewItemDao extends AbstractDao<ReviewItem, Long> {
     public ReviewItem readEntity(Cursor cursor, int offset) {
         ReviewItem entity = new ReviewItem( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // index
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // url
-            cursor.isNull(offset + 3) ? null : selectedAnswersConverter.convertToEntityProperty(cursor.getString(offset + 3)), // selectedAnswers
-            cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0, // review
-            cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5), // commentsCount
-            cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6), // attemptId
-            cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7) // questionId
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // url
+            cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2), // order
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // duration
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // bestDuration
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // averageDuration
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // essayText
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // essayTopic
+            cursor.isNull(offset + 8) ? null : selectedAnswersConverter.convertToEntityProperty(cursor.getString(offset + 8)), // selectedAnswers
+            cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0, // review
+            cursor.isNull(offset + 10) ? null : cursor.getInt(offset + 10), // commentsCount
+            cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11), // correctPercentage
+            cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12), // index
+            cursor.isNull(offset + 13) ? null : cursor.getLong(offset + 13), // attemptId
+            cursor.isNull(offset + 14) ? null : cursor.getLong(offset + 14) // questionId
         );
         return entity;
     }
@@ -193,13 +284,20 @@ public class ReviewItemDao extends AbstractDao<ReviewItem, Long> {
     @Override
     public void readEntity(Cursor cursor, ReviewItem entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setIndex(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
-        entity.setUrl(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setSelectedAnswers(cursor.isNull(offset + 3) ? null : selectedAnswersConverter.convertToEntityProperty(cursor.getString(offset + 3)));
-        entity.setReview(cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0);
-        entity.setCommentsCount(cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5));
-        entity.setAttemptId(cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6));
-        entity.setQuestionId(cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7));
+        entity.setUrl(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setOrder(cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2));
+        entity.setDuration(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setBestDuration(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setAverageDuration(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setEssayText(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setEssayTopic(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setSelectedAnswers(cursor.isNull(offset + 8) ? null : selectedAnswersConverter.convertToEntityProperty(cursor.getString(offset + 8)));
+        entity.setReview(cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0);
+        entity.setCommentsCount(cursor.isNull(offset + 10) ? null : cursor.getInt(offset + 10));
+        entity.setCorrectPercentage(cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11));
+        entity.setIndex(cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12));
+        entity.setAttemptId(cursor.isNull(offset + 13) ? null : cursor.getLong(offset + 13));
+        entity.setQuestionId(cursor.isNull(offset + 14) ? null : cursor.getLong(offset + 14));
      }
     
     @Override

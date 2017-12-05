@@ -296,3 +296,100 @@ table th {
 span {
     outline: 0;
 }
+
+.exam-title {
+    margin-left: 20px;
+    margin-top: 20px;
+    font-size: 24px;
+    color: #333333;
+    font-family: Lato;
+    font-weight: bold;
+}
+
+.exam-description {
+    margin-left: 20px;
+    font-family: Lato;
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: left;
+    color: #666666;
+}
+
+.time-analytics-question-index {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    flex: 0 0 40px;
+    color: #fff;
+    background: #00ccaa;
+    border-radius: 50%;
+    *zoom: 1;
+    margin-right: 10px;
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    vertical-align: middle;
+    text-align: center;
+    font-family: Lato;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.8px;
+}
+
+.time-analytics-question {
+    margin-top: 30px;
+    margin-left: 10px;
+    font-family: Lato;
+    font-size: 16px;
+    line-height: 1.38;
+    color: #333333;
+}
+
+.time-heading {
+    width: 150px;
+    font-size: 16px;
+    text-align: left;
+    padding-top: 12px;
+    color: #333333;
+    vertical-align: middle;
+    font-family: Lato;
+    font-weight: bold;
+    line-height: 1.25;
+}
+
+.time {
+    width: 40px;
+    text-align: center;
+    color: #ffffff;
+    background: #3598db;
+    border-radius: 5px;
+    padding-top: 13px;
+    height: 25px;
+    font-family: Lato;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.show-answer {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding-bottom: 5px;
+    padding: 2px;
+    border-bottom: 1px solid #999999;
+    display: inline-block;
+    font-family: Lato;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1.43;
+    color: #999999;
+}
+
+.no-question-error {
+    margin-top: 200px;
+    text-align: center;
+    font-family: Lato;
+    font-size: 16px;
+    line-height: 1.38;
+    color: #333333;
+}

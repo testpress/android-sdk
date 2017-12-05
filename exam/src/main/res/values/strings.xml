@@ -88,6 +88,7 @@
     <string name="testpress_negative_mark">Negative marks</string>
     <string name="testpress_start_date">Start &amp; End date</string>
     <string name="testpress_select_language">Select Language</string>
+    <string name="testpress_select_subject">Select Subject</string>
     <string name="testpress_description">Description</string>
     <string name="testpress_questions_list">QUESTIONS LIST</string>
 
@@ -175,5 +176,13 @@
     <string name="testpress_okay">Okay</string>
 
     <string name="testpress_continue">Continue</string>
+    <string name="testpress_time_analytics_label">Time Analytics</string>
+    <string name="testpress_error_loading_review_items">Loading review items failed</string>
+    <string name="testpress_incorrect_filter_text">Incorrect</string>
+    <string name="testpress_correct_filter_text">Correct</string>
+    <string name="testpress_unanswered_filter_text">Unanswered</string>
+    <string name="testpress_answer_type">Answer Type</string>
+    <string name="testpress_subject_filter">Filter by Subject</string>
+    <string name="testpress_time_sort">Sort by Time</string>
 
 </resources>

@@ -40,6 +40,11 @@
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
+        <activity android:name=".ui.TimeAnalyticsActivity"
+            android:label="@string/testpress_time_analytics_label"
+            android:theme="@style/TestpressTheme"
+            android:configChanges="orientation|keyboard|screenSize" />
+
         <activity android:name=".ui.AnalyticsActivity"
             android:label="@string/testpress_analytics"
             android:theme="@style/TestpressTheme"

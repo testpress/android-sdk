@@ -64,6 +64,7 @@ public class ReviewStatsFragment extends Fragment {
     private TextView reviewQuestionsButton;
     private TextView emailPdfButton;
     private LinearLayout emailPdfButtonLayout;
+    private Button timeAnalyticsButton;
     private Attempt attempt;
     private Exam exam;
 
@@ -116,10 +117,12 @@ public class ReviewStatsFragment extends Fragment {
         retakeButtonLayout = (LinearLayout) view.findViewById(R.id.retake_button_layout);
         emailPdfButtonLayout = (LinearLayout) view.findViewById(R.id.email_mcqs_layout);
         reviewQuestionsButton = (TextView) view.findViewById(R.id.review);
+        timeAnalyticsButton = (Button) view.findViewById(R.id.time_analytics);
         ViewUtils.setTypeface(
                 new TextView[] {
                         score, rank, correct, incorrect, timeTaken, accuracy, reviewQuestionsButton,
-                        analyticsButton, emailPdfButton, retakeButton, emptyTitleView, retryButton
+                        analyticsButton, emailPdfButton, retakeButton, emptyTitleView, retryButton,
+                        timeAnalyticsButton
                 },
                 TestpressSdk.getRubikMediumFont(getContext())
         );
@@ -188,9 +191,19 @@ public class ReviewStatsFragment extends Fragment {
                 }
             });
             analyticsButton.setVisibility(View.VISIBLE);
+            timeAnalyticsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getActivity().startActivity(
+                            TimeAnalyticsActivity.createIntent(getActivity(), exam, attempt)
+                    );
+                }
+            });
+            timeAnalyticsButton.setVisibility(View.VISIBLE);
         } else {
             reviewQuestionsButton.setVisibility(View.GONE);
             analyticsButton.setVisibility(View.GONE);
+            timeAnalyticsButton.setVisibility(View.GONE);
         }
         if (exam.getAllowPdf()) {
             emailPdfButton.setOnClickListener(new View.OnClickListener() {

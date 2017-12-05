@@ -105,6 +105,7 @@ public class AnalyticsFragment extends Fragment
         return pager;
     }
 
+    @SuppressLint("StaticFieldLeak")
     @Override
     public Loader<List<Subject>> onCreateLoader(int id, final Bundle args) {
         return new ThrowableLoader<List<Subject>>(getActivity(), subjects) {

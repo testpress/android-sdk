@@ -1,6 +1,5 @@
 package in.testpress.models.greendao;
 
-
 import org.greenrobot.greendao.annotation.*;
 
 import in.testpress.models.greendao.DaoSession;
