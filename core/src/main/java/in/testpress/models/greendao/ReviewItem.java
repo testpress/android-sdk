@@ -22,11 +22,18 @@ public class ReviewItem {
     private Long id;
     private Integer index;
     private String url;
+    private Integer order;
+    private String duration;
+    private String bestDuration;
+    private String averageDuration;
+    private String essayText;
+    private String essayTopic;
 
     @Convert(converter = in.testpress.util.IntegerListConverter.class, columnType = String.class)
     private IntegerList selectedAnswers;
     private Boolean review;
     private Integer commentsCount;
+    private Integer correctPercentage;
     private Long attemptId;
     private Long questionId;
 
@@ -56,13 +63,20 @@ public class ReviewItem {
     }
 
     @Generated
-    public ReviewItem(Long id, Integer index, String url, IntegerList selectedAnswers, Boolean review, Integer commentsCount, Long attemptId, Long questionId) {
+    public ReviewItem(Long id, String url, Integer order, String duration, String bestDuration, String averageDuration, String essayText, String essayTopic, IntegerList selectedAnswers, Boolean review, Integer commentsCount, Integer correctPercentage, Integer index, Long attemptId, Long questionId) {
         this.id = id;
-        this.index = index;
         this.url = url;
+        this.order = order;
+        this.duration = duration;
+        this.bestDuration = bestDuration;
+        this.averageDuration = averageDuration;
+        this.essayText = essayText;
+        this.essayTopic = essayTopic;
         this.selectedAnswers = selectedAnswers;
         this.review = review;
         this.commentsCount = commentsCount;
+        this.correctPercentage = correctPercentage;
+        this.index = index;
         this.attemptId = attemptId;
         this.questionId = questionId;
     }
@@ -82,20 +96,60 @@ public class ReviewItem {
         this.id = id;
     }
 
-    public Integer getIndex() {
-        return index;
-    }
-
-    public void setIndex(Integer index) {
-        this.index = index;
-    }
-
     public String getUrl() {
         return url;
     }
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public Integer getOrder() {
+        return order;
+    }
+
+    public void setOrder(Integer order) {
+        this.order = order;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    public String getBestDuration() {
+        return bestDuration;
+    }
+
+    public void setBestDuration(String bestDuration) {
+        this.bestDuration = bestDuration;
+    }
+
+    public String getAverageDuration() {
+        return averageDuration;
+    }
+
+    public void setAverageDuration(String averageDuration) {
+        this.averageDuration = averageDuration;
+    }
+
+    public String getEssayText() {
+        return essayText;
+    }
+
+    public void setEssayText(String essayText) {
+        this.essayText = essayText;
+    }
+
+    public String getEssayTopic() {
+        return essayTopic;
+    }
+
+    public void setEssayTopic(String essayTopic) {
+        this.essayTopic = essayTopic;
     }
 
     public IntegerList getSelectedAnswers() {
@@ -120,6 +174,22 @@ public class ReviewItem {
 
     public void setCommentsCount(Integer commentsCount) {
         this.commentsCount = commentsCount;
+    }
+
+    public Integer getCorrectPercentage() {
+        return correctPercentage;
+    }
+
+    public void setCorrectPercentage(Integer correctPercentage) {
+        this.correctPercentage = correctPercentage;
+    }
+
+    public Integer getIndex() {
+        return index;
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
     }
 
     public Long getAttemptId() {

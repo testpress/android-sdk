@@ -367,6 +367,7 @@ public class ReviewQuestionsFragment extends Fragment
         getLoaderManager().initLoader(PREVIOUS_COMMENTS_LOADER_ID, null, ReviewQuestionsFragment.this);
     }
 
+    @SuppressLint("StaticFieldLeak")
     @Override
     public Loader<List<Comment>> onCreateLoader(int loaderId, Bundle args) {
         switch (loaderId) {

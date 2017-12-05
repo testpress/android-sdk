@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        layout="@layout/testpress_toolbar"
+        android:id="@+id/appbar_layout" />
+
+    <include
+        layout="@layout/testpress_empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/appbar_layout" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/appbar_layout"
+        android:visibility="gone"
+        android:id="@+id/main_layout" >
+
+        <in.testpress.exam.ui.view.SlidingPaneLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/sliding_layout" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:background="#fff">
+
+                <TextView
+                    android:id="@+id/sortByTimeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/testpress_time_sort"
+                    android:textSize="12sp"
+                    android:textAllCaps="true"
+                    android:layout_alignParentTop="true"/>
+
+                <Spinner
+                    style="@style/Widget.Testpress.HeaderBar.Spinner.Base"
+                    android:id="@+id/timeSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:prompt="@string/testpress_select_language"
+                    android:layout_below="@+id/sortByTimeText"
+                    android:paddingBottom="30dp"/>
+
+                <TextView
+                    android:id="@+id/sortBySubjectText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/testpress_subject_filter"
+                    android:textSize="12sp"
+                    android:textAllCaps="true"
+                    android:layout_below="@+id/timeSpinner"/>
+
+                <Spinner
+                    style="@style/Widget.Testpress.HeaderBar.Spinner.Base"
+                    android:id="@+id/subjectSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:prompt="@string/testpress_select_subject"
+                    android:layout_below="@id/sortBySubjectText"
+                    android:paddingBottom="30dp"/>
+
+                <TextView
+                    android:id="@+id/answerType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/testpress_answer_type"
+                    android:textSize="12sp"
+                    android:textAllCaps="true"
+                    android:layout_below="@id/subjectSpinner"/>
+
+                <LinearLayout
+                    android:id="@+id/filterButtonsLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@id/answerType">
+
+                    <Button
+                        android:id="@+id/correct_filter"
+                        android:layout_width="60dp"
+                        android:layout_height="40dp"
+                        android:textSize="14sp"
+                        android:textColor="@color/testpress_black"
+                        android:background="@drawable/testpress_filter_button_left_off"
+                        android:textAllCaps="false"
+                        android:text="@string/testpress_correct_filter_text"/>
+
+                    <Button
+                        android:id="@+id/incorrect_filter"
+                        android:layout_width="70dp"
+                        android:layout_height="40dp"
+                        android:layout_marginLeft="3dp"
+                        android:layout_marginRight="3dp"
+                        android:textSize="14sp"
+                        android:textColor="@color/testpress_black"
+                        android:background="@drawable/testpress_filter_button_middle_off"
+                        android:textAllCaps="false"
+                        android:text="@string/testpress_incorrect_filter_text"/>
+
+                    <Button
+                        android:id="@+id/unanswered_filter"
+                        android:layout_width="80dp"
+                        android:layout_height="40dp"
+                        android:textSize="14sp"
+                        android:textColor="@color/testpress_black"
+                        android:background="@drawable/testpress_filter_button_right_off"
+                        android:textAllCaps="false"
+                        android:text="@string/testpress_unanswered_filter_text"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="30dp"
+                    android:layout_below="@+id/filterButtonsLayout">
+
+                    <Button
+                        android:id="@+id/apply_filter"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:textSize="16dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@drawable/testpress_rounded_green_button"
+                        android:text="Apply" />
+
+                    <Button
+                        android:id="@+id/clear_filter"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:textSize="16dp"
+                        android:layout_marginLeft="5dp"
+                        android:textColor="@color/testpress_green_light"
+                        android:background="@drawable/testpress_green_stroke"
+                        android:text="Clear"/>
+
+
+                </LinearLayout>
+            </RelativeLayout>
+
+            <WebView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/web_view" />
+
+        </in.testpress.exam.ui.view.SlidingPaneLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/testpress_gradient_shadow_gray_top" />
+
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_centerInParent="true"
+        android:indeterminate="true" />
+
+</RelativeLayout>

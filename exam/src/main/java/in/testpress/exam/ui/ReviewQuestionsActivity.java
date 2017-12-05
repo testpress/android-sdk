@@ -109,8 +109,16 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
 
     public static Intent createIntent(Activity activity, Exam exam, Attempt attempt) {
         Intent intent = new Intent(activity, ReviewQuestionsActivity.class);
-        intent.putExtra(ReviewQuestionsActivity.PARAM_EXAM, exam.getId());
+        intent.putExtra(ReviewQuestionsActivity.PARAM_EXAM, exam);
         intent.putExtra(ReviewQuestionsActivity.PARAM_ATTEMPT, attempt);
+        return intent;
+    }
+
+    public static Intent createIntent(Activity activity, Exam exam, Attempt attempt, int position) {
+        Intent intent = new Intent(activity, ReviewQuestionsActivity.class);
+        intent.putExtra(ReviewQuestionsActivity.PARAM_EXAM, exam);
+        intent.putExtra(ReviewQuestionsActivity.PARAM_ATTEMPT, attempt);
+        intent.putExtra("position", position);
         return intent;
     }
 
@@ -119,7 +127,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_review_question);
         activity = this;
-        exam = TestpressSDKDatabase.getExamDao(this).queryBuilder().where(ExamDao.Properties.Id.eq(getIntent().getLongExtra(PARAM_EXAM, 1L))).list().get(0);
+        exam = getIntent().getParcelableExtra(PARAM_EXAM);
         Assert.assertNotNull("PARAM_EXAM must not be null", exam);
         progressBar = (ProgressBar) findViewById(R.id.pb_loading);
         retryButton = (Button) findViewById(R.id.retry_button);
@@ -252,6 +260,9 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         } else {
             addFilterItemsInSpinner();
             onSpinnerItemSelected(0);
+        }
+        if(getIntent().getIntExtra("position", -1) != -1) {
+            goToQuestion(getIntent().getIntExtra("position", 1)-1);
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -437,7 +448,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     }
 
     /**
-     * Query items from DB using query builder created in {@code onSpinnerItemSelected} &
+     * Query items from DB using query builder created in {@code showFilteredContent} &
      * Display in the web view.
      */
     private void filterReviewItems() {

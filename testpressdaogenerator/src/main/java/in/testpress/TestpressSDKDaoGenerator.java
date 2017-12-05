@@ -287,12 +287,19 @@ public class TestpressSDKDaoGenerator {
         reviewItem.addLongProperty("id").primaryKey();
         reviewItem.addIntProperty("index");
         reviewItem.addStringProperty("url");
+        reviewItem.addIntProperty("order");
+        reviewItem.addStringProperty("duration");
+        reviewItem.addStringProperty("bestDuration");
+        reviewItem.addStringProperty("averageDuration");
+        reviewItem.addStringProperty("essayText");
+        reviewItem.addStringProperty("essayTopic");
         reviewItem.addStringProperty("selectedAnswers").customType(
                 "in.testpress.util.IntegerList",
                 "in.testpress.util.IntegerListConverter"
         );
         reviewItem.addBooleanProperty("review");
         reviewItem.addIntProperty("commentsCount");
+        reviewItem.addIntProperty("correctPercentage");
         return reviewItem;
     }
 
