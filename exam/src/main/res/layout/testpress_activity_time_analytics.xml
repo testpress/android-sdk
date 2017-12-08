@@ -92,9 +92,11 @@
 
                     <Button
                         android:id="@+id/correct_filter"
-                        android:layout_width="60dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="40dp"
                         android:textSize="14sp"
+                        android:paddingRight="10dp"
+                        android:paddingLeft="10dp"
                         android:textColor="@color/testpress_black"
                         android:background="@drawable/testpress_filter_button_left_off"
                         android:textAllCaps="false"
@@ -102,11 +104,13 @@
 
                     <Button
                         android:id="@+id/incorrect_filter"
-                        android:layout_width="70dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="40dp"
                         android:layout_marginLeft="3dp"
                         android:layout_marginRight="3dp"
                         android:textSize="14sp"
+                        android:paddingRight="10dp"
+                        android:paddingLeft="10dp"
                         android:textColor="@color/testpress_black"
                         android:background="@drawable/testpress_filter_button_middle_off"
                         android:textAllCaps="false"
@@ -114,9 +118,11 @@
 
                     <Button
                         android:id="@+id/unanswered_filter"
-                        android:layout_width="80dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="40dp"
                         android:textSize="14sp"
+                        android:paddingRight="10dp"
+                        android:paddingLeft="10dp"
                         android:textColor="@color/testpress_black"
                         android:background="@drawable/testpress_filter_button_right_off"
                         android:textAllCaps="false"

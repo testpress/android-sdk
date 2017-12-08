@@ -317,12 +317,12 @@ span {
 
 .time-analytics-question-index {
     width: 40px;
-    height: 40px;
+    height: 30px;
     line-height: 40px;
     flex: 0 0 40px;
     color: #fff;
     background: #00ccaa;
-    border-radius: 50%;
+    border-radius: 15px;
     *zoom: 1;
     margin-right: 10px;
     margin-top: 30px;

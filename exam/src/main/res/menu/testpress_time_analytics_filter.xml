@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/options"
-        android:icon="@drawable/testpress_filter_icon"
+        app:actionLayout="@layout/testpress_time_analytics_filter_icon"
         app:showAsAction="always"
         android:title="Options"/>
 

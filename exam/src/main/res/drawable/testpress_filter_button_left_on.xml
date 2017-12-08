@@ -5,9 +5,9 @@
     <solid android:color="@color/testpress_color_primary_blue" />
 
     <corners
-        android:bottomLeftRadius="10dp"
+        android:bottomLeftRadius="7dp"
         android:bottomRightRadius="0dp"
-        android:topLeftRadius="10dp"
+        android:topLeftRadius="7dp"
         android:topRightRadius="0dp" />
 
 </shape>

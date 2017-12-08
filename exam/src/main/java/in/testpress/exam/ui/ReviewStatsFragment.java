@@ -75,7 +75,7 @@ public class ReviewStatsFragment extends Fragment {
 
         ReviewStatsFragment fragment = new ReviewStatsFragment();
         Bundle bundle = new Bundle();
-        bundle.putLong(PARAM_EXAM, exam.getId());
+        bundle.putParcelable(PARAM_EXAM, exam);
         bundle.putParcelable(PARAM_ATTEMPT, attempt);
         bundle.putBoolean(PARAM_SHOW_RETAKE_BUTTON, showRetakeButton);
         fragment.setArguments(bundle);
@@ -87,7 +87,7 @@ public class ReviewStatsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        exam = TestpressSDKDatabase.getExamDao(getActivity()).queryBuilder().where(ExamDao.Properties.Id.eq(getArguments().getLong(PARAM_EXAM))).list().get(0);
+        exam = getArguments().getParcelable(PARAM_EXAM);
         // TODO exam coming as null
         Assert.assertNotNull("PARAM_EXAM must not be null.", exam);
         attempt = getArguments().getParcelable(PARAM_ATTEMPT);

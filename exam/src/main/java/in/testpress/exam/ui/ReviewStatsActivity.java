@@ -27,7 +27,7 @@ public class ReviewStatsActivity extends AppCompatActivity {
     public static Intent createIntent(Activity activity, Exam exam, Attempt attempt) {
         Intent intent = new Intent(activity, ReviewStatsActivity.class);
         intent.putExtra(PARAM_PREVIOUS_ACTIVITY, activity.getClass().getName());
-        intent.putExtra(PARAM_EXAM, exam.getId());
+        intent.putExtra(PARAM_EXAM, exam);
         intent.putExtra(PARAM_ATTEMPT, attempt);
         intent.putExtra(PARAM_SHOW_RETAKE_BUTTON, true);
         return intent;
@@ -36,7 +36,7 @@ public class ReviewStatsActivity extends AppCompatActivity {
     public static Intent createIntent(Activity activity, Exam exam, CourseAttempt courseAttempt) {
         Intent intent = new Intent(activity, ReviewStatsActivity.class);
         intent.putExtra(PARAM_PREVIOUS_ACTIVITY, activity.getClass().getName());
-        intent.putExtra(PARAM_EXAM, exam.getId());
+        intent.putExtra(PARAM_EXAM, exam);
         intent.putExtra(PARAM_COURSE_ATTEMPT, courseAttempt);
         intent.putExtra(PARAM_SHOW_RETAKE_BUTTON, false);
         return intent;
