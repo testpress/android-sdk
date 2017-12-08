@@ -1,0 +1,11 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="45dp"
+    android:layout_height="?attr/actionBarSize">
+
+    <ImageView
+        android:layout_width="45dp"
+        android:layout_height="?attr/actionBarSize"
+        android:id="@+id/filter"
+        android:src="@drawable/testpress_filter_icon"/>
+
+</RelativeLayout>

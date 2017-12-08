@@ -81,9 +81,9 @@ public interface ExamService {
             @Path(value = "attempts_url", encoded = true) String attemptsUrlFrag,
             @QueryMap Map<String, Object> options);
 
-    @GET("{attempts_url}")
+    @GET
     RetrofitCall<TestpressApiResponse<CourseAttempt>> getContentAttempts(
-            @Path(value = "attempts_url", encoded = true) String attemptsUrlFrag,
+            @Url String attemptsUrlFrag,
             @QueryMap Map<String, Object> options);
 
     @GET

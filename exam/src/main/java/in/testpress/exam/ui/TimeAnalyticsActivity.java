@@ -15,6 +15,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -104,6 +105,7 @@ public class TimeAnalyticsActivity extends BaseToolBarActivity {
     private Button unansweredFilterButton;
     private Button applyFilterButton;
     private Button clearFilterButton;
+    private ImageView filterIcon;
 
     public static Intent createIntent(Activity activity, Exam exam, Attempt attempt) {
         Intent intent = new Intent(activity, TimeAnalyticsActivity.class);
@@ -178,6 +180,7 @@ public class TimeAnalyticsActivity extends BaseToolBarActivity {
                 timeSpinner.setSelection(0);
                 subjectSpinner.setSelection(0);
                 showFilteredContent(CURRENT_FILTER);
+                setPanelOpen(!slidingPaneLayout.isOpen());
             }
         });
         reviewItemDao= TestpressSDKDatabase.getReviewItemDao(this);
@@ -196,8 +199,16 @@ public class TimeAnalyticsActivity extends BaseToolBarActivity {
         languageSpinner = (Spinner) actionView.findViewById(R.id.language_spinner);
         ViewUtils.setSpinnerIconColor(this, languageSpinner);
 
-        getMenuInflater().inflate(R.menu.testpress_options, menu);
+        getMenuInflater().inflate(R.menu.testpress_time_analytics_filter, menu);
         filterMenu = menu.findItem(R.id.options);
+        actionView = MenuItemCompat.getActionView(filterMenu);
+        filterIcon = ((ImageView) actionView.findViewById(R.id.filter));
+        filterIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setPanelOpen(!slidingPaneLayout.isOpen());
+            }
+        });
         spinnerDefaultCallback = true;
         // Check review items exists for the review attempt, load otherwise.
         if (reviewItemDao._queryReviewAttempt_ReviewItems(reviewAttempt.getId()).isEmpty()) {

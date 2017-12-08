@@ -40,7 +40,9 @@ import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.exam.models.AttemptItem;
+import in.testpress.models.greendao.AttemptDao;
 import in.testpress.models.greendao.CourseAttempt;
+import in.testpress.models.greendao.CourseAttemptDao;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.Language;
@@ -739,6 +741,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                             if (progressDialog.isShowing()) {
                                 progressDialog.dismiss();
                             }
+                            saveCourseAttemptInDB(courseAttempt);
                             showReview(ReviewStatsActivity.createIntent(getActivity(), exam,
                                     courseAttempt));
                         }
@@ -800,6 +803,15 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                         }
                     });
         }
+    }
+
+    private void saveCourseAttemptInDB(CourseAttempt courseAttempt) {
+        CourseAttemptDao courseAttemptDao = TestpressSDKDatabase.getCourseAttemptDao(getActivity());
+        AttemptDao attemptDao = TestpressSDKDatabase.getAttemptDao(getActivity());
+        Attempt attempt = courseAttempt.assessment;
+        attemptDao.insertOrReplace(attempt);
+        courseAttempt.setAttemptId(attempt.getId());
+        courseAttemptDao.insertOrReplace(courseAttempt);
     }
 
     @SuppressLint("DefaultLocale")
