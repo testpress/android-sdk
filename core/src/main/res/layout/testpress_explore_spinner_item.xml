@@ -17,7 +17,7 @@
         android:gravity="center_vertical"
         android:background="@drawable/testpress_bottom_grey_border"
         android:drawablePadding="10dp"
-        android:drawableRight="@drawable/testpress_spinner_dropdown_arrow"
-        android:drawableEnd="@drawable/testpress_spinner_dropdown_arrow" />
+        android:drawableRight="@drawable/ic_keyboard_arrow_down_black_18dp"
+        android:drawableEnd="@drawable/ic_keyboard_arrow_down_black_18dp" />
 
 </LinearLayout>

@@ -63,6 +63,7 @@ public class ReviewStatsFragment extends Fragment {
     private TextView analyticsButton;
     private TextView retakeButton;
     private LinearLayout retakeButtonLayout;
+    private LinearLayout timeAnalyticsButtonLayout;
     private TextView reviewQuestionsButton;
     private TextView emailPdfButton;
     private LinearLayout emailPdfButtonLayout;
@@ -120,6 +121,7 @@ public class ReviewStatsFragment extends Fragment {
         retakeButton = (TextView) view.findViewById(R.id.retake);
         emailPdfButton = (TextView) view.findViewById(R.id.email_mcqs);
         retakeButtonLayout = (LinearLayout) view.findViewById(R.id.retake_button_layout);
+        timeAnalyticsButtonLayout = (LinearLayout) view.findViewById(R.id.time_analytics_layout);
         emailPdfButtonLayout = (LinearLayout) view.findViewById(R.id.email_mcqs_layout);
         reviewQuestionsButton = (TextView) view.findViewById(R.id.review);
         timeAnalyticsButton = (Button) view.findViewById(R.id.time_analytics);
@@ -204,11 +206,11 @@ public class ReviewStatsFragment extends Fragment {
                     );
                 }
             });
-            timeAnalyticsButton.setVisibility(View.VISIBLE);
+            timeAnalyticsButtonLayout.setVisibility(View.VISIBLE);
         } else {
             reviewQuestionsButton.setVisibility(View.GONE);
             analyticsButton.setVisibility(View.GONE);
-            timeAnalyticsButton.setVisibility(View.GONE);
+            timeAnalyticsButtonLayout.setVisibility(View.GONE);
         }
         if (exam.getAllowPdf()) {
             emailPdfButton.setOnClickListener(new View.OnClickListener() {
