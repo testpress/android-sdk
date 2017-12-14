@@ -400,20 +400,27 @@
 
                 </LinearLayout>
 
-                <android.support.v7.widget.AppCompatButton
-                    android:id="@+id/time_analytics"
-                    android:background="@drawable/testpress_green_stroke"
-                    android:text="@string/testpress_time_analytics"
-                    android:gravity="center"
-                    android:textSize="16sp"
-                    android:textColor="@color/testpress_green_light"
+                <LinearLayout
+                    android:id="@+id/time_analytics_layout"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:layout_marginBottom="20dp"
                     android:layout_weight="1"
                     android:layout_width="0dp"
-                    android:layout_height="37dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="20dp"/>
+                    android:layout_height="wrap_content">
 
+                    <android.support.v7.widget.AppCompatButton
+                        android:id="@+id/time_analytics"
+                        android:background="@drawable/testpress_green_stroke"
+                        android:text="@string/testpress_time_analytics"
+                        android:gravity="center"
+                        android:textSize="16sp"
+                        android:textColor="@color/testpress_green_light"
+                        android:ellipsize="end"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp" />
+
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>
