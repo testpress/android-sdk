@@ -20,8 +20,8 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.course.TestpressCourse;
-import in.testpress.course.models.greendao.Chapter;
-import in.testpress.course.models.greendao.ChapterDao;
+import in.testpress.models.greendao.Chapter;
+import in.testpress.models.greendao.ChapterDao;
 import in.testpress.course.network.ChapterPager;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.ui.BaseGridFragment;
@@ -53,7 +53,7 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
         mApiClient = new TestpressCourseApiClient(getActivity());
         mOptions = ImageUtils.getPlaceholdersOption();
         mImageLoader = ImageUtils.initImageLoader(getActivity());
-        chapterDao = TestpressCourse.getChapterDao(getActivity());
+        chapterDao = TestpressSdk.getChapterDao(getActivity());
     }
 
     @Override

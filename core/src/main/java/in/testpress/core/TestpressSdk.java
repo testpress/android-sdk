@@ -8,19 +8,35 @@ import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.greenrobot.greendao.database.Database;
+
 import java.util.HashMap;
 
-import in.testpress.model.InstituteSettings;
+import in.testpress.models.InstituteSettings;
+import in.testpress.models.greendao.ChapterDao;
+import in.testpress.models.greendao.CourseDao;
+import in.testpress.models.greendao.DaoMaster;
+import in.testpress.models.greendao.DaoSession;
+import in.testpress.models.greendao.ReviewAnswerDao;
+import in.testpress.models.greendao.ReviewAnswerTranslationDao;
+import in.testpress.models.greendao.ReviewAttemptDao;
+import in.testpress.models.greendao.ReviewItemDao;
+import in.testpress.models.greendao.ReviewQuestionDao;
+import in.testpress.models.greendao.ReviewQuestionTranslationDao;
+import in.testpress.models.greendao.SelectedAnswerDao;
 import in.testpress.network.AuthorizationErrorResponse;
 import in.testpress.network.TestpressApiClient;
 import in.testpress.R;
 import in.testpress.util.Assert;
+import in.testpress.util.ImageUtils;
 import in.testpress.util.UIUtils;
 
 public final class TestpressSdk {
 
     private static SharedPreferences pref;
     private static SharedPreferences.Editor editor;
+    private static DaoSession daoSession;
+    private static Database database;
 
     public static final int COURSE_CHAPTER_REQUEST_CODE = 1002;
     public static final int COURSE_CONTENT_LIST_REQUEST_CODE = 1003;
@@ -34,8 +50,7 @@ public final class TestpressSdk {
     private static final String KEY_TESTPRESS_USER_ID = "testpressUserId";
     private static final String KEY_COURSE_DATABASE_SESSION = "courseDatabaseSession";
     private static final String KEY_EXAM_DATABASE_SESSION = "examDatabaseSession";
-    public static final String TESTPRESS_EXAM_SDK_DATABASE = "testpressExamSdkDB";
-    public static final String TESTPRESS_COURSE_SDK_DATABASE = "testpressCourseSdkDB";
+    public static final String TESTPRESS_SDK_DATABASE = "testpressSdkDB";
     private static final String RUBIK_REGULAR_FONT_PATH = "Rubik-Regular.ttf";
     private static final String RUBIK_MEDIUM_FONT_PATH = "Rubik-Medium.ttf";
     public enum Provider { FACEBOOK, GOOGLE, TESTPRESS }
@@ -306,5 +321,83 @@ public final class TestpressSdk {
         if (context == null) {
             throw new IllegalArgumentException("Context must not be null.");
         }
+    }
+
+    public static void init(Context context, TestpressSession testpressSession) {
+        if (testpressSession == null) {
+            throw new IllegalArgumentException("TestpressSession must not be null.");
+        }
+        TestpressSdk.setTestpressSession(context, testpressSession);
+        ImageUtils.initImageLoader(context);
+        initDatabase(context, testpressSession.getToken());
+    }
+
+    private static void initDatabase(Context context, String sessionToken) {
+        daoSession = getDaoSession(context);
+        if (TestpressSdk.isNewExamDBSession(context, sessionToken)) {
+            DaoMaster.dropAllTables(database, true);
+            DaoMaster.createAllTables(database, true);
+            TestpressSdk.setTestpressExamDBSession(context, sessionToken);
+        }
+    }
+
+    private static DaoSession getDaoSession(Context context) {
+        if (daoSession == null) {
+            database = getDatabase(context);
+            daoSession = new DaoMaster(database).newSession();
+        }
+        return daoSession;
+    }
+
+    public static void clearDatabase(@NonNull Context context) {
+        Database database = getDatabase(context);
+        DaoMaster.dropAllTables(database, true);
+        DaoMaster.createAllTables(database, true);
+    }
+
+    private static Database getDatabase(@NonNull Context context) {
+        if (database == null) {
+            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(
+                    context.getApplicationContext(), TestpressSdk.TESTPRESS_SDK_DATABASE);
+
+            database = helper.getWritableDb();
+        }
+        return database;
+    }
+
+    public static ReviewAttemptDao getReviewAttemptDao(Context context) {
+        return getDaoSession(context).getReviewAttemptDao();
+    }
+
+    public static ReviewItemDao getReviewItemDao(Context context) {
+        return getDaoSession(context).getReviewItemDao();
+    }
+
+    public static ReviewQuestionDao getReviewQuestionDao(Context context) {
+        return getDaoSession(context).getReviewQuestionDao();
+    }
+
+    public static ReviewAnswerDao getReviewAnswerDao(Context context) {
+        return getDaoSession(context).getReviewAnswerDao();
+    }
+
+    public static ReviewQuestionTranslationDao getReviewQuestionTranslationDao(Context context) {
+        return getDaoSession(context).getReviewQuestionTranslationDao();
+    }
+
+    public static ReviewAnswerTranslationDao getReviewAnswerTranslationDao(Context context) {
+        return getDaoSession(context).getReviewAnswerTranslationDao();
+    }
+
+    public static SelectedAnswerDao getSelectedAnswerDao(Context context) {
+        return getDaoSession(context).getSelectedAnswerDao();
+    }
+
+    public static CourseDao getCourseDao(Context context) {
+        return getDaoSession(context).getCourseDao();
+    }
+
+    public static ChapterDao getChapterDao(Context context) {
+        return getDaoSession(context).getChapterDao();
     }
 }

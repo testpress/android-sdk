@@ -11,7 +11,7 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.Exam;
-import in.testpress.model.InstituteSettings;
+import in.testpress.models.InstituteSettings;
 
 public class ReviewStatsActivity extends AppCompatActivity {
 

@@ -30,7 +30,7 @@ import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
 
 import in.testpress.exam.util.MultiLanguagesUtil;
-import in.testpress.model.TestpressApiResponse;
+import in.testpress.models.TestpressApiResponse;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.UIUtils;

@@ -1,4 +1,4 @@
-package in.testpress.exam.models.greendao;
+package in.testpress.models.greendao;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;

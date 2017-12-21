@@ -2,7 +2,7 @@ package in.testpress.core;
 
 import org.junit.Test;
 
-import in.testpress.model.InstituteSettings;
+import in.testpress.models.InstituteSettings;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

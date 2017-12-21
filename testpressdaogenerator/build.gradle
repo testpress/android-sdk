@@ -1,6 +1,9 @@
 apply plugin: 'java'
+apply plugin: 'application'
 
 dependencies {
     compile 'org.greenrobot:greendao-generator:3.2.0'
     compile 'org.greenrobot:greendao:3.2.0'
 }
+
+mainClassName = "in.testpress.TestpressDaoGenerator"

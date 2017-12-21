@@ -1,6 +1,6 @@
 package in.testpress.network;
 
-import in.testpress.model.FileDetails;
+import in.testpress.models.FileDetails;
 import okhttp3.MultipartBody;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;

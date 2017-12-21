@@ -22,7 +22,6 @@ import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.CourseContent;
 import in.testpress.exam.network.TestpressExamApiClient;
-import in.testpress.model.InstituteSettings;
 import in.testpress.util.ViewUtils;
 
 class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {

@@ -16,7 +16,7 @@ import junit.framework.Assert;
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.course.R;
-import in.testpress.course.models.greendao.Chapter;
+import in.testpress.models.greendao.Chapter;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.UIUtils;

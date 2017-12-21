@@ -2,18 +2,18 @@ package in.testpress;
 
 import org.greenrobot.greendao.generator.DaoGenerator;
 import org.greenrobot.greendao.generator.Entity;
-
-import org.greenrobot.greendao.generator.Schema;
 import org.greenrobot.greendao.generator.Property;
+import org.greenrobot.greendao.generator.Schema;
 import org.greenrobot.greendao.generator.ToMany;
 import org.greenrobot.greendao.generator.ToOne;
 
-public class TestpressExamDaoGenerator {
+public class TestpressDaoGenerator {
+
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 6;
+    private static final int VERSION = 7;
 
     public static void main(String args[]) throws Exception {
-        Schema schema = new Schema(VERSION, "in.testpress.exam.models.greendao");
+        Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
 
         Entity attempt = addAttempt(schema);
         Entity reviewItem = addReviewItem(schema);
@@ -28,7 +28,11 @@ public class TestpressExamDaoGenerator {
         addTranslationsToReviewQuestion(reviewQuestion, reviewQuestionTranslation);
         addAnswersToReviewTranslations(reviewQuestionTranslation, reviewAnswerTranslation);
 
-        new DaoGenerator().generateAll(schema, "exam/src/main/java");
+        addCourse(schema);
+        addChapter(schema);
+
+        schema.enableKeepSectionsByDefault();
+        new DaoGenerator().generateAll(schema, "../core/src/main/java");
     }
 
     private static Entity addAttempt(Schema schema) {
@@ -136,5 +140,50 @@ public class TestpressExamDaoGenerator {
         Property reviewQuestionId = answerTranslation.addLongProperty("questionTranslationId").getProperty();
         ToMany questionToAnswers = questionTranslation.addToMany(answerTranslation, reviewQuestionId);
         questionToAnswers.setName("answers");
+    }
+
+    private static Entity addCourse(Schema schema) {
+        Entity course = schema.addEntity("Course");
+        course.addLongProperty("id").primaryKey();
+        course.addStringProperty("url");
+        course.addStringProperty("title");
+        course.addStringProperty("description");
+        course.addStringProperty("image");
+        course.addStringProperty("modified");
+        course.addLongProperty("modifiedDate");
+        course.addStringProperty("contentsUrl");
+        course.addStringProperty("chaptersUrl");
+        course.addStringProperty("slug");
+        course.addIntProperty("trophiesCount");
+        course.addIntProperty("chaptersCount");
+        course.addIntProperty("contentsCount");
+        course.addIntProperty("order");
+        return course;
+    }
+
+    private static Entity addChapter(Schema schema) {
+        Entity chapter = schema.addEntity("Chapter");
+        chapter.addLongProperty("id").primaryKey();
+        chapter.addStringProperty("name");
+        chapter.addStringProperty("description");
+        chapter.addStringProperty("slug");
+        chapter.addStringProperty("image");
+        chapter.addStringProperty("modified");
+        chapter.addLongProperty("modifiedDate");
+        chapter.addIntProperty("courseId");
+        chapter.addStringProperty("courseUrl");
+        chapter.addStringProperty("contentUrl");
+        chapter.addStringProperty("childrenUrl");
+        chapter.addIntProperty("parentId");
+        chapter.addStringProperty("parentSlug");
+        chapter.addStringProperty("parentUrl");
+        chapter.addBooleanProperty("leaf");
+        chapter.addStringProperty("url");
+        chapter.addIntProperty("requiredTrophyCount");
+        chapter.addBooleanProperty("isLocked");
+        chapter.addIntProperty("order");
+        chapter.addIntProperty("contentsCount");
+        chapter.addIntProperty("childrenCount");
+        return chapter;
     }
 }

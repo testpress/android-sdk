@@ -7,14 +7,7 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 
-import org.greenrobot.greendao.database.Database;
-
-import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
-import in.testpress.course.models.greendao.ChapterDao;
-import in.testpress.course.models.greendao.CourseDao;
-import in.testpress.course.models.greendao.DaoMaster;
-import in.testpress.course.models.greendao.DaoSession;
 import in.testpress.course.ui.ChaptersGridActivity;
 import in.testpress.course.ui.ContentActivity;
 import in.testpress.course.ui.ContentsListActivity;
@@ -23,20 +16,17 @@ import in.testpress.course.ui.CourseListFragment;
 import in.testpress.course.ui.LeaderboardActivity;
 import in.testpress.course.ui.LeaderboardFragment;
 import in.testpress.util.Assert;
-import in.testpress.util.ImageUtils;
 
 import static in.testpress.core.TestpressSdk.COURSE_CHAPTER_REQUEST_CODE;
 import static in.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE;
 import static in.testpress.core.TestpressSdk.COURSE_CONTENT_LIST_REQUEST_CODE;
+import static in.testpress.core.TestpressSdk.init;
 
 public class TestpressCourse {
 
     public static final String COURSE_ID = "courseId";
     public static final String PARENT_ID = "parentId";
     public static final String CHAPTER_URL = "chapterUrl";
-
-    private static DaoSession daoSession;
-    private static Database database;
 
     /**
      * Use when testpress courses need to be open in a container as a fragment.
@@ -263,54 +253,4 @@ public class TestpressCourse {
         init(context.getApplicationContext(), testpressSession);
         return new LeaderboardFragment();
     }
-
-    private static void init(Context applicationContext, TestpressSession testpressSession) {
-        Assert.assertNotNull("TestpressSession must not be null.", testpressSession);
-
-        TestpressSdk.setTestpressSession(applicationContext, testpressSession);
-        ImageUtils.initImageLoader(applicationContext);
-        initDatabase(applicationContext, testpressSession.getToken());
-    }
-
-    private static DaoSession getDaoSession(Context context) {
-        if (daoSession == null) {
-            database = getDatabase(context);
-            daoSession = new DaoMaster(database).newSession();
-        }
-        return daoSession;
-    }
-
-    private static void initDatabase(Context context, String sessionToken) {
-        daoSession = getDaoSession(context);
-        if (TestpressSdk.isNewCourseDBSession(context, sessionToken)) {
-            DaoMaster.dropAllTables(database, true);
-            DaoMaster.createAllTables(database, true);
-            TestpressSdk.setTestpressCourseDBSession(context, sessionToken);
-        }
-    }
-
-    public static void clearDatabase(@NonNull Context context) {
-        Database database = getDatabase(context);
-        DaoMaster.dropAllTables(database, true);
-        DaoMaster.createAllTables(database, true);
-    }
-
-    private static Database getDatabase(@NonNull Context context) {
-        if (database == null) {
-            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(
-                    context.getApplicationContext(), TestpressSdk.TESTPRESS_COURSE_SDK_DATABASE);
-
-            database = helper.getWritableDb();
-        }
-        return database;
-    }
-
-    public static CourseDao getCourseDao(Context context) {
-        return getDaoSession(context).getCourseDao();
-    }
-
-    public static ChapterDao getChapterDao(Context context) {
-        return getDaoSession(context).getChapterDao();
-    }
-
 }

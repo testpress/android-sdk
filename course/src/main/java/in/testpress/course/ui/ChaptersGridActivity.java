@@ -1,5 +1,6 @@
 package in.testpress.course.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,10 +8,11 @@ import android.support.annotation.Nullable;
 
 import java.util.List;
 
+import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.course.TestpressCourse;
-import in.testpress.course.models.greendao.Chapter;
-import in.testpress.course.models.greendao.ChapterDao;
+import in.testpress.models.greendao.Chapter;
+import in.testpress.models.greendao.ChapterDao;
 import in.testpress.ui.BaseToolBarActivity;
 
 import static in.testpress.course.TestpressCourse.COURSE_ID;
@@ -52,6 +54,7 @@ public class ChaptersGridActivity extends BaseToolBarActivity {
         List<Chapter> chapters = null;
         try {
             //noinspection RestrictedApi
+            @SuppressLint("RestrictedApi")
             ChaptersGridFragment fragment =
                     (ChaptersGridFragment) getSupportFragmentManager().getFragments().get(0);
 
@@ -61,7 +64,7 @@ public class ChaptersGridActivity extends BaseToolBarActivity {
         if (chapters != null && !chapters.isEmpty()) {
             Integer parentId = chapters.get(0).getParentId();
             if (parentId != null) {
-                ChapterDao chapterDao = TestpressCourse.getChapterDao(this);
+                ChapterDao chapterDao = TestpressSdk.getChapterDao(this);
                 Chapter parentChapter = chapterDao.queryBuilder()
                         .where(ChapterDao.Properties.Id.eq(parentId))
                         .list().get(0);

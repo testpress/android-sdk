@@ -1,4 +1,4 @@
-package in.testpress.model;
+package in.testpress.models;
 
 import in.testpress.util.Assert;
 

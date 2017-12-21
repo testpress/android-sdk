@@ -1,8 +1,6 @@
 package in.testpress.exam.network;
 
 import android.content.Context;
-import android.text.Html;
-import android.text.SpannableString;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,8 +15,8 @@ import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
-import in.testpress.exam.models.greendao.ReviewItem;
-import in.testpress.model.TestpressApiResponse;
+import in.testpress.models.greendao.ReviewItem;
+import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
 
