@@ -9,15 +9,16 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
+import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Language;
-import in.testpress.exam.models.greendao.ReviewAnswer;
-import in.testpress.exam.models.greendao.ReviewItem;
-import in.testpress.exam.models.greendao.ReviewQuestion;
-import in.testpress.exam.models.greendao.ReviewQuestionTranslation;
-import in.testpress.exam.models.greendao.SelectedAnswer;
-import in.testpress.exam.models.greendao.SelectedAnswerDao;
+import in.testpress.models.greendao.ReviewAnswer;
+import in.testpress.models.greendao.ReviewItem;
+import in.testpress.models.greendao.ReviewQuestion;
+import in.testpress.models.greendao.ReviewQuestionTranslation;
+import in.testpress.models.greendao.SelectedAnswer;
+import in.testpress.models.greendao.SelectedAnswerDao;
 import in.testpress.util.SingleTypeAdapter;
 
 /**
@@ -31,7 +32,7 @@ class ReviewPanelListAdapter extends SingleTypeAdapter<ReviewItem> {
 
     ReviewPanelListAdapter(final LayoutInflater inflater, final List<ReviewItem> items, int layout) {
         super(inflater, layout);
-        selectedAnswerDao = TestpressExam.getSelectedAnswerDao(inflater.getContext());
+        selectedAnswerDao = TestpressSdk.getSelectedAnswerDao(inflater.getContext());
         setItems(items);
     }
 

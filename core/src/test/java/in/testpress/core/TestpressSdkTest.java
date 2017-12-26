@@ -4,7 +4,7 @@ import android.content.Context;
 
 import org.junit.Test;
 
-import in.testpress.model.InstituteSettings;
+import in.testpress.models.InstituteSettings;
 
 import static org.mockito.Mockito.*;
 

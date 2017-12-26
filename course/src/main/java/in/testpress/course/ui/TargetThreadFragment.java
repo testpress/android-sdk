@@ -23,7 +23,7 @@ import in.testpress.core.TestpressException;
 import in.testpress.course.R;
 import in.testpress.course.models.Reputation;
 import in.testpress.course.network.TestpressCourseApiClient;
-import in.testpress.model.TestpressApiResponse;
+import in.testpress.models.TestpressApiResponse;
 import in.testpress.util.Assert;
 
 import static in.testpress.course.ui.RankListFragment.PARAM_USER_REPUTATION;

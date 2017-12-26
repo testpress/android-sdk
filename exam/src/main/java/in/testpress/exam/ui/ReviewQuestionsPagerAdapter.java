@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import in.testpress.exam.models.Language;
-import in.testpress.exam.models.greendao.ReviewItem;
+import in.testpress.models.greendao.ReviewItem;
 
 class ReviewQuestionsPagerAdapter extends FragmentStatePagerAdapter {
 

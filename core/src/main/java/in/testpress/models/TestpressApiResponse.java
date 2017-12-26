@@ -1,4 +1,4 @@
-package in.testpress.model;
+package in.testpress.models;
 
 import java.util.ArrayList;
 import java.util.List;

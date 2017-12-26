@@ -8,8 +8,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
-import in.testpress.course.models.greendao.Course;
-import in.testpress.course.models.greendao.CourseDao;
+import in.testpress.models.greendao.Course;
+import in.testpress.models.greendao.CourseDao;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
 

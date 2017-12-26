@@ -25,7 +25,7 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.core.TestpressCallback;
-import in.testpress.model.InstituteSettings;
+import in.testpress.models.InstituteSettings;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 

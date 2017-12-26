@@ -1,4 +1,4 @@
-package in.testpress.exam.models.greendao;
+package in.testpress.models;
 
 import android.text.TextUtils;
 

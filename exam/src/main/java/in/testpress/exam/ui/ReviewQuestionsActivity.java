@@ -29,28 +29,29 @@ import java.util.List;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
+import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.exam.models.Language;
-import in.testpress.exam.models.greendao.ReviewAnswer;
-import in.testpress.exam.models.greendao.ReviewAnswerDao;
-import in.testpress.exam.models.greendao.ReviewAnswerTranslation;
-import in.testpress.exam.models.greendao.ReviewAnswerTranslationDao;
-import in.testpress.exam.models.greendao.ReviewAttempt;
-import in.testpress.exam.models.greendao.ReviewAttemptDao;
-import in.testpress.exam.models.greendao.ReviewItem;
-import in.testpress.exam.models.greendao.ReviewItemDao;
-import in.testpress.exam.models.greendao.ReviewQuestion;
-import in.testpress.exam.models.greendao.ReviewQuestionDao;
-import in.testpress.exam.models.greendao.ReviewQuestionTranslation;
-import in.testpress.exam.models.greendao.ReviewQuestionTranslationDao;
-import in.testpress.exam.models.greendao.SelectedAnswer;
-import in.testpress.exam.models.greendao.SelectedAnswerDao;
+import in.testpress.models.greendao.ReviewAnswer;
+import in.testpress.models.greendao.ReviewAnswerDao;
+import in.testpress.models.greendao.ReviewAnswerTranslation;
+import in.testpress.models.greendao.ReviewAnswerTranslationDao;
+import in.testpress.models.greendao.ReviewAttempt;
+import in.testpress.models.greendao.ReviewAttemptDao;
+import in.testpress.models.greendao.ReviewItem;
+import in.testpress.models.greendao.ReviewItemDao;
+import in.testpress.models.greendao.ReviewQuestion;
+import in.testpress.models.greendao.ReviewQuestionDao;
+import in.testpress.models.greendao.ReviewQuestionTranslation;
+import in.testpress.models.greendao.ReviewQuestionTranslationDao;
+import in.testpress.models.greendao.SelectedAnswer;
+import in.testpress.models.greendao.SelectedAnswerDao;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
-import in.testpress.model.TestpressApiResponse;
+import in.testpress.models.TestpressApiResponse;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.UIUtils;
@@ -194,8 +195,8 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         });
         spinnerAdapter = new ExploreSpinnerAdapter(getLayoutInflater(), getResources(), true);
         spinnerAdapter.hideSpinner(true);
-        reviewItemDao= TestpressExam.getReviewItemDao(this);
-        attemptDao = TestpressExam.getReviewAttemptDao(this);
+        reviewItemDao= TestpressSdk.getReviewItemDao(this);
+        attemptDao = TestpressSdk.getReviewAttemptDao(this);
         reviewAttempt = getReviewAttempt();
     }
 
@@ -347,15 +348,15 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
             ReviewQuestion reviewQuestion = reviewItem.question;
             // Store selected answers
             for (int selectedAnswerId : reviewItem.getSelectedAnswers()) {
-                SelectedAnswerDao selectedAnswersDao = TestpressExam.getSelectedAnswerDao(this);
+                SelectedAnswerDao selectedAnswersDao = TestpressSdk.getSelectedAnswerDao(this);
                 SelectedAnswer selectedAnswer = new SelectedAnswer();
                 selectedAnswer.setAnswerId(selectedAnswerId);
                 selectedAnswer.setReviewItemId(reviewItem.getId());
                 selectedAnswersDao.insertOrReplace(selectedAnswer);
             }
             // Store question
-            ReviewQuestionDao reviewQuestionDao = TestpressExam.getReviewQuestionDao(this);
-            ReviewAnswerDao reviewAnswerDao = TestpressExam.getReviewAnswerDao(this);
+            ReviewQuestionDao reviewQuestionDao = TestpressSdk.getReviewQuestionDao(this);
+            ReviewAnswerDao reviewAnswerDao = TestpressSdk.getReviewAnswerDao(this);
             reviewQuestionDao.insertOrReplace(reviewQuestion);
             // Store answers
             for (ReviewAnswer reviewAnswer : reviewQuestion.getAnswers()) {
@@ -366,7 +367,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
             for (ReviewQuestionTranslation translation : reviewQuestion.getTranslations()) {
                 translation.setQuestionId(reviewQuestion.getId());
                 ReviewQuestionTranslationDao translationDao =
-                        TestpressExam.getReviewQuestionTranslationDao(this);
+                        TestpressSdk.getReviewQuestionTranslationDao(this);
 
                 translationDao.insertOrReplace(translation);
                 for (ReviewAnswerTranslation answerTranslation : translation.getAnswers()) {
@@ -376,7 +377,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
                     answerTranslation.setIsCorrect(answer.getIsCorrect());
                     answerTranslation.setQuestionTranslationId(translation.getId());
                     ReviewAnswerTranslationDao reviewAnswerTranslationDao =
-                            TestpressExam.getReviewAnswerTranslationDao(this);
+                            TestpressSdk.getReviewAnswerTranslationDao(this);
 
                     reviewAnswerTranslationDao.insertOrReplace(answerTranslation);
                 }

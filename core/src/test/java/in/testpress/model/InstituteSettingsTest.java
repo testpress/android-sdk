@@ -2,6 +2,8 @@ package in.testpress.model;
 
 import org.junit.Test;
 
+import in.testpress.models.InstituteSettings;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
