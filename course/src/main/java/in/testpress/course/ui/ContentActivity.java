@@ -287,6 +287,7 @@ public class ContentActivity extends BaseToolBarActivity {
             pageNumber.setText(String.format("%d/%d", position + 1, contents.size()));
             checkContentType();
         }
+        validateAdjacentNavigationButton();
     }
 
     private void checkContentType() {
@@ -832,7 +833,7 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void hideContents() {
-        buttonLayout.setVisibility(View.GONE);
+        buttonLayout.setVisibility(View.VISIBLE);
         attachmentContentLayout.setVisibility(View.GONE);
         webView.setVisibility(View.GONE);
         startButton.setVisibility(View.GONE);

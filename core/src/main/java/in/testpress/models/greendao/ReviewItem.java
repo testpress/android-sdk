@@ -63,8 +63,9 @@ public class ReviewItem {
     }
 
     @Generated
-    public ReviewItem(Long id, String url, Integer order, String duration, String bestDuration, String averageDuration, String essayText, String essayTopic, IntegerList selectedAnswers, Boolean review, Integer commentsCount, Integer correctPercentage, Integer index, Long attemptId, Long questionId) {
+    public ReviewItem(Long id, Integer index, String url, Integer order, String duration, String bestDuration, String averageDuration, String essayText, String essayTopic, IntegerList selectedAnswers, Boolean review, Integer commentsCount, Integer correctPercentage, Long attemptId, Long questionId) {
         this.id = id;
+        this.index = index;
         this.url = url;
         this.order = order;
         this.duration = duration;
@@ -76,7 +77,6 @@ public class ReviewItem {
         this.review = review;
         this.commentsCount = commentsCount;
         this.correctPercentage = correctPercentage;
-        this.index = index;
         this.attemptId = attemptId;
         this.questionId = questionId;
     }
@@ -94,6 +94,14 @@ public class ReviewItem {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Integer getIndex() {
+        return index;
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
     }
 
     public String getUrl() {
@@ -182,14 +190,6 @@ public class ReviewItem {
 
     public void setCorrectPercentage(Integer correctPercentage) {
         this.correctPercentage = correctPercentage;
-    }
-
-    public Integer getIndex() {
-        return index;
-    }
-
-    public void setIndex(Integer index) {
-        this.index = index;
     }
 
     public Long getAttemptId() {

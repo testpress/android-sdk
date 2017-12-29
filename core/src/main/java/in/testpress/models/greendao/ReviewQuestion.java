@@ -25,6 +25,7 @@ public class ReviewQuestion {
     private String explanationHtml;
     private String commentsUrl;
     private String language;
+    private Float percentageGotCorrect;
 
     /** Used to resolve relations */
     @Generated
@@ -56,7 +57,7 @@ public class ReviewQuestion {
     }
 
     @Generated
-    public ReviewQuestion(Long id, String questionHtml, String direction, String subject, String explanationHtml, String commentsUrl, String language) {
+    public ReviewQuestion(Long id, String questionHtml, String direction, String subject, String explanationHtml, String commentsUrl, String language, Float percentageGotCorrect) {
         this.id = id;
         this.questionHtml = questionHtml;
         this.direction = direction;
@@ -64,6 +65,7 @@ public class ReviewQuestion {
         this.explanationHtml = explanationHtml;
         this.commentsUrl = commentsUrl;
         this.language = language;
+        this.percentageGotCorrect = percentageGotCorrect;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -127,6 +129,14 @@ public class ReviewQuestion {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public Float getPercentageGotCorrect() {
+        return percentageGotCorrect;
+    }
+
+    public void setPercentageGotCorrect(Float percentageGotCorrect) {
+        this.percentageGotCorrect = percentageGotCorrect;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

@@ -36,7 +36,7 @@ public class CourseAttempt implements android.os.Parcelable {
     private transient CourseAttemptDao myDao;
 
     @ToOne(joinProperty = "courseContentId")
-    public CourseContent chapterContent;
+    private CourseContent chapterContent;
 
     @Generated
     private transient Long chapterContent__resolvedKey;

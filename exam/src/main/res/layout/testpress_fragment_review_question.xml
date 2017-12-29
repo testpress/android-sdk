@@ -32,12 +32,115 @@
                 android:background="@drawable/testpress_gradient_shadow_white_right" />
 
             <LinearLayout
+                android:id="@+id/difficulty_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/web_view"
+                android:orientation="horizontal"
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="13dp"
+                android:layout_marginRight="15dp"
+                android:visibility="gone"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/difficulty_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:text="Difficulty Level:"
+                    android:textSize="16sp"
+                    android:textAllCaps="true"
+                    android:textColor="@color/testpress_black"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginLeft="10dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/difficulty1"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginRight="2dp"
+                            android:background="@drawable/testpress_difficulty_left_off"
+                            android:layout_gravity="right"/>
+
+                        <ImageView
+                            android:id="@+id/difficulty2"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginRight="2dp"
+                            android:background="@color/testpress_text_gray_light"
+                            android:layout_gravity="right"/>
+
+                        <ImageView
+                            android:id="@+id/difficulty3"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginRight="2dp"
+                            android:background="@color/testpress_text_gray_light"
+                            android:layout_gravity="right"/>
+
+                        <ImageView
+                            android:id="@+id/difficulty4"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginRight="2dp"
+                            android:background="@color/testpress_text_gray_light"
+                            android:layout_gravity="right"/>
+
+                        <ImageView
+                            android:id="@+id/difficulty5"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:background="@drawable/testpress_difficulty_right_off"
+                            android:layout_gravity="right"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="5dp">
+
+                        <TextView
+                            android:id="@+id/difficulty_percentage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:text="0%"
+                            android:textColor="@color/testpress_difficulty_percentage_gray"/>
+
+                        <TextView
+                            android:id="@+id/users_answered_right"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="@color/testpress_difficulty_percentage_gray"
+                            android:text="@string/testpress_users_answered_right"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:orientation="vertical"
                 android:id="@+id/comments_layout"
                 android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/web_view">
+                android:layout_below="@+id/difficulty_layout">
 
                 <View
                     android:layout_width="match_parent"
