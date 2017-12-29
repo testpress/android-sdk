@@ -29,6 +29,7 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
         public final static Property ExplanationHtml = new Property(4, String.class, "explanationHtml", false, "EXPLANATION_HTML");
         public final static Property CommentsUrl = new Property(5, String.class, "commentsUrl", false, "COMMENTS_URL");
         public final static Property Language = new Property(6, String.class, "language", false, "LANGUAGE");
+        public final static Property PercentageGotCorrect = new Property(7, Float.class, "percentageGotCorrect", false, "PERCENTAGE_GOT_CORRECT");
     }
 
     private DaoSession daoSession;
@@ -53,7 +54,8 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
                 "\"SUBJECT\" TEXT," + // 3: subject
                 "\"EXPLANATION_HTML\" TEXT," + // 4: explanationHtml
                 "\"COMMENTS_URL\" TEXT," + // 5: commentsUrl
-                "\"LANGUAGE\" TEXT);"); // 6: language
+                "\"LANGUAGE\" TEXT," + // 6: language
+                "\"PERCENTAGE_GOT_CORRECT\" REAL);"); // 7: percentageGotCorrect
     }
 
     /** Drops the underlying database table. */
@@ -100,6 +102,11 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
         if (language != null) {
             stmt.bindString(7, language);
         }
+ 
+        Float percentageGotCorrect = entity.getPercentageGotCorrect();
+        if (percentageGotCorrect != null) {
+            stmt.bindDouble(8, percentageGotCorrect);
+        }
     }
 
     @Override
@@ -140,6 +147,11 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
         if (language != null) {
             stmt.bindString(7, language);
         }
+ 
+        Float percentageGotCorrect = entity.getPercentageGotCorrect();
+        if (percentageGotCorrect != null) {
+            stmt.bindDouble(8, percentageGotCorrect);
+        }
     }
 
     @Override
@@ -162,7 +174,8 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // subject
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // explanationHtml
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // commentsUrl
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6) // language
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // language
+            cursor.isNull(offset + 7) ? null : cursor.getFloat(offset + 7) // percentageGotCorrect
         );
         return entity;
     }
@@ -176,6 +189,7 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
         entity.setExplanationHtml(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setCommentsUrl(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setLanguage(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setPercentageGotCorrect(cursor.isNull(offset + 7) ? null : cursor.getFloat(offset + 7));
      }
     
     @Override

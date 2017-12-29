@@ -9,7 +9,9 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 6;
+    private static final int VERSION = 7;
+    //already increased after editing review item
+    // 3:55PM 29th December 2017
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -320,6 +322,7 @@ public class TestpressSDKDaoGenerator {
         reviewQuestion.addStringProperty("explanationHtml");
         reviewQuestion.addStringProperty("commentsUrl");
         reviewQuestion.addStringProperty("language");
+        reviewQuestion.addFloatProperty("percentageGotCorrect");
         return reviewQuestion;
     }
 

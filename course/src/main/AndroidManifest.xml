@@ -18,7 +18,8 @@
             android:configChanges="orientation|keyboard|screenSize" />
 
         <activity android:name=".ui.ContentActivity"
-            android:theme="@style/TestpressTheme" />
+            android:theme="@style/TestpressTheme"
+            android:configChanges="orientation|keyboard|screenSize" />
 
         <activity android:name=".ui.LeaderboardActivity"
             android:label="@string/testpress_leaderboard"

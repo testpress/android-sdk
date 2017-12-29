@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -13,6 +14,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +26,7 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -46,7 +49,6 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
-import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Comment;
 import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.ReviewAnswer;
@@ -106,6 +108,15 @@ public class ReviewQuestionsFragment extends Fragment
     CommentsListAdapter commentsAdapter;
     ProgressDialog progressDialog;
     WebView webView;
+    TextView difficultyTitle;
+    TextView difficultyPercentageText;
+    TextView usersAnsweredRight;
+    ImageView imageView1;
+    ImageView imageView2;
+    ImageView imageView3;
+    ImageView imageView4;
+    ImageView imageView5;
+    int percentageCorrect;
     boolean postedNewComment;
     TestpressExamApiClient apiClient;
     List<Comment> comments = new ArrayList<>();
@@ -157,7 +168,7 @@ public class ReviewQuestionsFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.testpress_fragment_review_question, container, false);
+        final View view = inflater.inflate(R.layout.testpress_fragment_review_question, container, false);
         progressBar = (ProgressBar) view.findViewById(R.id.pb_loading);
         emptyView = view.findViewById(R.id.empty_container);
         emptyTitleView = (TextView) view.findViewById(R.id.empty_title);
@@ -178,29 +189,70 @@ public class ReviewQuestionsFragment extends Fragment
         commentBoxLayout = (LinearLayout) view.findViewById(R.id.comment_box_layout);
         postCommentButton = (ImageButton) view.findViewById(R.id.post_comment_button);
         imageCommentButton = (ImageButton) view.findViewById(R.id.image_comment_button);
+        difficultyTitle = (TextView) view.findViewById(R.id.difficulty_title);
+        difficultyPercentageText = (TextView) view.findViewById(R.id.difficulty_percentage);
+        usersAnsweredRight = (TextView) view.findViewById(R.id.users_answered_right);
+        imageView1 = (ImageView) view.findViewById(R.id.difficulty1);
+        imageView2 = (ImageView) view.findViewById(R.id.difficulty2);
+        imageView3 = (ImageView) view.findViewById(R.id.difficulty3);
+        imageView4 = (ImageView) view.findViewById(R.id.difficulty4);
+        imageView5 = (ImageView) view.findViewById(R.id.difficulty5);
+        percentageCorrect = Math.round(reviewItem.getQuestion().getPercentageGotCorrect());
         rootLayout = view;
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage(getResources().getString(R.string.testpress_please_wait));
         progressDialog.setCancelable(false);
         UIUtils.setIndeterminateDrawable(getContext(), progressDialog, 4);
         ViewUtils.setTypeface(
-                new TextView[] { loadPreviousCommentsText, commentsLabel, loadNewCommentsText },
-                TestpressSdk.getRubikMediumFont(getContext())
+                new TextView[] { loadPreviousCommentsText, commentsLabel, loadNewCommentsText,
+                difficultyTitle, difficultyPercentageText}, TestpressSdk.getRubikMediumFont(getContext())
         );
-        ViewUtils.setTypeface(new TextView[] { commentsEditText },
+        ViewUtils.setTypeface(new TextView[] { commentsEditText, usersAnsweredRight},
                 TestpressSdk.getRubikRegularFont(getContext()));
         webViewUtils = new WebViewUtils(webView) {
             @Override
             protected void onLoadFinished() {
                 super.onLoadFinished();
+                setDifficulty(view);
                 progressBar.setVisibility(View.GONE);
                 if (commentsAdapter == null && getActivity() != null) {
                     displayComments();
                 }
             }
         };
+        difficultyPercentageText.setText(percentageCorrect + "%");
         webViewUtils.initWebView(getReviewItemAsHtml(), getActivity());
         return view;
+    }
+
+    private void setDifficulty(View view) {
+        if (percentageCorrect >= 0) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                imageView1.setBackground(getResources().getDrawable(R.drawable.testpress_difficulty_left_on));
+            } else {
+                imageView1.setBackgroundColor(getResources().getColor(R.color.testpress_difficulty_level_1));
+            }
+        }
+        if (percentageCorrect > 20) {
+            imageView2.setBackgroundColor(ContextCompat.getColor(getContext(),
+                    R.color.testpress_difficulty_level_2));
+        }
+        if (percentageCorrect > 40) {
+            imageView3.setBackgroundColor(ContextCompat.getColor(getContext(),
+                    R.color.testpress_difficulty_level_3));
+        }
+        if (percentageCorrect > 60) {
+            imageView4.setBackgroundColor(ContextCompat.getColor(getContext(),
+                    R.color.testpress_difficulty_level_4));
+        }
+        if (percentageCorrect > 80) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                imageView5.setBackground(getResources().getDrawable(R.drawable.testpress_difficulty_right_on));
+            } else {
+                imageView5.setBackgroundColor(getResources().getColor(R.color.testpress_difficulty_level_5));
+            }
+        }
+        view.findViewById(R.id.difficulty_layout).setVisibility(View.VISIBLE);
     }
 
     /**

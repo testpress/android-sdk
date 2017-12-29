@@ -184,6 +184,7 @@
     <string name="testpress_answer_type">Answer Type</string>
     <string name="testpress_subject_filter">Filter by Subject</string>
     <string name="testpress_time_sort">Sort by Time</string>
+    <string name="testpress_users_answered_right">users answered right</string>
 
     <string name="testpress_exam_ended">This exam has ended</string>
 

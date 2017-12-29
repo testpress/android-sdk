@@ -43,4 +43,11 @@
     <color name="testpress_orange">#f14f08</color>
     <color name="testpress_green_success">#009933</color>
 
+    <color name="testpress_difficulty_level_1">#e65c6c</color>
+    <color name="testpress_difficulty_level_2">#ff7519</color>
+    <color name="testpress_difficulty_level_3">#ffb319</color>
+    <color name="testpress_difficulty_level_4">#aacc00</color>
+    <color name="testpress_difficulty_level_5">#44cc00</color>
+    <color name="testpress_difficulty_percentage_gray">#666666</color>
+
 </resources>
