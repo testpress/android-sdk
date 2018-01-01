@@ -353,6 +353,9 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void saveHtmlContentInDB(HtmlContent htmlContent) {
+        htmlContentDao.queryBuilder()
+                .where(HtmlContentDao.Properties.SourceUrl.eq(content.getHtmlContentUrl()))
+                .buildDelete().executeDeleteWithoutDetachingEntities();
         htmlContent.setSourceUrl(content.getHtmlContentUrl());
         htmlContentDao.insertOrReplace(htmlContent);
     }
@@ -690,7 +693,11 @@ public class ContentActivity extends BaseToolBarActivity {
                         contents = contentDao.queryBuilder()
                                 .where(ContentDao.Properties.ChapterId.eq(content.chapterId)).list();
                         ContentActivity.this.content = contents.get(position);
-                        checkContentType();
+                        if (content.getHtmlContentTitle() == null) {
+                            checkContentType();
+                        } else {
+                            loadContentHtmlFromServer();
+                        }
                     }
 
                     @Override
