@@ -230,10 +230,12 @@ public abstract class BaseGridFragment<E> extends Fragment
         }
         List<E> items = getItems();
         tableLayout.removeAllViews();
-        if (items.isEmpty()) {
-            setEmptyText();
-            if (!needRetryButton) {
-                retryButton.setVisibility(View.GONE);
+        if (isItemsEmpty()) {
+            if (!firstCallBack) {
+                setEmptyText();
+                if (!needRetryButton) {
+                    retryButton.setVisibility(View.GONE);
+                }
             }
         } else {
             int noOfItemsAvailable = items.size();    //Number of items Available

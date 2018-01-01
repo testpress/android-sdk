@@ -197,7 +197,8 @@ public class ReviewQuestionsFragment extends Fragment
         imageView3 = (ImageView) view.findViewById(R.id.difficulty3);
         imageView4 = (ImageView) view.findViewById(R.id.difficulty4);
         imageView5 = (ImageView) view.findViewById(R.id.difficulty5);
-        percentageCorrect = Math.round(reviewItem.getQuestion().getPercentageGotCorrect());
+        percentageCorrect = Math.round(reviewItem.getQuestion().getPercentageGotCorrect() == null ?
+        0 : reviewItem.getQuestion().getPercentageGotCorrect());
         rootLayout = view;
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage(getResources().getString(R.string.testpress_please_wait));
@@ -252,7 +253,11 @@ public class ReviewQuestionsFragment extends Fragment
                 imageView5.setBackgroundColor(getResources().getColor(R.color.testpress_difficulty_level_5));
             }
         }
-        view.findViewById(R.id.difficulty_layout).setVisibility(View.VISIBLE);
+        if (reviewItem.getQuestion().getPercentageGotCorrect() == null) {
+            view.findViewById(R.id.difficulty_layout).setVisibility(View.GONE);
+        } else {
+            view.findViewById(R.id.difficulty_layout).setVisibility(View.VISIBLE);
+        }
     }
 
     /**

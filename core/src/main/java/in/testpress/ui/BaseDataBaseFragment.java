@@ -30,7 +30,7 @@ public abstract class BaseDataBaseFragment<T, K> extends BaseListViewFragment<T>
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        displayDataFromDB();
+        getListAdapter().notifyDataSetChanged();
     }
 
     protected void displayDataFromDB() {
