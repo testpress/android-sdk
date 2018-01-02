@@ -35,6 +35,7 @@ public class Chapter {
     private Integer order;
     private Integer contentsCount;
     private Integer childrenCount;
+    private Boolean active;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -48,7 +49,7 @@ public class Chapter {
     }
 
     @Generated
-    public Chapter(Long id, String name, String description, String slug, String image, String modified, Long modifiedDate, Integer courseId, String courseUrl, String contentUrl, String childrenUrl, Integer parentId, String parentSlug, String parentUrl, Boolean leaf, String url, Integer requiredTrophyCount, Boolean isLocked, Integer order, Integer contentsCount, Integer childrenCount) {
+    public Chapter(Long id, String name, String description, String slug, String image, String modified, Long modifiedDate, Integer courseId, String courseUrl, String contentUrl, String childrenUrl, Integer parentId, String parentSlug, String parentUrl, Boolean leaf, String url, Integer requiredTrophyCount, Boolean isLocked, Integer order, Integer contentsCount, Integer childrenCount, Boolean active) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -70,6 +71,7 @@ public class Chapter {
         this.order = order;
         this.contentsCount = contentsCount;
         this.childrenCount = childrenCount;
+        this.active = active;
     }
 
     public Long getId() {
@@ -238,6 +240,14 @@ public class Chapter {
 
     public void setChildrenCount(Integer childrenCount) {
         this.childrenCount = childrenCount;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     // KEEP METHODS - put your custom methods here

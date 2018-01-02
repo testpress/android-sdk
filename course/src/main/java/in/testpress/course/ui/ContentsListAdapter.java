@@ -41,7 +41,8 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
     public int getCount() {
         return (int) contentDao.queryBuilder()
                 .where(
-                        ContentDao.Properties.ChapterId.eq(chapterId)
+                        ContentDao.Properties.ChapterId.eq(chapterId),
+                        ContentDao.Properties.Active.eq(true)
                 ).count();
     }
 
@@ -49,7 +50,8 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
     public Content getItem(int position) {
         return contentDao.queryBuilder()
                 .where(
-                        ContentDao.Properties.ChapterId.eq(chapterId)
+                        ContentDao.Properties.ChapterId.eq(chapterId),
+                        ContentDao.Properties.Active.eq(true)
                 )
                 .orderAsc(ContentDao.Properties.Order).listLazy().get(position);
     }
@@ -58,7 +60,8 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
     public List<Content> getItems() {
         return contentDao.queryBuilder()
                 .where(
-                        ContentDao.Properties.ChapterId.eq(chapterId)
+                        ContentDao.Properties.ChapterId.eq(chapterId),
+                        ContentDao.Properties.Active.eq(true)
                 )
                 .orderAsc(ContentDao.Properties.Order).list();
     }
