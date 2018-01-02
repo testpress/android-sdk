@@ -28,6 +28,7 @@ public class Course {
     private Integer chaptersCount;
     private Integer contentsCount;
     private Integer order;
+    private Boolean active;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -41,7 +42,7 @@ public class Course {
     }
 
     @Generated
-    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount, Integer order) {
+    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount, Integer order, Boolean active) {
         this.id = id;
         this.url = url;
         this.title = title;
@@ -56,6 +57,7 @@ public class Course {
         this.chaptersCount = chaptersCount;
         this.contentsCount = contentsCount;
         this.order = order;
+        this.active = active;
     }
 
     public Long getId() {
@@ -168,6 +170,14 @@ public class Course {
 
     public void setOrder(Integer order) {
         this.order = order;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     // KEEP METHODS - put your custom methods here

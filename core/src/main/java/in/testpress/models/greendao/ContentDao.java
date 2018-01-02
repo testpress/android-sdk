@@ -42,9 +42,10 @@ public class ContentDao extends AbstractDao<Content, Long> {
         public final static Property Start = new Property(14, String.class, "start", false, "START");
         public final static Property End = new Property(15, String.class, "end", false, "END");
         public final static Property HasStarted = new Property(16, Boolean.class, "hasStarted", false, "HAS_STARTED");
-        public final static Property VideoId = new Property(17, Long.class, "videoId", false, "VIDEO_ID");
-        public final static Property AttachmentId = new Property(18, Long.class, "attachmentId", false, "ATTACHMENT_ID");
-        public final static Property ExamId = new Property(19, Long.class, "examId", false, "EXAM_ID");
+        public final static Property Active = new Property(17, Boolean.class, "active", false, "ACTIVE");
+        public final static Property VideoId = new Property(18, Long.class, "videoId", false, "VIDEO_ID");
+        public final static Property AttachmentId = new Property(19, Long.class, "attachmentId", false, "ATTACHMENT_ID");
+        public final static Property ExamId = new Property(20, Long.class, "examId", false, "EXAM_ID");
     }
 
     private DaoSession daoSession;
@@ -80,9 +81,10 @@ public class ContentDao extends AbstractDao<Content, Long> {
                 "\"START\" TEXT," + // 14: start
                 "\"END\" TEXT," + // 15: end
                 "\"HAS_STARTED\" INTEGER," + // 16: hasStarted
-                "\"VIDEO_ID\" INTEGER," + // 17: videoId
-                "\"ATTACHMENT_ID\" INTEGER," + // 18: attachmentId
-                "\"EXAM_ID\" INTEGER);"); // 19: examId
+                "\"ACTIVE\" INTEGER," + // 17: active
+                "\"VIDEO_ID\" INTEGER," + // 18: videoId
+                "\"ATTACHMENT_ID\" INTEGER," + // 19: attachmentId
+                "\"EXAM_ID\" INTEGER);"); // 20: examId
     }
 
     /** Drops the underlying database table. */
@@ -180,19 +182,24 @@ public class ContentDao extends AbstractDao<Content, Long> {
             stmt.bindLong(17, hasStarted ? 1L: 0L);
         }
  
+        Boolean active = entity.getActive();
+        if (active != null) {
+            stmt.bindLong(18, active ? 1L: 0L);
+        }
+ 
         Long videoId = entity.getVideoId();
         if (videoId != null) {
-            stmt.bindLong(18, videoId);
+            stmt.bindLong(19, videoId);
         }
  
         Long attachmentId = entity.getAttachmentId();
         if (attachmentId != null) {
-            stmt.bindLong(19, attachmentId);
+            stmt.bindLong(20, attachmentId);
         }
  
         Long examId = entity.getExamId();
         if (examId != null) {
-            stmt.bindLong(20, examId);
+            stmt.bindLong(21, examId);
         }
     }
 
@@ -285,19 +292,24 @@ public class ContentDao extends AbstractDao<Content, Long> {
             stmt.bindLong(17, hasStarted ? 1L: 0L);
         }
  
+        Boolean active = entity.getActive();
+        if (active != null) {
+            stmt.bindLong(18, active ? 1L: 0L);
+        }
+ 
         Long videoId = entity.getVideoId();
         if (videoId != null) {
-            stmt.bindLong(18, videoId);
+            stmt.bindLong(19, videoId);
         }
  
         Long attachmentId = entity.getAttachmentId();
         if (attachmentId != null) {
-            stmt.bindLong(19, attachmentId);
+            stmt.bindLong(20, attachmentId);
         }
  
         Long examId = entity.getExamId();
         if (examId != null) {
-            stmt.bindLong(20, examId);
+            stmt.bindLong(21, examId);
         }
     }
 
@@ -332,9 +344,10 @@ public class ContentDao extends AbstractDao<Content, Long> {
             cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // start
             cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // end
             cursor.isNull(offset + 16) ? null : cursor.getShort(offset + 16) != 0, // hasStarted
-            cursor.isNull(offset + 17) ? null : cursor.getLong(offset + 17), // videoId
-            cursor.isNull(offset + 18) ? null : cursor.getLong(offset + 18), // attachmentId
-            cursor.isNull(offset + 19) ? null : cursor.getLong(offset + 19) // examId
+            cursor.isNull(offset + 17) ? null : cursor.getShort(offset + 17) != 0, // active
+            cursor.isNull(offset + 18) ? null : cursor.getLong(offset + 18), // videoId
+            cursor.isNull(offset + 19) ? null : cursor.getLong(offset + 19), // attachmentId
+            cursor.isNull(offset + 20) ? null : cursor.getLong(offset + 20) // examId
         );
         return entity;
     }
@@ -358,9 +371,10 @@ public class ContentDao extends AbstractDao<Content, Long> {
         entity.setStart(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
         entity.setEnd(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
         entity.setHasStarted(cursor.isNull(offset + 16) ? null : cursor.getShort(offset + 16) != 0);
-        entity.setVideoId(cursor.isNull(offset + 17) ? null : cursor.getLong(offset + 17));
-        entity.setAttachmentId(cursor.isNull(offset + 18) ? null : cursor.getLong(offset + 18));
-        entity.setExamId(cursor.isNull(offset + 19) ? null : cursor.getLong(offset + 19));
+        entity.setActive(cursor.isNull(offset + 17) ? null : cursor.getShort(offset + 17) != 0);
+        entity.setVideoId(cursor.isNull(offset + 18) ? null : cursor.getLong(offset + 18));
+        entity.setAttachmentId(cursor.isNull(offset + 19) ? null : cursor.getLong(offset + 19));
+        entity.setExamId(cursor.isNull(offset + 20) ? null : cursor.getLong(offset + 20));
      }
     
     @Override

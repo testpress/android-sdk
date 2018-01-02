@@ -36,6 +36,7 @@ public class Content implements android.os.Parcelable {
     private String start;
     private String end;
     private Boolean hasStarted;
+    private Boolean active;
     public Long videoId;
     public Long attachmentId;
     public Long examId;
@@ -78,7 +79,7 @@ public class Content implements android.os.Parcelable {
     }
 
     @Generated
-    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, Integer chapterId, String chapterSlug, String chapterUrl, Long id, String name, String image, String description, Boolean isLocked, Integer attemptsCount, String start, String end, Boolean hasStarted, Long videoId, Long attachmentId, Long examId) {
+    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, Integer chapterId, String chapterSlug, String chapterUrl, Long id, String name, String image, String description, Boolean isLocked, Integer attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long videoId, Long attachmentId, Long examId) {
         this.order = order;
         this.htmlContentTitle = htmlContentTitle;
         this.htmlContentUrl = htmlContentUrl;
@@ -96,6 +97,7 @@ public class Content implements android.os.Parcelable {
         this.start = start;
         this.end = end;
         this.hasStarted = hasStarted;
+        this.active = active;
         this.videoId = videoId;
         this.attachmentId = attachmentId;
         this.examId = examId;
@@ -242,6 +244,14 @@ public class Content implements android.os.Parcelable {
 
     public void setHasStarted(Boolean hasStarted) {
         this.hasStarted = hasStarted;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public Long getVideoId() {

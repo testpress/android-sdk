@@ -68,7 +68,8 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
     }
 
     private QueryBuilder<Chapter> getCourseChaptersQueryBuilder() {
-        return chapterDao.queryBuilder().where(ChapterDao.Properties.CourseId.eq(courseId));
+        return chapterDao.queryBuilder().where(ChapterDao.Properties.CourseId.eq(courseId),
+                ChapterDao.Properties.Active.eq(true));
     }
 
     private QueryBuilder<Chapter> getParentChaptersQueryBuilder() {
@@ -122,7 +123,6 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
         displayItems();
         showGrid();
     }
-
     @Override
     protected boolean isItemsEmpty() {
         return getParentChaptersQueryBuilder().count() == 0;

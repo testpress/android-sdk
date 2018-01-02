@@ -43,6 +43,7 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
         public final static Property Order = new Property(18, Integer.class, "order", false, "ORDER");
         public final static Property ContentsCount = new Property(19, Integer.class, "contentsCount", false, "CONTENTS_COUNT");
         public final static Property ChildrenCount = new Property(20, Integer.class, "childrenCount", false, "CHILDREN_COUNT");
+        public final static Property Active = new Property(21, Boolean.class, "active", false, "ACTIVE");
     }
 
 
@@ -78,7 +79,8 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
                 "\"IS_LOCKED\" INTEGER," + // 17: isLocked
                 "\"ORDER\" INTEGER," + // 18: order
                 "\"CONTENTS_COUNT\" INTEGER," + // 19: contentsCount
-                "\"CHILDREN_COUNT\" INTEGER);"); // 20: childrenCount
+                "\"CHILDREN_COUNT\" INTEGER," + // 20: childrenCount
+                "\"ACTIVE\" INTEGER);"); // 21: active
     }
 
     /** Drops the underlying database table. */
@@ -195,6 +197,11 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
         if (childrenCount != null) {
             stmt.bindLong(21, childrenCount);
         }
+ 
+        Boolean active = entity.getActive();
+        if (active != null) {
+            stmt.bindLong(22, active ? 1L: 0L);
+        }
     }
 
     @Override
@@ -305,6 +312,11 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
         if (childrenCount != null) {
             stmt.bindLong(21, childrenCount);
         }
+ 
+        Boolean active = entity.getActive();
+        if (active != null) {
+            stmt.bindLong(22, active ? 1L: 0L);
+        }
     }
 
     @Override
@@ -335,7 +347,8 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
             cursor.isNull(offset + 17) ? null : cursor.getShort(offset + 17) != 0, // isLocked
             cursor.isNull(offset + 18) ? null : cursor.getInt(offset + 18), // order
             cursor.isNull(offset + 19) ? null : cursor.getInt(offset + 19), // contentsCount
-            cursor.isNull(offset + 20) ? null : cursor.getInt(offset + 20) // childrenCount
+            cursor.isNull(offset + 20) ? null : cursor.getInt(offset + 20), // childrenCount
+            cursor.isNull(offset + 21) ? null : cursor.getShort(offset + 21) != 0 // active
         );
         return entity;
     }
@@ -363,6 +376,7 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
         entity.setOrder(cursor.isNull(offset + 18) ? null : cursor.getInt(offset + 18));
         entity.setContentsCount(cursor.isNull(offset + 19) ? null : cursor.getInt(offset + 19));
         entity.setChildrenCount(cursor.isNull(offset + 20) ? null : cursor.getInt(offset + 20));
+        entity.setActive(cursor.isNull(offset + 21) ? null : cursor.getShort(offset + 21) != 0);
      }
     
     @Override

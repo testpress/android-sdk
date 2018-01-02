@@ -9,9 +9,9 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 7;
-    //already increased after editing review item
-    // 3:55PM 29th December 2017
+    private static final int VERSION = 8;
+    //Increased after adding active field in Course and Chapter
+    // 12:02 2nd January 2018
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -159,6 +159,7 @@ public class TestpressSDKDaoGenerator {
         content.addStringProperty("start");
         content.addStringProperty("end");
         content.addBooleanProperty("hasStarted");
+        content.addBooleanProperty("active");
         content.implementsInterface("android.os.Parcelable");
         return content;
     }
@@ -239,6 +240,7 @@ public class TestpressSDKDaoGenerator {
         course.addIntProperty("chaptersCount");
         course.addIntProperty("contentsCount");
         course.addIntProperty("order");
+        course.addBooleanProperty("active");
         return course;
     }
 
@@ -265,6 +267,7 @@ public class TestpressSDKDaoGenerator {
         chapter.addIntProperty("order");
         chapter.addIntProperty("contentsCount");
         chapter.addIntProperty("childrenCount");
+        chapter.addBooleanProperty("active");
         return chapter;
     }
 
