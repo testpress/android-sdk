@@ -690,7 +690,12 @@ public class ContentActivity extends BaseToolBarActivity {
 
                         contents = contentDao.queryBuilder()
                                 .where(ContentDao.Properties.ChapterId.eq(content.chapterId)).list();
-                        ContentActivity.this.content = contents.get(position);
+                        if (contentId != null) {
+                            ContentActivity.this.content = contentDao.queryBuilder()
+                                    .where(ContentDao.Properties.Id.eq(contentId)).list().get(0);
+                        } else {
+                            ContentActivity.this.content = contents.get(position);
+                        }
                         if (content.getHtmlContentTitle() == null) {
                             checkContentType();
                         } else {
