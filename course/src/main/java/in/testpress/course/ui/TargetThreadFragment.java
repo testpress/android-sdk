@@ -98,6 +98,7 @@ public class TargetThreadFragment extends Fragment {
                     @Override
                     public void onSuccess(TestpressApiResponse<Reputation> response) {
                         if (getActivity() == null) {
+                            return;
                         }
 
                         List<Reputation> targets = response.getResults();
