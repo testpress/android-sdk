@@ -145,7 +145,9 @@ public abstract class BaseListViewFragment<E> extends Fragment
             TypedValue typed_value = new TypedValue();
             getActivity().getTheme().resolveAttribute(android.support.v7.appcompat.R.attr.actionBarSize, typed_value, true);
             swipeRefreshLayout.setProgressViewOffset(false, 0, getResources().getDimensionPixelSize(typed_value.resourceId));
-            swipeRefreshLayout.setRefreshing(true);
+            if (isItemsEmpty()) {
+                swipeRefreshLayout.setRefreshing(true);
+            }
         }
         emptyView = view.findViewById(R.id.empty_container);
         emptyTitleView = (TextView) view.findViewById(R.id.empty_title);
