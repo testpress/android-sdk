@@ -691,7 +691,9 @@ public class ContentActivity extends BaseToolBarActivity {
                         contentDao.insertOrReplace(content);
 
                         contents = contentDao.queryBuilder()
-                                .where(ContentDao.Properties.ChapterId.eq(content.chapterId)).list();
+                                .where(ContentDao.Properties.ChapterId.eq(content.chapterId),
+                                        ContentDao.Properties.Active.eq(true))
+                                .orderAsc(ContentDao.Properties.Order).list();
                         if (contentId != null) {
                             ContentActivity.this.content = contentDao.queryBuilder()
                                     .where(ContentDao.Properties.Id.eq(contentId)).list().get(0);
