@@ -2,7 +2,6 @@ package in.testpress.models.greendao;
 
 import org.greenrobot.greendao.annotation.*;
 
-import java.util.List;
 import in.testpress.models.greendao.DaoSession;
 import org.greenrobot.greendao.DaoException;
 
@@ -18,6 +17,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.ArrayList;
+import java.util.List;
 // KEEP INCLUDES END
 
 /**
@@ -51,6 +52,7 @@ public class Exam implements android.os.Parcelable {
     private Integer commentsCount;
     private String slug;
     private String selectedLanguage;
+    private Boolean variableMarkPerQuestion;
 
     /** Used to resolve relations */
     @Generated
@@ -77,7 +79,7 @@ public class Exam implements android.os.Parcelable {
     }
 
     @Generated
-    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String course_category, java.util.Date startDate, java.util.Date endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage) {
+    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String course_category, java.util.Date startDate, java.util.Date endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion) {
         this.totalMarks = totalMarks;
         this.url = url;
         this.id = id;
@@ -102,6 +104,7 @@ public class Exam implements android.os.Parcelable {
         this.commentsCount = commentsCount;
         this.slug = slug;
         this.selectedLanguage = selectedLanguage;
+        this.variableMarkPerQuestion = variableMarkPerQuestion;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -303,6 +306,14 @@ public class Exam implements android.os.Parcelable {
         this.selectedLanguage = selectedLanguage;
     }
 
+    public Boolean getVariableMarkPerQuestion() {
+        return variableMarkPerQuestion;
+    }
+
+    public void setVariableMarkPerQuestion(Boolean variableMarkPerQuestion) {
+        this.variableMarkPerQuestion = variableMarkPerQuestion;
+    }
+
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
     @Generated
     public List<Language> getLanguages() {
@@ -363,7 +374,6 @@ public class Exam implements android.os.Parcelable {
     }
 
     // KEEP METHODS - put your custom methods here
-
     protected Exam(Parcel in) {
         totalMarks = in.readString();
         url = in.readString();
@@ -392,6 +402,14 @@ public class Exam implements android.os.Parcelable {
         commentsCount = in.readByte() == 0x00 ? null : in.readInt();
         slug = in.readString();
         selectedLanguage = in.readString();
+        byte variableMarkPerQuestionVal = in.readByte();
+        variableMarkPerQuestion = variableMarkPerQuestionVal == 0x02 ? null : variableMarkPerQuestionVal != 0x00;
+        if (in.readByte() == 0x01) {
+            languages = new ArrayList<Language>();
+            in.readList(languages, Language.class.getClassLoader());
+        } else {
+            languages = null;
+        }
     }
 
     @Override
@@ -472,8 +490,20 @@ public class Exam implements android.os.Parcelable {
         }
         dest.writeString(slug);
         dest.writeString(selectedLanguage);
+        if (variableMarkPerQuestion == null) {
+            dest.writeByte((byte) (0x02));
+        } else {
+            dest.writeByte((byte) (variableMarkPerQuestion ? 0x01 : 0x00));
+        }
+        if (languages == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(languages);
+        }
     }
 
+    @SuppressWarnings("unused")
     public static final Parcelable.Creator<Exam> CREATOR = new Parcelable.Creator<Exam>() {
         @Override
         public Exam createFromParcel(Parcel in) {

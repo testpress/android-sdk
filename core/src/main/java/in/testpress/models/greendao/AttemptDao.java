@@ -41,6 +41,7 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
         public final static Property Speed = new Property(16, Integer.class, "speed", false, "SPEED");
         public final static Property Accuracy = new Property(17, Integer.class, "accuracy", false, "ACCURACY");
         public final static Property ContentId = new Property(18, Long.class, "contentId", false, "CONTENT_ID");
+        public final static Property Percentage = new Property(19, String.class, "percentage", false, "PERCENTAGE");
     }
 
 
@@ -74,7 +75,8 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
                 "\"PERCENTILE\" TEXT," + // 15: percentile
                 "\"SPEED\" INTEGER," + // 16: speed
                 "\"ACCURACY\" INTEGER," + // 17: accuracy
-                "\"CONTENT_ID\" INTEGER);"); // 18: contentId
+                "\"CONTENT_ID\" INTEGER," + // 18: contentId
+                "\"PERCENTAGE\" TEXT);"); // 19: percentage
     }
 
     /** Drops the underlying database table. */
@@ -181,6 +183,11 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
         if (contentId != null) {
             stmt.bindLong(19, contentId);
         }
+ 
+        String percentage = entity.getPercentage();
+        if (percentage != null) {
+            stmt.bindString(20, percentage);
+        }
     }
 
     @Override
@@ -281,6 +288,11 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
         if (contentId != null) {
             stmt.bindLong(19, contentId);
         }
+ 
+        String percentage = entity.getPercentage();
+        if (percentage != null) {
+            stmt.bindString(20, percentage);
+        }
     }
 
     @Override
@@ -309,7 +321,8 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
             cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // percentile
             cursor.isNull(offset + 16) ? null : cursor.getInt(offset + 16), // speed
             cursor.isNull(offset + 17) ? null : cursor.getInt(offset + 17), // accuracy
-            cursor.isNull(offset + 18) ? null : cursor.getLong(offset + 18) // contentId
+            cursor.isNull(offset + 18) ? null : cursor.getLong(offset + 18), // contentId
+            cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19) // percentage
         );
         return entity;
     }
@@ -335,6 +348,7 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
         entity.setSpeed(cursor.isNull(offset + 16) ? null : cursor.getInt(offset + 16));
         entity.setAccuracy(cursor.isNull(offset + 17) ? null : cursor.getInt(offset + 17));
         entity.setContentId(cursor.isNull(offset + 18) ? null : cursor.getLong(offset + 18));
+        entity.setPercentage(cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19));
      }
     
     @Override

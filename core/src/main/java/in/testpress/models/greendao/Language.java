@@ -117,15 +117,15 @@ public class Language implements android.os.Parcelable {
     }
 
     @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Exam> CREATOR = new Parcelable.Creator<Exam>() {
+    public static final Parcelable.Creator<Language> CREATOR = new Parcelable.Creator<Language>() {
         @Override
-        public Exam createFromParcel(Parcel in) {
-            return new Exam(in);
+        public Language createFromParcel(Parcel in) {
+            return new Language(in);
         }
 
         @Override
-        public Exam[] newArray(int size) {
-            return new Exam[size];
+        public Language[] newArray(int size) {
+            return new Language[size];
         }
     };
 
