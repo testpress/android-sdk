@@ -13,6 +13,8 @@ import in.testpress.core.TestpressException;
 import in.testpress.course.R;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.AttachmentDao;
+import in.testpress.models.greendao.Chapter;
+import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Content;
 import in.testpress.course.network.ContentPager;
 import in.testpress.course.network.TestpressCourseApiClient;
@@ -34,7 +36,7 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
     private String contentsUrlFrag;
     private ContentDao contentDao;
     private final String CHAPTER_ID = "chapterId";
-    private long chapterId;
+    private long chapterId = -1;
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
@@ -49,9 +51,19 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
         if (getArguments() == null || contentsUrlFrag == null || contentsUrlFrag.isEmpty()) {
             throw new IllegalArgumentException("CONTENTS_URL_FRAG must not be null or empty");
         }
+        if (contentsUrlFrag != null) {
+            ChapterDao chapterDao = TestpressSDKDatabase.getChapterDao(getContext());
+            List<Chapter> tempChapters = chapterDao.queryBuilder()
+                    .where(ChapterDao.Properties.ContentUrl.eq(contentsUrlFrag)).list();
+            if (!tempChapters.isEmpty()) {
+                chapterId = tempChapters.get(0).getId();
+            }
+        }
         mApiClient = new TestpressCourseApiClient(getActivity());
         contentDao = TestpressSDKDatabase.getContentDao(getContext());
-        chapterId = getArguments().getLong(CHAPTER_ID);
+        if (chapterId == -1) {
+            chapterId = getArguments().getLong(CHAPTER_ID);
+        }
     }
 
     @Override

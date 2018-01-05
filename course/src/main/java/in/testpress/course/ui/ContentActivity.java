@@ -125,7 +125,6 @@ public class ContentActivity extends BaseToolBarActivity {
                                       AppCompatActivity activity) {
 
         Intent intent = new Intent(activity, ContentActivity.class);
-        intent.putExtra(CONTENT_ID, contents.get(position).getId());
         intent.putParcelableArrayListExtra(CONTENTS, new ArrayList<Content>(contents));
         intent.putExtra(POSITION, position);
         //noinspection ConstantConditions
@@ -274,6 +273,7 @@ public class ContentActivity extends BaseToolBarActivity {
             } else {
                 updateContent();
             }
+            buttonLayout.setVisibility(View.GONE);
         } else {
             position = getIntent().getIntExtra(POSITION, -1);
             if (position == -1) {
@@ -286,8 +286,8 @@ public class ContentActivity extends BaseToolBarActivity {
             getSupportActionBar().setTitle(title);
             pageNumber.setText(String.format("%d/%d", position + 1, contents.size()));
             checkContentType();
+            validateAdjacentNavigationButton();
         }
-        validateAdjacentNavigationButton();
     }
 
     private void checkContentType() {
@@ -739,6 +739,9 @@ public class ContentActivity extends BaseToolBarActivity {
             // Discard navigation buttons if deep linked
             return;
         }
+        if (contentId != null) {
+            return;
+        }
         // Set previous button
         if (position == 0) {
             previousButton.setVisibility(View.INVISIBLE);
@@ -845,7 +848,7 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void hideContents() {
-        buttonLayout.setVisibility(View.VISIBLE);
+        buttonLayout.setVisibility(View.GONE);
         attachmentContentLayout.setVisibility(View.GONE);
         webView.setVisibility(View.GONE);
         startButton.setVisibility(View.GONE);

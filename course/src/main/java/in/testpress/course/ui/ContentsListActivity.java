@@ -1,5 +1,6 @@
 package in.testpress.course.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,9 +16,11 @@ import junit.framework.Assert;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.course.network.TestpressCourseApiClient;
+import in.testpress.models.greendao.ChapterDao;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.UIUtils;
 
@@ -42,6 +45,7 @@ public class ContentsListActivity extends BaseToolBarActivity {
     private TextView emptyDescView;
     private ProgressBar progressBar;
     private Button retryButton;
+    private Activity activity;
 
     public static Intent createIntent(String title, String contentsUrlFrag, Context context, Long idOfChapter) {
         Intent intent = new Intent(context, ContentsListActivity.class);
@@ -71,6 +75,7 @@ public class ContentsListActivity extends BaseToolBarActivity {
         prefs = getSharedPreferences(TESTPRESS_CONTENT_SHARED_PREFS, Context.MODE_PRIVATE);
         prefs.edit().clear().apply();
         String chapterUrl = getIntent().getStringExtra(CHAPTER_URL);
+        activity = this;
         if (chapterUrl != null) {
             emptyView = (LinearLayout) findViewById(R.id.empty_container);
             emptyTitleView = (TextView) findViewById(R.id.empty_title);
@@ -103,6 +108,7 @@ public class ContentsListActivity extends BaseToolBarActivity {
                     public void onSuccess(Chapter chapter) {
                         progressBar.setVisibility(View.GONE);
                         ContentsListActivity.this.chapter = chapter;
+                        saveChapterInDB(chapter);
                         //noinspection ConstantConditions
                         getSupportActionBar().setTitle(chapter.getName());
                         getIntent().putExtra(CONTENTS_URL_FRAG, chapter.getContentUrl());
@@ -136,6 +142,11 @@ public class ContentsListActivity extends BaseToolBarActivity {
                         }
                     }
                 });
+    }
+
+    private void saveChapterInDB(Chapter chapter) {
+        ChapterDao chapterDao = TestpressSDKDatabase.getChapterDao(activity);
+        chapterDao.insertOrReplace(chapter);
     }
 
     @Override
