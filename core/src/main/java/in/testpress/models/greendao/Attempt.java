@@ -7,6 +7,7 @@ import org.greenrobot.greendao.annotation.*;
 // KEEP INCLUDES - put your custom includes here
 import android.annotation.SuppressLint;
 import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -43,6 +44,7 @@ public class Attempt implements android.os.Parcelable {
     private Integer speed;
     private Integer accuracy;
     private Long contentId;
+    private String percentage;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -56,7 +58,7 @@ public class Attempt implements android.os.Parcelable {
     }
 
     @Generated
-    public Attempt(String url, Long id, String date, Integer totalQuestions, String score, String rank, String maxRank, String reviewUrl, String questionsUrl, Integer correctCount, Integer incorrectCount, String lastStartedTime, String remainingTime, String timeTaken, String state, String percentile, Integer speed, Integer accuracy, Long contentId) {
+    public Attempt(String url, Long id, String date, Integer totalQuestions, String score, String rank, String maxRank, String reviewUrl, String questionsUrl, Integer correctCount, Integer incorrectCount, String lastStartedTime, String remainingTime, String timeTaken, String state, String percentile, Integer speed, Integer accuracy, Long contentId, String percentage) {
         this.url = url;
         this.id = id;
         this.date = date;
@@ -76,6 +78,7 @@ public class Attempt implements android.os.Parcelable {
         this.speed = speed;
         this.accuracy = accuracy;
         this.contentId = contentId;
+        this.percentage = percentage;
     }
 
     public String getUrl() {
@@ -230,28 +233,39 @@ public class Attempt implements android.os.Parcelable {
         this.contentId = contentId;
     }
 
+    public String getPercentage() {
+        return percentage;
+    }
+
+    public void setPercentage(String percentage) {
+        this.percentage = percentage;
+    }
+
     // KEEP METHODS - put your custom methods here
 
     // Parcelling part
-    public Attempt(Parcel parcel){
-        id = parcel.readLong();
-        url = parcel.readString();
-        date = parcel.readString();
-        totalQuestions = parcel.readInt();
-        score = parcel.readString();
-        rank = parcel.readString();
-        maxRank = parcel.readString();
-        reviewUrl = parcel.readString();
-        questionsUrl = parcel.readString();
-        correctCount = parcel.readInt();
-        incorrectCount = parcel.readInt();
-        lastStartedTime = parcel.readString();
-        remainingTime = parcel.readString();
-        timeTaken = parcel.readString();
-        state = parcel.readString();
-        percentile = parcel.readString();
-        speed = parcel.readInt();
-        accuracy = parcel.readInt();
+
+    protected Attempt(Parcel in) {
+        url = in.readString();
+        id = in.readByte() == 0x00 ? null : in.readLong();
+        date = in.readString();
+        totalQuestions = in.readByte() == 0x00 ? null : in.readInt();
+        score = in.readString();
+        rank = in.readString();
+        maxRank = in.readString();
+        reviewUrl = in.readString();
+        questionsUrl = in.readString();
+        correctCount = in.readByte() == 0x00 ? null : in.readInt();
+        incorrectCount = in.readByte() == 0x00 ? null : in.readInt();
+        lastStartedTime = in.readString();
+        remainingTime = in.readString();
+        timeTaken = in.readString();
+        state = in.readString();
+        percentile = in.readString();
+        speed = in.readByte() == 0x00 ? null : in.readInt();
+        accuracy = in.readByte() == 0x00 ? null : in.readInt();
+        contentId = in.readByte() == 0x00 ? null : in.readLong();
+        percentage = in.readString();
     }
 
     @Override
@@ -260,32 +274,72 @@ public class Attempt implements android.os.Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(id);
-        parcel.writeString(url);
-        parcel.writeString(date);
-        parcel.writeInt(totalQuestions);
-        parcel.writeString(score);
-        parcel.writeString(rank);
-        parcel.writeString(maxRank);
-        parcel.writeString(reviewUrl);
-        parcel.writeString(questionsUrl);
-        parcel.writeInt(correctCount);
-        parcel.writeInt(incorrectCount);
-        parcel.writeString(lastStartedTime);
-        parcel.writeString(remainingTime);
-        parcel.writeString(timeTaken);
-        parcel.writeString(state);
-        parcel.writeString(percentile);
-        parcel.writeInt(speed);
-        parcel.writeInt(accuracy);
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(url);
+        if (id == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeLong(id);
+        }
+        dest.writeString(date);
+        if (totalQuestions == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeInt(totalQuestions);
+        }
+        dest.writeString(score);
+        dest.writeString(rank);
+        dest.writeString(maxRank);
+        dest.writeString(reviewUrl);
+        dest.writeString(questionsUrl);
+        if (correctCount == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeInt(correctCount);
+        }
+        if (incorrectCount == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeInt(incorrectCount);
+        }
+        dest.writeString(lastStartedTime);
+        dest.writeString(remainingTime);
+        dest.writeString(timeTaken);
+        dest.writeString(state);
+        dest.writeString(percentile);
+        if (speed == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeInt(speed);
+        }
+        if (accuracy == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeInt(accuracy);
+        }
+        if (contentId == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeLong(contentId);
+        }
+        dest.writeString(percentage);
     }
 
-    public static final Creator CREATOR = new Creator() {
-        public Attempt createFromParcel(Parcel parcel) {
-            return new Attempt(parcel);
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Attempt> CREATOR = new Parcelable.Creator<Attempt>() {
+        @Override
+        public Attempt createFromParcel(Parcel in) {
+            return new Attempt(in);
         }
 
+        @Override
         public Attempt[] newArray(int size) {
             return new Attempt[size];
         }

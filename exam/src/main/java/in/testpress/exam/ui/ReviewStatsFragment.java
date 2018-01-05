@@ -50,6 +50,15 @@ public class ReviewStatsFragment extends Fragment {
     private TextView correct;
     private TextView incorrect;
     private TextView accuracy;
+    private TextView percentile;
+    private TextView percentage;
+    private TextView correctTotal;
+    private TextView incorrectTotal;
+    private TextView scoreTotal;
+    private TextView scoreOblique;
+    private LinearLayout scoreLayout;
+    private LinearLayout percentileLayout;
+    private LinearLayout percentageLayout;
     private LinearLayout rankLayout;
     private LinearLayout reviewStatLayout;
     private ProgressBar progressBar;
@@ -109,6 +118,15 @@ public class ReviewStatsFragment extends Fragment {
         correct = (TextView) view.findViewById(R.id.correct_count);
         incorrect = (TextView) view.findViewById(R.id.incorrect_count);
         accuracy = (TextView) view.findViewById(R.id.accuracy);
+        percentile = (TextView) view.findViewById(R.id.percentile);
+        percentage = (TextView) view.findViewById(R.id.percentage);
+        correctTotal = (TextView) view.findViewById(R.id.correct_total);
+        incorrectTotal = (TextView) view.findViewById(R.id.incorrect_total);
+        scoreTotal = (TextView) view.findViewById(R.id.score_total);
+        scoreOblique = (TextView) view.findViewById(R.id.score_oblique);
+        scoreLayout = (LinearLayout) view.findViewById(R.id.score_layout);
+        percentageLayout = (LinearLayout) view.findViewById(R.id.percentage_layout);
+        percentileLayout = (LinearLayout) view.findViewById(R.id.percentile_layout);
         rankLayout = (LinearLayout) view.findViewById(R.id.rank_layout);
         reviewStatLayout = (LinearLayout) view.findViewById(R.id.review_statistics_layout);
         reviewStatLayout.setVisibility(View.GONE);
@@ -124,7 +142,7 @@ public class ReviewStatsFragment extends Fragment {
                 new TextView[] {
                         score, rank, correct, incorrect, timeTaken, accuracy, reviewQuestionsButton,
                         analyticsButton, emailPdfButton, retakeButton, emptyTitleView, retryButton,
-                        timeAnalyticsButton
+                        timeAnalyticsButton, percentage
                 },
                 TestpressSdk.getRubikMediumFont(getContext())
         );
@@ -165,13 +183,35 @@ public class ReviewStatsFragment extends Fragment {
         timeTaken.setText(attempt.getTimeTaken());
         correct.setText(attempt.getCorrectCount().toString());
         incorrect.setText(attempt.getIncorrectCount().toString());
+        incorrectTotal.setText(attempt.getTotalQuestions().toString());
+        correctTotal.setText(attempt.getTotalQuestions().toString());
         if (attempt.getRank().equals("NA")) {
             rankLayout.setVisibility(View.GONE);
         } else {
             rank.setText(attempt.getRank());
             maxRank.setText(attempt.getMaxRank());
         }
-        score.setText(attempt.getScore());
+        if (attempt.getPercentage() == null || attempt.getPercentage().equals("NA")) {
+            percentageLayout.setVisibility(View.GONE);
+        } else {
+            percentage.setText(attempt.getPercentage());
+        }
+        if (attempt.getScore() == null || attempt.getScore().equals("NA")) {
+            scoreLayout.setVisibility(View.GONE);
+        } else {
+            score.setText(attempt.getScore());
+            if (!exam.getVariableMarkPerQuestion() && attempt.getCorrectCount() != 0) {
+                scoreTotal.setText((Float.parseFloat(attempt.getScore())/attempt.getCorrectCount())*attempt.getTotalQuestions() + "");
+            } else {
+                scoreTotal.setVisibility(View.GONE);
+                scoreOblique.setVisibility(View.GONE);
+            }
+        }
+        if (attempt.getPercentile() == null || attempt.getPercentile().equals("NA")) {
+            percentileLayout.setVisibility(View.GONE);
+        } else {
+            percentile.setText(attempt.getPercentile());
+        }
         accuracy.setText(attempt.getAccuracy().toString());
         if (exam.getShowAnswers()) {
             reviewQuestionsButton.setOnClickListener(new View.OnClickListener() {

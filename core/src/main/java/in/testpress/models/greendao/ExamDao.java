@@ -46,6 +46,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         public final static Property CommentsCount = new Property(21, Integer.class, "commentsCount", false, "COMMENTS_COUNT");
         public final static Property Slug = new Property(22, String.class, "slug", false, "SLUG");
         public final static Property SelectedLanguage = new Property(23, String.class, "selectedLanguage", false, "SELECTED_LANGUAGE");
+        public final static Property VariableMarkPerQuestion = new Property(24, Boolean.class, "variableMarkPerQuestion", false, "VARIABLE_MARK_PER_QUESTION");
     }
 
     private DaoSession daoSession;
@@ -87,7 +88,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
                 "\"DEVICE_ACCESS_CONTROL\" TEXT," + // 20: deviceAccessControl
                 "\"COMMENTS_COUNT\" INTEGER," + // 21: commentsCount
                 "\"SLUG\" TEXT," + // 22: slug
-                "\"SELECTED_LANGUAGE\" TEXT);"); // 23: selectedLanguage
+                "\"SELECTED_LANGUAGE\" TEXT," + // 23: selectedLanguage
+                "\"VARIABLE_MARK_PER_QUESTION\" INTEGER);"); // 24: variableMarkPerQuestion
     }
 
     /** Drops the underlying database table. */
@@ -219,6 +221,11 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (selectedLanguage != null) {
             stmt.bindString(24, selectedLanguage);
         }
+ 
+        Boolean variableMarkPerQuestion = entity.getVariableMarkPerQuestion();
+        if (variableMarkPerQuestion != null) {
+            stmt.bindLong(25, variableMarkPerQuestion ? 1L: 0L);
+        }
     }
 
     @Override
@@ -344,6 +351,11 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (selectedLanguage != null) {
             stmt.bindString(24, selectedLanguage);
         }
+ 
+        Boolean variableMarkPerQuestion = entity.getVariableMarkPerQuestion();
+        if (variableMarkPerQuestion != null) {
+            stmt.bindLong(25, variableMarkPerQuestion ? 1L: 0L);
+        }
     }
 
     @Override
@@ -383,7 +395,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20), // deviceAccessControl
             cursor.isNull(offset + 21) ? null : cursor.getInt(offset + 21), // commentsCount
             cursor.isNull(offset + 22) ? null : cursor.getString(offset + 22), // slug
-            cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23) // selectedLanguage
+            cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23), // selectedLanguage
+            cursor.isNull(offset + 24) ? null : cursor.getShort(offset + 24) != 0 // variableMarkPerQuestion
         );
         return entity;
     }
@@ -414,6 +427,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         entity.setCommentsCount(cursor.isNull(offset + 21) ? null : cursor.getInt(offset + 21));
         entity.setSlug(cursor.isNull(offset + 22) ? null : cursor.getString(offset + 22));
         entity.setSelectedLanguage(cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23));
+        entity.setVariableMarkPerQuestion(cursor.isNull(offset + 24) ? null : cursor.getShort(offset + 24) != 0);
      }
     
     @Override
