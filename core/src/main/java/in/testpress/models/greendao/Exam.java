@@ -53,6 +53,7 @@ public class Exam implements android.os.Parcelable {
     private String slug;
     private String selectedLanguage;
     private Boolean variableMarkPerQuestion;
+    private Integer passPercentage;
 
     /** Used to resolve relations */
     @Generated
@@ -79,7 +80,7 @@ public class Exam implements android.os.Parcelable {
     }
 
     @Generated
-    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String course_category, java.util.Date startDate, java.util.Date endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion) {
+    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String course_category, java.util.Date startDate, java.util.Date endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage) {
         this.totalMarks = totalMarks;
         this.url = url;
         this.id = id;
@@ -105,6 +106,7 @@ public class Exam implements android.os.Parcelable {
         this.slug = slug;
         this.selectedLanguage = selectedLanguage;
         this.variableMarkPerQuestion = variableMarkPerQuestion;
+        this.passPercentage = passPercentage;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -314,6 +316,14 @@ public class Exam implements android.os.Parcelable {
         this.variableMarkPerQuestion = variableMarkPerQuestion;
     }
 
+    public Integer getPassPercentage() {
+        return passPercentage;
+    }
+
+    public void setPassPercentage(Integer passPercentage) {
+        this.passPercentage = passPercentage;
+    }
+
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
     @Generated
     public List<Language> getLanguages() {
@@ -404,6 +414,7 @@ public class Exam implements android.os.Parcelable {
         selectedLanguage = in.readString();
         byte variableMarkPerQuestionVal = in.readByte();
         variableMarkPerQuestion = variableMarkPerQuestionVal == 0x02 ? null : variableMarkPerQuestionVal != 0x00;
+        passPercentage = in.readByte() == 0x00 ? null : in.readInt();
         if (in.readByte() == 0x01) {
             languages = new ArrayList<Language>();
             in.readList(languages, Language.class.getClassLoader());
@@ -494,6 +505,12 @@ public class Exam implements android.os.Parcelable {
             dest.writeByte((byte) (0x02));
         } else {
             dest.writeByte((byte) (variableMarkPerQuestion ? 0x01 : 0x00));
+        }
+        if (passPercentage == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeInt(passPercentage);
         }
         if (languages == null) {
             dest.writeByte((byte) (0x00));

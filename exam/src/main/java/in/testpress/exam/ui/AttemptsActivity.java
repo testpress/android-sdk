@@ -205,7 +205,8 @@ public class AttemptsActivity extends BaseToolBarActivity
 
     void loadExam(final String examSlug) {
         List<Exam> exams = TestpressSDKDatabase.getExamDao(activity).queryBuilder().where(ExamDao.Properties.Slug.eq(examSlug)).list();
-        if(exams.size() > 0) {
+        if(exams.size() > 0 &&
+                exams.get(0).getPassPercentage() != null && exams.get(0).getTotalMarks() != null) {
             AttemptsActivity.this.exam = exams.get(0);
             checkExamState();
         } else {
