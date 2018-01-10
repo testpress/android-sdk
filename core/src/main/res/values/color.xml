@@ -34,6 +34,7 @@
     <color name="testpress_green">#18be99</color>
     <color name="testpress_green_light">#00ccaa</color>
     <color name="testpress_gray_light">#e6e6e6</color>
+    <color name="testpress_dotted_line">#dddddd</color>
     <color name="testpress_text_gray_light">#bfbfbf</color>
 
     <color name="testpress_red_incorrect">#E65C6C</color>
