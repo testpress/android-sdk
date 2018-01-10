@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,10 +55,10 @@ public class ReviewStatsFragment extends Fragment {
     private TextView accuracy;
     private TextView percentile;
     private TextView percentage;
-    private TextView correctTotal;
-    private TextView incorrectTotal;
-    private TextView scoreTotal;
-    private TextView scoreOblique;
+    private TextView totalQuestions;
+    private TextView totalMarks;
+    private TextView totalTime;
+    private TextView cutoff;
     private LinearLayout scoreLayout;
     private LinearLayout percentileLayout;
     private LinearLayout percentageLayout;
@@ -125,10 +126,10 @@ public class ReviewStatsFragment extends Fragment {
         accuracy = (TextView) view.findViewById(R.id.accuracy);
         percentile = (TextView) view.findViewById(R.id.percentile);
         percentage = (TextView) view.findViewById(R.id.percentage);
-        correctTotal = (TextView) view.findViewById(R.id.correct_total);
-        incorrectTotal = (TextView) view.findViewById(R.id.incorrect_total);
-        scoreTotal = (TextView) view.findViewById(R.id.score_total);
-        scoreOblique = (TextView) view.findViewById(R.id.score_oblique);
+        totalQuestions = (TextView) view.findViewById(R.id.total_questions);
+        totalMarks = (TextView) view.findViewById(R.id.total_marks);
+        totalTime = (TextView) view.findViewById(R.id.total_time);
+        cutoff = (TextView) view.findViewById(R.id.cutoff);
         scoreLayout = (LinearLayout) view.findViewById(R.id.score_layout);
         percentageLayout = (LinearLayout) view.findViewById(R.id.percentage_layout);
         percentileLayout = (LinearLayout) view.findViewById(R.id.percentile_layout);
@@ -147,7 +148,8 @@ public class ReviewStatsFragment extends Fragment {
                 new TextView[] {
                         score, rank, correct, incorrect, timeTaken, accuracy, reviewQuestionsButton,
                         analyticsButton, emailPdfButton, retakeButton, emptyTitleView, retryButton,
-                        timeAnalyticsButton, percentage
+                        timeAnalyticsButton, percentage, totalQuestions, totalMarks, totalTime,
+                        cutoff, percentile
                 },
                 TestpressSdk.getRubikMediumFont(getContext())
         );
@@ -163,6 +165,7 @@ public class ReviewStatsFragment extends Fragment {
                         accuracyLabel, examTitle, attemptDate, emptyDescView, maxRank
                 },
                 TestpressSdk.getRubikRegularFont(getContext()));
+
         return view;
     }
 
@@ -188,8 +191,6 @@ public class ReviewStatsFragment extends Fragment {
         timeTaken.setText(attempt.getTimeTaken());
         correct.setText(attempt.getCorrectCount().toString());
         incorrect.setText(attempt.getIncorrectCount().toString());
-        incorrectTotal.setText(attempt.getTotalQuestions().toString());
-        correctTotal.setText(attempt.getTotalQuestions().toString());
         if (attempt.getRank().equals("NA")) {
             rankLayout.setVisibility(View.GONE);
         } else {
@@ -205,17 +206,27 @@ public class ReviewStatsFragment extends Fragment {
             scoreLayout.setVisibility(View.GONE);
         } else {
             score.setText(attempt.getScore());
-            if (!exam.getVariableMarkPerQuestion() && attempt.getCorrectCount() != 0) {
-                scoreTotal.setText((Float.parseFloat(attempt.getScore())/attempt.getCorrectCount())*attempt.getTotalQuestions() + "");
-            } else {
-                scoreTotal.setVisibility(View.GONE);
-                scoreOblique.setVisibility(View.GONE);
-            }
         }
         if (attempt.getPercentile() == null || attempt.getPercentile().equals("NA")) {
             percentileLayout.setVisibility(View.GONE);
         } else {
             percentile.setText(attempt.getPercentile());
+        }
+        if (attempt.getTotalQuestions() != null) {
+            totalQuestions.setText(attempt.getTotalQuestions().toString());
+        }
+        if (exam.getTotalMarks() != null) {
+            totalMarks.setText(exam.getTotalMarks());
+        } else {
+            Log.e("Total marks is null", "sssssss");
+        }
+        if (exam.getDuration() != null) {
+            totalTime.setText(exam.getDuration());
+        }
+        if (exam.getPassPercentage() != null) {
+            cutoff.setText(exam.getPassPercentage().toString());
+        } else {
+            Log.e("Pass % is null", "zzzzzz");
         }
         accuracy.setText(attempt.getAccuracy().toString());
         if (exam.getShowAnswers()) {

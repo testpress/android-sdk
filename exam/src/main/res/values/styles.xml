@@ -57,17 +57,12 @@
     </style>
 
     <style name="TestpressCircleBorderImage">
-        <item name="android:layout_width">64dp</item>
-        <item name="android:layout_height">64dp</item>
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:gravity">center</item>
-        <item name="android:background">@drawable/testpress_circle_gray_border</item>
-        <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingBottom">14dp</item>
-        <item name="android:paddingLeft">16dp</item>
-        <item name="android:paddingRight">16dp</item>
-        <item name="android:layout_marginTop">20dp</item>
-        <item name="android:layout_marginBottom">20dp</item>
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="android:layout_marginBottom">0dp</item>
     </style>
 
     <style name="TestpressReviewStatValue">
