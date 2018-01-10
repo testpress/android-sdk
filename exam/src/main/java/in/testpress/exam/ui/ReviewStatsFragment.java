@@ -3,10 +3,15 @@ package in.testpress.exam.ui;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -166,6 +171,18 @@ public class ReviewStatsFragment extends Fragment {
                 },
                 TestpressSdk.getRubikRegularFont(getContext()));
 
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        toolbar.setTitle("Test Report");
+        toolbar.setTitleTextColor(getResources().getColor(R.color.testpress_white));
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+        setTintDrawable(toolbar.getNavigationIcon(), getResources().getColor(R.color.testpress_white));
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
+
         return view;
     }
 
@@ -177,6 +194,15 @@ public class ReviewStatsFragment extends Fragment {
         } else {
             displayTestReport();
         }
+    }
+
+    public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
+        drawable.clearColorFilter();
+        drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        drawable.invalidateSelf();
+        Drawable wrapDrawable = DrawableCompat.wrap(drawable).mutate();
+        DrawableCompat.setTint(wrapDrawable, color);
+        return wrapDrawable;
     }
 
     @SuppressLint("SetTextI18n")

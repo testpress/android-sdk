@@ -16,14 +16,22 @@
 
         <include layout="@layout/testpress_empty_view_with_image" />
 
-        <ScrollView
-            android:id="@+id/scroll_view"
+        <include
+            android:id="@+id/top_toolbar"
+            layout="@layout/testpress_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_above="@+id/bottom_border">
+            android:layout_alignParentTop="true" />
+
+        <ScrollView
+            android:id="@+id/scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/top_toolbar"
+            android:layout_above="@+id/bottom_border"
+            tools:ignore="UnknownIdInLayout">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -184,52 +192,55 @@
                         </LinearLayout>
 
                         <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_weight="1"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content">
+                            android:orientation="horizontal"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content">
 
-                        <LinearLayout
-                            android:layout_marginLeft="0dp"
-                            android:orientation="vertical"
-                            style="@style/TestpressCircleBorderImage" >
+                            <LinearLayout
+                                android:layout_marginLeft="0dp"
+                                android:orientation="vertical"
+                                style="@style/TestpressCircleBorderImage" >
 
-                            <ImageView
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:padding="5dp"
+                                    android:src="@drawable/testpress_cutoff_icon"/>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:orientation="vertical"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:padding="5dp"
-                                android:src="@drawable/testpress_cutoff_icon"/>
+                                android:layout_marginLeft="5dp" >
 
-                        </LinearLayout>
+                                <TextView
+                                    style="@style/TestpressReviewStatLabel"
+                                    android:text="@string/testpress_cutoff"
+                                    android:layout_gravity="left" />
 
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp" >
+                                <TextView
+                                    style="@style/TestpressReviewStatValue"
+                                    android:id="@+id/cutoff"
+                                    android:text="00"
+                                    android:layout_gravity="left" />
 
-                            <TextView
-                                style="@style/TestpressReviewStatLabel"
-                                android:text="@string/testpress_cutoff"
-                                android:layout_gravity="left" />
-
-                            <TextView
-                                style="@style/TestpressReviewStatValue"
-                                android:id="@+id/cutoff"
-                                android:text="00"
-                                android:layout_gravity="left" />
+                            </LinearLayout>
 
                         </LinearLayout>
 
                     </LinearLayout>
 
-                    </LinearLayout>
-
-                    <View
+                    <ImageView
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/testpress_gray_light"
-                        android:layout_marginTop="15dp"/>
+                        android:layout_height="5dp"
+                        android:src="@drawable/testpress_dotted_line"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:layerType="software"/>
 
                     <LinearLayout
                         android:orientation="horizontal"
@@ -540,7 +551,8 @@
                             android:orientation="horizontal"
                             android:layout_weight="1"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            tools:ignore="TooManyViews">
 
                             <LinearLayout
                                 android:layout_marginLeft="30dp"
