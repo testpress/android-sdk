@@ -298,7 +298,7 @@ public class ContentActivity extends BaseToolBarActivity {
             Video video = content.getVideo();
             setContentTitle(video.getTitle());
             webView.loadDataWithBaseURL("file:///android_asset/", getHeader() +
-                    "<div class='videoWrapper'>" + video.getEmbedCode() + "</div>",
+                    "<div class=''>" + video.getEmbedCode() + "</div>",
                     "text/html", "UTF-8", null);
         } else if (content.getExam() != null) {
             onExamContent();
