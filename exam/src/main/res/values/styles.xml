@@ -79,6 +79,7 @@
         <item name="android:textColor">@color/testpress_text_gray_medium</item>
         <item name="android:textSize">@dimen/testpress_text_size_small</item>
         <item name="android:layout_marginTop">5dp</item>
+        <item name="android:minWidth">75dp</item>
     </style>
 
     <style name="TestpressReviewStatValue.Tab">
