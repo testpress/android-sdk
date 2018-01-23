@@ -60,6 +60,7 @@
                     android:orientation="vertical">
 
                     <LinearLayout
+                        android:gravity="center"
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -67,6 +68,7 @@
                         android:layout_marginTop="15dp" >
 
                         <LinearLayout
+                            android:gravity="center"
                             android:id="@+id/total_question_layout"
                             android:orientation="horizontal"
                             android:layout_weight="1"
@@ -74,7 +76,6 @@
                             android:layout_height="wrap_content">
 
                             <LinearLayout
-                                android:layout_marginLeft="30dp"
                                 android:orientation="vertical"
                                 style="@style/TestpressCircleBorderImage" >
                                 <ImageView
@@ -105,13 +106,13 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:gravity="center"
                             android:orientation="horizontal"
                             android:layout_weight="1"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
                             <LinearLayout
-                                android:layout_marginLeft="0dp"
                                 android:orientation="vertical"
                                 style="@style/TestpressCircleBorderImage" >
                                 <ImageView
@@ -146,6 +147,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:gravity="center"
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -153,13 +155,13 @@
                         android:layout_marginTop="15dp" >
 
                         <LinearLayout
+                            android:gravity="center"
                             android:orientation="horizontal"
                             android:layout_weight="1"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
                             <LinearLayout
-                                android:layout_marginLeft="30dp"
                                 android:orientation="vertical"
                                 style="@style/TestpressCircleBorderImage" >
                                 <ImageView
@@ -192,13 +194,13 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:gravity="center"
                             android:orientation="horizontal"
                             android:layout_weight="1"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
                             <LinearLayout
-                                android:layout_marginLeft="0dp"
                                 android:orientation="vertical"
                                 style="@style/TestpressCircleBorderImage" >
 
@@ -207,7 +209,6 @@
                                     android:layout_height="wrap_content"
                                     android:padding="5dp"
                                     android:src="@drawable/testpress_cutoff_icon"/>
-
                             </LinearLayout>
 
                             <LinearLayout
@@ -243,20 +244,21 @@
                         android:layerType="software"/>
 
                     <LinearLayout
+                        android:gravity="center"
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:baselineAligned="false"
                         android:layout_marginTop="15dp" >
 
                         <LinearLayout
+                            android:id="@+id/rank_layout"
+                            android:gravity="center"
                             android:orientation="horizontal"
                             android:layout_weight="1"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
                             <LinearLayout
-                                android:layout_marginLeft="30dp"
                                 android:orientation="vertical"
                                 style="@style/TestpressCircleBorderImage" >
 
@@ -269,7 +271,6 @@
                             </LinearLayout>
 
                             <LinearLayout
-                                android:id="@+id/rank_layout"
                                 android:orientation="vertical"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -285,7 +286,7 @@
                                     android:orientation="horizontal"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_gravity="center" >
+                                    android:layout_gravity="left" >
 
                                     <TextView
                                         style="@style/TestpressReviewStatValue"
@@ -315,13 +316,14 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:id="@+id/percentile_layout"
+                            android:gravity="center"
                             android:orientation="horizontal"
                             android:layout_weight="1"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
                             <LinearLayout
-                                android:layout_marginLeft="0dp"
                                 android:orientation="vertical"
                                 style="@style/TestpressCircleBorderImage" >
 
@@ -334,7 +336,6 @@
                             </LinearLayout>
 
                             <LinearLayout
-                                android:id="@+id/percentile_layout"
                                 android:orientation="vertical"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -359,6 +360,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:gravity="center"
                         android:id="@+id/score_row"
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
@@ -367,6 +369,7 @@
                         android:layout_marginTop="15dp" >
 
                         <LinearLayout
+                            android:gravity="center"
                             android:id="@+id/score_layout"
                             android:orientation="horizontal"
                             android:layout_weight="1"
@@ -374,7 +377,6 @@
                             android:layout_height="wrap_content">
 
                             <LinearLayout
-                                android:layout_marginLeft="30dp"
                                 android:orientation="vertical"
                                 style="@style/TestpressCircleBorderImage" >
 
@@ -409,6 +411,7 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:gravity="center"
                             android:id="@+id/percentage_layout"
                             android:orientation="horizontal"
                             android:layout_weight="1"
@@ -452,6 +455,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:gravity="center"
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -459,13 +463,13 @@
                         android:layout_marginTop="15dp" >
 
                         <LinearLayout
+                            android:gravity="center"
                             android:orientation="horizontal"
                             android:layout_weight="1"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
                             <LinearLayout
-                                android:layout_marginLeft="30dp"
                                 android:orientation="vertical"
                                 style="@style/TestpressCircleBorderImage" >
 
@@ -499,6 +503,7 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:gravity="center"
                             android:orientation="horizontal"
                             android:layout_weight="1"
                             android:layout_width="0dp"
@@ -541,6 +546,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:gravity="center"
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -548,6 +554,7 @@
                         android:baselineAligned="false" >
 
                         <LinearLayout
+                            android:gravity="center"
                             android:orientation="horizontal"
                             android:layout_weight="1"
                             android:layout_width="0dp"
@@ -555,7 +562,6 @@
                             tools:ignore="TooManyViews">
 
                             <LinearLayout
-                                android:layout_marginLeft="30dp"
                                 android:orientation="vertical"
                                 style="@style/TestpressCircleBorderImage" >
 
@@ -589,6 +595,7 @@
 
 
                         <LinearLayout
+                            android:gravity="center"
                             android:orientation="horizontal"
                             android:layout_weight="1"
                             android:layout_width="0dp"
