@@ -9,9 +9,9 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 10;
-    //Increased after adding pass percentage field in Exam
-    // 9th Jan 2018
+    private static final int VERSION = 11;
+    //Increased after adding show ranl/percentage/percentile/score field in Exam
+    // 23th Jan 2018
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -223,6 +223,9 @@ public class TestpressSDKDaoGenerator {
         exam.addStringProperty("selectedLanguage");
         exam.addBooleanProperty("variableMarkPerQuestion");
         exam.addIntProperty("passPercentage");
+        exam.addBooleanProperty("enableRanks");
+        exam.addBooleanProperty("showScore");
+        exam.addBooleanProperty("showPercentile");
         exam.implementsInterface("android.os.Parcelable");
         return exam;
     }

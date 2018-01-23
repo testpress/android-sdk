@@ -2,6 +2,7 @@ package in.testpress.models.greendao;
 
 import org.greenrobot.greendao.annotation.*;
 
+import java.util.List;
 import in.testpress.models.greendao.DaoSession;
 import org.greenrobot.greendao.DaoException;
 
@@ -54,6 +55,9 @@ public class Exam implements android.os.Parcelable {
     private String selectedLanguage;
     private Boolean variableMarkPerQuestion;
     private Integer passPercentage;
+    private Boolean enableRanks;
+    private Boolean showScore;
+    private Boolean showPercentile;
 
     /** Used to resolve relations */
     @Generated
@@ -80,7 +84,7 @@ public class Exam implements android.os.Parcelable {
     }
 
     @Generated
-    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String course_category, java.util.Date startDate, java.util.Date endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage) {
+    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String course_category, java.util.Date startDate, java.util.Date endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile) {
         this.totalMarks = totalMarks;
         this.url = url;
         this.id = id;
@@ -107,6 +111,9 @@ public class Exam implements android.os.Parcelable {
         this.selectedLanguage = selectedLanguage;
         this.variableMarkPerQuestion = variableMarkPerQuestion;
         this.passPercentage = passPercentage;
+        this.enableRanks = enableRanks;
+        this.showScore = showScore;
+        this.showPercentile = showPercentile;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -324,6 +331,30 @@ public class Exam implements android.os.Parcelable {
         this.passPercentage = passPercentage;
     }
 
+    public Boolean getEnableRanks() {
+        return enableRanks;
+    }
+
+    public void setEnableRanks(Boolean enableRanks) {
+        this.enableRanks = enableRanks;
+    }
+
+    public Boolean getShowScore() {
+        return showScore;
+    }
+
+    public void setShowScore(Boolean showScore) {
+        this.showScore = showScore;
+    }
+
+    public Boolean getShowPercentile() {
+        return showPercentile;
+    }
+
+    public void setShowPercentile(Boolean showPercentile) {
+        this.showPercentile = showPercentile;
+    }
+
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
     @Generated
     public List<Language> getLanguages() {
@@ -415,6 +446,12 @@ public class Exam implements android.os.Parcelable {
         byte variableMarkPerQuestionVal = in.readByte();
         variableMarkPerQuestion = variableMarkPerQuestionVal == 0x02 ? null : variableMarkPerQuestionVal != 0x00;
         passPercentage = in.readByte() == 0x00 ? null : in.readInt();
+        byte enableRanksVal = in.readByte();
+        enableRanks = enableRanksVal == 0x02 ? null : enableRanksVal != 0x00;
+        byte showScoreVal = in.readByte();
+        showScore = showScoreVal == 0x02 ? null : showScoreVal != 0x00;
+        byte showPercentileVal = in.readByte();
+        showPercentile = showPercentileVal == 0x02 ? null : showPercentileVal != 0x00;
         if (in.readByte() == 0x01) {
             languages = new ArrayList<Language>();
             in.readList(languages, Language.class.getClassLoader());
@@ -511,6 +548,21 @@ public class Exam implements android.os.Parcelable {
         } else {
             dest.writeByte((byte) (0x01));
             dest.writeInt(passPercentage);
+        }
+        if (enableRanks == null) {
+            dest.writeByte((byte) (0x02));
+        } else {
+            dest.writeByte((byte) (enableRanks ? 0x01 : 0x00));
+        }
+        if (showScore == null) {
+            dest.writeByte((byte) (0x02));
+        } else {
+            dest.writeByte((byte) (showScore ? 0x01 : 0x00));
+        }
+        if (showPercentile == null) {
+            dest.writeByte((byte) (0x02));
+        } else {
+            dest.writeByte((byte) (showPercentile ? 0x01 : 0x00));
         }
         if (languages == null) {
             dest.writeByte((byte) (0x00));
