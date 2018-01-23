@@ -48,6 +48,9 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         public final static Property SelectedLanguage = new Property(23, String.class, "selectedLanguage", false, "SELECTED_LANGUAGE");
         public final static Property VariableMarkPerQuestion = new Property(24, Boolean.class, "variableMarkPerQuestion", false, "VARIABLE_MARK_PER_QUESTION");
         public final static Property PassPercentage = new Property(25, Integer.class, "passPercentage", false, "PASS_PERCENTAGE");
+        public final static Property EnableRanks = new Property(26, Boolean.class, "enableRanks", false, "ENABLE_RANKS");
+        public final static Property ShowScore = new Property(27, Boolean.class, "showScore", false, "SHOW_SCORE");
+        public final static Property ShowPercentile = new Property(28, Boolean.class, "showPercentile", false, "SHOW_PERCENTILE");
     }
 
     private DaoSession daoSession;
@@ -91,7 +94,10 @@ public class ExamDao extends AbstractDao<Exam, Long> {
                 "\"SLUG\" TEXT," + // 22: slug
                 "\"SELECTED_LANGUAGE\" TEXT," + // 23: selectedLanguage
                 "\"VARIABLE_MARK_PER_QUESTION\" INTEGER," + // 24: variableMarkPerQuestion
-                "\"PASS_PERCENTAGE\" INTEGER);"); // 25: passPercentage
+                "\"PASS_PERCENTAGE\" INTEGER," + // 25: passPercentage
+                "\"ENABLE_RANKS\" INTEGER," + // 26: enableRanks
+                "\"SHOW_SCORE\" INTEGER," + // 27: showScore
+                "\"SHOW_PERCENTILE\" INTEGER);"); // 28: showPercentile
     }
 
     /** Drops the underlying database table. */
@@ -233,6 +239,21 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (passPercentage != null) {
             stmt.bindLong(26, passPercentage);
         }
+ 
+        Boolean enableRanks = entity.getEnableRanks();
+        if (enableRanks != null) {
+            stmt.bindLong(27, enableRanks ? 1L: 0L);
+        }
+ 
+        Boolean showScore = entity.getShowScore();
+        if (showScore != null) {
+            stmt.bindLong(28, showScore ? 1L: 0L);
+        }
+ 
+        Boolean showPercentile = entity.getShowPercentile();
+        if (showPercentile != null) {
+            stmt.bindLong(29, showPercentile ? 1L: 0L);
+        }
     }
 
     @Override
@@ -368,6 +389,21 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (passPercentage != null) {
             stmt.bindLong(26, passPercentage);
         }
+ 
+        Boolean enableRanks = entity.getEnableRanks();
+        if (enableRanks != null) {
+            stmt.bindLong(27, enableRanks ? 1L: 0L);
+        }
+ 
+        Boolean showScore = entity.getShowScore();
+        if (showScore != null) {
+            stmt.bindLong(28, showScore ? 1L: 0L);
+        }
+ 
+        Boolean showPercentile = entity.getShowPercentile();
+        if (showPercentile != null) {
+            stmt.bindLong(29, showPercentile ? 1L: 0L);
+        }
     }
 
     @Override
@@ -409,7 +445,10 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             cursor.isNull(offset + 22) ? null : cursor.getString(offset + 22), // slug
             cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23), // selectedLanguage
             cursor.isNull(offset + 24) ? null : cursor.getShort(offset + 24) != 0, // variableMarkPerQuestion
-            cursor.isNull(offset + 25) ? null : cursor.getInt(offset + 25) // passPercentage
+            cursor.isNull(offset + 25) ? null : cursor.getInt(offset + 25), // passPercentage
+            cursor.isNull(offset + 26) ? null : cursor.getShort(offset + 26) != 0, // enableRanks
+            cursor.isNull(offset + 27) ? null : cursor.getShort(offset + 27) != 0, // showScore
+            cursor.isNull(offset + 28) ? null : cursor.getShort(offset + 28) != 0 // showPercentile
         );
         return entity;
     }
@@ -442,6 +481,9 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         entity.setSelectedLanguage(cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23));
         entity.setVariableMarkPerQuestion(cursor.isNull(offset + 24) ? null : cursor.getShort(offset + 24) != 0);
         entity.setPassPercentage(cursor.isNull(offset + 25) ? null : cursor.getInt(offset + 25));
+        entity.setEnableRanks(cursor.isNull(offset + 26) ? null : cursor.getShort(offset + 26) != 0);
+        entity.setShowScore(cursor.isNull(offset + 27) ? null : cursor.getShort(offset + 27) != 0);
+        entity.setShowPercentile(cursor.isNull(offset + 28) ? null : cursor.getShort(offset + 28) != 0);
      }
     
     @Override
