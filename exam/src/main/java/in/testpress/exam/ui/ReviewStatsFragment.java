@@ -212,7 +212,7 @@ public class ReviewStatsFragment extends Fragment {
         timeTaken.setText(attempt.getTimeTaken());
         correct.setText(attempt.getCorrectCount().toString());
         incorrect.setText(attempt.getIncorrectCount().toString());
-        if (attempt.getRank().equals("NA")) {
+        if (attempt.getRank().equals("NA") && !exam.getEnableRanks()) {
             rankLayout.setVisibility(View.GONE);
         } else {
             rank.setText(attempt.getRank());
@@ -223,12 +223,13 @@ public class ReviewStatsFragment extends Fragment {
         } else {
             percentage.setText(attempt.getPercentage());
         }
-        if (attempt.getScore() == null || attempt.getScore().equals("NA")) {
+        if ((exam.getShowScore()) && (attempt.getScore() == null || attempt.getScore().equals("NA"))) {
             scoreLayout.setVisibility(View.GONE);
         } else {
             score.setText(attempt.getScore());
         }
-        if (attempt.getPercentile() == null || attempt.getPercentile().equals("NA")) {
+        if ((exam.getShowPercentile()) &&
+                (attempt.getPercentile() == null || attempt.getPercentile().equals("NA"))) {
             percentileLayout.setVisibility(View.GONE);
         } else {
             percentile.setText(attempt.getPercentile());
