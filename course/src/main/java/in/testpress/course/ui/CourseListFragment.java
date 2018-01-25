@@ -2,6 +2,7 @@ package in.testpress.course.ui;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.Loader;
 
 import org.greenrobot.greendao.AbstractDao;
 
@@ -41,12 +42,6 @@ public class CourseListFragment extends BaseDataBaseFragment<Course, Long> {
     protected CoursePager getPager() {
         if (pager == null) {
             pager = new CoursePager(mApiClient);
-            if (courseDao.count() > 0) {
-                Course latest = courseDao.queryBuilder()
-                        .orderDesc(CourseDao.Properties.ModifiedDate)
-                        .list().get(0);
-                ((CoursePager) pager).setLatestModifiedDate(latest.getModified());
-            }
         }
         return (CoursePager)pager;
     }
@@ -59,6 +54,30 @@ public class CourseListFragment extends BaseDataBaseFragment<Course, Long> {
     @Override
     protected SingleTypeAdapter<Course> createAdapter(List<Course> items) {
         return new CourseListAdapter(getActivity(), courseDao);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Course>> loader, List<Course> courses) {
+        final TestpressException exception = getException(loader);
+        if (exception != null) {
+            this.exception = exception;
+            int errorMessage = getErrorMessage(exception);
+            if (!isItemsEmpty()) {
+                showError(errorMessage);
+            }
+            showList();
+            getLoaderManager().destroyLoader(loader.getId());
+            return;
+        }
+
+        this.exception = null;
+        this.items = courses;
+        getDao().deleteAll();
+        if (!courses.isEmpty()) {
+            getDao().insertOrReplaceInTx(courses);
+        }
+        displayDataFromDB();
+        showList();
     }
 
     @Override
