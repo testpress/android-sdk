@@ -326,6 +326,7 @@ public class ReviewStatsFragment extends Fragment {
                     @Override
                     public void onSuccess(TestpressApiResponse<Attempt> response) {
                         if (getActivity() == null) {
+                            return;
                         }
                         attempt = response.getResults().get(0);
                         if (exam.getAllowPdf()) {
