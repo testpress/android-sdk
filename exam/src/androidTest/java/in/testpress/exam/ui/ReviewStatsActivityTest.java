@@ -34,6 +34,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 public class ReviewStatsActivityTest extends ActivityTestRule<ReviewStatsActivity> {
 
     private static final int WAITING_TIME = 15000;
+    private static final String USER_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6NDYsInVzZXJfaWQiOjQ2LCJlbWFpbCI6IiIsImV4cCI6MTUxOTAzNjUzM30.FUuyJfYNSAw_VcypZsN8_ZHvZra6gHU3njcXmr-TGVU";
 
     @Rule
     public final ActivityTestRule<ReviewStatsActivity> mActivityRule =
@@ -41,12 +42,11 @@ public class ReviewStatsActivityTest extends ActivityTestRule<ReviewStatsActivit
                 @Override
                 protected void beforeActivityLaunched() {
                     super.beforeActivityLaunched();
-                    InstituteSettings instituteSettings = new InstituteSettings("http://demo.testpress.in");
+                    InstituteSettings instituteSettings =
+                            new InstituteSettings("http://sandbox.testpress.in");
+
                     TestpressSdk.setTestpressSession(InstrumentationRegistry.getTargetContext(),
-                            new TestpressSession(instituteSettings, "eyJhbGciOiJIUzI1Ni" +
-                                    "IsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6MTg4LCJ1c2VyX2lkIjoxODgs" +
-                                    "ImVtYWlsIjoiZHVtbXlAbGFja21haWwucnUiLCJleHAiOjE0NzcxNDA5MzR" +
-                                    "9.C1Mt3r5pxKprSKOvD-1W9IU_WgZjRHCLEM-m0jcFJY4"));
+                            new TestpressSession(instituteSettings, USER_TOKEN));
                 }
             };
 
@@ -56,17 +56,22 @@ public class ReviewStatsActivityTest extends ActivityTestRule<ReviewStatsActivit
 
     protected Intent getActivityIntent() {
         String examJson = "{\n" +
-                "url: \"http://demo.testpress.in/api/v2.2/exams/ias-demo/\",\n" +
+                "url: \"https://sandbox.testpress.in/api/v2.2/exams/android-app-test-case-exam/\",\n" +
                 "id: 60,\n" +
-                "title: \"Science & Technology\",\n" +
-                "number_of_questions: 100,\n" +
+                "title: \"Android App Test Case Exam\",\n" +
+                "number_of_questions: 200,\n" +
                 "template_type: 1,\n" +
                 "max_retakes: -1,\n" +
-                "attempts_url: \"http://demo.testpress.in/api/v2.2/exams/ias-demo/attempts/\",\n" +
+                "attempts_url: \"https://sandbox.testpress.in/api/v2.2/exams/android-app-test-case-exam/attempts/\",\n" +
                 "attempts_count: 1,\n" +
                 "paused_attempts_count: 0,\n" +
                 "allow_pdf: true,\n" +
-                "allow_question_pdf: true" +
+                "allow_question_pdf: true," +
+                "device_access_control: \"both\",\n" +
+                "allow_retake: true,\n" +
+                "show_answers: true,\n" +
+                "show_percentile: true,\n" +
+                "show_score: true\n" +
                 "}";
         Intent intent = new Intent(InstrumentationRegistry.getTargetContext(), ReviewStatsActivity.class);
         Gson gson = new GsonBuilder()
@@ -102,7 +107,7 @@ public class ReviewStatsActivityTest extends ActivityTestRule<ReviewStatsActivit
         IdlingResource idlingResource = new ElapsedTimeIdlingResource(WAITING_TIME);
         Espresso.registerIdlingResources(idlingResource);
 
-        onView(withText("Score")).check(matches(isDisplayed()));
+        onView(withText("Android App Test Case Exam")).check(matches(isDisplayed()));
 
         Espresso.unregisterIdlingResources(idlingResource);
     }
