@@ -64,7 +64,7 @@ public abstract class BaseDataBaseFragment<T, K> extends BaseListViewFragment<T>
     }
 
     @Override
-    public void onLoadFinished(Loader<List<T>> loader, List<T> courses) {
+    public void onLoadFinished(Loader<List<T>> loader, List<T> items) {
         final TestpressException exception = getException(loader);
         if (exception != null) {
             this.exception = exception;
@@ -78,9 +78,9 @@ public abstract class BaseDataBaseFragment<T, K> extends BaseListViewFragment<T>
         }
 
         this.exception = null;
-        this.items = courses;
-        if (!courses.isEmpty()) {
-            getDao().insertOrReplaceInTx(courses);
+        this.items = items;
+        if (!items.isEmpty()) {
+            getDao().insertOrReplaceInTx(items);
         }
         displayDataFromDB();
         showList();
