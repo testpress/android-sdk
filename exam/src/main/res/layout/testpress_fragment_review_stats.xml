@@ -30,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/top_toolbar"
-            android:layout_above="@+id/bottom_border"
+            android:layout_above="@+id/button_layout"
             tools:ignore="UnknownIdInLayout">
 
             <LinearLayout
@@ -55,6 +55,7 @@
                     tools:ignore="UnusedAttribute" />
 
                 <LinearLayout
+                    android:layout_marginBottom="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
@@ -75,14 +76,11 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
-                            <LinearLayout
-                                android:orientation="vertical"
-                                style="@style/TestpressCircleBorderImage" >
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:src="@drawable/testpress_total_questions_icon"/>
-                            </LinearLayout>
+                            <ImageView
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_marginRight="5dp"
+                                android:src="@drawable/testpress_questions_flat_icon"/>
 
                             <LinearLayout
                                 android:orientation="vertical"
@@ -112,15 +110,11 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
-                            <LinearLayout
-                                android:orientation="vertical"
-                                style="@style/TestpressCircleBorderImage" >
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:padding="7dp"
-                                    android:src="@drawable/testpress_total_marks_icon"/>
-                            </LinearLayout>
+                            <ImageView
+                                android:layout_width="30dp"
+                                android:layout_height="32dp"
+                                android:layout_marginRight="5dp"
+                                android:src="@drawable/testpress_total_marks_icon"/>
 
                             <LinearLayout
                                 android:orientation="vertical"
@@ -161,15 +155,11 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
-                            <LinearLayout
-                                android:orientation="vertical"
-                                style="@style/TestpressCircleBorderImage" >
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:padding="5dp"
-                                    android:src="@drawable/testpress_total_duration_icon"/>
-                            </LinearLayout>
+                            <ImageView
+                                android:layout_width="30dp"
+                                android:layout_height="32dp"
+                                android:layout_marginRight="5dp"
+                                android:src="@drawable/testpress_time_flat_icon"/>
 
                             <LinearLayout
                                 android:orientation="vertical"
@@ -200,16 +190,11 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
-                            <LinearLayout
-                                android:orientation="vertical"
-                                style="@style/TestpressCircleBorderImage" >
-
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:padding="5dp"
-                                    android:src="@drawable/testpress_cutoff_icon"/>
-                            </LinearLayout>
+                            <ImageView
+                                android:layout_width="30dp"
+                                android:layout_height="32dp"
+                                android:layout_marginRight="5dp"
+                                android:src="@drawable/testpress_cutoff_icon"/>
 
                             <LinearLayout
                                 android:orientation="vertical"
@@ -258,17 +243,11 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
-                            <LinearLayout
-                                android:orientation="vertical"
-                                style="@style/TestpressCircleBorderImage" >
-
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:padding="5dp"
-                                    android:src="@drawable/testpress_rank_icon"/>
-
-                            </LinearLayout>
+                            <ImageView
+                                android:layout_width="30dp"
+                                android:layout_height="32dp"
+                                android:layout_marginRight="5dp"
+                                android:src="@drawable/testpress_rank_flat_icon"/>
 
                             <LinearLayout
                                 android:orientation="vertical"
@@ -323,17 +302,11 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
-                            <LinearLayout
-                                android:orientation="vertical"
-                                style="@style/TestpressCircleBorderImage" >
-
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:padding="5dp"
-                                    android:src="@drawable/testpress_percentile_icon"/>
-
-                            </LinearLayout>
+                            <ImageView
+                                android:layout_width="30dp"
+                                android:layout_height="32dp"
+                                android:layout_marginRight="5dp"
+                                android:src="@drawable/testpress_percentile_icon"/>
 
                             <LinearLayout
                                 android:orientation="vertical"
@@ -376,17 +349,11 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
-                            <LinearLayout
-                                android:orientation="vertical"
-                                style="@style/TestpressCircleBorderImage" >
-
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:padding="5dp"
-                                    android:src="@drawable/testpress_score_icon"/>
-
-                            </LinearLayout>
+                            <ImageView
+                                android:layout_width="30dp"
+                                android:layout_height="32dp"
+                                android:layout_marginRight="5dp"
+                                android:src="@drawable/testpress_score_flat_icon"/>
 
                             <LinearLayout
                                 android:orientation="vertical"
@@ -418,17 +385,11 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
-                            <LinearLayout
-                                android:layout_marginLeft="0dp"
-                                android:orientation="vertical"
-                                style="@style/TestpressCircleBorderImage" >
-
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:src="@drawable/testpress_percentage_icon"/>
-
-                            </LinearLayout>
+                            <ImageView
+                                android:layout_width="30dp"
+                                android:layout_height="32dp"
+                                android:layout_marginRight="5dp"
+                                android:src="@drawable/testpress_percentage_badge_flat_icon"/>
 
                             <LinearLayout
                                 android:orientation="vertical"
@@ -469,16 +430,11 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
-                            <LinearLayout
-                                android:orientation="vertical"
-                                style="@style/TestpressCircleBorderImage" >
-
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:src="@drawable/testpress_correct_flat_icon"/>
-
-                            </LinearLayout>
+                            <ImageView
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_marginRight="5dp"
+                                android:src="@drawable/testpress_correct_flat_icon"/>
 
                             <LinearLayout
                                 android:orientation="vertical"
@@ -509,17 +465,11 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
-                            <LinearLayout
-                                android:layout_marginLeft="0dp"
-                                android:orientation="vertical"
-                                style="@style/TestpressCircleBorderImage" >
-
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:src="@drawable/testpress_incorrect_flat_icon"/>
-
-                            </LinearLayout>
+                            <ImageView
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_marginRight="5dp"
+                                android:src="@drawable/testpress_incorrect_flat_icon"/>
 
                             <LinearLayout
                                 android:orientation="vertical"
@@ -561,16 +511,11 @@
                             android:layout_height="wrap_content"
                             tools:ignore="TooManyViews">
 
-                            <LinearLayout
-                                android:orientation="vertical"
-                                style="@style/TestpressCircleBorderImage" >
-
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:src="@drawable/testpress_time_flat_icon"/>
-
-                            </LinearLayout>
+                            <ImageView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_marginRight="5dp"
+                                android:src="@drawable/testpress_stopwatch_flat_icon"/>
 
                             <LinearLayout
                                 android:orientation="vertical"
@@ -601,17 +546,11 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content">
 
-                            <LinearLayout
-                                android:layout_marginLeft="0dp"
-                                android:orientation="vertical"
-                                style="@style/TestpressCircleBorderImage" >
-
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:src="@drawable/testpress_accurate_flat_icon"/>
-
-                            </LinearLayout>
+                            <ImageView
+                                android:layout_width="30dp"
+                                android:layout_height="32dp"
+                                android:layout_marginRight="5dp"
+                                android:src="@drawable/testpress_accurate_flat_icon"/>
 
                             <LinearLayout
                                 android:orientation="vertical"
@@ -642,15 +581,14 @@
 
         </ScrollView>
 
-            <View
-                android:id="@+id/bottom_border"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/testpress_gray_light"
-                android:layout_above="@+id/above_bottom_row"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_above="@+id/button_layout"
+            android:background="@drawable/testpress_gradient_shadow_gray_top" />
 
             <LinearLayout
-                android:id="@+id/above_bottom_row"
+                android:id="@+id/button_layout"
                 android:orientation="horizontal"
                 android:layout_marginBottom="20dp"
                 android:layout_marginLeft="10dp"
