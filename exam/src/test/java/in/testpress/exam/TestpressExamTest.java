@@ -6,8 +6,8 @@ import android.support.v4.app.FragmentActivity;
 import org.junit.Test;
 
 import in.testpress.core.TestpressSession;
-import in.testpress.exam.models.CourseAttempt;
-import in.testpress.exam.models.CourseContent;
+import in.testpress.models.greendao.CourseAttempt;
+import in.testpress.models.greendao.CourseContent;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
