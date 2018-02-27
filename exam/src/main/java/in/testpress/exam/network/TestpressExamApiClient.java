@@ -30,6 +30,9 @@ public class TestpressExamApiClient extends TestpressApiClient {
      */
     public static final String EXAMS_LIST_PATH =  "/api/v2.2/exams/";
 
+    public static final String ACCESS_CODES_PATH =  "/api/v2.3/access_codes/";
+    public static final String EXAMS_PATH =  "/exams/";
+
     /**
      * Categories URL
      */
@@ -78,6 +81,11 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getExamService().getExams(queryParams);
     }
 
+    public RetrofitCall<TestpressApiResponse<Exam>> getExams(String accessCode,
+                                                             Map<String, Object> queryParams) {
+        return getExamService().getExams(accessCode, queryParams);
+    }
+
     public RetrofitCall<Exam> getExam(String examSlug) {
         return getExamService().getExam(examSlug);
     }
@@ -90,8 +98,8 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getExamService().mailExplanationsPdf(mailPdfUrlFrag);
     }
 
-    public RetrofitCall<Attempt> createAttempt(String attemptsUrlFrag) {
-        return getExamService().createAttempt(attemptsUrlFrag);
+    public RetrofitCall<Attempt> createAttempt(String attemptsUrlFrag, Map<String, Object> option) {
+        return getExamService().createAttempt(attemptsUrlFrag, option);
     }
 
     public RetrofitCall<CourseAttempt> createContentAttempt(String attemptUrl) {

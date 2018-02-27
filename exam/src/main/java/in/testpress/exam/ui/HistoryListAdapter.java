@@ -14,6 +14,7 @@ import in.testpress.exam.models.Exam;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ViewUtils;
 
+import static in.testpress.exam.ui.AccessCodeExamsFragment.ACCESS_CODE;
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 import static in.testpress.exam.ui.TestActivity.PARAM_EXAM;
 
@@ -21,6 +22,7 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
 
     private final Activity activity;
     private final Fragment fragment;
+    private String accessCode;
 
     /**
      * @param fragment
@@ -31,6 +33,11 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
         this.activity = fragment.getActivity();
         this.fragment = fragment;
         setItems(items);
+    }
+
+    public HistoryListAdapter(final Fragment fragment, final List<Exam> items, String accessCode) {
+        this(fragment, items);
+        this.accessCode = accessCode;
     }
 
     @Override
@@ -57,10 +64,11 @@ public class HistoryListAdapter extends SingleTypeAdapter<Exam> {
             public void onClick(View v) {
                 Intent intent = new Intent(activity, AttemptsActivity.class);
                 intent.putExtra(PARAM_EXAM, exam);
+                intent.putExtra(ACCESS_CODE, accessCode);
                 fragment.startActivityForResult(intent, TEST_TAKEN_REQUEST_CODE);
             }
         });
-        if (exam.getCommentsCount() == 0) {
+        if (exam.getCommentsCount() == null || exam.getCommentsCount() == 0) {
             setGone(8, true);
         } else {
             setText(9, exam.getCommentsCount().toString());

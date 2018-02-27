@@ -22,7 +22,7 @@ public abstract class BaseResourcePager<E> {
     /**
      * Next page to request
      */
-    protected int page = 1;
+    public int page = 1;
 
     /**
      * Number of pages to request
@@ -92,6 +92,12 @@ public abstract class BaseResourcePager<E> {
      */
     public List<E> getResources() {
         return new ArrayList<E>(resources.values());
+    }
+
+    public void setResources(List<E> items) {
+        for(E item : items) {
+            resources.put(getId(item), item);
+        }
     }
 
     /**

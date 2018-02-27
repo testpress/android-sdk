@@ -18,7 +18,8 @@
             android:theme="@style/TestpressTheme.NoToolBar"
             android:configChanges="orientation|keyboard|screenSize" />
 
-        <activity android:name=".ui.AttemptsListActivity"
+        <activity android:name=".ui.AccessCodeActivity"
+            android:label="@string/testpress_access_code"
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 

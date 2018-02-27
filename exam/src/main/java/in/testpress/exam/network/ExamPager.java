@@ -10,8 +10,14 @@ import retrofit2.Response;
 public class ExamPager extends BaseResourcePager<Exam> {
 
     private TestpressExamApiClient apiClient;
-    private final String subclass;
+    private String subclass;
     private String category;
+    private String accessCode;
+
+    public ExamPager(String accessCode, TestpressExamApiClient apiClient) {
+        this.apiClient = apiClient;
+        this.accessCode = accessCode;
+    }
 
     public ExamPager(String subclass, String category, TestpressExamApiClient apiClient) {
         this.apiClient = apiClient;
@@ -26,8 +32,13 @@ public class ExamPager extends BaseResourcePager<Exam> {
 
     @Override
     public Response<TestpressApiResponse<Exam>> getItems(int page, int size) throws IOException {
-        queryParams.put(TestpressExamApiClient.STATE, subclass);
         queryParams.put(TestpressExamApiClient.PAGE, page);
+        if (accessCode != null) {
+            return apiClient.getExams(accessCode, queryParams).execute();
+        }
+        if (subclass != null) {
+            queryParams.put(TestpressExamApiClient.STATE, subclass);
+        }
         if (category != null) {
             queryParams.put(TestpressExamApiClient.CATEGORY, category);
         }

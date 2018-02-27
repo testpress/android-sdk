@@ -75,7 +75,7 @@ public abstract class BaseListViewFragment<E> extends Fragment
     protected boolean listShown;
 
     protected TestpressException exception;
-    boolean firstCallBack = true;
+    protected boolean firstCallBack = true;
     boolean needRetryButton;
 
     @Override
@@ -226,6 +226,10 @@ public abstract class BaseListViewFragment<E> extends Fragment
             return;
         }
         this.exception = null;
+        updateItems(items);
+    }
+
+    public void updateItems(List<E> items) {
         this.items = items;
         if (items.isEmpty()) {
             setEmptyText();

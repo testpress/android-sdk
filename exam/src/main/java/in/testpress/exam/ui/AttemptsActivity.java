@@ -318,6 +318,9 @@ public class AttemptsActivity extends BaseToolBarActivity
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(AttemptsActivity.this, TestActivity.class);
+                        if (getIntent().getExtras() != null) {
+                            intent.putExtras(getIntent().getExtras());
+                        }
                         intent.putExtra(TestActivity.PARAM_EXAM, exam);
                         intent.putExtra(TestActivity.PARAM_ATTEMPT,
                                 pausedAttempts.get(pausedAttempts.size() - 1));
@@ -349,6 +352,9 @@ public class AttemptsActivity extends BaseToolBarActivity
 
     private void startExam(boolean discardExamDetails) {
         Intent intent = new Intent(this, TestActivity.class);
+        if (getIntent().getExtras() != null) {
+            intent.putExtras(getIntent().getExtras());
+        }
         intent.putExtra(TestActivity.PARAM_EXAM, exam);
         intent.putExtra(TestActivity.PARAM_DISCARD_EXAM_DETAILS, discardExamDetails);
         startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);

@@ -10,9 +10,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 public class Exam implements Parcelable {
@@ -40,6 +37,7 @@ public class Exam implements Parcelable {
     private Integer commentsCount;
     private ArrayList<Language> languages = new ArrayList<>();
     private String selectedLanguage;
+    private String slug;
 
     // Parcelling part
     public Exam(Parcel parcel){
@@ -68,6 +66,7 @@ public class Exam implements Parcelable {
         this.commentsCount = commentsCount.equals("null") ? null : Integer.parseInt(commentsCount);
         parcel.readTypedList(languages, Language.CREATOR);
         selectedLanguage    = parcel.readString();
+        slug = parcel.readString();
     }
 
     @Override
@@ -113,6 +112,7 @@ public class Exam implements Parcelable {
         parcel.writeString(String.valueOf(commentsCount));
         parcel.writeTypedList(languages);
         parcel.writeString(selectedLanguage);
+        parcel.writeString(slug);
     }
 
     public static final Creator CREATOR = new Creator() {
@@ -572,5 +572,13 @@ public class Exam implements Parcelable {
 
     public void setSelectedLanguage(String selectedLanguage) {
         this.selectedLanguage = selectedLanguage;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
     }
 }

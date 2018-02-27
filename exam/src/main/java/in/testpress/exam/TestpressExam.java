@@ -24,6 +24,7 @@ import in.testpress.exam.models.greendao.ReviewItemDao;
 import in.testpress.exam.models.greendao.ReviewQuestionDao;
 import in.testpress.exam.models.greendao.ReviewQuestionTranslationDao;
 import in.testpress.exam.models.greendao.SelectedAnswerDao;
+import in.testpress.exam.ui.AccessCodeActivity;
 import in.testpress.exam.ui.AnalyticsActivity;
 import in.testpress.exam.ui.AttemptsActivity;
 import in.testpress.exam.ui.CarouselFragment;
@@ -213,6 +214,23 @@ public class TestpressExam {
         Intent intent = new Intent(activity, AttemptsActivity.class);
         intent.putExtra(PARAM_EXAM_SLUG, examSlug);
         activity.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
+    }
+
+    /**
+     * Get access code from user & display exams which linked to it.
+     *
+     * @param context Context to start the new activity.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    @SuppressWarnings("ConstantConditions")
+    public static void showExamsForAccessCode(@NonNull Context context,
+                                              @NonNull TestpressSession testpressSession) {
+        if (context == null) {
+            throw new IllegalArgumentException("Activity must not be null.");
+        }
+        init(context, testpressSession);
+        Intent intent = new Intent(context, AccessCodeActivity.class);
+        context.startActivity(intent);
     }
 
     /**

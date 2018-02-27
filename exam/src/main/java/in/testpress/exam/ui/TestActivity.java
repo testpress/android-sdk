@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -18,6 +19,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
@@ -38,6 +40,7 @@ import in.testpress.network.RetrofitCall;
 import in.testpress.util.ViewUtils;
 import retrofit2.Response;
 
+import static in.testpress.exam.ui.AccessCodeExamsFragment.ACCESS_CODE;
 import static in.testpress.exam.ui.TestFragment.PARAM_CONTENT_ATTEMPT_END_URL;
 
 /**
@@ -342,7 +345,14 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                     RetrofitCall<Attempt> call = null;
                     switch (id) {
                         case START_ATTEMPT_LOADER:
-                            call = apiClient.createAttempt(exam.getAttemptsFrag());
+                            Map<String, Object> data = new HashMap<>();
+                            String accessCode = getIntent().getStringExtra(ACCESS_CODE);
+                            String url = exam.getAttemptsFrag();
+                            if (accessCode != null) {
+                                data.put(ACCESS_CODE, accessCode);
+                                url = url.replace("v2.3", "v2.2");
+                            }
+                            call = apiClient.createAttempt(url, data);
                             break;
                         case RESUME_ATTEMPT_LOADER:
                             call = apiClient.startAttempt(attempt.getStartUrlFrag());

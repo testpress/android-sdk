@@ -23,6 +23,9 @@ import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 import retrofit2.http.Url;
 
+import static in.testpress.exam.network.TestpressExamApiClient.ACCESS_CODES_PATH;
+import static in.testpress.exam.network.TestpressExamApiClient.EXAMS_PATH;
+
 public interface ExamService {
 
     @GET(TestpressExamApiClient.EXAMS_LIST_PATH)
@@ -30,6 +33,11 @@ public interface ExamService {
 
     @GET(TestpressExamApiClient.EXAMS_LIST_PATH + "{exam_slug}")
     RetrofitCall<Exam> getExam(@Path(value = "exam_slug", encoded = true) String examSlug);
+
+    @GET(ACCESS_CODES_PATH + "{access_code}" + EXAMS_PATH)
+    RetrofitCall<TestpressApiResponse<Exam>> getExams(
+            @Path(value = "access_code", encoded = true) String accessCode,
+            @QueryMap Map<String, Object> options);
 
     @GET("/{mail_pdf_url}")
     RetrofitCall<Void> mailQuestionsPdf(
@@ -46,7 +54,8 @@ public interface ExamService {
 
     @POST("/{attempts_url}")
     RetrofitCall<Attempt> createAttempt(
-            @Path(value = "attempts_url", encoded = true) String attemptsUrlFrag);
+            @Path(value = "attempts_url", encoded = true) String attemptsUrlFrag,
+            @Body Map<String, Object> options);
 
     @POST("{attempt_url}")
     RetrofitCall<CourseAttempt> createContentAttempt(

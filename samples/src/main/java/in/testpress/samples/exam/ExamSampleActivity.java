@@ -44,6 +44,12 @@ public class ExamSampleActivity extends BaseToolBarActivity {
                 getExamSlug(R.id.attempt_state);
             }
         });
+        findViewById(R.id.access_code).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showSDK(R.id.access_code);
+            }
+        });
         findViewById(R.id.exam_list).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,6 +87,9 @@ public class ExamSampleActivity extends BaseToolBarActivity {
                     break;
                 case R.id.attempt_state:
                     TestpressExam.showExamAttemptedState(this, examSlug, session);
+                    break;
+                case R.id.access_code:
+                    TestpressExam.showExamsForAccessCode(this, session);
                     break;
                 case R.id.exam_list:
                     TestpressExam.show(this, session);

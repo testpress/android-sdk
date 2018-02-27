@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/enter_code_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:text="@string/testpress_enter_access_code"
+        android:textSize="24sp"
+        android:textColor="@color/testpress_black"
+        />
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/access_code"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textSize="16sp"
+        android:textColor="@color/testpress_black"
+        android:textAlignment="center"
+        android:ellipsize="start"
+        android:singleLine="true"
+        android:gravity="center"
+        android:inputType="textCapCharacters"
+        android:imeOptions="actionDone"
+        android:maxLength="30"
+        />
+
+    <android.support.v7.widget.AppCompatButton
+        style="@style/TestpressButton"
+        android:enabled="false"
+        android:layout_marginTop="20dp"
+        android:text="@string/testpress_get_exams"
+        android:id="@+id/get_exams"
+        />
+
+</LinearLayout>

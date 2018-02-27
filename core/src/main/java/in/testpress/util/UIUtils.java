@@ -8,7 +8,9 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import in.testpress.R;
@@ -20,6 +22,21 @@ public class UIUtils {
             InputMethodManager inputMethodManager =
                     (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
+    public static void showSoftKeyboard(Activity activity, EditText editText) {
+        if (activity != null) {
+            InputMethodManager inputMethodManager =
+                    (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+
+            boolean isShowing =
+                    inputMethodManager.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+
+            if (!isShowing) {
+                activity.getWindow()
+                        .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+            }
         }
     }
 
