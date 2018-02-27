@@ -612,6 +612,7 @@ public class Exam implements android.os.Parcelable {
                 return simpleDateFormat.parse(getEndDate().toString()).before(new Date());
             }
         } catch (ParseException e) {
+            e.printStackTrace();
         }
         return false;
     }
