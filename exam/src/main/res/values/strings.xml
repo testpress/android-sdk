@@ -175,4 +175,6 @@
 
     <string name="testpress_continue">Continue</string>
 
+    <string name="testpress_exam_ended">This exam has ended</string>
+
 </resources>

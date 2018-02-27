@@ -191,6 +191,13 @@ public class AttemptsActivity extends BaseToolBarActivity
                 webOnlyLabel.setTypeface(TestpressSdk.getRubikRegularFont(this));
                 webOnlyLabel.setVisibility(View.VISIBLE);
                 return false;
+            } else if (exam.isEnded()) {
+                if (attempts.isEmpty()) {
+                    TextView webOnlyLabel = (TextView) findViewById(R.id.web_only_label);
+                    webOnlyLabel.setTypeface(TestpressSdk.getRubikRegularFont(this));
+                    webOnlyLabel.setVisibility(View.VISIBLE);
+                }
+                return false;
             } else {
                 return exam.hasStarted();
             }

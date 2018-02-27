@@ -224,6 +224,11 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         } else if (!exam.hasStarted()) {
             attemptActions.setVisibility(View.GONE);
             startExam.setVisibility(View.GONE);
+        } else if (exam.isEnded()) {
+            webOnlyLabel.setVisibility(View.VISIBLE);
+            webOnlyLabel.setText(R.string.testpress_exam_ended);
+            attemptActions.setVisibility(View.GONE);
+            startExam.setVisibility(View.GONE);
         } else if (exam.getPausedAttemptsCount() > 0) {
             if (attempt == null) {
                 if (courseContent != null) {

@@ -380,7 +380,7 @@ public class ContentActivity extends BaseToolBarActivity {
                         ((exam.getAttemptsCount() + exam.getPausedAttemptsCount()) <= exam.getMaxRetakes() ||
                                 exam.getMaxRetakes() < 0))) {
 
-            if (content.getIsLocked() || !content.getHasStarted()) {
+            if (content.getIsLocked() || !content.getHasStarted() || exam.isEnded()) {
                 if (courseAttempts.isEmpty()) {
                     TextView webOnlyLabel = (TextView) findViewById(R.id.web_only_label);
                     if (!content.getHasStarted()) {
@@ -388,6 +388,8 @@ public class ContentActivity extends BaseToolBarActivity {
                                 getString(R.string.testpress_can_start_exam_only_after),
                                 FormatDate.formatDateTime(exam.getStartDate())
                         ));
+                    } else if (exam.isEnded()) {
+                        webOnlyLabel.setText(R.string.testpress_exam_ended);
                     } else {
                         webOnlyLabel.setText(R.string.testpress_score_good_in_previous_exam);
                     }
@@ -396,7 +398,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 }
                 return false;
             } else {
-                return !isWebOnlyExam(exam) && !exam.isEnded();
+                return !isWebOnlyExam(exam);
             }
         } else {
             return false;

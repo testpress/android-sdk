@@ -196,7 +196,7 @@
         android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/testpress_black"
+        android:textColor="@color/testpress_red"
         android:text="@string/testpress_web_only_exam_description"
         android:lineSpacingExtra="5dp"
         android:layout_marginBottom="20dp"
