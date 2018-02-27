@@ -30,7 +30,7 @@ public class TestpressExamApiClient extends TestpressApiClient {
      */
     public static final String EXAMS_LIST_PATH =  "/api/v2.2/exams/";
 
-    public static final String ACCESS_CODES_PATH =  "/api/v2.3/access_codes/";
+    public static final String ACCESS_CODES_PATH =  "/api/v2.2/access_codes/";
     public static final String EXAMS_PATH =  "/exams/";
 
     /**

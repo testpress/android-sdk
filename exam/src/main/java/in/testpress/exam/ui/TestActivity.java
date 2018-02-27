@@ -347,12 +347,10 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                         case START_ATTEMPT_LOADER:
                             Map<String, Object> data = new HashMap<>();
                             String accessCode = getIntent().getStringExtra(ACCESS_CODE);
-                            String url = exam.getAttemptsFrag();
                             if (accessCode != null) {
                                 data.put(ACCESS_CODE, accessCode);
-                                url = url.replace("v2.3", "v2.2");
                             }
-                            call = apiClient.createAttempt(url, data);
+                            call = apiClient.createAttempt(exam.getAttemptsFrag(), data);
                             break;
                         case RESUME_ATTEMPT_LOADER:
                             call = apiClient.startAttempt(attempt.getStartUrlFrag());
