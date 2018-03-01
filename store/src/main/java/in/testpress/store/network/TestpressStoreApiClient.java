@@ -26,4 +26,8 @@ public class TestpressStoreApiClient extends TestpressApiClient {
         return getProductService().getProducts(queryParams);
     }
 
+    public RetrofitCall<Product> getProductDetail(String productSlug) {
+        return getProductService().getProductDetails(productSlug);
+    }
+
 }

@@ -1,5 +1,6 @@
 package in.testpress.store.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -44,7 +45,9 @@ public class ProductListFragment extends PagedItemFragment<Product> {
 
     public void onListItemClick(ListView l, View v, int position, long id) {
         Product product = ((Product) l.getItemAtPosition(position));
-        // ToDo: Goto product detail
+        Intent intent = new Intent(getActivity(), ProductDetailsActivity.class);
+        intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.getSlug());
+        startActivity(intent);
     }
 
     @Override

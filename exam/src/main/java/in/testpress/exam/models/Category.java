@@ -1,6 +1,9 @@
 package in.testpress.exam.models;
 
-public class Category {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Category implements Parcelable {
 
     private Integer id;
     private String url;
@@ -14,6 +17,91 @@ public class Category {
     private Integer examsCount;
     private Integer completedCount;
     private Integer availableCount;
+
+    protected Category(Parcel in) {
+        if (in.readByte() == 0) {
+            id = null;
+        } else {
+            id = in.readInt();
+        }
+        url = in.readString();
+        name = in.readString();
+        description = in.readString();
+        slug = in.readString();
+        image = in.readString();
+        parentUrl = in.readString();
+        byte tmpLeaf = in.readByte();
+        leaf = tmpLeaf == 0 ? null : tmpLeaf == 1;
+        parentSlug = in.readString();
+        if (in.readByte() == 0) {
+            examsCount = null;
+        } else {
+            examsCount = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            completedCount = null;
+        } else {
+            completedCount = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            availableCount = null;
+        } else {
+            availableCount = in.readInt();
+        }
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (id == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(id);
+        }
+        dest.writeString(url);
+        dest.writeString(name);
+        dest.writeString(description);
+        dest.writeString(slug);
+        dest.writeString(image);
+        dest.writeString(parentUrl);
+        dest.writeByte((byte) (leaf == null ? 0 : leaf ? 1 : 2));
+        dest.writeString(parentSlug);
+        if (examsCount == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(examsCount);
+        }
+        if (completedCount == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(completedCount);
+        }
+        if (availableCount == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(availableCount);
+        }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Category> CREATOR = new Creator<Category>() {
+        @Override
+        public Category createFromParcel(Parcel in) {
+            return new Category(in);
+        }
+
+        @Override
+        public Category[] newArray(int size) {
+            return new Category[size];
+        }
+    };
 
     /**
      *

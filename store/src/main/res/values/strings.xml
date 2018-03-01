@@ -6,6 +6,8 @@
     <string name="testpress_no_products">No Products</string>
     <string name="testpress_no_products_description">There are no products to purchase right now.</string>
     <string name="testpress_error_loading_products">Loading Products failed</string>
+    <string name="testpress_no_product_found">Product not found!</string>
+    <string name="testpress_no_product_found_description">This product might be removed or not yet in store</string>
 
     <plurals name="exams_count">
         <item quantity="one">1 Exam</item>
@@ -15,5 +17,7 @@
         <item quantity="one">1 Document</item>
         <item quantity="other">%d Documents</item>
     </plurals>
+
+    <string name="testpress_no_description">No description available</string>
 
 </resources>

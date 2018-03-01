@@ -1,5 +1,6 @@
 package in.testpress.store;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.IdRes;
@@ -8,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
+import in.testpress.store.ui.ProductDetailsActivity;
 import in.testpress.store.ui.ProductListFragment;
 import in.testpress.store.ui.ProductsListActivity;
 import in.testpress.util.Assert;
@@ -64,6 +66,26 @@ public class TestpressStore {
 
         init(context.getApplicationContext(), testpressSession);
         Intent intent = new Intent(context, ProductsListActivity.class);
+        context.startActivity(intent);
+    }
+
+    /**
+     * Use to show a particular product.
+     *
+     * @param context Context to start the new activity.
+     * @param productSlug Slug of the product which need to be show.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    @SuppressWarnings("ConstantConditions")
+    public static void showProduct(@NonNull Context context, @NonNull String productSlug,
+                                   @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Context must not be null.", context);
+        Assert.assertNotNullAndNotEmpty("productSlug must not be null or empty.", productSlug);
+
+        init(context.getApplicationContext(), testpressSession);
+        Intent intent = new Intent(context, ProductDetailsActivity.class);
+        intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, productSlug);
         context.startActivity(intent);
     }
 

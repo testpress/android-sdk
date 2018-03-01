@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingRight="10dp"
+    android:paddingBottom="0dp"
+    android:paddingTop="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:textColor="@color/testpress_black"
+        android:layout_height="wrap_content"
+        android:gravity="top"
+        android:textSize="@dimen/testpress_text_size_medium"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="TNPG Anatomy"
+        android:textStyle="bold"
+        android:layout_marginBottom="@dimen/testpress_margin_normal"
+        android:id="@+id/exam_title"/>
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/exam_date"
+            android:textColor="@color/testpress_black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="19th Dec 2015 to 31 Jan 2015"
+            android:layout_marginTop="5dp"
+            android:textSize="@dimen/testpress_text_size_small"
+            />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="@dimen/testpress_text_size_medium"
+                android:textStyle="bold"
+                android:id="@+id/number_of_questions"
+                android:text="200"
+                android:textColor="@color/testpress_black"
+                android:layout_gravity="bottom"/>
+
+            <TextView
+                android:id="@+id/questionsText"
+                android:layout_width="wrap_content"
+                android:layout_marginLeft="@dimen/testpress_margin_normal"
+                android:text="questions"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/testpress_text_size_small"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="@color/testpress_black"
+                android:layout_gravity="bottom"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:paddingTop="5dp"
+        android:layout_marginBottom="20dp"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/course_category_layout"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/testpress_margin_normal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_marginRight="@dimen/testpress_margin_normal"
+                android:text="Course: "
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/testpress_text_size_small"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="@color/testpress_black"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="@dimen/testpress_text_size_small"
+                android:id="@+id/course_category"
+                android:text="TNPG"
+                android:textColor="@color/testpress_black"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/exam_duration"
+            android:layout_toRightOf="@id/course_category_layout"
+            android:layout_alignParentRight="true"
+            android:text="0:30:00"
+            android:textSize="@dimen/testpress_text_size_medium"
+            android:textColor="@color/testpress_black"
+            android:textStyle="bold"
+            />
+
+    </RelativeLayout>
+
+</LinearLayout>

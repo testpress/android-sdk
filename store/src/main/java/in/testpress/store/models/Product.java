@@ -23,6 +23,7 @@ public class Product implements Parcelable {
     private Integer notesCount;
     private String price;
     private List<Images> images;
+    private String buyNowText;
     private String description;
     private String additionalInfo;
     private String paymentLink;
@@ -44,6 +45,7 @@ public class Product implements Parcelable {
         parcel.readStringList(categories);
         parcel.readStringList(types);
         parcel.readTypedList(images, Images.CREATOR);
+        buyNowText      = parcel.readString();
         description      = parcel.readString();
         additionalInfo   = parcel.readString();
         paymentLink      = parcel.readString();
@@ -71,6 +73,7 @@ public class Product implements Parcelable {
         parcel.writeStringList(categories);
         parcel.writeStringList(types);
         parcel.writeTypedList(images);
+        parcel.writeString(buyNowText);
         parcel.writeString(description);
         parcel.writeString(additionalInfo);
         parcel.writeString(paymentLink);
@@ -309,6 +312,14 @@ public class Product implements Parcelable {
     public List<Images> getImages() { return images; }
 
     public void setImages(List<Images> images) { this.images = images; }
+
+    public String getBuyNowText() {
+        return buyNowText;
+    }
+
+    public void setBuyNowText(String buyNowText) {
+        this.buyNowText = buyNowText;
+    }
 
     /**
      *

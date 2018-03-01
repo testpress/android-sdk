@@ -3,6 +3,7 @@ package in.testpress.util;
 import android.annotation.SuppressLint;
 import android.text.format.DateUtils;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,6 +43,21 @@ public class FormatDate {
         return  date1 != null && date2 != null && date1.after(date2);
     }
 
+    public static String getDate(String startDate, String endDate) {
+        if((startDate != null) || (endDate != null)) {
+            startDate = formatDate(startDate);
+            endDate = formatDate(endDate);
+            if (startDate == null) {
+                return "Ends on " + endDate;
+            }
+            if (endDate == null) {
+                return "From " + startDate;
+            }
+            return startDate + " to " + endDate;
+        }
+        return null;
+    }
+
     @SuppressLint("SimpleDateFormat")
     public static Date getDate(String inputString, String inputFormat, String timezone) {
         Date date;
@@ -55,6 +71,15 @@ public class FormatDate {
                 return date;
             }
         } catch (ParseException e) {
+        }
+        return null;
+    }
+
+    public static String formatDate(String inputString) {
+        Date date = getDate(inputString, "yyyy-MM-dd'T'HH:mm:ss", "UTC");
+        if(date != null) {
+            DateFormat dateformat = DateFormat.getDateInstance();
+            return dateformat.format(date);
         }
         return null;
     }
