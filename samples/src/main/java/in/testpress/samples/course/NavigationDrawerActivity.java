@@ -9,7 +9,6 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.course.TestpressCourse;
 import in.testpress.samples.BaseNavigationDrawerActivity;
-import in.testpress.samples.HomeFragment;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 
@@ -39,13 +38,6 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                 break;
         }
         super.onDrawerItemSelected(menuItem);
-    }
-
-    @Override
-    protected void displayHome() {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new HomeFragment())
-                .commit();
     }
 
     private void showSDK(int position) {

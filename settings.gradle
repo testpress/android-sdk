@@ -1,1 +1,1 @@
-include ':core', ':samples', ':exam', ':course', ':testpressdaogenerator'
+include ':core', ':samples', ':exam', ':course', ':store', ':testpressdaogenerator'

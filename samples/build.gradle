@@ -35,6 +35,7 @@ android {
 
 dependencies {
     compile project(':course')
+    compile project(':store')
     testCompile rootProject.junit
     compile rootProject.appcompat
     compile rootProject.design

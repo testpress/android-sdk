@@ -39,6 +39,13 @@
             android:text="Analytics"
             android:id="@+id/analytics" />
 
+        <android.support.v7.widget.AppCompatButton
+            android:layout_marginTop="30dp"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:text="Store"
+            android:id="@+id/store" />
+
     </LinearLayout>
 
 </LinearLayout>

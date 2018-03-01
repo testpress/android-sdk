@@ -13,6 +13,7 @@ import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.samples.exam.ExamSampleActivity;
 import in.testpress.samples.course.CourseSampleActivity;
+import in.testpress.samples.store.StoreSampleActivity;
 
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
 
@@ -47,6 +48,13 @@ public class MainActivity extends BaseToolBarActivity {
             @Override
             public void onClick(View view) {
                 showAnalytics();
+            }
+        });
+        findViewById(R.id.store).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, StoreSampleActivity.class);
+                startActivity(intent);
             }
         });
     }

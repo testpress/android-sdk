@@ -1,0 +1,19 @@
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="UnusedResources">
+
+    <string name="testpress_products">Products</string>
+
+    <string name="testpress_no_products">No Products</string>
+    <string name="testpress_no_products_description">There are no products to purchase right now.</string>
+    <string name="testpress_error_loading_products">Loading Products failed</string>
+
+    <plurals name="exams_count">
+        <item quantity="one">1 Exam</item>
+        <item quantity="other">%d Exams</item>
+    </plurals>
+    <plurals name="documents_count">
+        <item quantity="one">1 Document</item>
+        <item quantity="other">%d Documents</item>
+    </plurals>
+
+</resources>

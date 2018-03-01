@@ -61,7 +61,11 @@ public abstract class BaseNavigationDrawerActivity extends AppCompatActivity {
 
     protected abstract int getNavigationViewMenu();
 
-    protected abstract void displayHome();
+    protected void displayHome() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new HomeFragment())
+                .commit();
+    }
 
     @Override
     public void onBackPressed() {

@@ -115,7 +115,7 @@ public class Exam implements Parcelable {
         parcel.writeString(slug);
     }
 
-    public static final Creator CREATOR = new Creator() {
+    public static final Creator<Exam> CREATOR = new Creator<Exam>() {
         public Exam createFromParcel(Parcel in) {
             return new Exam(in);
         }
