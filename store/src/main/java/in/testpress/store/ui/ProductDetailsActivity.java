@@ -35,14 +35,14 @@ import in.testpress.util.ZoomableImageString;
 public class ProductDetailsActivity extends BaseToolBarActivity {
 
     public static final String PRODUCT_SLUG = "productSlug";
-
+    public static final String PRODUCT = "product";
 
     private LinearLayout emptyView;
     private TextView emptyTitleView;
     private TextView emptyDescView;
     private Button retryButton;
     private ProgressBar progressBar;
-    private Product productDetails;
+    private Product product;
     private String productSlug;
 
     @Override
@@ -61,6 +61,12 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         emptyTitleView = (TextView) findViewById(R.id.empty_title);
         emptyDescView = (TextView) findViewById(R.id.empty_description);
         retryButton = (Button) findViewById(R.id.retry_button);
+        retryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadProductDetails();
+            }
+        });
 
         loadProductDetails();
     }
@@ -198,17 +204,19 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
             ViewUtils.setListViewHeightBasedOnChildren(notesListView);
         }
 
-        ProductDetailsActivity.this.productDetails = product;
+        ProductDetailsActivity.this.product = product;
     }
 
     public void order() {
-        if (productDetails == null) {
+        if (product == null) {
             return;
         }
-        if (this.productDetails.getPaymentLink().isEmpty()) {
-            // TODO: Goto Order Confirm
+        if (this.product.getPaymentLink().isEmpty()) {
+            Intent intent = new Intent(ProductDetailsActivity.this, OrderConfirmActivity.class);
+            intent.putExtra(PRODUCT, product);
+            startActivity(intent);
         } else {
-            Uri uri = Uri.parse(this.productDetails.getPaymentLink());
+            Uri uri = Uri.parse(this.product.getPaymentLink());
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
         }

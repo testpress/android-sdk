@@ -22,7 +22,7 @@ public class Product implements Parcelable {
     private Integer examsCount;
     private Integer notesCount;
     private String price;
-    private List<Images> images;
+    private List<Images> images = new ArrayList<>();
     private String buyNowText;
     private String description;
     private String additionalInfo;

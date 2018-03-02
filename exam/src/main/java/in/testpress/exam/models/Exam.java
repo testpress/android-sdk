@@ -41,34 +41,120 @@ public class Exam implements Parcelable {
     private ArrayList<Category> categories = new ArrayList<>();
 
     // Parcelling part
-    public Exam(Parcel parcel){
-        totalMarks          = parcel.readString();
-        url                 = parcel.readString();
-        id                  = parcel.readInt();
-        attemptsCount       = parcel.readInt();
-        pausedAttemptsCount = parcel.readInt();
-        title               = parcel.readString();
-        description         = parcel.readString();
-        course_category = parcel.readString();
-        startDate           = parcel.readString();
-        endDate             = parcel.readString();
-        duration            = parcel.readString();
-        numberOfQuestions   = parcel.readInt();
-        negativeMarks       = parcel.readString();
-        markPerQuestion     = parcel.readString();
-        templateType        = parcel.readInt();
-        allowRetake         = parcel.readByte() != 0;
-        allowPdf            = parcel.readByte() != 0;
-        showAnswers         = parcel.readByte() != 0;
-        maxRetakes          = parcel.readInt();
-        attemptsUrl         = parcel.readString();
-        deviceAccessControl = parcel.readString();
-        String commentsCount = parcel.readString();
-        this.commentsCount = commentsCount.equals("null") ? null : Integer.parseInt(commentsCount);
-        parcel.readTypedList(languages, Language.CREATOR);
-        selectedLanguage    = parcel.readString();
-        slug = parcel.readString();
-        parcel.readTypedList(categories, Category.CREATOR);
+    protected Exam(Parcel in) {
+        totalMarks = in.readString();
+        url = in.readString();
+        id = in.readInt();
+        if (in.readByte() == 0) {
+            attemptsCount = null;
+        } else {
+            attemptsCount = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            pausedAttemptsCount = null;
+        } else {
+            pausedAttemptsCount = in.readInt();
+        }
+        title = in.readString();
+        description = in.readString();
+        course_category = in.readString();
+        startDate = in.readString();
+        endDate = in.readString();
+        duration = in.readString();
+        if (in.readByte() == 0) {
+            numberOfQuestions = null;
+        } else {
+            numberOfQuestions = in.readInt();
+        }
+        negativeMarks = in.readString();
+        markPerQuestion = in.readString();
+        if (in.readByte() == 0) {
+            templateType = null;
+        } else {
+            templateType = in.readInt();
+        }
+        byte tmpAllowRetake = in.readByte();
+        allowRetake = tmpAllowRetake == 0 ? null : tmpAllowRetake == 1;
+        byte tmpAllowPdf = in.readByte();
+        allowPdf = tmpAllowPdf == 0 ? null : tmpAllowPdf == 1;
+        byte tmpShowAnswers = in.readByte();
+        showAnswers = tmpShowAnswers == 0 ? null : tmpShowAnswers == 1;
+        if (in.readByte() == 0) {
+            maxRetakes = null;
+        } else {
+            maxRetakes = in.readInt();
+        }
+        attemptsUrl = in.readString();
+        deviceAccessControl = in.readString();
+        if (in.readByte() == 0) {
+            commentsCount = null;
+        } else {
+            commentsCount = in.readInt();
+        }
+        languages = in.createTypedArrayList(Language.CREATOR);
+        selectedLanguage = in.readString();
+        slug = in.readString();
+        categories = in.createTypedArrayList(Category.CREATOR);
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(totalMarks);
+        dest.writeString(url);
+        dest.writeInt(id);
+        if (attemptsCount == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(attemptsCount);
+        }
+        if (pausedAttemptsCount == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(pausedAttemptsCount);
+        }
+        dest.writeString(title);
+        dest.writeString(description);
+        dest.writeString(course_category);
+        dest.writeString(startDate);
+        dest.writeString(endDate);
+        dest.writeString(duration);
+        if (numberOfQuestions == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(numberOfQuestions);
+        }
+        dest.writeString(negativeMarks);
+        dest.writeString(markPerQuestion);
+        if (templateType == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(templateType);
+        }
+        dest.writeByte((byte) (allowRetake == null ? 0 : allowRetake ? 1 : 2));
+        dest.writeByte((byte) (allowPdf == null ? 0 : allowPdf ? 1 : 2));
+        dest.writeByte((byte) (showAnswers == null ? 0 : showAnswers ? 1 : 2));
+        if (maxRetakes == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(maxRetakes);
+        }
+        dest.writeString(attemptsUrl);
+        dest.writeString(deviceAccessControl);
+        if (commentsCount == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(commentsCount);
+        }
+        dest.writeTypedList(languages);
+        dest.writeString(selectedLanguage);
+        dest.writeString(slug);
+        dest.writeTypedList(categories);
     }
 
     @Override
@@ -76,53 +162,13 @@ public class Exam implements Parcelable {
         return 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(totalMarks);
-        parcel.writeString(url);
-        parcel.writeInt(id);
-        parcel.writeInt(attemptsCount);
-        parcel.writeInt(pausedAttemptsCount);
-        parcel.writeString(title);
-        parcel.writeString(description);
-        parcel.writeString(course_category);
-        parcel.writeString(startDate);
-        parcel.writeString(endDate);
-        parcel.writeString(duration);
-        parcel.writeInt(numberOfQuestions);
-        parcel.writeString(negativeMarks);
-        parcel.writeString(markPerQuestion);
-        parcel.writeInt(templateType);
-        if (allowRetake == null) {
-            parcel.writeByte((byte) (0));
-        } else {
-            parcel.writeByte((byte) (allowRetake ? 1 : 0));
-        }
-        if (allowPdf == null) {
-            parcel.writeByte((byte) (0));
-        } else {
-            parcel.writeByte((byte) (allowPdf ? 1 : 0));
-        }
-        if (showAnswers == null) {
-            parcel.writeByte((byte) (0));
-        } else {
-            parcel.writeByte((byte) (showAnswers ? 1 : 0));
-        }
-        parcel.writeInt(maxRetakes);
-        parcel.writeString(attemptsUrl);
-        parcel.writeString(deviceAccessControl);
-        parcel.writeString(String.valueOf(commentsCount));
-        parcel.writeTypedList(languages);
-        parcel.writeString(selectedLanguage);
-        parcel.writeString(slug);
-        parcel.writeTypedList(categories);
-    }
-
     public static final Creator<Exam> CREATOR = new Creator<Exam>() {
+        @Override
         public Exam createFromParcel(Parcel in) {
             return new Exam(in);
         }
 
+        @Override
         public Exam[] newArray(int size) {
             return new Exam[size];
         }

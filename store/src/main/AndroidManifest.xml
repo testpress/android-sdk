@@ -16,6 +16,12 @@
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
+        <activity
+            android:name=".ui.OrderConfirmActivity"
+            android:label="@string/testpress_shipping_address"
+            android:theme="@style/TestpressTheme"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+
     </application>
 
 </manifest>

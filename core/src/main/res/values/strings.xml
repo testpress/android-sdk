@@ -22,4 +22,6 @@
     <string name="testpress_vote_casted">Vote casted successfully!</string>
     <string name="testpress_self_vote_error">You can\'t vote for yourself!</string>
 
+    <string name="testpress_label_fill_required_details">*Please fill required details</string>
+
 </resources>

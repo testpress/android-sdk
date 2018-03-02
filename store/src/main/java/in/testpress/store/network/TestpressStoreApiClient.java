@@ -2,17 +2,25 @@ package in.testpress.store.network;
 
 import android.content.Context;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.model.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
+import in.testpress.store.models.Order;
+import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
 
 public class TestpressStoreApiClient extends TestpressApiClient {
 
     public static final String PRODUCTS_LIST_PATH =  "/api/v2.2/products/";
+
+    public static final String ORDERS_PATH = "/api/v2.2/orders/";
+
+    public static final String ORDER_CONFIRM_PATH = "/confirm/";
 
     public TestpressStoreApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
@@ -28,6 +36,16 @@ public class TestpressStoreApiClient extends TestpressApiClient {
 
     public RetrofitCall<Product> getProductDetail(String productSlug) {
         return getProductService().getProductDetails(productSlug);
+    }
+
+    public RetrofitCall<Order> order(List<OrderItem> orderItems) {
+        HashMap<String, Object> orderParameters = new HashMap<String, Object>();
+        orderParameters.put("order_items", orderItems);
+        return getProductService().order(orderParameters);
+    }
+
+    public RetrofitCall<Order> orderConfirm(Order order) {
+        return getProductService().orderConfirm(order.getId(), order);
     }
 
 }

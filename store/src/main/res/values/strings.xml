@@ -9,6 +9,9 @@
     <string name="testpress_no_product_found">Product not found!</string>
     <string name="testpress_no_product_found_description">This product might be removed or not yet in store</string>
 
+    <string name="testpress_error_ordering">Ordering Products failed</string>
+    <string name="testpress_error_confirm_order">Confirming order failed</string>
+
     <plurals name="exams_count">
         <item quantity="one">1 Exam</item>
         <item quantity="other">%d Exams</item>
@@ -19,5 +22,8 @@
     </plurals>
 
     <string name="testpress_no_description">No description available</string>
+
+    <string name="testpress_shipping_address">Shipping Address</string>
+    <string name="testpress_want_to_cancel_order">Do you really want to cancel the order ?</string>
 
 </resources>
