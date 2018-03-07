@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,8 +28,6 @@ import in.testpress.util.UIUtils;
 
 import static android.support.design.widget.Snackbar.LENGTH_SHORT;
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
-import static in.testpress.exam.ui.AccessCodeExamsFragment.ACCESS_CODE;
-import static in.testpress.exam.ui.AccessCodeExamsFragment.EXAMS;
 
 public class AccessCodeFragment extends Fragment {
 

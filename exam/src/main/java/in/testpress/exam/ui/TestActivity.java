@@ -24,7 +24,9 @@ import java.util.Map;
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
+import in.testpress.core.TestpressSession;
 import in.testpress.exam.R;
+import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Attempt;
 import in.testpress.exam.models.CourseContent;
 import in.testpress.exam.models.CourseAttempt;
@@ -33,6 +35,7 @@ import in.testpress.exam.network.TestpressExamApiClient;
 
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.model.TestpressApiResponse;
+import in.testpress.util.Assert;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.UIUtils;
@@ -408,8 +411,13 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, testFragment).commitAllowingStateLoss();
             } else {
-                startActivityForResult(ReviewStatsActivity.createIntent(this, exam, attempt),
-                        CarouselFragment.TEST_TAKEN_REQUEST_CODE);
+                TestpressSession session = TestpressSdk.getTestpressSession(this);
+                Assert.assertNotNull("TestpressSession must not be null.", session);
+                if (courseAttempt == null) {
+                    TestpressExam.showAttemptReport(this, exam, attempt, session);
+                } else {
+                    TestpressExam.showCourseAttemptReport(this, exam, courseAttempt, session);
+                }
             }
         } else {
             retryButton.setOnClickListener(new View.OnClickListener() {

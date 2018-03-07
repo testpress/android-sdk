@@ -39,6 +39,8 @@ import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_PREVIOUS_ACTIVITY;
 
 public class ReviewStatsFragment extends Fragment {
 
+    static final String PARAM_SHOW_RETAKE_BUTTON = "showRetakeButton";
+
     private TextView examTitle;
     private TextView attemptDate;
     private TextView timeTaken;
@@ -65,11 +67,14 @@ public class ReviewStatsFragment extends Fragment {
     private Attempt attempt;
     private Exam exam;
 
-    public static void showReviewStatsFragment(FragmentActivity activity, Exam exam, Attempt attempt) {
+    public static void showReviewStatsFragment(FragmentActivity activity, Exam exam, Attempt attempt,
+                                               boolean showRetakeButton) {
+
         ReviewStatsFragment fragment = new ReviewStatsFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(PARAM_EXAM, exam);
         bundle.putParcelable(PARAM_ATTEMPT, attempt);
+        bundle.putBoolean(PARAM_SHOW_RETAKE_BUTTON, showRetakeButton);
         fragment.setArguments(bundle);
         activity.getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, fragment)
@@ -204,7 +209,7 @@ public class ReviewStatsFragment extends Fragment {
         InstituteSettings settings =
                 TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
 
-        if (canAttemptExam() && !settings.isCoursesFrontend()) {
+        if (canAttemptExam() && getArguments().getBoolean(PARAM_SHOW_RETAKE_BUTTON, true)) {
             retakeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -284,7 +284,7 @@ public class AttemptsActivity extends BaseToolBarActivity
         if (attempts.size() == 1 && attempts.get(0).getState().equals(STATE_COMPLETED)) {
             // if only one attempt exist then show the test report of that attempt
             testReportLayout.setVisibility(View.VISIBLE);
-            ReviewStatsFragment.showReviewStatsFragment(this, exam, attempts.get(0));
+            ReviewStatsFragment.showReviewStatsFragment(this, exam, attempts.get(0), true);
             progressBar.setVisibility(View.GONE);
         } else {
             displayAttemptsList();

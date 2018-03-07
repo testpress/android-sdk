@@ -68,7 +68,7 @@ public class TrophiesAchievedFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ReviewStatsFragment.showReviewStatsFragment(getActivity(), exam,
-                        courseAttempt.getAssessment());
+                        courseAttempt.getAssessment(), false);
             }
         });
         return view;

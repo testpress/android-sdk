@@ -349,6 +349,29 @@ public class TestpressExam {
         activity.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
     }
 
+    /**
+     * Display the content attempt report.
+     *
+     * @param activity activity to which result of review activity need to pass.
+     * @param exam Exam object of the attempt.
+     * @param courseAttempt Attempt object which report need to be shown.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    public static void showCourseAttemptReport(@NonNull Activity activity,
+                                               @NonNull Exam exam,
+                                               @NonNull CourseAttempt courseAttempt,
+                                               @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Activity must not be null.", activity);
+        Assert.assertNotNull("Exam must not be null.", exam);
+        Assert.assertNotNull("CourseAttempt must not be null.", courseAttempt);
+        init(activity, testpressSession);
+        activity.startActivityForResult(
+                ReviewStatsActivity.createIntent(activity, exam, courseAttempt),
+                CarouselFragment.TEST_TAKEN_REQUEST_CODE
+        );
+    }
+
     private static void init(Context context, TestpressSession testpressSession) {
         if (testpressSession == null) {
             throw new IllegalArgumentException("TestpressSession must not be null.");

@@ -13,6 +13,8 @@ import in.testpress.exam.models.CourseAttempt;
 import in.testpress.exam.models.Exam;
 import in.testpress.model.InstituteSettings;
 
+import static in.testpress.exam.ui.ReviewStatsFragment.PARAM_SHOW_RETAKE_BUTTON;
+
 public class ReviewStatsActivity extends AppCompatActivity {
 
     static final String PARAM_PREVIOUS_ACTIVITY = "previousActivity";
@@ -27,6 +29,7 @@ public class ReviewStatsActivity extends AppCompatActivity {
         intent.putExtra(PARAM_PREVIOUS_ACTIVITY, activity.getClass().getName());
         intent.putExtra(PARAM_EXAM, exam);
         intent.putExtra(PARAM_ATTEMPT, attempt);
+        intent.putExtra(PARAM_SHOW_RETAKE_BUTTON, true);
         return intent;
     }
 
@@ -35,6 +38,7 @@ public class ReviewStatsActivity extends AppCompatActivity {
         intent.putExtra(PARAM_PREVIOUS_ACTIVITY, activity.getClass().getName());
         intent.putExtra(PARAM_EXAM, exam);
         intent.putExtra(PARAM_COURSE_ATTEMPT, courseAttempt);
+        intent.putExtra(PARAM_SHOW_RETAKE_BUTTON, false);
         return intent;
     }
 
