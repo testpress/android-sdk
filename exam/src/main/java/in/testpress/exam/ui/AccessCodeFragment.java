@@ -98,17 +98,8 @@ public class AccessCodeFragment extends Fragment {
                         }
 
                         progressDialog.dismiss();
-                        //noinspection ConstantConditions
-                        int parentId = ((ViewGroup) getView().getParent()).getId();
-                        AccessCodeExamsFragment fragment = new AccessCodeExamsFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putString(ACCESS_CODE, accessCode);
-                        ArrayList<Exam> exams = new ArrayList<>(response.getResults());
-                        bundle.putParcelableArrayList(EXAMS, exams);
-                        fragment.setArguments(bundle);
-                        getActivity().getSupportFragmentManager().beginTransaction()
-                                .replace(parentId, fragment)
-                                .commitAllowingStateLoss();
+                        startActivity(AccessCodeExamsActivity.getIntent(getActivity(), accessCode,
+                                response.getResults()));
                     }
 
                     @Override

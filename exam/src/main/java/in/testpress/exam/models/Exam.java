@@ -38,7 +38,7 @@ public class Exam implements Parcelable {
     private ArrayList<Language> languages = new ArrayList<>();
     private String selectedLanguage;
     private String slug;
-    private ArrayList<Category> categories = new ArrayList<>();
+    private ArrayList<String> categories = new ArrayList<>();
 
     // Parcelling part
     protected Exam(Parcel in) {
@@ -94,7 +94,7 @@ public class Exam implements Parcelable {
         languages = in.createTypedArrayList(Language.CREATOR);
         selectedLanguage = in.readString();
         slug = in.readString();
-        categories = in.createTypedArrayList(Category.CREATOR);
+        categories = in.createStringArrayList();
     }
 
     @Override
@@ -154,7 +154,7 @@ public class Exam implements Parcelable {
         dest.writeTypedList(languages);
         dest.writeString(selectedLanguage);
         dest.writeString(slug);
-        dest.writeTypedList(categories);
+        dest.writeStringList(categories);
     }
 
     @Override
@@ -631,11 +631,11 @@ public class Exam implements Parcelable {
         this.slug = slug;
     }
 
-    public ArrayList<Category> getCategories() {
+    public ArrayList<String> getCategories() {
         return categories;
     }
 
-    public void setCategories(ArrayList<Category> categories) {
+    public void setCategories(ArrayList<String> categories) {
         this.categories = categories;
     }
 }

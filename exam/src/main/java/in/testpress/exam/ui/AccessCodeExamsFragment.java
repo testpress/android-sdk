@@ -29,7 +29,6 @@ public class AccessCodeExamsFragment extends PagedItemFragment<Exam> {
     public void onCreate(Bundle savedInstanceState) {
         accessCode = getArguments().getString(ACCESS_CODE);
         apiClient = new TestpressExamApiClient(getActivity());
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.testpress_exams);
         super.onCreate(savedInstanceState);
     }
 

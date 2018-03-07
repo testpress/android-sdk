@@ -53,6 +53,11 @@
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/>
 
+        <activity android:name=".ui.AccessCodeExamsActivity"
+            android:label="@string/testpress_exams"
+            android:theme="@style/TestpressTheme"
+            android:configChanges="orientation|keyboard|screenSize" />
+
     </application>
 
 </manifest>

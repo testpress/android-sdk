@@ -25,6 +25,7 @@ import in.testpress.exam.models.greendao.ReviewQuestionDao;
 import in.testpress.exam.models.greendao.ReviewQuestionTranslationDao;
 import in.testpress.exam.models.greendao.SelectedAnswerDao;
 import in.testpress.exam.ui.AccessCodeActivity;
+import in.testpress.exam.ui.AccessCodeFragment;
 import in.testpress.exam.ui.AnalyticsActivity;
 import in.testpress.exam.ui.AttemptsActivity;
 import in.testpress.exam.ui.CarouselFragment;
@@ -231,6 +232,22 @@ public class TestpressExam {
         init(context, testpressSession);
         Intent intent = new Intent(context, AccessCodeActivity.class);
         context.startActivity(intent);
+    }
+
+    /**
+     * Get instance of AccessCodeFragment
+     * Use to get access code from user & display exams which linked to it.
+     *
+     * @param context Context
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    @SuppressWarnings("ConstantConditions")
+    public static AccessCodeFragment getAccessCodeFragment(@NonNull Context context,
+                                                           @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Activity must not be null.", context);
+        init(context.getApplicationContext(), testpressSession);
+        return new AccessCodeFragment();
     }
 
     /**
