@@ -3,6 +3,6 @@
 
     <item android:state_focused="true" android:drawable="@drawable/testpress_green_border" />
 
-    <item android:drawable="@drawable/testpress_black_border" />
+    <item android:drawable="@drawable/testpress_gray_border" />
 
 </selector>

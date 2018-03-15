@@ -137,6 +137,8 @@
         </ScrollView>
     </RelativeLayout>
 
+    <include layout="@layout/testpress_empty_view" />
+
     <ProgressBar
         android:layout_width="45dp"
         android:layout_height="45dp"

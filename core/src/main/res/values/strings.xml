@@ -24,4 +24,7 @@
 
     <string name="testpress_label_fill_required_details">*Please fill required details</string>
 
+    <string name="testpress_yes">Yes</string>
+    <string name="testpress_no">No</string>
+
 </resources>

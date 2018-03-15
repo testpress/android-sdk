@@ -26,4 +26,24 @@
     <string name="testpress_shipping_address">Shipping Address</string>
     <string name="testpress_want_to_cancel_order">Do you really want to cancel the order ?</string>
 
+    <string name="testpress_payment_method">Choose Payment Method</string>
+    <string name="testpress_credit_card">Credit / Debit Card</string>
+    <string name="testpress_net_banking">Net Banking</string>
+    <string name="testpress_amount_payable">Total payable including processing fees</string>
+    <string name="testpress_select_option">Select Option</string>
+
+    <string name="testpress_card_number">Card Number</string>
+    <string name="testpress_make_payment">Make Payment</string>
+
+    <string name="testpress_are_you_sure">Are you sure?</string>
+    <string name="testpress_want_to_cancel">Do you want to cancel your payment process?</string>
+
+    <string name="testpress_this_field_is_required">This filed is required</string>
+    <string name="testpress_invalid_month">Invalid month</string>
+    <string name="testpress_invalid_year">Invalid year</string>
+
+    <string name="testpress_enter_details">Enter Details</string>
+    <string name="testpress_select_bank">Select Bank</string>
+    <string name="testpress_complete_payment">Complete Payment</string>
+
 </resources>

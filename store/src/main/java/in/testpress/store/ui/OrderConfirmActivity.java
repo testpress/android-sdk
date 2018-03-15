@@ -7,6 +7,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +15,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.payu.india.Model.PaymentParams;
+import com.payu.india.Model.PayuConfig;
+import com.payu.india.Model.PayuHashes;
+import com.payu.india.Payu.PayuConstants;
+import in.testpress.store.payu.PaymentModeActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +40,7 @@ import in.testpress.util.TextWatcherAdapter;
 import in.testpress.util.UIUtils;
 
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
+import static in.testpress.store.network.TestpressStoreApiClient.URL_PAYMENT_RESPONSE_HANDLER;
 import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
 
 public class OrderConfirmActivity extends BaseToolBarActivity {
@@ -181,6 +189,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
         progressBar.setVisibility(View.VISIBLE);
         shippingDetails.setVisibility(View.GONE);
         emptyView.setVisibility(View.GONE);
+        UIUtils.hideSoftKeyboard(this);
         order.setShippingAddress(address.getText().toString().trim());
         order.setPhone(phone.getText().toString().trim());
         order.setZip(zip.getText().toString().trim());
@@ -188,9 +197,41 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
         apiClient.orderConfirm(order)
                 .enqueue(new TestpressCallback<Order>() {
                     @Override
-                    public void onSuccess(Order result) {
+                    public void onSuccess(Order order) {
                         progressBar.setVisibility(View.GONE);
-                        // TODO Goto payment activity
+
+                        //noinspection ConstantConditions
+                        String redirectUrl = TestpressSdk.getTestpressSession(OrderConfirmActivity.this)
+                                .getInstituteSettings().getBaseUrl() + URL_PAYMENT_RESPONSE_HANDLER;
+
+                        PaymentParams paymentParams = new PaymentParams();
+                        paymentParams.setKey(order.getApikey());
+                        paymentParams.setTxnId(order.getOrderId());
+                        paymentParams.setAmount(order.getAmount());
+                        paymentParams.setProductInfo(order.getProductInfo());
+                        paymentParams.setFirstName(order.getName());
+                        paymentParams.setEmail(order.getEmail());
+                        paymentParams.setUdf1("");
+                        paymentParams.setUdf2("");
+                        paymentParams.setUdf3("");
+                        paymentParams.setUdf4("");
+                        paymentParams.setUdf5("");
+                        paymentParams.setSurl(redirectUrl);
+                        paymentParams.setFurl(redirectUrl);
+
+                        PayuConfig payuConfig = new PayuConfig();
+                        payuConfig.setEnvironment(PayuConstants.PRODUCTION_ENV);
+
+                        PayuHashes payuHashes = new PayuHashes();
+                        payuHashes.setPaymentHash(order.getChecksum());
+                        paymentParams.setHash(payuHashes.getPaymentHash());
+                        payuHashes.setPaymentRelatedDetailsForMobileSdkHash(order.getMobileSdkHash());
+
+                        Intent intent = new Intent(OrderConfirmActivity.this, PaymentModeActivity.class);
+                        intent.putExtra(PayuConstants.PAYU_CONFIG, payuConfig);
+                        intent.putExtra(PayuConstants.PAYMENT_PARAMS, paymentParams);
+                        intent.putExtra(PayuConstants.PAYU_HASHES, payuHashes);
+                        startActivityForResult(intent, PayuConstants.PAYU_REQUEST_CODE);
                     }
 
                     @Override
@@ -237,23 +278,45 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PayuConstants.PAYU_REQUEST_CODE) {
+            if(resultCode == RESULT_OK) {
+               // TODO: goto payment success activity
+            } else {
+                setResult(resultCode, data);
+            }
+            finish();
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onBackPressed() {
         new AlertDialog.Builder(this, R.style.TestpressAppCompatAlertDialogStyle)
-                .setTitle(R.string.testpress_want_to_cancel_order)
-                .setPositiveButton(R.string.testpress_ok, new DialogInterface.OnClickListener() {
+                .setTitle(R.string.testpress_are_you_sure)
+                .setMessage(R.string.testpress_want_to_cancel_order)
+                .setPositiveButton(R.string.testpress_yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Intent intent = new Intent();
-                        intent.putExtra("result", "Transaction canceled due to back press!");
                         setResult(RESULT_CANCELED, intent);
                         finish();
                     }
                 })
-                .setNegativeButton(R.string.testpress_cancel, null)
+                .setNegativeButton(R.string.testpress_no, null)
                 .show();
     }
 
     protected void setEmptyText(final int title, final int description, final int left) {
+        progressBar.setVisibility(View.GONE);
         emptyView.setVisibility(View.VISIBLE);
         emptyTitleView.setText(title);
         emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0);

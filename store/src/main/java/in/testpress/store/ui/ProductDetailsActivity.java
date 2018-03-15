@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.payu.india.Payu.PayuConstants;
 
 import java.util.Arrays;
 
@@ -214,11 +215,18 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         if (this.product.getPaymentLink().isEmpty()) {
             Intent intent = new Intent(ProductDetailsActivity.this, OrderConfirmActivity.class);
             intent.putExtra(PRODUCT, product);
-            startActivity(intent);
+            startActivityForResult(intent, PayuConstants.PAYU_REQUEST_CODE);
         } else {
             Uri uri = Uri.parse(this.product.getPaymentLink());
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PayuConstants.PAYU_REQUEST_CODE && resultCode == RESULT_OK) {
+            finish();
         }
     }
 

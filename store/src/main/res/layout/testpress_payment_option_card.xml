@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:background="@drawable/testpress_border_bottom"
+    android:foreground="?android:selectableItemBackground"
+    android:orientation="horizontal"
+    android:paddingBottom="8dp"
+    android:paddingLeft="2dp"
+    android:paddingTop="8dp">
+
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="8dp"
+        android:src="@drawable/ic_credit_card" />
+
+    <TextView
+        android:id="@+id/bank_name"
+        android:textSize="14sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/image_view"
+        android:layout_toRightOf="@+id/image_view"
+        android:text="@string/testpress_credit_card"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/testpress_black" />
+
+</RelativeLayout>

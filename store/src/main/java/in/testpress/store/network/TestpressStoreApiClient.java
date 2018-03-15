@@ -22,6 +22,8 @@ public class TestpressStoreApiClient extends TestpressApiClient {
 
     public static final String ORDER_CONFIRM_PATH = "/confirm/";
 
+    public static final String URL_PAYMENT_RESPONSE_HANDLER = "/payments/response/payu/";
+
     public TestpressStoreApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
     }
@@ -45,7 +47,14 @@ public class TestpressStoreApiClient extends TestpressApiClient {
     }
 
     public RetrofitCall<Order> orderConfirm(Order order) {
-        return getProductService().orderConfirm(order.getId(), order);
+        HashMap<String, Object> orderParameters = new HashMap<String, Object>();
+        orderParameters.put("user", order.getUser());
+        orderParameters.put("order_items", order.getOrderItems());
+        orderParameters.put("shipping_address", order.getShippingAddress());
+        orderParameters.put("zip", order.getZip());
+        orderParameters.put("phone", order.getPhone());
+        orderParameters.put("land_mark", order.getLandMark());
+        return getProductService().orderConfirm(order.getId(), orderParameters);
     }
 
 }

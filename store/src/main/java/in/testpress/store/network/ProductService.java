@@ -33,7 +33,7 @@ public interface ProductService {
     @PUT(ORDERS_PATH + "{order_id}" + ORDER_CONFIRM_PATH)
     RetrofitCall<Order> orderConfirm(
             @Path(value = "order_id", encoded = true) int orderId,
-            @Body Order order);
+            @Body HashMap<String, Object> arguments);
 
 }
 

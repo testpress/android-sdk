@@ -24,6 +24,9 @@ android {
 dependencies {
     compile project(':core')
     compile project(':exam')
+
+    compile files('libs/payusdk.jar')
+
     testCompile rootProject.junit
     testCompile rootProject.mockito
 }

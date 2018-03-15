@@ -217,7 +217,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginEnd="10dp"
             android:src="@drawable/ic_thumb_up_black_18dp"
-            android:id="@+id/imageView" />
+            />
 
         <TextView
             android:layout_width="wrap_content"
