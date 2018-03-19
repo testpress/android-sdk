@@ -5,18 +5,15 @@ import in.testpress.util.Assert;
 public class InstituteSettings {
 
     private String baseUrl;
-    private Boolean showGameFrontend;
-    private Boolean coursesEnableGamification;
-    private Boolean commentsVotingEnabled;
+    private boolean showGameFrontend;
+    private boolean coursesEnableGamification;
+    private boolean commentsVotingEnabled;
+    private boolean accessCodeEnabled;
 
     public InstituteSettings(String baseUrl) {
-        this(baseUrl, false, false);
-    }
-
-    public InstituteSettings(String baseUrl, boolean showCoursesFrontend, boolean enableGamification) {
         setBaseUrl(baseUrl);
-        this.showGameFrontend = showCoursesFrontend;
-        this.coursesEnableGamification = enableGamification;
+        showGameFrontend = false;
+        coursesEnableGamification = false;
     }
 
     public String getBaseUrl() {
@@ -53,6 +50,15 @@ public class InstituteSettings {
 
     public InstituteSettings setCommentsVotingEnabled(Boolean commentsVotingEnabled) {
         this.commentsVotingEnabled = commentsVotingEnabled;
+        return this;
+    }
+
+    public boolean isAccessCodeEnabled() {
+        return accessCodeEnabled;
+    }
+
+    public InstituteSettings setAccessCodeEnabled(boolean accessCodeEnabled) {
+        this.accessCodeEnabled = accessCodeEnabled;
         return this;
     }
 }

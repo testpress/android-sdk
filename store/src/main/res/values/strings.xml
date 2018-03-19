@@ -59,4 +59,6 @@
 
     <string name="testpress_payment_status">Payment Status</string>
 
+    <string name="testpress_have_access_code">Have Access Code?</string>
+
 </resources>

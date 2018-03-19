@@ -53,6 +53,8 @@ public class StoreSampleActivity extends BaseToolBarActivity {
         if (TestpressSdk.hasActiveSession(this)) {
             TestpressSession session = TestpressSdk.getTestpressSession(this);
             Assert.assertNotNull("TestpressSession must not be null.", session);
+            session.getInstituteSettings().setAccessCodeEnabled(false);
+            TestpressSdk.setTestpressSession(this, session);
             switch (clickedButtonId) {
                 case R.id.store:
                     TestpressStore.show(this, session);

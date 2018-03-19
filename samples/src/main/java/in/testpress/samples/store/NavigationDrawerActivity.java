@@ -6,6 +6,7 @@ import android.view.MenuItem;
 import com.facebook.login.LoginManager;
 
 import in.testpress.core.TestpressSdk;
+import in.testpress.core.TestpressSession;
 import in.testpress.samples.BaseNavigationDrawerActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
@@ -39,9 +40,11 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
         selectedItem = position;
         if (TestpressSdk.hasActiveSession(this)) {
             if (position == R.id.store) {
+                TestpressSession session = TestpressSdk.getTestpressSession(this);
                 //noinspection ConstantConditions
-                TestpressStore.show(this, R.id.fragment_container,
-                        TestpressSdk.getTestpressSession(this));
+                session.getInstituteSettings().setAccessCodeEnabled(true);
+                TestpressSdk.setTestpressSession(this, session);
+                TestpressStore.show(this, R.id.fragment_container, session);
             }
         } else {
             Intent intent = new Intent(this, TestpressCoreSampleActivity.class);

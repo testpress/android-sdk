@@ -90,26 +90,25 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/total_exams_container"
             android:padding="@dimen/testpress_horizontal_margin">
 
             <ImageView
-                android:id="@+id/exam_icon"
+                android:id="@+id/categories_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/testpress_horizontal_margin"
                 android:layout_marginRight="@dimen/testpress_horizontal_margin"
-                android:src="@drawable/ic_assignment_black_18dp" />
+                android:src="@drawable/ic_school_black_18dp" />
 
             <TextView
-                android:id="@+id/total_exams"
+                android:id="@+id/categories"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/testpress_horizontal_margin"
                 android:layout_marginStart="@dimen/testpress_horizontal_margin"
-                android:layout_toEndOf="@id/exam_icon"
-                android:layout_toRightOf="@id/exam_icon"
+                android:layout_toEndOf="@id/categories_icon"
+                android:layout_toRightOf="@id/categories_icon"
                 android:text="20"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textColor="#212121" />
@@ -148,28 +147,40 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/total_exams_container"
             android:padding="@dimen/testpress_horizontal_margin">
 
             <ImageView
-                android:id="@+id/categories_icon"
+                android:id="@+id/exam_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/testpress_horizontal_margin"
                 android:layout_marginRight="@dimen/testpress_horizontal_margin"
-                android:src="@drawable/ic_school_black_18dp" />
+                android:src="@drawable/ic_assignment_black_18dp" />
 
             <TextView
-                android:id="@+id/categories"
+                android:id="@+id/total_exams"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/testpress_horizontal_margin"
                 android:layout_marginStart="@dimen/testpress_horizontal_margin"
-                android:layout_toEndOf="@id/categories_icon"
-                android:layout_toRightOf="@id/categories_icon"
+                android:layout_toEndOf="@id/exam_icon"
+                android:layout_toRightOf="@id/exam_icon"
                 android:text="20"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textColor="#212121" />
+
+            <TextView
+                android:id="@+id/have_access_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/exam_icon"
+                android:layout_marginTop="@dimen/testpress_horizontal_margin"
+                android:layout_marginLeft="2dp"
+                android:text="@string/testpress_have_access_code"
+                android:textColor="@color/testpress_green"
+                android:textStyle="bold"
+                />
 
         </RelativeLayout>
 

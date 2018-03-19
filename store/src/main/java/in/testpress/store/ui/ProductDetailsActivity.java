@@ -21,6 +21,10 @@ import java.util.Arrays;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
+import in.testpress.core.TestpressSdk;
+import in.testpress.core.TestpressSession;
+import in.testpress.exam.TestpressExam;
+import in.testpress.model.InstituteSettings;
 import in.testpress.store.R;
 import in.testpress.store.models.Product;
 import in.testpress.store.network.TestpressStoreApiClient;
@@ -142,6 +146,21 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
             totalExams.setText(getResources().getQuantityString(R.plurals.exams_count, examsCount,
                     examsCount));
 
+            TextView accessCodeButton = (TextView) findViewById(R.id.have_access_code);
+            final TestpressSession session = TestpressSdk.getTestpressSession(this);
+            //noinspection ConstantConditions
+            InstituteSettings settings = session.getInstituteSettings();
+            if (settings.isAccessCodeEnabled()) {
+                accessCodeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        TestpressExam.showExamsForAccessCode(ProductDetailsActivity.this, session);
+                    }
+                });
+                accessCodeButton.setVisibility(View.VISIBLE);
+            } else {
+                accessCodeButton.setVisibility(View.GONE);
+            }
             totalExamsContainer.setVisibility(View.VISIBLE);
         } else {
             totalExamsContainer.setVisibility(View.GONE);
