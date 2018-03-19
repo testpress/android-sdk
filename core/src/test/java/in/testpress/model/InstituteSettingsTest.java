@@ -15,24 +15,12 @@ public class InstituteSettingsTest {
         } catch (IllegalArgumentException e) {
             assertEquals("BaseUrl must not be null or Empty.", e.getMessage());
         }
-        try {
-            new InstituteSettings(null, false, false);
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertEquals("BaseUrl must not be null or Empty.", e.getMessage());
-        }
     }
 
     @Test
     public void testConstructor_withEmptyBaseUrl() throws Exception {
         try {
             new InstituteSettings("");
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertEquals("BaseUrl must not be null or Empty.", e.getMessage());
-        }
-        try {
-            new InstituteSettings("", false, false);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("BaseUrl must not be null or Empty.", e.getMessage());
