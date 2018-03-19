@@ -20,7 +20,6 @@ import com.payu.india.Model.PaymentParams;
 import com.payu.india.Model.PayuConfig;
 import com.payu.india.Model.PayuHashes;
 import com.payu.india.Payu.PayuConstants;
-import in.testpress.store.payu.PaymentModeActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,22 +27,25 @@ import java.util.List;
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
-import in.testpress.exam.TestpressExam;
 import in.testpress.store.R;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderConfirmErrorDetails;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
 import in.testpress.store.network.TestpressStoreApiClient;
+import in.testpress.store.payu.PaymentModeActivity;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.TextWatcherAdapter;
 import in.testpress.util.UIUtils;
 
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
+import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 import static in.testpress.store.network.TestpressStoreApiClient.URL_PAYMENT_RESPONSE_HANDLER;
 import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
 
 public class OrderConfirmActivity extends BaseToolBarActivity {
+
+    public static final String ORDER = "order";
 
     private EditText address;
     private EditText zip;
@@ -107,16 +109,8 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
             public void onSuccess(Order createdOrder) {
                 order = createdOrder;
                 progressBar.setVisibility(View.GONE);
-                if(createdOrder.getStatus().equals("Completed")) {
-                    setResult(RESULT_OK);
-                    if(product.getExams().size() != 0) {
-                        //noinspection ConstantConditions
-                        TestpressExam.show(OrderConfirmActivity.this,
-                                TestpressSdk.getTestpressSession(OrderConfirmActivity.this));
-                    } else {
-                        // TODO Goto payment success
-                    }
-                    finish();
+                if (createdOrder.getStatus().equals("Completed")) {
+                    showPaymentStatus();
                 } else if(product.getRequiresShipping()) {
                     landmark.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                         public boolean onEditorAction(final TextView v, final int actionId,
@@ -277,14 +271,23 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
                 });
     }
 
+    void showPaymentStatus() {
+        Intent intent = new Intent(this, PaymentSuccessActivity.class);
+        intent.putExtra(ORDER, order);
+        //noinspection ConstantConditions
+        intent.putExtras(getIntent().getExtras());
+        startActivityForResult(intent, STORE_REQUEST_CODE);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PayuConstants.PAYU_REQUEST_CODE) {
-            if(resultCode == RESULT_OK) {
-               // TODO: goto payment success activity
-            } else {
-                setResult(resultCode, data);
-            }
+        if (requestCode == PayuConstants.PAYU_REQUEST_CODE && resultCode == RESULT_OK) {
+            showPaymentStatus();
+        } else {
+            // requestCode = PAYU_REQUEST_CODE & payment failed, RESULT_CANCELED
+            // or
+            // requestCode = STORE_REQUEST_CODE & payment success, RESULT_OK
+            setResult(resultCode, data);
             finish();
         }
     }

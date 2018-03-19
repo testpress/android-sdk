@@ -17,6 +17,8 @@ import in.testpress.store.network.TestpressStoreApiClient;
 import in.testpress.ui.PagedItemFragment;
 import in.testpress.util.SingleTypeAdapter;
 
+import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
+
 public class ProductListFragment extends PagedItemFragment<Product> {
 
     protected TestpressStoreApiClient apiClient;
@@ -47,7 +49,7 @@ public class ProductListFragment extends PagedItemFragment<Product> {
         Product product = ((Product) l.getItemAtPosition(position));
         Intent intent = new Intent(getActivity(), ProductDetailsActivity.class);
         intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.getSlug());
-        startActivity(intent);
+        getActivity().startActivityForResult(intent, STORE_REQUEST_CODE);
     }
 
     @Override

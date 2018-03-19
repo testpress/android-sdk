@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.payu.india.Payu.PayuConstants;
 
 import java.util.Arrays;
 
@@ -32,6 +31,8 @@ import in.testpress.util.UILImageGetter;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 import in.testpress.util.ZoomableImageString;
+
+import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 
 public class ProductDetailsActivity extends BaseToolBarActivity {
 
@@ -52,8 +53,8 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         setContentView(R.layout.testpress_product_details_layout);
         if (getIntent().getStringExtra(PRODUCT_SLUG) != null) {
             productSlug = getIntent().getStringExtra(PRODUCT_SLUG);
-        } else if (getIntent().getParcelableExtra("product") != null) {
-            productSlug = ((Product) getIntent().getParcelableExtra("product")).getSlug();
+        } else if (getIntent().getParcelableExtra(PRODUCT) != null) {
+            productSlug = ((Product) getIntent().getParcelableExtra(PRODUCT)).getSlug();
         }
         progressBar = (ProgressBar) findViewById(R.id.pb_loading);
         UIUtils.setIndeterminateDrawable(this, progressBar, 4);
@@ -215,7 +216,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         if (this.product.getPaymentLink().isEmpty()) {
             Intent intent = new Intent(ProductDetailsActivity.this, OrderConfirmActivity.class);
             intent.putExtra(PRODUCT, product);
-            startActivityForResult(intent, PayuConstants.PAYU_REQUEST_CODE);
+            startActivityForResult(intent, STORE_REQUEST_CODE);
         } else {
             Uri uri = Uri.parse(this.product.getPaymentLink());
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
@@ -225,7 +226,8 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PayuConstants.PAYU_REQUEST_CODE && resultCode == RESULT_OK) {
+        if (requestCode == STORE_REQUEST_CODE && resultCode == RESULT_OK) {
+            setResult(RESULT_OK, data);
             finish();
         }
     }

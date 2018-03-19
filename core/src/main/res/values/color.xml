@@ -41,5 +41,6 @@
     <color name="testpress_blue">#3333ff</color>
 
     <color name="testpress_orange">#f14f08</color>
+    <color name="testpress_green_success">#009933</color>
 
 </resources>

@@ -46,6 +46,12 @@
             android:label="@string/testpress_select_bank"
             android:configChanges="orientation|keyboardHidden|screenSize" />
 
+        <activity
+            android:name=".ui.PaymentSuccessActivity"
+            android:theme="@style/TestpressTheme"
+            android:label="@string/testpress_payment_status"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package in.testpress.store;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 
@@ -33,11 +34,10 @@ public class TestpressStoreTest {
             TestpressStore.show(null, testpressSession);
             fail();
         } catch (IllegalArgumentException e) {
-            assertEquals("Context must not be null.", e.getMessage());
+            assertEquals("Activity must not be null.", e.getMessage());
         }
-        Context context = mock(Context.class);
         try {
-            TestpressStore.show(context, null);
+            TestpressStore.show(activity, null);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("TestpressSession must not be null.", e.getMessage());

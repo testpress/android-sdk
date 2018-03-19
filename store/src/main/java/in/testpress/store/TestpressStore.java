@@ -17,6 +17,9 @@ import in.testpress.util.ImageUtils;
 
 public class TestpressStore {
 
+    public static final int STORE_REQUEST_CODE = 1000;
+    public static final String CONTINUE_PURCHASE = "continue_purchase";
+
     /**
      * Use when testpress store need to be open in a container as a fragment.
      *
@@ -58,35 +61,35 @@ public class TestpressStore {
      * <p>             }
      * <p> });
      *
-     * @param context Context to start the new activity.
+     * @param activity Activity from which the product list needs to display.
      * @param testpressSession TestpressSession got from the core module.
      */
-    public static void show(@NonNull Context context, @NonNull TestpressSession testpressSession) {
-        Assert.assertNotNull("Context must not be null.", context);
+    public static void show(@NonNull Activity activity, @NonNull TestpressSession testpressSession) {
+        Assert.assertNotNull("Activity must not be null.", activity);
 
-        init(context.getApplicationContext(), testpressSession);
-        Intent intent = new Intent(context, ProductsListActivity.class);
-        context.startActivity(intent);
+        init(activity.getApplicationContext(), testpressSession);
+        Intent intent = new Intent(activity, ProductsListActivity.class);
+        activity.startActivityForResult(intent, STORE_REQUEST_CODE);
     }
 
     /**
      * Use to show a particular product.
      *
-     * @param context Context to start the new activity.
+     * @param activity activity from which product detail needs to show.
      * @param productSlug Slug of the product which need to be show.
      * @param testpressSession TestpressSession got from the core module.
      */
     @SuppressWarnings("ConstantConditions")
-    public static void showProduct(@NonNull Context context, @NonNull String productSlug,
+    public static void showProduct(@NonNull Activity activity, @NonNull String productSlug,
                                    @NonNull TestpressSession testpressSession) {
 
-        Assert.assertNotNull("Context must not be null.", context);
+        Assert.assertNotNull("Activity must not be null.", activity);
         Assert.assertNotNullAndNotEmpty("productSlug must not be null or empty.", productSlug);
 
-        init(context.getApplicationContext(), testpressSession);
-        Intent intent = new Intent(context, ProductDetailsActivity.class);
+        init(activity.getApplicationContext(), testpressSession);
+        Intent intent = new Intent(activity, ProductDetailsActivity.class);
         intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, productSlug);
-        context.startActivity(intent);
+        activity.startActivityForResult(intent, STORE_REQUEST_CODE);
     }
 
     private static void init(Context applicationContext, TestpressSession testpressSession) {

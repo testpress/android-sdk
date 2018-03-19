@@ -46,4 +46,17 @@
     <string name="testpress_select_bank">Select Bank</string>
     <string name="testpress_complete_payment">Complete Payment</string>
 
+    <string name="testpress_payment_completed">Payment Successfully Completed</string>
+    <string name="testpress_thanks_for_purchasing">Thank you for Purchasing</string>
+    <string name="testpress_books_message">Books will be Delivered to you shortly</string>
+    <string name="testpress_continue_purchase">Continue Purchase</string>
+    <string name="testpress_take_exam">Take Exam</string>
+    <string name="testpress_goto_home">Goto Home</string>
+
+    <string name="testpress_order_id">Order Id: %s</string>
+    <string name="testpress_amount">Amount: ₹ %s</string>
+    <string name="testpress_check_your_mail">Further Details check your mail\n(%s)</string>
+
+    <string name="testpress_payment_status">Payment Status</string>
+
 </resources>
