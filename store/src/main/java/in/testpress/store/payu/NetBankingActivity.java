@@ -18,6 +18,7 @@ import com.payu.india.Model.PaymentDetails;
 import com.payu.india.Model.PaymentParams;
 import com.payu.india.Model.PayuConfig;
 import com.payu.india.Model.PostData;
+import com.payu.india.Payu.Payu;
 import com.payu.india.Payu.PayuConstants;
 import com.payu.india.Payu.PayuErrors;
 import com.payu.india.PostParams.PaymentPostParams;
@@ -92,6 +93,7 @@ public class NetBankingActivity extends BaseToolBarActivity
         paymentParams.setBankCode(details.getBankCode());
 
         try {
+            Payu.setInstance(getApplicationContext());
             PostData postData =
                     new PaymentPostParams(paymentParams, PayuConstants.NB).getPaymentPostParams();
 
