@@ -6,13 +6,11 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.TextView;
 
-import java.util.Date;
 import java.util.List;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.models.greendao.Exam;
-import in.testpress.models.greendao.ExamDao;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ViewUtils;
 
@@ -23,43 +21,12 @@ public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
 
     private final Activity activity;
     private final Fragment fragment;
-    private ExamDao examDao;
 
-    AvailableExamsListAdapter(final Fragment fragment, final List<Exam> items, ExamDao examDao) {
+    AvailableExamsListAdapter(final Fragment fragment, final List<Exam> items) {
         super(fragment.getActivity().getLayoutInflater(), R.layout.testpress_content_list_item);
         this.activity = fragment.getActivity();
         this.fragment = fragment;
-        this.examDao = examDao;
         setItems(items);
-    }
-
-    @Override
-    public int getCount() {
-        Date today = new Date();
-        return (int) examDao.queryBuilder()
-                .where(
-                        ExamDao.Properties.AttemptsCount.eq("0"),
-                        ExamDao.Properties.PausedAttemptsCount.eq("0"),
-                        ExamDao.Properties.StartDate.le(today),
-                        ExamDao.Properties.EndDate.ge(today)
-                ).count();
-    }
-
-    @Override
-    public Exam getItem(int position) {
-        Date today = new Date();
-        return examDao.queryBuilder()
-                .where(
-                        ExamDao.Properties.AttemptsCount.eq("0"),
-                        ExamDao.Properties.PausedAttemptsCount.eq("0"),
-                        ExamDao.Properties.StartDate.le(today),
-                        ExamDao.Properties.EndDate.ge(today)
-                ).orderAsc(ExamDao.Properties.StartDate).listLazy().get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return getItem(position).getId();
     }
 
     @Override
@@ -85,7 +52,7 @@ public class AvailableExamsListAdapter extends SingleTypeAdapter<Exam> {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity, TestActivity.class);
-                intent.putExtra(PARAM_EXAM, exam.getId());
+                intent.putExtra(PARAM_EXAM, exam);
                 fragment.startActivityForResult(intent, TEST_TAKEN_REQUEST_CODE);
             }
         });

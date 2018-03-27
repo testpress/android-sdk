@@ -24,20 +24,11 @@ import in.testpress.models.greendao.ReviewQuestionDao;
 import in.testpress.models.greendao.ReviewQuestionTranslationDao;
 import in.testpress.models.greendao.SelectedAnswerDao;
 import in.testpress.models.greendao.VideoDao;
-import in.testpress.util.ImageUtils;
 
 public class TestpressSDKDatabase {
 
     private static DaoSession daoSession;
     private static Database database;
-
-    public static void init(Context context, TestpressSession testpressSession) {
-        if (testpressSession == null) {
-            throw new IllegalArgumentException("TestpressSession must not be null.");
-        }
-        TestpressSdk.setTestpressSession(context, testpressSession);
-        ImageUtils.initImageLoader(context);
-    }
 
     public static Database getDatabase(@NonNull Context context) {
         if (database == null) {

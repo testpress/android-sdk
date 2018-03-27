@@ -26,21 +26,18 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
-import in.testpress.models.greendao.Attempt;
-import in.testpress.models.greendao.CourseContent;
-import in.testpress.models.greendao.CourseAttempt;
-import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
-
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.models.TestpressApiResponse;
-import in.testpress.models.greendao.ExamDao;
-import in.testpress.core.TestpressSDKDatabase;
+import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.CourseAttempt;
+import in.testpress.models.greendao.CourseContent;
+import in.testpress.models.greendao.Exam;
+import in.testpress.network.RetrofitCall;
+import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.Assert;
 import in.testpress.util.ThrowableLoader;
-import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.UIUtils;
-import in.testpress.network.RetrofitCall;
 import in.testpress.util.ViewUtils;
 import retrofit2.Response;
 
@@ -81,13 +78,11 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private Button retryButton;
     private Button resumeButton;
     private Button startButton;
-    private Activity activity;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_test);
-        activity = this;
         examDetailsContainer = findViewById(R.id.exam_details);
         fragmentContainer = (LinearLayout) findViewById(R.id.fragment_container);
         progressBar = (RelativeLayout) findViewById(R.id.pb_loading);
@@ -112,33 +107,69 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         apiClient = new TestpressExamApiClient(this);
         final Intent intent = getIntent();
         Bundle data = intent.getExtras();
-
-        //Currently I am passing parcelled exam from ContentAttempt
         exam = data.getParcelable(PARAM_EXAM);
-
-        //If coming through exam list then only Id will be passed
-        if(exam == null && data.getLong(PARAM_EXAM) != 0) {
-            exam = TestpressSDKDatabase.getExamDao(activity).queryBuilder()
-                    .where(ExamDao.Properties.Id.eq(data.getLong(PARAM_EXAM))).list().get(0);
-        }
-
         attempt = data.getParcelable(PARAM_ATTEMPT);
         discardExamDetails = getIntent().getBooleanExtra(PARAM_DISCARD_EXAM_DETAILS, false);
         if (exam == null) {
             courseContent = data.getParcelable(PARAM_COURSE_CONTENT);
             courseAttempt = data.getParcelable(PARAM_COURSE_ATTEMPT);
             if (courseContent != null) {
-                exam = courseContent.exam;
+                exam = courseContent.getRawExam();
                 displayStartExamScreen();
                 return;
             }
-            String examSlug = exam.getSlug();
+            String examSlug = data.getString(PARAM_EXAM_SLUG);
             if (examSlug == null || examSlug.isEmpty()) {
                 throw new IllegalArgumentException("PARAM_EXAM_SLUG must not be null or empty.");
             }
+            loadExam(examSlug);
             return;
         }
         displayStartExamScreen();
+    }
+
+    void loadExam(final String examSlug) {
+        progressBar.setVisibility(View.VISIBLE);
+        new TestpressExamApiClient(this).getExam(examSlug)
+                .enqueue(new TestpressCallback<Exam>() {
+                    @Override
+                    public void onSuccess(Exam exam) {
+                        TestActivity.this.exam = exam;
+                        if (exam.getPausedAttemptsCount() > 0) {
+                            loadAttempts(exam.getAttemptsUrl());
+                        } else {
+                            displayStartExamScreen();
+                        }
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        if (exception.isUnauthenticated()) {
+                            setEmptyText(R.string.testpress_authentication_failed,
+                                    R.string.testpress_exam_no_permission);
+                            retryButton.setVisibility(View.GONE);
+                        } else if (exception.isNetworkError()) {
+                            setEmptyText(R.string.testpress_network_error,
+                                    R.string.testpress_no_internet_try_again);
+                            retryButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    progressBar.setVisibility(View.VISIBLE);
+                                    emptyView.setVisibility(View.GONE);
+                                    loadExam(examSlug);
+                                }
+                            });
+                        } else if (exception.getResponse().code() == 404) {
+                            setEmptyText(R.string.testpress_exam_not_available,
+                                    R.string.testpress_exam_not_available_description);
+                            retryButton.setVisibility(View.GONE);
+                        } else  {
+                            setEmptyText(R.string.testpress_error_loading_exam,
+                                    R.string.testpress_some_thing_went_wrong_try_again);
+                            retryButton.setVisibility(View.GONE);
+                        }
+                    }
+                });
     }
 
     void loadAttempts(final String attemptUrlFrag) {
@@ -190,7 +221,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         Button startExam = (Button) findViewById(R.id.start_exam);
         LinearLayout attemptActions = (LinearLayout) findViewById(R.id.attempt_actions);
         if (courseAttempt != null) {
-            attempt = courseAttempt.assessment;
+            attempt = courseAttempt.getRawAssessment();
         }
         if (exam.getDeviceAccessControl() != null && exam.getDeviceAccessControl().equals("web")) {
             webOnlyLabel.setVisibility(View.VISIBLE);
@@ -293,7 +324,6 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         getSupportLoaderManager().initLoader(END_ATTEMPT_LOADER, null, TestActivity.this);
     }
 
-    @SuppressLint("StaticFieldLeak")
     @Override
     public Loader<Attempt> onCreateLoader(final int id, final Bundle args) {
         progressBar.setVisibility(View.VISIBLE);
@@ -311,7 +341,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                             break;
                     }
                     courseAttempt = executeRetrofitCall(call);
-                    return courseAttempt.assessment;
+                    return courseAttempt.getRawAssessment();
                 } else {
                     RetrofitCall<Attempt> call = null;
                     switch (id) {
@@ -370,7 +400,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 TestFragment testFragment = new TestFragment();
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(TestFragment.PARAM_ATTEMPT, attempt);
-                bundle.putLong(TestFragment.PARAM_EXAM, exam.getId());
+                bundle.putParcelable(TestFragment.PARAM_EXAM, exam);
                 if (courseAttempt != null) {
                     bundle.putString(PARAM_CONTENT_ATTEMPT_END_URL, courseAttempt.getEndAttemptUrl());
                 }
@@ -423,7 +453,6 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         
     }
 
-    @SuppressLint("RestrictedApi")
     @Override
     public void onBackPressed() {
         TestFragment testFragment = null;

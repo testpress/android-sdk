@@ -10,11 +10,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.models.greendao.CourseAttempt;
-import in.testpress.models.greendao.CourseAttemptDao;
 import in.testpress.models.greendao.Exam;
 import in.testpress.util.Assert;
 import in.testpress.util.ViewUtils;
@@ -34,6 +32,7 @@ public class TrophiesAchievedFragment extends Fragment {
         Assert.assertNotNull("PARAM_EXAM must not be null.", exam);
         courseAttempt = getArguments().getParcelable(PARAM_COURSE_ATTEMPT);
         Assert.assertNotNull("CourseAttempt must not be null.", courseAttempt);
+        ((ReviewStatsActivity) getActivity()).setActionBarTitle(R.string.testpress_trophies);
     }
 
     @SuppressLint("SetTextI18n")
@@ -51,13 +50,6 @@ public class TrophiesAchievedFragment extends Fragment {
                 TestpressSdk.getRubikMediumFont(getContext()));
         ViewUtils.setTypeface(new TextView[] { trophiesText, trophiesLabel, completedMessage },
                 TestpressSdk.getRubikRegularFont(getContext()));
-
-        // Received courseAttempt is having null values in fields, only id coming fine
-        // So I am re-fetching it from DB using it's id.
-
-        courseAttempt = TestpressSDKDatabase.getDaoSession(getActivity())
-                .getCourseAttemptDao().queryBuilder()
-                .where(CourseAttemptDao.Properties.Id.eq(courseAttempt.getId())).list().get(0);
 
         String trophies = courseAttempt.getTrophies();
         if (trophies.equals("NA")) {
@@ -77,7 +69,7 @@ public class TrophiesAchievedFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ReviewStatsFragment.showReviewStatsFragment(getActivity(), exam,
-                        courseAttempt.getAssessment(), false);
+                        courseAttempt.getRawAssessment(), false);
             }
         });
         return view;

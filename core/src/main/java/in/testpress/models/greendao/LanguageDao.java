@@ -28,8 +28,7 @@ public class LanguageDao extends AbstractDao<Language, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "ID");
         public final static Property Code = new Property(1, String.class, "code", false, "CODE");
         public final static Property Title = new Property(2, String.class, "title", false, "TITLE");
-        public final static Property Exam_slug = new Property(3, String.class, "exam_slug", false, "EXAM_SLUG");
-        public final static Property ExamId = new Property(4, Long.class, "examId", false, "EXAM_ID");
+        public final static Property ExamId = new Property(3, Long.class, "examId", false, "EXAM_ID");
     }
 
     private Query<Language> exam_LanguagesQuery;
@@ -46,11 +45,13 @@ public class LanguageDao extends AbstractDao<Language, Long> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"LANGUAGE\" (" + //
-                "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
+                "\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"CODE\" TEXT," + // 1: code
                 "\"TITLE\" TEXT," + // 2: title
-                "\"EXAM_SLUG\" TEXT," + // 3: exam_slug
-                "\"EXAM_ID\" INTEGER);"); // 4: examId
+                "\"EXAM_ID\" INTEGER);"); // 3: examId
+        // Add Indexes
+        db.execSQL("CREATE UNIQUE INDEX " + constraint + "IDX_LANGUAGE_CODE_EXAM_ID ON LANGUAGE" +
+                " (\"CODE\",\"EXAM_ID\");");
     }
 
     /** Drops the underlying database table. */
@@ -78,14 +79,9 @@ public class LanguageDao extends AbstractDao<Language, Long> {
             stmt.bindString(3, title);
         }
  
-        String exam_slug = entity.getExam_slug();
-        if (exam_slug != null) {
-            stmt.bindString(4, exam_slug);
-        }
- 
         Long examId = entity.getExamId();
         if (examId != null) {
-            stmt.bindLong(5, examId);
+            stmt.bindLong(4, examId);
         }
     }
 
@@ -108,14 +104,9 @@ public class LanguageDao extends AbstractDao<Language, Long> {
             stmt.bindString(3, title);
         }
  
-        String exam_slug = entity.getExam_slug();
-        if (exam_slug != null) {
-            stmt.bindString(4, exam_slug);
-        }
- 
         Long examId = entity.getExamId();
         if (examId != null) {
-            stmt.bindLong(5, examId);
+            stmt.bindLong(4, examId);
         }
     }
 
@@ -130,8 +121,7 @@ public class LanguageDao extends AbstractDao<Language, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // code
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // title
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // exam_slug
-            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4) // examId
+            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3) // examId
         );
         return entity;
     }
@@ -141,8 +131,7 @@ public class LanguageDao extends AbstractDao<Language, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setCode(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setTitle(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setExam_slug(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setExamId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
+        entity.setExamId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
      }
     
     @Override

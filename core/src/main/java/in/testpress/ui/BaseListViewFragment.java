@@ -194,7 +194,7 @@ public abstract class BaseListViewFragment<E> extends Fragment
         refresh(null);
     }
 
-    private void refresh(final Bundle args) {
+    protected void refresh(final Bundle args) {
         if (!isUsable()) {
             return;
         }

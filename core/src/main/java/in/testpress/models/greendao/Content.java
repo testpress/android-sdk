@@ -17,12 +17,12 @@ import android.os.Parcelable;
  */
 @Entity(active = true)
 public class Content implements android.os.Parcelable {
-    public Integer order;
+    private Integer order;
     private String htmlContentTitle;
     private String htmlContentUrl;
     private String url;
     private String attemptsUrl;
-    public Integer chapterId;
+    private Integer chapterId;
     private String chapterSlug;
     private String chapterUrl;
 
@@ -37,9 +37,9 @@ public class Content implements android.os.Parcelable {
     private String end;
     private Boolean hasStarted;
     private Boolean active;
-    public Long videoId;
-    public Long attachmentId;
-    public Long examId;
+    private Long videoId;
+    private Long attachmentId;
+    private Long examId;
 
     /** Used to resolve relations */
     @Generated
@@ -50,19 +50,19 @@ public class Content implements android.os.Parcelable {
     private transient ContentDao myDao;
 
     @ToOne(joinProperty = "videoId")
-    public Video video;
+    private Video video;
 
     @Generated
     private transient Long video__resolvedKey;
 
     @ToOne(joinProperty = "attachmentId")
-    public Attachment attachment;
+    private Attachment attachment;
 
     @Generated
     private transient Long attachment__resolvedKey;
 
     @ToOne(joinProperty = "examId")
-    public Exam exam;
+    private Exam exam;
 
     @Generated
     private transient Long exam__resolvedKey;
@@ -392,44 +392,69 @@ public class Content implements android.os.Parcelable {
 
     // KEEP METHODS - put your custom methods here
     protected Content(Parcel in) {
-        order = in.readByte() == 0x00 ? null : in.readInt();
+        if (in.readByte() == 0) {
+            order = null;
+        } else {
+            order = in.readInt();
+        }
         htmlContentTitle = in.readString();
         htmlContentUrl = in.readString();
         url = in.readString();
         attemptsUrl = in.readString();
-        chapterId = in.readByte() == 0x00 ? null : in.readInt();
+        if (in.readByte() == 0) {
+            chapterId = null;
+        } else {
+            chapterId = in.readInt();
+        }
         chapterSlug = in.readString();
         chapterUrl = in.readString();
-        id = in.readByte() == 0x00 ? null : in.readLong();
+        if (in.readByte() == 0) {
+            id = null;
+        } else {
+            id = in.readLong();
+        }
         name = in.readString();
         image = in.readString();
         description = in.readString();
-        byte isLockedVal = in.readByte();
-        isLocked = isLockedVal == 0x02 ? null : isLockedVal != 0x00;
-        attemptsCount = in.readByte() == 0x00 ? null : in.readInt();
+        byte tmpIsLocked = in.readByte();
+        isLocked = tmpIsLocked == 0 ? null : tmpIsLocked == 1;
+        if (in.readByte() == 0) {
+            attemptsCount = null;
+        } else {
+            attemptsCount = in.readInt();
+        }
         start = in.readString();
         end = in.readString();
-        byte hasStartedVal = in.readByte();
-        hasStarted = hasStartedVal == 0x02 ? null : hasStartedVal != 0x00;
-        videoId = in.readByte() == 0x00 ? null : in.readLong();
-        attachmentId = in.readByte() == 0x00 ? null : in.readLong();
-        examId = in.readByte() == 0x00 ? null : in.readLong();
-        exam = (Exam) in.readValue(Exam.class.getClassLoader());
-        attachment = (Attachment) in.readValue(Attachment.class.getClassLoader());
-        video = (Video) in.readValue(Video.class.getClassLoader());
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
+        byte tmpHasStarted = in.readByte();
+        hasStarted = tmpHasStarted == 0 ? null : tmpHasStarted == 1;
+        byte tmpActive = in.readByte();
+        active = tmpActive == 0 ? null : tmpActive == 1;
+        if (in.readByte() == 0) {
+            videoId = null;
+        } else {
+            videoId = in.readLong();
+        }
+        if (in.readByte() == 0) {
+            attachmentId = null;
+        } else {
+            attachmentId = in.readLong();
+        }
+        if (in.readByte() == 0) {
+            examId = null;
+        } else {
+            examId = in.readLong();
+        }
+        video = in.readParcelable(Video.class.getClassLoader());
+        attachment = in.readParcelable(Attachment.class.getClassLoader());
+        exam = in.readParcelable(Exam.class.getClassLoader());
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         if (order == null) {
-            dest.writeByte((byte) (0x00));
+            dest.writeByte((byte) 0);
         } else {
-            dest.writeByte((byte) (0x01));
+            dest.writeByte((byte) 1);
             dest.writeInt(order);
         }
         dest.writeString(htmlContentTitle);
@@ -437,65 +462,62 @@ public class Content implements android.os.Parcelable {
         dest.writeString(url);
         dest.writeString(attemptsUrl);
         if (chapterId == null) {
-            dest.writeByte((byte) (0x00));
+            dest.writeByte((byte) 0);
         } else {
-            dest.writeByte((byte) (0x01));
+            dest.writeByte((byte) 1);
             dest.writeInt(chapterId);
         }
         dest.writeString(chapterSlug);
         dest.writeString(chapterUrl);
         if (id == null) {
-            dest.writeByte((byte) (0x00));
+            dest.writeByte((byte) 0);
         } else {
-            dest.writeByte((byte) (0x01));
+            dest.writeByte((byte) 1);
             dest.writeLong(id);
         }
         dest.writeString(name);
         dest.writeString(image);
         dest.writeString(description);
-        if (isLocked == null) {
-            dest.writeByte((byte) (0x02));
-        } else {
-            dest.writeByte((byte) (isLocked ? 0x01 : 0x00));
-        }
+        dest.writeByte((byte) (isLocked == null ? 0 : isLocked ? 1 : 2));
         if (attemptsCount == null) {
-            dest.writeByte((byte) (0x00));
+            dest.writeByte((byte) 0);
         } else {
-            dest.writeByte((byte) (0x01));
+            dest.writeByte((byte) 1);
             dest.writeInt(attemptsCount);
         }
         dest.writeString(start);
         dest.writeString(end);
-        if (hasStarted == null) {
-            dest.writeByte((byte) (0x02));
-        } else {
-            dest.writeByte((byte) (hasStarted ? 0x01 : 0x00));
-        }
+        dest.writeByte((byte) (hasStarted == null ? 0 : hasStarted ? 1 : 2));
+        dest.writeByte((byte) (active == null ? 0 : active ? 1 : 2));
         if (videoId == null) {
-            dest.writeByte((byte) (0x00));
+            dest.writeByte((byte) 0);
         } else {
-            dest.writeByte((byte) (0x01));
+            dest.writeByte((byte) 1);
             dest.writeLong(videoId);
         }
         if (attachmentId == null) {
-            dest.writeByte((byte) (0x00));
+            dest.writeByte((byte) 0);
         } else {
-            dest.writeByte((byte) (0x01));
+            dest.writeByte((byte) 1);
             dest.writeLong(attachmentId);
         }
         if (examId == null) {
-            dest.writeByte((byte) (0x00));
+            dest.writeByte((byte) 0);
         } else {
-            dest.writeByte((byte) (0x01));
+            dest.writeByte((byte) 1);
             dest.writeLong(examId);
         }
-        dest.writeValue(exam);
-        dest.writeValue(attachment);
-        dest.writeValue(video);
+        dest.writeParcelable(getRawVideo(), flags);
+        dest.writeParcelable(getRawAttachment(), flags);
+        dest.writeParcelable(getRawExam(), flags);
     }
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Content> CREATOR = new Parcelable.Creator<Content>() {
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Content> CREATOR = new Creator<Content>() {
         @Override
         public Content createFromParcel(Parcel in) {
             return new Content(in);
@@ -506,6 +528,27 @@ public class Content implements android.os.Parcelable {
             return new Content[size];
         }
     };
+
+    public Video getRawVideo() {
+        if (myDao == null || video != null) {
+            return video;
+        }
+        return getVideo();
+    }
+
+    public Attachment getRawAttachment() {
+        if (myDao == null || attachment != null) {
+            return attachment;
+        }
+        return getAttachment();
+    }
+
+    public Exam getRawExam() {
+        if (myDao == null || exam != null) {
+            return exam;
+        }
+        return getExam();
+    }
     // KEEP METHODS END
 
 }

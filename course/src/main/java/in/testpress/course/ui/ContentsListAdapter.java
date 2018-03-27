@@ -10,9 +10,9 @@ import java.util.List;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
+import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.Exam;
-import in.testpress.models.greendao.Content;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -27,13 +27,14 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
     private long chapterId;
 
     ContentsListAdapter(Activity activity, final List<Content> items, int layout,
-                        ContentDao contentDao, Long idOfChapter) {
+                        ContentDao contentDao, Long chapterId) {
+
         super(activity.getLayoutInflater(), layout);
         mActivity = activity;
         mImageLoader = ImageUtils.initImageLoader(activity);
         mOptions = ImageUtils.getPlaceholdersOption();
         this.contentDao = contentDao;
-        chapterId = idOfChapter;
+        this.chapterId = chapterId;
         setItems(items);
     }
 
@@ -54,16 +55,6 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
                         ContentDao.Properties.Active.eq(true)
                 )
                 .orderAsc(ContentDao.Properties.Order).listLazy().get(position);
-    }
-
-    @Override
-    public List<Content> getItems() {
-        return contentDao.queryBuilder()
-                .where(
-                        ContentDao.Properties.ChapterId.eq(chapterId),
-                        ContentDao.Properties.Active.eq(true)
-                )
-                .orderAsc(ContentDao.Properties.Order).list();
     }
 
     @Override
@@ -92,7 +83,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
             setGone(1, false);
             mImageLoader.displayImage(content.getImage(), imageView(1), mOptions);
         }
-        Exam exam = content.getExam();
+        Exam exam = content.getRawExam();
         // Validate lock
         if (content.getIsLocked() || !content.getHasStarted()) {
             setGone(2, false);
@@ -113,8 +104,14 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
             view(4).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mActivity.startActivityForResult(ContentActivity.createIntent(getItems(),
-                            position, chapterId, (ContentsListActivity) mActivity), TEST_TAKEN_REQUEST_CODE);
+                    mActivity.startActivityForResult(
+                            ContentActivity.createIntent(
+                                    position,
+                                    chapterId,
+                                    (ContentsListActivity) mActivity
+                            ),
+                            TEST_TAKEN_REQUEST_CODE
+                    );
                 }
             });
         }

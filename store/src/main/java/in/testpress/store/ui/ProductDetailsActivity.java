@@ -24,7 +24,7 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.TestpressExam;
-import in.testpress.model.InstituteSettings;
+import in.testpress.models.InstituteSettings;
 import in.testpress.store.R;
 import in.testpress.store.models.Product;
 import in.testpress.store.network.TestpressStoreApiClient;

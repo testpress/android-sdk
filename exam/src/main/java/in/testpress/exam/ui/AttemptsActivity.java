@@ -25,14 +25,11 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
-import in.testpress.models.greendao.Attempt;
-import in.testpress.models.greendao.Language;
-import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.AttemptsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.MultiLanguagesUtil;
-import in.testpress.models.greendao.ExamDao;
-import in.testpress.core.TestpressSDKDatabase;
+import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.Exam;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
@@ -41,11 +38,11 @@ import in.testpress.util.ViewUtils;
 import static in.testpress.exam.TestpressExam.PARAM_EXAM_SLUG;
 import static in.testpress.exam.network.TestpressExamApiClient.STATE_PAUSED;
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
+import static in.testpress.exam.ui.TestActivity.PARAM_EXAM;
 
 public class AttemptsActivity extends BaseToolBarActivity
         implements LoaderManager.LoaderCallbacks<List<Attempt>> {
 
-    public static final String EXAM = "exam";
     public static final String STATE_COMPLETED = "Completed";
 
     private ScrollView scrollView;
@@ -61,7 +58,6 @@ public class AttemptsActivity extends BaseToolBarActivity
     private Exam exam;
     private List<Attempt> attempts = new ArrayList<>();
     private AttemptsPager pager;
-    private Activity activity;
 
     @SuppressWarnings({"ConstantConditions", "deprecation"})
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface", "DefaultLocale"})
@@ -69,7 +65,6 @@ public class AttemptsActivity extends BaseToolBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_attempts);
-        activity = this;
         scrollView = (ScrollView) findViewById(R.id.scroll_view);
         examDetailsLayout = (LinearLayout) findViewById(R.id.exam_details_layout);
         testReportLayout = (FrameLayout) findViewById(R.id.fragment_container);
@@ -82,9 +77,7 @@ public class AttemptsActivity extends BaseToolBarActivity
         progressBar = (ProgressBar) findViewById(R.id.pb_loading);
         UIUtils.setIndeterminateDrawable(this, progressBar, 4);
         startButton.setTypeface(TestpressSdk.getRubikMediumFont(this));
-        //noinspection ConstantConditions
-        getSupportActionBar().hide();
-        //exam = getIntent().getLongExtra(EXAM, 0);
+        exam = getIntent().getParcelableExtra(PARAM_EXAM);
         if (exam == null) {
             String examSlug = getIntent().getStringExtra(PARAM_EXAM_SLUG);
             // Throw exception if both exam & exam slug is null
@@ -96,6 +89,7 @@ public class AttemptsActivity extends BaseToolBarActivity
     }
 
     void checkExamState() {
+        setActionBarTitle(exam.getTitle());
         if ((exam.getAttemptsCount() == 0) ||
                 (exam.getAttemptsCount() == 1 && exam.getPausedAttemptsCount() == 1)) {
             // Show start exam screen with exam details if still exam is not taken or only one
@@ -143,9 +137,7 @@ public class AttemptsActivity extends BaseToolBarActivity
                 R.string.testpress_resume_exam : R.string.testpress_start_exam;
 
         startButton.setText(buttonTextResId);
-        //noinspection ConstantConditions
-        getSupportActionBar().setTitle(buttonTextResId);
-        getSupportActionBar().show();
+        setActionBarTitle(buttonTextResId);
         titleView.setText(exam.getTitle());
         numberOfQuestions.setText(exam.getNumberOfQuestions().toString());
         examDuration.setText(exam.getDuration());
@@ -211,63 +203,45 @@ public class AttemptsActivity extends BaseToolBarActivity
     }
 
     void loadExam(final String examSlug) {
-        List<Exam> exams = TestpressSDKDatabase.getExamDao(activity).queryBuilder().where(ExamDao.Properties.Slug.eq(examSlug)).list();
-        if(exams.size() > 0 &&
-                exams.get(0).getPassPercentage() != null && exams.get(0).getTotalMarks() != null) {
-            AttemptsActivity.this.exam = exams.get(0);
-            checkExamState();
-        } else {
-            progressBar.setVisibility(View.VISIBLE);
-            new TestpressExamApiClient(this).getExam(examSlug)
-                    .enqueue(new TestpressCallback<Exam>() {
-                        @Override
-                        public void onSuccess(Exam exam) {
-                            AttemptsActivity.this.exam = exam;
-                            saveExamInDB(exam);
-                            checkExamState();
-                        }
+        progressBar.setVisibility(View.VISIBLE);
+        new TestpressExamApiClient(this).getExam(examSlug)
+                .enqueue(new TestpressCallback<Exam>() {
+                    @Override
+                    public void onSuccess(Exam exam) {
+                        AttemptsActivity.this.exam = exam;
+                        checkExamState();
+                    }
 
-                        @Override
-                        public void onException(TestpressException exception) {
-                            if (exception.isUnauthenticated()) {
-                                setEmptyText(R.string.testpress_authentication_failed,
-                                        R.string.testpress_exam_no_permission);
-                                retryButton.setVisibility(View.GONE);
-                            } else if (exception.isNetworkError()) {
-                                setEmptyText(R.string.testpress_network_error,
-                                        R.string.testpress_no_internet_try_again);
-                                retryButton.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        progressBar.setVisibility(View.VISIBLE);
-                                        emptyView.setVisibility(View.GONE);
-                                        loadExam(examSlug);
-                                    }
-                                });
-                            } else if (exception.getResponse().code() == 404) {
-                                setEmptyText(R.string.testpress_exam_not_available,
-                                        R.string.testpress_exam_not_available_description);
-                                retryButton.setVisibility(View.GONE);
-                            } else {
-                                setEmptyText(R.string.testpress_error_loading_exam,
-                                        R.string.testpress_some_thing_went_wrong_try_again);
-                                retryButton.setVisibility(View.GONE);
-                            }
+                    @Override
+                    public void onException(TestpressException exception) {
+                        if (exception.isUnauthenticated()) {
+                            setEmptyText(R.string.testpress_authentication_failed,
+                                    R.string.testpress_exam_no_permission);
+                            retryButton.setVisibility(View.GONE);
+                        } else if (exception.isNetworkError()) {
+                            setEmptyText(R.string.testpress_network_error,
+                                    R.string.testpress_no_internet_try_again);
+                            retryButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    progressBar.setVisibility(View.VISIBLE);
+                                    emptyView.setVisibility(View.GONE);
+                                    loadExam(examSlug);
+                                }
+                            });
+                        } else if (exception.getResponse().code() == 404) {
+                            setEmptyText(R.string.testpress_exam_not_available,
+                                    R.string.testpress_exam_not_available_description);
+                            retryButton.setVisibility(View.GONE);
+                        } else  {
+                            setEmptyText(R.string.testpress_error_loading_exam,
+                                    R.string.testpress_some_thing_went_wrong_try_again);
+                            retryButton.setVisibility(View.GONE);
                         }
-                    });
-        }
+                    }
+                });
     }
 
-    void saveExamInDB(Exam exam) {
-        TestpressSDKDatabase.getExamDao(activity).insertOrReplace(exam);
-        for(Language language : exam.getLanguages()) {
-            language.setExam_slug(exam.getSlug());
-            language.setExamId(exam.getId());
-            TestpressSDKDatabase.getLanguageDao(activity).insertOrReplace(language);
-        }
-    }
-
-    @SuppressLint("StaticFieldLeak")
     @Override
     public Loader<List<Attempt>> onCreateLoader(int id, Bundle args) {
         progressBar.setVisibility(View.VISIBLE);
@@ -306,6 +280,7 @@ public class AttemptsActivity extends BaseToolBarActivity
         if (attempts.size() == 1 && attempts.get(0).getState().equals(STATE_COMPLETED)) {
             // if only one attempt exist then show the test report of that attempt
             testReportLayout.setVisibility(View.VISIBLE);
+            setActionBarTitle(R.string.testpress_test_report);
             ReviewStatsFragment.showReviewStatsFragment(this, exam, attempts.get(0), true);
             progressBar.setVisibility(View.GONE);
         } else {
@@ -314,9 +289,6 @@ public class AttemptsActivity extends BaseToolBarActivity
     }
 
     private void displayAttemptsList() {
-        //noinspection ConstantConditions
-        getSupportActionBar().setTitle(exam.getTitle());
-        getSupportActionBar().show();
         if (canAttemptExam()) {
             final List<Attempt> pausedAttempts = new ArrayList<>();
             if (exam.getPausedAttemptsCount() > 0) {

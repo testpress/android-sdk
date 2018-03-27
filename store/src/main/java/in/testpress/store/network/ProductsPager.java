@@ -2,7 +2,7 @@ package in.testpress.store.network;
 
 import java.io.IOException;
 
-import in.testpress.model.TestpressApiResponse;
+import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseResourcePager;
 import in.testpress.store.models.Product;
 import retrofit2.Response;

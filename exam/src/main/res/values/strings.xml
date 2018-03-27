@@ -177,7 +177,6 @@
 
     <string name="testpress_continue">Continue</string>
     <string name="testpress_time_analytics_label">Time Analytics</string>
-    <string name="testpress_error_loading_review_items">Loading review items failed</string>
     <string name="testpress_incorrect_filter_text">Incorrect</string>
     <string name="testpress_correct_filter_text">Correct</string>
     <string name="testpress_unanswered_filter_text">Unanswered</string>

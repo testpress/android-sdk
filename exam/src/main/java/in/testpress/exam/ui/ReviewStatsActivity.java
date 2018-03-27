@@ -4,18 +4,18 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
+import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
-import in.testpress.models.InstituteSettings;
+import in.testpress.ui.BaseToolBarActivity;
 
 import static in.testpress.exam.ui.ReviewStatsFragment.PARAM_SHOW_RETAKE_BUTTON;
 
-public class ReviewStatsActivity extends AppCompatActivity {
+public class ReviewStatsActivity extends BaseToolBarActivity {
 
     static final String PARAM_PREVIOUS_ACTIVITY = "previousActivity";
     static final String PARAM_EXAM = "exam";
@@ -45,7 +45,7 @@ public class ReviewStatsActivity extends AppCompatActivity {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.testpress_container_layout_without_toolbar);
+        setContentView(R.layout.testpress_container_layout);
         String previousActivity = getIntent().getStringExtra(PARAM_PREVIOUS_ACTIVITY);
         parentIsTestEngine = (previousActivity != null) &&
                 previousActivity.equals(TestActivity.class.getName());

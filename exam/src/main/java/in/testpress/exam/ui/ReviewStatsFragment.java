@@ -30,18 +30,18 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
-import in.testpress.models.greendao.Attempt;
-import in.testpress.models.greendao.Exam;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.TestpressApiResponse;
-import in.testpress.models.greendao.ExamDao;
-import in.testpress.core.TestpressSDKDatabase;
+import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.CourseAttempt;
+import in.testpress.models.greendao.Exam;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_ATTEMPT;
+import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_COURSE_ATTEMPT;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_EXAM;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_PREVIOUS_ACTIVITY;
 
@@ -104,14 +104,21 @@ public class ReviewStatsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         exam = getArguments().getParcelable(PARAM_EXAM);
-        // TODO exam coming as null
         Assert.assertNotNull("PARAM_EXAM must not be null.", exam);
         attempt = getArguments().getParcelable(PARAM_ATTEMPT);
+        CourseAttempt courseAttempt = getArguments().getParcelable(PARAM_COURSE_ATTEMPT);
+        if (courseAttempt != null) {
+            attempt = courseAttempt.getRawAssessment();
+        }
+        if (getActivity().getClass() == ReviewStatsActivity.class) {
+            ((ReviewStatsActivity) getActivity()).setActionBarTitle(R.string.testpress_test_report);
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
         final View view = inflater.inflate(R.layout.testpress_fragment_review_stats, container, false);
         progressBar = (ProgressBar) view.findViewById(R.id.pb_loading);
         UIUtils.setIndeterminateDrawable(getActivity(), progressBar, 4);
@@ -171,18 +178,6 @@ public class ReviewStatsFragment extends Fragment {
                 },
                 TestpressSdk.getRubikRegularFont(getContext()));
 
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        toolbar.setTitle("Test Report");
-        toolbar.setTitleTextColor(getResources().getColor(R.color.testpress_white));
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
-        setTintDrawable(toolbar.getNavigationIcon(), getResources().getColor(R.color.testpress_white));
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().onBackPressed();
-            }
-        });
-
         return view;
     }
 
@@ -196,24 +191,15 @@ public class ReviewStatsFragment extends Fragment {
         }
     }
 
-    public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
-        drawable.clearColorFilter();
-        drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
-        drawable.invalidateSelf();
-        Drawable wrapDrawable = DrawableCompat.wrap(drawable).mutate();
-        DrawableCompat.setTint(wrapDrawable, color);
-        return wrapDrawable;
-    }
-
     @SuppressLint("SetTextI18n")
     private void displayTestReport() {
         String previousActivity = getArguments().getString(PARAM_PREVIOUS_ACTIVITY);
         if((previousActivity != null) && previousActivity.equals(TestActivity.class.getName())) {
-            attemptDate.setText(attempt.getShortDate());
+            attemptDate.setVisibility(View.GONE);
         } else {
-            examTitle.setText(exam.getTitle());
-            attemptDate.setVisibility(View.VISIBLE);
+            attemptDate.setText(attempt.getShortDate());
         }
+        examTitle.setText(exam.getTitle());
         timeTaken.setText(attempt.getTimeTaken());
         correct.setText(attempt.getCorrectCount().toString());
         incorrect.setText(attempt.getIncorrectCount().toString());
@@ -239,21 +225,13 @@ public class ReviewStatsFragment extends Fragment {
         } else {
             percentile.setText(attempt.getPercentile());
         }
-        if (attempt.getTotalQuestions() != null) {
-            totalQuestions.setText(attempt.getTotalQuestions().toString());
-        }
+        totalQuestions.setText(attempt.getTotalQuestions().toString());
         if (exam.getTotalMarks() != null) {
             totalMarks.setText(exam.getTotalMarks());
-        } else {
-            Log.e("Total marks is null", "sssssss");
         }
-        if (exam.getDuration() != null) {
-            totalTime.setText(exam.getDuration());
-        }
+        totalTime.setText(exam.getDuration());
         if (exam.getPassPercentage() != null) {
             cutoff.setText(exam.getPassPercentage().toString());
-        } else {
-            Log.e("Pass % is null", "zzzzzz");
         }
         accuracy.setText(attempt.getAccuracy().toString());
         if (exam.getShowAnswers()) {
@@ -284,7 +262,8 @@ public class ReviewStatsFragment extends Fragment {
                     );
                 }
             });
-            timeAnalyticsButtonLayout.setVisibility(View.VISIBLE);
+            // TODO: Clean up TimeAnalytics & enable it
+            timeAnalyticsButtonLayout.setVisibility(View.GONE);
         } else {
             reviewQuestionsButton.setVisibility(View.GONE);
             analyticsButton.setVisibility(View.GONE);
@@ -370,7 +349,7 @@ public class ReviewStatsFragment extends Fragment {
 
     private void startExam() {
         Intent intent = new Intent(getActivity(), TestActivity.class);
-        intent.putExtra(TestActivity.PARAM_EXAM, exam.getId());
+        intent.putExtra(TestActivity.PARAM_EXAM, exam);
         startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
     }
 

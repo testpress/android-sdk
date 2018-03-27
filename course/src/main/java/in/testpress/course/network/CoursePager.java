@@ -30,7 +30,7 @@ public class CoursePager extends BaseDatabaseModelPager<Course> {
 
     @Override
     protected Course register(Course course) {
-        if (course != null) {
+        if (course != null && course.getModified() != null && !course.getModified().isEmpty()) {
             try {
                 course.setModifiedDate(simpleDateFormat.parse(course.getModified()).getTime());
             } catch (ParseException e) {

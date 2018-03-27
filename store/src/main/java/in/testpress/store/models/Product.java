@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.List;
 
-import in.testpress.exam.models.Exam;
+import in.testpress.models.greendao.Exam;
 
 public class Product implements Parcelable {
 

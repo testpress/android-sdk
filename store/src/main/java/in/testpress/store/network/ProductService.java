@@ -3,7 +3,7 @@ package in.testpress.store.network;
 import java.util.HashMap;
 import java.util.Map;
 
-import in.testpress.model.TestpressApiResponse;
+import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.Product;

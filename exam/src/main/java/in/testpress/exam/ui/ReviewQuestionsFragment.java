@@ -198,7 +198,8 @@ public class ReviewQuestionsFragment extends Fragment
         imageView4 = (ImageView) view.findViewById(R.id.difficulty4);
         imageView5 = (ImageView) view.findViewById(R.id.difficulty5);
         percentageCorrect = Math.round(reviewItem.getQuestion().getPercentageGotCorrect() == null ?
-        0 : reviewItem.getQuestion().getPercentageGotCorrect());
+                0 : reviewItem.getQuestion().getPercentageGotCorrect());
+
         rootLayout = view;
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage(getResources().getString(R.string.testpress_please_wait));
@@ -618,6 +619,7 @@ public class ReviewQuestionsFragment extends Fragment
                     @Override
                     public void onSuccess(Comment comment) {
                         if (getActivity() == null) {
+                            return;
                         }
                         commentsEditText.setText("");
                         progressDialog.dismiss();

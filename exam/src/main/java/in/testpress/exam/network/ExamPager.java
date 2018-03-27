@@ -2,13 +2,12 @@ package in.testpress.exam.network;
 
 import java.io.IOException;
 
-import in.testpress.models.greendao.Exam;
 import in.testpress.models.TestpressApiResponse;
-import in.testpress.network.BaseDatabaseModelPager;
+import in.testpress.models.greendao.Exam;
 import in.testpress.network.BaseResourcePager;
 import retrofit2.Response;
 
-public class ExamPager extends BaseDatabaseModelPager<Exam> {
+public class ExamPager extends BaseResourcePager<Exam> {
 
     private TestpressExamApiClient apiClient;
     private String subclass;
@@ -43,7 +42,7 @@ public class ExamPager extends BaseDatabaseModelPager<Exam> {
         if (category != null) {
             queryParams.put(TestpressExamApiClient.CATEGORY, category);
         }
-        return apiClient.getExams(queryParams, latestModifiedDate).execute();
+        return apiClient.getExams(queryParams).execute();
     }
 
 }

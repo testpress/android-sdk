@@ -1,23 +1,22 @@
 package in.testpress.exam.network;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import in.testpress.core.TestpressSdk;
-import in.testpress.models.greendao.Attempt;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.Comment;
-import in.testpress.models.greendao.CourseAttempt;
-import in.testpress.models.greendao.Exam;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
-import in.testpress.models.greendao.ReviewItem;
 import in.testpress.models.TestpressApiResponse;
+import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.CourseAttempt;
+import in.testpress.models.greendao.Exam;
+import in.testpress.models.greendao.ReviewItem;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
 
@@ -76,9 +75,8 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return retrofit.create(ExamService.class);
     }
 
-    public RetrofitCall<TestpressApiResponse<Exam>> getExams(Map<String, Object> queryParams,
-                                                             String latestModifiedDate) {
-        return getExamService().getExams(queryParams, latestModifiedDate);
+    public RetrofitCall<TestpressApiResponse<Exam>> getExams(Map<String, Object> queryParams) {
+        return getExamService().getExams(queryParams);
     }
 
     public RetrofitCall<TestpressApiResponse<Exam>> getExams(String accessCode,
@@ -128,9 +126,8 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getExamService().getAttempts(urlFrag, queryParams);
     }
 
-    public RetrofitCall<TestpressApiResponse<CourseAttempt>> getContentAttempts(
-            String urlFrag, Map<String, Object> queryParams) {
-        return getExamService().getContentAttempts(urlFrag, queryParams);
+    public RetrofitCall<TestpressApiResponse<CourseAttempt>> getContentAttempts(String url) {
+        return getExamService().getContentAttempts(url);
     }
 
     public RetrofitCall<TestpressApiResponse<ReviewItem>> getReviewItems(

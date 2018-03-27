@@ -132,38 +132,38 @@ public class TestpressCourseTest {
     public void testShowContents_withNullValues() throws Exception {
         TestpressSession testpressSession = mock(TestpressSession.class);
         try {
-            TestpressCourse.showContents(null, "", "", testpressSession);
+            TestpressCourse.showContents(null, "", 0, "", testpressSession);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("Context must not be null.", e.getMessage());
         }
         Context context = mock(Context.class);
         try {
-            TestpressCourse.showContents(context, null, null, testpressSession);
+            TestpressCourse.showContents(context, null, 0, null, testpressSession);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("title must not be null or empty.", e.getMessage());
         }
         try {
-            TestpressCourse.showContents(context, "", null, testpressSession);
+            TestpressCourse.showContents(context, "", 0, null, testpressSession);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("title must not be null or empty.", e.getMessage());
         }
         try {
-            TestpressCourse.showContents(context, "DummyTitle", null, testpressSession);
+            TestpressCourse.showContents(context, "DummyTitle", 0, null, testpressSession);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("contentsUrl must not be null or empty.", e.getMessage());
         }
         try {
-            TestpressCourse.showContents(context, "DummyTitle", "", testpressSession);
+            TestpressCourse.showContents(context, "DummyTitle", 0, "", testpressSession);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("contentsUrl must not be null or empty.", e.getMessage());
         }
         try {
-            TestpressCourse.showContents(context, "DummyTitle", "DummyUrl", null);
+            TestpressCourse.showContents(context, "DummyTitle", 0, "DummyUrl", null);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("TestpressSession must not be null.", e.getMessage());

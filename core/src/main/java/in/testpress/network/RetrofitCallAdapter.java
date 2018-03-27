@@ -28,7 +28,7 @@ public class RetrofitCallAdapter<T> implements RetrofitCall<T> {
         call.cancel();
     }
 
-    @Override public void enqueue(final TestpressCallback<T> callback) {
+    @Override public RetrofitCall<T> enqueue(final TestpressCallback<T> callback) {
         call.enqueue(new Callback<T>() {
             @Override public void onResponse(final Call<T> call, final Response<T> response) {
                 if (response.isSuccessful()) {
@@ -66,6 +66,7 @@ public class RetrofitCallAdapter<T> implements RetrofitCall<T> {
                 });
             }
         });
+        return this;
     }
 
     @SuppressWarnings("CloneDoesntCallSuperClone")

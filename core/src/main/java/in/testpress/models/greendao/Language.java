@@ -6,20 +6,20 @@ import org.greenrobot.greendao.annotation.*;
 
 // KEEP INCLUDES - put your custom includes here
 import android.os.Parcel;
-import android.os.Parcelable;
 // KEEP INCLUDES END
 
 /**
  * Entity mapped to table "LANGUAGE".
  */
-@Entity
+@Entity(indexes = {
+    @Index(value = "code, examId", unique = true)
+})
 public class Language implements android.os.Parcelable {
 
-    @Id
+    @Id(autoincrement = true)
     private Long id;
     private String code;
     private String title;
-    private String exam_slug;
     private Long examId;
 
     // KEEP FIELDS - put your custom fields here
@@ -34,11 +34,10 @@ public class Language implements android.os.Parcelable {
     }
 
     @Generated
-    public Language(Long id, String code, String title, String exam_slug, Long examId) {
+    public Language(Long id, String code, String title, Long examId) {
         this.id = id;
         this.code = code;
         this.title = title;
-        this.exam_slug = exam_slug;
         this.examId = examId;
     }
 
@@ -66,14 +65,6 @@ public class Language implements android.os.Parcelable {
         this.title = title;
     }
 
-    public String getExam_slug() {
-        return exam_slug;
-    }
-
-    public void setExam_slug(String exam_slug) {
-        this.exam_slug = exam_slug;
-    }
-
     public Long getExamId() {
         return examId;
     }
@@ -83,13 +74,37 @@ public class Language implements android.os.Parcelable {
     }
 
     // KEEP METHODS - put your custom methods here
-
     protected Language(Parcel in) {
-        id = in.readByte() == 0x00 ? null : in.readLong();
+        if (in.readByte() == 0) {
+            id = null;
+        } else {
+            id = in.readLong();
+        }
         code = in.readString();
         title = in.readString();
-        exam_slug = in.readString();
-        examId = in.readByte() == 0x00 ? null : in.readLong();
+        if (in.readByte() == 0) {
+            examId = null;
+        } else {
+            examId = in.readLong();
+        }
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (id == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(id);
+        }
+        dest.writeString(code);
+        dest.writeString(title);
+        if (examId == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(examId);
+        }
     }
 
     @Override
@@ -97,27 +112,7 @@ public class Language implements android.os.Parcelable {
         return 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        if (id == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeLong(id);
-        }
-        dest.writeString(code);
-        dest.writeString(title);
-        dest.writeString(exam_slug);
-        if (examId == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeLong(examId);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Language> CREATOR = new Parcelable.Creator<Language>() {
+    public static final Creator<Language> CREATOR = new Creator<Language>() {
         @Override
         public Language createFromParcel(Parcel in) {
             return new Language(in);
@@ -137,15 +132,6 @@ public class Language implements android.os.Parcelable {
     public void update(Language language) {
         code = language.getCode();
         title = language.getTitle();
-    }
-    public Language(String code, String title) {
-        this.code = code;
-        this.title = title;
-    }
-    public Language(String code, String title, String exam_slug) {
-        this.code = code;
-        this.title = title;
-        this.exam_slug = exam_slug;
     }
     // KEEP METHODS END
 

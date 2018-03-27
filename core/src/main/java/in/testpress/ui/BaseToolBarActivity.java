@@ -2,6 +2,7 @@ package in.testpress.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -25,6 +26,16 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
         //noinspection ConstantConditions
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    public void setActionBarTitle(@StringRes int titleId) {
+        //noinspection ConstantConditions
+        getSupportActionBar().setTitle(titleId);
+    }
+
+    public void setActionBarTitle(String title) {
+        //noinspection ConstantConditions
+        getSupportActionBar().setTitle(title);
     }
 
     @SuppressWarnings("DanglingJavadoc")

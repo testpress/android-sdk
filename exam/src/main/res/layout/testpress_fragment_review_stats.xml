@@ -1,140 +1,92 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true" >
 
+    <ProgressBar
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:id="@+id/pb_loading"
+        android:indeterminate="true"
+        android:layout_centerInParent="true" />
 
-    <RelativeLayout
-        android:orientation="vertical" xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <include layout="@layout/testpress_empty_view_with_image" />
+
+    <ScrollView
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true" >
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/button_layout"
+        tools:ignore="UnknownIdInLayout">
 
-        <ProgressBar
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:id="@+id/pb_loading"
-            android:indeterminate="true"
-            android:layout_centerInParent="true" />
-
-        <include layout="@layout/testpress_empty_view_with_image" />
-
-        <include
-            android:id="@+id/top_toolbar"
-            layout="@layout/testpress_toolbar"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true" />
+            android:orientation="vertical"
+            android:id="@+id/review_statistics_layout">
 
-        <ScrollView
-            android:id="@+id/scroll_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/top_toolbar"
-            android:layout_above="@+id/button_layout"
-            tools:ignore="UnknownIdInLayout">
+            <TextView
+                style="@style/TestpressReviewStatTitle"
+                android:text="@string/testpress_test_report"
+                android:id="@+id/exam_title"
+                android:layout_marginTop="15dp"/>
+
+            <TextView
+                style="@style/TestpressReviewStatLabel"
+                android:layout_marginTop="8dp"
+                android:layout_gravity="center"
+                android:text="15 Oct '16"
+                android:textAllCaps="false"
+                android:id="@+id/attempt_date"
+                tools:ignore="UnusedAttribute" />
 
             <LinearLayout
+                android:layout_marginBottom="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:id="@+id/review_statistics_layout">
-
-                <TextView
-                    style="@style/TestpressReviewStatTitle"
-                    android:text="@string/testpress_test_report"
-                    android:id="@+id/exam_title"
-                    android:layout_marginTop="15dp"/>
-
-                <TextView
-                    style="@style/TestpressReviewStatLabel"
-                    android:layout_marginTop="8dp"
-                    android:layout_gravity="center"
-                    android:text="15 Oct '16"
-                    android:textAllCaps="false"
-                    android:id="@+id/attempt_date"
-                    tools:ignore="UnusedAttribute" />
+                android:orientation="vertical">
 
                 <LinearLayout
-                    android:layout_marginBottom="20dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:baselineAligned="false"
+                    android:layout_marginTop="15dp" >
 
                     <LinearLayout
                         android:gravity="center"
+                        android:id="@+id/total_question_layout"
                         android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:baselineAligned="false"
-                        android:layout_marginTop="15dp" >
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_marginRight="5dp"
+                            android:src="@drawable/testpress_questions_flat_icon"/>
 
                         <LinearLayout
-                            android:gravity="center"
-                            android:id="@+id/total_question_layout"
-                            android:orientation="horizontal"
-                            android:layout_weight="1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content">
+                            android:orientation="vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp" >
 
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:layout_marginRight="5dp"
-                                android:src="@drawable/testpress_questions_flat_icon"/>
+                            <TextView
+                                style="@style/TestpressReviewStatLabel"
+                                android:text="@string/testpress_total_questions"
+                                android:layout_gravity="left" />
 
-                            <LinearLayout
-                                android:orientation="vertical"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp" >
-
-                                <TextView
-                                    style="@style/TestpressReviewStatLabel"
-                                    android:text="@string/testpress_total_questions"
-                                    android:layout_gravity="left" />
-
-                                <TextView
-                                    style="@style/TestpressReviewStatValue"
-                                    android:id="@+id/total_questions"
-                                    android:text="00"
-                                    android:layout_gravity="left" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:gravity="center"
-                            android:orientation="horizontal"
-                            android:layout_weight="1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content">
-
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="32dp"
-                                android:layout_marginRight="5dp"
-                                android:src="@drawable/testpress_total_marks_icon"/>
-
-                            <LinearLayout
-                                android:orientation="vertical"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp" >
-
-                                <TextView
-                                    style="@style/TestpressReviewStatLabel"
-                                    android:id="@+id/total_marks_label"
-                                    android:text="@string/testpress_total_marks"
-                                    android:layout_gravity="left" />
-
-                                <TextView
-                                    style="@style/TestpressReviewStatValue"
-                                    android:id="@+id/total_marks"
-                                    android:text="00"
-                                    android:layout_gravity="left" />
-
-                            </LinearLayout>
+                            <TextView
+                                style="@style/TestpressReviewStatValue"
+                                android:id="@+id/total_questions"
+                                android:text="00"
+                                android:layout_gravity="left" />
 
                         </LinearLayout>
 
@@ -143,350 +95,186 @@
                     <LinearLayout
                         android:gravity="center"
                         android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:baselineAligned="false"
-                        android:layout_marginTop="15dp" >
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="32dp"
+                            android:layout_marginRight="5dp"
+                            android:src="@drawable/testpress_total_marks_icon"/>
 
                         <LinearLayout
-                            android:gravity="center"
-                            android:orientation="horizontal"
-                            android:layout_weight="1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content">
+                            android:orientation="vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp" >
 
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="32dp"
-                                android:layout_marginRight="5dp"
-                                android:src="@drawable/testpress_time_flat_icon"/>
+                            <TextView
+                                style="@style/TestpressReviewStatLabel"
+                                android:id="@+id/total_marks_label"
+                                android:text="@string/testpress_total_marks"
+                                android:layout_gravity="left" />
 
-                            <LinearLayout
-                                android:orientation="vertical"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp" >
-
-                                <TextView
-                                    style="@style/TestpressReviewStatLabel"
-                                    android:id="@+id/total_time_label"
-                                    android:text="@string/testpress_total_time"
-                                    android:layout_gravity="left" />
-
-                                <TextView
-                                    style="@style/TestpressReviewStatValue"
-                                    android:id="@+id/total_time"
-                                    android:text="00:30:00"
-                                    android:layout_gravity="left" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:gravity="center"
-                            android:orientation="horizontal"
-                            android:layout_weight="1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content">
-
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="32dp"
-                                android:layout_marginRight="5dp"
-                                android:src="@drawable/testpress_cutoff_icon"/>
-
-                            <LinearLayout
-                                android:orientation="vertical"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp" >
-
-                                <TextView
-                                    style="@style/TestpressReviewStatLabel"
-                                    android:text="@string/testpress_cutoff"
-                                    android:layout_gravity="left" />
-
-                                <TextView
-                                    style="@style/TestpressReviewStatValue"
-                                    android:id="@+id/cutoff"
-                                    android:text="00"
-                                    android:layout_gravity="left" />
-
-                            </LinearLayout>
+                            <TextView
+                                style="@style/TestpressReviewStatValue"
+                                android:id="@+id/total_marks"
+                                android:text="00"
+                                android:layout_gravity="left" />
 
                         </LinearLayout>
 
                     </LinearLayout>
 
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="5dp"
-                        android:src="@drawable/testpress_dotted_line"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginRight="20dp"
-                        android:layerType="software"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:layout_marginTop="15dp" >
 
                     <LinearLayout
                         android:gravity="center"
                         android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp" >
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="32dp"
+                            android:layout_marginRight="5dp"
+                            android:src="@drawable/testpress_time_flat_icon"/>
 
                         <LinearLayout
-                            android:id="@+id/rank_layout"
-                            android:gravity="center"
-                            android:orientation="horizontal"
-                            android:layout_weight="1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content">
+                            android:orientation="vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp" >
 
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="32dp"
-                                android:layout_marginRight="5dp"
-                                android:src="@drawable/testpress_rank_flat_icon"/>
+                            <TextView
+                                style="@style/TestpressReviewStatLabel"
+                                android:id="@+id/total_time_label"
+                                android:text="@string/testpress_total_time"
+                                android:layout_gravity="left" />
+
+                            <TextView
+                                style="@style/TestpressReviewStatValue"
+                                android:id="@+id/total_time"
+                                android:text="00:30:00"
+                                android:layout_gravity="left" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="32dp"
+                            android:layout_marginRight="5dp"
+                            android:src="@drawable/testpress_cutoff_icon"/>
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp" >
+
+                            <TextView
+                                style="@style/TestpressReviewStatLabel"
+                                android:text="@string/testpress_cutoff"
+                                android:layout_gravity="left" />
+
+                            <TextView
+                                style="@style/TestpressReviewStatValue"
+                                android:id="@+id/cutoff"
+                                android:text="00"
+                                android:layout_gravity="left" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:src="@drawable/testpress_dotted_line"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layerType="software"/>
+
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp" >
+
+                    <LinearLayout
+                        android:id="@+id/rank_layout"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="32dp"
+                            android:layout_marginRight="5dp"
+                            android:src="@drawable/testpress_rank_flat_icon"/>
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp" >
+
+                            <TextView
+                                style="@style/TestpressReviewStatLabel"
+                                android:id="@+id/rank_label"
+                                android:text="@string/testpress_rank"
+                                android:layout_gravity="center" />
 
                             <LinearLayout
-                                android:orientation="vertical"
+                                android:orientation="horizontal"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp" >
+                                android:layout_gravity="left" >
 
                                 <TextView
-                                    style="@style/TestpressReviewStatLabel"
-                                    android:id="@+id/rank_label"
-                                    android:text="@string/testpress_rank"
-                                    android:layout_gravity="center" />
+                                    style="@style/TestpressReviewStatValue"
+                                    android:id="@+id/rank"
+                                    android:text="5"
+                                    android:layout_gravity="bottom" />
 
-                                <LinearLayout
-                                    android:orientation="horizontal"
+                                <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_gravity="left" >
-
-                                    <TextView
-                                        style="@style/TestpressReviewStatValue"
-                                        android:id="@+id/rank"
-                                        android:text="5"
-                                        android:layout_gravity="bottom" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="/"
-                                        android:layout_marginBottom="1dp"
-                                        android:layout_gravity="bottom" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:id="@+id/max_rank"
-                                        android:text="15"
-                                        android:layout_marginBottom="1dp"
-                                        android:layout_gravity="bottom" />
-
-                                </LinearLayout>
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/percentile_layout"
-                            android:gravity="center"
-                            android:orientation="horizontal"
-                            android:layout_weight="1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content">
-
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="32dp"
-                                android:layout_marginRight="5dp"
-                                android:src="@drawable/testpress_percentile_icon"/>
-
-                            <LinearLayout
-                                android:orientation="vertical"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp" >
-
-                                <TextView
-                                    style="@style/TestpressReviewStatLabel"
-                                    android:id="@+id/percentile_label"
-                                    android:text="@string/testpress_percentile"
-                                    android:layout_gravity="left" />
-
-                                <TextView
-                                    style="@style/TestpressReviewStatValue"
-                                    android:id="@+id/percentile"
-                                    android:text="73"
-                                    android:layout_gravity="left" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:gravity="center"
-                        android:id="@+id/score_row"
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:baselineAligned="false"
-                        android:layout_marginTop="15dp" >
-
-                        <LinearLayout
-                            android:gravity="center"
-                            android:id="@+id/score_layout"
-                            android:orientation="horizontal"
-                            android:layout_weight="1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content">
-
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="32dp"
-                                android:layout_marginRight="5dp"
-                                android:src="@drawable/testpress_score_flat_icon"/>
-
-                            <LinearLayout
-                                android:orientation="vertical"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp" >
-
-                                <TextView
-                                    style="@style/TestpressReviewStatLabel"
-                                    android:text="@string/testpress_score"
-                                    android:id="@+id/score_label"
-                                    android:layout_gravity="left" />
-
-                                <TextView
-                                    style="@style/TestpressReviewStatValue"
-                                    android:id="@+id/score"
-                                    android:text="5"
+                                    android:text="/"
+                                    android:layout_marginBottom="1dp"
                                     android:layout_gravity="bottom" />
 
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:gravity="center"
-                            android:id="@+id/percentage_layout"
-                            android:orientation="horizontal"
-                            android:layout_weight="1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content">
-
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="32dp"
-                                android:layout_marginRight="5dp"
-                                android:src="@drawable/testpress_percentage_badge_flat_icon"/>
-
-                            <LinearLayout
-                                android:orientation="vertical"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="left"
-                                android:layout_marginLeft="5dp" >
-
                                 <TextView
-                                    style="@style/TestpressReviewStatLabel"
-                                    android:text="Percentage"
-                                    android:id="@+id/percentage_label"
-                                    android:layout_gravity="center" />
-
-                                <TextView
-                                    style="@style/TestpressReviewStatValue"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/max_rank"
                                     android:text="15"
-                                    android:id="@+id/percentage" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:gravity="center"
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:baselineAligned="false"
-                        android:layout_marginTop="15dp" >
-
-                        <LinearLayout
-                            android:gravity="center"
-                            android:orientation="horizontal"
-                            android:layout_weight="1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content">
-
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:layout_marginRight="5dp"
-                                android:src="@drawable/testpress_correct_flat_icon"/>
-
-                            <LinearLayout
-                                android:orientation="vertical"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp" >
-
-                                <TextView
-                                    style="@style/TestpressReviewStatLabel"
-                                    android:text="@string/testpress_correct"
-                                    android:id="@+id/correct_label"
-                                    android:layout_gravity="center" />
-
-                                <TextView
-                                    style="@style/TestpressReviewStatValue"
-                                    android:id="@+id/correct_count"
-                                    android:text="5"
-                                    android:layout_gravity="bottom" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:gravity="center"
-                            android:orientation="horizontal"
-                            android:layout_weight="1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content">
-
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:layout_marginRight="5dp"
-                                android:src="@drawable/testpress_incorrect_flat_icon"/>
-
-                            <LinearLayout
-                                android:orientation="vertical"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp" >
-
-                                <TextView
-                                    style="@style/TestpressReviewStatLabel"
-                                    android:text="@string/testpress_incorrect"
-                                    android:id="@+id/incorrect_label"
-                                    android:layout_gravity="center" />
-
-                                <TextView
-                                    style="@style/TestpressReviewStatValue"
-                                    android:id="@+id/incorrect_count"
-                                    android:text="5"
+                                    android:layout_marginBottom="1dp"
                                     android:layout_gravity="bottom" />
 
                             </LinearLayout>
@@ -496,80 +284,279 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/percentile_layout"
                         android:gravity="center"
                         android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        android:baselineAligned="false" >
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="32dp"
+                            android:layout_marginRight="5dp"
+                            android:src="@drawable/testpress_percentile_icon"/>
 
                         <LinearLayout
-                            android:gravity="center"
-                            android:orientation="horizontal"
-                            android:layout_weight="1"
-                            android:layout_width="0dp"
+                            android:orientation="vertical"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            tools:ignore="TooManyViews">
+                            android:layout_marginLeft="5dp" >
 
-                            <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:layout_marginRight="5dp"
-                                android:src="@drawable/testpress_stopwatch_flat_icon"/>
+                            <TextView
+                                style="@style/TestpressReviewStatLabel"
+                                android:id="@+id/percentile_label"
+                                android:text="@string/testpress_percentile"
+                                android:layout_gravity="left" />
 
-                            <LinearLayout
-                                android:orientation="vertical"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp" >
-
-                                <TextView
-                                    style="@style/TestpressReviewStatLabel"
-                                    android:text="@string/testpress_time_taken"
-                                    android:id="@+id/time_taken_label"
-                                    android:layout_gravity="center" />
-
-                                <TextView
-                                    style="@style/TestpressReviewStatValue"
-                                    android:text="01:14:00"
-                                    android:id="@+id/time_taken" />
-
-                            </LinearLayout>
+                            <TextView
+                                style="@style/TestpressReviewStatValue"
+                                android:id="@+id/percentile"
+                                android:text="73"
+                                android:layout_gravity="left" />
 
                         </LinearLayout>
 
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:gravity="center"
+                    android:id="@+id/score_row"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:layout_marginTop="15dp" >
+
+                    <LinearLayout
+                        android:gravity="center"
+                        android:id="@+id/score_layout"
+                        android:orientation="horizontal"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="32dp"
+                            android:layout_marginRight="5dp"
+                            android:src="@drawable/testpress_score_flat_icon"/>
 
                         <LinearLayout
-                            android:gravity="center"
-                            android:orientation="horizontal"
-                            android:layout_weight="1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content">
+                            android:orientation="vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp" >
 
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="32dp"
-                                android:layout_marginRight="5dp"
-                                android:src="@drawable/testpress_accurate_flat_icon"/>
+                            <TextView
+                                style="@style/TestpressReviewStatLabel"
+                                android:text="@string/testpress_score"
+                                android:id="@+id/score_label"
+                                android:layout_gravity="left" />
 
-                            <LinearLayout
-                                android:orientation="vertical"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp" >
+                            <TextView
+                                style="@style/TestpressReviewStatValue"
+                                android:id="@+id/score"
+                                android:text="5"
+                                android:layout_gravity="bottom" />
 
-                                <TextView
-                                    style="@style/TestpressReviewStatLabel"
-                                    android:text="@string/testpress_accuracy"
-                                    android:id="@+id/accuracy_label"
-                                    android:layout_gravity="center" />
+                        </LinearLayout>
 
-                                <TextView
-                                    style="@style/TestpressReviewStatValue"
-                                    android:text="75%"
-                                    android:id="@+id/accuracy" />
+                    </LinearLayout>
 
-                            </LinearLayout>
+                    <LinearLayout
+                        android:gravity="center"
+                        android:id="@+id/percentage_layout"
+                        android:orientation="horizontal"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="32dp"
+                            android:layout_marginRight="5dp"
+                            android:src="@drawable/testpress_percentage_badge_flat_icon"/>
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="left"
+                            android:layout_marginLeft="5dp" >
+
+                            <TextView
+                                style="@style/TestpressReviewStatLabel"
+                                android:text="Percentage"
+                                android:id="@+id/percentage_label"
+                                android:layout_gravity="center" />
+
+                            <TextView
+                                style="@style/TestpressReviewStatValue"
+                                android:text="15"
+                                android:id="@+id/percentage" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:layout_marginTop="15dp" >
+
+                    <LinearLayout
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_marginRight="5dp"
+                            android:src="@drawable/testpress_correct_flat_icon"/>
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp" >
+
+                            <TextView
+                                style="@style/TestpressReviewStatLabel"
+                                android:text="@string/testpress_correct"
+                                android:id="@+id/correct_label"
+                                android:layout_gravity="center" />
+
+                            <TextView
+                                style="@style/TestpressReviewStatValue"
+                                android:id="@+id/correct_count"
+                                android:text="5"
+                                android:layout_gravity="bottom" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_marginRight="5dp"
+                            android:src="@drawable/testpress_incorrect_flat_icon"/>
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp" >
+
+                            <TextView
+                                style="@style/TestpressReviewStatLabel"
+                                android:text="@string/testpress_incorrect"
+                                android:id="@+id/incorrect_label"
+                                android:layout_gravity="center" />
+
+                            <TextView
+                                style="@style/TestpressReviewStatValue"
+                                android:id="@+id/incorrect_count"
+                                android:text="5"
+                                android:layout_gravity="bottom" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:baselineAligned="false" >
+
+                    <LinearLayout
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        tools:ignore="TooManyViews">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_marginRight="5dp"
+                            android:src="@drawable/testpress_stopwatch_flat_icon"/>
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp" >
+
+                            <TextView
+                                style="@style/TestpressReviewStatLabel"
+                                android:text="@string/testpress_time_taken"
+                                android:id="@+id/time_taken_label"
+                                android:layout_gravity="center" />
+
+                            <TextView
+                                style="@style/TestpressReviewStatValue"
+                                android:text="01:14:00"
+                                android:id="@+id/time_taken" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="32dp"
+                            android:layout_marginRight="5dp"
+                            android:src="@drawable/testpress_accurate_flat_icon"/>
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp" >
+
+                            <TextView
+                                style="@style/TestpressReviewStatLabel"
+                                android:text="@string/testpress_accuracy"
+                                android:id="@+id/accuracy_label"
+                                android:layout_gravity="center" />
+
+                            <TextView
+                                style="@style/TestpressReviewStatValue"
+                                android:text="75%"
+                                android:id="@+id/accuracy" />
 
                         </LinearLayout>
 
@@ -579,131 +566,133 @@
 
             </LinearLayout>
 
-        </ScrollView>
+        </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:layout_above="@+id/button_layout"
-            android:background="@drawable/testpress_gradient_shadow_gray_top" />
+    </ScrollView>
 
-            <LinearLayout
-                android:id="@+id/button_layout"
-                android:orientation="horizontal"
-                android:layout_marginBottom="20dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_above="@+id/button_layout"
+        android:background="@drawable/testpress_gradient_shadow_gray_top" />
+
+    <LinearLayout
+        android:id="@+id/button_layout"
+        android:orientation="horizontal"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bottom_row">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/analytics"
+            android:background="@drawable/testpress_green_stroke"
+            android:text="@string/testpress_analytics"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textColor="@color/testpress_green_light"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="37dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="15dp" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/review"
+            android:background="@drawable/testpress_green_stroke"
+            android:text="@string/testpress_solutions"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textColor="@color/testpress_green_light"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="37dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="15dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottom_row"
+        android:orientation="horizontal"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:weightSum="2"
+        android:baselineAligned="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <LinearLayout
+            android:id="@+id/email_mcqs_layout"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_marginBottom="15dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/email_mcqs"
+                android:background="@drawable/testpress_green_stroke"
+                android:text="@string/testpress_email_mcqs"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:textColor="@color/testpress_green_light"
+                android:ellipsize="end"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/bottom_row">
+                android:layout_height="37dp" />
 
-                <android.support.v7.widget.AppCompatButton
-                    android:id="@+id/analytics"
-                    android:background="@drawable/testpress_green_stroke"
-                    android:text="@string/testpress_analytics"
-                    android:gravity="center"
-                    android:textSize="16sp"
-                    android:textColor="@color/testpress_green_light"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:layout_height="37dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginTop="20dp" />
+        </LinearLayout>
 
-                <android.support.v7.widget.AppCompatButton
-                    android:id="@+id/review"
-                    android:background="@drawable/testpress_green_stroke"
-                    android:text="@string/testpress_solutions"
-                    android:gravity="center"
-                    android:textSize="16sp"
-                    android:textColor="@color/testpress_green_light"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:layout_height="37dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginTop="20dp" />
+        <LinearLayout
+            android:id="@+id/retake_button_layout"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_marginBottom="15dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/bottom_row"
-                android:orientation="horizontal"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:weightSum="2"
-                android:baselineAligned="false"
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/retake"
+                android:background="@drawable/testpress_green_stroke"
+                android:text="@string/testpress_retake_exam"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:textColor="@color/testpress_green_light"
+                android:ellipsize="end"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true">
+                android:layout_height="37dp" />
 
-                <LinearLayout
-                    android:id="@+id/email_mcqs_layout"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:layout_marginBottom="20dp"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content">
+        </LinearLayout>
 
-                    <android.support.v7.widget.AppCompatButton
-                        android:id="@+id/email_mcqs"
-                        android:background="@drawable/testpress_green_stroke"
-                        android:text="@string/testpress_email_mcqs"
-                        android:gravity="center"
-                        android:textSize="16sp"
-                        android:textColor="@color/testpress_green_light"
-                        android:ellipsize="end"
-                        android:layout_width="match_parent"
-                        android:layout_height="37dp" />
+        <LinearLayout
+            android:id="@+id/time_analytics_layout"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_marginBottom="15dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
 
-                </LinearLayout>
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/time_analytics"
+                android:background="@drawable/testpress_green_stroke"
+                android:text="@string/testpress_time_analytics"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:textColor="@color/testpress_green_light"
+                android:ellipsize="end"
+                android:layout_width="match_parent"
+                android:layout_height="37dp" />
 
-                <LinearLayout
-                    android:id="@+id/retake_button_layout"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:layout_marginBottom="20dp"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content">
+        </LinearLayout>
 
-                    <android.support.v7.widget.AppCompatButton
-                        android:id="@+id/retake"
-                        android:background="@drawable/testpress_green_stroke"
-                        android:text="@string/testpress_retake_exam"
-                        android:gravity="center"
-                        android:textSize="16sp"
-                        android:textColor="@color/testpress_green_light"
-                        android:ellipsize="end"
-                        android:layout_width="match_parent"
-                        android:layout_height="37dp" />
+    </LinearLayout>
 
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/time_analytics_layout"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:layout_marginBottom="20dp"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content">
-
-                    <android.support.v7.widget.AppCompatButton
-                        android:id="@+id/time_analytics"
-                        android:background="@drawable/testpress_green_stroke"
-                        android:text="@string/testpress_time_analytics"
-                        android:gravity="center"
-                        android:textSize="16sp"
-                        android:textColor="@color/testpress_green_light"
-                        android:ellipsize="end"
-                        android:layout_width="match_parent"
-                        android:layout_height="37dp" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-    </RelativeLayout>
+</RelativeLayout>

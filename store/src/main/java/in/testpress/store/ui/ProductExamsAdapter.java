@@ -12,7 +12,7 @@ import android.widget.TextView;
 import java.util.Arrays;
 import java.util.List;
 
-import in.testpress.exam.models.Exam;
+import in.testpress.models.greendao.Exam;
 import in.testpress.store.R;
 
 public class ProductExamsAdapter extends ArrayAdapter<Exam> {
@@ -57,7 +57,7 @@ public class ProductExamsAdapter extends ArrayAdapter<Exam> {
             viewHolder.date.setText(exam.getFormattedStartDate() + " to " +
                     exam.getFormattedEndDate());
 
-            viewHolder.noOfQuestions.setText(exam.getNumberOfQuestionsString());
+            viewHolder.noOfQuestions.setText(exam.getNumberOfQuestions().toString());
             viewHolder.duration.setText(exam.getDuration());
 
             if (!exam.getCategories().isEmpty()) {

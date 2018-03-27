@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -137,7 +138,7 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     public void onClick(View v) {
                         //noinspection ConstantConditions
                         TestpressExam.resumeCourseAttempt(mActivity,
-                                new CourseContent(mContent.getAttemptsUrl(), mContent.exam),
+                                new CourseContent(mContent.getAttemptsUrl(), mContent.getRawExam()),
                                 courseAttempt, false, TestpressSdk.getTestpressSession(mActivity));
                     }
                 });
@@ -149,8 +150,9 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 holder.completedAttemptLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Log.e("sssssss","");
                         //noinspection ConstantConditions
-                        TestpressExam.showCourseAttemptReport(mActivity, mContent.getExam(),
+                        TestpressExam.showCourseAttemptReport(mActivity, mContent.getRawExam(),
                                 courseAttempt, TestpressSdk.getTestpressSession(mActivity));
                     }
                 });

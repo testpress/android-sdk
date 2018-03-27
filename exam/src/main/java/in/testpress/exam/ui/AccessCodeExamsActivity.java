@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import in.testpress.exam.R;
-import in.testpress.exam.models.Exam;
+import in.testpress.models.greendao.Exam;
 import in.testpress.ui.BaseToolBarActivity;
 
 import static in.testpress.exam.ui.AccessCodeExamsFragment.ACCESS_CODE;

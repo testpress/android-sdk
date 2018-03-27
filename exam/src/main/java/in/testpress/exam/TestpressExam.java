@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 
 import org.greenrobot.greendao.database.Database;
 
+import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.ui.AccessCodeActivity;
 import in.testpress.exam.ui.AccessCodeFragment;
@@ -26,8 +27,8 @@ import in.testpress.models.greendao.CourseContent;
 import in.testpress.models.greendao.DaoSession;
 import in.testpress.models.greendao.Exam;
 import in.testpress.util.Assert;
+import in.testpress.util.ImageUtils;
 
-import static in.testpress.core.TestpressSDKDatabase.init;
 import static in.testpress.exam.ui.CategoryGridActivity.SHOW_EXAMS_AS_DEFAULT;
 
 public class TestpressExam {
@@ -361,6 +362,14 @@ public class TestpressExam {
             intent.putExtra(TestActivity.PARAM_ACTION, TestActivity.PARAM_VALUE_ACTION_END);
         }
         activity.startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
+    }
+
+    private static void init(Context context, TestpressSession testpressSession) {
+        if (testpressSession == null) {
+            throw new IllegalArgumentException("TestpressSession must not be null.");
+        }
+        TestpressSdk.setTestpressSession(context, testpressSession);
+        ImageUtils.initImageLoader(context);
     }
 
 }

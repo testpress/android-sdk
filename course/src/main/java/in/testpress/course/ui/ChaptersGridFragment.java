@@ -153,12 +153,19 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
                 @Override
                 public void onClick(View v) {
                     if (chapter.getChildrenCount() > 0) {
-                        getActivity().startActivity(
-                                ChaptersGridActivity.createIntent(chapter.getName(),
-                                        courseId, chapter.getId().toString(), getContext()));
+                        getActivity().startActivity(ChaptersGridActivity.createIntent(
+                                chapter.getName(),
+                                courseId,
+                                chapter.getId().toString(),
+                                getContext())
+                        );
                     } else {
                         getActivity().startActivity(ContentsListActivity.createIntent(
-                                chapter.getName(), chapter.getContentUrl(), getContext(), chapter.getId()));
+                                chapter.getName(),
+                                chapter.getId(),
+                                chapter.getContentUrl(),
+                                getContext())
+                        );
                     }
                 }
             });

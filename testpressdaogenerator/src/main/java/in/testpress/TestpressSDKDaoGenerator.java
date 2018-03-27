@@ -2,6 +2,7 @@ package in.testpress;
 
 import org.greenrobot.greendao.generator.DaoGenerator;
 import org.greenrobot.greendao.generator.Entity;
+import org.greenrobot.greendao.generator.Index;
 import org.greenrobot.greendao.generator.Property;
 import org.greenrobot.greendao.generator.Schema;
 import org.greenrobot.greendao.generator.ToMany;
@@ -9,9 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 11;
-    //Increased after adding show ranl/percentage/percentile/score field in Exam
-    // 23th Jan 2018
+    private static final int VERSION = 12;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -30,12 +29,11 @@ public class TestpressSDKDaoGenerator {
         addCourse(schema);
         addChapter(schema);
 
-        Entity language = addLanguage(schema);
         Entity video = addVideo(schema);
         Entity attachment = addAttachment(schema);
         Entity exam = addExam(schema);
+        addLanguage(schema, exam);
         Entity content = addContent(schema);
-        addLanguageToExam(exam, language);
         addVideoToContent(content, video);
         addAttachmentToContent(content, attachment);
         addExamToContent(content, exam);
@@ -72,7 +70,6 @@ public class TestpressSDKDaoGenerator {
         attempt.addStringProperty("percentile");
         attempt.addIntProperty("speed");
         attempt.addIntProperty("accuracy");
-        attempt.addLongProperty("contentId");
         attempt.addStringProperty("percentage");
         attempt.implementsInterface("android.os.Parcelable");
         return attempt;
@@ -111,11 +108,6 @@ public class TestpressSDKDaoGenerator {
     private static void addAttemptToCourseAttempt(Entity courseAttempt, Entity attempt) {
         Property attemptId = courseAttempt.addLongProperty("attemptId").getProperty();
         courseAttempt.addToOne(attempt, attemptId, "assessment");
-    }
-
-    private static void addLanguageToExam(Entity exam, Entity language) {
-        Property examId = language.addLongProperty("examId").getProperty();
-        exam.addToMany(language, examId, "languages");
     }
 
     private static void addExamToContent(Entity content, Entity exam) {
@@ -185,13 +177,24 @@ public class TestpressSDKDaoGenerator {
         return video;
     }
 
-    private static Entity addLanguage(Schema schema) {
+    private static Entity addLanguage(Schema schema, Entity exam) {
         Entity language = schema.addEntity("Language");
-        language.addLongProperty("id").primaryKey();
-        language.addStringProperty("code");
+        language.addLongProperty("id").primaryKey().autoincrement();
+        Property code = language.addStringProperty("code").getProperty();
         language.addStringProperty("title");
-        language.addStringProperty("exam_slug");
         language.implementsInterface("android.os.Parcelable");
+
+        // Add languages to exam
+        Property examId = language.addLongProperty("examId").getProperty();
+        exam.addToMany(language, examId, "languages");
+
+        // Unique together code & examId
+        Index index = new Index();
+        index.addProperty(code);
+        index.addProperty(examId);
+        index.makeUnique();
+
+        language.addIndex(index);
         return language;
     }
 
@@ -204,9 +207,8 @@ public class TestpressSDKDaoGenerator {
         exam.addIntProperty("pausedAttemptsCount");
         exam.addStringProperty("title");
         exam.addStringProperty("description");
-        exam.addStringProperty("course_category");
-        exam.addDateProperty("startDate");
-        exam.addDateProperty("endDate");
+        exam.addStringProperty("startDate");
+        exam.addStringProperty("endDate");
         exam.addStringProperty("duration");
         exam.addIntProperty("numberOfQuestions");
         exam.addStringProperty("negativeMarks");
@@ -226,6 +228,10 @@ public class TestpressSDKDaoGenerator {
         exam.addBooleanProperty("enableRanks");
         exam.addBooleanProperty("showScore");
         exam.addBooleanProperty("showPercentile");
+        exam.addStringProperty("categories").customType(
+                "in.testpress.util.StringList",
+                "in.testpress.util.StringListConverter"
+        );
         exam.implementsInterface("android.os.Parcelable");
         return exam;
     }
@@ -305,7 +311,7 @@ public class TestpressSDKDaoGenerator {
         reviewItem.addStringProperty("essayText");
         reviewItem.addStringProperty("essayTopic");
         reviewItem.addStringProperty("selectedAnswers").customType(
-                "in.testpress.util.IntegerList",
+                "List<Integer>",
                 "in.testpress.util.IntegerListConverter"
         );
         reviewItem.addBooleanProperty("review");

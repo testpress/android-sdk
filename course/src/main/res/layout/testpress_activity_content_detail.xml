@@ -155,6 +155,20 @@
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
+        <include layout="@layout/testpress_empty_view"
+            android:layout_above="@+id/button_layout"
+            android:layout_below="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:ignore="UnknownIdInLayout" />
+
+        <View
+            android:id="@+id/top_shadow"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_above="@+id/button_layout"
+            android:background="@drawable/testpress_gradient_shadow_gray_top" />
+
         <LinearLayout
             android:id="@+id/button_layout"
             android:orientation="vertical"
@@ -163,18 +177,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:background="@color/testpress_white">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#efefef"/>
-
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -223,12 +225,6 @@
                 android:layout_marginBottom="10dp" />
             </LinearLayout>
         </LinearLayout>
-
-        <include layout="@layout/testpress_empty_view"
-            android:layout_above="@+id/button_layout"
-            android:layout_below="@+id/appbar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
 
     </RelativeLayout>
 </merge>

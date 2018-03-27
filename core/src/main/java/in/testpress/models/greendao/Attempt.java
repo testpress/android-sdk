@@ -7,7 +7,6 @@ import org.greenrobot.greendao.annotation.*;
 // KEEP INCLUDES - put your custom includes here
 import android.annotation.SuppressLint;
 import android.os.Parcel;
-import android.os.Parcelable;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -43,7 +42,6 @@ public class Attempt implements android.os.Parcelable {
     private String percentile;
     private Integer speed;
     private Integer accuracy;
-    private Long contentId;
     private String percentage;
 
     // KEEP FIELDS - put your custom fields here
@@ -58,7 +56,7 @@ public class Attempt implements android.os.Parcelable {
     }
 
     @Generated
-    public Attempt(String url, Long id, String date, Integer totalQuestions, String score, String rank, String maxRank, String reviewUrl, String questionsUrl, Integer correctCount, Integer incorrectCount, String lastStartedTime, String remainingTime, String timeTaken, String state, String percentile, Integer speed, Integer accuracy, Long contentId, String percentage) {
+    public Attempt(String url, Long id, String date, Integer totalQuestions, String score, String rank, String maxRank, String reviewUrl, String questionsUrl, Integer correctCount, Integer incorrectCount, String lastStartedTime, String remainingTime, String timeTaken, String state, String percentile, Integer speed, Integer accuracy, String percentage) {
         this.url = url;
         this.id = id;
         this.date = date;
@@ -77,7 +75,6 @@ public class Attempt implements android.os.Parcelable {
         this.percentile = percentile;
         this.speed = speed;
         this.accuracy = accuracy;
-        this.contentId = contentId;
         this.percentage = percentage;
     }
 
@@ -225,14 +222,6 @@ public class Attempt implements android.os.Parcelable {
         this.accuracy = accuracy;
     }
 
-    public Long getContentId() {
-        return contentId;
-    }
-
-    public void setContentId(Long contentId) {
-        this.contentId = contentId;
-    }
-
     public String getPercentage() {
         return percentage;
     }
@@ -242,51 +231,66 @@ public class Attempt implements android.os.Parcelable {
     }
 
     // KEEP METHODS - put your custom methods here
-
-    // Parcelling part
-
     protected Attempt(Parcel in) {
         url = in.readString();
-        id = in.readByte() == 0x00 ? null : in.readLong();
+        if (in.readByte() == 0) {
+            id = null;
+        } else {
+            id = in.readLong();
+        }
         date = in.readString();
-        totalQuestions = in.readByte() == 0x00 ? null : in.readInt();
+        if (in.readByte() == 0) {
+            totalQuestions = null;
+        } else {
+            totalQuestions = in.readInt();
+        }
         score = in.readString();
         rank = in.readString();
         maxRank = in.readString();
         reviewUrl = in.readString();
         questionsUrl = in.readString();
-        correctCount = in.readByte() == 0x00 ? null : in.readInt();
-        incorrectCount = in.readByte() == 0x00 ? null : in.readInt();
+        if (in.readByte() == 0) {
+            correctCount = null;
+        } else {
+            correctCount = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            incorrectCount = null;
+        } else {
+            incorrectCount = in.readInt();
+        }
         lastStartedTime = in.readString();
         remainingTime = in.readString();
         timeTaken = in.readString();
         state = in.readString();
         percentile = in.readString();
-        speed = in.readByte() == 0x00 ? null : in.readInt();
-        accuracy = in.readByte() == 0x00 ? null : in.readInt();
-        contentId = in.readByte() == 0x00 ? null : in.readLong();
+        if (in.readByte() == 0) {
+            speed = null;
+        } else {
+            speed = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            accuracy = null;
+        } else {
+            accuracy = in.readInt();
+        }
         percentage = in.readString();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(url);
         if (id == null) {
-            dest.writeByte((byte) (0x00));
+            dest.writeByte((byte) 0);
         } else {
-            dest.writeByte((byte) (0x01));
+            dest.writeByte((byte) 1);
             dest.writeLong(id);
         }
         dest.writeString(date);
         if (totalQuestions == null) {
-            dest.writeByte((byte) (0x00));
+            dest.writeByte((byte) 0);
         } else {
-            dest.writeByte((byte) (0x01));
+            dest.writeByte((byte) 1);
             dest.writeInt(totalQuestions);
         }
         dest.writeString(score);
@@ -295,15 +299,15 @@ public class Attempt implements android.os.Parcelable {
         dest.writeString(reviewUrl);
         dest.writeString(questionsUrl);
         if (correctCount == null) {
-            dest.writeByte((byte) (0x00));
+            dest.writeByte((byte) 0);
         } else {
-            dest.writeByte((byte) (0x01));
+            dest.writeByte((byte) 1);
             dest.writeInt(correctCount);
         }
         if (incorrectCount == null) {
-            dest.writeByte((byte) (0x00));
+            dest.writeByte((byte) 0);
         } else {
-            dest.writeByte((byte) (0x01));
+            dest.writeByte((byte) 1);
             dest.writeInt(incorrectCount);
         }
         dest.writeString(lastStartedTime);
@@ -312,28 +316,26 @@ public class Attempt implements android.os.Parcelable {
         dest.writeString(state);
         dest.writeString(percentile);
         if (speed == null) {
-            dest.writeByte((byte) (0x00));
+            dest.writeByte((byte) 0);
         } else {
-            dest.writeByte((byte) (0x01));
+            dest.writeByte((byte) 1);
             dest.writeInt(speed);
         }
         if (accuracy == null) {
-            dest.writeByte((byte) (0x00));
+            dest.writeByte((byte) 0);
         } else {
-            dest.writeByte((byte) (0x01));
+            dest.writeByte((byte) 1);
             dest.writeInt(accuracy);
-        }
-        if (contentId == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeLong(contentId);
         }
         dest.writeString(percentage);
     }
 
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Attempt> CREATOR = new Parcelable.Creator<Attempt>() {
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Attempt> CREATOR = new Creator<Attempt>() {
         @Override
         public Attempt createFromParcel(Parcel in) {
             return new Attempt(in);

@@ -9,7 +9,7 @@ public interface RetrofitCall<T> {
 
     void cancel();
 
-    void enqueue(TestpressCallback<T> callback);
+    RetrofitCall<T> enqueue(TestpressCallback<T> callback);
 
     RetrofitCall<T> clone();
 

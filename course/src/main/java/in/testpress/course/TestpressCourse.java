@@ -160,6 +160,7 @@ public class TestpressCourse {
      */
     public static void showContents(@NonNull Context context,
                                     @NonNull String title,
+                                    long chapterId,
                                     @NonNull String contentsUrl,
                                     @NonNull TestpressSession testpressSession) {
 
@@ -168,7 +169,8 @@ public class TestpressCourse {
         Assert.assertNotNullAndNotEmpty("contentsUrl must not be null or empty.", contentsUrl);
 
         init(context.getApplicationContext(), testpressSession);
-        context.startActivity(ContentsListActivity.createIntent(title, contentsUrl, context));
+        context.startActivity(
+                ContentsListActivity.createIntent(title, chapterId, contentsUrl, context));
     }
 
     /**

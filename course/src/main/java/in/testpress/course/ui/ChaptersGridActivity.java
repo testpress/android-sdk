@@ -10,7 +10,6 @@ import java.util.List;
 
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
-import in.testpress.course.TestpressCourse;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.ui.BaseToolBarActivity;
@@ -53,8 +52,8 @@ public class ChaptersGridActivity extends BaseToolBarActivity {
         // If chapter list have parent then pass parent's parent id & course id
         List<Chapter> chapters = null;
         try {
-            //noinspection RestrictedApi
-            @SuppressLint("RestrictedApi") ChaptersGridFragment fragment =
+            @SuppressLint("RestrictedApi")
+            ChaptersGridFragment fragment =
                     (ChaptersGridFragment) getSupportFragmentManager().getFragments().get(0);
 
             chapters = fragment.getItems();

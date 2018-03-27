@@ -33,7 +33,7 @@ public class ChapterPager extends BaseDatabaseModelPager<Chapter> {
 
     @Override
     protected Chapter register(Chapter chapter) {
-        if (chapter != null) {
+        if (chapter != null && chapter.getModified() != null && !chapter.getModified().isEmpty()) {
             try {
                 chapter.setModifiedDate(simpleDateFormat.parse(chapter.getModified()).getTime());
             } catch (ParseException e) {

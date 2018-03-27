@@ -3,15 +3,14 @@ package in.testpress.exam.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 
 import java.util.List;
 
 import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
-import in.testpress.exam.models.Exam;
 import in.testpress.exam.network.ExamPager;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.models.greendao.Exam;
 import in.testpress.ui.PagedItemFragment;
 import in.testpress.util.SingleTypeAdapter;
 

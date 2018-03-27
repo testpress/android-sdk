@@ -4,11 +4,10 @@ import java.io.IOException;
 
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Content;
-import in.testpress.network.BaseDatabaseModelPager;
 import in.testpress.network.BaseResourcePager;
 import retrofit2.Response;
 
-public class ContentPager extends BaseDatabaseModelPager<Content> {
+public class ContentPager extends BaseResourcePager<Content> {
 
     private TestpressCourseApiClient apiClient;
     private String contentsUrlFrag;
@@ -26,7 +25,7 @@ public class ContentPager extends BaseDatabaseModelPager<Content> {
     @Override
     public Response<TestpressApiResponse<Content>> getItems(int page, int size) throws IOException {
         queryParams.put(TestpressCourseApiClient.PAGE, page);
-        return apiClient.getContents(contentsUrlFrag, queryParams, latestModifiedDate).execute();
+        return apiClient.getContents(contentsUrlFrag, queryParams).execute();
     }
 
 }

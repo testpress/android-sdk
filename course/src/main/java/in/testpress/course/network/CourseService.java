@@ -41,8 +41,7 @@ public interface CourseService {
     @GET("{contents_url}")
     RetrofitCall<TestpressApiResponse<Content>> getContents(
             @Path(value = "contents_url", encoded = true) String contentsUrlFrag,
-            @QueryMap Map<String, Object> queryParams,
-            @Header("If-Modified-Since") String latestModifiedDate);
+            @QueryMap Map<String, Object> queryParams);
 
     @GET("{html_content_url}")
     RetrofitCall<HtmlContent> getHtmlContent(

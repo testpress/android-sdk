@@ -6,22 +6,23 @@ import org.greenrobot.greendao.converter.PropertyConverter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-public class IntegerListConverter implements PropertyConverter<IntegerList, String> {
+public class IntegerListConverter implements PropertyConverter<List<Integer>, String> {
 
     @Override
-    public IntegerList convertToEntityProperty(String databaseValue) {
+    public List<Integer> convertToEntityProperty(String databaseValue) {
         if (databaseValue == null) {
             return null;
         }
         if (databaseValue.isEmpty()) {
-            return new IntegerList();
+            return new ArrayList<>();
         }
-        return new IntegerList(Arrays.asList(convertStringTOInt(databaseValue.split(","))));
+        return new ArrayList<>(Arrays.asList(convertStringTOInt(databaseValue.split(","))));
     }
 
     @Override
-    public String convertToDatabaseValue(IntegerList entityProperty) {
+    public String convertToDatabaseValue(List<Integer> entityProperty) {
         return (entityProperty == null) ? null : TextUtils.join(",", entityProperty);
     }
 

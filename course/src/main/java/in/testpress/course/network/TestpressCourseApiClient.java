@@ -57,8 +57,8 @@ public class TestpressCourseApiClient extends TestpressApiClient {
     }
 
     public RetrofitCall<TestpressApiResponse<Content>> getContents(String chaptersUrlFrag,
-                                Map<String, Object> queryParams, String latestModifiedDate) {
-        return getCourseService().getContents(chaptersUrlFrag, queryParams, latestModifiedDate);
+                                                                   Map<String, Object> queryParams) {
+        return getCourseService().getContents(chaptersUrlFrag, queryParams);
     }
 
     public RetrofitCall<HtmlContent> getHtmlContent(String htmlContentUrlFrag) {

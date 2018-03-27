@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+
 import org.greenrobot.greendao.query.QueryBuilder;
 import org.greenrobot.greendao.query.WhereCondition;
 
@@ -455,47 +456,6 @@ public class TimeAnalyticsActivity extends BaseToolBarActivity {
         }
     }
 
-    private void addLanguagesToSpinner() {
-        final List<Language> languages = languageDao.queryBuilder()
-                .where(LanguageDao.Properties.Exam_slug.eq(exam.getSlug())).list();
-        if (languages.size() > 1) {
-            if (languageSpinnerAdapter == null) {
-                languageSpinnerAdapter =
-                        new ExploreSpinnerAdapter(getLayoutInflater(), getResources(), false);
-
-                languageSpinnerAdapter.hideSpinner(true);
-                for (Language language : languages) {
-                    languageSpinnerAdapter.addItem(language.getCode(), language.getTitle(), true, 0);
-                }
-                languageSpinner.setAdapter(languageSpinnerAdapter);
-                languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position,
-                                               long id) {
-
-                        // Update existing object so that update will reflect in ReviewQuestionFragment also
-                        selectedLanguage.update(languages.get(position));
-                        exam.setSelectedLanguage(selectedLanguage.getCode());
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                    }
-                });
-                String selectedLanguageCode = exam.getSelectedLanguage();
-                if (selectedLanguageCode != null && !selectedLanguageCode.isEmpty()) {
-                    int selectedPosition =
-                            languageSpinnerAdapter.getItemPositionFromTag(selectedLanguageCode);
-
-                    initSelectedLanguage(languages.get(selectedPosition));
-                    languageSpinner.setSelection(selectedPosition);
-                } else {
-                    initSelectedLanguage(languages.get(0));
-                }
-            }
-        }
-    }
-
     private void initSelectedLanguage(Language language) {
         // Create new object so that we can update it without affecting original languages list
         selectedLanguage = new Language(language);
@@ -566,7 +526,7 @@ public class TimeAnalyticsActivity extends BaseToolBarActivity {
             // Store question
             ReviewQuestionDao reviewQuestionDao = TestpressSDKDatabase.getReviewQuestionDao(this);
             ReviewAnswerDao reviewAnswerDao = TestpressSDKDatabase.getReviewAnswerDao(this);
-            ReviewQuestion reviewQuestion = reviewItem.question;
+            ReviewQuestion reviewQuestion = reviewItem.getRawQuestion();
             reviewQuestionDao.insertOrReplace(reviewQuestion);
             // Store answers
             for (ReviewAnswer reviewAnswer : reviewQuestion.getAnswers()) {
@@ -724,9 +684,10 @@ public class TimeAnalyticsActivity extends BaseToolBarActivity {
     public class TimeAnalyticsListener {
 
         @JavascriptInterface
-        public void openReviewQuestionsActivity(String position) {
+        public void openReviewQuestionsActivity(String index) {
+            int position = Integer.parseInt(index) - 1;
             activity.startActivity(
-                    ReviewQuestionsActivity.createIntent(activity, exam, attempt, Integer.parseInt(position))
+                    ReviewQuestionsActivity.createIntent(activity, exam, attempt, position)
             );
         }
     }

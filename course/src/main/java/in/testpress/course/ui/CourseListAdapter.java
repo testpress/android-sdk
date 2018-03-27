@@ -30,14 +30,15 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
 
     @Override
     public int getCount() {
-        return (int) mCourseDao.queryBuilder()
-                .where(CourseDao.Properties.Active.eq(true)).count();
+        return (int) mCourseDao.queryBuilder().where(CourseDao.Properties.Active.eq(true)).count();
     }
 
     @Override
     public Course getItem(int position) {
-        return mCourseDao.queryBuilder().where(CourseDao.Properties.Active.eq(true))
-                .orderAsc(CourseDao.Properties.Order).listLazy().get(position);
+        return mCourseDao.queryBuilder()
+                .where(CourseDao.Properties.Active.eq(true))
+                .orderAsc(CourseDao.Properties.Order)
+                .listLazy().get(position);
     }
 
     @Override
@@ -64,13 +65,13 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         view(3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (course.getChaptersCount() > 0) {
-                    mActivity.startActivity(ChaptersGridActivity.createIntent(course.getTitle(),
-                            course.getId().toString(), null, mActivity));
-                } else {
-                    mActivity.startActivity(ContentsListActivity.createIntent(course.getTitle(),
-                            course.getContentsUrl(), mActivity));
-                }
+                mActivity.startActivity(ChaptersGridActivity.createIntent(
+                        course.getTitle(),
+                        course.getId().toString(),
+                        null,
+                        mActivity
+                ));
+
             }
         });
         // ToDo: Set completed percentage in the progress bar

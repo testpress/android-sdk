@@ -32,7 +32,7 @@ public class CourseContent implements android.os.Parcelable {
     private transient CourseContentDao myDao;
 
     @ToOne(joinProperty = "examId")
-    public Exam exam;
+    private Exam exam;
 
     @Generated
     private transient Long exam__resolvedKey;
@@ -149,12 +149,37 @@ public class CourseContent implements android.os.Parcelable {
     }
 
     // KEEP METHODS - put your custom methods here
-
     protected CourseContent(Parcel in) {
-        id = in.readByte() == 0x00 ? null : in.readLong();
+        if (in.readByte() == 0) {
+            id = null;
+        } else {
+            id = in.readLong();
+        }
         attemptsUrl = in.readString();
-        examId = in.readByte() == 0x00 ? null : in.readLong();
-        exam = (Exam) in.readValue(Exam.class.getClassLoader());
+        if (in.readByte() == 0) {
+            examId = null;
+        } else {
+            examId = in.readLong();
+        }
+        setExam((Exam) in.readParcelable(Exam.class.getClassLoader()));
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (id == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(id);
+        }
+        dest.writeString(attemptsUrl);
+        if (examId == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(examId);
+        }
+        dest.writeParcelable(getRawExam(), flags);
     }
 
     @Override
@@ -162,26 +187,7 @@ public class CourseContent implements android.os.Parcelable {
         return 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        if (id == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeLong(id);
-        }
-        dest.writeString(attemptsUrl);
-        if (examId == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeLong(examId);
-        }
-        dest.writeValue(exam);
-    }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<CourseContent> CREATOR = new Parcelable.Creator<CourseContent>() {
+    public static final Creator<CourseContent> CREATOR = new Creator<CourseContent>() {
         @Override
         public CourseContent createFromParcel(Parcel in) {
             return new CourseContent(in);
@@ -193,10 +199,16 @@ public class CourseContent implements android.os.Parcelable {
         }
     };
 
-
     public CourseContent(String attemptsUrl, Exam exam) {
         this.attemptsUrl = attemptsUrl;
-        this.exam = exam;
+        setExam(exam);
+    }
+
+    public Exam getRawExam() {
+        if (myDao == null || exam != null) {
+            return exam;
+        }
+        return getExam();
     }
     // KEEP METHODS END
 

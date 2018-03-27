@@ -48,19 +48,27 @@ public abstract class BaseDataBaseFragment<T, K> extends BaseListViewFragment<T>
         return getDao().count() == 0;
     }
 
-    @SuppressLint("StaticFieldLeak")
     @Override
     public Loader<List<T>> onCreateLoader(int id, Bundle args) {
-        return new ThrowableLoader<List<T>>(getActivity(), items) {
-            @Override
-            public List<T> loadData() throws TestpressException {
-                do {
-                    getPager().next();
-                    items = getPager().getResources();
-                } while (getPager().hasNext());
-                return items;
-            }
-        };
+        return new DBItemsLoader<>(this, items);
+    }
+
+    private static class DBItemsLoader<T, K> extends ThrowableLoader<List<T>> {
+
+        private BaseDataBaseFragment<T, K> fragment;
+
+        DBItemsLoader(BaseDataBaseFragment<T, K> fragment, List<T> data) {
+            super(fragment.getContext(), data);
+            this.fragment = fragment;
+        }
+
+        @Override
+        public List<T> loadData() throws TestpressException {
+            do {
+                fragment.getPager().next();
+            } while (fragment.getPager().hasNext());
+            return fragment.getPager().getResources();
+        }
     }
 
     @Override

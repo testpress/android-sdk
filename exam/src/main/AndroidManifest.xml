@@ -24,7 +24,7 @@
             android:configChanges="orientation|keyboard|screenSize" />
 
         <activity android:name=".ui.ReviewStatsActivity"
-            android:label="@string/testpress_review_label"
+            android:label="@string/testpress_test_report"
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
@@ -37,7 +37,7 @@
             android:theme="@style/TestpressTheme" />
 
         <activity android:name=".ui.ReviewQuestionsActivity"
-            android:label="@string/testpress_review_label"
+            android:label="@string/testpress_solutions"
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 

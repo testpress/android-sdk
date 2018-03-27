@@ -9,7 +9,6 @@ import org.greenrobot.greendao.DaoException;
 
 // KEEP INCLUDES - put your custom includes here
 import android.os.Parcel;
-import android.os.Parcelable;
 // KEEP INCLUDES END
 
 /**
@@ -42,7 +41,7 @@ public class CourseAttempt implements android.os.Parcelable {
     private transient Long chapterContent__resolvedKey;
 
     @ToOne(joinProperty = "attemptId")
-    public Attempt assessment;
+    private Attempt assessment;
 
     @Generated
     private transient Long assessment__resolvedKey;
@@ -223,11 +222,64 @@ public class CourseAttempt implements android.os.Parcelable {
 
     // KEEP METHODS - put your custom methods here
     protected CourseAttempt(Parcel in) {
-        id = in.readByte() == 0x00 ? null : in.readLong();
-        courseContentId = in.readByte() == 0x00 ? null : in.readLong();
-        attemptId = in.readByte() == 0x00 ? null : in.readLong();
-        chapterContent = (CourseContent) in.readValue(CourseContent.class.getClassLoader());
-        assessment = (Attempt) in.readValue(Attempt.class.getClassLoader());
+        if (in.readByte() == 0) {
+            id = null;
+        } else {
+            id = in.readLong();
+        }
+        type = in.readString();
+        if (in.readByte() == 0) {
+            objectId = null;
+        } else {
+            objectId = in.readInt();
+        }
+        objectUrl = in.readString();
+        trophies = in.readString();
+        if (in.readByte() == 0) {
+            courseContentId = null;
+        } else {
+            courseContentId = in.readLong();
+        }
+        if (in.readByte() == 0) {
+            attemptId = null;
+        } else {
+            attemptId = in.readLong();
+        }
+        setChapterContent((CourseContent) in.readParcelable(CourseContent.class.getClassLoader()));
+        setAssessment((Attempt) in.readParcelable(Attempt.class.getClassLoader()));
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (id == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(id);
+        }
+        dest.writeString(type);
+        if (objectId == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(objectId);
+        }
+        dest.writeString(objectUrl);
+        dest.writeString(trophies);
+        if (courseContentId == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(courseContentId);
+        }
+        if (attemptId == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(attemptId);
+        }
+        dest.writeParcelable(getRawChapterContent(), flags);
+        dest.writeParcelable(getRawAssessment(), flags);
     }
 
     @Override
@@ -235,32 +287,7 @@ public class CourseAttempt implements android.os.Parcelable {
         return 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        if (id == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeLong(id);
-        }
-        if (courseContentId == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeLong(courseContentId);
-        }
-        if (attemptId == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeLong(attemptId);
-        }
-        dest.writeValue(chapterContent);
-        dest.writeValue(assessment);
-    }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<CourseAttempt> CREATOR = new Parcelable.Creator<CourseAttempt>() {
+    public static final Creator<CourseAttempt> CREATOR = new Creator<CourseAttempt>() {
         @Override
         public CourseAttempt createFromParcel(Parcel in) {
             return new CourseAttempt(in);
@@ -274,6 +301,20 @@ public class CourseAttempt implements android.os.Parcelable {
 
     public String getEndAttemptUrl() {
         return CONTENT_ATTEMPTS_PATH + id + END_EXAM_PATH;
+    }
+
+    public Attempt getRawAssessment() {
+        if (myDao == null || assessment != null) {
+            return assessment;
+        }
+        return getAssessment();
+    }
+
+    public CourseContent getRawChapterContent() {
+        if (myDao == null || chapterContent != null) {
+            return chapterContent;
+        }
+        return getChapterContent();
     }
     // KEEP METHODS END
 

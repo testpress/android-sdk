@@ -1,8 +1,6 @@
 package in.testpress.course.ui;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.Loader;
 
 import org.greenrobot.greendao.AbstractDao;
@@ -10,24 +8,25 @@ import org.greenrobot.greendao.AbstractDao;
 import java.util.List;
 
 import in.testpress.core.TestpressException;
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
-import in.testpress.models.greendao.Attachment;
-import in.testpress.models.greendao.AttachmentDao;
-import in.testpress.models.greendao.Chapter;
-import in.testpress.models.greendao.ChapterDao;
-import in.testpress.models.greendao.Content;
 import in.testpress.course.network.ContentPager;
 import in.testpress.course.network.TestpressCourseApiClient;
+import in.testpress.models.greendao.Attachment;
+import in.testpress.models.greendao.AttachmentDao;
+import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.ExamDao;
-import in.testpress.core.TestpressSDKDatabase;
+import in.testpress.models.greendao.Language;
+import in.testpress.models.greendao.LanguageDao;
 import in.testpress.models.greendao.Video;
 import in.testpress.models.greendao.VideoDao;
 import in.testpress.ui.BaseDataBaseFragment;
+import in.testpress.util.Assert;
 import in.testpress.util.SingleTypeAdapter;
-import in.testpress.util.ThrowableLoader;
 
+import static in.testpress.course.ui.ContentsListActivity.CHAPTER_ID;
 import static in.testpress.course.ui.ContentsListActivity.CONTENTS_URL_FRAG;
 
 public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
@@ -35,14 +34,7 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
     private TestpressCourseApiClient mApiClient;
     private String contentsUrlFrag;
     private ContentDao contentDao;
-    private final String CHAPTER_ID = "chapterId";
-    private long chapterId = -1;
-
-    public static void show(FragmentActivity activity, int containerViewId) {
-        activity.getSupportFragmentManager().beginTransaction()
-                .replace(containerViewId, new ContentsListFragment())
-                .commitAllowingStateLoss();
-    }
+    private Long chapterId;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,33 +43,18 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
         if (getArguments() == null || contentsUrlFrag == null || contentsUrlFrag.isEmpty()) {
             throw new IllegalArgumentException("CONTENTS_URL_FRAG must not be null or empty");
         }
-        if (contentsUrlFrag != null) {
-            ChapterDao chapterDao = TestpressSDKDatabase.getChapterDao(getContext());
-            List<Chapter> tempChapters = chapterDao.queryBuilder()
-                    .where(ChapterDao.Properties.ContentUrl.eq(contentsUrlFrag)).list();
-            if (!tempChapters.isEmpty()) {
-                chapterId = tempChapters.get(0).getId();
-            }
-        }
         mApiClient = new TestpressCourseApiClient(getActivity());
         contentDao = TestpressSDKDatabase.getContentDao(getContext());
-        if (chapterId == -1) {
-            chapterId = getArguments().getLong(CHAPTER_ID);
-        }
+        chapterId = getArguments().getLong(CHAPTER_ID);
+        Assert.assertNotNull("chapterId must not be null.", chapterId);
     }
 
     @Override
     protected ContentPager getPager() {
         if (pager == null) {
             pager = new ContentPager(contentsUrlFrag, mApiClient);
-            if(contentDao.count() > 0) {
-                Content latest = contentDao.queryBuilder()
-                        //.where(ContentDao.Properties.ChapterId.eq())
-                        .orderAsc(ContentDao.Properties.Start)
-                        .list().get(0);
-            }
         }
-        return (ContentPager)pager;
+        return (ContentPager) pager;
     }
 
     @Override
@@ -88,12 +65,6 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
     @Override
     public void onLoadFinished(Loader<List<Content>> loader, List<Content> contents) {
         final TestpressException exception = getException(loader);
-        Video video;
-        Attachment attachment;
-        Exam exam;
-        VideoDao videoDao = TestpressSDKDatabase.getVideoDao(getContext());
-        AttachmentDao attachmentDao = TestpressSDKDatabase.getAttachmentDao(getContext());
-        ExamDao examDao = TestpressSDKDatabase.getExamDao(getContext());
         if (exception != null) {
             this.exception = exception;
             int errorMessage = getErrorMessage(exception);
@@ -109,9 +80,13 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
         this.items = contents;
         if (!contents.isEmpty()) {
             for(Content content : contents) {
-                video = content.video;
-                attachment = content.attachment;
-                exam = content.exam;
+                VideoDao videoDao = TestpressSDKDatabase.getVideoDao(getContext());
+                AttachmentDao attachmentDao = TestpressSDKDatabase.getAttachmentDao(getContext());
+                ExamDao examDao = TestpressSDKDatabase.getExamDao(getContext());
+                LanguageDao languageDao = TestpressSDKDatabase.getLanguageDao(getContext());
+                Video video = content.getRawVideo();
+                Attachment attachment = content.getRawAttachment();
+                Exam exam = content.getRawExam();
                 if (attachment != null) {
                     attachmentDao.insertOrReplace(attachment);
                     content.setAttachmentId(attachment.getId());
@@ -121,6 +96,11 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
                     content.setVideoId(video.getId());
                 }
                 if (exam != null) {
+                    List<Language> languages = exam.getLanguages();
+                    for (Language language : languages) {
+                        language.setExamId(exam.getId());
+                    }
+                    languageDao.insertOrReplaceInTx(languages);
                     examDao.insertOrReplace(exam);
                     content.setExamId(exam.getId());
                 }
@@ -133,16 +113,25 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
 
     @Override
     protected SingleTypeAdapter<Content> createAdapter(List<Content> items) {
-        return new ContentsListAdapter(getActivity(), items, R.layout.testpress_content_list_item, contentDao, chapterId);
+        return new ContentsListAdapter(getActivity(), items, R.layout.testpress_content_list_item,
+                contentDao, chapterId);
     }
 
     @Override
     protected boolean isItemsEmpty() {
         return contentDao.queryBuilder()
-                .where(
-                        ContentDao.Properties.ChapterId.eq(chapterId)
-                )
+                .where(ContentDao.Properties.ChapterId.eq(chapterId))
                 .list().isEmpty();
+    }
+
+    @Override
+    protected void refresh(final Bundle args) {
+        if (!isUsable()) {
+            return;
+        }
+        if (!getLoaderManager().hasRunningLoaders()) {
+            super.refresh(args);
+        }
     }
 
     @Override
