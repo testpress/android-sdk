@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.MenuItem;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
@@ -76,6 +77,15 @@ public class ReviewStatsActivity extends BaseToolBarActivity {
             setResult(RESULT_OK);
             finish();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        if(item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
