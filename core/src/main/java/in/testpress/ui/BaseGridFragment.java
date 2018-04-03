@@ -67,7 +67,7 @@ public abstract class BaseGridFragment<E> extends Fragment
     protected boolean gridShown;
 
     protected TestpressException exception;
-    boolean firstCallBack = true;
+    protected boolean firstCallBack = true;
     boolean needRetryButton;
     protected BaseResourcePager<E> pager;
 

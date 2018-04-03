@@ -65,6 +65,7 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
             showGrid();
         }
         displayItems();
+        firstCallBack = false;
     }
 
     private QueryBuilder<Chapter> getCourseChaptersQueryBuilder() {
