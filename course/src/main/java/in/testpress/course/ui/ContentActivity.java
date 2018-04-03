@@ -241,6 +241,9 @@ public class ContentActivity extends BaseToolBarActivity {
                                         WebResourceError error) {
 
                 super.onReceivedError(view, request, error);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && error.getErrorCode() == -2) {
+                    return;
+                }
                 setEmptyText(R.string.testpress_network_error,
                         R.string.testpress_no_internet_try_again,
                         R.drawable.ic_error_outline_black_18dp);
