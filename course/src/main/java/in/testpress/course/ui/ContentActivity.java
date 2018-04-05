@@ -63,6 +63,7 @@ import in.testpress.models.greendao.VideoDao;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ZoomableImageActivity;
 import in.testpress.util.FormatDate;
+import in.testpress.util.InternetConnectivityChecker;
 import in.testpress.util.ViewUtils;
 
 import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
@@ -241,7 +242,7 @@ public class ContentActivity extends BaseToolBarActivity {
                                         WebResourceError error) {
 
                 super.onReceivedError(view, request, error);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && error.getErrorCode() == -2) {
+                if (InternetConnectivityChecker.isConnected(ContentActivity.this)) {
                     return;
                 }
                 setEmptyText(R.string.testpress_network_error,
