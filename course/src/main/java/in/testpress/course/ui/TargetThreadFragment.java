@@ -24,6 +24,7 @@ import in.testpress.course.R;
 import in.testpress.course.models.Reputation;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.models.TestpressApiResponse;
+import in.testpress.network.RetrofitCall;
 import in.testpress.util.Assert;
 
 import static in.testpress.course.ui.RankListFragment.PARAM_USER_REPUTATION;
@@ -38,6 +39,8 @@ public class TargetThreadFragment extends Fragment {
     private ArrayList<Reputation> reputations = new ArrayList<>();
     private Reputation userReputation;
     private RankListAdapter listAdapter;
+    private RetrofitCall<TestpressApiResponse<Reputation>> targetsLoader;
+    private RetrofitCall<TestpressApiResponse<Reputation>> threadsLoader;
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
@@ -93,7 +96,7 @@ public class TargetThreadFragment extends Fragment {
     }
 
     void loadTargets() {
-        new TestpressCourseApiClient(getContext()).getTargets()
+        targetsLoader = new TestpressCourseApiClient(getContext()).getTargets()
                 .enqueue(new TestpressCallback<TestpressApiResponse<Reputation>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Reputation> response) {
@@ -116,7 +119,7 @@ public class TargetThreadFragment extends Fragment {
     }
 
     void loadThreads() {
-        new TestpressCourseApiClient(getContext()).getThreads()
+        threadsLoader = new TestpressCourseApiClient(getContext()).getThreads()
                 .enqueue(new TestpressCallback<TestpressApiResponse<Reputation>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Reputation> response) {
@@ -158,6 +161,9 @@ public class TargetThreadFragment extends Fragment {
     }
 
     private void handleErrors(TestpressException exception, final boolean isTarget) {
+        if (getActivity() == null) {
+            return;
+        }
         if (exception.isNetworkError()) {
             setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again);
             if (!isTarget) {
@@ -193,4 +199,14 @@ public class TargetThreadFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        if (threadsLoader != null) {
+            threadsLoader.cancel();
+        }
+        if (targetsLoader != null) {
+            targetsLoader.cancel();
+        }
+        super.onDestroy();
+    }
 }

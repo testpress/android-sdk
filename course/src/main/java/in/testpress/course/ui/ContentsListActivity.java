@@ -90,7 +90,7 @@ public class ContentsListActivity extends BaseToolBarActivity {
         ContentsListFragment fragment = new ContentsListFragment();
         fragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
-                .commit();
+                .commitAllowingStateLoss();
     }
 
     void loadChapter(final String chapterUrl) {

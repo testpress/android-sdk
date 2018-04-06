@@ -30,6 +30,9 @@ public class UILImageGetter implements Html.ImageGetter {
 
     @Override
     public Drawable getDrawable(String source) {
+        if (source == null) {
+            return null;
+        }
         // Remove \" from beginning & end if present in src.
         source = source.replaceAll("^\\\\\"|\\\\\"$", "");
         UrlImageDownloader urlDrawable = new UrlImageDownloader(activity.getApplicationContext()

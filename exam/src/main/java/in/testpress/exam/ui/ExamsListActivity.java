@@ -16,7 +16,7 @@ public class  ExamsListActivity extends BaseToolBarActivity {
         fragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, fragment)
-                .commit();
+                .commitAllowingStateLoss();
     }
 
 }
