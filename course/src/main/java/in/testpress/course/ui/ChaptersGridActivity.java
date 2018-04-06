@@ -63,10 +63,14 @@ public class ChaptersGridActivity extends BaseToolBarActivity {
             Integer parentId = chapters.get(0).getParentId();
             if (parentId != null) {
                 ChapterDao chapterDao = TestpressSDKDatabase.getChapterDao(this);
-                Chapter parentChapter = chapterDao.queryBuilder()
+                List<Chapter> parentChapterList = chapterDao.queryBuilder()
                         .where(ChapterDao.Properties.Id.eq(parentId))
-                        .list().get(0);
+                        .list();
 
+                if (parentChapterList.isEmpty()) {
+                    return data;
+                }
+                Chapter parentChapter = parentChapterList.get(0);
                 data.putString(COURSE_ID, parentChapter.getCourseId().toString());
                 data.putString(PARENT_ID, String.valueOf(parentChapter.getParentId()));
             }
