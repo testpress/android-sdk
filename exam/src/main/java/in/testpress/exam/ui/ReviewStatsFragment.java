@@ -110,9 +110,6 @@ public class ReviewStatsFragment extends Fragment {
         if (courseAttempt != null) {
             attempt = courseAttempt.getRawAssessment();
         }
-        if (getActivity().getClass() == ReviewStatsActivity.class) {
-            ((ReviewStatsActivity) getActivity()).setActionBarTitle(R.string.testpress_test_report);
-        }
     }
 
     @Override
@@ -184,6 +181,9 @@ public class ReviewStatsFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        if (getActivity().getClass() == ReviewStatsActivity.class) {
+            ((ReviewStatsActivity) getActivity()).setActionBarTitle(R.string.testpress_test_report);
+        }
         if (attempt == null) {
             loadAttempt();
         } else {

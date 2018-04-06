@@ -71,7 +71,8 @@ public class ReviewStatsActivityTest extends ActivityTestRule<ReviewStatsActivit
                 "allow_retake: true,\n" +
                 "show_answers: true,\n" +
                 "show_percentile: true,\n" +
-                "show_score: true\n" +
+                "show_score: true,\n" +
+                "languages: [{ \"code\": \"en\",\"title\": \"English\" }]" +
                 "}";
         Intent intent = new Intent(InstrumentationRegistry.getTargetContext(), ReviewStatsActivity.class);
         Gson gson = new GsonBuilder()

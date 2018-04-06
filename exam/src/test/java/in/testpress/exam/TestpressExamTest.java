@@ -6,8 +6,8 @@ import android.support.v4.app.FragmentActivity;
 import org.junit.Test;
 
 import in.testpress.core.TestpressSession;
+import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.CourseAttempt;
-import in.testpress.models.greendao.CourseContent;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -170,7 +170,7 @@ public class TestpressExamTest {
     @Test
     public void testStartCourseExam_withNullValues() throws Exception {
         TestpressSession testpressSession = mock(TestpressSession.class);
-        CourseContent courseContent = mock(CourseContent.class);
+        Content courseContent = mock(Content.class);
         FragmentActivity activity = mock(FragmentActivity.class);
         try {
             TestpressExam.startCourseExam(null, courseContent, false, testpressSession);
@@ -195,7 +195,7 @@ public class TestpressExamTest {
     @Test
     public void testResumeCourseAttempt_withNullValues() throws Exception {
         TestpressSession testpressSession = mock(TestpressSession.class);
-        CourseContent courseContent = mock(CourseContent.class);
+        Content courseContent = mock(Content.class);
         CourseAttempt courseAttempt = mock(CourseAttempt.class);
         FragmentActivity activity = mock(FragmentActivity.class);
         try {
@@ -228,7 +228,7 @@ public class TestpressExamTest {
     @Test
     public void testEndCourseAttempt_withNullValues() throws Exception {
         TestpressSession testpressSession = mock(TestpressSession.class);
-        CourseContent courseContent = mock(CourseContent.class);
+        Content courseContent = mock(Content.class);
         CourseAttempt courseAttempt = mock(CourseAttempt.class);
         FragmentActivity activity = mock(FragmentActivity.class);
         try {
