@@ -33,27 +33,27 @@ import java.util.TimeZone;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
-import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.network.TestQuestionsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
 import in.testpress.models.greendao.Attempt;
-import in.testpress.models.greendao.AttemptDao;
+import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.CourseAttempt;
-import in.testpress.models.greendao.CourseAttemptDao;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Language;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 
+import static in.testpress.exam.ui.TestActivity.PARAM_COURSE_ATTEMPT;
+import static in.testpress.exam.ui.TestActivity.PARAM_COURSE_CONTENT;
+
 public class TestFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>> {
 
     static final String PARAM_EXAM = "exam";
     static final String PARAM_ATTEMPT = "attempt";
-    static final String PARAM_CONTENT_ATTEMPT_END_URL = "contentAttemptEndUrl";
     SlidingPaneLayout slidingPaneLayout;
     private TestpressExamApiClient apiClient;
     private TextView previous;
@@ -67,10 +67,11 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private TestQuestionPagerAdapter pagerAdapter;
     private List<AttemptItem> filterItems = new ArrayList<>();
     private TestPanelListAdapter panelListAdapter;
-    private String contentAttemptEndUrl;
     private ProgressDialog progressDialog;
     private Attempt attempt;
     private Exam exam;
+    private Content courseContent;
+    private CourseAttempt courseAttempt;
     private int currentPosition;
     private TestQuestionsPager questionsPager;
     private List<AttemptItem> attemptItemList = new ArrayList<AttemptItem>();
@@ -91,9 +92,15 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        attempt = getArguments().getParcelable(PARAM_ATTEMPT);
-        exam = getArguments().getParcelable(PARAM_EXAM);
-        contentAttemptEndUrl = getArguments().getString(PARAM_CONTENT_ATTEMPT_END_URL);
+        courseContent = getArguments().getParcelable(PARAM_COURSE_CONTENT);
+        if (courseContent != null) {
+            courseAttempt = getArguments().getParcelable(PARAM_COURSE_ATTEMPT);
+            exam = courseContent.getRawExam();
+            attempt = courseAttempt.getRawAssessment();
+        } else {
+            attempt = getArguments().getParcelable(PARAM_ATTEMPT);
+            exam = getArguments().getParcelable(PARAM_EXAM);
+        }
         questionsPager = new TestQuestionsPager(attempt.getQuestionsUrlFrag(),
                 new TestpressExamApiClient(getActivity()));
         getLoaderManager().initLoader(0, null, this);
@@ -594,8 +601,8 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
            saveResult(pager.getCurrentItem(), Action.END);
             return;
         }
-        if (contentAttemptEndUrl != null) {
-            apiClient.endContentAttempt(contentAttemptEndUrl)
+        if (courseContent != null) {
+            apiClient.endContentAttempt(courseAttempt.getEndAttemptUrl())
                     .enqueue(new TestpressCallback<CourseAttempt>() {
                         @Override
                         public void onSuccess(CourseAttempt courseAttempt) {
@@ -605,7 +612,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                             if (progressDialog.isShowing()) {
                                 progressDialog.dismiss();
                             }
-                            saveCourseAttemptInDB(courseAttempt);
+                            courseAttempt.saveInDB(getActivity(), courseContent);
                             showReview(ReviewStatsActivity.createIntent(getActivity(), exam,
                                     courseAttempt));
                         }
@@ -668,15 +675,6 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                         }
                     });
         }
-    }
-
-    private void saveCourseAttemptInDB(CourseAttempt courseAttempt) {
-        CourseAttemptDao courseAttemptDao = TestpressSDKDatabase.getCourseAttemptDao(getActivity());
-        AttemptDao attemptDao = TestpressSDKDatabase.getAttemptDao(getActivity());
-        Attempt attempt = courseAttempt.getRawAssessment();
-        attemptDao.insertOrReplace(attempt);
-        courseAttempt.setAttemptId(attempt.getId());
-        courseAttemptDao.insertOrReplace(courseAttempt);
     }
 
     @SuppressLint("DefaultLocale")

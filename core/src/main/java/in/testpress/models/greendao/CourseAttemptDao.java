@@ -213,11 +213,11 @@ public class CourseAttemptDao extends AbstractDao<CourseAttempt, Long> {
             StringBuilder builder = new StringBuilder("SELECT ");
             SqlUtils.appendColumns(builder, "T", getAllColumns());
             builder.append(',');
-            SqlUtils.appendColumns(builder, "T0", daoSession.getCourseContentDao().getAllColumns());
+            SqlUtils.appendColumns(builder, "T0", daoSession.getContentDao().getAllColumns());
             builder.append(',');
             SqlUtils.appendColumns(builder, "T1", daoSession.getAttemptDao().getAllColumns());
             builder.append(" FROM COURSE_ATTEMPT T");
-            builder.append(" LEFT JOIN COURSE_CONTENT T0 ON T.\"COURSE_CONTENT_ID\"=T0.\"ID\"");
+            builder.append(" LEFT JOIN CONTENT T0 ON T.\"COURSE_CONTENT_ID\"=T0.\"ID\"");
             builder.append(" LEFT JOIN ATTEMPT T1 ON T.\"ATTEMPT_ID\"=T1.\"ID\"");
             builder.append(' ');
             selectDeep = builder.toString();
@@ -229,9 +229,9 @@ public class CourseAttemptDao extends AbstractDao<CourseAttempt, Long> {
         CourseAttempt entity = loadCurrent(cursor, 0, lock);
         int offset = getAllColumns().length;
 
-        CourseContent chapterContent = loadCurrentOther(daoSession.getCourseContentDao(), cursor, offset);
+        Content chapterContent = loadCurrentOther(daoSession.getContentDao(), cursor, offset);
         entity.setChapterContent(chapterContent);
-        offset += daoSession.getCourseContentDao().getAllColumns().length;
+        offset += daoSession.getContentDao().getAllColumns().length;
 
         Attempt assessment = loadCurrentOther(daoSession.getAttemptDao(), cursor, offset);
         entity.setAssessment(assessment);

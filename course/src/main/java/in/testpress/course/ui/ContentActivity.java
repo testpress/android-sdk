@@ -53,7 +53,6 @@ import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.CourseAttemptDao;
-import in.testpress.models.greendao.CourseContent;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.HtmlContent;
@@ -734,18 +733,14 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void startCourseExam(boolean discardExamDetails) {
         //noinspection ConstantConditions
-        TestpressExam.startCourseExam(ContentActivity.this,
-                new CourseContent(content.getAttemptsUrl(), content.getRawExam()), discardExamDetails,
-                TestpressSdk.getTestpressSession(ContentActivity.this));
+        TestpressExam.startCourseExam(this, content, discardExamDetails,
+                TestpressSdk.getTestpressSession(this));
     }
 
     private void resumeCourseExam(boolean discardExamDetails, CourseAttempt pausedCourseAttempt) {
         //noinspection ConstantConditions
-        TestpressExam.resumeCourseAttempt(ContentActivity.this,
-                new CourseContent(content.getAttemptsUrl(), content.getRawExam()),
-                pausedCourseAttempt,
-                discardExamDetails,
-                TestpressSdk.getTestpressSession(ContentActivity.this));
+        TestpressExam.resumeCourseAttempt(this, content, pausedCourseAttempt, discardExamDetails,
+                TestpressSdk.getTestpressSession(this));
     }
 
     private void validateAdjacentNavigationButton() {

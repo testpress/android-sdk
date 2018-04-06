@@ -22,6 +22,7 @@ import java.util.Map;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.R;
@@ -30,8 +31,11 @@ import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.AttemptDao;
+import in.testpress.models.greendao.Content;
+import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.CourseAttempt;
-import in.testpress.models.greendao.CourseContent;
+import in.testpress.models.greendao.CourseAttemptDao;
 import in.testpress.models.greendao.Exam;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
@@ -42,7 +46,6 @@ import in.testpress.util.ViewUtils;
 import retrofit2.Response;
 
 import static in.testpress.exam.ui.AccessCodeExamsFragment.ACCESS_CODE;
-import static in.testpress.exam.ui.TestFragment.PARAM_CONTENT_ATTEMPT_END_URL;
 
 /**
  * Activity of Test Engine
@@ -65,7 +68,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private TestpressExamApiClient apiClient;
     private Exam exam;
     private Attempt attempt;
-    private CourseContent courseContent;
+    private Content courseContent;
     private CourseAttempt courseAttempt;
     private boolean discardExamDetails;
     private RelativeLayout progressBar;
@@ -332,15 +335,19 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
             public Attempt loadData() throws TestpressException {
                 if (courseContent != null && id != RESUME_ATTEMPT_LOADER) {
                     RetrofitCall<CourseAttempt> call = null;
+                    boolean createdNewAttempt = false;
                     switch (id) {
                         case START_ATTEMPT_LOADER:
                             call = apiClient.createContentAttempt(courseContent.getAttemptsUrl());
+                            createdNewAttempt = true;
                             break;
                         case END_ATTEMPT_LOADER:
                             call = apiClient.endContentAttempt(courseAttempt.getEndAttemptUrl());
+                            createdNewAttempt = false;
                             break;
                     }
                     courseAttempt = executeRetrofitCall(call);
+                    saveCourseAttemptInDB(courseAttempt, createdNewAttempt);
                     return courseAttempt.getRawAssessment();
                 } else {
                     RetrofitCall<Attempt> call = null;
@@ -364,6 +371,15 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 }
             }
         };
+    }
+
+    private void saveCourseAttemptInDB(CourseAttempt courseAttempt, boolean createdNewAttempt) {
+        courseAttempt.saveInDB(this, courseContent);
+        if (createdNewAttempt) {
+            courseContent.setAttemptsCount(courseContent.getAttemptsCount() + 1);
+            ContentDao contentDao = TestpressSDKDatabase.getContentDao(this);
+            contentDao.insertOrReplace(courseContent);
+        }
     }
 
     private <T> T executeRetrofitCall(RetrofitCall<T> call) {
@@ -401,8 +417,9 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(TestFragment.PARAM_ATTEMPT, attempt);
                 bundle.putParcelable(TestFragment.PARAM_EXAM, exam);
-                if (courseAttempt != null) {
-                    bundle.putString(PARAM_CONTENT_ATTEMPT_END_URL, courseAttempt.getEndAttemptUrl());
+                if (courseContent != null) {
+                    bundle.putParcelable(TestActivity.PARAM_COURSE_CONTENT, courseContent);
+                    bundle.putParcelable(TestActivity.PARAM_COURSE_ATTEMPT, courseAttempt);
                 }
                 bundle.putBoolean(PARAM_DISCARD_EXAM_DETAILS, discardExamDetails);
                 testFragment.setArguments(bundle);

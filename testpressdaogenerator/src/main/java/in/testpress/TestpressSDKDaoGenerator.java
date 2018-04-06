@@ -41,9 +41,7 @@ public class TestpressSDKDaoGenerator {
 
         Entity courseAttempt = addCourseAttempt(schema);
         Entity attempt = addAttempt(schema);
-        Entity courseContent = addCourseContent(schema);
-        addExamToCourseContent(courseContent, exam);
-        addCourseContentToCourseAttempt(courseAttempt, courseContent);
+        addCourseContentToCourseAttempt(courseAttempt, content);
         addAttemptToCourseAttempt(courseAttempt, attempt);
 
         schema.enableKeepSectionsByDefault();
@@ -76,14 +74,6 @@ public class TestpressSDKDaoGenerator {
 
     }
 
-    private static Entity addCourseContent(Schema schema) {
-        Entity courseContent = schema.addEntity("CourseContent");
-        courseContent.addLongProperty("id").primaryKey();
-        courseContent.addStringProperty("attemptsUrl");
-        courseContent.implementsInterface("android.os.Parcelable");
-        return courseContent;
-    }
-
     private static Entity addCourseAttempt(Schema schema) {
         Entity courseAttempt = schema.addEntity("CourseAttempt");
         courseAttempt.addLongProperty("id").primaryKey();
@@ -95,14 +85,9 @@ public class TestpressSDKDaoGenerator {
         return courseAttempt;
     }
 
-    private static void addExamToCourseContent(Entity courseContent, Entity exam) {
-        Property examId = courseContent.addLongProperty("examId").getProperty();
-        courseContent.addToOne(exam, examId, "exam");
-    }
-
-    private static void addCourseContentToCourseAttempt(Entity courseAttempt, Entity courseContent) {
+    private static void addCourseContentToCourseAttempt(Entity courseAttempt, Entity content) {
         Property courseContentId = courseAttempt.addLongProperty("courseContentId").getProperty();
-        courseAttempt.addToOne(courseContent, courseContentId, "chapterContent");
+        courseAttempt.addToOne(content, courseContentId, "chapterContent");
     }
 
     private static void addAttemptToCourseAttempt(Entity courseAttempt, Entity attempt) {

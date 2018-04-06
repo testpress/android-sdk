@@ -20,7 +20,6 @@ import in.testpress.course.R;
 import in.testpress.exam.TestpressExam;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.CourseAttempt;
-import in.testpress.models.greendao.CourseContent;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.models.greendao.Content;
 import in.testpress.util.ViewUtils;
@@ -137,9 +136,8 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     @Override
                     public void onClick(View v) {
                         //noinspection ConstantConditions
-                        TestpressExam.resumeCourseAttempt(mActivity,
-                                new CourseContent(mContent.getAttemptsUrl(), mContent.getRawExam()),
-                                courseAttempt, false, TestpressSdk.getTestpressSession(mActivity));
+                        TestpressExam.resumeCourseAttempt(mActivity, mContent, courseAttempt, false,
+                                TestpressSdk.getTestpressSession(mActivity));
                     }
                 });
                 holder.resumeLabel.setVisibility(isGamificationEnabled ? View.GONE : View.VISIBLE);

@@ -22,8 +22,8 @@ import in.testpress.exam.ui.ExamsListActivity;
 import in.testpress.exam.ui.ReviewStatsActivity;
 import in.testpress.exam.ui.TestActivity;
 import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.CourseAttempt;
-import in.testpress.models.greendao.CourseContent;
 import in.testpress.models.greendao.DaoSession;
 import in.testpress.models.greendao.Exam;
 import in.testpress.util.Assert;
@@ -272,7 +272,7 @@ public class TestpressExam {
      * @param testpressSession TestpressSession got from the core module.
      */
     public static void startCourseExam(@NonNull Activity activity,
-                                       @NonNull CourseContent courseContent,
+                                       @NonNull Content courseContent,
                                        boolean discardExamDetails,
                                        @NonNull TestpressSession testpressSession) {
 
@@ -291,7 +291,7 @@ public class TestpressExam {
      * @param testpressSession TestpressSession got from the core module.
      */
     public static void resumeCourseAttempt(@NonNull Activity activity,
-                                           @NonNull CourseContent courseContent,
+                                           @NonNull Content courseContent,
                                            @NonNull CourseAttempt courseAttempt,
                                            boolean discardExamDetails,
                                            @NonNull TestpressSession testpressSession) {
@@ -311,7 +311,7 @@ public class TestpressExam {
      */
     @SuppressWarnings("ConstantConditions")
     public static void endCourseAttempt(@NonNull Activity activity,
-                                        @NonNull CourseContent courseContent,
+                                        @NonNull Content courseContent,
                                         @NonNull CourseAttempt courseAttempt,
                                         @NonNull TestpressSession testpressSession) {
 
@@ -343,7 +343,7 @@ public class TestpressExam {
     }
 
     private static void handleCourseAttempt(@NonNull Activity activity,
-                                            @NonNull CourseContent courseContent,
+                                            @NonNull Content courseContent,
                                             CourseAttempt courseAttempt,
                                             boolean discardExamDetails,
                                             @NonNull TestpressSession testpressSession,
