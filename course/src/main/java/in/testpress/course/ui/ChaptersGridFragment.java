@@ -20,7 +20,6 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
-import in.testpress.course.TestpressCourse;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.course.network.ChapterPager;

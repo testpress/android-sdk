@@ -17,6 +17,11 @@ import in.testpress.network.TestpressApiClient;
 public class TestpressCourseApiClient extends TestpressApiClient {
 
     /**
+     * Query Params
+     */
+    public static final String COURSE_ID = "course_id";
+
+    /**
      * Course List Url
      */
     public static final String COURSE_LIST_PATH =  "/api/v2.2.1/courses/";

@@ -11,10 +11,6 @@ import org.greenrobot.greendao.database.Database;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
-import in.testpress.models.greendao.ChapterDao;
-import in.testpress.models.greendao.ContentDao;
-import in.testpress.models.greendao.CourseDao;
-import in.testpress.models.greendao.DaoMaster;
 import in.testpress.models.greendao.DaoSession;
 import in.testpress.course.ui.ChaptersGridActivity;
 import in.testpress.course.ui.ContentActivity;

@@ -39,4 +39,6 @@
     <string name="testpress_leaderboard">Leaderboard</string>
     <string name="testpress_targets_or_threads">Targets / Threats</string>
 
+    <string name="testpress_learn">Learn</string>
+
 </resources>

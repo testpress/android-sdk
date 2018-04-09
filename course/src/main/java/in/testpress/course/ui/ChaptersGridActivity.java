@@ -5,17 +5,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import java.util.List;
 
 import in.testpress.core.TestpressSDKDatabase;
+import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
+import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.ui.BaseToolBarActivity;
 
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
+import static in.testpress.course.ui.RankListFragment.PARAM_COURSE_ID;
 
 public class ChaptersGridActivity extends BaseToolBarActivity {
 
@@ -33,17 +41,40 @@ public class ChaptersGridActivity extends BaseToolBarActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.testpress_container_layout);
-        ChaptersGridFragment fragment = new ChaptersGridFragment();
+        setContentView(R.layout.testpress_activity_carousal);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        LinearLayout carouselView = (LinearLayout) findViewById(R.id.fragment_carousel);
+        FrameLayout fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
         Bundle bundle = getIntent().getExtras();
         String title = bundle.getString(ACTIONBAR_TITLE);
         if (title != null && !title.isEmpty()) {
             //noinspection ConstantConditions
             getSupportActionBar().setTitle(title);
         }
-        fragment.setArguments(bundle);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
-                .commitAllowingStateLoss();
+
+        //noinspection ConstantConditions
+        InstituteSettings instituteSettings =
+                TestpressSdk.getTestpressSession(this).getInstituteSettings();
+
+        if (bundle.getString(PARENT_ID) == null && instituteSettings.isCoursesFrontend() &&
+                instituteSettings.isCoursesGamificationEnabled()) {
+
+            String courseId =  bundle.getString(COURSE_ID);
+            bundle.putString(PARAM_COURSE_ID, courseId);
+            CourseDetailsTabAdapter adapter = new CourseDetailsTabAdapter(getResources(),
+                    getSupportFragmentManager(), bundle);
+
+            viewPager.setAdapter(adapter);
+            tabLayout.setupWithViewPager(viewPager);
+        } else {
+            carouselView.setVisibility(View.GONE);
+            fragmentContainer.setVisibility(View.VISIBLE);
+            ChaptersGridFragment fragment = new ChaptersGridFragment();
+            fragment.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
+                    .commitAllowingStateLoss();
+        }
     }
 
     @Override

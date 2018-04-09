@@ -23,6 +23,10 @@ class RankListAdapter extends SingleTypeAdapter<Reputation> {
     private int userId;
     private int startingRank = 1;
 
+    RankListAdapter(Context context, final List<Reputation> items) {
+        this(context, items, 0);
+    }
+
     RankListAdapter(Context context, final List<Reputation> items, int userId) {
         super(context, R.layout.testpress_leaderboard_item);
         this.context = context;
