@@ -3,9 +3,7 @@ package in.testpress.samples.course;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.view.View;
-import android.widget.Toast;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
@@ -26,7 +24,7 @@ import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE
 public class CourseSampleActivity extends BaseToolBarActivity {
 
     private int selectedItem;
-    private String contentId;
+    private String text;
     private TestpressSession session;
 
     @Override
@@ -53,14 +51,27 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                 showSDK(R.id.leaderboard);
             }
         });
-        findViewById(R.id.content_detail).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.chapter_contents).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ViewUtils.showInputDialogBox(CourseSampleActivity.this, "Enter Course Id",
+                ViewUtils.showInputDialogBox(CourseSampleActivity.this, "Enter Chapter Slug",
                         new ViewUtils.OnInputCompletedListener() {
                             @Override
                             public void onInputComplete(String inputText) {
-                                contentId = inputText;
+                                text = inputText;
+                                showSDK(R.id.chapter_contents);
+                            }
+                        });
+            }
+        });
+        findViewById(R.id.content_detail).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ViewUtils.showInputDialogBox(CourseSampleActivity.this, "Enter Content Id",
+                        new ViewUtils.OnInputCompletedListener() {
+                            @Override
+                            public void onInputComplete(String inputText) {
+                                text = inputText;
                                 showSDK(R.id.content_detail);
                             }
                 });
@@ -89,6 +100,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                     break;
                 case R.id.gamified_course:
                 case R.id.leaderboard:
+                case R.id.chapter_contents:
                 case R.id.content_detail:
                     session.getInstituteSettings()
                             .setCommentsVotingEnabled(false)
@@ -105,8 +117,14 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                 case R.id.leaderboard:
                     TestpressCourse.showLeaderboard(this, session);
                     break;
+                case R.id.chapter_contents:
+                    String url = session.getInstituteSettings().getBaseUrl() +
+                            "/api/v2.2.1/chapters/" + text + "/";
+
+                    TestpressCourse.showChapterContents(this, url, session);
+                    break;
                 case R.id.content_detail:
-                    TestpressCourse.showContentDetail(this, contentId, session);
+                    TestpressCourse.showContentDetail(this, text, session);
                     break;
             }
         } else {
@@ -131,21 +149,20 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                     if (data.getBooleanExtra(TestpressSdk.ACTION_PRESSED_HOME, false)) {
                         switch (requestCode) {
                             case COURSE_CONTENT_DETAIL_REQUEST_CODE:
-                                String chapterUrl = data.getStringExtra(CHAPTER_URL);
-                                ViewUtils.toast(this, "User pressed home button " + chapterUrl);
-                                if (chapterUrl != null) {
-                                    TestpressCourse.showContents(this, chapterUrl, session);
-                                }
-                                break;
                             case COURSE_CONTENT_LIST_REQUEST_CODE:
                             case COURSE_CHAPTER_REQUEST_CODE:
-                                String courseId = data.getStringExtra(COURSE_ID);
-                                String parentId = data.getStringExtra(PARENT_ID);
-                                ViewUtils.toast(this,
-                                        "User pressed home button " + courseId + " - " + parentId);
-
-                                if (courseId != null) {
-                                    TestpressCourse.showChapters(this, courseId, parentId, session);
+                                int courseId = data.getIntExtra(COURSE_ID, 0);
+                                String chapterUrl = data.getStringExtra(CHAPTER_URL);
+                                if (chapterUrl != null) {
+                                    ViewUtils.toast(this,
+                                            "User pressed home button chapterUrl:" + chapterUrl);
+                                    TestpressCourse.showChapterContents(this, chapterUrl, session);
+                                } else if (courseId != 0) {
+                                    ViewUtils.toast(this,
+                                            "User pressed home button courseId:" + courseId);
+                                    TestpressCourse.showChapters(this, null, courseId, session);
+                                } else {
+                                    ViewUtils.toast(this, "User pressed home button");
                                 }
                                 break;
                         }

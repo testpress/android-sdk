@@ -22,21 +22,28 @@
 
         <android.support.v7.widget.AppCompatButton
             style="@style/Button"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30dp"
             android:text="Gamified Course"
             android:id="@+id/gamified_course" />
 
         <android.support.v7.widget.AppCompatButton
             style="@style/Button"
             android:layout_width="match_parent"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30dp"
             android:text="Leaderboard"
             android:id="@+id/leaderboard" />
 
         <android.support.v7.widget.AppCompatButton
             style="@style/Button"
             android:layout_width="match_parent"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30dp"
+            android:text="Chapter Detail"
+            android:id="@+id/chapter_contents" />
+
+        <android.support.v7.widget.AppCompatButton
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_marginTop="30dp"
             android:text="Content Detail"
             android:id="@+id/content_detail" />
 
@@ -44,7 +51,7 @@
             style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30dp"
             android:text="Fragment"
             android:id="@+id/fragment_button" />
 

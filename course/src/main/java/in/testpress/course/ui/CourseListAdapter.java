@@ -65,10 +65,9 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         view(3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mActivity.startActivity(ChaptersGridActivity.createIntent(
+                mActivity.startActivity(ChapterDetailActivity.createIntent(
                         course.getTitle(),
                         course.getId().toString(),
-                        null,
                         mActivity
                 ));
 

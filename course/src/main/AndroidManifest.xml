@@ -10,10 +10,7 @@
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
-        <activity android:name=".ui.ChaptersGridActivity"
-            android:theme="@style/TestpressTheme" />
-
-        <activity android:name=".ui.ContentsListActivity"
+        <activity android:name=".ui.ChapterDetailActivity"
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 

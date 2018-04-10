@@ -7,14 +7,10 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 
-import org.greenrobot.greendao.database.Database;
-
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
-import in.testpress.models.greendao.DaoSession;
-import in.testpress.course.ui.ChaptersGridActivity;
+import in.testpress.course.ui.ChapterDetailActivity;
 import in.testpress.course.ui.ContentActivity;
-import in.testpress.course.ui.ContentsListActivity;
 import in.testpress.course.ui.CourseListActivity;
 import in.testpress.course.ui.CourseListFragment;
 import in.testpress.course.ui.LeaderboardActivity;
@@ -31,9 +27,6 @@ public class TestpressCourse {
     public static final String COURSE_ID = "courseId";
     public static final String PARENT_ID = "parentId";
     public static final String CHAPTER_URL = "chapterUrl";
-
-    private static DaoSession daoSession;
-    private static Database database;
 
     /**
      * Use when testpress courses need to be open in a container as a fragment.
@@ -104,88 +97,43 @@ public class TestpressCourse {
     /**
      * Show chapters of a specific course as new Activity.
      *
-     * @param context Context to start the new activity.
+     * @param activity Activity from which chapters needs to show.
      * @param courseName Course name to be displayed in the action bar of new activity.
      * @param courseId Id of the Course which chapters need to be display.
      * @param testpressSession TestpressSession got from the core module.
      */
-    public static void showChapters(@NonNull Context context,
-                                    @NonNull String courseName,
+    public static void showChapters(@NonNull Activity activity,
+                                    String courseName,
                                     @NonNull Integer courseId,
                                     @NonNull TestpressSession testpressSession) {
 
-        Assert.assertNotNull("Context must not be null.", context);
-        Assert.assertNotNullAndNotEmpty("courseName must not be null or empty.", courseName);
-        Assert.assertNotNull("courseId must not be null.", courseId);
-
-        init(context.getApplicationContext(), testpressSession);
-        context.startActivity(
-                ChaptersGridActivity.createIntent(courseName, courseId.toString(), null, context));
-    }
-
-    /**
-     * Show sub chapters of a parent chapter as new Activity.
-     *
-     * @param activity activity from which chapters need to show.
-     * @param courseId Id of the Course which chapters need to be display.
-     * @param parentId Id of the parent chapter.
-     * @param testpressSession TestpressSession got from the core module.
-     */
-    public static void showChapters(@NonNull Activity activity,
-                                    @NonNull String courseId,
-                                    @NonNull String parentId,
-                                    @NonNull TestpressSession testpressSession) {
-
         Assert.assertNotNull("Activity must not be null.", activity);
-        Assert.assertNotNullAndNotEmpty("courseId must not be null or empty.", courseId);
+        Assert.assertNotNull("courseId must not be null.", courseId);
 
         init(activity.getApplicationContext(), testpressSession);
         activity.startActivityForResult(
-                ChaptersGridActivity.createIntent(null, courseId, parentId, activity),
+                ChapterDetailActivity.createIntent(courseName, courseId.toString(), activity),
                 COURSE_CHAPTER_REQUEST_CODE
         );
     }
 
     /**
-     * Load contents from given url & show in new Activity.
+     * Load chapter & display child chapters or contents of the chapter in new Activity.
      *
-     * @param context Context to start the new activity.
-     * @param title Text to be displayed in the action bar of new activity.
-     * @param contentsUrl Url from which contents can be load.
+     * @param activity activity from which child list needs to show.
+     * @param chapterUrl Url of the chapter which children needs to show.
      * @param testpressSession TestpressSession got from the core module.
      */
-    public static void showContents(@NonNull Context context,
-                                    @NonNull String title,
-                                    long chapterId,
-                                    @NonNull String contentsUrl,
-                                    @NonNull TestpressSession testpressSession) {
-
-        Assert.assertNotNull("Context must not be null.", context);
-        Assert.assertNotNullAndNotEmpty("title must not be null or empty.", title);
-        Assert.assertNotNullAndNotEmpty("contentsUrl must not be null or empty.", contentsUrl);
-
-        init(context.getApplicationContext(), testpressSession);
-        context.startActivity(
-                ContentsListActivity.createIntent(title, chapterId, contentsUrl, context));
-    }
-
-    /**
-     * Display contents list of the chapter in new Activity.
-     *
-     * @param activity activity from which contents list needs to show.
-     * @param chapterUrl Url of the chapter which contents needs to show.
-     * @param testpressSession TestpressSession got from the core module.
-     */
-    public static void showContents(@NonNull Activity activity,
-                                    @NonNull String chapterUrl,
-                                    @NonNull TestpressSession testpressSession) {
+    public static void showChapterContents(@NonNull Activity activity,
+                                           @NonNull String chapterUrl,
+                                           @NonNull TestpressSession testpressSession) {
 
         Assert.assertNotNull("Activity must not be null.", activity);
         Assert.assertNotNullAndNotEmpty("chapterUrl must not be null or empty.", chapterUrl);
 
         init(activity.getApplicationContext(), testpressSession);
         activity.startActivityForResult(
-                ContentsListActivity.createIntent(chapterUrl, activity),
+                ChapterDetailActivity.createIntent(chapterUrl, activity),
                 COURSE_CONTENT_LIST_REQUEST_CODE
         );
     }

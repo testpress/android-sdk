@@ -58,11 +58,10 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
 
     @Override
     protected void initItems() {
-        if (parentId.equals("null") || getCourseChaptersQueryBuilder().count() == 0) {
-            getLoaderManager().initLoader(0, null, this);
-        } else {
+        if (getParentChaptersQueryBuilder().count() != 0) {
             showGrid();
         }
+        getLoaderManager().initLoader(0, null, this);
         displayItems();
         firstCallBack = false;
     }
@@ -90,12 +89,20 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
     @Override
     protected ChapterPager getPager() {
         if (pager == null) {
-            pager = new ChapterPager(courseId, mApiClient);
-            QueryBuilder<Chapter> queryBuilder = getCourseChaptersQueryBuilder();
-            if (queryBuilder.count() > 0) {
-                Chapter latest = queryBuilder.orderDesc(ChapterDao.Properties.ModifiedDate)
-                        .list().get(0);
-                ((ChapterPager) pager).setLatestModifiedDate(latest.getModified());
+            QueryBuilder<Chapter> courseChaptersQueryBuilder = getCourseChaptersQueryBuilder();
+            if (parentId.equals("null") && courseChaptersQueryBuilder.count() == 0) {
+                pager = new ChapterPager(courseId, mApiClient);
+            } else {
+                pager = new ChapterPager(courseId, parentId, mApiClient);
+                QueryBuilder<Chapter> parentChaptersQueryBuilder = getParentChaptersQueryBuilder();
+                if (parentChaptersQueryBuilder.count() > 0) {
+                    Chapter latestChapter = parentChaptersQueryBuilder
+                            .orderDesc(ChapterDao.Properties.ModifiedDate)
+                            .list().get(0);
+
+                    ((ChapterPager) pager).setLatestModifiedDate(latestChapter.getModified());
+                }
+
             }
         }
         return (ChapterPager)pager;
@@ -152,21 +159,10 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (chapter.getChildrenCount() > 0) {
-                        getActivity().startActivity(ChaptersGridActivity.createIntent(
-                                chapter.getName(),
-                                courseId,
-                                chapter.getId().toString(),
-                                getContext())
-                        );
-                    } else {
-                        getActivity().startActivity(ContentsListActivity.createIntent(
-                                chapter.getName(),
-                                chapter.getId(),
-                                chapter.getContentUrl(),
-                                getContext())
-                        );
-                    }
+                    getActivity().startActivity(ChapterDetailActivity.createIntent(
+                            chapter.getUrl(),
+                            getContext())
+                    );
                 }
             });
         }

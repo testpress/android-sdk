@@ -7,6 +7,7 @@ import java.util.List;
 
 import in.testpress.core.TestpressException;
 import in.testpress.course.R;
+import in.testpress.course.TestpressCourse;
 import in.testpress.course.models.Reputation;
 import in.testpress.course.network.LeaderboardPager;
 import in.testpress.course.network.TestpressCourseApiClient;
@@ -19,7 +20,6 @@ import static in.testpress.course.network.TestpressCourseApiClient.COURSE_ID;
 public class RankListFragment extends PagedItemFragment<Reputation> {
 
     public static final String PARAM_USER_REPUTATION = "userReputation";
-    public static final String PARAM_COURSE_ID = "courseId";
 
     @Override
     protected void configureList(Activity activity, ListView listView) {
@@ -32,7 +32,7 @@ public class RankListFragment extends PagedItemFragment<Reputation> {
         if (pager == null) {
             pager = new LeaderboardPager(new TestpressCourseApiClient(getContext()));
         }
-        String courseId = getArguments().getString(PARAM_COURSE_ID);
+        String courseId = getArguments().getString(TestpressCourse.COURSE_ID);
         if (courseId != null && !courseId.isEmpty()) {
             pager.setQueryParams(COURSE_ID, courseId);
         }

@@ -1,6 +1,7 @@
 package in.testpress.course.ui;
 
 import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -108,7 +109,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
                             ContentActivity.createIntent(
                                     position,
                                     chapterId,
-                                    (ContentsListActivity) mActivity
+                                    (AppCompatActivity) mActivity
                             ),
                             TEST_TAKEN_REQUEST_CODE
                     );

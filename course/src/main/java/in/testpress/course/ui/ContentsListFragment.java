@@ -26,10 +26,10 @@ import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.Assert;
 import in.testpress.util.SingleTypeAdapter;
 
-import static in.testpress.course.ui.ContentsListActivity.CHAPTER_ID;
-import static in.testpress.course.ui.ContentsListActivity.CONTENTS_URL_FRAG;
-
 public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
+
+    public static final String CONTENTS_URL_FRAG = "contentsUrlFrag";
+    public static final String CHAPTER_ID = "chapterId";
 
     private TestpressCourseApiClient mApiClient;
     private String contentsUrlFrag;

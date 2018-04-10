@@ -18,6 +18,8 @@ import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
  */
 public abstract class BaseToolBarActivity extends AppCompatActivity {
 
+    public static final String ACTIONBAR_TITLE = "title";
+
     @Override
     public void setContentView(final int layoutResId) {
         super.setContentView(layoutResId);
