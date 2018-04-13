@@ -15,6 +15,8 @@ import in.testpress.store.TestpressStore;
 import in.testpress.util.Assert;
 
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
+import static in.testpress.store.TestpressStore.CONTINUE_PURCHASE;
+import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 
 public class StoreSampleActivity extends BaseToolBarActivity {
 
@@ -75,8 +77,16 @@ public class StoreSampleActivity extends BaseToolBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == AUTHENTICATE_REQUEST_CODE && resultCode == RESULT_OK) {
-            showSDK(selectedItem);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == AUTHENTICATE_REQUEST_CODE) {
+                showSDK(selectedItem);
+            } else if (requestCode == STORE_REQUEST_CODE) {
+                if (data != null && data.getBooleanExtra(CONTINUE_PURCHASE, false)) {
+                    ViewUtils.toast(this, "User pressed continue purchase");
+                } else {
+                    ViewUtils.toast(this, "User pressed goto home");
+                }
+            }
         }
     }
 
