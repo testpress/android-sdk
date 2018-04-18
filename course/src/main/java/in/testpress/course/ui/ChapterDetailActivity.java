@@ -209,7 +209,9 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         if (prefs.getBoolean(GO_TO_MENU, false)) {
             prefs.edit().putBoolean(GO_TO_MENU, false).apply();
             finish();
-        } else if (prefs.getBoolean(FORCE_REFRESH, false)) {
+        } else if (prefs.getBoolean(FORCE_REFRESH, false) &&
+                getIntent().getStringExtra(CONTENTS_URL_FRAG) != null) {
+
             prefs.edit().putBoolean(FORCE_REFRESH, false).apply();
             loadContents();
         }

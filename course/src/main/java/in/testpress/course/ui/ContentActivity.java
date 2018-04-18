@@ -647,10 +647,12 @@ public class ContentActivity extends BaseToolBarActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == TEST_TAKEN_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                SharedPreferences prefs =
-                        getSharedPreferences(TESTPRESS_CONTENT_SHARED_PREFS, Context.MODE_PRIVATE);
+                if (getCallingActivity() == null) {
+                    SharedPreferences prefs =
+                            getSharedPreferences(TESTPRESS_CONTENT_SHARED_PREFS, Context.MODE_PRIVATE);
 
-                prefs.edit().putBoolean(FORCE_REFRESH, true).apply();
+                    prefs.edit().putBoolean(FORCE_REFRESH, true).apply();
+                }
                 if (content.getRawExam() != null) {
                     clearContentAttemptsInDB();
                 }
