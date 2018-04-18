@@ -41,6 +41,7 @@
     <string name="testpress_this_field_is_required">This filed is required</string>
     <string name="testpress_invalid_month">Invalid month</string>
     <string name="testpress_invalid_year">Invalid year</string>
+    <string name="testpress_invalid_cvv">Invalid CVV</string>
 
     <string name="testpress_enter_details">Enter Details</string>
     <string name="testpress_select_bank">Select Bank</string>

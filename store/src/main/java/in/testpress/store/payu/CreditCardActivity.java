@@ -86,39 +86,41 @@ public class CreditCardActivity extends BaseToolBarActivity
         String _cvv = cvv.getText().toString().trim();
         String _name = name.getText().toString().trim();
 
-        int monthNum = Integer.parseInt(_month);
-
+        int monthNum;
         if (_cardNumber.length() == 0) {
             cardNumber.setError(getString(R.string.testpress_this_field_is_required));
             return;
         }
 
-        if (month.getVisibility() == View.VISIBLE) {
-            if (_month.length() == 0) {
-                month.setError(getString(R.string.testpress_this_field_is_required));
-                return;
-            } else if (monthNum > 12) {
-                month.setError(getString(R.string.testpress_invalid_month));
+        if (_month.length() == 0) {
+            month.setError(getString(R.string.testpress_this_field_is_required));
+            return;
+        }
+        monthNum = Integer.parseInt(_month);
+        if (monthNum > 12) {
+            month.setError(getString(R.string.testpress_invalid_month));
+            return;
+        }
+
+        if (_year.length() == 0) {
+            year.setError(getString(R.string.testpress_this_field_is_required));
+            return;
+        } else {
+            Calendar calendar = Calendar.getInstance(Locale.getDefault());
+            int currentYear = calendar.get(Calendar.YEAR);
+            int __year = Integer.parseInt(_year);
+            if (__year < currentYear) {
+                year.setError(getString(R.string.testpress_invalid_year));
                 return;
             }
         }
 
-        if (year.getVisibility() == View.VISIBLE) {
-            if (_year.length() == 0) {
-                year.setError(getString(R.string.testpress_this_field_is_required));
-                return;
-            } else {
-                Calendar calendar = Calendar.getInstance(Locale.getDefault());
-                int currentYear = calendar.get(Calendar.YEAR);
-                int __year = Integer.parseInt(_year);
-                if (__year < currentYear) {
-                    year.setError(getString(R.string.testpress_invalid_month));
-                    return;
-                }
-            }
-        }
-        if (cvv.getVisibility() == View.VISIBLE && (_cvv.length() == 0 || _cvv.length() < 3)) {
+        if (_cvv.length() == 0 ) {
             cvv.setError(getString(R.string.testpress_this_field_is_required));
+            return;
+        }
+        if (_cvv.length() < 3) {
+            cvv.setError(getString(R.string.testpress_invalid_cvv));
             return;
         }
 
