@@ -2,6 +2,7 @@ package in.testpress.exam.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.RemoteException;
 import android.support.annotation.RequiresApi;
@@ -103,9 +104,15 @@ public class ReviewStatsActivityTest extends ActivityTestRule<ReviewStatsActivit
         ReviewStatsActivity activity = mActivityRule.launchActivity(getActivityIntent());
         unlockScreen(activity);
         UiDevice uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        Point[] coordinates = new Point[4];
+        coordinates[0] = new Point(248, 1520);
+        coordinates[1] = new Point(248, 929);
+        coordinates[2] = new Point(796, 1520);
+        coordinates[3] = new Point(796, 929);
         try {
             if (!uiDevice.isScreenOn()) {
                 uiDevice.wakeUp();
+                uiDevice.swipe(coordinates, 10);
             }
         } catch (RemoteException e) {
             e.printStackTrace();
