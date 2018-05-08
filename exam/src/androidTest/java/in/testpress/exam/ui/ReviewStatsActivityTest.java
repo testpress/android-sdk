@@ -3,12 +3,14 @@ package in.testpress.exam.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
+import android.os.RemoteException;
 import android.support.annotation.RequiresApi;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingResource;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.test.uiautomator.UiDevice;
 import android.view.WindowManager;
 
 import com.google.gson.FieldNamingPolicy;
@@ -100,6 +102,14 @@ public class ReviewStatsActivityTest extends ActivityTestRule<ReviewStatsActivit
     private ReviewStatsActivity launchNewActivity() {
         ReviewStatsActivity activity = mActivityRule.launchActivity(getActivityIntent());
         unlockScreen(activity);
+        UiDevice uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        try {
+            if (!uiDevice.isScreenOn()) {
+                uiDevice.wakeUp();
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
         assertReviewStatsDisplayed();
         return activity;
     }

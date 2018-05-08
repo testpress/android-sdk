@@ -13,7 +13,13 @@ android {
     buildToolsVersion rootProject.buildToolsVersion
     defaultConfig {
         applicationId "in.testpress.samples"
-        minSdkVersion rootProject.minSdkVersion
+        if (gradle.startParameter.taskNames.contains("connectedAndroidTest")
+                || gradle.startParameter.taskNames.contains("connectedCheck")) {
+
+            minSdkVersion rootProject.minSdkVersionForUITest
+        } else {
+            minSdkVersion rootProject.minSdkVersion
+        }
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 1
         versionName "1.0"
