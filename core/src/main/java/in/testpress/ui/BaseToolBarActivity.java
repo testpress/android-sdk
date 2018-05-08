@@ -8,7 +8,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import in.testpress.R;
+import in.testpress.core.TestpressSdk;
+import in.testpress.core.TestpressSession;
 
+import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
 
 /**
@@ -22,6 +25,10 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
 
     @Override
     public void setContentView(final int layoutResId) {
+        TestpressSession session = TestpressSdk.getTestpressSession(this);
+        if (session != null && session.getInstituteSettings().isScreenshotDisabled()) {
+            getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
+        }
         super.setContentView(layoutResId);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

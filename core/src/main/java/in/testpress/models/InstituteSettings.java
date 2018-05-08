@@ -9,11 +9,10 @@ public class InstituteSettings {
     private boolean coursesEnableGamification;
     private boolean commentsVotingEnabled;
     private boolean accessCodeEnabled;
+    private boolean screenshotDisabled;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
-        showGameFrontend = false;
-        coursesEnableGamification = false;
     }
 
     public String getBaseUrl() {
@@ -59,6 +58,15 @@ public class InstituteSettings {
 
     public InstituteSettings setAccessCodeEnabled(boolean accessCodeEnabled) {
         this.accessCodeEnabled = accessCodeEnabled;
+        return this;
+    }
+
+    public boolean isScreenshotDisabled() {
+        return screenshotDisabled;
+    }
+
+    public InstituteSettings setScreenshotDisabled(boolean screenshotDisabled) {
+        this.screenshotDisabled = screenshotDisabled;
         return this;
     }
 }
