@@ -2,59 +2,61 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:layout_height="match_parent">
 
     <include layout="@layout/toolbar" />
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center">
+    <ScrollView
+        android:fillViewport="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <android.support.v7.widget.AppCompatButton
-            style="@style/Button"
-            android:layout_width="match_parent"
-            android:text="Start Exam"
-            android:id="@+id/start_exam" />
-
-        <android.support.v7.widget.AppCompatButton
-            style="@style/Button"
-            android:layout_marginTop="40dp"
-            android:text="Attempt State"
-            android:id="@+id/attempt_state" />
-
-        <android.support.v7.widget.AppCompatButton
-            style="@style/Button"
-            android:layout_width="match_parent"
-            android:layout_marginTop="40dp"
-            android:text="Exams List"
-            android:id="@+id/exam_list" />
-
-        <android.support.v7.widget.AppCompatButton
-            style="@style/Button"
-            android:layout_width="match_parent"
-            android:layout_marginTop="40dp"
-            android:text="Categories"
-            android:id="@+id/categories" />
-
-        <android.support.v7.widget.AppCompatButton
-            style="@style/Button"
-            android:layout_width="match_parent"
-            android:layout_marginTop="40dp"
-            android:text="Access Code"
-            android:id="@+id/access_code" />
-
-        <android.support.v7.widget.AppCompatButton
-            style="@style/Button"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:text="Fragment"
-            android:id="@+id/fragment_button" />
+            android:layout_gravity="center_horizontal"
+            android:gravity="center">
 
-    </LinearLayout>
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Button"
+                android:layout_marginTop="10dp"
+                android:text="Start Exam"
+                android:id="@+id/start_exam" />
+
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Button"
+                android:layout_width="wrap_content"
+                android:text="Attempt State"
+                android:id="@+id/attempt_state" />
+
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Button"
+                android:text="Exams List"
+                android:id="@+id/exam_list" />
+
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Button"
+                android:text="Categories"
+                android:id="@+id/categories" />
+
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Button"
+                android:text="Access Code"
+                android:id="@+id/access_code" />
+
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Button"
+                android:text="Bookmarks"
+                android:id="@+id/bookmarks" />
+
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Button"
+                android:text="Fragment"
+                android:id="@+id/fragment_button" />
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

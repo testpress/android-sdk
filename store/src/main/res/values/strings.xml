@@ -35,7 +35,6 @@
     <string name="testpress_card_number">Card Number</string>
     <string name="testpress_make_payment">Make Payment</string>
 
-    <string name="testpress_are_you_sure">Are you sure?</string>
     <string name="testpress_want_to_cancel">Do you want to cancel your payment process?</string>
 
     <string name="testpress_this_field_is_required">This filed is required</string>

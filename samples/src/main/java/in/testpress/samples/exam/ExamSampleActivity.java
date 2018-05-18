@@ -1,13 +1,9 @@
 package in.testpress.samples.exam;
 
-import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import in.testpress.core.TestpressSdk;
@@ -16,7 +12,7 @@ import in.testpress.exam.TestpressExam;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
-import in.testpress.samples.util.ViewUtils;
+import in.testpress.util.ViewUtils;
 
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
@@ -62,6 +58,12 @@ public class ExamSampleActivity extends BaseToolBarActivity {
                 showSDK(view.getId());
             }
         });
+        findViewById(R.id.bookmarks).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showSDK(view.getId());
+            }
+        });
         findViewById(R.id.fragment_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -77,6 +79,7 @@ public class ExamSampleActivity extends BaseToolBarActivity {
             TestpressSession session = TestpressSdk.getTestpressSession(this);
             //noinspection ConstantConditions
             session.getInstituteSettings()
+                    .setBookmarksEnabled(true)
                     .setCommentsVotingEnabled(false)
                     .setCoursesFrontend(false)
                     .setCoursesGamificationEnabled(false);
@@ -93,6 +96,9 @@ public class ExamSampleActivity extends BaseToolBarActivity {
                     break;
                 case R.id.exam_list:
                     TestpressExam.show(this, session);
+                    break;
+                case R.id.bookmarks:
+                    TestpressExam.showBookmarks(this, session);
                     break;
                 default:
                     TestpressExam.showCategories(this, false, session);

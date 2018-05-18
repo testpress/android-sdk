@@ -1,5 +1,6 @@
 package in.testpress.samples.core;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -37,6 +38,7 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
     private CallbackManager callbackManager;
     private GoogleApiClient googleApiClient;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,6 +102,9 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
         });
         final EditText usernameEditText = (EditText) findViewById(R.id.username);
         final EditText passwordEditText = (EditText) findViewById(R.id.password);
+        usernameEditText.setText("testpress");
+        passwordEditText.setText("demo");
+        usernameEditText.setSelection(usernameEditText.getText().length());
         findViewById(R.id.testpress_login_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -114,7 +119,7 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
     }
 
     private void authenticate(String userId, String accessToken, TestpressSdk.Provider provider) {
-        InstituteSettings instituteSettings = new InstituteSettings("https://sandbox.testpress.in");
+        InstituteSettings instituteSettings = new InstituteSettings("http://192.168.0.104:8000");
         TestpressSdk.initialize(this, instituteSettings, userId, accessToken, provider,
                 new TestpressCallback<TestpressSession>() {
                     @Override

@@ -5,14 +5,20 @@ import android.support.annotation.NonNull;
 
 import org.greenrobot.greendao.database.Database;
 
+import in.testpress.models.greendao.AnswerTranslationDao;
 import in.testpress.models.greendao.AttachmentDao;
 import in.testpress.models.greendao.AttemptDao;
+import in.testpress.models.greendao.BookmarkDao;
+import in.testpress.models.greendao.BookmarkFolderDao;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.ContentDao;
+import in.testpress.models.greendao.ContentTypeDao;
 import in.testpress.models.greendao.CourseAttemptDao;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.DaoMaster;
 import in.testpress.models.greendao.DaoSession;
+import in.testpress.models.greendao.DirectionDao;
+import in.testpress.models.greendao.DirectionTranslationDao;
 import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.HtmlContentDao;
 import in.testpress.models.greendao.LanguageDao;
@@ -23,6 +29,7 @@ import in.testpress.models.greendao.ReviewItemDao;
 import in.testpress.models.greendao.ReviewQuestionDao;
 import in.testpress.models.greendao.ReviewQuestionTranslationDao;
 import in.testpress.models.greendao.SelectedAnswerDao;
+import in.testpress.models.greendao.SubjectDao;
 import in.testpress.models.greendao.VideoDao;
 
 public class TestpressSDKDatabase {
@@ -121,4 +128,33 @@ public class TestpressSDKDatabase {
     public static SelectedAnswerDao getSelectedAnswerDao(Context context) {
         return getDaoSession(context).getSelectedAnswerDao();
     }
+
+    public static BookmarkFolderDao getBookmarkFolderDao(Context context) {
+        return getDaoSession(context).getBookmarkFolderDao();
+    }
+
+    public static AnswerTranslationDao getAnswerTranslationDao(Context context) {
+        return getDaoSession(context).getAnswerTranslationDao();
+    }
+
+    public static DirectionDao getDirectionDao(Context context) {
+        return getDaoSession(context).getDirectionDao();
+    }
+
+    public static DirectionTranslationDao getDirectionTranslationDao(Context context) {
+        return getDaoSession(context).getDirectionTranslationDao();
+    }
+
+    public static SubjectDao getSubjectDao(Context context) {
+        return getDaoSession(context).getSubjectDao();
+    }
+
+    public static BookmarkDao getBookmarkDao(Context context) {
+        return getDaoSession(context).getBookmarkDao();
+    }
+
+    public static ContentTypeDao getContentTypeDao(Context context) {
+        return getDaoSession(context).getContentTypeDao();
+    }
+
 }

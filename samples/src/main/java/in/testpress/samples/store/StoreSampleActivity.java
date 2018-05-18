@@ -10,9 +10,9 @@ import in.testpress.core.TestpressSession;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
-import in.testpress.samples.util.ViewUtils;
 import in.testpress.store.TestpressStore;
 import in.testpress.util.Assert;
+import in.testpress.util.ViewUtils;
 
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
 import static in.testpress.store.TestpressStore.CONTINUE_PURCHASE;

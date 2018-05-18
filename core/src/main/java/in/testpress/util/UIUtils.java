@@ -18,10 +18,18 @@ import in.testpress.R;
 public class UIUtils {
 
     public static void hideSoftKeyboard(Activity activity) {
-        if (activity != null && activity.getCurrentFocus() != null) {
+        if (activity != null) {
+            hideSoftKeyboard(activity, activity.getCurrentFocus());
+        }
+    }
+
+    public static void hideSoftKeyboard(Activity activity, View view) {
+        if (activity != null && view != null) {
             InputMethodManager inputMethodManager =
                     (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+
+            assert inputMethodManager != null;
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 
@@ -31,7 +39,7 @@ public class UIUtils {
                     (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
 
             boolean isShowing =
-                    inputMethodManager.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+                    inputMethodManager.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
 
             if (!isShowing) {
                 activity.getWindow()

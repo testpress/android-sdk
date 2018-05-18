@@ -361,12 +361,14 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
             ReviewItem reviewItem = reviewItems.get(i);
             ReviewQuestion reviewQuestion = reviewItem.getRawQuestion();
             // Store selected answers
-            for (int selectedAnswerId : reviewItem.getSelectedAnswers()) {
-                SelectedAnswerDao selectedAnswersDao = TestpressSDKDatabase.getSelectedAnswerDao(this);
-                SelectedAnswer selectedAnswer = new SelectedAnswer();
-                selectedAnswer.setAnswerId(selectedAnswerId);
-                selectedAnswer.setReviewItemId(reviewItem.getId());
-                selectedAnswersDao.insertOrReplace(selectedAnswer);
+            if (reviewItem.getSelectedAnswers() != null) {
+                for (int selectedAnswerId : reviewItem.getSelectedAnswers()) {
+                    SelectedAnswerDao selectedAnswersDao = TestpressSDKDatabase.getSelectedAnswerDao(this);
+                    SelectedAnswer selectedAnswer = new SelectedAnswer();
+                    selectedAnswer.setAnswerId(selectedAnswerId);
+                    selectedAnswer.setReviewItemId(reviewItem.getId());
+                    selectedAnswersDao.insertOrReplace(selectedAnswer);
+                }
             }
             // Store question
             ReviewQuestionDao reviewQuestionDao = TestpressSDKDatabase.getReviewQuestionDao(this);

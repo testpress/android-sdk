@@ -1,0 +1,78 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <View
+        android:id="@+id/divider_view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/testpress_dropdown_list_divider_color" />
+
+    <TextView
+        android:id="@+id/header_text"
+        android:layout_height="40dp"
+        android:layout_width="match_parent"
+        android:paddingLeft="30dp"
+        android:paddingRight="20dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
+        android:layout_marginTop="10dp"
+        android:textStyle="normal"
+        android:fontFamily="sans-serif"
+        android:textSize="14sp"
+        android:textColor="@color/testpress_body_text"
+        tools:ignore="UnusedAttribute" />
+
+    <LinearLayout
+        android:id="@+id/item_text_layout"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <ImageView
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginLeft="17dp"
+            android:tint="#00bb9c"
+            android:src="@drawable/testpress_folder_spinner_item_states"
+            />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_height="40dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:paddingRight="20dp"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:textSize="16sp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/testpress_black" />
+
+        <LinearLayout
+            android:id="@+id/edit"
+            android:visibility="gone"
+            android:padding="11dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            >
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:tint="#777"
+                android:src="@drawable/ic_mode_edit_18dp"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

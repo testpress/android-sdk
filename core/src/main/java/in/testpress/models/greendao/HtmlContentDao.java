@@ -13,7 +13,7 @@ import org.greenrobot.greendao.database.DatabaseStatement;
 /** 
  * DAO for table "HTML_CONTENT".
 */
-public class HtmlContentDao extends AbstractDao<HtmlContent, Void> {
+public class HtmlContentDao extends AbstractDao<HtmlContent, Long> {
 
     public static final String TABLENAME = "HTML_CONTENT";
 
@@ -22,9 +22,10 @@ public class HtmlContentDao extends AbstractDao<HtmlContent, Void> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Title = new Property(0, String.class, "title", false, "TITLE");
-        public final static Property TextHtml = new Property(1, String.class, "textHtml", false, "TEXT_HTML");
-        public final static Property SourceUrl = new Property(2, String.class, "sourceUrl", false, "SOURCE_URL");
+        public final static Property Id = new Property(0, Long.class, "id", true, "ID");
+        public final static Property Title = new Property(1, String.class, "title", false, "TITLE");
+        public final static Property TextHtml = new Property(2, String.class, "textHtml", false, "TEXT_HTML");
+        public final static Property SourceUrl = new Property(3, String.class, "sourceUrl", false, "SOURCE_URL");
     }
 
 
@@ -40,9 +41,10 @@ public class HtmlContentDao extends AbstractDao<HtmlContent, Void> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"HTML_CONTENT\" (" + //
-                "\"TITLE\" TEXT," + // 0: title
-                "\"TEXT_HTML\" TEXT," + // 1: textHtml
-                "\"SOURCE_URL\" TEXT);"); // 2: sourceUrl
+                "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
+                "\"TITLE\" TEXT," + // 1: title
+                "\"TEXT_HTML\" TEXT," + // 2: textHtml
+                "\"SOURCE_URL\" TEXT);"); // 3: sourceUrl
     }
 
     /** Drops the underlying database table. */
@@ -55,19 +57,24 @@ public class HtmlContentDao extends AbstractDao<HtmlContent, Void> {
     protected final void bindValues(DatabaseStatement stmt, HtmlContent entity) {
         stmt.clearBindings();
  
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
+ 
         String title = entity.getTitle();
         if (title != null) {
-            stmt.bindString(1, title);
+            stmt.bindString(2, title);
         }
  
         String textHtml = entity.getTextHtml();
         if (textHtml != null) {
-            stmt.bindString(2, textHtml);
+            stmt.bindString(3, textHtml);
         }
  
         String sourceUrl = entity.getSourceUrl();
         if (sourceUrl != null) {
-            stmt.bindString(3, sourceUrl);
+            stmt.bindString(4, sourceUrl);
         }
     }
 
@@ -75,59 +82,69 @@ public class HtmlContentDao extends AbstractDao<HtmlContent, Void> {
     protected final void bindValues(SQLiteStatement stmt, HtmlContent entity) {
         stmt.clearBindings();
  
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
+ 
         String title = entity.getTitle();
         if (title != null) {
-            stmt.bindString(1, title);
+            stmt.bindString(2, title);
         }
  
         String textHtml = entity.getTextHtml();
         if (textHtml != null) {
-            stmt.bindString(2, textHtml);
+            stmt.bindString(3, textHtml);
         }
  
         String sourceUrl = entity.getSourceUrl();
         if (sourceUrl != null) {
-            stmt.bindString(3, sourceUrl);
+            stmt.bindString(4, sourceUrl);
         }
     }
 
     @Override
-    public Void readKey(Cursor cursor, int offset) {
-        return null;
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     @Override
     public HtmlContent readEntity(Cursor cursor, int offset) {
         HtmlContent entity = new HtmlContent( //
-            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // title
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // textHtml
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // sourceUrl
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // title
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // textHtml
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // sourceUrl
         );
         return entity;
     }
      
     @Override
     public void readEntity(Cursor cursor, HtmlContent entity, int offset) {
-        entity.setTitle(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
-        entity.setTextHtml(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setSourceUrl(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setTitle(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setTextHtml(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setSourceUrl(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
      }
     
     @Override
-    protected final Void updateKeyAfterInsert(HtmlContent entity, long rowId) {
-        // Unsupported or missing PK type
-        return null;
+    protected final Long updateKeyAfterInsert(HtmlContent entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     @Override
-    public Void getKey(HtmlContent entity) {
-        return null;
+    public Long getKey(HtmlContent entity) {
+        if(entity != null) {
+            return entity.getId();
+        } else {
+            return null;
+        }
     }
 
     @Override
     public boolean hasKey(HtmlContent entity) {
-        // TODO
-        return false;
+        return entity.getId() != null;
     }
 
     @Override

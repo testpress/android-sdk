@@ -14,9 +14,15 @@ import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.Bookmark;
+import in.testpress.models.greendao.BookmarkFolder;
+import in.testpress.models.greendao.ContentType;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.ReviewItem;
+import in.testpress.v2_4.models.ApiResponse;
+import in.testpress.v2_4.models.BookmarksListResponse;
+import in.testpress.v2_4.models.FolderListResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
 
@@ -27,6 +33,9 @@ public class TestpressExamApiClient extends TestpressApiClient {
      * Exams List URL
      */
     public static final String EXAMS_LIST_PATH =  "/api/v2.2/exams/";
+
+    public static final String QUESTIONS_PATH =  "api/v2.2/questions/";
+    public static final String COMMENTS_PATH =  "/comments/";
 
     public static final String ACCESS_CODES_PATH =  "/api/v2.2/access_codes/";
     public static final String EXAMS_PATH =  "/exams/";
@@ -39,7 +48,8 @@ public class TestpressExamApiClient extends TestpressApiClient {
     public static final String MAIL_PDF_PATH =  "pdf/";
     public static final String MAIL_PDF_QUESTIONS_PATH =  "pdf-questions/";
 
-    public static final String CONTENT_ATTEMPTS_PATH =  "/api/v2.2/content_attempts/";
+    public static final String BOOKMARK_FOLDERS_PATH =  "/api/v2.4/folders/";
+    public static final String BOOKMARKS_PATH =  "/api/v2.4/bookmarks/";
 
     /**
      * Overall subject analytics path
@@ -73,6 +83,10 @@ public class TestpressExamApiClient extends TestpressApiClient {
     
     public ExamService getExamService() {
         return retrofit.create(ExamService.class);
+    }
+
+    private BookmarkService getBookmarkService() {
+        return retrofit.create(BookmarkService.class);
     }
 
     public RetrofitCall<TestpressApiResponse<Exam>> getExams(Map<String, Object> queryParams) {
@@ -188,5 +202,50 @@ public class TestpressExamApiClient extends TestpressApiClient {
         params.put("content_object", comment);
         params.put("type_of_vote", typeOfVote);
         return getExamService().updateCommentVote(comment.getVoteId(), params);
+    }
+
+    public RetrofitCall<ApiResponse<FolderListResponse>> getBookmarkFolders(String bookmarkFolderUrl) {
+        return getBookmarkService().getBookmarkFolders(bookmarkFolderUrl);
+    }
+
+    public RetrofitCall<BookmarkFolder> updateBookmarkFolder(long folderId, String folderName) {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("name", folderName);
+        return getBookmarkService().updateFolder(folderId, params);
+    }
+
+    public RetrofitCall<Void> deleteBookmarkFolder(long folderId) {
+        return getBookmarkService().deleteFolder(folderId);
+    }
+
+    public RetrofitCall<Bookmark> bookmark(long objectId, String folder, String model,
+                                           String appLabel) {
+
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("object_id", objectId);
+        params.put("folder", folder);
+        params.put("content_type", new ContentType(model, appLabel));
+        return getBookmarkService().bookmark(params);
+    }
+
+    public RetrofitCall<Bookmark> updateBookmark(long bookmarkId, String folder) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("folder", folder);
+        return getBookmarkService().updateBookmark(bookmarkId, params);
+    }
+
+    public RetrofitCall<Bookmark> undoBookmarkDelete(long bookmarkId, long objectId) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("object_id", objectId);
+        params.put("active", true);
+        return getBookmarkService().updateBookmark(bookmarkId, params);
+    }
+
+    public RetrofitCall<Void> deleteBookmark(long bookmarkId) {
+        return getBookmarkService().deleteBookmark(bookmarkId);
+    }
+
+    public RetrofitCall<ApiResponse<BookmarksListResponse>> getBookmarks(Map<String, Object> queryParams) {
+        return getBookmarkService().getBookmarks(queryParams);
     }
 }

@@ -47,6 +47,7 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
             TestpressSession session = TestpressSdk.getTestpressSession(this);
             //noinspection ConstantConditions
             session.getInstituteSettings()
+                    .setBookmarksEnabled(false)
                     .setCommentsVotingEnabled(false)
                     .setCoursesFrontend(false)
                     .setCoursesGamificationEnabled(false);

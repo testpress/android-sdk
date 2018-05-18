@@ -10,6 +10,7 @@ public class InstituteSettings {
     private boolean commentsVotingEnabled;
     private boolean accessCodeEnabled;
     private boolean screenshotDisabled;
+    private boolean bookmarksEnabled;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -67,6 +68,15 @@ public class InstituteSettings {
 
     public InstituteSettings setScreenshotDisabled(boolean screenshotDisabled) {
         this.screenshotDisabled = screenshotDisabled;
+        return this;
+    }
+
+    public boolean isBookmarksEnabled() {
+        return bookmarksEnabled;
+    }
+
+    public InstituteSettings setBookmarksEnabled(boolean bookmarksEnabled) {
+        this.bookmarksEnabled = bookmarksEnabled;
         return this;
     }
 }

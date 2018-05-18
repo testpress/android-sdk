@@ -3,6 +3,7 @@ package in.testpress.exam.ui;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -23,7 +24,9 @@ import android.text.SpannableString;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -31,6 +34,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import junit.framework.Assert;
@@ -50,6 +54,11 @@ import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Comment;
+import in.testpress.exam.network.CommentsPager;
+import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.models.FileDetails;
+import in.testpress.models.greendao.Bookmark;
+import in.testpress.models.greendao.BookmarkFolder;
 import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.ReviewAnswer;
 import in.testpress.models.greendao.ReviewAnswerTranslation;
@@ -57,22 +66,24 @@ import in.testpress.models.greendao.ReviewItem;
 import in.testpress.models.greendao.ReviewItemDao;
 import in.testpress.models.greendao.ReviewQuestion;
 import in.testpress.models.greendao.ReviewQuestionTranslation;
-import in.testpress.exam.network.CommentsPager;
-import in.testpress.exam.network.TestpressExamApiClient;
-import in.testpress.models.FileDetails;
 import in.testpress.network.TestpressApiClient;
 import in.testpress.ui.view.BackEventListeningEditText;
+import in.testpress.ui.view.ClosableSpinner;
 import in.testpress.util.FormatDate;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 import in.testpress.util.WebViewUtils;
+import in.testpress.v2_4.models.ApiResponse;
+import in.testpress.v2_4.models.FolderListResponse;
 
 import static android.app.Activity.RESULT_OK;
 import static com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE;
 import static com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE;
 import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE;
 import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE;
+import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
+import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 
 public class ReviewQuestionsFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<List<Comment>> {
@@ -108,6 +119,11 @@ public class ReviewQuestionsFragment extends Fragment
     CommentsListAdapter commentsAdapter;
     ProgressDialog progressDialog;
     WebView webView;
+    ClosableSpinner bookmarkFolderSpinner;
+    FolderSpinnerAdapter folderSpinnerAdapter;
+    ArrayList<BookmarkFolder> bookmarkFolders = new ArrayList<>();
+    ReviewItemDao reviewItemDao;
+    LottieAnimationView animationView;
     TextView difficultyTitle;
     TextView difficultyPercentageText;
     TextView usersAnsweredRight;
@@ -154,7 +170,7 @@ public class ReviewQuestionsFragment extends Fragment
         long reviewItemId = getArguments().getLong(PARAM_REVIEW_ITEM_ID);
         Assert.assertNotNull("PARAM_REVIEW_ITEM_ID must not be null", reviewItemId);
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
-        ReviewItemDao reviewItemDao= TestpressSDKDatabase.getReviewItemDao(getContext());
+        reviewItemDao = TestpressSDKDatabase.getReviewItemDao(getContext());
         List<ReviewItem> reviewItems = reviewItemDao.queryBuilder()
                 .where(ReviewItemDao.Properties.Id.eq(reviewItemId)).list();
         if (!reviewItems.isEmpty()) {
@@ -165,6 +181,7 @@ public class ReviewQuestionsFragment extends Fragment
         }
     }
 
+    @SuppressLint("AddJavascriptInterface")
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -189,6 +206,32 @@ public class ReviewQuestionsFragment extends Fragment
         commentBoxLayout = (LinearLayout) view.findViewById(R.id.comment_box_layout);
         postCommentButton = (ImageButton) view.findViewById(R.id.post_comment_button);
         imageCommentButton = (ImageButton) view.findViewById(R.id.image_comment_button);
+        bookmarkFolderSpinner = view.findViewById(R.id.bookmark_folder_spinner);
+        folderSpinnerAdapter = new FolderSpinnerAdapter(getActivity(), getResources(),
+                new ViewUtils.OnInputCompletedListener() {
+                    @Override
+                    public void onInputComplete(String folderName) {
+                        bookmarkFolderSpinner.dismissPopUp();
+                        bookmark(folderName);
+                    }
+                });
+        folderSpinnerAdapter.hideSpinner(true);
+        bookmarkFolderSpinner.setAdapter(folderSpinnerAdapter);
+        bookmarkFolderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> spinner, View view, int position, long itemId) {
+                if (position == 0) {
+                    return;
+                }
+                bookmark(folderSpinnerAdapter.getTag(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+        animationView = view.findViewById(R.id.move_bookmark_loader);
+        animationView.playAnimation();
         difficultyTitle = (TextView) view.findViewById(R.id.difficulty_title);
         difficultyPercentageText = (TextView) view.findViewById(R.id.difficulty_percentage);
         usersAnsweredRight = (TextView) view.findViewById(R.id.users_answered_right);
@@ -220,8 +263,16 @@ public class ReviewQuestionsFragment extends Fragment
                 if (commentsAdapter == null && getActivity() != null) {
                     displayComments();
                 }
+                animationView.bringToFront();
             }
+
+            @Override
+            public String getHeader() {
+                return super.getHeader() + getBookmarkHandlerScript();
+            }
+
         };
+        webView.addJavascriptInterface(new BookmarkListener(), "BookmarkListener");
         difficultyPercentageText.setText(percentageCorrect + "%");
         webViewUtils.initWebView(getReviewItemAsHtml(), getActivity());
         return view;
@@ -298,6 +349,11 @@ public class ReviewQuestionsFragment extends Fragment
                 reviewItem.getIndex() +
                 "</div>";
 
+        //noinspection ConstantConditions
+        if (TestpressSdk.getTestpressSession(getActivity()).getInstituteSettings().isBookmarksEnabled()) {
+            html += WebViewUtils.getBookmarkButtonWithTags(reviewItem.getBookmarkId() != null);
+        }
+
         // Add direction/passage
         if (directionHtml != null && !directionHtml.isEmpty()) {
             html += "<div class='question' style='padding-bottom: 0px;'>" +
@@ -330,6 +386,7 @@ public class ReviewQuestionsFragment extends Fragment
 
             int optionColor;
             if (reviewItem.getSelectedAnswers().contains(attemptAnswer.getId().intValue())) {
+
                 if (attemptAnswer.getIsCorrect()) {
                     optionColor = R.color.testpress_green;
                 } else {
@@ -367,6 +424,125 @@ public class ReviewQuestionsFragment extends Fragment
                     "</div>";
         }
         return html + "</div>";
+    }
+
+    private class BookmarkListener {
+
+        @JavascriptInterface
+        public void onClickBookmark() {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (reviewItem.getBookmarkId() != null) {
+                        deleteBookmark(reviewItem.getBookmarkId());
+                    } else {
+//                        if (bookmarkFolderDao.queryBuilder().count() == 0) {
+                            //noinspection ConstantConditions
+                            String baseUrl = TestpressSdk.getTestpressSession(getActivity())
+                                    .getInstituteSettings().getBaseUrl();
+
+                            bookmarkFolders.clear();
+                            loadBookmarkFolders(baseUrl + BOOKMARK_FOLDERS_PATH);
+//                        } else {
+//                            if (folderSpinnerAdapter.getCount() == 1) {
+//                                addFoldersToSpinner();
+//                            }
+//                            bookmarkFolderSpinner.performClick();
+//                        }
+                    }
+                }
+            });
+        }
+    }
+
+    void loadBookmarkFolders(String url) {
+        setBookmarkProgress(true);
+        apiClient.getBookmarkFolders(url)
+                .enqueue(new TestpressCallback<ApiResponse<FolderListResponse>>() {
+                    @Override
+                    public void onSuccess(ApiResponse<FolderListResponse> apiResponse) {
+                        bookmarkFolders.addAll(apiResponse.getResults().getFolders());
+                        if (apiResponse.getNext() != null) {
+                            loadBookmarkFolders(apiResponse.getNext());
+                        } else {
+                            if (getActivity() == null) {
+                                return;
+                            }
+
+                            addFoldersToSpinner(bookmarkFolders);
+                            setBookmarkProgress(false);
+                            bookmarkFolderSpinner.performClick();
+                        }
+
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        setBookmarkProgress(false);
+                        handleException(exception);
+                    }
+                });
+    }
+
+    void bookmark(String folder) {
+        setBookmarkProgress(true);
+        apiClient.bookmark(reviewItem.getId(), folder, "userselectedanswer", "exams")
+                .enqueue(new TestpressCallback<Bookmark>() {
+                    @Override
+                    public void onSuccess(Bookmark bookmark) {
+                        reviewItem.setBookmarkId(bookmark.getId());
+                        reviewItemDao.updateInTx(reviewItem);
+                        webViewUtils.updateBookmarkButtonState(true);
+                        setBookmarkProgress(false);
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        setBookmarkProgress(false);
+                        handleException(exception);
+                    }
+                });
+    }
+
+    void deleteBookmark(Long bookmarkId) {
+        setBookmarkProgress(true);
+        apiClient.deleteBookmark(bookmarkId)
+                .enqueue(new TestpressCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void data) {
+                        reviewItem.setBookmarkId(null);
+                        reviewItemDao.updateInTx(reviewItem);
+                        bookmarkFolderSpinner.setSelection(0);
+                        webViewUtils.updateBookmarkButtonState(false);
+                        setBookmarkProgress(false);
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        setBookmarkProgress(false);
+                        handleException(exception);
+                    }
+                });
+    }
+
+    void setBookmarkProgress(boolean show) {
+        if (show) {
+            webViewUtils.hideBookmarkButton();
+            animationView.setVisibility(View.VISIBLE);
+        } else {
+            animationView.setVisibility(View.GONE);
+            webViewUtils.displayBookmarkButton();
+        }
+    }
+
+    void addFoldersToSpinner(List<BookmarkFolder> bookmarkFolders) {
+        folderSpinnerAdapter.clear();
+        folderSpinnerAdapter.addHeader("-- Select Folder --");
+        for (BookmarkFolder folder: bookmarkFolders) {
+            folderSpinnerAdapter.addItem(folder.getName(), folder.getName(), false, 0);
+        }
+        folderSpinnerAdapter.addItem(null, UNCATEGORIZED, false, 0);
+        folderSpinnerAdapter.notifyDataSetChanged();
     }
 
     void displayComments() {
@@ -639,7 +815,7 @@ public class ReviewQuestionsFragment extends Fragment
 
                     @Override
                     public void onException(TestpressException exception) {
-                        handleExceptionOnPostComment(exception);
+                        handleException(exception);
                     }
                 });
     }
@@ -695,7 +871,7 @@ public class ReviewQuestionsFragment extends Fragment
 
             @Override
             public void onException(TestpressException exception) {
-                handleExceptionOnPostComment(exception);
+                handleException(exception);
             }
         });
     }
@@ -783,13 +959,16 @@ public class ReviewQuestionsFragment extends Fragment
         webView.onResume();
     }
 
-    void handleExceptionOnPostComment(TestpressException exception) {
+    void handleException(TestpressException exception) {
         progressDialog.dismiss();
         if(exception.isUnauthenticated()) {
             Snackbar.make(rootLayout, R.string.testpress_authentication_failed,
                     Snackbar.LENGTH_SHORT).show();
         } else if (exception.getCause() instanceof IOException) {
             Snackbar.make(rootLayout, R.string.testpress_no_internet_connection,
+                    Snackbar.LENGTH_SHORT).show();
+        } else if (exception.isClientError()) {
+            Snackbar.make(rootLayout, R.string.testpress_folder_name_not_allowed,
                     Snackbar.LENGTH_SHORT).show();
         } else {
             Snackbar.make(rootLayout, R.string.testpress_network_error,

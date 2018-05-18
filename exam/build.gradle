@@ -33,6 +33,7 @@ dependencies {
     compile rootProject.cardview
     compile rootProject.chart
     compile rootProject.imageCropper
+    compile rootProject.lottie
     testCompile rootProject.junit
     testCompile rootProject.mockito
     androidTestCompile rootProject.junit

@@ -516,12 +516,14 @@ public class TimeAnalyticsActivity extends BaseToolBarActivity {
         for (int i = 0; i < reviewItems.size(); i++) {
             ReviewItem reviewItem = reviewItems.get(i);
             // Store selected answers
-            for (int selectedAnswerId : reviewItem.getSelectedAnswers()) {
-                SelectedAnswerDao selectedAnswersDao = TestpressSDKDatabase.getSelectedAnswerDao(this);
-                SelectedAnswer selectedAnswer = new SelectedAnswer();
-                selectedAnswer.setAnswerId(selectedAnswerId);
-                selectedAnswer.setReviewItemId(reviewItem.getId());
-                selectedAnswersDao.insertOrReplace(selectedAnswer);
+            if (reviewItem.getSelectedAnswers() != null) {
+                for (int selectedAnswerId : reviewItem.getSelectedAnswers()) {
+                    SelectedAnswerDao selectedAnswersDao = TestpressSDKDatabase.getSelectedAnswerDao(this);
+                    SelectedAnswer selectedAnswer = new SelectedAnswer();
+                    selectedAnswer.setAnswerId(selectedAnswerId);
+                    selectedAnswer.setReviewItemId(reviewItem.getId());
+                    selectedAnswersDao.insertOrReplace(selectedAnswer);
+                }
             }
             // Store question
             ReviewQuestionDao reviewQuestionDao = TestpressSDKDatabase.getReviewQuestionDao(this);

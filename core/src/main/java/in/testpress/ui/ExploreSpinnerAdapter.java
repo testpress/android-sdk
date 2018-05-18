@@ -22,7 +22,7 @@ public class ExploreSpinnerAdapter extends BaseAdapter {
 
     private int mDotSize;
     private boolean mTopLevel;
-    private LayoutInflater inflater;
+    protected LayoutInflater inflater;
     private Resources resources;
     private boolean hideSpinner; // Icon will be used instead of showing the selected item in spinner.
 
@@ -66,6 +66,18 @@ public class ExploreSpinnerAdapter extends BaseAdapter {
 
     public void addItem(String tag, String title, boolean indented, int color) {
         mItems.add(new ExploreSpinnerItem(false, tag, title, indented, color));
+    }
+
+    public void addItem(int index, String tag, String title, boolean indented, int color) {
+        mItems.add(index, new ExploreSpinnerItem(false, tag, title, indented, color));
+    }
+
+    public void updateItem(int index, String tag, String title, boolean indented, int color) {
+        mItems.set(index, new ExploreSpinnerItem(false, tag, title, indented, color));
+    }
+
+    public void removeItem(int index) {
+        mItems.remove(index);
     }
 
     public void addHeader(String title) {
@@ -112,7 +124,7 @@ public class ExploreSpinnerAdapter extends BaseAdapter {
         return position;
     }
 
-    private boolean isHeader(int position) {
+    protected boolean isHeader(int position) {
         return position >= 0 && position < mItems.size()
                 && mItems.get(position).isHeader;
     }
@@ -178,7 +190,7 @@ public class ExploreSpinnerAdapter extends BaseAdapter {
         return position >= 0 && position < mItems.size() ? mItems.get(position).tag : "";
     }
 
-    private void setUpNormalDropdownView(int position, TextView textView) {
+    protected void setUpNormalDropdownView(int position, TextView textView) {
         textView.setText(getTitle(position));
         ShapeDrawable colorDrawable = (ShapeDrawable) textView.getCompoundDrawables()[2];
         int color = getColor(position);

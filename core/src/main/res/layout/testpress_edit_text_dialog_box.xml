@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="22dp"
+    android:paddingRight="22dp">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:theme="@style/TestpressTextInputLayoutTheme">
+
+        <android.support.v7.widget.AppCompatEditText
+            style="@style/TestpressEditTextStyle"
+            android:id="@+id/edit_text"
+            android:inputType="textMultiLine"
+            android:textSize="16sp"
+            android:maxLines="6"
+            android:imeOptions="actionDone" />
+
+    </android.support.design.widget.TextInputLayout>
+
+</LinearLayout>

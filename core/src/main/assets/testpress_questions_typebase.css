@@ -393,3 +393,34 @@ span {
     line-height: 1.38;
     color: #333333;
 }
+
+.bookmark-button {
+    margin-top: 20px;
+    margin-right: 15px;
+    float: right;
+    font-size: 16px;
+    color: #bfbfbf;
+    display: flex;
+    align-items: center;
+    font-family: 'Rubik-Regular', sans-serif;
+}
+
+.bookmark-image {
+    width: 12px;
+    height: 14.2px;
+    margin-right: 8px;
+}
+
+.videoWrapper {
+	position: relative;
+	padding-bottom: 56.25%; /* 16:9 */
+	padding-top: 25px;
+	height: 0;
+}
+.videoWrapper iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}

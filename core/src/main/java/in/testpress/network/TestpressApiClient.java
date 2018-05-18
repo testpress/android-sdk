@@ -39,6 +39,10 @@ public class TestpressApiClient {
     public static final String SINCE = "since";
     public static final String UNTIL = "until";
     public static final String ORDER = "order";
+    public static final String UNFILTERED = "unfiltered";
+    public static final String FOLDER = "folder";
+    public static final String TIME_FIELD = "time_field";
+    public static final String MODIFIED = "modified";
 
     protected final Retrofit retrofit;
 
@@ -113,6 +117,10 @@ public class TestpressApiClient {
             throw new IllegalArgumentException("TestpressSession must not be null.");
         }
         return testpressSession;
+    }
+
+    public String getBaseUrl() {
+        return retrofit.baseUrl().toString();
     }
 
     private AuthenticationService getAuthenticationService() {

@@ -16,22 +16,17 @@
 
         <android.support.v7.widget.AppCompatButton
             style="@style/Button"
-            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
             android:text="New Activity"
             android:id="@+id/new_activity_button" />
 
         <android.support.v7.widget.AppCompatButton
             style="@style/Button"
-            android:layout_width="match_parent"
-            android:layout_marginTop="40dp"
             android:text="Show Product"
             android:id="@+id/show_product" />
 
         <android.support.v7.widget.AppCompatButton
             style="@style/Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
             android:text="Fragment"
             android:id="@+id/fragment_button" />
 

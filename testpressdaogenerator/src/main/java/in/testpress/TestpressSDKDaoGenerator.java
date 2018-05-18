@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 12;
+    private static final int VERSION = 13;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -29,20 +29,33 @@ public class TestpressSDKDaoGenerator {
         addCourse(schema);
         addChapter(schema);
 
+        Entity html = addHtmlContent(schema);
         Entity video = addVideo(schema);
         Entity attachment = addAttachment(schema);
         Entity exam = addExam(schema);
         addLanguage(schema, exam);
         Entity content = addContent(schema);
+        addHTMLToContent(content, html);
         addVideoToContent(content, video);
         addAttachmentToContent(content, attachment);
         addExamToContent(content, exam);
-        addHtmlContent(schema);
+
 
         Entity courseAttempt = addCourseAttempt(schema);
         Entity attempt = addAttempt(schema);
         addCourseContentToCourseAttempt(courseAttempt, content);
         addAttemptToCourseAttempt(courseAttempt, attempt);
+
+        addBookmarkFolder(schema);
+        Entity bookmark = addBookmark(schema);
+        Entity contentType = addContentType(schema);
+        addContentTypeToBookmark(bookmark, contentType);
+
+        Entity answerTranslation = addAnswerTranslation(schema);
+        addAnswersTranslationToReviewTranslations(reviewQuestionTranslation, answerTranslation);
+        addSubject(schema);
+        addDirection(schema);
+        addDirectionTranslation(schema);
 
         schema.enableKeepSectionsByDefault();
         new DaoGenerator().generateAll(schema, "../core/src/main/java");
@@ -100,6 +113,11 @@ public class TestpressSDKDaoGenerator {
         content.addToOne(exam, examId, "exam");
     }
 
+    private static void addHTMLToContent(Entity content, Entity html) {
+        Property htmlId = content.addLongProperty("htmlId").getProperty();
+        content.addToOne(html, htmlId, "html");
+    }
+
     private static void addVideoToContent(Entity content, Entity video) {
         Property videoId = content.addLongProperty("videoId").getProperty();
         content.addToOne(video, videoId, "video");
@@ -112,6 +130,7 @@ public class TestpressSDKDaoGenerator {
 
     private static Entity addHtmlContent(Schema schema) {
         Entity htmlContent = schema.addEntity("HtmlContent");
+        htmlContent.addLongProperty("id").primaryKey();
         htmlContent.addStringProperty("title");
         htmlContent.addStringProperty("textHtml");
         htmlContent.addStringProperty("sourceUrl");
@@ -138,6 +157,7 @@ public class TestpressSDKDaoGenerator {
         content.addStringProperty("end");
         content.addBooleanProperty("hasStarted");
         content.addBooleanProperty("active");
+        content.addLongProperty("bookmarkId");
         content.implementsInterface("android.os.Parcelable");
         return content;
     }
@@ -296,12 +316,13 @@ public class TestpressSDKDaoGenerator {
         reviewItem.addStringProperty("essayText");
         reviewItem.addStringProperty("essayTopic");
         reviewItem.addStringProperty("selectedAnswers").customType(
-                "List<Integer>",
+                "in.testpress.util.IntegerList",
                 "in.testpress.util.IntegerListConverter"
-        );
+        ).codeBeforeField("@SerializedName(value=\"selected_answer_ids\", alternate={\"selected_answers\"})");
         reviewItem.addBooleanProperty("review");
         reviewItem.addIntProperty("commentsCount");
         reviewItem.addIntProperty("correctPercentage");
+        reviewItem.addLongProperty("bookmarkId");
         return reviewItem;
     }
 
@@ -323,6 +344,16 @@ public class TestpressSDKDaoGenerator {
         reviewQuestion.addStringProperty("commentsUrl");
         reviewQuestion.addStringProperty("language");
         reviewQuestion.addFloatProperty("percentageGotCorrect");
+        reviewQuestion.addLongProperty("directionId");
+        reviewQuestion.addLongProperty("subjectId");
+        reviewQuestion.addStringProperty("answerIds").customType(
+                "in.testpress.util.IntegerList",
+                "in.testpress.util.IntegerListConverter"
+        );
+        reviewQuestion.addStringProperty("translationIds").customType(
+                "in.testpress.util.IntegerList",
+                "in.testpress.util.IntegerListConverter"
+        );
         return reviewQuestion;
     }
 
@@ -333,6 +364,11 @@ public class TestpressSDKDaoGenerator {
         reviewQuestionTranslation.addStringProperty("direction");
         reviewQuestionTranslation.addStringProperty("explanation");
         reviewQuestionTranslation.addStringProperty("language");
+        reviewQuestionTranslation.addLongProperty("directionId");
+        reviewQuestionTranslation.addStringProperty("answerIds").customType(
+                "in.testpress.util.IntegerList",
+                "in.testpress.util.IntegerListConverter"
+        );
         return reviewQuestionTranslation;
     }
 
@@ -346,7 +382,6 @@ public class TestpressSDKDaoGenerator {
 
     private static Entity addReviewAnswerTranslation(Schema schema) {
         Entity reviewAnswerTranslation = schema.addEntity("ReviewAnswerTranslation");
-        reviewAnswerTranslation.addLongProperty("translationAnswerId").primaryKey().autoincrement();
         reviewAnswerTranslation.addLongProperty("id");
         reviewAnswerTranslation.addStringProperty("textHtml");
         reviewAnswerTranslation.addBooleanProperty("isCorrect");
@@ -381,6 +416,83 @@ public class TestpressSDKDaoGenerator {
         Property reviewQuestionId = answerTranslation.addLongProperty("questionTranslationId").getProperty();
         ToMany questionToAnswers = questionTranslation.addToMany(answerTranslation, reviewQuestionId);
         questionToAnswers.setName("answers");
+    }
+
+    private static void addBookmarkFolder(Schema schema) {
+        Entity folder = schema.addEntity("BookmarkFolder");
+        folder.addLongProperty("id").primaryKey();
+        folder.addStringProperty("name");
+    }
+
+    private static Entity addBookmark(Schema schema) {
+        Entity bookmark = schema.addEntity("Bookmark");
+        bookmark.addLongProperty("id").primaryKey();
+        bookmark.addStringProperty("folder");
+        bookmark.addLongProperty("folderId");
+        bookmark.addLongProperty("objectId");
+        bookmark.addStringProperty("modified");
+        bookmark.addLongProperty("modifiedDate");
+        bookmark.addStringProperty("created");
+        bookmark.addLongProperty("createdDate");
+        bookmark.addBooleanProperty("loadedInAllFolder");
+        bookmark.addBooleanProperty("loadedInRespectiveFolder");
+        bookmark.addBooleanProperty("active");
+        return bookmark;
+    }
+
+    private static Entity addContentType(Schema schema) {
+        Entity contentType = schema.addEntity("ContentType");
+        contentType.addLongProperty("id").primaryKey().autoincrement();
+        Property model = contentType.addStringProperty("model").getProperty();
+        Property appLabel = contentType.addStringProperty("appLabel").getProperty();
+
+        // Unique together model & app_label
+        Index index = new Index();
+        index.addProperty(model);
+        index.addProperty(appLabel);
+        index.makeUnique();
+
+        contentType.addIndex(index);
+        return contentType;
+    }
+
+    private static void addContentTypeToBookmark(Entity bookmark, Entity contentType) {
+        Property contentTypeId = bookmark.addLongProperty("contentTypeId").getProperty();
+        bookmark.addToOne(contentType, contentTypeId, "contentType");
+    }
+
+    private static Entity addAnswerTranslation(Schema schema) {
+        Entity answerTranslation = schema.addEntity("AnswerTranslation");
+        answerTranslation.addLongProperty("id").primaryKey();
+        answerTranslation.addStringProperty("textHtml");
+        answerTranslation.addLongProperty("answerId");
+        return answerTranslation;
+    }
+
+    private static void addAnswersTranslationToReviewTranslations(Entity questionTranslation,
+                                                                  Entity answerTranslation) {
+
+        Property questionId = answerTranslation.addLongProperty("questionId").getProperty();
+        ToMany questionToAnswers = questionTranslation.addToMany(answerTranslation, questionId);
+        questionToAnswers.setName("answerTranslations");
+    }
+
+    private static void addSubject(Schema schema) {
+        Entity subject = schema.addEntity("Subject");
+        subject.addLongProperty("id").primaryKey();
+        subject.addStringProperty("name");
+    }
+
+    private static void addDirection(Schema schema) {
+        Entity direction = schema.addEntity("Direction");
+        direction.addLongProperty("id").primaryKey();
+        direction.addStringProperty("html");
+    }
+
+    private static void addDirectionTranslation(Schema schema) {
+        Entity direction = schema.addEntity("DirectionTranslation");
+        direction.addLongProperty("id").primaryKey();
+        direction.addStringProperty("html");
     }
 
 }

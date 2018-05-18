@@ -4,26 +4,21 @@ import android.text.TextUtils;
 
 import org.greenrobot.greendao.converter.PropertyConverter;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-public class IntegerListConverter implements PropertyConverter<List<Integer>, String> {
+public class IntegerListConverter implements PropertyConverter<IntegerList, String> {
 
     @Override
-    public List<Integer> convertToEntityProperty(String databaseValue) {
-        if (databaseValue == null) {
-            return null;
+    public IntegerList convertToEntityProperty(String databaseValue) {
+        if (databaseValue == null || databaseValue.isEmpty()) {
+            return new IntegerList();
         }
-        if (databaseValue.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return new ArrayList<>(Arrays.asList(convertStringTOInt(databaseValue.split(","))));
+        return new IntegerList(Arrays.asList(convertStringTOInt(databaseValue.split(","))));
     }
 
     @Override
-    public String convertToDatabaseValue(List<Integer> entityProperty) {
-        return (entityProperty == null) ? null : TextUtils.join(",", entityProperty);
+    public String convertToDatabaseValue(IntegerList entityProperty) {
+        return (entityProperty == null) ? "" : TextUtils.join(",", entityProperty);
     }
 
     private Integer[] convertStringTOInt(String[] string) {

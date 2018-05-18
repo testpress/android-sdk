@@ -256,4 +256,23 @@ public class TestpressExamTest {
             assertEquals("TestpressSession must not be null.", e.getMessage());
         }
     }
+
+    @Test
+    public void testShowBookmarks_withNullValues() throws Exception {
+        TestpressSession testpressSession = mock(TestpressSession.class);
+        try {
+            TestpressExam.showBookmarks(null, testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Context must not be null.", e.getMessage());
+        }
+        Context context = mock(Context.class);
+        try {
+            TestpressExam.showBookmarks(context, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+    }
+
 }

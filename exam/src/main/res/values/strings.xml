@@ -27,6 +27,7 @@
     <string name="testpress_error_loading_exam">Loading exam failed</string>
     <string name="testpress_error_loading_attempts">Loading attempts failed</string>
     <string name="testpress_error_loading_questions">Loading questions failed</string>
+    <string name="testpress_error_loading_bookmarks">Loading bookmarks failed</string>
     <string name="testpress_cannot_attempt_exam">Can\'t attempt this exam</string>
     <string name="testpress_please_login">Please login to see this exams</string>
     <string name="testpress_no_questions">No Questions</string>
@@ -195,5 +196,31 @@
     <string name="testpress_enter_access_code">Enter Access Code</string>
     <string name="testpress_get_exams">Get Exams</string>
     <string name="testpress_invalid_access_code">Invalid Access Code</string>
+
+    <string name="testpress_bookmark">Bookmark</string>
+    <string name="testpress_bookmarks">Bookmarks</string>
+    <string name="testpress_bookmark_this">Bookmark this</string>
+    <string name="testpress_remove_bookmark">Remove Bookmark</string>
+    <string name="testpress_move_bookmark">Move Bookmark</string>
+    <string name="testpress_remove">Remove</string>
+    <string name="testpress_add_folder">Add Folder</string>
+    <string name="testpress_enter_folder_name">Enter Folder Name</string>
+    <string name="testpress_bookmarks_list">Bookmarks List</string>
+    <string name="testpress_no_bookmarks">No bookmarks added yet</string>
+    <string name="testpress_no_bookmarks_description">You can bookmark stuff like Questions, Articles, Videos and Files you see in the courses you’ve opted for.</string>
+    <string name="testpress_bookmark_moved">Bookmark moved successfully</string>
+    <string name="testpress_bookmark_deleted">Bookmark deleted successfully</string>
+    <string name="testpress_rename_folder">Rename Folder</string>
+    <string name="testpress_update">Update</string>
+    <string name="testpress_delete">Delete</string>
+    <string name="testpress_folder_updated">Folder updated successfully</string>
+    <string name="testpress_folder_deleted">Folder deleted successfully</string>
+    <string name="testpress_folder_name_not_allowed">Folder name not allowed</string>
+    <string name="testpress_undo">Undo</string>
+    <string name="testpress_want_to_delete_folder">Do you want to delete this folder?</string>
+
+    <string name="testpress_previous_content">Previous</string>
+
+    <string name="testpress_download_attachment">Download Attachment</string>
 
 </resources>

@@ -1,11 +1,16 @@
 package in.testpress.exam.network;
 
+import android.util.Log;
+
 import java.io.IOException;
 
 import in.testpress.exam.models.Comment;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseResourcePager;
 import retrofit2.Response;
+
+import static in.testpress.exam.network.TestpressExamApiClient.COMMENTS_PATH;
+import static in.testpress.exam.network.TestpressExamApiClient.QUESTIONS_PATH;
 
 public class CommentsPager extends BaseResourcePager<Comment> {
 
@@ -15,6 +20,10 @@ public class CommentsPager extends BaseResourcePager<Comment> {
     public CommentsPager(String commentsUrlFrag, TestpressExamApiClient apiClient) {
         this.apiClient = apiClient;
         this.commentsUrlFrag = commentsUrlFrag;
+    }
+
+    public CommentsPager(long questionId, TestpressExamApiClient apiClient) {
+        this(apiClient.getBaseUrl() + QUESTIONS_PATH + questionId + COMMENTS_PATH, apiClient);
     }
 
     @Override

@@ -8,6 +8,7 @@
     <color name="testpress_black">#333333</color>
 
     <color name="testpress_table_text">#484848</color>
+    <color name="testpress_text_gray_dark">#666666</color>
     <color name="testpress_text_gray">#777</color>
     <color name="testpress_text_gray_medium">#999999</color>
 
@@ -50,5 +51,8 @@
     <color name="testpress_difficulty_level_4">#aacc00</color>
     <color name="testpress_difficulty_level_5">#44cc00</color>
     <color name="testpress_difficulty_percentage_gray">#666666</color>
+
+    <color name="testpress_blue_text">#3b99d8</color>
+    <color name="testpress_blue_image">#3598db</color>
 
 </resources>

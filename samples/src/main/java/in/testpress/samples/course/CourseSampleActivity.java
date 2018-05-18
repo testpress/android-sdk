@@ -11,14 +11,13 @@ import in.testpress.course.TestpressCourse;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
-import in.testpress.samples.util.ViewUtils;
+import in.testpress.util.ViewUtils;
 
 import static in.testpress.core.TestpressSdk.COURSE_CHAPTER_REQUEST_CODE;
 import static in.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE;
 import static in.testpress.core.TestpressSdk.COURSE_CONTENT_LIST_REQUEST_CODE;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
-import static in.testpress.course.TestpressCourse.PARENT_ID;
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
 
 public class CourseSampleActivity extends BaseToolBarActivity {
@@ -94,6 +93,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
             switch (clickedButtonId) {
                 case R.id.simple_course:
                     session.getInstituteSettings()
+                            .setBookmarksEnabled(true)
                             .setCommentsVotingEnabled(false)
                             .setCoursesFrontend(true)
                             .setCoursesGamificationEnabled(false);
@@ -103,6 +103,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                 case R.id.chapter_contents:
                 case R.id.content_detail:
                     session.getInstituteSettings()
+                            .setBookmarksEnabled(true)
                             .setCommentsVotingEnabled(false)
                             .setCoursesFrontend(true)
                             .setCoursesGamificationEnabled(true);

@@ -80,29 +80,37 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
         this.items = contents;
         if (!contents.isEmpty()) {
             for(Content content : contents) {
-                VideoDao videoDao = TestpressSDKDatabase.getVideoDao(getContext());
-                AttachmentDao attachmentDao = TestpressSDKDatabase.getAttachmentDao(getContext());
-                ExamDao examDao = TestpressSDKDatabase.getExamDao(getContext());
-                LanguageDao languageDao = TestpressSDKDatabase.getLanguageDao(getContext());
                 Video video = content.getRawVideo();
                 Attachment attachment = content.getRawAttachment();
                 Exam exam = content.getRawExam();
                 if (attachment != null) {
+                    AttachmentDao attachmentDao = TestpressSDKDatabase.getAttachmentDao(getContext());
                     attachmentDao.insertOrReplace(attachment);
                     content.setAttachmentId(attachment.getId());
-                }
-                if (video != null) {
+                } else if (video != null) {
+                    VideoDao videoDao = TestpressSDKDatabase.getVideoDao(getContext());
                     videoDao.insertOrReplace(video);
                     content.setVideoId(video.getId());
-                }
-                if (exam != null) {
+                } else if (exam != null) {
                     List<Language> languages = exam.getLanguages();
                     for (Language language : languages) {
                         language.setExamId(exam.getId());
                     }
+                    LanguageDao languageDao = TestpressSDKDatabase.getLanguageDao(getContext());
                     languageDao.insertOrReplaceInTx(languages);
+                    ExamDao examDao = TestpressSDKDatabase.getExamDao(getContext());
                     examDao.insertOrReplace(exam);
                     content.setExamId(exam.getId());
+                } else if (content.getHtmlContentTitle() != null) {
+                    List<Content> contentsFromDB = getDao().queryBuilder()
+                            .where(ContentDao.Properties.Id.eq(content.getId())).list();
+
+                    if (!contentsFromDB.isEmpty()) {
+                        Content contentFromDB = contentsFromDB.get(0);
+                        if (contentFromDB.getHtmlId() != null) {
+                            content.setHtmlId(contentFromDB.getHtmlId());
+                        }
+                    }
                 }
                 getDao().insertOrReplace(content);
             }

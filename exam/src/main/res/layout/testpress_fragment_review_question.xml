@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:focusable="true"
     android:focusableInTouchMode="true"
@@ -18,13 +19,35 @@
             android:layout_height="match_parent"
             android:id="@+id/postDetails">
 
+            <in.testpress.ui.view.ClosableSpinner
+                android:id="@+id/bookmark_folder_spinner"
+                android:layout_width="240dp"
+                android:layout_height="10dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginRight="20dp"
+                android:layout_alignParentRight="true"
+                android:dropDownWidth="240dp"
+                />
+
             <WebView
                 android:id="@+id/web_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/move_bookmark_loader"
+                android:visibility="gone"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginTop="-20dp"
+                android:layout_alignParentRight="true"
+                app:lottie_rawRes="@raw/testpress_continuous_wave_loader"
+                app:lottie_loop="true"
+                app:lottie_colorFilter="@color/testpress_color_primary"
+                app:lottie_autoPlay="true" />
+
             <View
-                android:layout_width="20dp"
+                android:layout_width="15dp"
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@+id/web_view"
                 android:layout_alignBottom="@+id/web_view"

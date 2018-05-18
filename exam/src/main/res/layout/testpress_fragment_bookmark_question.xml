@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/full_screen_view_container"
+        android:visibility="gone"
+        android:background="@android:color/black"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <RelativeLayout
+        android:id="@+id/main_content"
+        android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffffff" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/postDetails">
+
+                <LinearLayout
+                    android:id="@+id/bookmark_layout"
+                    android:orientation="horizontal"
+                    android:background="@drawable/testpress_gray_border"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="15dp"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="15dp"
+                    android:visibility="gone"
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp">
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_width="125dp"
+                        android:layout_height="wrap_content">
+
+                        <in.testpress.ui.view.ClosableSpinner
+                            android:id="@+id/bookmark_folder_spinner"
+                            android:layout_width="1dp"
+                            android:layout_height="10dp"
+                            android:layout_marginTop="22dp"
+                            android:dropDownWidth="240dp"
+                            app:popupTheme="@style/TestpressTheme.PopupOverlay"
+                            />
+
+                        <LinearLayout
+                            android:id="@+id/move_bookmark_layout"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <ImageView
+                                android:layout_width="12dp"
+                                android:layout_height="15dp"
+                                android:tint="@color/testpress_blue_text"
+                                android:src="@drawable/testpress_move_bookmark"/>
+
+                            <TextView
+                                android:id="@+id/move_bookmark_text"
+                                android:layout_marginLeft="7dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/testpress_move_bookmark"
+                                android:textColor="@color/testpress_blue_text"
+                                />
+
+                        </LinearLayout>
+
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/move_bookmark_loader"
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
+                            android:visibility="gone"
+                            app:lottie_rawRes="@raw/testpress_material_wave_loading"
+                            app:lottie_loop="true"
+                            app:lottie_colorFilter="@color/testpress_color_primary"
+                            app:lottie_autoPlay="true" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_width="80dp"
+                        android:id="@+id/remove_bookmark_layout"
+                        android:layout_marginLeft="20dp"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <ImageView
+                                android:layout_width="12dp"
+                                android:layout_height="15dp"
+                                android:tint="@color/testpress_text_gray_light"
+                                android:src="@drawable/testpress_remove_bookmark"/>
+
+                            <TextView
+                                android:id="@+id/remove_bookmark_text"
+                                android:layout_marginLeft="7dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/testpress_remove"
+                                android:textColor="@color/testpress_text_gray_light"
+                                />
+
+                        </LinearLayout>
+
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/remove_bookmark_loader"
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
+                            android:visibility="gone"
+                            app:lottie_rawRes="@raw/testpress_material_wave_loading"
+                            app:lottie_loop="true"
+                            app:lottie_colorFilter="@color/testpress_color_primary"
+                            app:lottie_autoPlay="true" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_below="@id/bookmark_layout"
+                    android:visibility="gone"
+                    android:id="@+id/title_layout"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="match_parent"
+                        android:text="Lorem ipsum dolor sit amet, consectetur"
+                        android:gravity="center"
+                        android:lineSpacingExtra="6dp"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/testpress_black"
+                        android:layout_marginLeft="18dp"
+                        android:layout_marginRight="18dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_height="wrap_content"/>
+
+                    <View
+                        android:id="@+id/title_separator"
+                        android:layout_width="100dp"
+                        android:layout_height="1dp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="20dp"
+                        android:background="#e6e6e6"/>
+
+                </LinearLayout>
+
+                <WebView
+                    android:id="@+id/web_view"
+                    android:layout_below="@id/title_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <View
+                    android:id="@+id/right_gradient_shadow"
+                    android:layout_width="15dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/web_view"
+                    android:layout_alignBottom="@+id/web_view"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/testpress_gradient_shadow_white_right" />
+
+                <LinearLayout
+                    android:id="@+id/attachment_content_layout"
+                    android:layout_below="@+id/title_layout"
+                    android:visibility="gone"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/attachment_description"
+                        android:textColor="@color/testpress_text_gray"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="15dp"
+                        android:layout_marginLeft="3dp"
+                        android:text="Content description goes here"/>
+
+                    <android.support.v7.widget.AppCompatButton
+                        android:id="@+id/download_attachment"
+                        style="@style/TestpressSmallButton"
+                        android:layout_gravity="center"
+                        android:text="@string/testpress_download_attachment" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/difficulty_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/web_view"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="15dp"
+                    android:visibility="gone"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/difficulty_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:text="Difficulty Level:"
+                        android:textSize="16sp"
+                        android:textAllCaps="true"
+                        android:textColor="@color/testpress_black"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginLeft="20dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/difficulty1"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginRight="2dp"
+                                android:background="@drawable/testpress_difficulty_left_off"
+                                android:layout_gravity="right"/>
+
+                            <ImageView
+                                android:id="@+id/difficulty2"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginRight="2dp"
+                                android:background="@color/testpress_text_gray_light"
+                                android:layout_gravity="right"/>
+
+                            <ImageView
+                                android:id="@+id/difficulty3"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginRight="2dp"
+                                android:background="@color/testpress_text_gray_light"
+                                android:layout_gravity="right"/>
+
+                            <ImageView
+                                android:id="@+id/difficulty4"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginRight="2dp"
+                                android:background="@color/testpress_text_gray_light"
+                                android:layout_gravity="right"/>
+
+                            <ImageView
+                                android:id="@+id/difficulty5"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:background="@drawable/testpress_difficulty_right_off"
+                                android:layout_gravity="right"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="5dp">
+
+                            <TextView
+                                android:id="@+id/difficulty_percentage"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="14sp"
+                                android:text="0%"
+                                android:textColor="@color/testpress_difficulty_percentage_gray"/>
+
+                            <TextView
+                                android:id="@+id/users_answered_right"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="14sp"
+                                android:layout_marginLeft="5dp"
+                                android:textColor="@color/testpress_difficulty_percentage_gray"
+                                android:text="@string/testpress_users_answered_right"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:id="@+id/comments_layout"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/difficulty_layout">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="15dp"
+                        android:background="#e6e6e6"/>
+
+                    <TextView
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/testpress_black"
+                        android:text="@string/comments_title"
+                        android:textSize="16sp"
+                        android:lineSpacingExtra="4sp"
+                        android:id="@+id/comments_label" />
+
+                    <LinearLayout
+                        android:id="@+id/comment_box_layout"
+                        android:visibility="gone"
+                        android:orientation="horizontal"
+                        android:background="#fff"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:layout_marginBottom="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" >
+
+                        <ImageButton
+                            android:id="@+id/image_comment_button"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:padding="10dp"
+                            android:scaleType="fitXY"
+                            android:layout_gravity="bottom"
+                            android:background="@drawable/testpress_curved_green_background"
+                            android:layout_marginRight="10dp"
+                            android:tint="@android:color/white"
+                            android:src="@drawable/ic_add_a_photo_black_24dp" />
+
+                        <in.testpress.ui.view.BackEventListeningEditText
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="40dp"
+                            android:id="@+id/comment_box"
+                            android:inputType="text|textMultiLine"
+                            android:textSize="13sp"
+                            android:textColor="@color/testpress_black"
+                            android:textColorHint="#cccccc"
+                            android:layout_gravity="center"
+                            android:gravity="left|bottom"
+                            android:background="@drawable/testpress_curved_gray_border"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="6dp"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:lineSpacingExtra="4dp"
+                            android:hint="@string/write_a_comment"
+                            tools:ignore="RtlHardcoded" />
+
+                        <ImageButton
+                            android:id="@+id/post_comment_button"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:padding="10dp"
+                            android:scaleType="fitXY"
+                            android:layout_gravity="bottom"
+                            android:background="@drawable/testpress_curved_green_background"
+                            android:layout_marginLeft="10dp"
+                            android:tint="@android:color/white"
+                            android:src="@drawable/testpress_paper_plane" />
+
+                    </LinearLayout>
+
+                    <include
+                        layout="@layout/testpress_loading_layout_small"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:id="@+id/loading_new_comments_layout"/>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:id="@+id/load_new_comments_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:paddingTop="15dp"
+                        android:paddingBottom="15dp"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textStyle="bold"
+                            android:id="@+id/load_new_comments_text"
+                            android:text="@string/load_new_comments" />
+
+                    </LinearLayout>
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/comments_list_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:id="@+id/loading_previous_comments_layout"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" >
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#e6e6e6"/>
+
+                        <include layout="@layout/testpress_loading_layout_small" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:id="@+id/load_previous_comments_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:gravity="center" >
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#e6e6e6" />
+
+                        <TextView
+                            android:id="@+id/load_previous_comments"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="15dp"
+                            android:paddingBottom="15dp"
+                            android:textStyle="bold"
+                            android:text="@string/load_previous_comments" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </android.support.v4.widget.NestedScrollView>
+
+        <include layout="@layout/testpress_empty_view" />
+
+        <ProgressBar
+            android:id="@+id/pb_loading"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:indeterminate="true"
+            android:layout_centerInParent="true" />
+
+    </RelativeLayout>
+</RelativeLayout>

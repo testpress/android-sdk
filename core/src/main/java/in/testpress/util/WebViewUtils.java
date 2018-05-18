@@ -10,6 +10,8 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -21,6 +23,7 @@ import in.testpress.ui.ZoomableImageActivity;
 public class WebViewUtils {
 
     private WebView webView;
+    private boolean hasError;
 
     public WebViewUtils(WebView webView) {
         this.webView = webView;
@@ -37,6 +40,14 @@ public class WebViewUtils {
         webSettings.setDatabaseEnabled(true);
         webSettings.setDomStorageEnabled(true);
         webSettings.setAppCacheEnabled(true);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
+        if (Build.VERSION.SDK_INT >= 19) {
+            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        }
+        else {
+            webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        }
     }
 
     @SuppressLint({"AddJavascriptInterface", "SetJavaScriptEnabled"})
@@ -47,13 +58,15 @@ public class WebViewUtils {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                String javascript = getJavascript(activity);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    webView.evaluateJavascript(javascript, null);
-                } else {
-                    webView.loadUrl(javascript, null);
+                if (!hasError) {
+                    String javascript = getJavascript(activity);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        webView.evaluateJavascript(javascript, null);
+                    } else {
+                        webView.loadUrl(javascript, null);
+                    }
+                    onLoadFinished();
                 }
-                onLoadFinished();
             }
 
             @SuppressWarnings("deprecation")
@@ -62,6 +75,18 @@ public class WebViewUtils {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 activity.startActivity(intent);
                 return true;
+            }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request,
+                                        WebResourceError error) {
+
+                super.onReceivedError(view, request, error);
+                if (InternetConnectivityChecker.isConnected(activity)) {
+                    return;
+                }
+                onNetworkError();
+                hasError = true;
             }
         });
         loadHtml(htmlContent);
@@ -76,8 +101,35 @@ public class WebViewUtils {
         webView.setVisibility(View.VISIBLE);
     }
 
+    protected void onNetworkError() {
+    }
+
+    private void evaluateJavascript(String javascript) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            webView.evaluateJavascript(javascript, null);
+        } else {
+            webView.loadUrl(javascript, null);
+        }
+    }
+
+    public void updateBookmarkButtonState(boolean bookmarked) {
+        evaluateJavascript(getBookmarkButtonUpdater(bookmarked));
+    }
+
+    public void hideBookmarkButton() {
+        evaluateJavascript("hideBookmarkButton();");
+    }
+
+    public void displayBookmarkButton() {
+        evaluateJavascript("displayBookmarkButton();");
+    }
+
     protected static String getTestEngineHeader() {
         return "<script src='TestpressTestEngine.js'></script>";
+    }
+
+    protected static String getBookmarkHandlerScript() {
+        return "<script src='TestpressReview.js'></script>";
     }
 
     protected static String getRadioButtonInitializer(int selectedOption) {
@@ -86,6 +138,10 @@ public class WebViewUtils {
 
     protected static String getCheckBoxInitializer(List<Integer> selectedOptions) {
         return "initCheckBoxGroup(" + selectedOptions + ");";
+    }
+
+    protected static String getBookmarkButtonUpdater(boolean bookmarked) {
+        return "updateBookmarkButtonState(" + bookmarked + ");";
     }
 
     public String getJavascript(Context context) {
@@ -173,6 +229,16 @@ public class WebViewUtils {
 
     public static String getColor(Context context, int colorRes) {
         return "#" + Integer.toHexString(ContextCompat.getColor(context, colorRes) & 0x00ffffff);
+    }
+
+    public static String getBookmarkButtonWithTags(boolean bookmarked) {
+        String image = bookmarked ? "testpress_remove_bookmark.svg" : "testpress_bookmark.svg";
+        String text = bookmarked ? "Remove Bookmark" : "Bookmark this";
+        return "" +
+                "<div class='bookmark-button' onclick='onClickBookmarkButton()'>" +
+                "   <img class='bookmark-image' src='" + image + "' />" +
+                "   <span class='bookmark-text'>" + text + "</span>" +
+                "</div>";
     }
 
     private class ImageHandler {

@@ -15,34 +15,27 @@
 
         <android.support.v7.widget.AppCompatButton
             style="@style/Button"
-            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
             android:text="Core"
             android:id="@+id/core" />
 
         <android.support.v7.widget.AppCompatButton
-            android:layout_marginTop="30dp"
             style="@style/Button"
-            android:layout_width="match_parent"
             android:text="Exam"
             android:id="@+id/exam" />
 
         <android.support.v7.widget.AppCompatButton
-            android:layout_marginTop="30dp"
             style="@style/Button"
-            android:layout_width="match_parent"
             android:text="Course"
             android:id="@+id/course" />
 
         <android.support.v7.widget.AppCompatButton
-            android:layout_marginTop="30dp"
             style="@style/Button"
             android:text="Analytics"
             android:id="@+id/analytics" />
 
         <android.support.v7.widget.AppCompatButton
-            android:layout_marginTop="30dp"
             style="@style/Button"
-            android:layout_width="match_parent"
             android:text="Store"
             android:id="@+id/store" />
 

@@ -12,6 +12,9 @@ import org.greenrobot.greendao.annotation.*;
  */
 @Entity
 public class HtmlContent {
+
+    @Id
+    private Long id;
     private String title;
     private String textHtml;
     private String sourceUrl;
@@ -23,11 +26,24 @@ public class HtmlContent {
     public HtmlContent() {
     }
 
+    public HtmlContent(Long id) {
+        this.id = id;
+    }
+
     @Generated
-    public HtmlContent(String title, String textHtml, String sourceUrl) {
+    public HtmlContent(Long id, String title, String textHtml, String sourceUrl) {
+        this.id = id;
         this.title = title;
         this.textHtml = textHtml;
         this.sourceUrl = sourceUrl;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitle() {

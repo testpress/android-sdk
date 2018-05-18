@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,21 +18,24 @@ import android.text.Html;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.airbnb.lottie.LottieAnimationView;
+
 import junit.framework.Assert;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,12 +47,15 @@ import in.testpress.course.R;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.ui.FolderSpinnerAdapter;
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.AttachmentDao;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.AttemptDao;
+import in.testpress.models.greendao.Bookmark;
+import in.testpress.models.greendao.BookmarkFolder;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.CourseAttempt;
@@ -61,14 +68,20 @@ import in.testpress.models.greendao.Video;
 import in.testpress.models.greendao.VideoDao;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ZoomableImageActivity;
+import in.testpress.ui.view.ClosableSpinner;
 import in.testpress.util.FormatDate;
+import in.testpress.util.FullScreenChromeClient;
 import in.testpress.util.InternetConnectivityChecker;
 import in.testpress.util.ViewUtils;
+import in.testpress.v2_4.models.ApiResponse;
+import in.testpress.v2_4.models.FolderListResponse;
 
 import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
+import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.STATE_PAUSED;
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
+import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 
 public class ContentActivity extends BaseToolBarActivity {
 
@@ -81,9 +94,7 @@ public class ContentActivity extends BaseToolBarActivity {
     public static final String POSITION = "position";
 
     private WebView webView;
-    private FrameLayout mCustomViewContainer;
     private RelativeLayout mContentView;
-    private View mCustomView;
     private SwipeRefreshLayout swipeRefresh;
     private LinearLayout examContentLayout;
     private LinearLayout examDetailsLayout;
@@ -106,8 +117,7 @@ public class ContentActivity extends BaseToolBarActivity {
     private String attemptsUrl;
     private List<CourseAttempt> courseAttempts = new ArrayList<>();
     private int position;
-    private FullScreenChromeClient mWebChromeClient = null;
-    private WebChromeClient.CustomViewCallback mCustomViewCallback;
+    private FullScreenChromeClient mWebChromeClient;
     private ContentDao contentDao;
     private HtmlContentDao htmlContentDao;
     private CourseAttemptDao courseAttemptDao;
@@ -119,6 +129,14 @@ public class ContentActivity extends BaseToolBarActivity {
     private TestpressExamApiClient examApiClient;
     private TestpressCourseApiClient courseApiClient;
     private Toast toast;
+    private LottieAnimationView animationView;
+    private TextView bookmarkButtonText;
+    private ImageView bookmarkButtonImage;
+    private RelativeLayout bookmarkLayout;
+    private LinearLayout bookmarkButtonLayout;
+    private ArrayList<BookmarkFolder> bookmarkFolders = new ArrayList<>();
+    private ClosableSpinner bookmarkFolderSpinner;
+    private FolderSpinnerAdapter folderSpinnerAdapter;
 
     public static Intent createIntent(int position, long chapterId, AppCompatActivity activity) {
         Intent intent = new Intent(activity, ContentActivity.class);
@@ -149,7 +167,6 @@ public class ContentActivity extends BaseToolBarActivity {
         examDao = TestpressSDKDatabase.getExamDao(this);
         attachmentDao = TestpressSDKDatabase.getAttachmentDao(this);
         webView = (WebView) findViewById(R.id.web_view);
-        mCustomViewContainer = (FrameLayout) findViewById(R.id.container);
         mContentView = (RelativeLayout) findViewById(R.id.main_content);
         swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         examContentLayout = (LinearLayout) findViewById(R.id.exam_content_layout);
@@ -173,9 +190,54 @@ public class ContentActivity extends BaseToolBarActivity {
                 new TextView[] {titleView, previousButton, nextButton, startButton, pageNumber},
                 TestpressSdk.getRubikMediumFont(this)
         );
+        bookmarkLayout = findViewById(R.id.bookmark_layout);
+        bookmarkButtonLayout = findViewById(R.id.bookmark_button_layout);
+        bookmarkButtonImage = findViewById(R.id.bookmark_button_image);
+        bookmarkButtonText = findViewById(R.id.bookmark_text);
+        bookmarkButtonText.setTypeface(TestpressSdk.getRubikRegularFont(this));
+        bookmarkButtonLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (content.getBookmarkId() != null) {
+                    deleteBookmark(content.getBookmarkId());
+                } else {
+                    String baseUrl = TestpressSdk.getTestpressSession(ContentActivity.this)
+                            .getInstituteSettings().getBaseUrl();
+
+                    bookmarkFolders.clear();
+                    loadBookmarkFolders(baseUrl + BOOKMARK_FOLDERS_PATH);
+                }
+            }
+        });
+        bookmarkFolderSpinner = findViewById(R.id.bookmark_folder_spinner);
+        folderSpinnerAdapter = new FolderSpinnerAdapter(this, getResources(),
+                new ViewUtils.OnInputCompletedListener() {
+                    @Override
+                    public void onInputComplete(String folderName) {
+                        bookmarkFolderSpinner.dismissPopUp();
+                        bookmark(folderName);
+                    }
+                });
+        folderSpinnerAdapter.hideSpinner(true);
+        bookmarkFolderSpinner.setAdapter(folderSpinnerAdapter);
+        bookmarkFolderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> spinner, View view, int position, long itemId) {
+                if (position == 0) {
+                    return;
+                }
+                bookmark(folderSpinnerAdapter.getTag(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+        animationView = findViewById(R.id.bookmark_loader);
+        animationView.playAnimation();
         examApiClient = new TestpressExamApiClient(this);
         courseApiClient = new TestpressCourseApiClient(this);
-        mWebChromeClient = new FullScreenChromeClient();
+        mWebChromeClient = new FullScreenChromeClient(this);
         webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
         webView.setWebChromeClient(mWebChromeClient);
         WebSettings webSettings = webView.getSettings();
@@ -361,7 +423,7 @@ public class ContentActivity extends BaseToolBarActivity {
         setContentTitle(content.getName());
         TextView description = (TextView) findViewById(R.id.attachment_description);
         final Attachment attachment = content.getRawAttachment();
-        if (attachment.getDescription() != null) {
+        if (attachment.getDescription() != null && !attachment.getDescription().isEmpty()) {
             description.setText(attachment.getDescription());
             description.setTypeface(TestpressSdk.getRubikRegularFont(this));
             description.setVisibility(View.VISIBLE);
@@ -369,7 +431,7 @@ public class ContentActivity extends BaseToolBarActivity {
             description.setVisibility(View.GONE);
         }
         Button downloadButton = (Button) findViewById(R.id.download_attachment);
-        ViewUtils.setLeftDrawable(this, downloadButton, R.drawable.ic_file_download_white_18dp);
+        ViewUtils.setLeftDrawable(this, downloadButton, R.drawable.ic_file_download_18dp);
         downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -745,6 +807,93 @@ public class ContentActivity extends BaseToolBarActivity {
                 TestpressSdk.getTestpressSession(this));
     }
 
+    void loadBookmarkFolders(String url) {
+        setBookmarkProgress(true);
+        examApiClient.getBookmarkFolders(url)
+                .enqueue(new TestpressCallback<ApiResponse<FolderListResponse>>() {
+                    @Override
+                    public void onSuccess(ApiResponse<FolderListResponse> apiResponse) {
+                        bookmarkFolders.addAll(apiResponse.getResults().getFolders());
+                        if (apiResponse.getNext() != null) {
+                            loadBookmarkFolders(apiResponse.getNext());
+                        } else {
+                            addFoldersToSpinner(bookmarkFolders);
+                            setBookmarkProgress(false);
+                            bookmarkFolderSpinner.performClick();
+                        }
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        setBookmarkProgress(false);
+                        handleException(exception);
+                    }
+                });
+    }
+
+    void bookmark(String folder) {
+        setBookmarkProgress(true);
+        examApiClient.bookmark(content.getId(), folder, "chaptercontent", "courses")
+                .enqueue(new TestpressCallback<Bookmark>() {
+                    @Override
+                    public void onSuccess(Bookmark bookmark) {
+                        content.setBookmarkId(bookmark.getId());
+                        contentDao.updateInTx(content);
+                        bookmarkButtonText.setText(R.string.testpress_remove_bookmark);
+                        bookmarkButtonImage.setImageResource(R.drawable.ic_remove_bookmark);
+                        setBookmarkProgress(false);
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        setBookmarkProgress(false);
+                        handleException(exception);
+                    }
+                });
+    }
+
+    void deleteBookmark(Long bookmarkId) {
+        setBookmarkProgress(true);
+        examApiClient.deleteBookmark(bookmarkId)
+                .enqueue(new TestpressCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void data) {
+                        content.setBookmarkId(null);
+                        contentDao.updateInTx(content);
+                        bookmarkFolderSpinner.setSelection(0);
+                        bookmarkButtonText.setText(R.string.testpress_bookmark_this);
+                        bookmarkButtonImage.setImageResource(R.drawable.ic_bookmark);
+                        setBookmarkProgress(false);
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        setBookmarkProgress(false);
+                        handleException(exception);
+                    }
+                });
+    }
+
+    void setBookmarkProgress(boolean show) {
+        if (show) {
+            bookmarkButtonLayout.setVisibility(View.GONE);
+            animationView.setVisibility(View.VISIBLE);
+        } else {
+            animationView.setVisibility(View.GONE);
+            bookmarkButtonLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
+    void addFoldersToSpinner(List<BookmarkFolder> bookmarkFolders) {
+        folderSpinnerAdapter.clear();
+        folderSpinnerAdapter.addHeader("-- Select Folder --");
+        for (BookmarkFolder folder: bookmarkFolders) {
+            folderSpinnerAdapter.addItem(folder.getName(), folder.getName(), false, 0);
+        }
+        folderSpinnerAdapter.addItem(null, UNCATEGORIZED, false, 0);
+        folderSpinnerAdapter.notifyDataSetChanged();
+    }
+
     private void validateAdjacentNavigationButton() {
         if (contents == null) {
             // Discard navigation buttons if deep linked
@@ -880,6 +1029,22 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void setContentTitle(CharSequence title) {
         titleView.setText(title);
+        //noinspection ConstantConditions
+        boolean bookmarksEnabled = TestpressSdk.getTestpressSession(this).getInstituteSettings()
+                .isBookmarksEnabled();
+
+        if (content.getRawExam() == null && bookmarksEnabled) {
+            if (content.getBookmarkId() != null) {
+                bookmarkButtonText.setText(R.string.testpress_remove_bookmark);
+                bookmarkButtonImage.setImageResource(R.drawable.ic_remove_bookmark);
+            } else {
+                bookmarkButtonText.setText(R.string.testpress_bookmark_this);
+                bookmarkButtonImage.setImageResource(R.drawable.ic_bookmark);
+            }
+            bookmarkLayout.setVisibility(View.VISIBLE);
+        } else {
+            bookmarkLayout.setVisibility(View.GONE);
+        }
         titleLayout.setVisibility(View.VISIBLE);
     }
 
@@ -918,40 +1083,25 @@ public class ContentActivity extends BaseToolBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class FullScreenChromeClient extends WebChromeClient {
-        FrameLayout.LayoutParams LayoutParameters = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
-
-        @Override
-        public void onShowCustomView(View view, CustomViewCallback callback) {
-            if (mCustomView != null) {
-                callback.onCustomViewHidden();
-                return;
-            }
-            mContentView.setVisibility(View.INVISIBLE);
-            view.setLayoutParams(LayoutParameters);
-            mCustomView = view;
-            mCustomViewCallback = callback;
-            mCustomViewContainer.setVisibility(View.VISIBLE);
-            mCustomViewContainer.addView(view);
-        }
-
-        @Override
-        public void onHideCustomView() {
-            if (mCustomView != null) {
-                mCustomView.setVisibility(View.GONE);
-                mCustomViewContainer.removeView(mCustomView);
-                mCustomView = null;
-                mCustomViewContainer.setVisibility(View.GONE);
-                mCustomViewCallback.onCustomViewHidden();
-                mContentView.setVisibility(View.VISIBLE);
-            }
+    void handleException(TestpressException exception) {
+        if(exception.isUnauthenticated()) {
+            Snackbar.make(mContentView, R.string.testpress_authentication_failed,
+                    Snackbar.LENGTH_SHORT).show();
+        } else if (exception.getCause() instanceof IOException) {
+            Snackbar.make(mContentView, R.string.testpress_no_internet_connection,
+                    Snackbar.LENGTH_SHORT).show();
+        } else if (exception.isClientError()) {
+            Snackbar.make(mContentView, R.string.testpress_folder_name_not_allowed,
+                    Snackbar.LENGTH_SHORT).show();
+        } else {
+            Snackbar.make(mContentView, R.string.testpress_network_error,
+                    Snackbar.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void onBackPressed() {
-        if (mCustomView != null) {
+        if (mWebChromeClient.isFullScreen()) {
             mWebChromeClient.onHideCustomView();
         } else {
             super.onBackPressed();

@@ -12,9 +12,6 @@ import org.greenrobot.greendao.annotation.*;
  */
 @Entity
 public class ReviewAnswerTranslation {
-
-    @Id(autoincrement = true)
-    private Long translationAnswerId;
     private Long id;
     private String textHtml;
     private Boolean isCorrect;
@@ -27,25 +24,12 @@ public class ReviewAnswerTranslation {
     public ReviewAnswerTranslation() {
     }
 
-    public ReviewAnswerTranslation(Long translationAnswerId) {
-        this.translationAnswerId = translationAnswerId;
-    }
-
     @Generated
-    public ReviewAnswerTranslation(Long translationAnswerId, Long id, String textHtml, Boolean isCorrect, Long questionTranslationId) {
-        this.translationAnswerId = translationAnswerId;
+    public ReviewAnswerTranslation(Long id, String textHtml, Boolean isCorrect, Long questionTranslationId) {
         this.id = id;
         this.textHtml = textHtml;
         this.isCorrect = isCorrect;
         this.questionTranslationId = questionTranslationId;
-    }
-
-    public Long getTranslationAnswerId() {
-        return translationAnswerId;
-    }
-
-    public void setTranslationAnswerId(Long translationAnswerId) {
-        this.translationAnswerId = translationAnswerId;
     }
 
     public Long getId() {

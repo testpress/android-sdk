@@ -16,27 +16,35 @@ package in.testpress.util;
  * limitations under the License.
  */
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.app.AlertDialog;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import in.testpress.R;
 
@@ -136,11 +144,21 @@ public class ViewUtils {
 
     public static void setLeftDrawable(Context context, Button button, @DrawableRes int drawableRes) {
         Drawable drawable = ContextCompat.getDrawable(context, drawableRes);
+        assert drawable != null;
         drawable.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(context,
-                R.color.testpress_button_text_color), PorterDuff.Mode.MULTIPLY));
+                R.color.testpress_button_text_color), PorterDuff.Mode.SRC_IN));
         button.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
         button.setCompoundDrawablePadding((int) context.getResources().getDimension(
                 R.dimen.testpress_button_left_drawable_padding));
+    }
+
+    public static void setDrawableColor(TextView textView, @ColorRes int colorRes) {
+        int color = ContextCompat.getColor(textView.getContext(), colorRes);
+        for (Drawable drawable : textView.getCompoundDrawables()) {
+            if (drawable != null) {
+                drawable.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
+            }
+        }
     }
 
     // Used to put ListView inside ScrollView
@@ -158,6 +176,50 @@ public class ViewUtils {
         ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
+    }
+
+    @SuppressLint("InflateParams")
+    public static void showInputDialogBox(final Activity activity, String title,
+                                          final OnInputCompletedListener inputCompletedListener) {
+
+        final View dialogView =
+                activity.getLayoutInflater().inflate(R.layout.testpress_edit_text_dialog_box, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity,
+                R.style.TestpressAppCompatAlertDialogStyle);
+
+        builder.setTitle(title);
+        builder.setView(dialogView);
+        final EditText editText = dialogView.findViewById(R.id.edit_text);
+        builder.setPositiveButton(activity.getString(R.string.testpress_ok),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        UIUtils.hideSoftKeyboard(activity, editText);
+                        String inputText = editText.getText().toString();
+                        if (inputText.trim().isEmpty()) {
+                            return;
+                        }
+                        inputCompletedListener.onInputComplete(inputText);
+                    }
+        });
+        builder.setNegativeButton(activity.getString(R.string.testpress_cancel),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        UIUtils.hideSoftKeyboard(activity, editText);
+                    }
+        });
+        Dialog dialog = builder.create();
+        //noinspection ConstantConditions
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        dialog.show();
+    }
+
+    public interface OnInputCompletedListener {
+        void onInputComplete(String inputText);
+    }
+
+    public static void toast(Context context, String message) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
     private ViewUtils() {

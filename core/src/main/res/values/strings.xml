@@ -28,4 +28,6 @@
     <string name="testpress_yes">Yes</string>
     <string name="testpress_no">No</string>
 
+    <string name="testpress_are_you_sure">Are you sure?</string>
+
 </resources>

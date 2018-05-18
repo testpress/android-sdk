@@ -16,7 +16,7 @@ import org.greenrobot.greendao.query.QueryBuilder;
 /** 
  * DAO for table "REVIEW_ANSWER_TRANSLATION".
 */
-public class ReviewAnswerTranslationDao extends AbstractDao<ReviewAnswerTranslation, Long> {
+public class ReviewAnswerTranslationDao extends AbstractDao<ReviewAnswerTranslation, Void> {
 
     public static final String TABLENAME = "REVIEW_ANSWER_TRANSLATION";
 
@@ -25,11 +25,10 @@ public class ReviewAnswerTranslationDao extends AbstractDao<ReviewAnswerTranslat
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property TranslationAnswerId = new Property(0, Long.class, "translationAnswerId", true, "TRANSLATION_ANSWER_ID");
-        public final static Property Id = new Property(1, Long.class, "id", false, "ID");
-        public final static Property TextHtml = new Property(2, String.class, "textHtml", false, "TEXT_HTML");
-        public final static Property IsCorrect = new Property(3, Boolean.class, "isCorrect", false, "IS_CORRECT");
-        public final static Property QuestionTranslationId = new Property(4, Long.class, "questionTranslationId", false, "QUESTION_TRANSLATION_ID");
+        public final static Property Id = new Property(0, Long.class, "id", false, "ID");
+        public final static Property TextHtml = new Property(1, String.class, "textHtml", false, "TEXT_HTML");
+        public final static Property IsCorrect = new Property(2, Boolean.class, "isCorrect", false, "IS_CORRECT");
+        public final static Property QuestionTranslationId = new Property(3, Long.class, "questionTranslationId", false, "QUESTION_TRANSLATION_ID");
     }
 
     private Query<ReviewAnswerTranslation> reviewQuestionTranslation_AnswersQuery;
@@ -46,11 +45,10 @@ public class ReviewAnswerTranslationDao extends AbstractDao<ReviewAnswerTranslat
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"REVIEW_ANSWER_TRANSLATION\" (" + //
-                "\"TRANSLATION_ANSWER_ID\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: translationAnswerId
-                "\"ID\" INTEGER," + // 1: id
-                "\"TEXT_HTML\" TEXT," + // 2: textHtml
-                "\"IS_CORRECT\" INTEGER," + // 3: isCorrect
-                "\"QUESTION_TRANSLATION_ID\" INTEGER);"); // 4: questionTranslationId
+                "\"ID\" INTEGER," + // 0: id
+                "\"TEXT_HTML\" TEXT," + // 1: textHtml
+                "\"IS_CORRECT\" INTEGER," + // 2: isCorrect
+                "\"QUESTION_TRANSLATION_ID\" INTEGER);"); // 3: questionTranslationId
     }
 
     /** Drops the underlying database table. */
@@ -63,29 +61,24 @@ public class ReviewAnswerTranslationDao extends AbstractDao<ReviewAnswerTranslat
     protected final void bindValues(DatabaseStatement stmt, ReviewAnswerTranslation entity) {
         stmt.clearBindings();
  
-        Long translationAnswerId = entity.getTranslationAnswerId();
-        if (translationAnswerId != null) {
-            stmt.bindLong(1, translationAnswerId);
-        }
- 
         Long id = entity.getId();
         if (id != null) {
-            stmt.bindLong(2, id);
+            stmt.bindLong(1, id);
         }
  
         String textHtml = entity.getTextHtml();
         if (textHtml != null) {
-            stmt.bindString(3, textHtml);
+            stmt.bindString(2, textHtml);
         }
  
         Boolean isCorrect = entity.getIsCorrect();
         if (isCorrect != null) {
-            stmt.bindLong(4, isCorrect ? 1L: 0L);
+            stmt.bindLong(3, isCorrect ? 1L: 0L);
         }
  
         Long questionTranslationId = entity.getQuestionTranslationId();
         if (questionTranslationId != null) {
-            stmt.bindLong(5, questionTranslationId);
+            stmt.bindLong(4, questionTranslationId);
         }
     }
 
@@ -93,76 +86,66 @@ public class ReviewAnswerTranslationDao extends AbstractDao<ReviewAnswerTranslat
     protected final void bindValues(SQLiteStatement stmt, ReviewAnswerTranslation entity) {
         stmt.clearBindings();
  
-        Long translationAnswerId = entity.getTranslationAnswerId();
-        if (translationAnswerId != null) {
-            stmt.bindLong(1, translationAnswerId);
-        }
- 
         Long id = entity.getId();
         if (id != null) {
-            stmt.bindLong(2, id);
+            stmt.bindLong(1, id);
         }
  
         String textHtml = entity.getTextHtml();
         if (textHtml != null) {
-            stmt.bindString(3, textHtml);
+            stmt.bindString(2, textHtml);
         }
  
         Boolean isCorrect = entity.getIsCorrect();
         if (isCorrect != null) {
-            stmt.bindLong(4, isCorrect ? 1L: 0L);
+            stmt.bindLong(3, isCorrect ? 1L: 0L);
         }
  
         Long questionTranslationId = entity.getQuestionTranslationId();
         if (questionTranslationId != null) {
-            stmt.bindLong(5, questionTranslationId);
+            stmt.bindLong(4, questionTranslationId);
         }
     }
 
     @Override
-    public Long readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
+    public Void readKey(Cursor cursor, int offset) {
+        return null;
     }    
 
     @Override
     public ReviewAnswerTranslation readEntity(Cursor cursor, int offset) {
         ReviewAnswerTranslation entity = new ReviewAnswerTranslation( //
-            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // translationAnswerId
-            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // id
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // textHtml
-            cursor.isNull(offset + 3) ? null : cursor.getShort(offset + 3) != 0, // isCorrect
-            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4) // questionTranslationId
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // textHtml
+            cursor.isNull(offset + 2) ? null : cursor.getShort(offset + 2) != 0, // isCorrect
+            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3) // questionTranslationId
         );
         return entity;
     }
      
     @Override
     public void readEntity(Cursor cursor, ReviewAnswerTranslation entity, int offset) {
-        entity.setTranslationAnswerId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setId(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
-        entity.setTextHtml(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setIsCorrect(cursor.isNull(offset + 3) ? null : cursor.getShort(offset + 3) != 0);
-        entity.setQuestionTranslationId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setTextHtml(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setIsCorrect(cursor.isNull(offset + 2) ? null : cursor.getShort(offset + 2) != 0);
+        entity.setQuestionTranslationId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
      }
     
     @Override
-    protected final Long updateKeyAfterInsert(ReviewAnswerTranslation entity, long rowId) {
-        entity.setTranslationAnswerId(rowId);
-        return rowId;
+    protected final Void updateKeyAfterInsert(ReviewAnswerTranslation entity, long rowId) {
+        // Unsupported or missing PK type
+        return null;
     }
     
     @Override
-    public Long getKey(ReviewAnswerTranslation entity) {
-        if(entity != null) {
-            return entity.getTranslationAnswerId();
-        } else {
-            return null;
-        }
+    public Void getKey(ReviewAnswerTranslation entity) {
+        return null;
     }
 
     @Override
     public boolean hasKey(ReviewAnswerTranslation entity) {
-        return entity.getTranslationAnswerId() != null;
+        // TODO
+        return false;
     }
 
     @Override
