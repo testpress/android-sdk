@@ -39,6 +39,7 @@ import retrofit2.Response;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 import static in.testpress.network.TestpressApiClient.FOLDER;
 import static in.testpress.network.TestpressApiClient.SINCE;
+import static in.testpress.network.TestpressApiClient.UNFILTERED;
 
 public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Bookmark> {
 
@@ -101,34 +102,24 @@ public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Boo
     @Override
     protected Bookmark register(Bookmark bookmark) {
         try {
-            // Omit the bookmark if its modified date less then the lowest modified date in db
-            // This check will done only for refresh pager(bookmarkDao != null)
-            if (queryParams.containsKey(SINCE)) {
-                QueryBuilder<Bookmark> queryBuilder = Bookmark.getQueryBuilder(context, folder);
-                if (queryBuilder.count() != 0 &&
-                        (simpleDateFormat.parse(bookmark.getCreated()).getTime() <
-                                queryBuilder.orderDesc(BookmarkDao.Properties.CreatedDate).list()
-                                        .get((int) queryBuilder.count() - 1).getCreatedDate())) {
+            if (queryParams.containsKey(UNFILTERED) && !bookmark.getActive()) {
+                // Remove bookmark id from content object for deleted bookmarks
+                List<Bookmark> bookmarksFromDB = TestpressSDKDatabase.getBookmarkDao(context)
+                        .queryBuilder().where(BookmarkDao.Properties.Id.eq(bookmark.getId()))
+                        .list();
 
-                    return null;
-                } else if (!bookmark.getActive()) {
-                    List<Bookmark> bookmarksFromDB = TestpressSDKDatabase.getBookmarkDao(context)
-                            .queryBuilder().where(BookmarkDao.Properties.Id.eq(bookmark.getId()))
-                            .list();
+                if (!bookmarksFromDB.isEmpty()) {
+                    Object object = bookmarksFromDB.get(0).getBookmarkedObject();
+                    if (object instanceof ReviewItem) {
+                        ReviewItem reviewItem = (ReviewItem) object;
+                        reviewItem.setBookmarkId(null);
+                        TestpressSDKDatabase.getReviewItemDao(context)
+                                .insertOrReplaceInTx(reviewItem);
 
-                    if (!bookmarksFromDB.isEmpty()) {
-                        Object object = bookmarksFromDB.get(0).getBookmarkedObject();
-                        if (object instanceof ReviewItem) {
-                            ReviewItem reviewItem = (ReviewItem) object;
-                            reviewItem.setBookmarkId(null);
-                            TestpressSDKDatabase.getReviewItemDao(context)
-                                    .insertOrReplaceInTx(reviewItem);
-
-                        } else if (object instanceof Content) {
-                            Content content = (Content) object;
-                            content.setBookmarkId(null);
-                            TestpressSDKDatabase.getContentDao(context).insertOrReplaceInTx(content);
-                        }
+                    } else if (object instanceof Content) {
+                        Content content = (Content) object;
+                        content.setBookmarkId(null);
+                        TestpressSDKDatabase.getContentDao(context).insertOrReplaceInTx(content);
                     }
                 }
             }

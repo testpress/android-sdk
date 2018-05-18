@@ -41,8 +41,9 @@ public class TestpressApiClient {
     public static final String ORDER = "order";
     public static final String UNFILTERED = "unfiltered";
     public static final String FOLDER = "folder";
-    public static final String TIME_FIELD = "time_field";
-    public static final String MODIFIED = "modified";
+    public static final String MODIFIED_SINCE = "modified_since";
+    public static final String CREATED_SINCE = "created_since";
+    public static final String CREATED_UNTIL = "created_until";
 
     protected final Retrofit retrofit;
 

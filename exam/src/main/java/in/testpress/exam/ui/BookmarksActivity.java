@@ -60,11 +60,10 @@ import in.testpress.v2_4.models.FolderListResponse;
 
 import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
-import static in.testpress.network.TestpressApiClient.MODIFIED;
-import static in.testpress.network.TestpressApiClient.SINCE;
-import static in.testpress.network.TestpressApiClient.TIME_FIELD;
+import static in.testpress.network.TestpressApiClient.CREATED_SINCE;
+import static in.testpress.network.TestpressApiClient.CREATED_UNTIL;
+import static in.testpress.network.TestpressApiClient.MODIFIED_SINCE;
 import static in.testpress.network.TestpressApiClient.UNFILTERED;
-import static in.testpress.network.TestpressApiClient.UNTIL;
 
 public class BookmarksActivity extends BaseToolBarActivity
         implements LoaderManager.LoaderCallbacks<List<Bookmark>>, AbsListView.OnScrollListener {
@@ -309,10 +308,12 @@ public class BookmarksActivity extends BaseToolBarActivity
             QueryBuilder<Bookmark> queryBuilder = getQueryBuilder();
             if (queryBuilder.count() > 0) {
                 queryBuilder.orderDesc(BookmarkDao.Properties.ModifiedDate);
-                Bookmark latest = queryBuilder.list().get(0);
-                refreshPager.setQueryParams(SINCE, latest.getModified());
+                Bookmark latestModified = queryBuilder.list().get(0);
+                refreshPager.setQueryParams(MODIFIED_SINCE, latestModified.getModified());
+                queryBuilder.orderAsc(BookmarkDao.Properties.CreatedDate);
+                Bookmark oldestCreated = queryBuilder.list().get(0);
+                refreshPager.setQueryParams(CREATED_SINCE, oldestCreated.getCreated());
                 refreshPager.setQueryParams(UNFILTERED, true);
-                refreshPager.setQueryParams(TIME_FIELD, MODIFIED);
             }
         }
         return refreshPager;
@@ -325,7 +326,7 @@ public class BookmarksActivity extends BaseToolBarActivity
             if (queryBuilder.count() > 0) {
                 queryBuilder.orderDesc(BookmarkDao.Properties.CreatedDate);
                 Bookmark lastBookmark = queryBuilder.list().get((int) queryBuilder.count() - 1);
-                pager.setQueryParams(UNTIL, lastBookmark.getCreated());
+                pager.setQueryParams(CREATED_UNTIL, lastBookmark.getCreated());
             }
         }
         return pager;
