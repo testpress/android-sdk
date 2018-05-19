@@ -42,12 +42,6 @@ public class WebViewUtils {
         webSettings.setAppCacheEnabled(true);
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
-        if (Build.VERSION.SDK_INT >= 19) {
-            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        }
-        else {
-            webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        }
     }
 
     @SuppressLint({"AddJavascriptInterface", "SetJavaScriptEnabled"})

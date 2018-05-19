@@ -3,8 +3,6 @@ package in.testpress.exam.network;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
-import org.greenrobot.greendao.query.QueryBuilder;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,7 +36,6 @@ import retrofit2.Response;
 
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 import static in.testpress.network.TestpressApiClient.FOLDER;
-import static in.testpress.network.TestpressApiClient.SINCE;
 import static in.testpress.network.TestpressApiClient.UNFILTERED;
 
 public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Bookmark> {

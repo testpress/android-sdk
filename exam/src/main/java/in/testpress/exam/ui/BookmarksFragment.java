@@ -3,7 +3,6 @@ package in.testpress.exam.ui;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -312,11 +311,6 @@ public class BookmarksFragment extends Fragment
             @Override
             public String getHeader() {
                 return super.getHeader() + getBookmarkHandlerScript();
-            }
-
-            @Override
-            public String getJavascript(Context context) {
-                return super.getJavascript(context);
             }
 
             @Override
