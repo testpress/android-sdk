@@ -570,6 +570,7 @@ public class BookmarksActivity extends BaseToolBarActivity
         } else {
             contentLayout.setVisibility(View.VISIBLE);
             setNavigationBarVisible(viewPagerSwipeRefreshLayout.getVisibility() == View.VISIBLE);
+            updateNavigationButtons(viewPager.getCurrentItem());
             emptyView.setVisibility(View.GONE);
         }
     }
@@ -867,9 +868,12 @@ public class BookmarksActivity extends BaseToolBarActivity
                 });
     }
 
-    void undoBookmarkDelete(final long bookmarkId, long objectId) {
+    void undoBookmarkDelete(final long bookmarkId) {
         progressDialog.show();
-        apiClient.undoBookmarkDelete(bookmarkId, objectId)
+        Bookmark bookmark = bookmarkDao.queryBuilder()
+                .where(BookmarkDao.Properties.Id.eq(bookmarkId)).list().get(0);
+
+        apiClient.undoBookmarkDelete(bookmarkId, bookmark.getObjectId(), bookmark.getFolderFromDB())
                 .enqueue(new TestpressCallback<Bookmark>() {
                     @Override
                     public void onSuccess(Bookmark bookmark) {
@@ -879,18 +883,19 @@ public class BookmarksActivity extends BaseToolBarActivity
                         Object object = bookmarkFromDB.getBookmarkedObject();
                         if (object instanceof ReviewItem) {
                             ReviewItem reviewItem = (ReviewItem) object;
-                            reviewItem.setBookmarkId(null);
+                            reviewItem.setBookmarkId(bookmarkId);
                             TestpressSDKDatabase.getReviewItemDao(BookmarksActivity.this)
                                     .insertOrReplaceInTx(reviewItem);
 
                         } else if (object instanceof Content) {
                             Content content = (Content) object;
-                            content.setBookmarkId(null);
+                            content.setBookmarkId(bookmarkId);
                             TestpressSDKDatabase.getContentDao(BookmarksActivity.this)
                                     .insertOrReplaceInTx(content);
                         }
                         bookmarkFromDB.setActive(true);
                         bookmarkDao.insertOrReplaceInTx(bookmarkFromDB);
+                        progressDialog.dismiss();
                         updateItems(true);
                     }
 

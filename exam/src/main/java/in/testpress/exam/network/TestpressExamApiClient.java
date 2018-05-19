@@ -234,10 +234,11 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getBookmarkService().updateBookmark(bookmarkId, params);
     }
 
-    public RetrofitCall<Bookmark> undoBookmarkDelete(long bookmarkId, long objectId) {
+    public RetrofitCall<Bookmark> undoBookmarkDelete(long bookmarkId, long objectId, String folder) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("object_id", objectId);
         params.put("active", true);
+        params.put("folder", folder);
         return getBookmarkService().updateBookmark(bookmarkId, params);
     }
 

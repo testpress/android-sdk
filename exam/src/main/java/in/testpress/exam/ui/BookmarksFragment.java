@@ -605,21 +605,19 @@ public class BookmarksFragment extends Fragment
                             TestpressSDKDatabase.getContentDao(getContext())
                                     .insertOrReplaceInTx(content);
                         }
-                        final long objectId = bookmark.getObjectId();
                         BookmarksFragment.this.bookmark.setActive(false);
                         bookmarkDao.updateInTx(BookmarksFragment.this.bookmark);
                         Snackbar snackbar = Snackbar.make(rootLayout,
                                 R.string.testpress_bookmark_deleted, Snackbar.LENGTH_LONG);
 
-                        // ToDo Uncomment after Undo supported by API
-//                        final BookmarksActivity activity = ((BookmarksActivity) getActivity());
-//                        snackbar.setAction(R.string.testpress_undo, new View.OnClickListener() {
-//                            @Override
-//                            public void onClick(View view) {
-//                                //noinspection ConstantConditions
-//                                activity.undoBookmarkDelete(bookmarkId, objectId);
-//                            }
-//                        });
+                        final BookmarksActivity activity = ((BookmarksActivity) getActivity());
+                        snackbar.setAction(R.string.testpress_undo, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                //noinspection ConstantConditions
+                                activity.undoBookmarkDelete(bookmarkId);
+                            }
+                        });
                         snackbar.show();
 
                         //noinspection ConstantConditions
