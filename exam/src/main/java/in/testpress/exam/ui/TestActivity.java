@@ -31,11 +31,9 @@ import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
-import in.testpress.models.greendao.AttemptDao;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.CourseAttempt;
-import in.testpress.models.greendao.CourseAttemptDao;
 import in.testpress.models.greendao.Exam;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
@@ -404,6 +402,9 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     }
 
     public void onLoadFinished(final Loader<Attempt> loader, final Attempt attempt) {
+        if (progressBar.getVisibility() == View.GONE) {
+            return;
+        }
         progressBar.setVisibility(View.GONE);
         //noinspection ThrowableResultOfMethodCallIgnored
         TestpressException exception = ((ThrowableLoader<Attempt>) loader).clearException();

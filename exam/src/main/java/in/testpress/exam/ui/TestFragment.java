@@ -347,6 +347,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         if (progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
+        getLoaderManager().destroyLoader(loader.getId());
         //noinspection ThrowableResultOfMethodCallIgnored
         TestpressException exception = ((ThrowableLoader<List<AttemptItem>>) loader).clearException();
         if(exception != null) {
