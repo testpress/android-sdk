@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 13;
+    private static final int VERSION = 14;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -422,6 +422,7 @@ public class TestpressSDKDaoGenerator {
         Entity folder = schema.addEntity("BookmarkFolder");
         folder.addLongProperty("id").primaryKey();
         folder.addStringProperty("name");
+        folder.addIntProperty("bookmarksCount");
     }
 
     private static Entity addBookmark(Schema schema) {

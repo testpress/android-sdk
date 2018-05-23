@@ -24,6 +24,7 @@ public class BookmarkFolderDao extends AbstractDao<BookmarkFolder, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "ID");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
+        public final static Property BookmarksCount = new Property(2, Integer.class, "bookmarksCount", false, "BOOKMARKS_COUNT");
     }
 
 
@@ -40,7 +41,8 @@ public class BookmarkFolderDao extends AbstractDao<BookmarkFolder, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"BOOKMARK_FOLDER\" (" + //
                 "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
-                "\"NAME\" TEXT);"); // 1: name
+                "\"NAME\" TEXT," + // 1: name
+                "\"BOOKMARKS_COUNT\" INTEGER);"); // 2: bookmarksCount
     }
 
     /** Drops the underlying database table. */
@@ -62,6 +64,11 @@ public class BookmarkFolderDao extends AbstractDao<BookmarkFolder, Long> {
         if (name != null) {
             stmt.bindString(2, name);
         }
+ 
+        Integer bookmarksCount = entity.getBookmarksCount();
+        if (bookmarksCount != null) {
+            stmt.bindLong(3, bookmarksCount);
+        }
     }
 
     @Override
@@ -77,6 +84,11 @@ public class BookmarkFolderDao extends AbstractDao<BookmarkFolder, Long> {
         if (name != null) {
             stmt.bindString(2, name);
         }
+ 
+        Integer bookmarksCount = entity.getBookmarksCount();
+        if (bookmarksCount != null) {
+            stmt.bindLong(3, bookmarksCount);
+        }
     }
 
     @Override
@@ -88,7 +100,8 @@ public class BookmarkFolderDao extends AbstractDao<BookmarkFolder, Long> {
     public BookmarkFolder readEntity(Cursor cursor, int offset) {
         BookmarkFolder entity = new BookmarkFolder( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1) // name
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
+            cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2) // bookmarksCount
         );
         return entity;
     }
@@ -97,6 +110,7 @@ public class BookmarkFolderDao extends AbstractDao<BookmarkFolder, Long> {
     public void readEntity(Cursor cursor, BookmarkFolder entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setBookmarksCount(cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2));
      }
     
     @Override

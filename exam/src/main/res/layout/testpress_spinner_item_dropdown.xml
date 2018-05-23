@@ -55,19 +55,28 @@
             android:textColor="@color/testpress_black" />
 
         <LinearLayout
-            android:id="@+id/edit"
-            android:visibility="gone"
-            android:padding="11dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:layout_width="40dp"
+            android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:orientation="horizontal"
-            >
+            android:gravity="center"
+            tools:ignore="UseCompoundDrawables">
+
+            <TextView
+                android:id="@+id/count"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                />
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:id="@+id/edit"
+                android:visibility="gone"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="11dp"
                 android:tint="#777"
+                android:background="?android:attr/selectableItemBackground"
                 android:src="@drawable/ic_mode_edit_18dp"
                 />
 

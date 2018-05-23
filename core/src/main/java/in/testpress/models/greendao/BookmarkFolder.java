@@ -16,6 +16,7 @@ public class BookmarkFolder {
     @Id
     private Long id;
     private String name;
+    private Integer bookmarksCount;
 
     // KEEP FIELDS - put your custom fields here
     public static final String UNCATEGORIZED = "Uncategorized";
@@ -30,9 +31,10 @@ public class BookmarkFolder {
     }
 
     @Generated
-    public BookmarkFolder(Long id, String name) {
+    public BookmarkFolder(Long id, String name, Integer bookmarksCount) {
         this.id = id;
         this.name = name;
+        this.bookmarksCount = bookmarksCount;
     }
 
     public Long getId() {
@@ -49,6 +51,14 @@ public class BookmarkFolder {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getBookmarksCount() {
+        return bookmarksCount;
+    }
+
+    public void setBookmarksCount(Integer bookmarksCount) {
+        this.bookmarksCount = bookmarksCount;
     }
 
     // KEEP METHODS - put your custom methods here

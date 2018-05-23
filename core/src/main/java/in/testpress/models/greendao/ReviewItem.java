@@ -304,10 +304,9 @@ public class ReviewItem {
             List<ReviewItem> reviewItemsFromDB = reviewItemDao.queryBuilder()
                     .where(ReviewItemDao.Properties.Id.eq(reviewItem.getId())).list();
 
-            if (!reviewItemsFromDB.isEmpty()) {
-                reviewItem = reviewItemsFromDB.get(0);
+            if (reviewItemsFromDB.isEmpty()) {
+                reviewItemDao.insertOrReplace(reviewItem);
             }
-            reviewItemDao.insertOrReplace(reviewItem);
         }
     }
     // KEEP METHODS END

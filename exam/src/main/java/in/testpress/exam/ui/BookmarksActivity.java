@@ -356,25 +356,32 @@ public class BookmarksActivity extends BaseToolBarActivity
 
     synchronized void addFoldersToSpinner() {
         foldersSpinnerAdapter.clear();
-        foldersSpinnerAdapter.addItem("", "All Bookmarks", false, 0);
+        foldersSpinnerAdapter.addItem("", "All Bookmarks", 0);
         List<BookmarkFolder> bookmarkFolders = folderDao.queryBuilder().list();
         for (BookmarkFolder folder: bookmarkFolders) {
-            foldersSpinnerAdapter.addItem(folder.getName(), folder.getName(), false, 0);
+            foldersSpinnerAdapter
+                    .addItem(folder.getName(), folder.getName(), folder.getBookmarksCount());
         }
-        foldersSpinnerAdapter.addItem(UNCATEGORIZED, UNCATEGORIZED, false, 0);
+        foldersSpinnerAdapter.addItem(UNCATEGORIZED, UNCATEGORIZED, 0);
         foldersSpinnerAdapter.notifyDataSetChanged();
     }
 
     void addNewFolderToSpinner(String folderName) {
         String currentFolder = foldersSpinnerAdapter.getTag(folderSpinner.getSelectedItemPosition());
         int index = foldersSpinnerAdapter.getCount() - 1;
-        foldersSpinnerAdapter.addItem(index, folderName, folderName, false, 0);
+        foldersSpinnerAdapter.addItem(index, folderName, folderName, 1);
         foldersSpinnerAdapter.notifyDataSetChanged();
         folderSpinner.setSelection(foldersSpinnerAdapter.getItemPosition(currentFolder));
     }
 
-    void updateFolderSpinnerItem(int position, String folderName) {
-        foldersSpinnerAdapter.updateItem(position, folderName, folderName, false, 0);
+    void updateFolderSpinnerItem(BookmarkFolder folder) {
+        updateFolderSpinnerItem(foldersSpinnerAdapter.getItemPosition(folder.getName()), folder);
+    }
+
+    void updateFolderSpinnerItem(int position, BookmarkFolder folder) {
+        foldersSpinnerAdapter.updateItem(position, folder.getName(), folder.getName(),
+                folder.getBookmarksCount());
+
         foldersSpinnerAdapter.notifyDataSetChanged();
     }
 
@@ -538,7 +545,6 @@ public class BookmarksActivity extends BaseToolBarActivity
         TestpressSDKDatabase.getContentTypeDao(this).insertOrReplaceInTx(pager.getContentTypes());
 
         ReviewItem.save(this, pager.getReviewItems());
-        TestpressSDKDatabase.getReviewItemDao(this).insertOrReplaceInTx(pager.getReviewItems());
         TestpressSDKDatabase.getReviewQuestionDao(this).insertOrReplaceInTx(pager.getQuestions());
         TestpressSDKDatabase.getReviewAnswerDao(this).insertOrReplaceInTx(pager.getAnswers());
         TestpressSDKDatabase.getReviewQuestionTranslationDao(this)
@@ -784,7 +790,7 @@ public class BookmarksActivity extends BaseToolBarActivity
                         .setPositiveButton(R.string.testpress_yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                deleteBookmark(folder.getId(), position);
+                                deleteFolder(folder.getId(), position);
                             }
                         })
                         .setNegativeButton(R.string.testpress_no, null)
@@ -804,7 +810,7 @@ public class BookmarksActivity extends BaseToolBarActivity
                     @Override
                     public void onSuccess(BookmarkFolder folder) {
                         folderDao.updateInTx(folder);
-                        updateFolderSpinnerItem(position, folder.getName());
+                        updateFolderSpinnerItem(position, folder);
                         progressDialog.dismiss();
                         Snackbar.make(listView, R.string.testpress_folder_updated,
                                 Snackbar.LENGTH_SHORT).show();
@@ -818,7 +824,7 @@ public class BookmarksActivity extends BaseToolBarActivity
                 });
     }
 
-    void deleteBookmark(final Long folderId, final int deletedPosition) {
+    void deleteFolder(final Long folderId, final int deletedPosition) {
         progressDialog.show();
         apiClient.deleteBookmarkFolder(folderId)
                 .enqueue(new TestpressCallback<Void>() {
@@ -895,6 +901,15 @@ public class BookmarksActivity extends BaseToolBarActivity
                         }
                         bookmarkFromDB.setActive(true);
                         bookmarkDao.insertOrReplaceInTx(bookmarkFromDB);
+                        if (bookmark.getFolderId() != null) {
+                            BookmarkFolder folder = folderDao.queryBuilder()
+                                    .where(BookmarkFolderDao.Properties.Id.eq(bookmark.getFolderId()))
+                                    .list().get(0);
+
+                            folder.setBookmarksCount(folder.getBookmarksCount() + 1);
+                            folderDao.insertOrReplaceInTx(folder);
+                            updateFolderSpinnerItem(folder);
+                        }
                         progressDialog.dismiss();
                         updateItems(true);
                     }

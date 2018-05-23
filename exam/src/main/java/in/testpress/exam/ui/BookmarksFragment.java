@@ -138,6 +138,7 @@ public class BookmarksFragment extends Fragment
     private TextView difficultyPercentageText;
     private boolean postedNewComment;
     private Bookmark bookmark;
+    private BookmarksActivity bookmarksActivity;
     private FullScreenChromeClient fullScreenChromeClient;;
     private TestpressExamApiClient apiClient;
     private List<Comment> comments = new ArrayList<>();
@@ -324,6 +325,12 @@ public class BookmarksFragment extends Fragment
         fullScreenChromeClient = new FullScreenChromeClient(getActivity());
         updateContentObject();
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        bookmarksActivity = (BookmarksActivity) getActivity();
     }
 
     void updateContentObject() {
@@ -554,31 +561,42 @@ public class BookmarksFragment extends Fragment
         apiClient.updateBookmark(bookmark.getId(), folder)
                 .enqueue(new TestpressCallback<Bookmark>() {
                     @Override
-                    public void onSuccess(Bookmark bookmark) {
-                        if (bookmark.getFolderId() != null) {
+                    public void onSuccess(Bookmark newBookmark) {
+                        if (newBookmark.getFolderId() != null) {
                             List<BookmarkFolder> folders = bookmarkFolderDao.queryBuilder()
-                                    .where(BookmarkFolderDao.Properties.Id.eq(bookmark.getFolderId()))
+                                    .where(BookmarkFolderDao.Properties.Id.eq(newBookmark.getFolderId()))
                                     .list();
 
                             if (folders.isEmpty()) {
-                                BookmarkFolder newFolder = new BookmarkFolder(bookmark.getFolderId(),
-                                        bookmark.getFolder());
+                                BookmarkFolder newFolder = new BookmarkFolder(newBookmark.getFolderId(),
+                                        newBookmark.getFolder(), 1);
 
                                 bookmarkFolderDao.insertOrReplaceInTx(newFolder);
-                                //noinspection ConstantConditions
-                                ((BookmarksActivity) getActivity())
-                                        .addNewFolderToSpinner(bookmark.getFolder());
+                                bookmarksActivity.addNewFolderToSpinner(newBookmark.getFolder());
+                            } else {
+                                BookmarkFolder folderFromDB = folders.get(0);
+                                folderFromDB.setBookmarksCount(folderFromDB.getBookmarksCount() + 1);
+                                bookmarkFolderDao.insertOrReplaceInTx(folderFromDB);
+                                bookmarksActivity.updateFolderSpinnerItem(folderFromDB);
                             }
                         }
-                        BookmarksFragment.this.bookmark.setFolder(bookmark.getFolder());
-                        BookmarksFragment.this.bookmark.setFolderId(bookmark.getFolderId());
-                        BookmarksFragment.this.bookmark.setLoadedInRespectiveFolder(false);
-                        bookmarkDao.updateInTx(BookmarksFragment.this.bookmark);
+                        if (bookmark.getFolderId() != null) {
+                            BookmarkFolder folderFromDB = bookmarkFolderDao.queryBuilder()
+                                    .where(BookmarkFolderDao.Properties.Id.eq(bookmark.getFolderId()))
+                                    .list().get(0);
+
+                            folderFromDB.setBookmarksCount(folderFromDB.getBookmarksCount() - 1);
+                            bookmarkFolderDao.insertOrReplaceInTx(folderFromDB);
+                            bookmarksActivity.updateFolderSpinnerItem(folderFromDB);
+                        }
+                        bookmark.setFolder(newBookmark.getFolder());
+                        bookmark.setFolderId(newBookmark.getFolderId());
+                        bookmark.setLoadedInRespectiveFolder(false);
+                        bookmarkDao.updateInTx(bookmark);
                         Snackbar.make(rootLayout, R.string.testpress_bookmark_moved,
                                 Snackbar.LENGTH_SHORT).show();
 
-                        //noinspection ConstantConditions
-                        ((BookmarksActivity) getActivity()).updateItems(true);
+                        bookmarksActivity.updateItems(true);
                     }
 
                     @Override
@@ -605,23 +623,31 @@ public class BookmarksFragment extends Fragment
                             TestpressSDKDatabase.getContentDao(getContext())
                                     .insertOrReplaceInTx(content);
                         }
-                        BookmarksFragment.this.bookmark.setActive(false);
-                        bookmarkDao.updateInTx(BookmarksFragment.this.bookmark);
+                        bookmark.setActive(false);
+                        bookmarkDao.updateInTx(bookmark);
+                        if (bookmark.getFolderId() != null) {
+                            List<BookmarkFolder> folders = bookmarkFolderDao.queryBuilder()
+                                    .where(BookmarkFolderDao.Properties.Id.eq(bookmark.getFolderId()))
+                                    .list();
+
+                            BookmarkFolder folderFromDB = folders.get(0);
+                            folderFromDB.setBookmarksCount(folderFromDB.getBookmarksCount() - 1);
+                            bookmarkFolderDao.insertOrReplaceInTx(folderFromDB);
+                            bookmarksActivity.updateFolderSpinnerItem(folderFromDB);
+                        }
                         Snackbar snackbar = Snackbar.make(rootLayout,
                                 R.string.testpress_bookmark_deleted, Snackbar.LENGTH_LONG);
 
-                        final BookmarksActivity activity = ((BookmarksActivity) getActivity());
                         snackbar.setAction(R.string.testpress_undo, new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                //noinspection ConstantConditions
-                                activity.undoBookmarkDelete(bookmarkId);
+                                bookmarksActivity.undoBookmarkDelete(bookmarkId);
                             }
                         });
                         snackbar.show();
 
                         //noinspection ConstantConditions
-                        ((BookmarksActivity) getActivity()).updateItems(true);
+                        bookmarksActivity.updateItems(true);
                     }
 
                     @Override
@@ -728,7 +754,7 @@ public class BookmarksFragment extends Fragment
             public void onFocusChange(View v, boolean hasFocus) {
                 // Hide/Show navigation bar based on focus change
                 //noinspection ConstantConditions
-                ((BookmarksActivity) getActivity()).setNavigationBarVisible(!hasFocus);
+                bookmarksActivity.setNavigationBarVisible(!hasFocus);
             }
         });
         loadPreviousCommentsLayout.setOnClickListener(new View.OnClickListener() {

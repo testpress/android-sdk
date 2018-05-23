@@ -1,7 +1,5 @@
 package in.testpress.exam.network;
 
-import android.util.Log;
-
 import java.io.IOException;
 
 import in.testpress.exam.models.Comment;
@@ -15,15 +13,11 @@ import static in.testpress.exam.network.TestpressExamApiClient.QUESTIONS_PATH;
 public class CommentsPager extends BaseResourcePager<Comment> {
 
     private TestpressExamApiClient apiClient;
-    private final String commentsUrlFrag;
-
-    public CommentsPager(String commentsUrlFrag, TestpressExamApiClient apiClient) {
-        this.apiClient = apiClient;
-        this.commentsUrlFrag = commentsUrlFrag;
-    }
+    private final String commentsUrl;
 
     public CommentsPager(long questionId, TestpressExamApiClient apiClient) {
-        this(apiClient.getBaseUrl() + QUESTIONS_PATH + questionId + COMMENTS_PATH, apiClient);
+        this.apiClient = apiClient;
+        this.commentsUrl = apiClient.getBaseUrl() + QUESTIONS_PATH + questionId + COMMENTS_PATH;
     }
 
     @Override
@@ -34,7 +28,7 @@ public class CommentsPager extends BaseResourcePager<Comment> {
     @Override
     public Response<TestpressApiResponse<Comment>> getItems(int page, int size) throws IOException {
         queryParams.put(TestpressExamApiClient.PAGE, page);
-        return apiClient.getComments(commentsUrlFrag, queryParams).execute();
+        return apiClient.getComments(commentsUrl, queryParams).execute();
     }
 
     public Integer getCommentsCount() {

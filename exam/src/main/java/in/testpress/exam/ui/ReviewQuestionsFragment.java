@@ -83,6 +83,8 @@ import static com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_RESUL
 import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE;
 import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE;
 import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
+import static in.testpress.exam.network.TestpressExamApiClient.COMMENTS_PATH;
+import static in.testpress.exam.network.TestpressExamApiClient.QUESTIONS_PATH;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 
 public class ReviewQuestionsFragment extends Fragment
@@ -636,8 +638,7 @@ public class ReviewQuestionsFragment extends Fragment
     @SuppressLint("SimpleDateFormat")
     CommentsPager getPreviousCommentsPager() {
         if (previousCommentsPager == null) {
-            String commentsUrl = reviewItem.getQuestion().getCommentsUrl();
-            previousCommentsPager = new CommentsPager(commentsUrl, apiClient);
+            previousCommentsPager = new CommentsPager(reviewItem.getQuestionId(), apiClient);
             previousCommentsPager.queryParams.put(TestpressApiClient.ORDER, "-submit_date");
             // Query comments till now to paginate afterwards
             previousCommentsPager.queryParams.put(TestpressApiClient.UNTIL,
@@ -648,8 +649,7 @@ public class ReviewQuestionsFragment extends Fragment
 
     CommentsPager getNewCommentsPager() {
         if (newCommentsPager == null) {
-            String commentsUrl = reviewItem.getQuestion().getCommentsUrl();
-            newCommentsPager = new CommentsPager(commentsUrl, apiClient);
+            newCommentsPager = new CommentsPager(reviewItem.getQuestionId(), apiClient);
         }
         //  Query comments after the latest comment we already have
         if (newCommentsPager.queryParams.isEmpty() && comments.size() != 0) {
@@ -790,7 +790,10 @@ public class ReviewQuestionsFragment extends Fragment
     void postComment(String comment) {
         // Clear edit text focus to display the navigation bar
         commentsEditText.clearFocus(getActivity());
-        apiClient.postComment(reviewItem.getQuestion().getCommentsUrl(), comment)
+        String url = apiClient.getBaseUrl() + QUESTIONS_PATH + reviewItem.getQuestionId() +
+                COMMENTS_PATH;
+
+        apiClient.postComment(url, comment)
                 .enqueue(new TestpressCallback<Comment>() {
                     @Override
                     public void onSuccess(Comment comment) {
