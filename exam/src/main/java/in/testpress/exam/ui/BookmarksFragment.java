@@ -593,6 +593,7 @@ public class BookmarksFragment extends Fragment
                         bookmark.setFolderId(newBookmark.getFolderId());
                         bookmark.setLoadedInRespectiveFolder(false);
                         bookmarkDao.updateInTx(bookmark);
+                        setMoveBookmarkProgress(false);
                         Snackbar.make(rootLayout, R.string.testpress_bookmark_moved,
                                 Snackbar.LENGTH_SHORT).show();
 
@@ -635,8 +636,12 @@ public class BookmarksFragment extends Fragment
                             bookmarkFolderDao.insertOrReplaceInTx(folderFromDB);
                             bookmarksActivity.updateFolderSpinnerItem(folderFromDB);
                         }
+                        setRemoveBookmarkProgress(false);
                         Snackbar snackbar = Snackbar.make(rootLayout,
                                 R.string.testpress_bookmark_deleted, Snackbar.LENGTH_LONG);
+
+                        snackbar.setActionTextColor(ContextCompat.getColor(snackbar.getContext(),
+                                R.color.testpress_color_primary_blue));
 
                         snackbar.setAction(R.string.testpress_undo, new View.OnClickListener() {
                             @Override

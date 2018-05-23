@@ -103,11 +103,11 @@
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
                         android:layout_width="80dp"
-                        android:id="@+id/remove_bookmark_layout"
                         android:layout_marginLeft="20dp"
                         android:layout_height="wrap_content">
 
                         <LinearLayout
+                            android:id="@+id/remove_bookmark_layout"
                             android:orientation="horizontal"
                             android:gravity="center"
                             android:paddingTop="10dp"

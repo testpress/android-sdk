@@ -310,6 +310,7 @@ public class BookmarksActivity extends BaseToolBarActivity
                 queryBuilder.orderDesc(BookmarkDao.Properties.ModifiedDate);
                 Bookmark latestModified = queryBuilder.list().get(0);
                 refreshPager.setQueryParams(MODIFIED_SINCE, latestModified.getModified());
+                queryBuilder = getQueryBuilder();
                 queryBuilder.orderAsc(BookmarkDao.Properties.CreatedDate);
                 Bookmark oldestCreated = queryBuilder.list().get(0);
                 refreshPager.setQueryParams(CREATED_SINCE, oldestCreated.getCreated());
@@ -591,7 +592,11 @@ public class BookmarksActivity extends BaseToolBarActivity
             saveItems(refreshPager);
         }
         updateItems(true);
-        viewPager.setCurrentItem(0, false);
+        if (listView.getVisibility() == View.VISIBLE) {
+            listView.setSelectionAfterHeaderView();
+        } else {
+            viewPager.setCurrentItem(0, false);
+        }
     }
 
     @Override
