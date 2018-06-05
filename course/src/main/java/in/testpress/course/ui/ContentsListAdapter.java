@@ -96,7 +96,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
             setGone(3, true);
             if (content.getAttemptsCount() == 0 ||
                     (content.getAttemptsCount() == 1 && exam != null &&
-                            exam.getPausedAttemptsCount() > 0)) {
+                            exam.getAttemptsCount() == 0 && exam.getPausedAttemptsCount() == 1)) {
                 setGone(6, true);
             } else {
                 setGone(6, false);
