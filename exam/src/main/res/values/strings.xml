@@ -68,9 +68,10 @@
     <string name="testpress_previous">PREV</string>
     <string name="testpress_paused">PAUSED</string>
     <string name="testpress_end">END</string>
-    <string name="testpress_pause_message">Do you want to Pause the exam?</string>
-    <string name="testpress_pause_content">You can pause the exam &amp; resume later before end date</string>
-    <string name="testpress_end_message">Do you want to End the exam?</string>
+    <string name="testpress_yes_pause">Yes, Pause!</string>
+    <string name="testpress_pause_message">Are you sure? Want to Pause the exam &amp; resume later before the end date.</string>
+    <string name="testpress_end_title">Exit Exam?</string>
+    <string name="testpress_end_message">You can pause the exam &amp; resume later before the end date.</string>
 
     <string name="testpress_email_mcqs">Email MCQs</string>
 
@@ -222,5 +223,18 @@
     <string name="testpress_previous_content">Previous</string>
 
     <string name="testpress_download_attachment">Download Attachment</string>
+
+    <string name="testpress_saving_last_change">Saving your last change</string>
+    <string name="testpress_ending_section">Ending current section</string>
+    <string name="testpress_starting_section">Starting next section</string>
+    <string name="testpress_loading_section_questions">Loading \"%s\" questions</string>
+    <string name="testpress_ending_exam">Ending exam</string>
+    <string name="testpress_cannot_switch">Can\'t Switch Section!</string>
+    <string name="testpress_cannot_switch_section">You can\'t switch sections in the first attempt.</string>
+    <string name="testpress_already_submitted">You have already submitted this section.</string>
+    <string name="testpress_switch_section">Switch Section?</string>
+    <string name="testpress_switch_section_message">Are you sure want to move to the next section? You won\'t be able to switch back to this section.</string>
+    <string name="testpress_attempt_sections_in_order">You need to attempt sections in order.</string>
+    <string name="testpress_switch">Switch</string>
 
 </resources>

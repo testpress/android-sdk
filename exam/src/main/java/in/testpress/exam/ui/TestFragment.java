@@ -3,10 +3,14 @@ package in.testpress.exam.ui;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
@@ -19,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -39,6 +44,7 @@ import in.testpress.exam.network.TestQuestionsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
 import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.AttemptSection;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
@@ -46,9 +52,11 @@ import in.testpress.models.greendao.Language;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
+import in.testpress.util.ViewUtils;
 
 import static in.testpress.exam.ui.TestActivity.PARAM_COURSE_ATTEMPT;
 import static in.testpress.exam.ui.TestActivity.PARAM_COURSE_CONTENT;
+import static in.testpress.models.greendao.Attempt.RUNNING;
 
 public class TestFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>> {
 
@@ -60,25 +68,30 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private TextView next;
     private ListView questionsListView;
     private TextView timer;
-    private Spinner questionsFilter;
-    private Spinner subjectFilter;
-    private Spinner languageSpinner;
+    private Spinner panelQuestionsFilter;
+    private Spinner primaryQuestionsFilter;
+    private RelativeLayout questionFilterContainer;
     private NonSwipeableViewPager pager;
     private TestQuestionPagerAdapter pagerAdapter;
     private List<AttemptItem> filterItems = new ArrayList<>();
     private TestPanelListAdapter panelListAdapter;
     private ProgressDialog progressDialog;
+    private AlertDialog endExamAlertDialog;
+    private AlertDialog pauseExamAlertDialog;
+    private AlertDialog sectionSwitchAlertDialog;
     private Attempt attempt;
     private Exam exam;
     private Content courseContent;
     private CourseAttempt courseAttempt;
     private int currentPosition;
+    private int currentSection;
+    private List<AttemptSection> sections = new ArrayList<>();
     private TestQuestionsPager questionsPager;
     private List<AttemptItem> attemptItemList = new ArrayList<AttemptItem>();
     private CountDownTimer countDownTimer;
     private long millisRemaining;
-    private ExploreSpinnerAdapter subjectSpinnerAdapter;
-    private ExploreSpinnerAdapter languageSpinnerAdapter;
+    private LockableSpinnerItemAdapter sectionSpinnerAdapter;
+    private PlainSpinnerItemAdapter subjectSpinnerAdapter;
     private Language selectedLanguage;
     private Boolean fistTimeCallback = false;
     private int selectedSubjectOffset;
@@ -87,7 +100,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
      * Map of subjects & its starting point(first question index)
      */
     private HashMap<String, Integer> subjectsOffset = new HashMap<>();
-    private enum Action { PAUSE, END, UPDATE_ANSWER }
+    private enum Action { PAUSE, END, UPDATE_ANSWER, END_SECTION }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -101,9 +114,19 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             attempt = getArguments().getParcelable(PARAM_ATTEMPT);
             exam = getArguments().getParcelable(PARAM_EXAM);
         }
-        questionsPager = new TestQuestionsPager(attempt.getQuestionsUrlFrag(),
-                new TestpressExamApiClient(getActivity()));
-        getLoaderManager().initLoader(0, null, this);
+        String questionUrl = attempt.getQuestionsUrlFrag();
+        sections = attempt.getSections();
+        if (sections.size() > 1) {
+            for (int i = 0; i < sections.size(); i++) {
+                if (sections.get(i).getState().equals(RUNNING)) {
+                    currentSection = i;
+                    break;
+                }
+            }
+            questionUrl = sections.get(currentSection).getQuestionsUrlFrag();
+        }
+        apiClient = new TestpressExamApiClient(getActivity());
+        questionsPager = new TestQuestionsPager(questionUrl, apiClient);
     }
 
     @Override
@@ -114,17 +137,15 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         next = (TextView) view.findViewById(R.id.next);
         questionsListView = (ListView) view.findViewById(R.id.questions_list);
         timer = (TextView) view.findViewById(R.id.timer);
-        questionsFilter = (Spinner) view.findViewById(R.id.questions_filter);
-        subjectFilter = (Spinner) view.findViewById(R.id.subject_filter);
-        languageSpinner = (Spinner) view.findViewById(R.id.language_spinner);
+        panelQuestionsFilter = (Spinner) view.findViewById(R.id.questions_filter);
+        primaryQuestionsFilter = (Spinner) view.findViewById(R.id.primary_questions_filter);
+        questionFilterContainer = view.findViewById(R.id.questions_filter_container);
         pager = (NonSwipeableViewPager) view.findViewById(R.id.pager);
         slidingPaneLayout = (SlidingPaneLayout) view.findViewById(R.id.sliding_layout);
-        apiClient = new TestpressExamApiClient(getActivity());
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage(getResources().getString(R.string.testpress_loading_questions));
         progressDialog.setCancelable(false);
         UIUtils.setIndeterminateDrawable(getActivity(), progressDialog, 4);
-        progressDialog.show();
         previous.setVisibility(View.VISIBLE);
         next.setVisibility(View.VISIBLE);
         slidingPaneLayout.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
@@ -189,47 +210,170 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 showPreviousQuestion();
             }
         });
-        view.findViewById(R.id.end).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.exit_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 endExamAlert();
             }
         });
-        view.findViewById(R.id.pause_exam).setOnClickListener(new View.OnClickListener() {
+        ViewUtils.setDrawableColor(timer, R.color.testpress_actionbar_text);
+        timer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pauseExam();
+                showPauseExamAlert();
             }
         });
         panelListAdapter = new TestPanelListAdapter(getActivity().getLayoutInflater(), filterItems,
                 R.layout.testpress_test_panel_list_item);
 
-        subjectSpinnerAdapter = new ExploreSpinnerAdapter(getActivity().getLayoutInflater(),
-                getActivity().getResources(), false);
-        subjectFilter.setAdapter(subjectSpinnerAdapter);
-        subjectFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> spinner, View view, int position, long itemId) {
-                if (!fistTimeCallback) {
-                    fistTimeCallback = true;
-                    return;
-                }
-                String subject = subjectSpinnerAdapter.getTag(position);
-                selectedSubjectOffset = subjectsOffset.get(subject);
-                if (navigationButtonPressed) {
-                    // Spinner item changed by clicking next or prev button
-                    navigationButtonPressed = false;
-                } else {
-                    // Spinner item changed by selecting subject in spinner
-                    pager.setCurrentItem(subjectsOffset.get(subject));
-                }
+        if (sections.size() > 1) {
+            sectionSpinnerAdapter = new LockableSpinnerItemAdapter(getActivity());
+            for (AttemptSection section : sections) {
+                sectionSpinnerAdapter.addItem(section.getName(), section.getName(), true, 0);
             }
+            primaryQuestionsFilter.setAdapter(sectionSpinnerAdapter);
+            primaryQuestionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> spinner, View view, int position,
+                                           long itemId) {
 
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
+                    if (!fistTimeCallback) {
+                        fistTimeCallback = true;
+                        return;
+                    }
+
+                    if (position == currentSection) {
+                        return;
+                    }
+                    primaryQuestionsFilter.setSelection(currentSection);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+                            R.style.TestpressAppCompatAlertDialogStyle);
+
+                    if ((courseContent != null && courseContent.getAttemptsCount() <= 1) ||
+                            (courseContent == null && (exam.getAttemptsCount() == 0 ||
+                                    (exam.getAttemptsCount() == 1 && exam.getPausedAttemptsCount() == 1)))) {
+
+                        builder.setTitle(R.string.testpress_cannot_switch);
+                        builder.setMessage(R.string.testpress_cannot_switch_section);
+                        builder.setPositiveButton(getString(R.string.testpress_ok), null);
+                    } else if (currentSection > position) {
+                        builder.setTitle(R.string.testpress_cannot_switch);
+                        builder.setMessage(R.string.testpress_already_submitted);
+                        builder.setPositiveButton(getString(R.string.testpress_ok), null);
+                    } else if (currentSection + 1 < position) {
+                        builder.setTitle(R.string.testpress_cannot_switch);
+                        builder.setMessage(R.string.testpress_attempt_sections_in_order);
+                        builder.setPositiveButton(getString(R.string.testpress_ok), null);
+                    } else {
+                        builder.setTitle(R.string.testpress_switch_section);
+                        builder.setMessage(R.string.testpress_switch_section_message);
+                        builder.setPositiveButton(getString(R.string.testpress_switch),
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        endSection();
+                                    }
+                        });
+                    }
+                    sectionSwitchAlertDialog = builder.show();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+                }
+            });
+            sectionSpinnerAdapter.setSelectedItem(currentSection);
+            primaryQuestionsFilter.setSelection(currentSection);
+            questionFilterContainer.setVisibility(View.VISIBLE);
+        } else {
+            subjectSpinnerAdapter = new PlainSpinnerItemAdapter(getActivity());
+            primaryQuestionsFilter.setAdapter(subjectSpinnerAdapter);
+            primaryQuestionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> spinner, View view, int position,
+                                           long itemId) {
+
+                    if (!fistTimeCallback) {
+                        fistTimeCallback = true;
+                        return;
+                    }
+                    String subject = subjectSpinnerAdapter.getTag(position);
+                    selectedSubjectOffset = subjectsOffset.get(subject);
+                    if (navigationButtonPressed) {
+                        // Spinner item changed by clicking next or prev button
+                        navigationButtonPressed = false;
+                    } else {
+                        // Spinner item changed by selecting subject in spinner
+                        pager.setCurrentItem(subjectsOffset.get(subject));
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+                }
+            });
+        }
+        Spinner languageSpinner = view.findViewById(R.id.language_spinner);
+        final ArrayList<Language> languages = new ArrayList<>(exam.getLanguages());
+        if (languages.size() > 1) {
+            ExploreSpinnerAdapter languageSpinnerAdapter =
+                    new ExploreSpinnerAdapter(getLayoutInflater(), getResources(), false);
+
+            for (Language language : languages) {
+                languageSpinnerAdapter.addItem(language.getCode(), language.getTitle(), true, 0);
             }
-        });
+            languageSpinnerAdapter.hideSpinner(true);
+            languageSpinner.setAdapter(languageSpinnerAdapter);
+            languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    // Update existing object so that update will reflect in TestQuestionFragment also
+                    selectedLanguage.update(languages.get(position));
+                    exam.setSelectedLanguage(selectedLanguage.getCode());
+                    if (pagerAdapter != null) {
+                        pagerAdapter.notifyDataSetChanged();
+
+                    }
+                    panelListAdapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
+            String selectedLanguageCode = exam.getSelectedLanguage();
+            if (selectedLanguageCode != null && !selectedLanguageCode.isEmpty()) {
+                int selectedPosition =
+                        languageSpinnerAdapter.getItemPositionFromTag(selectedLanguageCode);
+
+                // Create new object so that we can update it without affecting original language list
+                selectedLanguage = new Language(languages.get(selectedPosition));
+                panelListAdapter.setSelectedLanguage(selectedLanguage);
+                languageSpinner.setSelection(selectedPosition);
+            }
+            languageSpinner.setVisibility(View.VISIBLE);
+            RelativeLayout.LayoutParams layoutParams =
+                    (RelativeLayout.LayoutParams) timer.getLayoutParams();
+
+            layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
+        } else {
+            languageSpinner.setVisibility(View.GONE);
+            RelativeLayout.LayoutParams layoutParams =
+                    (RelativeLayout.LayoutParams) timer.getLayoutParams();
+
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
+        }
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (attemptItemList.isEmpty()) {
+            getLoaderManager().initLoader(0, null, this);
+        }
     }
 
     private void openPanel() {
@@ -258,23 +402,21 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         if (slidingPaneLayout.isOpen()) {
             slidingPaneLayout.closePane();
         }
-        if(subjectSpinnerAdapter.getCount() > 1) {
+        if(subjectSpinnerAdapter != null && subjectSpinnerAdapter.getCount() > 1) {
             String currentSubject = attemptItemList.get(pager.getCurrentItem()).getAttemptQuestion()
                     .getSubject();
             if (selectedSubjectOffset != subjectsOffset.get(currentSubject)) {
                 //  Navigated to prev subject, so change the spinner item
                 navigationButtonPressed = true;
-                subjectFilter.setSelection(subjectSpinnerAdapter.getItemPosition(currentSubject));
+                primaryQuestionsFilter.setSelection(subjectSpinnerAdapter.getItemPosition(currentSubject));
             }
         }
 
         if (position == 0) {
             // Reached first question
-            previous.setClickable(false);
-            previous.setTextColor(ContextCompat.getColor(getActivity(), R.color.testpress_nav_button_disabled));
+            setEnable(false, previous);
         } else {
-            previous.setClickable(true);
-            previous.setTextColor(ContextCompat.getColor(getActivity(), R.color.testpress_color_primary));
+            setEnable(true, previous);
         }
 
         updateNextButton(position);
@@ -283,10 +425,14 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private void updateNextButton(int position) {
         if ((position + 1) == attemptItemList.size()) {
             // Reached last question
-            next.setTextColor(ContextCompat.getColor(getActivity(), R.color.testpress_red));
-            next.setText(R.string.testpress_end);
+            if (sections.size() > 1) {
+                setEnable(false, next);
+            } else {
+                next.setTextColor(ContextCompat.getColor(next.getContext(), R.color.testpress_red));
+                next.setText(R.string.testpress_end);
+            }
         } else {
-            next.setTextColor(ContextCompat.getColor(getActivity(), R.color.testpress_color_primary));
+            setEnable(true, next);
             next.setText(R.string.testpress_next);
         }
     }
@@ -298,45 +444,85 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     private void endExamAlert() {
-        new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
-                .setTitle(R.string.testpress_end_message)
-                .setPositiveButton(R.string.testpress_end, new DialogInterface.OnClickListener() {
+        AlertDialog.Builder dialogBuilder =
+                new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
+                        .setTitle(R.string.testpress_end_title)
+                        .setMessage(R.string.testpress_end_message);
+
+        if (sections.size() <= 1) {
+            dialogBuilder
+                    .setPositiveButton(R.string.testpress_end, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            endExam();
+                        }
+                    });
+        }
+        endExamAlertDialog = dialogBuilder
+                .setNegativeButton(R.string.testpress_pause, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        endExam();
+                        pauseExam();
                     }
                 })
-                .setNegativeButton(R.string.testpress_cancel, null)
+                .setNeutralButton(R.string.testpress_cancel, null)
                 .show();
+
+        endExamAlertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setTextColor(ContextCompat.getColor(getActivity(), R.color.testpress_red_incorrect));
+    }
+
+    void showPauseExamAlert() {
+        pauseExamAlertDialog =
+                new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
+                        .setMessage(R.string.testpress_pause_message)
+                        .setPositiveButton(R.string.testpress_yes_pause,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        pauseExam();
+                                    }
+                        })
+                        .setNegativeButton(R.string.testpress_cancel, null)
+                        .show();
     }
 
     void pauseExam() {
-        new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
-                .setTitle(R.string.testpress_pause_message)
-                .setMessage(R.string.testpress_pause_content)
-                .setPositiveButton(R.string.testpress_pause, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        countDownTimer.cancel();
-                        saveResult(pager.getCurrentItem(), Action.PAUSE);
-                    }
-                })
-                .setNegativeButton(R.string.testpress_cancel, null)
-                .show();
+        countDownTimer.cancel();
+        saveResult(pager.getCurrentItem(), Action.PAUSE);
     }
 
+    @NonNull
     @Override
     public Loader<List<AttemptItem>> onCreateLoader(int id, final Bundle args) {
-        return new ThrowableLoader<List<AttemptItem>>(getActivity(), attemptItemList) {
-            @Override
-            public List<AttemptItem> loadData() throws TestpressException {
-                do {
-                    questionsPager.next();
-                    attemptItemList = questionsPager.getResources();
-                } while (questionsPager.hasNext());
-                return attemptItemList;
-            }
-        };
+        if (sections.size() > 1) {
+            progressDialog.setMessage(getString(R.string.testpress_loading_section_questions,
+                    sections.get(currentSection).getName()));
+
+            progressDialog.show();
+        } else {
+            showProgress(R.string.testpress_loading_questions);
+        }
+        return new AttemptItemsLoader(getActivity(), this);
+    }
+
+    private static class AttemptItemsLoader extends ThrowableLoader<List<AttemptItem>> {
+
+        private TestFragment fragment;
+
+        AttemptItemsLoader(Context context, TestFragment fragment) {
+            super(context, null);
+            this.fragment = fragment;
+        }
+
+        @Override
+        public List<AttemptItem> loadData() throws TestpressException {
+            do {
+                fragment.questionsPager.next();
+                fragment.attemptItemList = fragment.questionsPager.getResources();
+            } while (fragment.questionsPager.hasNext());
+            return fragment.attemptItemList;
+        }
     }
 
     @Override
@@ -399,96 +585,69 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                     .show();
             return;
         }
-        /**
-         * Used to get subjects in order as it fetched
-         */
-        List<String> subjectsList = new ArrayList<>();
-        /*
-         * To Populate the spinner with the subjects
-         */
-        HashMap<String, List<AttemptItem>> subjectsWiseItems = new HashMap<>();
-        for (AttemptItem item : items) {
-            if (item.getAttemptQuestion().getSubject() == null || item.getAttemptQuestion()
-                    .getSubject().isEmpty()) {
-                // If subject is empty, subject = "Uncategorized"
-                item.getAttemptQuestion().setSubject(getResources()
-                        .getString(R.string.testpress_uncategorized));
-            }
-            if (subjectsWiseItems.containsKey(item.getAttemptQuestion().getSubject())) {
-                // Check subject is already added if added simply add the item it
-                subjectsWiseItems.get(item.getAttemptQuestion().getSubject()).add(item);
-            } else {
-                // Add the subject & then add item to it
-                subjectsWiseItems.put(item.getAttemptQuestion().getSubject(),
-                        new ArrayList<AttemptItem>());
-                subjectsWiseItems.get(item.getAttemptQuestion().getSubject()).add(item);
-                subjectsList.add(item.getAttemptQuestion().getSubject());
-            }
-        }
-        if (subjectsList.size() > 1) {
-            // Clear the previous data stored while loading which might be unordered
-            attemptItemList.clear();
-            // Store each set of subject items to attemptItemList
-            for (String subject : subjectsList) {
-                subjectsOffset.put(subject, attemptItemList.size()); // Add subjects & it starting point
-                attemptItemList.addAll(subjectsWiseItems.get(subject));
-                subjectSpinnerAdapter.addItem(subject, subject, true, 0);
-            }
-            subjectSpinnerAdapter.notifyDataSetChanged();
-            subjectFilter.setSelection(0); // Set 1st item as default selection
-            subjectFilter.setVisibility(View.VISIBLE);
-            selectedSubjectOffset = 0;
-        }
 
-        final ArrayList<Language> languages = new ArrayList<>(exam.getLanguages());
-        if (languages.size() > 1) {
-            languageSpinnerAdapter = new ExploreSpinnerAdapter(getActivity().getLayoutInflater(),
-                    getResources(), false);
-
-            for (Language language : languages) {
-                languageSpinnerAdapter.addItem(language.getCode(), language.getTitle(), true, 0);
-            }
-            languageSpinner.setAdapter(languageSpinnerAdapter);
-            languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    // Update existing object so that update will reflect in TestQuestionFragment also
-                    selectedLanguage.update(languages.get(position));
-                    exam.setSelectedLanguage(selectedLanguage.getCode());
-                    pagerAdapter.notifyDataSetChanged();
-                    panelListAdapter.notifyDataSetChanged();
+        if (sections.size() <= 1) {
+            /**
+             * Used to get subjects in order as it fetched
+             */
+            List<String> subjectsList = new ArrayList<>();
+            /*
+             * To Populate the spinner with the subjects
+             */
+            HashMap<String, List<AttemptItem>> subjectsWiseItems = new HashMap<>();
+            for (AttemptItem item : items) {
+                if (item.getAttemptQuestion().getSubject() == null || item.getAttemptQuestion()
+                        .getSubject().isEmpty()) {
+                    // If subject is empty, subject = "Uncategorized"
+                    item.getAttemptQuestion().setSubject(getResources()
+                            .getString(R.string.testpress_uncategorized));
                 }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
+                if (subjectsWiseItems.containsKey(item.getAttemptQuestion().getSubject())) {
+                    // Check subject is already added if added simply add the item it
+                    subjectsWiseItems.get(item.getAttemptQuestion().getSubject()).add(item);
+                } else {
+                    // Add the subject & then add item to it
+                    subjectsWiseItems.put(item.getAttemptQuestion().getSubject(),
+                            new ArrayList<AttemptItem>());
+                    subjectsWiseItems.get(item.getAttemptQuestion().getSubject()).add(item);
+                    subjectsList.add(item.getAttemptQuestion().getSubject());
                 }
-            });
-            String selectedLanguageCode = exam.getSelectedLanguage();
-            if (selectedLanguageCode != null && !selectedLanguageCode.isEmpty()) {
-                int selectedPosition =
-                        languageSpinnerAdapter.getItemPositionFromTag(selectedLanguageCode);
-
-                // Create new object so that we can update it without affecting original language list
-                selectedLanguage = new Language(languages.get(selectedPosition));
-                panelListAdapter.setSelectedLanguage(selectedLanguage);
-                languageSpinner.setSelection(selectedPosition);
             }
-            languageSpinner.setVisibility(View.VISIBLE);
+            if (subjectsList.size() > 1) {
+                // Clear the previous data stored while loading which might be unordered
+                attemptItemList.clear();
+                // Store each set of subject items to attemptItemList
+                for (String subject : subjectsList) {
+                    subjectsOffset.put(subject, attemptItemList.size()); // Add subjects & it starting point
+                    attemptItemList.addAll(subjectsWiseItems.get(subject));
+                    subjectSpinnerAdapter.addItem(subject, subject, true, 0);
+                }
+                subjectSpinnerAdapter.notifyDataSetChanged();
+                primaryQuestionsFilter.setSelection(0); // Set 1st item as default selection
+                questionFilterContainer.setVisibility(View.VISIBLE);
+                selectedSubjectOffset = 0;
+            }
         }
 
         pagerAdapter =
                 new TestQuestionPagerAdapter(getFragmentManager(), attemptItemList, selectedLanguage);
 
-        pagerAdapter.setCount(attemptItemList.size());
         pager.setAdapter(pagerAdapter);
-        pagerAdapter.notifyDataSetChanged();
         for (int i = 0; i< attemptItemList.size(); i++) {
             attemptItemList.get(i).setIndex(i + 1);
         }
         panelListAdapter.setItems(attemptItemList);
         questionsListView.setAdapter(panelListAdapter);
-        updateNextButton(pager.getCurrentItem());
-        startCountDownTimer(formatMillisecond(attempt.getRemainingTime()));
+        if (pager.getCurrentItem() != 0) {
+            pager.setCurrentItem(0);
+        } else {
+            goToQuestion(0);
+        }
+        String remainingTime = attempt.getRemainingTime();
+        if (sections.size() > 1) {
+            remainingTime = sections.get(currentSection).getRemainingTime();
+        }
+        startCountDownTimer(formatMillisecond(remainingTime));
     }
 
     @Override
@@ -510,6 +669,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private void saveResult(final int position, final Action action) {
         final AttemptItem attemptItem = attemptItemList.get(position);
         if (attemptItem.hasChanged()) {
+            if (action != Action.UPDATE_ANSWER) {
+                showProgress(R.string.testpress_saving_last_change);
+            }
             apiClient.postAnswer(attemptItem.getUrlFrag(), attemptItem.getSavedAnswers(),
                     attemptItem.getCurrentReview())
                     .enqueue(new TestpressCallback<AttemptItem>() {
@@ -526,6 +688,8 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                                 returnToHistory();
                             } else if (action.equals(Action.END)) {
                                 endExam();
+                            } else if (action.equals(Action.END_SECTION)) {
+                                endSection();
                             } else {
                                 if (progressDialog.isShowing()) {
                                     startCountDownTimer(millisRemaining);
@@ -546,9 +710,13 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                                 return;
                             }
                             countDownTimer.cancel();
+                            progressDialog.dismiss();
                             TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception) {
                                 @Override
                                 protected void onRetry() {
+                                    if (action == Action.UPDATE_ANSWER) {
+                                        showProgress(R.string.testpress_saving_last_change);
+                                    }
                                     saveResult(position, action);
                                 }
                             };
@@ -583,6 +751,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception) {
                     @Override
                     protected void onRetry() {
+                        showProgress(R.string.testpress_please_wait);
                         sendHeartBeat();
                     }
                 };
@@ -591,17 +760,105 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         });
     }
 
+    private void endSection() {
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+        // Save attemptItem, if option or review is changed
+        final AttemptItem attemptItem = attemptItemList.get(pager.getCurrentItem());
+        if (attemptItem.hasChanged()) {
+            saveResult(pager.getCurrentItem(), Action.END_SECTION);
+            return;
+        }
+        showProgress(R.string.testpress_ending_section);
+        apiClient.updateSection(sections.get(currentSection).getEndUrlFrag())
+                .enqueue(new TestpressCallback<AttemptSection>() {
+                    @Override
+                    public void onSuccess(AttemptSection attemptSection) {
+                        if (getActivity() == null) {
+                            return;
+                        }
+                        sections.set(currentSection, attemptSection);
+                        if (++currentSection == sections.size()) {
+                            endExam();
+                        } else {
+                            sectionSpinnerAdapter.setSelectedItem(currentSection);
+                            sectionSpinnerAdapter.notifyDataSetChanged();
+                            primaryQuestionsFilter.setSelection(currentSection);
+                            startSection();
+                        }
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        if (getActivity() == null) {
+                            return;
+                        }
+                        TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception);
+                        if (exception.isNetworkError()) {
+                            alertDialog.setMessage(R.string.testpress_exam_paused_check_internet_to_end);
+                            alertDialog.setPositiveButton(R.string.testpress_end,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            endSection();
+                                        }
+                                    });
+                        }
+                        alertDialog.show();
+                    }
+                });
+    }
+
+    private void startSection() {
+        showProgress(R.string.testpress_starting_section);
+        apiClient.updateSection(sections.get(currentSection).getStartUrlFrag())
+                .enqueue(new TestpressCallback<AttemptSection>() {
+                    @Override
+                    public void onSuccess(AttemptSection section) {
+                        if (getActivity() == null) {
+                            return;
+                        }
+                        sections.set(currentSection, section);
+                        questionsPager =
+                                new TestQuestionsPager(section.getQuestionsUrlFrag(), apiClient);
+
+                        attemptItemList.clear();
+                        getLoaderManager().restartLoader(0, null, TestFragment.this);
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        if (getActivity() == null) {
+                            return;
+                        }
+                        TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception);
+                        if (exception.isNetworkError()) {
+                            alertDialog.setMessage(R.string.testpress_exam_paused_check_internet);
+                            alertDialog.setPositiveButton(R.string.testpress_resume,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            startSection();
+                                        }
+                                    });
+                        }
+                        alertDialog.show();
+                    }
+                });
+    }
+
     private void endExam() {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
-        showProgress();
         // Save attemptItem, if option or review is changed
         final AttemptItem attemptItem = attemptItemList.get(pager.getCurrentItem());
         if (attemptItem.hasChanged()) {
-           saveResult(pager.getCurrentItem(), Action.END);
+            saveResult(pager.getCurrentItem(), Action.END);
             return;
         }
+        showProgress(R.string.testpress_ending_exam);
         if (courseContent != null) {
             apiClient.endContentAttempt(courseAttempt.getEndAttemptUrl())
                     .enqueue(new TestpressCallback<CourseAttempt>() {
@@ -630,7 +887,6 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                                         new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
-                                                showProgress();
                                                 endExam();
                                             }
                                         });
@@ -665,9 +921,6 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                                         new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
-                                                progressDialog.setMessage(getString(
-                                                        R.string.testpress_loading));
-                                                progressDialog.show();
                                                 endExam();
                                             }
                                         });
@@ -710,13 +963,13 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     private void updatePanel() {
-        if (questionsFilter.getAdapter() == null) {
+        if (panelQuestionsFilter.getAdapter() == null) {
             String[] types = {"All", "Answered", "Unanswered", "Marked for review"};
             ExploreSpinnerAdapter typeSpinnerAdapter = new ExploreSpinnerAdapter(getActivity()
                     .getLayoutInflater(), getActivity().getResources(), false);
             typeSpinnerAdapter.addItems(Arrays.asList(types));
-            questionsFilter.setAdapter(typeSpinnerAdapter);
-            questionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            panelQuestionsFilter.setAdapter(typeSpinnerAdapter);
+            panelQuestionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
                     filterQuestions(position);
@@ -726,8 +979,8 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 public void onNothingSelected(AdapterView<?> adapterView) {
                 }
             });
-        } else if (questionsFilter.getSelectedItemPosition() != 0) {
-            filterQuestions(questionsFilter.getSelectedItemPosition());
+        } else if (panelQuestionsFilter.getSelectedItemPosition() != 0) {
+            filterQuestions(panelQuestionsFilter.getSelectedItemPosition());
         } else {
             panelListAdapter.notifyDataSetChanged();
         }
@@ -784,7 +1037,18 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 if (getActivity() == null) {
                     return;
                 }
-                endExam();
+                if (sectionSwitchAlertDialog != null && sectionSwitchAlertDialog.isShowing()) {
+                    sectionSwitchAlertDialog.dismiss();
+                } else if (pauseExamAlertDialog != null && pauseExamAlertDialog.isShowing()) {
+                    pauseExamAlertDialog.dismiss();
+                } else if (endExamAlertDialog != null && endExamAlertDialog.isShowing()) {
+                    endExamAlertDialog.dismiss();
+                }
+                if (sections.size() > 1) {
+                    endSection();
+                } else {
+                    endExam();
+                }
             }
         }.start();
     }
@@ -801,9 +1065,6 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
-                                        progressDialog.setMessage(getString(
-                                                R.string.testpress_loading));
-                                        progressDialog.show();
                                         onRetry();
                                     }
                                 })
@@ -830,10 +1091,18 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         protected void onRetry() {}
     }
 
-    private void showProgress() {
+    private void showProgress(@StringRes int stringResId) {
+        progressDialog.setMessage(getString(stringResId));
         if (!progressDialog.isShowing()) {
-            progressDialog.setMessage(getString(R.string.testpress_please_wait));
             progressDialog.show();
         }
+    }
+
+    void setEnable(boolean enable, TextView textView) {
+        int colorRes =
+                enable ? R.color.testpress_text_gray : R.color.testpress_gray_light;
+
+        textView.setTextColor(ContextCompat.getColor(textView.getContext(), colorRes));
+        textView.setClickable(enable);
     }
 }

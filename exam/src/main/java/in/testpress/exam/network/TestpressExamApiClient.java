@@ -14,6 +14,7 @@ import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.AttemptSection;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.BookmarkFolder;
 import in.testpress.models.greendao.ContentType;
@@ -159,6 +160,10 @@ public class TestpressExamApiClient extends TestpressApiClient {
 
     public RetrofitCall<Attempt> heartbeat(String heartbeatUrlFrag) {
         return getExamService().heartbeat(heartbeatUrlFrag);
+    }
+
+    public RetrofitCall<AttemptSection> updateSection(String urlFrag) {
+        return getExamService().updateSection(urlFrag);
     }
 
     public RetrofitCall<Attempt> endExam(String endExamUrlFrag) {

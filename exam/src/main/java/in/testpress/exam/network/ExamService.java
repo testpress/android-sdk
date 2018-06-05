@@ -10,6 +10,7 @@ import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.AttemptSection;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.ReviewItem;
@@ -17,6 +18,7 @@ import in.testpress.network.RetrofitCall;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -77,6 +79,10 @@ public interface ExamService {
     @PUT("/{end_exam_url}")
     RetrofitCall<Attempt> endExam(
             @Path(value = "end_exam_url", encoded = true) String endExamUrlFrag);
+
+    @PATCH("/{url_frag}")
+    RetrofitCall<AttemptSection> updateSection(
+            @Path(value = "url_frag", encoded = true) String urlFrag);
 
     @PUT("{end_exam_url}")
     RetrofitCall<CourseAttempt> endContentAttempt(

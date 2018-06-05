@@ -43,6 +43,8 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
         public final static Property Percentage = new Property(18, String.class, "percentage", false, "PERCENTAGE");
     }
 
+    private DaoSession daoSession;
+
 
     public AttemptDao(DaoConfig config) {
         super(config);
@@ -50,6 +52,7 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
     
     public AttemptDao(DaoConfig config, DaoSession daoSession) {
         super(config, daoSession);
+        this.daoSession = daoSession;
     }
 
     /** Creates the underlying database table. */
@@ -281,6 +284,12 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
         if (percentage != null) {
             stmt.bindString(19, percentage);
         }
+    }
+
+    @Override
+    protected final void attachEntity(Attempt entity) {
+        super.attachEntity(entity);
+        entity.__setDaoSession(daoSession);
     }
 
     @Override

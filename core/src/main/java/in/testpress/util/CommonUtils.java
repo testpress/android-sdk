@@ -4,6 +4,8 @@ import android.content.Context;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class CommonUtils {
 
@@ -42,6 +44,16 @@ public class CommonUtils {
             return ((byte) 0);
         }
         return ((byte) (booleanValue ? 1 : 0)); // if booleanValue == true, byte == 1
+    }
+
+    public static String getUrlFrag(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            return url.getFile().substring(1);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

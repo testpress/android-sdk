@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 14;
+    private static final int VERSION = 15;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -45,6 +45,8 @@ public class TestpressSDKDaoGenerator {
         Entity attempt = addAttempt(schema);
         addCourseContentToCourseAttempt(courseAttempt, content);
         addAttemptToCourseAttempt(courseAttempt, attempt);
+        Entity attemptSection = addAttemptSection(schema);
+        addSectionToAttempt(attempt, attemptSection);
 
         addBookmarkFolder(schema);
         Entity bookmark = addBookmark(schema);
@@ -239,6 +241,27 @@ public class TestpressSDKDaoGenerator {
         );
         exam.implementsInterface("android.os.Parcelable");
         return exam;
+    }
+
+    private static Entity addAttemptSection(Schema schema) {
+        Entity attemptSection = schema.addEntity("AttemptSection");
+        attemptSection.addLongProperty("id").primaryKey();
+        attemptSection.addStringProperty("state");
+        attemptSection.addStringProperty("questionsUrl");
+        attemptSection.addStringProperty("startUrl");
+        attemptSection.addStringProperty("endUrl");
+        attemptSection.addStringProperty("remainingTime");
+        attemptSection.addStringProperty("name");
+        attemptSection.addStringProperty("duration");
+        attemptSection.addIntProperty("order");
+        attemptSection.implementsInterface("android.os.Parcelable");
+        return attemptSection;
+    }
+
+    private static void addSectionToAttempt(Entity attempt, Entity section) {
+        Property attemptId = section.addLongProperty("attemptId").getProperty();
+        ToMany attemptToSections = attempt.addToMany(section, attemptId);
+        attemptToSections.setName("sections");
     }
 
     private static Entity addCourse(Schema schema) {

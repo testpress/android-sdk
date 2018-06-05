@@ -23,8 +23,6 @@
     <color name="testpress_tab_background_color">@color/testpress_white</color>
     <color name="testpress_tab_indicator_color">@color/testpress_color_primary</color>
 
-    <color name="testpress_nav_button_disabled">#646464</color>
-
     <color name="testpress_dropdown_list_divider_color">#92a3a3a3</color>
     <color name="testpress_body_text">#60000000</color>
 

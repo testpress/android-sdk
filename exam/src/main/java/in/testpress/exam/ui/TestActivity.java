@@ -79,6 +79,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private Button retryButton;
     private Button resumeButton;
     private Button startButton;
+    private Button endButton;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -94,7 +95,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         retryButton = (Button) findViewById(R.id.retry_button);
         examDetailsContainer.setVisibility(View.GONE);
         startButton = (Button) findViewById(R.id.start_exam);
-        Button endButton = (Button) findViewById(R.id.end_exam);
+        endButton = findViewById(R.id.end_exam);
         endButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -303,6 +304,9 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                         }});
             durationLabel.setText(getString(R.string.testpress_time_remaining));
             examDuration.setText(attempt.getRemainingTime());
+            if (attempt.getSections().size() > 1) {
+                endButton.setVisibility(View.GONE);
+            }
         }
         markPerQuestion.setText(exam.getMarkPerQuestion());
         negativeMarks.setText(exam.getNegativeMarks());
@@ -483,7 +487,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
             if (testFragment.slidingPaneLayout.isOpen()) {
                 testFragment.slidingPaneLayout.closePane();
             } else {
-                testFragment.pauseExam();
+                testFragment.showPauseExamAlert();
             }
         } else {
             super.onBackPressed();

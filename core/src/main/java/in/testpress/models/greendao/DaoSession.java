@@ -25,6 +25,7 @@ import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.AttemptSection;
 import in.testpress.models.greendao.BookmarkFolder;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.ContentType;
@@ -50,6 +51,7 @@ import in.testpress.models.greendao.LanguageDao;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.CourseAttemptDao;
 import in.testpress.models.greendao.AttemptDao;
+import in.testpress.models.greendao.AttemptSectionDao;
 import in.testpress.models.greendao.BookmarkFolderDao;
 import in.testpress.models.greendao.BookmarkDao;
 import in.testpress.models.greendao.ContentTypeDao;
@@ -84,6 +86,7 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig contentDaoConfig;
     private final DaoConfig courseAttemptDaoConfig;
     private final DaoConfig attemptDaoConfig;
+    private final DaoConfig attemptSectionDaoConfig;
     private final DaoConfig bookmarkFolderDaoConfig;
     private final DaoConfig bookmarkDaoConfig;
     private final DaoConfig contentTypeDaoConfig;
@@ -109,6 +112,7 @@ public class DaoSession extends AbstractDaoSession {
     private final ContentDao contentDao;
     private final CourseAttemptDao courseAttemptDao;
     private final AttemptDao attemptDao;
+    private final AttemptSectionDao attemptSectionDao;
     private final BookmarkFolderDao bookmarkFolderDao;
     private final BookmarkDao bookmarkDao;
     private final ContentTypeDao contentTypeDao;
@@ -172,6 +176,9 @@ public class DaoSession extends AbstractDaoSession {
         attemptDaoConfig = daoConfigMap.get(AttemptDao.class).clone();
         attemptDaoConfig.initIdentityScope(type);
 
+        attemptSectionDaoConfig = daoConfigMap.get(AttemptSectionDao.class).clone();
+        attemptSectionDaoConfig.initIdentityScope(type);
+
         bookmarkFolderDaoConfig = daoConfigMap.get(BookmarkFolderDao.class).clone();
         bookmarkFolderDaoConfig.initIdentityScope(type);
 
@@ -210,6 +217,7 @@ public class DaoSession extends AbstractDaoSession {
         contentDao = new ContentDao(contentDaoConfig, this);
         courseAttemptDao = new CourseAttemptDao(courseAttemptDaoConfig, this);
         attemptDao = new AttemptDao(attemptDaoConfig, this);
+        attemptSectionDao = new AttemptSectionDao(attemptSectionDaoConfig, this);
         bookmarkFolderDao = new BookmarkFolderDao(bookmarkFolderDaoConfig, this);
         bookmarkDao = new BookmarkDao(bookmarkDaoConfig, this);
         contentTypeDao = new ContentTypeDao(contentTypeDaoConfig, this);
@@ -235,6 +243,7 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(Content.class, contentDao);
         registerDao(CourseAttempt.class, courseAttemptDao);
         registerDao(Attempt.class, attemptDao);
+        registerDao(AttemptSection.class, attemptSectionDao);
         registerDao(BookmarkFolder.class, bookmarkFolderDao);
         registerDao(Bookmark.class, bookmarkDao);
         registerDao(ContentType.class, contentTypeDao);
@@ -262,6 +271,7 @@ public class DaoSession extends AbstractDaoSession {
         contentDaoConfig.clearIdentityScope();
         courseAttemptDaoConfig.clearIdentityScope();
         attemptDaoConfig.clearIdentityScope();
+        attemptSectionDaoConfig.clearIdentityScope();
         bookmarkFolderDaoConfig.clearIdentityScope();
         bookmarkDaoConfig.clearIdentityScope();
         contentTypeDaoConfig.clearIdentityScope();
@@ -337,6 +347,10 @@ public class DaoSession extends AbstractDaoSession {
 
     public AttemptDao getAttemptDao() {
         return attemptDao;
+    }
+
+    public AttemptSectionDao getAttemptSectionDao() {
+        return attemptSectionDao;
     }
 
     public BookmarkFolderDao getBookmarkFolderDao() {

@@ -1,82 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
+    android:background="@color/testpress_white"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
     <RelativeLayout
+        android:background="@color/testpress_color_primary"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="50dp" >
+        android:layout_height="?android:attr/actionBarSize" >
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/testpress_pause"
-            android:gravity="center_vertical"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp"
-            android:textStyle="bold"
-            android:clickable="true"
-            android:id="@+id/pause_exam"
-            android:textColor="@color/testpress_color_primary" />
-
-        <View
-            android:layout_toRightOf="@+id/pause_exam"
-            android:layout_toEndOf="@+id/pause_exam"
-            android:layout_width="1dp"
-            android:layout_height="30dp"
+        <ImageButton
+            android:id="@+id/exit_button"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:padding="10dp"
+            android:background="?android:selectableItemBackground"
+            android:src="@drawable/ic_close_black_24dp"
+            android:tint="@color/testpress_actionbar_text"
             android:layout_centerVertical="true"
-            android:layout_centerInParent="true"
-            android:background="@android:color/darker_gray" />
+            android:layout_marginLeft="10dp"
+            />
 
         <TextView
             android:id="@+id/timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?android:selectableItemBackground"
             android:text="00:00:00"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center"
-            android:textStyle="bold"
-            android:textColor="#ffffff"
-            android:background="#18be99"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingBottom="5dp"
-            android:paddingTop="5dp" />
-
-        <View
-            android:layout_toLeftOf="@+id/end"
-            android:layout_toStartOf="@+id/end"
-            android:layout_width="1dp"
-            android:layout_height="30dp"
-            android:layout_centerVertical="true"
-            android:layout_centerInParent="true"
-            android:background="@android:color/darker_gray" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:textStyle="bold"
-            android:text="@string/testpress_end"
-            android:id="@+id/end"
-            android:clickable="true"
-            android:layout_gravity="end"
-            android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_centerInParent="true"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp"
-            android:textColor="#d9534f" />
+            android:layout_centerVertical="true"
+            android:textStyle="bold"
+            android:textColor="@color/testpress_actionbar_text"
+            android:gravity="center"
+            android:drawableLeft="@drawable/ic_round_pause_circle_outline_black_24"
+            android:drawablePadding="5dp"
+            android:layout_marginRight="10dp"
+            android:padding="10dp"
+            />
+
+        <Spinner
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:visibility="gone"
+            android:id="@+id/language_spinner"
+            android:layout_alignParentRight="true"
+            style="@style/Widget.Testpress.HeaderBar.Spinner.Base"
+            android:background="@drawable/testpress_translate_action_bar"
+            />
 
     </RelativeLayout>
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dip"
-        android:background="#cccccc" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -115,78 +89,49 @@
 
             </LinearLayout>
 
-
-            <LinearLayout
+            <RelativeLayout
                 android:orientation="vertical"
-                android:background="@color/testpress_white"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" >
 
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:baselineAligned="false"
+                <!--Don't change this order-->
+                <in.testpress.exam.ui.view.NonSwipeableViewPager
+                    android:id="@+id/pager"
+                    android:layout_marginTop="-5dp"
+                    android:layout_below="@+id/questions_filter_container"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
+                    android:layout_height="match_parent" />
 
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_weight="1"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content" >
-
-                        <Spinner
-                            android:visibility="gone"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/language_spinner"
-                            style="@style/Widget.Testpress.HeaderBar.Spinner.Base"
-                            android:padding="5dp" />
-
-                    </LinearLayout>
-
-                    <RelativeLayout
-                        android:layout_weight="1"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/subject_filter_container" >
-
-                        <Spinner
-                            android:visibility="gone"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/subject_filter"
-                            style="@style/Widget.Testpress.HeaderBar.Spinner.Base"
-                            android:layout_alignParentRight="true"
-                            android:layout_alignParentEnd="true"
-                            android:gravity="end"
-                            android:padding="5dp" />
-
-                    </RelativeLayout>
-
-                </LinearLayout>
-
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="1dip"
-                    android:background="#cccccc"
-                    android:layout_gravity="center_horizontal" />
-
-                <LinearLayout
-                    android:orientation="vertical"
+                <RelativeLayout
+                    android:visibility="gone"
                     android:layout_width="match_parent"
-                    android:layout_weight="0.8"
-                    android:layout_height="0dp" >
+                    android:layout_height="wrap_content"
+                    android:id="@+id/questions_filter_container" >
 
-                    <in.testpress.exam.ui.view.NonSwipeableViewPager
-                        android:id="@+id/pager"
+                    <Spinner
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.Testpress.HeaderBar.Spinner.Base"
+                        android:id="@+id/primary_questions_filter"
+                        />
 
-                </LinearLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="5dp"
+                        android:layout_below="@+id/primary_questions_filter"
+                        android:background="@drawable/testpress_gradient_shadow_gray_light_bottom" />
 
-            </LinearLayout>
+                </RelativeLayout>
+
+            </RelativeLayout>
 
         </in.testpress.exam.ui.view.SlidingPaneLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/testpress_gradient_shadow_gray_bottom" />
 
         <View
             android:layout_width="fill_parent"
@@ -212,7 +157,7 @@
             android:textStyle="bold"
             android:clickable="false"
             android:id="@+id/previous"
-            android:textColor="@color/testpress_nav_button_disabled" />
+            android:textColor="@color/testpress_gray_light" />
 
         <View
             android:layout_width="1dp"
@@ -258,7 +203,7 @@
             android:layout_gravity="end"
             android:paddingLeft="25dp"
             android:paddingRight="25dp"
-            android:textColor="@color/testpress_color_primary" />
+            android:textColor="@color/testpress_text_gray" />
 
     </LinearLayout>
 
