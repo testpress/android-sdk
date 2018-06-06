@@ -191,29 +191,29 @@ public class ReviewQuestionsFragment extends Fragment
 
     @SuppressLint("AddJavascriptInterface")
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.testpress_fragment_review_question, container, false);
-        progressBar = (ProgressBar) view.findViewById(R.id.pb_loading);
+        progressBar = view.findViewById(R.id.pb_loading);
         emptyView = view.findViewById(R.id.empty_container);
-        emptyTitleView = (TextView) view.findViewById(R.id.empty_title);
-        emptyDescView = (TextView) view.findViewById(R.id.empty_description);
-        retryButton = (Button) view.findViewById(R.id.retry_button);
+        emptyTitleView = view.findViewById(R.id.empty_title);
+        emptyDescView = view.findViewById(R.id.empty_description);
+        retryButton = view.findViewById(R.id.retry_button);
         UIUtils.setIndeterminateDrawable(getContext(), progressBar, 4);
-        webView = (WebView) view.findViewById(R.id.web_view);
-        commentsLayout = (LinearLayout) view.findViewById(R.id.comments_layout);
-        previousCommentsLoadingLayout = (LinearLayout) view.findViewById(R.id.loading_previous_comments_layout);
-        newCommentsLoadingLayout = (LinearLayout) view.findViewById(R.id.loading_new_comments_layout);
-        commentsListView = (RecyclerView) view.findViewById(R.id.comments_list_view);
-        loadPreviousCommentsLayout = (LinearLayout) view.findViewById(R.id.load_previous_comments_layout);
-        loadPreviousCommentsText = (TextView) view.findViewById(R.id.load_previous_comments);
-        loadNewCommentsLayout = (LinearLayout) view.findViewById(R.id.load_new_comments_layout);
-        loadNewCommentsText = (TextView) view.findViewById(R.id.load_new_comments_text);
-        commentsLabel = (TextView) view.findViewById(R.id.comments_label);
-        commentsEditText = (BackEventListeningEditText) view.findViewById(R.id.comment_box);
-        commentBoxLayout = (LinearLayout) view.findViewById(R.id.comment_box_layout);
-        postCommentButton = (ImageButton) view.findViewById(R.id.post_comment_button);
-        imageCommentButton = (ImageButton) view.findViewById(R.id.image_comment_button);
+        webView = view.findViewById(R.id.web_view);
+        commentsLayout = view.findViewById(R.id.comments_layout);
+        previousCommentsLoadingLayout = view.findViewById(R.id.loading_previous_comments_layout);
+        newCommentsLoadingLayout = view.findViewById(R.id.loading_new_comments_layout);
+        commentsListView = view.findViewById(R.id.comments_list_view);
+        loadPreviousCommentsLayout = view.findViewById(R.id.load_previous_comments_layout);
+        loadPreviousCommentsText = view.findViewById(R.id.load_previous_comments);
+        loadNewCommentsLayout = view.findViewById(R.id.load_new_comments_layout);
+        loadNewCommentsText = view.findViewById(R.id.load_new_comments_text);
+        commentsLabel = view.findViewById(R.id.comments_label);
+        commentsEditText = view.findViewById(R.id.comment_box);
+        commentBoxLayout = view.findViewById(R.id.comment_box_layout);
+        postCommentButton = view.findViewById(R.id.post_comment_button);
+        imageCommentButton = view.findViewById(R.id.image_comment_button);
         bookmarkFolderSpinner = view.findViewById(R.id.bookmark_folder_spinner);
         folderSpinnerAdapter = new FolderSpinnerAdapter(getActivity(), getResources(),
                 new ViewUtils.OnInputCompletedListener() {
@@ -240,14 +240,14 @@ public class ReviewQuestionsFragment extends Fragment
         });
         animationView = view.findViewById(R.id.move_bookmark_loader);
         animationView.playAnimation();
-        difficultyTitle = (TextView) view.findViewById(R.id.difficulty_title);
-        difficultyPercentageText = (TextView) view.findViewById(R.id.difficulty_percentage);
-        usersAnsweredRight = (TextView) view.findViewById(R.id.users_answered_right);
-        imageView1 = (ImageView) view.findViewById(R.id.difficulty1);
-        imageView2 = (ImageView) view.findViewById(R.id.difficulty2);
-        imageView3 = (ImageView) view.findViewById(R.id.difficulty3);
-        imageView4 = (ImageView) view.findViewById(R.id.difficulty4);
-        imageView5 = (ImageView) view.findViewById(R.id.difficulty5);
+        difficultyTitle = view.findViewById(R.id.difficulty_title);
+        difficultyPercentageText = view.findViewById(R.id.difficulty_percentage);
+        usersAnsweredRight = view.findViewById(R.id.users_answered_right);
+        imageView1 = view.findViewById(R.id.difficulty1);
+        imageView2 = view.findViewById(R.id.difficulty2);
+        imageView3 = view.findViewById(R.id.difficulty3);
+        imageView4 = view.findViewById(R.id.difficulty4);
+        imageView5 = view.findViewById(R.id.difficulty5);
         percentageCorrect = Math.round(reviewItem.getQuestion().getPercentageGotCorrect() == null ?
                 0 : reviewItem.getQuestion().getPercentageGotCorrect());
 
@@ -447,19 +447,12 @@ public class ReviewQuestionsFragment extends Fragment
                     if (reviewItem.getBookmarkId() != null) {
                         deleteBookmark(reviewItem.getBookmarkId());
                     } else {
-//                        if (bookmarkFolderDao.queryBuilder().count() == 0) {
-                            //noinspection ConstantConditions
-                            String baseUrl = TestpressSdk.getTestpressSession(getActivity())
-                                    .getInstituteSettings().getBaseUrl();
+                        //noinspection ConstantConditions
+                        String baseUrl = TestpressSdk.getTestpressSession(getActivity())
+                                .getInstituteSettings().getBaseUrl();
 
-                            bookmarkFolders.clear();
-                            loadBookmarkFolders(baseUrl + BOOKMARK_FOLDERS_PATH);
-//                        } else {
-//                            if (folderSpinnerAdapter.getCount() == 1) {
-//                                addFoldersToSpinner();
-//                            }
-//                            bookmarkFolderSpinner.performClick();
-//                        }
+                        bookmarkFolders.clear();
+                        loadBookmarkFolders(baseUrl + BOOKMARK_FOLDERS_PATH);
                     }
                 }
             });
@@ -613,6 +606,7 @@ public class ReviewQuestionsFragment extends Fragment
         getLoaderManager().initLoader(PREVIOUS_COMMENTS_LOADER_ID, null, ReviewQuestionsFragment.this);
     }
 
+    @NonNull
     @SuppressLint("StaticFieldLeak")
     @Override
     public Loader<List<Comment>> onCreateLoader(int loaderId, Bundle args) {
@@ -671,7 +665,7 @@ public class ReviewQuestionsFragment extends Fragment
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Comment>> loader, List<Comment> comments) {
+    public void onLoadFinished(@NonNull Loader<List<Comment>> loader, List<Comment> comments) {
         if (getActivity() == null) {
             return;
         }
@@ -915,6 +909,7 @@ public class ReviewQuestionsFragment extends Fragment
         Collections.sort(this.comments, new Comparator<Comment>() {
             @Override
             public int compare(Comment o1, Comment o2) {
+                //noinspection ComparatorMethodParameterNotUsed
                 return FormatDate.compareDate(o2.getSubmitDate(), o1.getSubmitDate(),
                         "yyyy-MM-dd'T'HH:mm:ss", "UTC") ? 1 : -1;
             }
@@ -1002,7 +997,7 @@ public class ReviewQuestionsFragment extends Fragment
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Comment>> loader) {
+    public void onLoaderReset(@NonNull Loader<List<Comment>> loader) {
     }
 
 }

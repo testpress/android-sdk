@@ -141,7 +141,7 @@ public class BookmarksFragment extends Fragment
     private boolean postedNewComment;
     private Bookmark bookmark;
     private BookmarksActivity bookmarksActivity;
-    private FullScreenChromeClient fullScreenChromeClient;;
+    private FullScreenChromeClient fullScreenChromeClient;
     private TestpressExamApiClient apiClient;
     private List<Comment> comments = new ArrayList<>();
     @SuppressLint("UseSparseArrays")

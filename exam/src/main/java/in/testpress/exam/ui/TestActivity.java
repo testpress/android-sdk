@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.View;
@@ -86,15 +87,15 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_test);
         examDetailsContainer = findViewById(R.id.exam_details);
-        fragmentContainer = (LinearLayout) findViewById(R.id.fragment_container);
-        progressBar = (RelativeLayout) findViewById(R.id.pb_loading);
-        webOnlyLabel = (TextView) findViewById(R.id.web_only_label);
+        fragmentContainer = findViewById(R.id.fragment_container);
+        progressBar = findViewById(R.id.pb_loading);
+        webOnlyLabel = findViewById(R.id.web_only_label);
         emptyView = findViewById(R.id.empty_container);
-        emptyTitleView = (TextView) findViewById(R.id.empty_title);
-        emptyDescView = (TextView) findViewById(R.id.empty_description);
-        retryButton = (Button) findViewById(R.id.retry_button);
+        emptyTitleView = findViewById(R.id.empty_title);
+        emptyDescView = findViewById(R.id.empty_description);
+        retryButton = findViewById(R.id.retry_button);
         examDetailsContainer.setVisibility(View.GONE);
-        startButton = (Button) findViewById(R.id.start_exam);
+        startButton = findViewById(R.id.start_exam);
         endButton = findViewById(R.id.end_exam);
         endButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,13 +103,14 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 endExam();
             }
         });
-        resumeButton = (Button) findViewById(R.id.resume_exam);
+        resumeButton = findViewById(R.id.resume_exam);
         ViewUtils.setTypeface(new TextView[] {startButton, resumeButton, endButton},
                 TestpressSdk.getRubikMediumFont(this));
         UIUtils.setIndeterminateDrawable(this, findViewById(R.id.progress_bar), 4);
         apiClient = new TestpressExamApiClient(this);
         final Intent intent = getIntent();
         Bundle data = intent.getExtras();
+        assert data != null;
         exam = data.getParcelable(PARAM_EXAM);
         attempt = data.getParcelable(PARAM_ATTEMPT);
         discardExamDetails = getIntent().getBooleanExtra(PARAM_DISCARD_EXAM_DETAILS, false);
@@ -220,8 +222,8 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     @SuppressWarnings("ConstantConditions")
     @SuppressLint("SetTextI18n")
     void displayStartExamScreen() {
-        Button startExam = (Button) findViewById(R.id.start_exam);
-        LinearLayout attemptActions = (LinearLayout) findViewById(R.id.attempt_actions);
+        Button startExam = findViewById(R.id.start_exam);
+        LinearLayout attemptActions = findViewById(R.id.attempt_actions);
         if (courseAttempt != null) {
             attempt = courseAttempt.getRawAssessment();
         }
@@ -265,21 +267,21 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
             }
             return;
         }
-        TextView examTitle = (TextView) findViewById(R.id.exam_title);
-        TextView numberOfQuestions = (TextView) findViewById(R.id.number_of_questions);
-        TextView examDuration = (TextView) findViewById(R.id.exam_duration);
-        TextView markPerQuestion = (TextView) findViewById(R.id.mark_per_question);
-        TextView negativeMarks = (TextView) findViewById(R.id.negative_marks);
-        TextView date = (TextView) findViewById(R.id.date);
-        LinearLayout dateLayout = (LinearLayout) findViewById(R.id.date_layout);
-        LinearLayout description = (LinearLayout) findViewById(R.id.description);
-        TextView descriptionContent = (TextView) findViewById(R.id.descriptionContent);
-        TextView questionsLabel = (TextView) findViewById(R.id.questions_label);
-        TextView durationLabel = (TextView) findViewById(R.id.duration_label);
-        TextView markLabel = (TextView) findViewById(R.id.mark_per_question_label);
-        TextView negativeMarkLabel = (TextView) findViewById(R.id.negative_marks_label);
-        TextView dateLabel = (TextView) findViewById(R.id.date_label);
-        TextView languageLabel = (TextView) findViewById(R.id.language_label);
+        TextView examTitle = findViewById(R.id.exam_title);
+        TextView numberOfQuestions = findViewById(R.id.number_of_questions);
+        TextView examDuration = findViewById(R.id.exam_duration);
+        TextView markPerQuestion = findViewById(R.id.mark_per_question);
+        TextView negativeMarks = findViewById(R.id.negative_marks);
+        TextView date = findViewById(R.id.date);
+        LinearLayout dateLayout = findViewById(R.id.date_layout);
+        LinearLayout description = findViewById(R.id.description);
+        TextView descriptionContent = findViewById(R.id.descriptionContent);
+        TextView questionsLabel = findViewById(R.id.questions_label);
+        TextView durationLabel = findViewById(R.id.duration_label);
+        TextView markLabel = findViewById(R.id.mark_per_question_label);
+        TextView negativeMarkLabel = findViewById(R.id.negative_marks_label);
+        TextView dateLabel = findViewById(R.id.date_label);
+        TextView languageLabel = findViewById(R.id.language_label);
         ViewUtils.setTypeface(new TextView[] {numberOfQuestions, examDuration, markPerQuestion,
                 negativeMarks, examTitle, date}, TestpressSdk.getRubikMediumFont(this));
         ViewUtils.setTypeface(new TextView[] {descriptionContent, questionsLabel, webOnlyLabel,
@@ -329,6 +331,8 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         getSupportLoaderManager().initLoader(END_ATTEMPT_LOADER, null, TestActivity.this);
     }
 
+    @SuppressLint("StaticFieldLeak")
+    @NonNull
     @Override
     public Loader<Attempt> onCreateLoader(final int id, final Bundle args) {
         progressBar.setVisibility(View.VISIBLE);
@@ -405,7 +409,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         }
     }
 
-    public void onLoadFinished(final Loader<Attempt> loader, final Attempt attempt) {
+    public void onLoadFinished(@NonNull final Loader<Attempt> loader, final Attempt attempt) {
         if (progressBar.getVisibility() == View.GONE) {
             return;
         }
@@ -471,7 +475,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     }
 
     @Override
-    public void onLoaderReset(final Loader<Attempt> loader) {
+    public void onLoaderReset(@NonNull final Loader<Attempt> loader) {
         
     }
 
@@ -481,7 +485,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         try {
             //noinspection RestrictedApi
             testFragment = (TestFragment) getSupportFragmentManager().getFragments().get(0);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         if(testFragment != null) {
             if (testFragment.slidingPaneLayout.isOpen()) {

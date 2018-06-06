@@ -87,7 +87,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private int currentSection;
     private List<AttemptSection> sections = new ArrayList<>();
     private TestQuestionsPager questionsPager;
-    private List<AttemptItem> attemptItemList = new ArrayList<AttemptItem>();
+    private List<AttemptItem> attemptItemList = new ArrayList<>();
     private CountDownTimer countDownTimer;
     private long millisRemaining;
     private LockableSpinnerItemAdapter sectionSpinnerAdapter;
@@ -130,18 +130,19 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-        ViewGroup view = (ViewGroup) inflater.inflate(R.layout.testpress_fragment_test_engine,
-                container, false);
-        previous = (TextView) view.findViewById(R.id.previous);
-        next = (TextView) view.findViewById(R.id.next);
-        questionsListView = (ListView) view.findViewById(R.id.questions_list);
-        timer = (TextView) view.findViewById(R.id.timer);
-        panelQuestionsFilter = (Spinner) view.findViewById(R.id.questions_filter);
-        primaryQuestionsFilter = (Spinner) view.findViewById(R.id.primary_questions_filter);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.testpress_fragment_test_engine, container, false);
+        previous = view.findViewById(R.id.previous);
+        next = view.findViewById(R.id.next);
+        questionsListView = view.findViewById(R.id.questions_list);
+        timer = view.findViewById(R.id.timer);
+        panelQuestionsFilter = view.findViewById(R.id.questions_filter);
+        primaryQuestionsFilter = view.findViewById(R.id.primary_questions_filter);
         questionFilterContainer = view.findViewById(R.id.questions_filter_container);
-        pager = (NonSwipeableViewPager) view.findViewById(R.id.pager);
-        slidingPaneLayout = (SlidingPaneLayout) view.findViewById(R.id.sliding_layout);
+        pager = view.findViewById(R.id.pager);
+        slidingPaneLayout = view.findViewById(R.id.sliding_layout);
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage(getResources().getString(R.string.testpress_loading_questions));
         progressDialog.setCancelable(false);
@@ -150,16 +151,16 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         next.setVisibility(View.VISIBLE);
         slidingPaneLayout.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
             @Override
-            public void onPanelSlide(View panel, float slideOffset) {
+            public void onPanelSlide(@NonNull View panel, float slideOffset) {
             }
 
             @Override
-            public void onPanelOpened(View panel) {
+            public void onPanelOpened(@NonNull View panel) {
                 onExpandPanel();
             }
 
             @Override
-            public void onPanelClosed(View panel) {
+            public void onPanelClosed(@NonNull View panel) {
                 pager.setSwipeEnabled(true);
                 previous.setVisibility(View.VISIBLE);
                 next.setVisibility(View.VISIBLE);
@@ -186,25 +187,20 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 openPanel();
             }
         });
-        view.findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
+        next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showNextQuestion();
             }
         });
-        ((ListView) view.findViewById(R.id.questions_list)).setOnItemClickListener(
-                new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int position,
-                                            long id) {
-
-                        int index = ((AttemptItem) questionsListView.getItemAtPosition(position))
-                                .getIndex();
-
-                        pager.setCurrentItem(index - 1);
-                    }
+        questionsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                int index = ((AttemptItem) questionsListView.getItemAtPosition(position)).getIndex();
+                pager.setCurrentItem(index - 1);
+            }
         });
-        view.findViewById(R.id.previous).setOnClickListener(new View.OnClickListener() {
+        previous.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showPreviousQuestion();
@@ -223,7 +219,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 showPauseExamAlert();
             }
         });
-        panelListAdapter = new TestPanelListAdapter(getActivity().getLayoutInflater(), filterItems,
+        panelListAdapter = new TestPanelListAdapter(getLayoutInflater(), filterItems,
                 R.layout.testpress_test_panel_list_item);
 
         if (sections.size() > 1) {
@@ -526,7 +522,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @Override
-    public void onLoadFinished(final Loader<List<AttemptItem>> loader, final List<AttemptItem> items) {
+    public void onLoadFinished(@NonNull final Loader<List<AttemptItem>> loader,
+                               final List<AttemptItem> items) {
+
         if (getActivity() == null) {
             return;
         }
@@ -587,13 +585,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         }
 
         if (sections.size() <= 1) {
-            /**
-             * Used to get subjects in order as it fetched
-             */
+            // Used to get subjects in order as it fetched
             List<String> subjectsList = new ArrayList<>();
-            /*
-             * To Populate the spinner with the subjects
-             */
+            // To Populate the spinner with the subjects
             HashMap<String, List<AttemptItem>> subjectsWiseItems = new HashMap<>();
             for (AttemptItem item : items) {
                 if (item.getAttemptQuestion().getSubject() == null || item.getAttemptQuestion()
@@ -651,7 +645,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @Override
-    public void onLoaderReset(final Loader<List<AttemptItem>> loader) {
+    public void onLoaderReset(@NonNull final Loader<List<AttemptItem>> loader) {
     }
 
     private  void returnToHistory() {
@@ -942,14 +936,14 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @SuppressLint("SimpleDateFormat")
     private long formatMillisecond(String inputString) {
-        Date date = null;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         try {
-            date = simpleDateFormat.parse(inputString);
+            return simpleDateFormat.parse(inputString).getTime();
         } catch (ParseException e) {
+            e.printStackTrace();
+            return 0;
         }
-        return date.getTime();
     }
 
     private void onExpandPanel() {
@@ -965,8 +959,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private void updatePanel() {
         if (panelQuestionsFilter.getAdapter() == null) {
             String[] types = {"All", "Answered", "Unanswered", "Marked for review"};
-            ExploreSpinnerAdapter typeSpinnerAdapter = new ExploreSpinnerAdapter(getActivity()
-                    .getLayoutInflater(), getActivity().getResources(), false);
+            ExploreSpinnerAdapter typeSpinnerAdapter = new ExploreSpinnerAdapter(
+                    getLayoutInflater(), getResources(), false);
+
             typeSpinnerAdapter.addItems(Arrays.asList(types));
             panelQuestionsFilter.setAdapter(typeSpinnerAdapter);
             panelQuestionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -996,6 +991,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                     markedItems.add(attemptItemList.get(i));
                 }
             } catch (Exception e) {
+                e.printStackTrace();
             }
             if(!attemptItemList.get(i).getSelectedAnswers().isEmpty() ||
                     !attemptItemList.get(i).getSavedAnswers().isEmpty()) {
@@ -1055,7 +1051,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
     class TestEngineAlertDialog extends AlertDialog.Builder {
 
-        public TestEngineAlertDialog(TestpressException exception) {
+        TestEngineAlertDialog(TestpressException exception) {
             super(getActivity(), R.style.TestpressAppCompatAlertDialogStyle);
             setCancelable(false);
             if (exception.isNetworkError()) {
