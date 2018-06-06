@@ -40,14 +40,14 @@ android {
 }
 
 dependencies {
-    compile project(':course')
-    compile project(':store')
-    testCompile rootProject.junit
-    compile rootProject.appcompat
-    compile rootProject.design
-    compile 'com.google.android.gms:play-services-auth:10.2.0'
-    compile 'com.facebook.android:facebook-android-sdk:4.20.0'
+    api project(':course')
+    api project(':store')
+    api rootProject.appcompat
+    api rootProject.design
     // Facebook sdk may use the different version of customtabs, To avoid the lint errors & crashes
     // declare same version of support lib
-    compile rootProject.customtabs
+    api rootProject.customtabs
+    api 'com.google.android.gms:play-services-auth:10.2.0'
+    api 'com.facebook.android:facebook-android-sdk:4.20.0'
+    testImplementation rootProject.junit
 }

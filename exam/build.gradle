@@ -28,17 +28,17 @@ android {
 }
 
 dependencies {
-    compile project(':core')
-    compile rootProject.design
-    compile rootProject.cardview
-    compile rootProject.chart
-    compile rootProject.imageCropper
-    compile rootProject.lottie
-    testCompile rootProject.junit
-    testCompile rootProject.mockito
-    androidTestCompile rootProject.junit
-    androidTestCompile rootProject.testRunner
-    androidTestCompile rootProject.espressoCore
+    api project(':core')
+    api rootProject.design
+    api rootProject.cardview
+    api rootProject.chart
+    api rootProject.imageCropper
+    api rootProject.lottie
+    testImplementation rootProject.junit
+    testImplementation rootProject.mockito
+    androidTestImplementation rootProject.junit
+    androidTestImplementation rootProject.testRunner
+    androidTestImplementation rootProject.espressoCore
     androidTestImplementation rootProject.uiautomator
 }
 

@@ -22,17 +22,17 @@ android {
 }
 
 dependencies {
-    testCompile rootProject.junit
-    testCompile rootProject.mockito
-    compile rootProject.appcompat
-    compile rootProject.design
-    compile rootProject.retrofit2
-    compile rootProject.gsonConverter
-    compile rootProject.httpLogInterceptor
-    compile rootProject.universalImageLoader
-    compile rootProject.greendao
-    androidTestCompile rootProject.junit
-    androidTestCompile rootProject.testRunner
+    api rootProject.appcompat
+    api rootProject.design
+    api rootProject.retrofit2
+    api rootProject.gsonConverter
+    api rootProject.httpLogInterceptor
+    api rootProject.universalImageLoader
+    api rootProject.greendao
+    testImplementation rootProject.junit
+    testImplementation rootProject.mockito
+    androidTestImplementation rootProject.junit
+    androidTestImplementation rootProject.testRunner
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

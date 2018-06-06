@@ -28,13 +28,13 @@ android {
 }
 
 dependencies {
-    compile project(':core')
-    compile project(':exam')
+    api project(':core')
+    api project(':exam')
 
-    compile 'com.payu.india:payu-sdk:4.4.3'
+    api 'com.payu.india:payu-sdk:4.4.3'
 
-    testCompile rootProject.junit
-    testCompile rootProject.mockito
+    testImplementation rootProject.junit
+    testImplementation rootProject.mockito
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

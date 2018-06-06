@@ -28,13 +28,13 @@ android {
 }
 
 dependencies {
-    compile project(':core')
-    compile project(':exam')
-    compile rootProject.design
-    testCompile rootProject.junit
-    testCompile rootProject.mockito
-    androidTestCompile rootProject.junit
-    androidTestCompile rootProject.testRunner
+    api project(':core')
+    api project(':exam')
+    api rootProject.design
+    testImplementation rootProject.junit
+    testImplementation rootProject.mockito
+    androidTestImplementation rootProject.junit
+    androidTestImplementation rootProject.testRunner
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
