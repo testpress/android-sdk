@@ -3,7 +3,6 @@ package in.testpress.exam.ui;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -66,9 +65,11 @@ import in.testpress.models.greendao.ReviewItem;
 import in.testpress.models.greendao.ReviewItemDao;
 import in.testpress.models.greendao.ReviewQuestion;
 import in.testpress.models.greendao.ReviewQuestionTranslation;
+import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
 import in.testpress.ui.view.BackEventListeningEditText;
 import in.testpress.ui.view.ClosableSpinner;
+import in.testpress.util.CommonUtils;
 import in.testpress.util.FormatDate;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
@@ -155,6 +156,11 @@ public class ReviewQuestionsFragment extends Fragment
             getLoaderManager().restartLoader(NEW_COMMENTS_LOADER_ID, null, ReviewQuestionsFragment.this);
         }
     };
+    private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
+    private RetrofitCall<Bookmark> bookmarkAPIRequest;
+    private RetrofitCall<Void> deleteBookmarkAPIRequest;
+    private RetrofitCall<Comment> commentAPIRequest;
+    private RetrofitCall<FileDetails> imageUploadAPIRequest;
 
     public static ReviewQuestionsFragment getInstance(long reviewItemId, Language selectedLanguage) {
         ReviewQuestionsFragment reviewQuestionsFragment = new ReviewQuestionsFragment();
@@ -260,9 +266,12 @@ public class ReviewQuestionsFragment extends Fragment
             @Override
             protected void onLoadFinished() {
                 super.onLoadFinished();
+                if (getActivity() == null) {
+                    return;
+                }
                 setDifficulty(view);
                 progressBar.setVisibility(View.GONE);
-                if (commentsAdapter == null && getActivity() != null) {
+                if (commentsAdapter == null) {
                     displayComments();
                 }
                 animationView.bringToFront();
@@ -459,7 +468,7 @@ public class ReviewQuestionsFragment extends Fragment
 
     void loadBookmarkFolders(String url) {
         setBookmarkProgress(true);
-        apiClient.getBookmarkFolders(url)
+        bookmarkFoldersLoader = apiClient.getBookmarkFolders(url)
                 .enqueue(new TestpressCallback<ApiResponse<FolderListResponse>>() {
                     @Override
                     public void onSuccess(ApiResponse<FolderListResponse> apiResponse) {
@@ -488,7 +497,8 @@ public class ReviewQuestionsFragment extends Fragment
 
     void bookmark(String folder) {
         setBookmarkProgress(true);
-        apiClient.bookmark(reviewItem.getId(), folder, "userselectedanswer", "exams")
+        bookmarkAPIRequest = apiClient
+                .bookmark(reviewItem.getId(), folder, "userselectedanswer", "exams")
                 .enqueue(new TestpressCallback<Bookmark>() {
                     @Override
                     public void onSuccess(Bookmark bookmark) {
@@ -508,7 +518,7 @@ public class ReviewQuestionsFragment extends Fragment
 
     void deleteBookmark(Long bookmarkId) {
         setBookmarkProgress(true);
-        apiClient.deleteBookmark(bookmarkId)
+        deleteBookmarkAPIRequest = apiClient.deleteBookmark(bookmarkId)
                 .enqueue(new TestpressCallback<Void>() {
                     @Override
                     public void onSuccess(Void data) {
@@ -793,7 +803,7 @@ public class ReviewQuestionsFragment extends Fragment
         String url = apiClient.getBaseUrl() + QUESTIONS_PATH + reviewItem.getQuestionId() +
                 COMMENTS_PATH;
 
-        apiClient.postComment(url, comment)
+        commentAPIRequest = apiClient.postComment(url, comment)
                 .enqueue(new TestpressCallback<Comment>() {
                     @Override
                     public void onSuccess(Comment comment) {
@@ -866,17 +876,18 @@ public class ReviewQuestionsFragment extends Fragment
         if (!progressDialog.isShowing()) {
             progressDialog.show();
         }
-        apiClient.upload(imagePath).enqueue(new TestpressCallback<FileDetails>() {
-            @Override
-            public void onSuccess(FileDetails fileDetails) {
-                postComment(WebViewUtils.appendImageTags(fileDetails.getUrl()));
-            }
+        imageUploadAPIRequest = apiClient.upload(imagePath)
+                .enqueue(new TestpressCallback<FileDetails>() {
+                    @Override
+                    public void onSuccess(FileDetails fileDetails) {
+                        postComment(WebViewUtils.appendImageTags(fileDetails.getUrl()));
+                    }
 
-            @Override
-            public void onException(TestpressException exception) {
-                handleException(exception);
-            }
-        });
+                    @Override
+                    public void onException(TestpressException exception) {
+                        handleException(exception);
+                    }
+                });
     }
 
     @Override
@@ -923,6 +934,10 @@ public class ReviewQuestionsFragment extends Fragment
         if (newCommentsHandler != null) {
             newCommentsHandler.removeCallbacks(runnable);
         }
+        CommonUtils.cancelAPIRequests(new RetrofitCall[] {
+                bookmarkFoldersLoader, bookmarkAPIRequest, deleteBookmarkAPIRequest,
+                commentAPIRequest, imageUploadAPIRequest
+        });
         final ViewGroup viewGroup = (ViewGroup) webView.getParent();
         if (viewGroup != null) {
             // Remove webView from its parent before destroy to support below kitkat
@@ -963,6 +978,9 @@ public class ReviewQuestionsFragment extends Fragment
     }
 
     void handleException(TestpressException exception) {
+        if (getActivity() == null) {
+            return;
+        }
         progressDialog.dismiss();
         if(exception.isUnauthenticated()) {
             Snackbar.make(rootLayout, R.string.testpress_authentication_failed,

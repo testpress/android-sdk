@@ -41,6 +41,7 @@ public class TargetThreadFragment extends Fragment {
     private RankListAdapter listAdapter;
     private RetrofitCall<TestpressApiResponse<Reputation>> targetsLoader;
     private RetrofitCall<TestpressApiResponse<Reputation>> threadsLoader;
+    private TestpressCourseApiClient apiClient;
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
@@ -51,6 +52,7 @@ public class TargetThreadFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        apiClient = new TestpressCourseApiClient(getContext());
         userReputation = getArguments().getParcelable(PARAM_USER_REPUTATION);
         Assert.assertNotNull("PARAM_USER_REPUTATION must not be null.", userReputation);
         listAdapter = new RankListAdapter(getContext(),  reputations,
@@ -96,7 +98,7 @@ public class TargetThreadFragment extends Fragment {
     }
 
     void loadTargets() {
-        targetsLoader = new TestpressCourseApiClient(getContext()).getTargets()
+        targetsLoader = apiClient.getTargets()
                 .enqueue(new TestpressCallback<TestpressApiResponse<Reputation>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Reputation> response) {
@@ -119,7 +121,7 @@ public class TargetThreadFragment extends Fragment {
     }
 
     void loadThreads() {
-        threadsLoader = new TestpressCourseApiClient(getContext()).getThreads()
+        threadsLoader = apiClient.getThreads()
                 .enqueue(new TestpressCallback<TestpressApiResponse<Reputation>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Reputation> response) {

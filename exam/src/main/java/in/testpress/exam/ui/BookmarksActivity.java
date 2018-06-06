@@ -48,9 +48,11 @@ import in.testpress.models.greendao.BookmarkFolder;
 import in.testpress.models.greendao.BookmarkFolderDao;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ReviewItem;
+import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.HeaderFooterListAdapter;
 import in.testpress.ui.view.ClosableSpinner;
+import in.testpress.util.CommonUtils;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
@@ -108,6 +110,10 @@ public class BookmarksActivity extends BaseToolBarActivity
     private BookmarkDao bookmarkDao;
     private List<BookmarkFolder> bookmarkFolders = new ArrayList<>();
     private ProgressDialog progressDialog;
+    private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
+    private RetrofitCall<BookmarkFolder> updateFolderAPIRequest;
+    private RetrofitCall<Void> deleteFolderAPIRequest;
+    private RetrofitCall<Bookmark> undoBookmarkAPIRequest;
 
     @SuppressLint("InflateParams")
     @Override
@@ -334,7 +340,7 @@ public class BookmarksActivity extends BaseToolBarActivity
     }
 
     void loadBookmarkFolders(String url) {
-        new TestpressExamApiClient(this).getBookmarkFolders(url)
+        bookmarkFoldersLoader = apiClient.getBookmarkFolders(url)
                 .enqueue(new TestpressCallback<ApiResponse<FolderListResponse>>() {
                     @Override
                     public void onSuccess(ApiResponse<FolderListResponse> apiResponse) {
@@ -810,7 +816,7 @@ public class BookmarksActivity extends BaseToolBarActivity
 
     void updateBookmarkFolder(long folderId, String folderName, final int position) {
         progressDialog.show();
-        apiClient.updateBookmarkFolder(folderId, folderName)
+        updateFolderAPIRequest = apiClient.updateBookmarkFolder(folderId, folderName)
                 .enqueue(new TestpressCallback<BookmarkFolder>() {
                     @Override
                     public void onSuccess(BookmarkFolder folder) {
@@ -831,7 +837,7 @@ public class BookmarksActivity extends BaseToolBarActivity
 
     void deleteFolder(final Long folderId, final int deletedPosition) {
         progressDialog.show();
-        apiClient.deleteBookmarkFolder(folderId)
+        deleteFolderAPIRequest = apiClient.deleteBookmarkFolder(folderId)
                 .enqueue(new TestpressCallback<Void>() {
                     @Override
                     public void onSuccess(Void data) {
@@ -884,7 +890,8 @@ public class BookmarksActivity extends BaseToolBarActivity
         Bookmark bookmark = bookmarkDao.queryBuilder()
                 .where(BookmarkDao.Properties.Id.eq(bookmarkId)).list().get(0);
 
-        apiClient.undoBookmarkDelete(bookmarkId, bookmark.getObjectId(), bookmark.getFolderFromDB())
+        undoBookmarkAPIRequest = apiClient
+                .undoBookmarkDelete(bookmarkId, bookmark.getObjectId(), bookmark.getFolderFromDB())
                 .enqueue(new TestpressCallback<Bookmark>() {
                     @Override
                     public void onSuccess(Bookmark bookmark) {
@@ -997,6 +1004,15 @@ public class BookmarksActivity extends BaseToolBarActivity
         emptyImageView.setImageResource(imageResId);
         retryButton.setVisibility(View.VISIBLE);
         emptyView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    protected void onStop() {
+        CommonUtils.cancelAPIRequests(new RetrofitCall[] {
+                bookmarkFoldersLoader, updateFolderAPIRequest, deleteFolderAPIRequest,
+                undoBookmarkAPIRequest
+        });
+        super.onStop();
     }
 
     @Override

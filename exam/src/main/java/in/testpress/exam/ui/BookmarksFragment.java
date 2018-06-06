@@ -67,9 +67,11 @@ import in.testpress.models.greendao.ReviewItem;
 import in.testpress.models.greendao.ReviewQuestion;
 import in.testpress.models.greendao.ReviewQuestionTranslation;
 import in.testpress.models.greendao.Video;
+import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
 import in.testpress.ui.view.BackEventListeningEditText;
 import in.testpress.ui.view.ClosableSpinner;
+import in.testpress.util.CommonUtils;
 import in.testpress.util.FormatDate;
 import in.testpress.util.FullScreenChromeClient;
 import in.testpress.util.ThrowableLoader;
@@ -159,6 +161,11 @@ public class BookmarksFragment extends Fragment
             getLoaderManager().restartLoader(NEW_COMMENTS_LOADER_ID, null, BookmarksFragment.this);
         }
     };
+    private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
+    private RetrofitCall<Bookmark> updateBookmarkAPIRequest;
+    private RetrofitCall<Void> deleteBookmarkAPIRequest;
+    private RetrofitCall<Comment> commentAPIRequest;
+    private RetrofitCall<FileDetails> imageUploadAPIRequest;
 
     public static BookmarksFragment getInstance(long bookmarkId, Language selectedLanguage) {
         BookmarksFragment reviewQuestionsFragment = new BookmarksFragment();
@@ -525,7 +532,7 @@ public class BookmarksFragment extends Fragment
 
     void loadBookmarkFolders(String url) {
         setMoveBookmarkProgress(true);
-        apiClient.getBookmarkFolders(url)
+        bookmarkFoldersLoader = apiClient.getBookmarkFolders(url)
                 .enqueue(new TestpressCallback<ApiResponse<FolderListResponse>>() {
                     @Override
                     public void onSuccess(ApiResponse<FolderListResponse> apiResponse) {
@@ -558,7 +565,7 @@ public class BookmarksFragment extends Fragment
         if (folder.equals(UNCATEGORIZED)) {
             folder = "";
         }
-        apiClient.updateBookmark(bookmark.getId(), folder)
+        updateBookmarkAPIRequest = apiClient.updateBookmark(bookmark.getId(), folder)
                 .enqueue(new TestpressCallback<Bookmark>() {
                     @Override
                     public void onSuccess(Bookmark newBookmark) {
@@ -610,7 +617,7 @@ public class BookmarksFragment extends Fragment
 
     void deleteBookmark(final Long bookmarkId) {
         setRemoveBookmarkProgress(true);
-        apiClient.deleteBookmark(bookmarkId)
+        deleteBookmarkAPIRequest = apiClient.deleteBookmark(bookmarkId)
                 .enqueue(new TestpressCallback<Void>() {
                     @Override
                     public void onSuccess(Void data) {
@@ -966,7 +973,7 @@ public class BookmarksFragment extends Fragment
         String url = apiClient.getBaseUrl() + QUESTIONS_PATH + reviewItem.getQuestionId() +
                 COMMENTS_PATH;
 
-        apiClient.postComment(url, comment)
+        commentAPIRequest = apiClient.postComment(url, comment)
                 .enqueue(new TestpressCallback<Comment>() {
                     @Override
                     public void onSuccess(Comment comment) {
@@ -1042,17 +1049,18 @@ public class BookmarksFragment extends Fragment
         if (!progressDialog.isShowing()) {
             progressDialog.show();
         }
-        apiClient.upload(imagePath).enqueue(new TestpressCallback<FileDetails>() {
-            @Override
-            public void onSuccess(FileDetails fileDetails) {
-                postComment(WebViewUtils.appendImageTags(fileDetails.getUrl()));
-            }
+        imageUploadAPIRequest = apiClient.upload(imagePath)
+                .enqueue(new TestpressCallback<FileDetails>() {
+                    @Override
+                    public void onSuccess(FileDetails fileDetails) {
+                        postComment(WebViewUtils.appendImageTags(fileDetails.getUrl()));
+                    }
 
-            @Override
-            public void onException(TestpressException exception) {
-                handleException(exception);
-            }
-        });
+                    @Override
+                    public void onException(TestpressException exception) {
+                        handleException(exception);
+                    }
+                });
     }
 
     @Override
@@ -1100,6 +1108,10 @@ public class BookmarksFragment extends Fragment
         if (newCommentsHandler != null) {
             newCommentsHandler.removeCallbacks(runnable);
         }
+        CommonUtils.cancelAPIRequests(new RetrofitCall[] {
+                bookmarkFoldersLoader, updateBookmarkAPIRequest, deleteBookmarkAPIRequest,
+                commentAPIRequest, imageUploadAPIRequest
+        });
         final ViewGroup viewGroup = (ViewGroup) webView.getParent();
         if (viewGroup != null) {
             // Remove webView from its parent before destroy to support below kitkat
@@ -1134,6 +1146,9 @@ public class BookmarksFragment extends Fragment
     }
 
     void handleException(TestpressException exception) {
+        if (getActivity() == null) {
+            return;
+        }
         progressDialog.dismiss();
         if(exception.isUnauthenticated()) {
             Snackbar.make(rootLayout, R.string.testpress_authentication_failed,

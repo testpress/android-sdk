@@ -270,7 +270,9 @@ public final class TestpressSdk {
                         SharedPreferences.Editor editor = getPreferenceEditor(context);
                         editor.putString(KEY_USER_ID, userId);
                         editor.apply();
-                        progressDialog.dismiss();
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
                         if (callback != null) {
                             callback.onSuccess(testpressSession);
                         }
@@ -278,7 +280,9 @@ public final class TestpressSdk {
 
                     @Override
                     public void onException(TestpressException testpressException) {
-                        progressDialog.dismiss();
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
                         if (callback != null) {
                             if (testpressException.isClientError()) {
                                 AuthorizationErrorResponse errorResponse = testpressException.getErrorBodyAs(

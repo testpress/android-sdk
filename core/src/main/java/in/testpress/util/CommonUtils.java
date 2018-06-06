@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import in.testpress.network.RetrofitCall;
+
 public class CommonUtils {
 
     public static String getStringFromAsset(Context context, String path) {
@@ -53,6 +55,14 @@ public class CommonUtils {
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public static void cancelAPIRequests(RetrofitCall[] retrofitCalls) {
+        for (RetrofitCall retrofitCall : retrofitCalls) {
+            if (retrofitCall != null) {
+                retrofitCall.cancel();
+            }
         }
     }
 
