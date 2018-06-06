@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import in.testpress.core.TestpressSession;
-import in.testpress.models.AttemptSectionDeserializer;
 import in.testpress.models.FileDetails;
 import in.testpress.models.greendao.AttemptSection;
 import in.testpress.util.UserAgentProvider;
@@ -84,7 +83,6 @@ public class TestpressApiClient {
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .registerTypeAdapter(AttemptSection.class, new AttemptSectionDeserializer())
                 .create();
 
         // Set headers for all network requests

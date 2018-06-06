@@ -235,6 +235,6 @@
     <string name="testpress_switch_section">Switch Section?</string>
     <string name="testpress_switch_section_message">Are you sure want to move to the next section? You won\'t be able to switch back to this section.</string>
     <string name="testpress_attempt_sections_in_order">You need to attempt sections in order.</string>
-    <string name="testpress_switch">Switch</string>
+    <string name="testpress_end_section">End current section</string>
 
 </resources>

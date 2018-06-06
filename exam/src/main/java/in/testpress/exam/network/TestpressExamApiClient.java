@@ -33,12 +33,12 @@ public class TestpressExamApiClient extends TestpressApiClient {
     /**
      * Exams List URL
      */
-    public static final String EXAMS_LIST_PATH =  "/api/v2.2/exams/";
+    public static final String EXAMS_LIST_PATH =  "/api/v2.2.1/exams/";
 
     public static final String QUESTIONS_PATH =  "api/v2.2/questions/";
     public static final String COMMENTS_PATH =  "/comments/";
 
-    public static final String ACCESS_CODES_PATH =  "/api/v2.2/access_codes/";
+    public static final String ACCESS_CODES_PATH =  "/api/v2.2.1/access_codes/";
     public static final String EXAMS_PATH =  "/exams/";
 
     /**

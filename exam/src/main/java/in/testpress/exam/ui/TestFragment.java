@@ -267,7 +267,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                     } else {
                         builder.setTitle(R.string.testpress_switch_section);
                         builder.setMessage(R.string.testpress_switch_section_message);
-                        builder.setPositiveButton(getString(R.string.testpress_switch),
+                        builder.setPositiveButton(getString(R.string.testpress_end_section),
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
