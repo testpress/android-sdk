@@ -30,4 +30,10 @@
 
     <string name="testpress_are_you_sure">Are you sure?</string>
 
+    <string name="testpress_deny">Deny</string>
+    <string name="testpress_permission_denied">Permission Denied</string>
+    <string name="testpress_permission_denied_message">Without this permission app is unable to do your intended action, Goto app settings -> Permissions -> Enable permission to continue.</string>
+    <string name="testpress_go_to_settings">Goto Settings</string>
+    <string name="testpress_action_cant_done_without_permission">Action can\'t be done without permission</string>
+
 </resources>

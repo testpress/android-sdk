@@ -1,10 +1,8 @@
 package in.testpress.exam.ui;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -55,6 +53,7 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.Comment;
 import in.testpress.exam.network.CommentsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.util.ImagePickerUtils;
 import in.testpress.models.FileDetails;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.BookmarkFolder;
@@ -78,11 +77,7 @@ import in.testpress.util.WebViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
-import static android.app.Activity.RESULT_OK;
-import static com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE;
-import static com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE;
 import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE;
-import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE;
 import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.COMMENTS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.QUESTIONS_PATH;
@@ -141,7 +136,7 @@ public class ReviewQuestionsFragment extends Fragment
     List<Comment> comments = new ArrayList<>();
     @SuppressLint("UseSparseArrays")
     HashMap<Integer, Comment> uniqueComments = new HashMap<>();
-    Uri selectedCommentImageUri;
+    ImagePickerUtils imagePickerUtils;
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
     private Handler newCommentsHandler;
@@ -602,6 +597,7 @@ public class ReviewQuestionsFragment extends Fragment
                 }
             }
         });
+        imagePickerUtils = new ImagePickerUtils(rootLayout, this);
         commentsLayout.setVisibility(View.VISIBLE);
         getLoaderManager().initLoader(PREVIOUS_COMMENTS_LOADER_ID, null, ReviewQuestionsFragment.this);
     }
@@ -833,37 +829,15 @@ public class ReviewQuestionsFragment extends Fragment
     }
 
     @Override
-    @SuppressLint("NewApi")
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == RESULT_OK) {
-            Uri imageUri = CropImage.getPickImageResultUri(getContext(), data);
-            // For API >= 23 we need to check specifically that we have permissions to read external storage.
-            if (CropImage.isReadExternalStoragePermissionsRequired(getContext(), imageUri)) {
-                // Request permission
-                selectedCommentImageUri = imageUri;
-                requestPermissions(new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
-                        PICK_IMAGE_PERMISSIONS_REQUEST_CODE);
-            } else {
-                // No permissions required or already grunted
-                startCropImageActivity(imageUri);
-            }
-        } else if (requestCode == CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            if (resultCode == RESULT_OK) {
-                uploadImage(result.getUri().getPath());
-            } else if (resultCode == CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                //noinspection ThrowableResultOfMethodCallIgnored
-                Exception exception = result.getError();
-                Snackbar.make(rootLayout, exception.getMessage(), Snackbar.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    void startCropImageActivity(Uri imageUri) {
-        CropImage.activity(imageUri)
-                .setAllowFlipping(false)
-                .start(getContext(), this);
+        imagePickerUtils.onActivityResult(requestCode, resultCode, data,
+                new ImagePickerUtils.ImagePickerResultHandler() {
+                    @Override
+                    public void onSuccessfullyImageCropped(String imagePath) {
+                        uploadImage(imagePath);
+                    }
+                });
     }
 
     void uploadImage(String imagePath) {
@@ -888,17 +862,7 @@ public class ReviewQuestionsFragment extends Fragment
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
 
-        if (requestCode == PICK_IMAGE_PERMISSIONS_REQUEST_CODE) {
-            if (selectedCommentImageUri == null ||
-                    (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-
-                // Permission granted show image picker
-                startCropImageActivity(selectedCommentImageUri);
-            } else {
-                Snackbar.make(rootLayout, R.string.action_cant_done_without_permission,
-                        Snackbar.LENGTH_SHORT).show();
-            }
-        }
+        imagePickerUtils.permissionsUtils.onRequestPermissionsResult(requestCode, grantResults);
     }
 
     void addComments(List<Comment> commentsList) {
@@ -969,6 +933,9 @@ public class ReviewQuestionsFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
+        if (imagePickerUtils != null) {
+            imagePickerUtils.permissionsUtils.onResume();
+        }
         webView.onResume();
     }
 
