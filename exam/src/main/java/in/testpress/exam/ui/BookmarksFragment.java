@@ -1012,14 +1012,13 @@ public class BookmarksFragment extends Fragment
     }
 
     @Override
-    @SuppressLint("NewApi")
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         imagePickerUtils.onActivityResult(requestCode, resultCode, data,
                 new ImagePickerUtils.ImagePickerResultHandler() {
                     @Override
-                    public void onSuccessfullyImageCropped(String imagePath) {
-                        uploadImage(imagePath);
+                    public void onSuccessfullyImageCropped(CropImage.ActivityResult result) {
+                        uploadImage(result.getUri().getPath());
                     }
                 });
     }

@@ -834,8 +834,8 @@ public class ReviewQuestionsFragment extends Fragment
         imagePickerUtils.onActivityResult(requestCode, resultCode, data,
                 new ImagePickerUtils.ImagePickerResultHandler() {
                     @Override
-                    public void onSuccessfullyImageCropped(String imagePath) {
-                        uploadImage(imagePath);
+                    public void onSuccessfullyImageCropped(CropImage.ActivityResult result) {
+                        uploadImage(result.getUri().getPath());
                     }
                 });
     }

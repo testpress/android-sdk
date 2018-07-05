@@ -1,10 +1,12 @@
 package in.testpress.util;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -46,7 +48,25 @@ public class PermissionsUtils {
         this.fragment = fragment;
     }
 
-    public void checkPermission() {
+    public boolean checkPermissionRequired() {
+        return checkPermissionRequired(activity, permissions);
+    }
+
+    public static boolean checkPermissionRequired(Context context, String[] permissions) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            for (String permission : permissions) {
+                boolean required =
+                        context.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED;
+
+                if (required) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void requestPermissions() {
         if (fragment != null) {
             fragment.requestPermissions(permissions, permissionRequestCode);
         } else {
@@ -92,8 +112,12 @@ public class PermissionsUtils {
     public void onResume() {
         if (checkPermission) {
             checkPermission = false;
-            checkPermission();
+            requestPermissions();
         }
+    }
+
+    public void setPermissions(String[] permissions) {
+        this.permissions = permissions;
     }
 
     public interface PermissionRequestResultHandler {

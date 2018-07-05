@@ -134,4 +134,11 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="CropImageActivityTheme" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/testpress_color_primary</item>
+        <item name="titleTextColor">@color/testpress_white</item>
+        <item name="actionMenuTextColor">@color/testpress_white</item>
+        <item name="android:textColorPrimary">@color/testpress_white</item>
+    </style>
+
 </resources>

@@ -29,6 +29,8 @@ public class ImagePickerUtils {
     private Fragment fragment;
     private Uri selectedImageUri;
     public PermissionsUtils permissionsUtils;
+    private int[] aspectRatio = null;
+
     private PermissionsUtils.PermissionRequestResultHandler permissionRequestResultHandler =
             new PermissionsUtils.PermissionRequestResultHandler() {
                 @Override
@@ -59,8 +61,10 @@ public class ImagePickerUtils {
         if (requestCode == PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == RESULT_OK) {
             selectedImageUri = CropImage.getPickImageResultUri(activity, data);
             // For API >= 23 we need to check specifically that we have permissions to read external storage.
-            if (CropImage.isReadExternalStoragePermissionsRequired(activity, selectedImageUri)) {
-                permissionsUtils.checkPermission();
+            if (permissionsUtils.checkPermissionRequired() &&
+                    CropImage.isUriRequiresPermissions(activity, selectedImageUri)) {
+
+                permissionsUtils.requestPermissions();
             } else {
                 // No permissions required or already granted
                 startCropImageActivity(selectedImageUri);
@@ -68,7 +72,7 @@ public class ImagePickerUtils {
         } else if (requestCode == CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-                handler.onSuccessfullyImageCropped(result.getUri().getPath());
+                handler.onSuccessfullyImageCropped(result);
             } else if (resultCode == CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 //noinspection ThrowableResultOfMethodCallIgnored
                 Exception exception = result.getError();
@@ -78,9 +82,10 @@ public class ImagePickerUtils {
     }
 
     private void startCropImageActivity(Uri imageUri) {
-        CropImage.ActivityBuilder activityBuilder = CropImage.activity(imageUri)
-                .setAllowFlipping(false);
-
+        CropImage.ActivityBuilder activityBuilder = getActivityBuilder(imageUri);
+        if (aspectRatio != null) {
+            activityBuilder.setAspectRatio(aspectRatio[0], aspectRatio[1]);
+        }
         if (fragment == null) {
             activityBuilder.start(activity);
         } else {
@@ -88,8 +93,22 @@ public class ImagePickerUtils {
         }
     }
 
+    protected CropImage.ActivityBuilder getActivityBuilder(Uri imageUri) {
+        return CropImage.activity(imageUri)
+                .setBorderCornerThickness(0)
+                .setAllowFlipping(false);
+    }
+
+    public void setImagePickerPermissions(String[] permissions) {
+        permissionsUtils.setPermissions(permissions);
+    }
+
+    public void setAspectRatio(int aspectRatioX, int aspectRatioY) {
+        aspectRatio = new int[] { aspectRatioX, aspectRatioY };
+    }
+
     public interface ImagePickerResultHandler {
-        void onSuccessfullyImageCropped(String imagePath);
+        void onSuccessfullyImageCropped(CropImage.ActivityResult result);
     }
 
 }

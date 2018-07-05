@@ -55,7 +55,7 @@
             android:configChanges="orientation|keyboard|screenSize" />
 
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat"/>
+            android:theme="@style/CropImageActivityTheme" />
 
         <activity android:name=".ui.AccessCodeExamsActivity"
             android:label="@string/testpress_exams"

@@ -22,7 +22,6 @@ android {
 }
 
 dependencies {
-    api rootProject.appcompat
     api rootProject.design
     api rootProject.retrofit2
     api rootProject.gsonConverter
