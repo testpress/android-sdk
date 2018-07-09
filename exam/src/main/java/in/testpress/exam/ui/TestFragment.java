@@ -281,7 +281,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             sectionSpinnerAdapter.setSelectedItem(currentSection);
             primaryQuestionsFilter.setSelection(currentSection);
             questionFilterContainer.setVisibility(View.VISIBLE);
-        } else {
+        } else if (exam.getTemplateType() == 2) {
             subjectSpinnerAdapter = new PlainSpinnerItemAdapter(getActivity());
             primaryQuestionsFilter.setAdapter(subjectSpinnerAdapter);
             primaryQuestionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -584,7 +584,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             return;
         }
 
-        if (sections.size() <= 1) {
+        if (sections.size() <= 1 && exam.getTemplateType() == 2) {
             // Used to get subjects in order as it fetched
             List<String> subjectsList = new ArrayList<>();
             // To Populate the spinner with the subjects
