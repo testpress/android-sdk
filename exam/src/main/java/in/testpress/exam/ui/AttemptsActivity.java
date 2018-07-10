@@ -28,6 +28,7 @@ import in.testpress.exam.R;
 import in.testpress.exam.network.AttemptsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.MultiLanguagesUtil;
+import in.testpress.exam.util.RetakeExamUtil;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.ui.BaseToolBarActivity;
@@ -158,7 +159,7 @@ public class AttemptsActivity extends BaseToolBarActivity
                     new MultiLanguagesUtil.LanguageSelectionListener() {
                         @Override
                         public void onLanguageSelected() {
-                            startExam(true);
+                            startExam(true, false);
                         }});
             startButtonLayout.setVisibility(View.VISIBLE);
         } else {
@@ -303,7 +304,14 @@ public class AttemptsActivity extends BaseToolBarActivity
                 startButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        startExam(false);
+                        RetakeExamUtil.showRetakeOptions(AttemptsActivity.this,
+                                new RetakeExamUtil.SelectionListener() {
+                                    @Override
+                                    public void onOptionSelected(boolean isPartial) {
+                                        startExam(false, isPartial);
+                                    }
+                                });
+
                     }
                 });
             } else {
@@ -344,11 +352,12 @@ public class AttemptsActivity extends BaseToolBarActivity
         }
     }
 
-    private void startExam(boolean discardExamDetails) {
+    private void startExam(boolean discardExamDetails, boolean isPartial) {
         Intent intent = new Intent(this, TestActivity.class);
         if (getIntent().getExtras() != null) {
             intent.putExtras(getIntent().getExtras());
         }
+        intent.putExtra(TestActivity.PARAM_IS_PARTIAL_QUESTIONS, isPartial);
         intent.putExtra(TestActivity.PARAM_EXAM, exam);
         intent.putExtra(TestActivity.PARAM_DISCARD_EXAM_DETAILS, discardExamDetails);
         startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);

@@ -173,19 +173,19 @@ public class TestpressExamTest {
         Content courseContent = mock(Content.class);
         FragmentActivity activity = mock(FragmentActivity.class);
         try {
-            TestpressExam.startCourseExam(null, courseContent, false, testpressSession);
+            TestpressExam.startCourseExam(null, courseContent, false, false, testpressSession);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("Activity must not be null.", e.getMessage());
         }
         try {
-            TestpressExam.startCourseExam(activity, null, false, testpressSession);
+            TestpressExam.startCourseExam(activity, null, false, false, testpressSession);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("PARAM_COURSE_CONTENT must not be null.", e.getMessage());
         }
         try {
-            TestpressExam.startCourseExam(activity, courseContent, false, null);
+            TestpressExam.startCourseExam(activity, courseContent, false, false, null);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("TestpressSession must not be null.", e.getMessage());

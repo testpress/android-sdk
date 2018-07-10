@@ -37,7 +37,9 @@ import junit.framework.Assert;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
@@ -49,6 +51,7 @@ import in.testpress.exam.TestpressExam;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.FolderSpinnerAdapter;
 import in.testpress.exam.util.MultiLanguagesUtil;
+import in.testpress.exam.util.RetakeExamUtil;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.AttachmentDao;
@@ -79,6 +82,7 @@ import in.testpress.v2_4.models.FolderListResponse;
 import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
+import static in.testpress.exam.network.TestpressExamApiClient.CONTENTS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.STATE_PAUSED;
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
@@ -649,13 +653,19 @@ public class ContentActivity extends BaseToolBarActivity {
                         new MultiLanguagesUtil.LanguageSelectionListener() {
                             @Override
                             public void onLanguageSelected() {
-                                startCourseExam(true);
+                                startCourseExam(true, false);
                             }});
             } else {
                 startButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        startCourseExam(false);
+                        RetakeExamUtil.showRetakeOptions(ContentActivity.this,
+                                new RetakeExamUtil.SelectionListener() {
+                                    @Override
+                                    public void onOptionSelected(boolean isPartial) {
+                                        startCourseExam(false, isPartial);
+                                    }
+                        });
                     }
                 });
             }
@@ -684,7 +694,8 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void createContentAttempt() {
-        examApiClient.createContentAttempt(content.getAttemptsUrl())
+        Map<String, Object> data = new HashMap<>();
+        examApiClient.createContentAttempt(content.getAttemptsUrl(), data)
                 .enqueue(new TestpressCallback<CourseAttempt>() {
                     @Override
                     public void onSuccess(CourseAttempt courseAttempt) {
@@ -737,7 +748,7 @@ public class ContentActivity extends BaseToolBarActivity {
         if (content != null) {
             contentUrl = content.getUrl();
         } else {
-            contentUrl = TestpressCourseApiClient.CONTENTS_PATH + contentId;
+            contentUrl = CONTENTS_PATH + contentId;
         }
 
         courseApiClient.getContent(contentUrl)
@@ -795,9 +806,9 @@ public class ContentActivity extends BaseToolBarActivity {
                 "</style>";
     }
 
-    private void startCourseExam(boolean discardExamDetails) {
+    private void startCourseExam(boolean discardExamDetails, boolean isPartial) {
         //noinspection ConstantConditions
-        TestpressExam.startCourseExam(this, content, discardExamDetails,
+        TestpressExam.startCourseExam(this, content, discardExamDetails, isPartial,
                 TestpressSdk.getTestpressSession(this));
     }
 

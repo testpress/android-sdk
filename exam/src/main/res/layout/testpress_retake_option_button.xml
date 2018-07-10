@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.AppCompatButton
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/text1"
+    android:layout_height="35dp"
+    android:layout_width="match_parent"
+    android:textColor="@color/testpress_white"
+    android:focusable="false"
+    android:background="@drawable/testpress_green_curved_edge_background"
+    android:gravity="center"
+    />

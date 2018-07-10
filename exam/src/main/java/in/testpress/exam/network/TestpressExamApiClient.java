@@ -10,6 +10,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.Comment;
+import in.testpress.exam.models.Permission;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
 import in.testpress.models.TestpressApiResponse;
@@ -40,6 +41,9 @@ public class TestpressExamApiClient extends TestpressApiClient {
 
     public static final String ACCESS_CODES_PATH =  "/api/v2.2.1/access_codes/";
     public static final String EXAMS_PATH =  "/exams/";
+
+    public static final String CONTENTS_PATH =  "/api/v2.2.1/contents/";
+    public static final String PERMISSIONS_PATH =  "/permissions/";
 
     /**
      * Categories URL
@@ -75,6 +79,7 @@ public class TestpressExamApiClient extends TestpressApiClient {
     public static final String PAGE = "page";
     public static final String PARENT = "parent";
     public static final String CATEGORY = "course_slug";
+    public static final String IS_PARTIAL = "is_partial";
 
     public static final String STATE_PAUSED = "Running";
 
@@ -115,8 +120,10 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getExamService().createAttempt(attemptsUrlFrag, option);
     }
 
-    public RetrofitCall<CourseAttempt> createContentAttempt(String attemptUrl) {
-        return getExamService().createContentAttempt(attemptUrl);
+    public RetrofitCall<CourseAttempt> createContentAttempt(String attemptUrl,
+                                                            Map<String, Object> option) {
+
+        return getExamService().createContentAttempt(attemptUrl, option);
     }
 
     public RetrofitCall<Attempt> startAttempt(String startAttemptUrlFrag) {
@@ -253,5 +260,9 @@ public class TestpressExamApiClient extends TestpressApiClient {
 
     public RetrofitCall<ApiResponse<BookmarksListResponse>> getBookmarks(Map<String, Object> queryParams) {
         return getBookmarkService().getBookmarks(queryParams);
+    }
+
+    public RetrofitCall<Permission> checkPermission(long contentId) {
+        return getExamService().checkPermission(contentId);
     }
 }

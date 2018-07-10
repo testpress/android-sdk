@@ -270,10 +270,11 @@ public class TestpressExam {
     public static void startCourseExam(@NonNull Activity activity,
                                        @NonNull Content courseContent,
                                        boolean discardExamDetails,
+                                       boolean isPartialQuestions,
                                        @NonNull TestpressSession testpressSession) {
 
-        handleCourseAttempt(activity, courseContent, null, discardExamDetails, testpressSession,
-                false);
+        handleCourseAttempt(activity, courseContent, null, discardExamDetails, isPartialQuestions,
+                testpressSession, false);
     }
 
     /**
@@ -293,7 +294,7 @@ public class TestpressExam {
                                            @NonNull TestpressSession testpressSession) {
 
         Assert.assertNotNull("PARAM_COURSE_ATTEMPT must not be null.", courseAttempt);
-        handleCourseAttempt(activity, courseContent, courseAttempt, discardExamDetails,
+        handleCourseAttempt(activity, courseContent, courseAttempt, discardExamDetails, false,
                 testpressSession, false);
     }
 
@@ -312,7 +313,8 @@ public class TestpressExam {
                                         @NonNull TestpressSession testpressSession) {
 
         Assert.assertNotNull("PARAM_COURSE_ATTEMPT must not be null.", courseAttempt);
-        handleCourseAttempt(activity, courseContent, courseAttempt, true, testpressSession, true);
+        handleCourseAttempt(activity, courseContent, courseAttempt, true, false, testpressSession,
+                true);
     }
 
     /**
@@ -360,6 +362,7 @@ public class TestpressExam {
                                             @NonNull Content courseContent,
                                             CourseAttempt courseAttempt,
                                             boolean discardExamDetails,
+                                            boolean isPartialQuestions,
                                             @NonNull TestpressSession testpressSession,
                                             boolean endExam) {
 
@@ -371,6 +374,7 @@ public class TestpressExam {
         if (courseAttempt != null) {
             intent.putExtra(TestActivity.PARAM_COURSE_ATTEMPT, courseAttempt);
         }
+        intent.putExtra(TestActivity.PARAM_IS_PARTIAL_QUESTIONS, isPartialQuestions);
         intent.putExtra(TestActivity.PARAM_DISCARD_EXAM_DETAILS, discardExamDetails);
         if (endExam) {
             intent.putExtra(TestActivity.PARAM_ACTION, TestActivity.PARAM_VALUE_ACTION_END);

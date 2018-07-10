@@ -17,7 +17,7 @@
     <string name="testpress_no_internet_connection">No internet connection</string>
     <string name="testpress_try_again">Try again</string>
 
-    <string name="testpress_exam_no_permission">You do not have permission to view this exam.</string>
+    <string name="testpress_exam_no_permission">You do not have permission to attempt this exam.</string>
     <string name="testpress_loading_questions">Loading questions</string>
     <string name="testpress_no_exams">No Exams</string>
     <string name="testpress_no_exams_description">You can buy exams from the store.</string>
@@ -234,5 +234,12 @@
     <string name="testpress_switch_section_message">Are you sure want to move to the next section? You won\'t be able to switch back to this section.</string>
     <string name="testpress_attempt_sections_in_order">You need to attempt sections in order.</string>
     <string name="testpress_end_section">End current section</string>
+
+    <string name="testpress_retake_with">Retake with?</string>
+    <string-array name="testpress_retake_options">
+        <item>All Questions</item>
+        <item>Wrong Questions</item>
+    </string-array>
+    <string name="testpress_can_retake_in_few_min">You can retake this exam %s. Meanwhile review your previous attempt.</string>
 
 </resources>

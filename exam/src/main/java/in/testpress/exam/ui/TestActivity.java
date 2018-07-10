@@ -28,6 +28,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
+import in.testpress.exam.models.Permission;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.models.TestpressApiResponse;
@@ -39,11 +40,13 @@ import in.testpress.models.greendao.Exam;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.Assert;
+import in.testpress.util.FormatDate;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 import retrofit2.Response;
 
+import static in.testpress.exam.network.TestpressExamApiClient.IS_PARTIAL;
 import static in.testpress.exam.ui.AccessCodeExamsFragment.ACCESS_CODE;
 
 /**
@@ -59,6 +62,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     static final String PARAM_ATTEMPT = "attempt";
     static final String PARAM_STATE = "state";
     static final String STATE_PAUSED = "paused";
+    public static final String PARAM_IS_PARTIAL_QUESTIONS = "isPartialQuestions";
     public static final String PARAM_ACTION = "action";
     public static final String PARAM_VALUE_ACTION_END = "end";
     private static final int START_ATTEMPT_LOADER = 0;
@@ -69,6 +73,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private Attempt attempt;
     private Content courseContent;
     private CourseAttempt courseAttempt;
+    private Permission permission;
     private boolean discardExamDetails;
     private RelativeLayout progressBar;
     private View examDetailsContainer;
@@ -81,6 +86,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private Button resumeButton;
     private Button startButton;
     private Button endButton;
+    private boolean isPartialQuestions;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -113,13 +119,18 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         assert data != null;
         exam = data.getParcelable(PARAM_EXAM);
         attempt = data.getParcelable(PARAM_ATTEMPT);
+        isPartialQuestions = data.getBoolean(PARAM_IS_PARTIAL_QUESTIONS, false);
         discardExamDetails = getIntent().getBooleanExtra(PARAM_DISCARD_EXAM_DETAILS, false);
         if (exam == null) {
             courseContent = data.getParcelable(PARAM_COURSE_CONTENT);
             courseAttempt = data.getParcelable(PARAM_COURSE_ATTEMPT);
             if (courseContent != null) {
                 exam = courseContent.getRawExam();
-                displayStartExamScreen();
+                if (courseAttempt == null) {
+                    checkPermission();
+                } else {
+                    displayStartExamScreen();
+                }
                 return;
             }
             String examSlug = data.getString(PARAM_EXAM_SLUG);
@@ -132,9 +143,45 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         displayStartExamScreen();
     }
 
+    void checkPermission() {
+        progressBar.setVisibility(View.VISIBLE);
+        apiClient.checkPermission(courseContent.getId())
+                .enqueue(new TestpressCallback<Permission>() {
+                    @Override
+                    public void onSuccess(Permission permission) {
+                        TestActivity.this.permission = permission;
+                        displayStartExamScreen();
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        if (exception.isUnauthenticated()) {
+                            setEmptyText(R.string.testpress_authentication_failed,
+                                    R.string.testpress_exam_no_permission);
+                            retryButton.setVisibility(View.GONE);
+                        } else if (exception.isNetworkError()) {
+                            setEmptyText(R.string.testpress_network_error,
+                                    R.string.testpress_no_internet_try_again);
+                            retryButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    progressBar.setVisibility(View.VISIBLE);
+                                    emptyView.setVisibility(View.GONE);
+                                    checkPermission();
+                                }
+                            });
+                        } else  {
+                            setEmptyText(R.string.testpress_error_loading_exam,
+                                    R.string.testpress_some_thing_went_wrong_try_again);
+                            retryButton.setVisibility(View.GONE);
+                        }
+                    }
+                });
+    }
+
     void loadExam(final String examSlug) {
         progressBar.setVisibility(View.VISIBLE);
-        new TestpressExamApiClient(this).getExam(examSlug)
+        apiClient.getExam(examSlug)
                 .enqueue(new TestpressCallback<Exam>() {
                     @Override
                     public void onSuccess(Exam exam) {
@@ -180,7 +227,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         progressBar.setVisibility(View.VISIBLE);
         HashMap<String, Object> queryParams = new HashMap<>();
         queryParams.put(PARAM_STATE, STATE_PAUSED);
-        new TestpressExamApiClient(this).getAttempts(attemptUrlFrag, queryParams)
+        apiClient.getAttempts(attemptUrlFrag, queryParams)
                 .enqueue(new TestpressCallback<TestpressApiResponse<Attempt>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Attempt> response) {
@@ -235,6 +282,20 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         } else if (exam.isEnded()) {
             webOnlyLabel.setVisibility(View.VISIBLE);
             webOnlyLabel.setText(R.string.testpress_exam_ended);
+            attemptActions.setVisibility(View.GONE);
+            startExam.setVisibility(View.GONE);
+        } else if (permission != null &&
+                (!permission.getHasPermission() || (permission.getNextRetakeTime() != null &&
+                        !permission.getNextRetakeTime().equals("0")))) {
+
+            if (!permission.getHasPermission()) {
+                webOnlyLabel.setText(R.string.testpress_exam_no_permission);
+            } else {
+                String time =
+                        FormatDate.getTimeDifference(permission.getNextRetakeTime()).toLowerCase();
+                webOnlyLabel.setText(getString(R.string.testpress_can_retake_in_few_min, time));
+            }
+            webOnlyLabel.setVisibility(View.VISIBLE);
             attemptActions.setVisibility(View.GONE);
             startExam.setVisibility(View.GONE);
         } else if (exam.getPausedAttemptsCount() > 0) {
@@ -310,6 +371,9 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 endButton.setVisibility(View.GONE);
             }
         }
+        if (isPartialQuestions) {
+            findViewById(R.id.questions_info_layout).setVisibility(View.GONE);
+        }
         markPerQuestion.setText(exam.getMarkPerQuestion());
         negativeMarks.setText(exam.getNegativeMarks());
         if (exam.getFormattedStartDate().equals("forever")) {
@@ -344,7 +408,12 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                     boolean createdNewAttempt = false;
                     switch (id) {
                         case START_ATTEMPT_LOADER:
-                            call = apiClient.createContentAttempt(courseContent.getAttemptsUrl());
+                            Map<String, Object> data = new HashMap<>();
+                            if (isPartialQuestions) {
+                                data.put(IS_PARTIAL, true);
+                            }
+                            call = apiClient
+                                    .createContentAttempt(courseContent.getAttemptsUrl(), data);
                             createdNewAttempt = true;
                             break;
                         case END_ATTEMPT_LOADER:
@@ -354,7 +423,11 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                     }
                     courseAttempt = executeRetrofitCall(call);
                     saveCourseAttemptInDB(courseAttempt, createdNewAttempt);
-                    return courseAttempt.getRawAssessment();
+                    Attempt attempt = courseAttempt.getRawAssessment();
+                    if (id == START_ATTEMPT_LOADER && attempt.getRemainingTime().equals("0:00:00")) {
+                        attempt.setRemainingTime(exam.getDuration());
+                    }
+                    return attempt;
                 } else {
                     RetrofitCall<Attempt> call = null;
                     switch (id) {
@@ -363,6 +436,9 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                             String accessCode = getIntent().getStringExtra(ACCESS_CODE);
                             if (accessCode != null) {
                                 data.put(ACCESS_CODE, accessCode);
+                            }
+                            if (isPartialQuestions) {
+                                data.put(IS_PARTIAL, true);
                             }
                             call = apiClient.createAttempt(exam.getAttemptsFrag(), data);
                             break;

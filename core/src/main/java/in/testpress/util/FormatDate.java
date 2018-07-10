@@ -58,6 +58,10 @@ public class FormatDate {
         return null;
     }
 
+    public static Date getDate(String inputString) {
+        return getDate(inputString, "yyyy-MM-dd'T'HH:mm:ss", "UTC");
+    }
+
     @SuppressLint("SimpleDateFormat")
     public static Date getDate(String inputString, String inputFormat, String timezone) {
         Date date;
@@ -71,15 +75,28 @@ public class FormatDate {
                 return date;
             }
         } catch (ParseException e) {
+            e.printStackTrace();
         }
         return null;
     }
 
     public static String formatDate(String inputString) {
-        Date date = getDate(inputString, "yyyy-MM-dd'T'HH:mm:ss", "UTC");
+        Date date = getDate(inputString);
         if(date != null) {
             DateFormat dateformat = DateFormat.getDateInstance();
             return dateformat.format(date);
+        }
+        return null;
+    }
+
+    public static String getTimeDifference(String inputString) {
+        Date date = getDate(inputString);
+        if (date != null) {
+            return DateUtils.getRelativeTimeSpanString(
+                    date.getTime(),
+                    System.currentTimeMillis(),
+                    DateUtils.SECOND_IN_MILLIS,
+                    DateUtils.FORMAT_NUMERIC_DATE).toString();
         }
         return null;
     }

@@ -28,8 +28,6 @@ public class TestpressCourseApiClient extends TestpressApiClient {
 
     public static final String CHAPTERS_PATH =  "/chapters/";
 
-    public static final String CONTENTS_PATH =  "/api/v2.2.1/contents/";
-
     public static final String LEADERBOARD_PATH =  "/api/v2.2/leaderboard/";
 
     public static final String RANK_PATH =  "/api/v2.2/me/rank/";

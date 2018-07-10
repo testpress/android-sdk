@@ -31,6 +31,7 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.util.RetakeExamUtil;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
@@ -288,7 +289,13 @@ public class ReviewStatsFragment extends Fragment {
             retakeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startExam();
+                    RetakeExamUtil.showRetakeOptions(getContext(),
+                            new RetakeExamUtil.SelectionListener() {
+                                @Override
+                                public void onOptionSelected(boolean isPartial) {
+                                    startExam(isPartial);
+                                }
+                            });
                 }
             });
         } else {
@@ -347,7 +354,7 @@ public class ReviewStatsFragment extends Fragment {
                 !exam.getDeviceAccessControl().equals("web");
     }
 
-    private void startExam() {
+    private void startExam(boolean isPartial) {
         Intent intent = new Intent(getActivity(), TestActivity.class);
         intent.putExtra(TestActivity.PARAM_EXAM, exam);
         startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);

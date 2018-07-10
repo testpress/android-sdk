@@ -6,6 +6,7 @@ import java.util.Map;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.Comment;
+import in.testpress.exam.models.Permission;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
 import in.testpress.models.TestpressApiResponse;
@@ -26,7 +27,9 @@ import retrofit2.http.QueryMap;
 import retrofit2.http.Url;
 
 import static in.testpress.exam.network.TestpressExamApiClient.ACCESS_CODES_PATH;
+import static in.testpress.exam.network.TestpressExamApiClient.CONTENTS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.EXAMS_PATH;
+import static in.testpress.exam.network.TestpressExamApiClient.PERMISSIONS_PATH;
 
 public interface ExamService {
 
@@ -61,7 +64,8 @@ public interface ExamService {
 
     @POST("{attempt_url}")
     RetrofitCall<CourseAttempt> createContentAttempt(
-            @Path(value = "attempt_url", encoded = true) String attemptUrl);
+            @Path(value = "attempt_url", encoded = true) String attemptUrl,
+            @Body Map<String, Object> options);
 
     @PUT("/{start_attempt_url}")
     RetrofitCall<Attempt> startAttempt(
@@ -127,6 +131,10 @@ public interface ExamService {
     RetrofitCall<Vote<Comment>> updateCommentVote(
             @Path(value = "vote_id") int id,
             @Body HashMap<String, Object> params);
+
+    @GET(CONTENTS_PATH + "{content_id}" + PERMISSIONS_PATH)
+    RetrofitCall<Permission> checkPermission(
+            @Path(value = "content_id", encoded = true) long contentId);
 }
 
 

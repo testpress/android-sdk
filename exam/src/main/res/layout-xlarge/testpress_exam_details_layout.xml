@@ -20,6 +20,7 @@
             android:layout_gravity="center">
 
             <LinearLayout
+                android:id="@+id/questions_info_layout"
                 style="@style/TestpressExamInfoRow"
                 android:layout_marginBottom="5dp"
                 android:layout_gravity="center">
