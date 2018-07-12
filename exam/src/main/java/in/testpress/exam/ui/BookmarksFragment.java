@@ -319,7 +319,7 @@ public class BookmarksFragment extends Fragment
 
             @Override
             public String getHeader() {
-                return super.getHeader() + getBookmarkHandlerScript();
+                return getQuestionsHeader() + getBookmarkHandlerScript();
             }
 
             @Override

@@ -7,17 +7,20 @@ html {
   -webkit-font-smoothing: antialiased;
   -webkit-user-select: none;
 }
+body {
+    margin: 0px;
+}
 /* Copy & Lists */
 p {
   text-align: justify;
   line-height: 1.7rem;
-  margin-top: 1.7rem;
+  margin-top: 1.25rem;
   margin-bottom: 0;
 }
 ul,
 ol {
-  margin-top: 1.7rem;
-  margin-bottom: 1.7rem;
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
 }
 ul li,
 ol li {
@@ -39,7 +42,7 @@ h5,
 h6 {
   /* Change heading typefaces here */
   font-family: sans-serif;
-  margin-top: 1.7rem;
+  margin-top: 1.25rem;
   margin-bottom: 0;
   line-height: 1.7rem;
 }
@@ -65,7 +68,7 @@ h6 {
 }
 /* Tables */
 table {
-  margin-top: 1.7rem;
+  margin-top: 1.25rem;
   border-spacing: 0px;
   border-collapse: collapse;
 }

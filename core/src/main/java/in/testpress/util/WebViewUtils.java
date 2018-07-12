@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
@@ -34,6 +35,8 @@ public class WebViewUtils {
         webView.setWebChromeClient(new WebChromeClient());
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setPluginState(WebSettings.PluginState.ON);
+        webSettings.getJavaScriptCanOpenWindowsAutomatically();
         webSettings.setBuiltInZoomControls(false);
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
@@ -49,6 +52,13 @@ public class WebViewUtils {
         initWebView(webView);
         webView.addJavascriptInterface(new ImageHandler(activity), "ImageHandler");
         webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                super.onPageStarted(view, url, favicon);
+                WebViewUtils.this.onPageStarted();
+                hasError = false;
+            }
+
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
@@ -93,6 +103,9 @@ public class WebViewUtils {
 
     protected void onLoadFinished() {
         webView.setVisibility(View.VISIBLE);
+    }
+
+    protected void onPageStarted() {
     }
 
     protected void onNetworkError() {
@@ -143,10 +156,9 @@ public class WebViewUtils {
                 CommonUtils.getStringFromAsset(context, "TestpressImageTagHandler.js");
     }
 
-    public String getHeader() {
+    public String getBaseHeader() {
         return "<!DOCTYPE html><meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no' />" +
-                "<link rel='stylesheet' type='text/css' href='testpress_questions_typebase.css' />" +
-                "<link rel='stylesheet' type='text/css' href='icomoon/style.css' />" +
+                "<link rel='stylesheet' type='text/css' href='testpress_typebase.css' />" +
                 "<style>img{display: inline; height: auto !important; width: auto !important; max-width: 100%;}</style>" +
                 "<script type='text/x-mathjax-config'>" +
                 "    MathJax.Hub.Config({" +
@@ -165,6 +177,16 @@ public class WebViewUtils {
                 "</script>" +
                 "<script src='MathJax-2.7.1/config/TeX-MML-AM_CHTML-full.js'></script>" +
                 "<script src='MathJax-2.7.1/extensions/TeX/mhchem3/mhchem.js'></script>";
+    }
+
+    public String getHeader() {
+        return getBaseHeader();
+    }
+
+    public String getQuestionsHeader() {
+        return getBaseHeader() +
+                "<link rel='stylesheet' type='text/css' href='testpress_questions_typebase.css' />" +
+                "<link rel='stylesheet' type='text/css' href='icomoon/style.css' />";
     }
 
     public static String getHeadingTags(String headingText) {

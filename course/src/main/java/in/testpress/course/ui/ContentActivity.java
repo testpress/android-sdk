@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,11 +17,7 @@ import android.text.Html;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -74,8 +69,8 @@ import in.testpress.ui.ZoomableImageActivity;
 import in.testpress.ui.view.ClosableSpinner;
 import in.testpress.util.FormatDate;
 import in.testpress.util.FullScreenChromeClient;
-import in.testpress.util.InternetConnectivityChecker;
 import in.testpress.util.ViewUtils;
+import in.testpress.util.WebViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
@@ -114,14 +109,12 @@ public class ContentActivity extends BaseToolBarActivity {
     private LinearLayout titleLayout;
     private Button previousButton;
     private Button nextButton;
-    private boolean hasError = false;
     private List<Content> contents;
     private Content content;
     private String contentId;
     private String attemptsUrl;
     private List<CourseAttempt> courseAttempts = new ArrayList<>();
     private int position;
-    private FullScreenChromeClient mWebChromeClient;
     private ContentDao contentDao;
     private HtmlContentDao htmlContentDao;
     private CourseAttemptDao courseAttemptDao;
@@ -141,6 +134,8 @@ public class ContentActivity extends BaseToolBarActivity {
     private ArrayList<BookmarkFolder> bookmarkFolders = new ArrayList<>();
     private ClosableSpinner bookmarkFolderSpinner;
     private FolderSpinnerAdapter folderSpinnerAdapter;
+    private WebViewUtils webViewUtils;
+    private FullScreenChromeClient fullScreenChromeClient;
 
     public static Intent createIntent(int position, long chapterId, AppCompatActivity activity) {
         Intent intent = new Intent(activity, ContentActivity.class);
@@ -241,16 +236,6 @@ public class ContentActivity extends BaseToolBarActivity {
         animationView.playAnimation();
         examApiClient = new TestpressExamApiClient(this);
         courseApiClient = new TestpressCourseApiClient(this);
-        mWebChromeClient = new FullScreenChromeClient(this);
-        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
-        webView.setWebChromeClient(mWebChromeClient);
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setPluginState(WebSettings.PluginState.ON);
-        webSettings.getJavaScriptCanOpenWindowsAutomatically();
-        webSettings.setBuiltInZoomControls(false);
-        webSettings.setUseWideViewPort(true);
-        webSettings.setLoadWithOverviewMode(true);
         swipeRefresh.setColorSchemeResources(R.color.testpress_color_primary);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -258,58 +243,30 @@ public class ContentActivity extends BaseToolBarActivity {
                 updateContent();
             }
         });
-        webView.addJavascriptInterface(new ImageHandler(), "ImageHandler");
-        webView.setWebViewClient(new WebViewClient() {
+        webViewUtils = new WebViewUtils(webView) {
             @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                super.onPageStarted(view, url, favicon);
-                swipeRefresh.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        swipeRefresh.setRefreshing(true);
-                    }
-                });
-                hasError = false;
+            protected void onPageStarted() {
+                super.onPageStarted();
+                swipeRefresh.setRefreshing(true);
                 emptyContainer.setVisibility(View.GONE);
                 swipeRefresh.setVisibility(View.VISIBLE);
             }
 
             @Override
-            public void onPageFinished(WebView view, String url) {
+            protected void onLoadFinished() {
+                super.onLoadFinished();
                 swipeRefresh.setRefreshing(false);
-                super.onPageFinished(view, url);
-                if(!hasError) {
-                    String javascript = "" +
-                            "javascript:" +
-                            "var images = document.getElementsByTagName('img');" +
-                            "for (i = 0; i < images.length; i++) {" +
-                            "   images[i].onclick = (" +
-                            "       function() {" +
-                            "           var src = images[i].src;" +
-                            "           return function() {" +
-                            "               ImageHandler.onClickImage(src);" +
-                            "           }" +
-                            "       }" +
-                            "   )();" +
-                            "}";
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                        webView.evaluateJavascript(javascript, null);
-                    } else {
-                        webView.loadUrl(javascript, null);
-                    }
-                    webView.setVisibility(View.VISIBLE);
-                    createContentAttempt();
-                }
+                webView.setVisibility(View.VISIBLE);
+                createContentAttempt();
             }
 
             @Override
-            public void onReceivedError(WebView view, WebResourceRequest request,
-                                        WebResourceError error) {
+            public String getHeader() {
+                return super.getHeader() + getBookmarkHandlerScript();
+            }
 
-                super.onReceivedError(view, request, error);
-                if (InternetConnectivityChecker.isConnected(ContentActivity.this)) {
-                    return;
-                }
+            @Override
+            protected void onNetworkError() {
                 setEmptyText(R.string.testpress_network_error,
                         R.string.testpress_no_internet_try_again,
                         R.drawable.ic_error_outline_black_18dp);
@@ -320,18 +277,10 @@ public class ContentActivity extends BaseToolBarActivity {
                         updateContent();
                     }
                 });
-                hasError = true;
             }
-
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(intent);
-                return true;
-            }
-
-        });
-
+        };
+        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+        fullScreenChromeClient = new FullScreenChromeClient(this);
         chapterId = getIntent().getLongExtra(CHAPTER_ID, 0);
         if (chapterId != 0) {
             contents = getContentsFromDB();
@@ -366,9 +315,11 @@ public class ContentActivity extends BaseToolBarActivity {
         } else if (content.getRawVideo() != null) {
             Video video = content.getRawVideo();
             setContentTitle(video.getTitle());
-            webView.loadDataWithBaseURL("file:///android_asset/", getHeader() +
-                    "<div class='videoWrapper'>" + video.getEmbedCode() + "</div>",
-                    "text/html", "UTF-8", null);
+            String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
+                    "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
+
+            webViewUtils.initWebView(html, this);
+            webView.setWebChromeClient(fullScreenChromeClient);
         } else if (content.getRawExam() != null) {
             onExamContent();
         } else if (content.getRawAttachment() != null) {
@@ -419,8 +370,9 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     void displayHtmlContent(HtmlContent htmlContent) {
-        webView.loadDataWithBaseURL("file:///android_asset/", getHeader() +
-                htmlContent.getTextHtml(), "text/html", "UTF-8", null);
+        String html = "<div style='padding-left: 20px; padding-right: 20px;'>" +
+                htmlContent.getTextHtml() + "</div>";
+        webViewUtils.initWebView(html, this);
     }
 
     private void displayAttachmentContent() {
@@ -798,14 +750,6 @@ public class ContentActivity extends BaseToolBarActivity {
                 .orderAsc(ContentDao.Properties.Order).list();
     }
 
-    String getHeader() {
-        return "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\" />" +
-                "<link rel=\"stylesheet\" type=\"text/css\" href=\"testpress_typebase.css\" />" +
-                "<style>" +
-                "   img{display: inline; height: auto !important; width: auto !important; max-width: 100%;}" +
-                "</style>";
-    }
-
     private void startCourseExam(boolean discardExamDetails, boolean isPartial) {
         //noinspection ConstantConditions
         TestpressExam.startCourseExam(this, content, discardExamDetails, isPartial,
@@ -1016,7 +960,6 @@ public class ContentActivity extends BaseToolBarActivity {
         emptyTitleView.setText(title);
         emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0);
         emptyDescView.setText(description);
-        hasError = true;
         swipeRefresh.setRefreshing(false);
         swipeRefresh.setVisibility(View.GONE);
         retryButton.setVisibility(View.VISIBLE);
@@ -1107,15 +1050,6 @@ public class ContentActivity extends BaseToolBarActivity {
         } else {
             Snackbar.make(mContentView, R.string.testpress_network_error,
                     Snackbar.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (mWebChromeClient.isFullScreen()) {
-            mWebChromeClient.onHideCustomView();
-        } else {
-            super.onBackPressed();
         }
     }
 

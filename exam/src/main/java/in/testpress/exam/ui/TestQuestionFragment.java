@@ -69,7 +69,7 @@ public class TestQuestionFragment extends Fragment {
             webViewUtils = new WebViewUtils(questionsView) {
                 @Override
                 public String getHeader() {
-                    return super.getHeader() + getTestEngineHeader();
+                    return getQuestionsHeader() + getTestEngineHeader();
                 }
 
                 @Override

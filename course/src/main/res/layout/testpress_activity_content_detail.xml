@@ -27,14 +27,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:paddingTop="20dp"
-                android:paddingRight="10dp"
-                android:paddingLeft="10dp"
                 tools:ignore="ScrollViewSize">
 
                 <LinearLayout
                     android:visibility="gone"
                     android:id="@+id/title_layout"
                     android:orientation="vertical"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -121,6 +121,8 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:paddingRight="20dp"
+                    android:paddingLeft="20dp"
                     android:visibility="gone"
                     android:id="@+id/exam_content_layout"
                     android:orientation="vertical"
@@ -178,6 +180,7 @@
 
                     <android.support.v7.widget.AppCompatButton
                         android:id="@+id/download_attachment"
+                        android:layout_gravity="center"
                         style="@style/TestpressSmallButton"
                         android:text="@string/testpress_download_attachment" />
 
@@ -198,6 +201,8 @@
                     android:textColor="@android:color/white"
                     android:layout_width="match_parent"
                     android:layout_height="37dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginBottom="20dp"
                     android:layout_marginTop="20dp" />
 
