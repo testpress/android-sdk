@@ -160,27 +160,27 @@ p {
 }
 
 .mark-button {
-     color: #ffa31a;
-     border: 1px solid #ffa319;
-     border-radius: 100px;
-     height: 40px;
-     width: 100%;
-     font-size: 16px;
-     font-family: "Rubik-Medium";
-     background: #ffffff;
-     outline: 0;
+    color: #ffffff;
+    border: 0px;
+    border-radius: 100px;
+    height: 40px;
+    width: 100%;
+    font-size: 16px;
+    font-family: "Rubik-Medium";
+    background: #ffa319;
+    outline: 0;
  }
 
  .unmark-button {
-     color: #ffffff;
-     border: 0px;
-     border-radius: 100px;
-     height: 40px;
-     width: 100%;
-     font-size: 16px;
-     font-family: "Rubik-Medium";
-     background: #ffa319;
-     outline: 0;
+    color: #ffa31a;
+    border: 1px solid #ffa319;
+    border-radius: 100px;
+    height: 40px;
+    width: 100%;
+    font-size: 16px;
+    font-family: "Rubik-Medium";
+    background: #ffffff;
+    outline: 0;
  }
 
 .option-item-selected {
@@ -332,4 +332,55 @@ span {
     width: 12px;
     height: 14.2px;
     margin-right: 8px;
+}
+
+html, body {
+    height: 100%;
+}
+
+.question_container {
+    min-height: 100%;
+    /* equal to review_later_button_layout height */
+    margin-bottom: -60px;
+}
+
+.question_container:after {
+    content: "";
+    display: block;
+}
+
+.review_later_button_layout, .question_container:after {
+    height: 60px;
+}
+
+.review_later_button_layout {
+    padding-left: 60px;
+    padding-right: 60px;
+}
+
+::placeholder {
+    color: #cccccc;
+    font-size: 12px;
+}
+
+input:focus {
+    outline: none !important;
+    border-color: #dddddd;
+    box-shadow: 0 0 10px #cccccc;
+}
+
+.edit_box {
+    font-family: 'Rubik-Regular', serif;
+    display: block;
+    font-size: 14px;
+    line-height: 20px;
+    border: solid 1px #cccccc;
+    padding: 10px;
+    min-height: 20px;
+    margin: 20px;
+    border-radius: 5px;
+    vertical-align: middle;
+    word-wrap: break-word;
+    -webkit-user-select: text;
+    user-select: text;
 }

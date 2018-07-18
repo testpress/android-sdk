@@ -19,6 +19,8 @@ public class AttemptItem implements Parcelable {
     private List<Integer> savedAnswers = new ArrayList<Integer>();
     private Integer index;
     private Boolean currentReview;
+    private String shortText;
+    private String currentShortText;
 
     AttemptItem() {
         selectedAnswers = new ArrayList<Integer>();
@@ -35,6 +37,8 @@ public class AttemptItem implements Parcelable {
         parcel.readList(savedAnswers, List.class.getClassLoader());
         review = parcel.readByte() != 0;
         currentReview = parcel.readByte() != 0;
+        shortText = parcel.readString();
+        currentShortText = parcel.readString();
     }
 
     @Override
@@ -50,6 +54,8 @@ public class AttemptItem implements Parcelable {
         parcel.writeList(savedAnswers);
         parcel.writeByte(CommonUtils.getByteFromBoolean(review));
         parcel.writeByte(CommonUtils.getByteFromBoolean(currentReview));
+        parcel.writeString(shortText);
+        parcel.writeString(currentShortText);
     }
 
     public static final Creator CREATOR = new Creator() {
@@ -71,7 +77,9 @@ public class AttemptItem implements Parcelable {
     }
 
     public Boolean hasChanged() {
-        return !savedAnswers.equals(selectedAnswers) || !getCurrentReview().equals(getReview());
+        return !savedAnswers.equals(selectedAnswers) || !getCurrentReview().equals(getReview())
+                || (shortText != null && !shortText.equals(currentShortText)) ||
+                (shortText == null && currentShortText != null && !currentShortText.isEmpty());
     }
 
     /**
@@ -181,4 +189,19 @@ public class AttemptItem implements Parcelable {
         return Boolean.TRUE.equals(currentReview);
     }
 
+    public String getShortText() {
+        return shortText;
+    }
+
+    public void setShortText(String shortText) {
+        this.shortText = shortText;
+    }
+
+    public String getCurrentShortText() {
+        return currentShortText;
+    }
+
+    public void setCurrentShortText(String currentShortText) {
+        this.currentShortText = currentShortText;
+    }
 }

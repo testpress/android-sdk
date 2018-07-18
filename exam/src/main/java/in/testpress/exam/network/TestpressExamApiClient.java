@@ -158,9 +158,10 @@ public class TestpressExamApiClient extends TestpressApiClient {
     }
 
     public RetrofitCall<AttemptItem> postAnswer(String answerUrlFrag, List<Integer> savedAnswers,
-                                                Boolean review) {
+                                                String shortAnswer, Boolean review) {
         HashMap<String, Object> answer = new HashMap<String, Object>();
         answer.put("selected_answers", savedAnswers);
+        answer.put("short_text", shortAnswer);
         answer.put("review", review);
         return getExamService().postAnswer(answerUrlFrag, answer);
     }

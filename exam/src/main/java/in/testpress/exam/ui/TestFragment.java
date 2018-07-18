@@ -667,7 +667,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 showProgress(R.string.testpress_saving_last_change);
             }
             apiClient.postAnswer(attemptItem.getUrlFrag(), attemptItem.getSavedAnswers(),
-                    attemptItem.getCurrentReview())
+                    attemptItem.getCurrentShortText(), attemptItem.getCurrentReview())
                     .enqueue(new TestpressCallback<AttemptItem>() {
                         @Override
                         public void onSuccess(AttemptItem newAttemptItem) {
@@ -675,6 +675,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                                 return;
                             }
                             attemptItem.setSelectedAnswers(newAttemptItem.getSelectedAnswers());
+                            attemptItem.setShortText(newAttemptItem.getShortText());
                             attemptItem.setReview(newAttemptItem.getReview());
                             attemptItemList.set(position, attemptItem);
                             if (action.equals(Action.PAUSE)) {
@@ -986,18 +987,22 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         List<AttemptItem> unansweredItems = new ArrayList<>();
         List<AttemptItem> markedItems = new ArrayList<>();
         for(int i = 0; i< attemptItemList.size(); i++) {
+            AttemptItem attemptItem = attemptItemList.get(i);
             try {
-                if (attemptItemList.get(i).getReview() || attemptItemList.get(i).getCurrentReview()) {
-                    markedItems.add(attemptItemList.get(i));
+                if (attemptItem.getReview() || attemptItem.getCurrentReview()) {
+                    markedItems.add(attemptItem);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if(!attemptItemList.get(i).getSelectedAnswers().isEmpty() ||
-                    !attemptItemList.get(i).getSavedAnswers().isEmpty()) {
-                answeredItems.add(attemptItemList.get(i));
+            if(!attemptItem.getSelectedAnswers().isEmpty() || !attemptItem.getSavedAnswers().isEmpty()
+                    || (attemptItem.getShortText() != null && !attemptItem.getShortText().isEmpty())
+                    || (attemptItem.getCurrentShortText() != null
+                        && !attemptItem.getCurrentShortText().isEmpty())) {
+
+                answeredItems.add(attemptItem);
             } else {
-                unansweredItems.add(attemptItemList.get(i));
+                unansweredItems.add(attemptItem);
             }
         }
         switch (type) {

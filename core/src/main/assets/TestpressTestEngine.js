@@ -91,6 +91,10 @@ function setCheckboxState(option, check) {
     }
 }
 
+function onValueChange(element) {
+   OptionsSelectionListener.onTextValueChange(element.value)
+}
+
 // Common functions
 
 function getWidget(layout) {

@@ -52,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:gravity="center"
-            android:background="#d9534f"
+            android:background="#ffa31a"
             android:typeface="normal"
             android:textColor="#ffffff"
             android:textStyle="bold" />

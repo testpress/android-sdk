@@ -55,7 +55,10 @@ class TestPanelListAdapter extends SingleTypeAdapter<AttemptItem> {
             updater.view.findViewById(R.id.marked_question).setVisibility(View.VISIBLE);
             setNumber(3, item.getIndex());
             setText(1, question.trim());
-        } else if(!item.getSelectedAnswers().isEmpty() || !item.getSavedAnswers().isEmpty()) {
+        } else if(!item.getSelectedAnswers().isEmpty() || !item.getSavedAnswers().isEmpty()
+                || (item.getShortText() != null && !item.getShortText().isEmpty())
+                || (item.getCurrentShortText() != null && !item.getCurrentShortText().isEmpty())) {
+
             // Answered question
             updater.view.findViewById(R.id.marked_question).setVisibility(View.GONE);
             updater.view.findViewById(R.id.answered_question).setVisibility(View.VISIBLE);

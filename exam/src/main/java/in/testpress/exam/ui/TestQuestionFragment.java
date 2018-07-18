@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +16,7 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptAnswer;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.AttemptQuestion;
+import in.testpress.exam.ui.view.WebView;
 import in.testpress.models.greendao.Language;
 import in.testpress.util.WebViewUtils;
 
@@ -65,6 +65,7 @@ public class TestQuestionFragment extends Fragment {
                     "OptionsSelectionListener");
 
             attemptItem.saveAnswers(attemptItem.getSelectedAnswers());
+            attemptItem.setCurrentShortText(attemptItem.getShortText());
             attemptItem.setCurrentReview(attemptItem.getReview());
             webViewUtils = new WebViewUtils(questionsView) {
                 @Override
@@ -103,7 +104,7 @@ public class TestQuestionFragment extends Fragment {
                 }
             }
         }
-        String htmlContent = "<div>";
+        String htmlContent = "<div class='question_container'>";
 
         // Add index
         htmlContent += "<div style='padding-right:10px; padding-left:10px;'>" +
@@ -121,28 +122,37 @@ public class TestQuestionFragment extends Fragment {
                 "<div class='question' style='padding-bottom: 10px;'>" +
                     attemptQuestion.getQuestionHtml() +
                 "</div></div>";
-        // Add options
-        htmlContent += "<hr><table width='100%' style='margin-top:0px; margin-bottom:20px;'>";
-        for (int i = 0; i < attemptQuestion.getAttemptAnswers().size(); i++) {
-            AttemptAnswer attemptAnswer = attemptQuestion.getAttemptAnswers().get(i);
-            if (attemptItem.getAttemptQuestion().getType().equals("R")) {
-                htmlContent += "\n" + WebViewUtils.getRadioButtonOptionWithTags(
-                        attemptAnswer.getTextHtml(), attemptAnswer.getId());
-            } else {
-                htmlContent += "\n" + WebViewUtils.getCheckBoxOptionWithTags(
-                        attemptAnswer.getTextHtml(), attemptAnswer.getId());
-            }
-        }
-        htmlContent += "</table>";
 
+        if (attemptQuestion.getType().equals("R") || attemptQuestion.getType().equals("C")) {
+            // Add options
+            htmlContent += "<hr><table width='100%' style='margin-top:0px; margin-bottom:20px;'>";
+            for (int i = 0; i < attemptQuestion.getAttemptAnswers().size(); i++) {
+                AttemptAnswer attemptAnswer = attemptQuestion.getAttemptAnswers().get(i);
+                if (attemptItem.getAttemptQuestion().getType().equals("R")) {
+                    htmlContent += "\n" + WebViewUtils.getRadioButtonOptionWithTags(
+                            attemptAnswer.getTextHtml(), attemptAnswer.getId());
+                } else {
+                    htmlContent += "\n" + WebViewUtils.getCheckBoxOptionWithTags(
+                            attemptAnswer.getTextHtml(), attemptAnswer.getId());
+                }
+            }
+            htmlContent += "</table>";
+        } else {
+            boolean numberType = attemptQuestion.getType().equals("N");
+            questionsView.setNumberType(numberType);
+            String value = attemptItem.getCurrentShortText() != null ? attemptItem.getCurrentShortText() : "";
+            htmlContent += "<input class='edit_box' type='text' onpaste='return false'" +
+                    "value='" + value + "' oninput='onValueChange(this)' placeholder='YOUR ANSWER'>";
+        }
+        htmlContent += "</div>";
         // Add review later button
-        htmlContent += "<div style='padding-left:60px; padding-right:60px; padding-bottom:20px;'>" +
+        htmlContent += "<div class='review_later_button_layout'>" +
                 "<button class='" + (attemptItem.getCurrentReview() ? "mark-button'" : "unmark-button'") +
                     "onClick='reviewButtonClick(this)' >" +
                         (attemptItem.getCurrentReview() ? "MARKED" : "MARK FOR LATER") +
-                "</button>";
+                "</button></div>";
 
-        return htmlContent + "</div>";
+        return htmlContent;
     }
 
     private class OptionsSelectionListener {
@@ -163,6 +173,11 @@ public class TestQuestionFragment extends Fragment {
         @JavascriptInterface
         public void onMarkStateChange() {
             attemptItem.setCurrentReview(!attemptItem.getCurrentReview());
+        }
+
+        @JavascriptInterface
+        public void onTextValueChange(String value) {
+            attemptItem.setCurrentShortText(value.trim());
         }
     }
 
