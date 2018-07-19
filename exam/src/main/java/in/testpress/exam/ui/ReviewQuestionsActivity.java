@@ -57,6 +57,10 @@ import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 
+import static in.testpress.models.greendao.ReviewItem.ANSWERED_CORRECT;
+import static in.testpress.models.greendao.ReviewItem.ANSWERED_INCORRECT;
+import static in.testpress.models.greendao.ReviewItem.UNANSWERED;
+
 public class ReviewQuestionsActivity extends BaseToolBarActivity {
 
     static final String PARAM_ATTEMPT = "attempt";
@@ -422,27 +426,23 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
             case FILTER_CORRECT:
                 queryBuilder = reviewItemDao.queryBuilder().where(
                         ReviewItemDao.Properties.AttemptId.eq(reviewAttempt.getId()),
-                        new WhereCondition.StringCondition("" +
-                                " T.QUESTION_ID IN (SELECT QUESTION_ID FROM REVIEW_ANSWER A" +
-                                " INNER JOIN SELECTED_ANSWER S ON T.ID = S.REVIEW_ITEM_ID" +
-                                " WHERE A.IS_CORRECT = 1" +
-                                "   AND S.ANSWER_ID = A.ID)")
+                        ReviewItemDao.Properties.Result.eq(ANSWERED_CORRECT)
                 );
                 break;
             case FILTER_INCORRECT:
                 queryBuilder = reviewItemDao.queryBuilder().where(
                         ReviewItemDao.Properties.AttemptId.eq(reviewAttempt.getId()),
-                        new WhereCondition.StringCondition("" +
-                                " T.QUESTION_ID IN (SELECT QUESTION_ID FROM REVIEW_ANSWER A" +
-                                " INNER JOIN SELECTED_ANSWER S ON T.ID = S.REVIEW_ITEM_ID" +
-                                " WHERE A.IS_CORRECT = 0" +
-                                "   AND S.ANSWER_ID = A.ID)")
+                        ReviewItemDao.Properties.Result.eq(ANSWERED_INCORRECT)
                 );
                 break;
+
             case FILTER_UNANSWERED:
-                queryBuilder = reviewItemDao.queryBuilder().where(
-                        ReviewItemDao.Properties.AttemptId.eq(reviewAttempt.getId()),
-                        ReviewItemDao.Properties.SelectedAnswers.eq(""));
+                queryBuilder = reviewItemDao.queryBuilder()
+                        .where(ReviewItemDao.Properties.AttemptId.eq(reviewAttempt.getId()));
+
+                queryBuilder.where(queryBuilder.or(ReviewItemDao.Properties.Result.isNull(),
+                                ReviewItemDao.Properties.Result.eq(UNANSWERED)));
+
                 break;
             case FILTER_MARKED:
                 queryBuilder = reviewItemDao.queryBuilder().where(

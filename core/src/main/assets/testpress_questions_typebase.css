@@ -384,3 +384,13 @@ input:focus {
     -webkit-user-select: text;
     user-select: text;
 }
+
+.short_answer_option_item {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 10px;
+    padding-left: 10px;
+    color: #666666;
+    text-align: left;
+    font-family: 'PT-Serif-Regular', serif;
+}

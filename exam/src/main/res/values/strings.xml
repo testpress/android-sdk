@@ -118,7 +118,9 @@
     <string name="testpress_time_taken">Time Taken</string>
     <string name="testpress_speed">Speed</string>
     <string name="testpress_accuracy">Accuracy</string>
+    <string name="testpress_your_answer">Your Answer:</string>
     <string name="testpress_correct_answer">Correct Answer:</string>
+    <string name="testpress_marks_awarded">Marks Awarded:</string>
     <string name="testpress_explanation">Explanation:</string>
     <string name="testpress_subject">Subject:</string>
     <string name="testpress_review_label">Review</string>

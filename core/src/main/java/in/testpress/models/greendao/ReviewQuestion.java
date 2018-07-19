@@ -25,6 +25,7 @@ public class ReviewQuestion {
     private String direction;
     private String subject;
     private String explanationHtml;
+    private String type;
     private String commentsUrl;
     private String language;
     private Float percentageGotCorrect;
@@ -67,12 +68,13 @@ public class ReviewQuestion {
     }
 
     @Generated
-    public ReviewQuestion(Long id, String questionHtml, String direction, String subject, String explanationHtml, String commentsUrl, String language, Float percentageGotCorrect, Long directionId, Long subjectId, IntegerList answerIds, IntegerList translationIds) {
+    public ReviewQuestion(Long id, String questionHtml, String direction, String subject, String explanationHtml, String type, String commentsUrl, String language, Float percentageGotCorrect, Long directionId, Long subjectId, IntegerList answerIds, IntegerList translationIds) {
         this.id = id;
         this.questionHtml = questionHtml;
         this.direction = direction;
         this.subject = subject;
         this.explanationHtml = explanationHtml;
+        this.type = type;
         this.commentsUrl = commentsUrl;
         this.language = language;
         this.percentageGotCorrect = percentageGotCorrect;
@@ -127,6 +129,14 @@ public class ReviewQuestion {
 
     public void setExplanationHtml(String explanationHtml) {
         this.explanationHtml = explanationHtml;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getCommentsUrl() {

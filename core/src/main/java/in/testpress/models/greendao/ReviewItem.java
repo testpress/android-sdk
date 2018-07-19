@@ -44,6 +44,9 @@ public class ReviewItem {
     private Integer commentsCount;
     private Integer correctPercentage;
     private Long bookmarkId;
+    private String marks;
+    private String shortText;
+    private String result;
     private Long attemptId;
     private Long questionId;
 
@@ -62,6 +65,9 @@ public class ReviewItem {
     private transient Long question__resolvedKey;
 
     // KEEP FIELDS - put your custom fields here
+    public static final String ANSWERED_CORRECT = "Correct";
+    public static final String ANSWERED_INCORRECT = "Incorrect";
+    public static final String UNANSWERED = "Unanswered";
     // KEEP FIELDS END
 
     @Generated
@@ -73,7 +79,7 @@ public class ReviewItem {
     }
 
     @Generated
-    public ReviewItem(Long id, Integer index, String url, Integer order, String duration, String bestDuration, String averageDuration, String essayText, String essayTopic, IntegerList selectedAnswers, Boolean review, Integer commentsCount, Integer correctPercentage, Long bookmarkId, Long attemptId, Long questionId) {
+    public ReviewItem(Long id, Integer index, String url, Integer order, String duration, String bestDuration, String averageDuration, String essayText, String essayTopic, IntegerList selectedAnswers, Boolean review, Integer commentsCount, Integer correctPercentage, Long bookmarkId, String marks, String shortText, String result, Long attemptId, Long questionId) {
         this.id = id;
         this.index = index;
         this.url = url;
@@ -88,6 +94,9 @@ public class ReviewItem {
         this.commentsCount = commentsCount;
         this.correctPercentage = correctPercentage;
         this.bookmarkId = bookmarkId;
+        this.marks = marks;
+        this.shortText = shortText;
+        this.result = result;
         this.attemptId = attemptId;
         this.questionId = questionId;
     }
@@ -209,6 +218,30 @@ public class ReviewItem {
 
     public void setBookmarkId(Long bookmarkId) {
         this.bookmarkId = bookmarkId;
+    }
+
+    public String getMarks() {
+        return marks;
+    }
+
+    public void setMarks(String marks) {
+        this.marks = marks;
+    }
+
+    public String getShortText() {
+        return shortText;
+    }
+
+    public void setShortText(String shortText) {
+        this.shortText = shortText;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 
     public Long getAttemptId() {

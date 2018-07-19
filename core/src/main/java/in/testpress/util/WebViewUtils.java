@@ -239,6 +239,22 @@ public class WebViewUtils {
                 "</tr>";
     }
 
+    public static String getShortAnswerHeadersWithTags() {
+        return "" +
+                "<tr>" +
+                "   <th class='short_answer_option_item table-without-border'>Answers</th>" +
+                "   <th class='short_answer_option_item table-without-border'>Marks</th>" +
+                "</tr>";
+    }
+
+    public static String getShortAnswersWithTags(String shortAnswerText, String marksAllocated) {
+        return "" +
+                "<tr>" +
+                "   <td class='short_answer_option_item table-without-border'>" + shortAnswerText + "</td>" +
+                "   <td class='short_answer_option_item table-without-border'>" + marksAllocated + "%</td>" +
+                "</tr>";
+    }
+
     public static String appendImageTags(String imageUrl) {
         return "<img src=\"" + imageUrl + "\">";
     }

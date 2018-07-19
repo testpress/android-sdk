@@ -15,6 +15,7 @@ public class ReviewAnswerTranslation {
     private Long id;
     private String textHtml;
     private Boolean isCorrect;
+    private String marks;
     private Long questionTranslationId;
 
     // KEEP FIELDS - put your custom fields here
@@ -25,10 +26,11 @@ public class ReviewAnswerTranslation {
     }
 
     @Generated
-    public ReviewAnswerTranslation(Long id, String textHtml, Boolean isCorrect, Long questionTranslationId) {
+    public ReviewAnswerTranslation(Long id, String textHtml, Boolean isCorrect, String marks, Long questionTranslationId) {
         this.id = id;
         this.textHtml = textHtml;
         this.isCorrect = isCorrect;
+        this.marks = marks;
         this.questionTranslationId = questionTranslationId;
     }
 
@@ -54,6 +56,14 @@ public class ReviewAnswerTranslation {
 
     public void setIsCorrect(Boolean isCorrect) {
         this.isCorrect = isCorrect;
+    }
+
+    public String getMarks() {
+        return marks;
+    }
+
+    public void setMarks(String marks) {
+        this.marks = marks;
     }
 
     public Long getQuestionTranslationId() {

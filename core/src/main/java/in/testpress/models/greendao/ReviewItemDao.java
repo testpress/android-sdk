@@ -44,8 +44,11 @@ public class ReviewItemDao extends AbstractDao<ReviewItem, Long> {
         public final static Property CommentsCount = new Property(11, Integer.class, "commentsCount", false, "COMMENTS_COUNT");
         public final static Property CorrectPercentage = new Property(12, Integer.class, "correctPercentage", false, "CORRECT_PERCENTAGE");
         public final static Property BookmarkId = new Property(13, Long.class, "bookmarkId", false, "BOOKMARK_ID");
-        public final static Property AttemptId = new Property(14, Long.class, "attemptId", false, "ATTEMPT_ID");
-        public final static Property QuestionId = new Property(15, Long.class, "questionId", false, "QUESTION_ID");
+        public final static Property Marks = new Property(14, String.class, "marks", false, "MARKS");
+        public final static Property ShortText = new Property(15, String.class, "shortText", false, "SHORT_TEXT");
+        public final static Property Result = new Property(16, String.class, "result", false, "RESULT");
+        public final static Property AttemptId = new Property(17, Long.class, "attemptId", false, "ATTEMPT_ID");
+        public final static Property QuestionId = new Property(18, Long.class, "questionId", false, "QUESTION_ID");
     }
 
     private DaoSession daoSession;
@@ -80,8 +83,11 @@ public class ReviewItemDao extends AbstractDao<ReviewItem, Long> {
                 "\"COMMENTS_COUNT\" INTEGER," + // 11: commentsCount
                 "\"CORRECT_PERCENTAGE\" INTEGER," + // 12: correctPercentage
                 "\"BOOKMARK_ID\" INTEGER," + // 13: bookmarkId
-                "\"ATTEMPT_ID\" INTEGER," + // 14: attemptId
-                "\"QUESTION_ID\" INTEGER);"); // 15: questionId
+                "\"MARKS\" TEXT," + // 14: marks
+                "\"SHORT_TEXT\" TEXT," + // 15: shortText
+                "\"RESULT\" TEXT," + // 16: result
+                "\"ATTEMPT_ID\" INTEGER," + // 17: attemptId
+                "\"QUESTION_ID\" INTEGER);"); // 18: questionId
     }
 
     /** Drops the underlying database table. */
@@ -164,14 +170,29 @@ public class ReviewItemDao extends AbstractDao<ReviewItem, Long> {
             stmt.bindLong(14, bookmarkId);
         }
  
+        String marks = entity.getMarks();
+        if (marks != null) {
+            stmt.bindString(15, marks);
+        }
+ 
+        String shortText = entity.getShortText();
+        if (shortText != null) {
+            stmt.bindString(16, shortText);
+        }
+ 
+        String result = entity.getResult();
+        if (result != null) {
+            stmt.bindString(17, result);
+        }
+ 
         Long attemptId = entity.getAttemptId();
         if (attemptId != null) {
-            stmt.bindLong(15, attemptId);
+            stmt.bindLong(18, attemptId);
         }
  
         Long questionId = entity.getQuestionId();
         if (questionId != null) {
-            stmt.bindLong(16, questionId);
+            stmt.bindLong(19, questionId);
         }
     }
 
@@ -249,14 +270,29 @@ public class ReviewItemDao extends AbstractDao<ReviewItem, Long> {
             stmt.bindLong(14, bookmarkId);
         }
  
+        String marks = entity.getMarks();
+        if (marks != null) {
+            stmt.bindString(15, marks);
+        }
+ 
+        String shortText = entity.getShortText();
+        if (shortText != null) {
+            stmt.bindString(16, shortText);
+        }
+ 
+        String result = entity.getResult();
+        if (result != null) {
+            stmt.bindString(17, result);
+        }
+ 
         Long attemptId = entity.getAttemptId();
         if (attemptId != null) {
-            stmt.bindLong(15, attemptId);
+            stmt.bindLong(18, attemptId);
         }
  
         Long questionId = entity.getQuestionId();
         if (questionId != null) {
-            stmt.bindLong(16, questionId);
+            stmt.bindLong(19, questionId);
         }
     }
 
@@ -288,8 +324,11 @@ public class ReviewItemDao extends AbstractDao<ReviewItem, Long> {
             cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11), // commentsCount
             cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12), // correctPercentage
             cursor.isNull(offset + 13) ? null : cursor.getLong(offset + 13), // bookmarkId
-            cursor.isNull(offset + 14) ? null : cursor.getLong(offset + 14), // attemptId
-            cursor.isNull(offset + 15) ? null : cursor.getLong(offset + 15) // questionId
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // marks
+            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // shortText
+            cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16), // result
+            cursor.isNull(offset + 17) ? null : cursor.getLong(offset + 17), // attemptId
+            cursor.isNull(offset + 18) ? null : cursor.getLong(offset + 18) // questionId
         );
         return entity;
     }
@@ -310,8 +349,11 @@ public class ReviewItemDao extends AbstractDao<ReviewItem, Long> {
         entity.setCommentsCount(cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11));
         entity.setCorrectPercentage(cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12));
         entity.setBookmarkId(cursor.isNull(offset + 13) ? null : cursor.getLong(offset + 13));
-        entity.setAttemptId(cursor.isNull(offset + 14) ? null : cursor.getLong(offset + 14));
-        entity.setQuestionId(cursor.isNull(offset + 15) ? null : cursor.getLong(offset + 15));
+        entity.setMarks(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
+        entity.setShortText(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
+        entity.setResult(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
+        entity.setAttemptId(cursor.isNull(offset + 17) ? null : cursor.getLong(offset + 17));
+        entity.setQuestionId(cursor.isNull(offset + 18) ? null : cursor.getLong(offset + 18));
      }
     
     @Override

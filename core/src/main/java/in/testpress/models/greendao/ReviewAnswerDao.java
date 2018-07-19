@@ -28,7 +28,8 @@ public class ReviewAnswerDao extends AbstractDao<ReviewAnswer, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "ID");
         public final static Property TextHtml = new Property(1, String.class, "textHtml", false, "TEXT_HTML");
         public final static Property IsCorrect = new Property(2, Boolean.class, "isCorrect", false, "IS_CORRECT");
-        public final static Property QuestionId = new Property(3, Long.class, "questionId", false, "QUESTION_ID");
+        public final static Property Marks = new Property(3, String.class, "marks", false, "MARKS");
+        public final static Property QuestionId = new Property(4, Long.class, "questionId", false, "QUESTION_ID");
     }
 
     private Query<ReviewAnswer> reviewQuestion_AnswersQuery;
@@ -48,7 +49,8 @@ public class ReviewAnswerDao extends AbstractDao<ReviewAnswer, Long> {
                 "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"TEXT_HTML\" TEXT," + // 1: textHtml
                 "\"IS_CORRECT\" INTEGER," + // 2: isCorrect
-                "\"QUESTION_ID\" INTEGER);"); // 3: questionId
+                "\"MARKS\" TEXT," + // 3: marks
+                "\"QUESTION_ID\" INTEGER);"); // 4: questionId
     }
 
     /** Drops the underlying database table. */
@@ -76,9 +78,14 @@ public class ReviewAnswerDao extends AbstractDao<ReviewAnswer, Long> {
             stmt.bindLong(3, isCorrect ? 1L: 0L);
         }
  
+        String marks = entity.getMarks();
+        if (marks != null) {
+            stmt.bindString(4, marks);
+        }
+ 
         Long questionId = entity.getQuestionId();
         if (questionId != null) {
-            stmt.bindLong(4, questionId);
+            stmt.bindLong(5, questionId);
         }
     }
 
@@ -101,9 +108,14 @@ public class ReviewAnswerDao extends AbstractDao<ReviewAnswer, Long> {
             stmt.bindLong(3, isCorrect ? 1L: 0L);
         }
  
+        String marks = entity.getMarks();
+        if (marks != null) {
+            stmt.bindString(4, marks);
+        }
+ 
         Long questionId = entity.getQuestionId();
         if (questionId != null) {
-            stmt.bindLong(4, questionId);
+            stmt.bindLong(5, questionId);
         }
     }
 
@@ -118,7 +130,8 @@ public class ReviewAnswerDao extends AbstractDao<ReviewAnswer, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // textHtml
             cursor.isNull(offset + 2) ? null : cursor.getShort(offset + 2) != 0, // isCorrect
-            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3) // questionId
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // marks
+            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4) // questionId
         );
         return entity;
     }
@@ -128,7 +141,8 @@ public class ReviewAnswerDao extends AbstractDao<ReviewAnswer, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setTextHtml(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setIsCorrect(cursor.isNull(offset + 2) ? null : cursor.getShort(offset + 2) != 0);
-        entity.setQuestionId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
+        entity.setMarks(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setQuestionId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
      }
     
     @Override

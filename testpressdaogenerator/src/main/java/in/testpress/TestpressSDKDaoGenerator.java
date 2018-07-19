@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 15;
+    private static final int VERSION = 16;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -346,6 +346,9 @@ public class TestpressSDKDaoGenerator {
         reviewItem.addIntProperty("commentsCount");
         reviewItem.addIntProperty("correctPercentage");
         reviewItem.addLongProperty("bookmarkId");
+        reviewItem.addStringProperty("marks");
+        reviewItem.addStringProperty("shortText");
+        reviewItem.addStringProperty("result");
         return reviewItem;
     }
 
@@ -364,6 +367,7 @@ public class TestpressSDKDaoGenerator {
         reviewQuestion.addStringProperty("direction");
         reviewQuestion.addStringProperty("subject");
         reviewQuestion.addStringProperty("explanationHtml");
+        reviewQuestion.addStringProperty("type");
         reviewQuestion.addStringProperty("commentsUrl");
         reviewQuestion.addStringProperty("language");
         reviewQuestion.addFloatProperty("percentageGotCorrect");
@@ -400,6 +404,7 @@ public class TestpressSDKDaoGenerator {
         reviewAnswer.addLongProperty("id").primaryKey();
         reviewAnswer.addStringProperty("textHtml");
         reviewAnswer.addBooleanProperty("isCorrect");
+        reviewAnswer.addStringProperty("marks");
         return reviewAnswer;
     }
 
@@ -408,6 +413,7 @@ public class TestpressSDKDaoGenerator {
         reviewAnswerTranslation.addLongProperty("id");
         reviewAnswerTranslation.addStringProperty("textHtml");
         reviewAnswerTranslation.addBooleanProperty("isCorrect");
+        reviewAnswerTranslation.addStringProperty("marks");
         return reviewAnswerTranslation;
     }
 

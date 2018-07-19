@@ -30,13 +30,14 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
         public final static Property Direction = new Property(2, String.class, "direction", false, "DIRECTION");
         public final static Property Subject = new Property(3, String.class, "subject", false, "SUBJECT");
         public final static Property ExplanationHtml = new Property(4, String.class, "explanationHtml", false, "EXPLANATION_HTML");
-        public final static Property CommentsUrl = new Property(5, String.class, "commentsUrl", false, "COMMENTS_URL");
-        public final static Property Language = new Property(6, String.class, "language", false, "LANGUAGE");
-        public final static Property PercentageGotCorrect = new Property(7, Float.class, "percentageGotCorrect", false, "PERCENTAGE_GOT_CORRECT");
-        public final static Property DirectionId = new Property(8, Long.class, "directionId", false, "DIRECTION_ID");
-        public final static Property SubjectId = new Property(9, Long.class, "subjectId", false, "SUBJECT_ID");
-        public final static Property AnswerIds = new Property(10, String.class, "answerIds", false, "ANSWER_IDS");
-        public final static Property TranslationIds = new Property(11, String.class, "translationIds", false, "TRANSLATION_IDS");
+        public final static Property Type = new Property(5, String.class, "type", false, "TYPE");
+        public final static Property CommentsUrl = new Property(6, String.class, "commentsUrl", false, "COMMENTS_URL");
+        public final static Property Language = new Property(7, String.class, "language", false, "LANGUAGE");
+        public final static Property PercentageGotCorrect = new Property(8, Float.class, "percentageGotCorrect", false, "PERCENTAGE_GOT_CORRECT");
+        public final static Property DirectionId = new Property(9, Long.class, "directionId", false, "DIRECTION_ID");
+        public final static Property SubjectId = new Property(10, Long.class, "subjectId", false, "SUBJECT_ID");
+        public final static Property AnswerIds = new Property(11, String.class, "answerIds", false, "ANSWER_IDS");
+        public final static Property TranslationIds = new Property(12, String.class, "translationIds", false, "TRANSLATION_IDS");
     }
 
     private DaoSession daoSession;
@@ -62,13 +63,14 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
                 "\"DIRECTION\" TEXT," + // 2: direction
                 "\"SUBJECT\" TEXT," + // 3: subject
                 "\"EXPLANATION_HTML\" TEXT," + // 4: explanationHtml
-                "\"COMMENTS_URL\" TEXT," + // 5: commentsUrl
-                "\"LANGUAGE\" TEXT," + // 6: language
-                "\"PERCENTAGE_GOT_CORRECT\" REAL," + // 7: percentageGotCorrect
-                "\"DIRECTION_ID\" INTEGER," + // 8: directionId
-                "\"SUBJECT_ID\" INTEGER," + // 9: subjectId
-                "\"ANSWER_IDS\" TEXT," + // 10: answerIds
-                "\"TRANSLATION_IDS\" TEXT);"); // 11: translationIds
+                "\"TYPE\" TEXT," + // 5: type
+                "\"COMMENTS_URL\" TEXT," + // 6: commentsUrl
+                "\"LANGUAGE\" TEXT," + // 7: language
+                "\"PERCENTAGE_GOT_CORRECT\" REAL," + // 8: percentageGotCorrect
+                "\"DIRECTION_ID\" INTEGER," + // 9: directionId
+                "\"SUBJECT_ID\" INTEGER," + // 10: subjectId
+                "\"ANSWER_IDS\" TEXT," + // 11: answerIds
+                "\"TRANSLATION_IDS\" TEXT);"); // 12: translationIds
     }
 
     /** Drops the underlying database table. */
@@ -106,39 +108,44 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
             stmt.bindString(5, explanationHtml);
         }
  
+        String type = entity.getType();
+        if (type != null) {
+            stmt.bindString(6, type);
+        }
+ 
         String commentsUrl = entity.getCommentsUrl();
         if (commentsUrl != null) {
-            stmt.bindString(6, commentsUrl);
+            stmt.bindString(7, commentsUrl);
         }
  
         String language = entity.getLanguage();
         if (language != null) {
-            stmt.bindString(7, language);
+            stmt.bindString(8, language);
         }
  
         Float percentageGotCorrect = entity.getPercentageGotCorrect();
         if (percentageGotCorrect != null) {
-            stmt.bindDouble(8, percentageGotCorrect);
+            stmt.bindDouble(9, percentageGotCorrect);
         }
  
         Long directionId = entity.getDirectionId();
         if (directionId != null) {
-            stmt.bindLong(9, directionId);
+            stmt.bindLong(10, directionId);
         }
  
         Long subjectId = entity.getSubjectId();
         if (subjectId != null) {
-            stmt.bindLong(10, subjectId);
+            stmt.bindLong(11, subjectId);
         }
  
         IntegerList answerIds = entity.getAnswerIds();
         if (answerIds != null) {
-            stmt.bindString(11, answerIdsConverter.convertToDatabaseValue(answerIds));
+            stmt.bindString(12, answerIdsConverter.convertToDatabaseValue(answerIds));
         }
  
         IntegerList translationIds = entity.getTranslationIds();
         if (translationIds != null) {
-            stmt.bindString(12, translationIdsConverter.convertToDatabaseValue(translationIds));
+            stmt.bindString(13, translationIdsConverter.convertToDatabaseValue(translationIds));
         }
     }
 
@@ -171,39 +178,44 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
             stmt.bindString(5, explanationHtml);
         }
  
+        String type = entity.getType();
+        if (type != null) {
+            stmt.bindString(6, type);
+        }
+ 
         String commentsUrl = entity.getCommentsUrl();
         if (commentsUrl != null) {
-            stmt.bindString(6, commentsUrl);
+            stmt.bindString(7, commentsUrl);
         }
  
         String language = entity.getLanguage();
         if (language != null) {
-            stmt.bindString(7, language);
+            stmt.bindString(8, language);
         }
  
         Float percentageGotCorrect = entity.getPercentageGotCorrect();
         if (percentageGotCorrect != null) {
-            stmt.bindDouble(8, percentageGotCorrect);
+            stmt.bindDouble(9, percentageGotCorrect);
         }
  
         Long directionId = entity.getDirectionId();
         if (directionId != null) {
-            stmt.bindLong(9, directionId);
+            stmt.bindLong(10, directionId);
         }
  
         Long subjectId = entity.getSubjectId();
         if (subjectId != null) {
-            stmt.bindLong(10, subjectId);
+            stmt.bindLong(11, subjectId);
         }
  
         IntegerList answerIds = entity.getAnswerIds();
         if (answerIds != null) {
-            stmt.bindString(11, answerIdsConverter.convertToDatabaseValue(answerIds));
+            stmt.bindString(12, answerIdsConverter.convertToDatabaseValue(answerIds));
         }
  
         IntegerList translationIds = entity.getTranslationIds();
         if (translationIds != null) {
-            stmt.bindString(12, translationIdsConverter.convertToDatabaseValue(translationIds));
+            stmt.bindString(13, translationIdsConverter.convertToDatabaseValue(translationIds));
         }
     }
 
@@ -226,13 +238,14 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // direction
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // subject
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // explanationHtml
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // commentsUrl
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // language
-            cursor.isNull(offset + 7) ? null : cursor.getFloat(offset + 7), // percentageGotCorrect
-            cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8), // directionId
-            cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9), // subjectId
-            cursor.isNull(offset + 10) ? null : answerIdsConverter.convertToEntityProperty(cursor.getString(offset + 10)), // answerIds
-            cursor.isNull(offset + 11) ? null : translationIdsConverter.convertToEntityProperty(cursor.getString(offset + 11)) // translationIds
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // type
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // commentsUrl
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // language
+            cursor.isNull(offset + 8) ? null : cursor.getFloat(offset + 8), // percentageGotCorrect
+            cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9), // directionId
+            cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10), // subjectId
+            cursor.isNull(offset + 11) ? null : answerIdsConverter.convertToEntityProperty(cursor.getString(offset + 11)), // answerIds
+            cursor.isNull(offset + 12) ? null : translationIdsConverter.convertToEntityProperty(cursor.getString(offset + 12)) // translationIds
         );
         return entity;
     }
@@ -244,13 +257,14 @@ public class ReviewQuestionDao extends AbstractDao<ReviewQuestion, Long> {
         entity.setDirection(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setSubject(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setExplanationHtml(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setCommentsUrl(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setLanguage(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setPercentageGotCorrect(cursor.isNull(offset + 7) ? null : cursor.getFloat(offset + 7));
-        entity.setDirectionId(cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8));
-        entity.setSubjectId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
-        entity.setAnswerIds(cursor.isNull(offset + 10) ? null : answerIdsConverter.convertToEntityProperty(cursor.getString(offset + 10)));
-        entity.setTranslationIds(cursor.isNull(offset + 11) ? null : translationIdsConverter.convertToEntityProperty(cursor.getString(offset + 11)));
+        entity.setType(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setCommentsUrl(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setLanguage(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setPercentageGotCorrect(cursor.isNull(offset + 8) ? null : cursor.getFloat(offset + 8));
+        entity.setDirectionId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
+        entity.setSubjectId(cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10));
+        entity.setAnswerIds(cursor.isNull(offset + 11) ? null : answerIdsConverter.convertToEntityProperty(cursor.getString(offset + 11)));
+        entity.setTranslationIds(cursor.isNull(offset + 12) ? null : translationIdsConverter.convertToEntityProperty(cursor.getString(offset + 12)));
      }
     
     @Override

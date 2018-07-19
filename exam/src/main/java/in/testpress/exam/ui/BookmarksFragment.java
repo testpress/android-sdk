@@ -1,10 +1,8 @@
 package in.testpress.exam.ui;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -82,11 +80,7 @@ import in.testpress.util.WebViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
-import static android.app.Activity.RESULT_OK;
-import static com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE;
-import static com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE;
 import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE;
-import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE;
 import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.COMMENTS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.QUESTIONS_PATH;
@@ -471,7 +465,10 @@ public class BookmarksFragment extends Fragment
                 questionHtml +
                 "</div>";
 
-        // Add options
+        boolean isSingleMCQType = reviewItem.getQuestion().getType().equals("R");
+        boolean isMultipleMCQType = reviewItem.getQuestion().getType().equals("C");
+        boolean isShortAnswerType = reviewItem.getQuestion().getType().equals("S");
+        boolean isNumericalType = reviewItem.getQuestion().getType().equals("N");
         String correctAnswerHtml = "";
         //noinspection unchecked
         List<Object> reviewAnswers = (List<Object>) answers;
@@ -485,33 +482,66 @@ public class BookmarksFragment extends Fragment
                         answerTranslation.getId(),
                         answerTranslation.getTextHtml(),
                         answerTranslation.getIsCorrect(),
+                        answerTranslation.getMarks(),
                         null
                 );
             }
 
-            int optionColor;
-            if (reviewItem.getSelectedAnswers().contains(attemptAnswer.getId().intValue())) {
+            if (isSingleMCQType || isMultipleMCQType) {
+                int optionColor;
+                if (reviewItem.getSelectedAnswers().contains(attemptAnswer.getId().intValue())) {
+
+                    if (attemptAnswer.getIsCorrect()) {
+                        optionColor = R.color.testpress_green;
+                    } else {
+                        optionColor = R.color.testpress_red;
+                    }
+                } else {
+                    optionColor = android.R.color.white;
+                }
+                html += "\n" + WebViewUtils.getOptionWithTags(attemptAnswer.getTextHtml(), j,
+                        optionColor, getContext());
 
                 if (attemptAnswer.getIsCorrect()) {
-                    optionColor = R.color.testpress_green;
-                } else {
-                    optionColor = R.color.testpress_red;
+                    correctAnswerHtml += "\n" + WebViewUtils.getCorrectAnswerIndexWithTags(j);
                 }
+            } else if (isNumericalType) {
+                correctAnswerHtml = attemptAnswer.getTextHtml();
             } else {
-                optionColor = android.R.color.white;
-            }
-            html += "\n" + WebViewUtils.getOptionWithTags(attemptAnswer.getTextHtml(), j,
-                    optionColor, getContext());
-            if (attemptAnswer.getIsCorrect()) {
-                correctAnswerHtml += "\n" + WebViewUtils.getCorrectAnswerIndexWithTags(j);
+                if (j == 0) {
+                    html += "<table width='100%' style='margin-top:0px; margin-bottom:15px;'>"
+                            + WebViewUtils.getShortAnswerHeadersWithTags();
+                }
+                html += WebViewUtils.getShortAnswersWithTags(
+                        attemptAnswer.getTextHtml(), attemptAnswer.getMarks());
+
+                if (j == reviewAnswers.size() - 1) {
+                    html += "</table>";
+                }
             }
         }
 
-        // Add correct answer
-        html += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
+        if (isShortAnswerType || isNumericalType) {
+            html += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
+                    WebViewUtils.getHeadingTags(getString(R.string.testpress_your_answer)) +
+                    reviewItem.getShortText() +
+                    "</div>";
+        }
+
+        if (isSingleMCQType || isMultipleMCQType || isNumericalType) {
+            // Add correct answer
+            html += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
                     WebViewUtils.getHeadingTags(getString(R.string.testpress_correct_answer)) +
                     correctAnswerHtml +
-                "</div>";
+                    "</div>";
+        }
+
+        if (isShortAnswerType || isNumericalType) {
+            html += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
+                    WebViewUtils.getHeadingTags(getString(R.string.testpress_marks_awarded)) +
+                    reviewItem.getMarks() +
+                    "</div>";
+        }
 
         // Add explanation
         if (explanationHtml != null && !explanationHtml.isEmpty()) {
