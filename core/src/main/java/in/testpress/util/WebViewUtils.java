@@ -76,9 +76,7 @@ public class WebViewUtils {
             @SuppressWarnings("deprecation")
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                activity.startActivity(intent);
-                return true;
+                return WebViewUtils.this.shouldOverrideUrlLoading(activity, url);
             }
 
             @Override
@@ -106,6 +104,12 @@ public class WebViewUtils {
     }
 
     protected void onPageStarted() {
+    }
+
+    protected boolean shouldOverrideUrlLoading(Activity activity, String url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        activity.startActivity(intent);
+        return true;
     }
 
     protected void onNetworkError() {
