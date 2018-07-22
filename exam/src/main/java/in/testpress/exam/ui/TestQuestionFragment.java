@@ -100,6 +100,7 @@ public class TestQuestionFragment extends Fragment {
 
             for (AttemptQuestion translation : translations) {
                 if (translation.getLanguage().equals(selectedLanguage.getCode())) {
+                    translation.setType(attemptQuestion.getType());
                     attemptQuestion = translation;
                 }
             }
