@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import in.testpress.core.TestpressSession;
 import in.testpress.models.FileDetails;
+import in.testpress.models.ProfileDetails;
 import in.testpress.models.greendao.AttemptSection;
 import in.testpress.util.UserAgentProvider;
 import okhttp3.Interceptor;
@@ -29,6 +30,8 @@ public class TestpressApiClient {
 
     public static final String SOCIAL_AUTH_PATH= "api/v2.2/social-auth/";
     public static final String TESTPRESS_AUTH_PATH= "api/v2.2/auth-token/";
+
+    public static final String PROFILE_DETAILS_PATH= "api/v2.2/me/";
 
     /**
      * Query Params
@@ -136,6 +139,10 @@ public class TestpressApiClient {
     public RetrofitCall<TestpressSession> authenticate(String authenticateUrlFrag,
                                                        HashMap<String, String> arguments) {
         return getAuthenticationService().authenticate(authenticateUrlFrag, arguments);
+    }
+
+    public RetrofitCall<ProfileDetails> getProfileDetails() {
+        return getAuthenticationService().getProfileDetails();
     }
 
     public RetrofitCall<FileDetails> upload(String filePath) {

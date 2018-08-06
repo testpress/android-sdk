@@ -2,9 +2,8 @@ package in.testpress.course.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.TextUtils;
 
-import in.testpress.exam.models.ProfileDetails;
+import in.testpress.models.ProfileDetails;
 
 public class Reputation implements Parcelable {
 

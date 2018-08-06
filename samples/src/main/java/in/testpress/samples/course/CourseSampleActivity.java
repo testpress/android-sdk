@@ -109,6 +109,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                             .setCoursesGamificationEnabled(true);
                     break;
             }
+            session.getInstituteSettings().setDisplayUserEmailOnVideo(true);
             TestpressSdk.setTestpressSession(this, session);
             switch (clickedButtonId) {
                 case R.id.simple_course:

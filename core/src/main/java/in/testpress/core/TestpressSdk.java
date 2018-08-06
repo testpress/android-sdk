@@ -26,6 +26,8 @@ public final class TestpressSdk {
     public static final int COURSE_CONTENT_LIST_REQUEST_CODE = 1003;
     public static final int COURSE_CONTENT_DETAIL_REQUEST_CODE = 1004;
 
+    public static final int EXO_PLAYER_FULLSCREEN_REQUEST_CODE = 1005;
+
     public static final String ACTION_PRESSED_HOME = "pressedHomeButton";
 
     private static final String KEY_TESTPRESS_AUTH_TOKEN = "testpressAuthToken";

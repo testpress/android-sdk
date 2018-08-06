@@ -20,6 +20,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.exoplayer2.ui.PlayerView;
 
 import junit.framework.Assert;
 
@@ -40,13 +42,17 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
+import in.testpress.core.TestpressSession;
+import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
 import in.testpress.course.network.TestpressCourseApiClient;
+import in.testpress.course.util.ExoPlayerUtil;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.FolderSpinnerAdapter;
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.exam.util.RetakeExamUtil;
+import in.testpress.models.ProfileDetails;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.AttachmentDao;
@@ -75,7 +81,11 @@ import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
 import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
+import static in.testpress.core.TestpressSdk.EXO_PLAYER_FULLSCREEN_REQUEST_CODE;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
+import static in.testpress.course.ui.ExoPlayerActivity.PLAY_WHEN_READY;
+import static in.testpress.course.ui.ExoPlayerActivity.START_POSITION;
+import static in.testpress.course.ui.ExoPlayerActivity.VIDEO_URL;
 import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.CONTENTS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.STATE_PAUSED;
@@ -136,6 +146,9 @@ public class ContentActivity extends BaseToolBarActivity {
     private FolderSpinnerAdapter folderSpinnerAdapter;
     private WebViewUtils webViewUtils;
     private FullScreenChromeClient fullScreenChromeClient;
+    private PlayerView playerView;
+    private ExoPlayerUtil exoPlayerUtil;
+    private View exoPlayerLayout;
 
     public static Intent createIntent(int position, long chapterId, AppCompatActivity activity) {
         Intent intent = new Intent(activity, ContentActivity.class);
@@ -182,6 +195,8 @@ public class ContentActivity extends BaseToolBarActivity {
         previousButton = (Button) findViewById(R.id.previous);
         nextButton = (Button) findViewById(R.id.next);
         retryButton = (Button) findViewById(R.id.retry_button);
+        playerView = findViewById(R.id.exo_player_view);
+        exoPlayerLayout = findViewById(R.id.exo_player_layout);
         toast = Toast.makeText(this, R.string.testpress_no_internet_try_again, Toast.LENGTH_SHORT);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         TextView pageNumber = (TextView) findViewById(R.id.page_number);
@@ -315,11 +330,22 @@ public class ContentActivity extends BaseToolBarActivity {
         } else if (content.getRawVideo() != null) {
             Video video = content.getRawVideo();
             setContentTitle(video.getTitle());
-            String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
-                    "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
+            if (video.getEmbedCode() == null || video.getEmbedCode().isEmpty() ||
+                    video.getUrl().endsWith(".mp4")) {
 
-            webViewUtils.initWebView(html, this);
-            webView.setWebChromeClient(fullScreenChromeClient);
+                TestpressSession session = TestpressSdk.getTestpressSession(this);
+                if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
+                    checkProfileDetailExist(video.getUrl());
+                } else {
+                    initExoPlayer(video.getUrl());
+                }
+            } else {
+                String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
+                        "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
+
+                webViewUtils.initWebView(html, this);
+                webView.setWebChromeClient(fullScreenChromeClient);
+            }
         } else if (content.getRawExam() != null) {
             onExamContent();
         } else if (content.getRawAttachment() != null) {
@@ -373,6 +399,45 @@ public class ContentActivity extends BaseToolBarActivity {
         String html = "<div style='padding-left: 20px; padding-right: 20px;'>" +
                 htmlContent.getTextHtml() + "</div>";
         webViewUtils.initWebView(html, this);
+    }
+
+    private void checkProfileDetailExist(final String videoUrl) {
+        ProfileDetails profileDetails = TestpressUserDetails.getInstance().getProfileDetails();
+        if (profileDetails != null) {
+            initExoPlayer(videoUrl);
+        } else {
+            showLoadingProgress();
+            TestpressUserDetails.getInstance().load(this, new TestpressCallback<ProfileDetails>() {
+                @Override
+                public void onSuccess(ProfileDetails userDetails) {
+                    swipeRefresh.setRefreshing(false);
+                    initExoPlayer(videoUrl);
+                }
+
+                @Override
+                public void onException(TestpressException exception) {
+                    handleError(exception, false);
+                }
+            });
+        }
+    }
+
+    private void initExoPlayer(String videoUrl) {
+        exoPlayerUtil = new ExoPlayerUtil(this, exoPlayerLayout, videoUrl);
+        FrameLayout fullScreenButton = playerView.findViewById(R.id.exo_fullscreen_button);
+        fullScreenButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ContentActivity.this, ExoPlayerActivity.class);
+                intent.putExtra(VIDEO_URL, content.getRawVideo().getUrl());
+                intent.putExtra(START_POSITION, Math.max(0, exoPlayerUtil.getStartPosition()));
+                exoPlayerUtil.releasePlayer();
+                startActivityForResult(intent, EXO_PLAYER_FULLSCREEN_REQUEST_CODE);
+            }
+        });
+        exoPlayerLayout.setVisibility(View.VISIBLE);
+        exoPlayerUtil.initializePlayer();
+        createContentAttempt();
     }
 
     private void displayAttachmentContent() {
@@ -683,6 +748,9 @@ public class ContentActivity extends BaseToolBarActivity {
                 }
                 updateContent();
             }
+        } else if (requestCode == EXO_PLAYER_FULLSCREEN_REQUEST_CODE) {
+            exoPlayerUtil.setStartPosition(data.getLongExtra(START_POSITION, 0));
+            exoPlayerUtil.setPlayWhenReady(data.getBooleanExtra(PLAY_WHEN_READY, true));
         }
     }
 
@@ -1008,6 +1076,9 @@ public class ContentActivity extends BaseToolBarActivity {
         super.onPause();
         webView.onPause();
         toast.cancel();
+        if (exoPlayerUtil != null) {
+            exoPlayerUtil.onPause();
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
@@ -1015,6 +1086,25 @@ public class ContentActivity extends BaseToolBarActivity {
     public void onResume() {
         super.onResume();
         webView.onResume();
+        if (exoPlayerUtil != null) {
+            exoPlayerUtil.onResume();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (exoPlayerUtil != null) {
+            exoPlayerUtil.onStart();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (exoPlayerUtil != null) {
+            exoPlayerUtil.onStop();
+        }
     }
 
     @Override

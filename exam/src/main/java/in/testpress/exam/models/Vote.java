@@ -1,5 +1,7 @@
 package in.testpress.exam.models;
 
+import in.testpress.models.ProfileDetails;
+
 public class Vote<T> {
 
     private int id;

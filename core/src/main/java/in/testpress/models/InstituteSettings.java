@@ -11,6 +11,7 @@ public class InstituteSettings {
     private boolean accessCodeEnabled;
     private boolean screenshotDisabled;
     private boolean bookmarksEnabled;
+    private boolean displayUserEmailOnVideo;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -77,6 +78,15 @@ public class InstituteSettings {
 
     public InstituteSettings setBookmarksEnabled(boolean bookmarksEnabled) {
         this.bookmarksEnabled = bookmarksEnabled;
+        return this;
+    }
+
+    public boolean isDisplayUserEmailOnVideo() {
+        return displayUserEmailOnVideo;
+    }
+
+    public InstituteSettings setDisplayUserEmailOnVideo(boolean displayUserEmailOnVideo) {
+        this.displayUserEmailOnVideo = displayUserEmailOnVideo;
         return this;
     }
 }

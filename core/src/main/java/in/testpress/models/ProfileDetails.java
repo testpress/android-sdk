@@ -1,4 +1,4 @@
-package in.testpress.exam.models;
+package in.testpress.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

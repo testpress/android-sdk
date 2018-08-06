@@ -186,6 +186,13 @@
 
                 </LinearLayout>
 
+                <include
+                    android:layout_marginTop="20dp"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    layout="@layout/testpress_exo_player_view" />
+
                 <!-- Empty layout to keep the navigation button in bottom -->
                 <View
                     android:layout_width="match_parent"
