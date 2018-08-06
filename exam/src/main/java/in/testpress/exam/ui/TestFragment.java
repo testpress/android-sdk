@@ -515,9 +515,8 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         public List<AttemptItem> loadData() throws TestpressException {
             do {
                 fragment.questionsPager.next();
-                fragment.attemptItemList = fragment.questionsPager.getResources();
             } while (fragment.questionsPager.hasNext());
-            return fragment.attemptItemList;
+            return fragment.questionsPager.getResources();
         }
     }
 
@@ -565,11 +564,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             return;
         }
 
-        if (attempt.getRemainingTime() == null || attempt.getRemainingTime().equals("00:00:00")) {
-            endExam();
-            return;
-        }
-        if (items.isEmpty()) { // Display alert if no questions exist
+        if (items == null || items.isEmpty()) { // Display alert if no questions exist
             new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
                     .setTitle(R.string.testpress_no_questions)
                     .setMessage(R.string.testpress_no_questions_message)
@@ -584,6 +579,11 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             return;
         }
 
+        attemptItemList = items;
+        if (attempt.getRemainingTime() == null || attempt.getRemainingTime().equals("00:00:00")) {
+            endExam();
+            return;
+        }
         if (sections.size() <= 1 && exam.getTemplateType() == 2) {
             // Used to get subjects in order as it fetched
             List<String> subjectsList = new ArrayList<>();
