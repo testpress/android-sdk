@@ -1,11 +1,9 @@
 package in.testpress.exam.network;
 
-import java.io.IOException;
-
 import in.testpress.exam.models.Category;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseResourcePager;
-import retrofit2.Response;
+import in.testpress.network.RetrofitCall;
 
 public class CategoryPager extends BaseResourcePager<Category> {
 
@@ -23,10 +21,10 @@ public class CategoryPager extends BaseResourcePager<Category> {
     }
 
     @Override
-    public Response<TestpressApiResponse<Category>> getItems(int page, int size) throws IOException {
+    public RetrofitCall<TestpressApiResponse<Category>> getItems(int page, int size) {
         queryParams.put(TestpressExamApiClient.PARENT, parentId);
         queryParams.put(TestpressExamApiClient.PAGE, page);
-        return apiClient.getCategories(queryParams).execute();
+        return apiClient.getCategories(queryParams);
     }
 
 }

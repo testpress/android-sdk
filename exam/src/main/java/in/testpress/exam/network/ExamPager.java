@@ -1,11 +1,9 @@
 package in.testpress.exam.network;
 
-import java.io.IOException;
-
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Exam;
 import in.testpress.network.BaseResourcePager;
-import retrofit2.Response;
+import in.testpress.network.RetrofitCall;
 
 public class ExamPager extends BaseResourcePager<Exam> {
 
@@ -31,10 +29,10 @@ public class ExamPager extends BaseResourcePager<Exam> {
     }
 
     @Override
-    public Response<TestpressApiResponse<Exam>> getItems(int page, int size) throws IOException {
+    public RetrofitCall<TestpressApiResponse<Exam>> getItems(int page, int size) {
         queryParams.put(TestpressExamApiClient.PAGE, page);
         if (accessCode != null) {
-            return apiClient.getExams(accessCode, queryParams).execute();
+            return apiClient.getExams(accessCode, queryParams);
         }
         if (subclass != null) {
             queryParams.put(TestpressExamApiClient.STATE, subclass);
@@ -42,7 +40,7 @@ public class ExamPager extends BaseResourcePager<Exam> {
         if (category != null) {
             queryParams.put(TestpressExamApiClient.CATEGORY, category);
         }
-        return apiClient.getExams(queryParams).execute();
+        return apiClient.getExams(queryParams);
     }
 
 }

@@ -6,7 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
+import in.testpress.network.RetrofitCall;
 import in.testpress.v2_4.models.ApiResponse;
 import retrofit2.Response;
 
@@ -110,7 +112,7 @@ public abstract class BaseResourcePager<T, L> {
         boolean emptyPage = false;
         try {
             for (int i = 0; i < count && hasNext(); i++) {
-                Response<ApiResponse<T>> retrofitResponse = getResponse(page, -1);
+                Response<ApiResponse<T>> retrofitResponse = getResponse(page, -1).execute();
                 List<L> resources;
                 if (retrofitResponse.isSuccessful()) {
                     apiResponse = retrofitResponse.body();
@@ -145,6 +147,43 @@ public abstract class BaseResourcePager<T, L> {
         }
         hasMore = hasNext() && !emptyPage;
         return hasMore;
+    }
+
+    public RetrofitCall<ApiResponse<T>> enqueueNext(final TestpressCallback<List<L>> callback) {
+        return getResponse(page, -1).enqueue(new TestpressCallback<ApiResponse<T>>() {
+            @Override
+            public void onSuccess(ApiResponse<T> result) {
+                apiResponse = result;
+                List<L> resources = getItems(apiResponse.getResults());
+                if (resources.isEmpty()) {
+                    hasMore = false;
+                } else {
+                    for (L resource : resources) {
+                        resource = register(resource);
+                        if (resource == null)
+                            continue;
+                        BaseResourcePager.this.resources.put(getId(resource), resource);
+                    }
+                    page++;
+                    if (count >= page) {
+                        enqueueNext(callback);
+                        return;
+                    }
+                    hasMore = hasNext();
+                }
+                // Set count value to 1 if first load request made after call clear()
+                if (count > 1) {
+                    count = 1;
+                }
+                callback.onSuccess(getResources());
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                hasMore = false;
+                callback.onException(exception);
+            }
+        });
     }
 
     public boolean hasNext() {
@@ -197,8 +236,7 @@ public abstract class BaseResourcePager<T, L> {
      * @param size
      * @return iterator
      */
-    public abstract Response<ApiResponse<T>> getResponse(final int page, final int size)
-            throws IOException;
+    public abstract RetrofitCall<ApiResponse<T>> getResponse(final int page, final int size);
 
     public abstract List<L> getItems(T resultResponse);
 
