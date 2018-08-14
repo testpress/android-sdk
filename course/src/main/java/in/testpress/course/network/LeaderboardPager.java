@@ -1,11 +1,9 @@
 package in.testpress.course.network;
 
-import java.io.IOException;
-
 import in.testpress.course.models.Reputation;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseResourcePager;
-import retrofit2.Response;
+import in.testpress.network.RetrofitCall;
 
 public class LeaderboardPager extends BaseResourcePager<Reputation> {
 
@@ -21,10 +19,10 @@ public class LeaderboardPager extends BaseResourcePager<Reputation> {
     }
 
     @Override
-    public Response<TestpressApiResponse<Reputation>> getItems(int page, int size) throws IOException {
+    public RetrofitCall<TestpressApiResponse<Reputation>> getItems(int page, int size) {
         queryParams.put(TestpressCourseApiClient.PAGE, page);
         queryParams.put(TestpressCourseApiClient.PAGE_SIZE, 20);
-        return apiClient.getLeaderboard(queryParams).execute();
+        return apiClient.getLeaderboard(queryParams);
     }
 
 }
