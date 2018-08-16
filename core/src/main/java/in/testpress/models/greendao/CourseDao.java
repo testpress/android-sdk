@@ -37,6 +37,7 @@ public class CourseDao extends AbstractDao<Course, Long> {
         public final static Property ContentsCount = new Property(12, Integer.class, "contentsCount", false, "CONTENTS_COUNT");
         public final static Property Order = new Property(13, Integer.class, "order", false, "ORDER");
         public final static Property Active = new Property(14, Boolean.class, "active", false, "ACTIVE");
+        public final static Property ChildItemsLoaded = new Property(15, boolean.class, "childItemsLoaded", false, "CHILD_ITEMS_LOADED");
     }
 
 
@@ -66,7 +67,8 @@ public class CourseDao extends AbstractDao<Course, Long> {
                 "\"CHAPTERS_COUNT\" INTEGER," + // 11: chaptersCount
                 "\"CONTENTS_COUNT\" INTEGER," + // 12: contentsCount
                 "\"ORDER\" INTEGER," + // 13: order
-                "\"ACTIVE\" INTEGER);"); // 14: active
+                "\"ACTIVE\" INTEGER," + // 14: active
+                "\"CHILD_ITEMS_LOADED\" INTEGER NOT NULL );"); // 15: childItemsLoaded
     }
 
     /** Drops the underlying database table. */
@@ -153,6 +155,7 @@ public class CourseDao extends AbstractDao<Course, Long> {
         if (active != null) {
             stmt.bindLong(15, active ? 1L: 0L);
         }
+        stmt.bindLong(16, entity.getChildItemsLoaded() ? 1L: 0L);
     }
 
     @Override
@@ -233,6 +236,7 @@ public class CourseDao extends AbstractDao<Course, Long> {
         if (active != null) {
             stmt.bindLong(15, active ? 1L: 0L);
         }
+        stmt.bindLong(16, entity.getChildItemsLoaded() ? 1L: 0L);
     }
 
     @Override
@@ -257,7 +261,8 @@ public class CourseDao extends AbstractDao<Course, Long> {
             cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11), // chaptersCount
             cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12), // contentsCount
             cursor.isNull(offset + 13) ? null : cursor.getInt(offset + 13), // order
-            cursor.isNull(offset + 14) ? null : cursor.getShort(offset + 14) != 0 // active
+            cursor.isNull(offset + 14) ? null : cursor.getShort(offset + 14) != 0, // active
+            cursor.getShort(offset + 15) != 0 // childItemsLoaded
         );
         return entity;
     }
@@ -279,6 +284,7 @@ public class CourseDao extends AbstractDao<Course, Long> {
         entity.setContentsCount(cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12));
         entity.setOrder(cursor.isNull(offset + 13) ? null : cursor.getInt(offset + 13));
         entity.setActive(cursor.isNull(offset + 14) ? null : cursor.getShort(offset + 14) != 0);
+        entity.setChildItemsLoaded(cursor.getShort(offset + 15) != 0);
      }
     
     @Override
