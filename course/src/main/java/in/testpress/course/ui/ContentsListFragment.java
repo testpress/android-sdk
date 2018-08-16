@@ -52,7 +52,7 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
     @Override
     protected ContentPager getPager() {
         if (pager == null) {
-            pager = new ContentPager(contentsUrlFrag, mApiClient);
+            pager = new ContentPager(chapterId, mApiClient);
         }
         return (ContentPager) pager;
     }

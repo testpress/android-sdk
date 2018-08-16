@@ -159,10 +159,12 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    getActivity().startActivity(ChapterDetailActivity.createIntent(
-                            chapter.getUrl(),
-                            getContext())
-                    );
+                    // Do nothing as chapter url has been remove from api v2_4
+
+                    // getActivity().startActivity(ChapterDetailActivity.createIntent(
+                    // chapter.getUrl(),
+                    // getContext())
+                    // );
                 }
             });
         }

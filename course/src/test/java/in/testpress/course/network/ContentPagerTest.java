@@ -34,7 +34,7 @@ public class ContentPagerTest {
         contentPager.getItems(Mockito.<Integer>anyInt(), Mockito.<Integer>anyInt());
 
         verify(apiClient, times(1)).getContents(
-                Mockito.<String>any(),
+                anyLong(),
                 ArgumentMatchers.<String, Object>anyMap()
         );
     }

@@ -51,4 +51,8 @@
         <item>2</item>
     </string-array>
 
+    <string name="testpress_fetching_contents" tools:ignore="TypographyEllipsis">Fetching contents...</string>
+
+    <string name="testpress_want_to_cancel">Do you want to cancel?</string>
+
 </resources>

@@ -3,6 +3,7 @@ package in.testpress.util;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.os.Build;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
@@ -81,5 +82,29 @@ public class UIUtils {
 
     public static void showSnackBar(View view, @StringRes int message) {
         Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    public static Activity getActivity(Context context) {
+        if (context == null) {
+            return null;
+        } else if (context instanceof ContextWrapper) {
+            if (context instanceof Activity) {
+                return (Activity) context;
+            } else {
+                return getActivity(((ContextWrapper) context).getBaseContext());
+            }
+        }
+        return null;
+    }
+
+    public static boolean isActivityDestroyed(Context context) {
+        Activity activity = UIUtils.getActivity(context);
+        if (activity == null) {
+            return false;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            return activity.isDestroyed();
+        }
+        return activity.isFinishing();
     }
 }

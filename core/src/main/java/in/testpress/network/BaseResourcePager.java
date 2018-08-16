@@ -185,7 +185,6 @@ public abstract class BaseResourcePager<E> {
                 callback.onException(exception);
             }
         });
-
         return retrofitCall;
     }
 
@@ -259,6 +258,10 @@ public abstract class BaseResourcePager<E> {
 
     public Integer getTotalItemsCount() {
         return response != null ? response.getCount() : 0;
+    }
+
+    public Integer getPerPage() {
+        return response.getPerPage();
     }
 
     public void cancelAsyncRequest() {
