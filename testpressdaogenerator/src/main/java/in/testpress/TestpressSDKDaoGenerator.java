@@ -306,6 +306,7 @@ public class TestpressSDKDaoGenerator {
         course.addIntProperty("contentsCount");
         course.addIntProperty("order");
         course.addBooleanProperty("active");
+        course.addBooleanProperty("childItemsLoaded").notNull();
         return course;
     }
 

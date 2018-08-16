@@ -8,10 +8,10 @@ import in.testpress.network.RetrofitCall;
 public class ContentPager extends BaseResourcePager<Content> {
 
     private TestpressCourseApiClient apiClient;
-    private String contentsUrlFrag;
+    private long courseId;
 
-    public ContentPager(String contentsUrlFrag, TestpressCourseApiClient apiClient) {
-        this.contentsUrlFrag = contentsUrlFrag;
+    public ContentPager(long courseId, TestpressCourseApiClient apiClient) {
+        this.courseId = courseId;
         this.apiClient = apiClient;
     }
 
@@ -23,7 +23,7 @@ public class ContentPager extends BaseResourcePager<Content> {
     @Override
     public RetrofitCall<TestpressApiResponse<Content>> getItems(int page, int size) {
         queryParams.put(TestpressCourseApiClient.PAGE, page);
-        return apiClient.getContents(contentsUrlFrag, queryParams);
+        return apiClient.getContents(courseId, queryParams);
     }
 
 }

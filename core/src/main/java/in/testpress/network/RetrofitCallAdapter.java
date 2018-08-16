@@ -53,6 +53,7 @@ public class RetrofitCallAdapter<T> implements RetrofitCall<T> {
                 TestpressException exception;
                 if (throwable instanceof IOException) {
                     exception = TestpressException.networkError((IOException) throwable);
+                    exception.setCancelled(call.isCanceled());
                 } else {
                     exception = TestpressException.unexpectedError(throwable);
                     exception.printStackTrace();

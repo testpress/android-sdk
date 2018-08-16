@@ -10,10 +10,10 @@ import android.support.annotation.Nullable;
 
 import java.util.HashMap;
 
+import in.testpress.R;
 import in.testpress.models.InstituteSettings;
 import in.testpress.network.AuthorizationErrorResponse;
 import in.testpress.network.TestpressApiClient;
-import in.testpress.R;
 import in.testpress.util.Assert;
 import in.testpress.util.UIUtils;
 
@@ -282,6 +282,9 @@ public final class TestpressSdk {
 
                     @Override
                     public void onException(TestpressException testpressException) {
+                        if (UIUtils.isActivityDestroyed(context)) {
+                            return;
+                        }
                         if (progressDialog.isShowing()) {
                             progressDialog.dismiss();
                         }
