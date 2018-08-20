@@ -31,8 +31,9 @@ dependencies {
     api project(':core')
     api project(':exam')
     api rootProject.design
-    api 'com.google.android.exoplayer:exoplayer-core:' + rootProject.exoPlayer
-    api 'com.google.android.exoplayer:exoplayer-ui:' + rootProject.exoPlayer
+    api rootProject.exoPlayerCore
+    api rootProject.exoPlayerUI
+    api rootProject.multiLevelListView
     api rootProject.constraintLayout
     api rootProject.mediarouter
     testImplementation rootProject.junit

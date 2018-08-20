@@ -137,4 +137,11 @@
         <item name="android:textColorPrimary">@color/testpress_white</item>
     </style>
 
+    <style name="TestpressNewItemsAvailableLayout">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_marginTop">20dp</item>
+    </style>
+
 </resources>

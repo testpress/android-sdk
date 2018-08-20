@@ -13,6 +13,8 @@ import java.util.List;
 import android.content.Context;
 import android.os.Parcel;
 
+import com.google.gson.annotations.SerializedName;
+
 import in.testpress.core.TestpressSDKDatabase;
 // KEEP INCLUDES END
 
@@ -23,6 +25,7 @@ import in.testpress.core.TestpressSDKDatabase;
 public class Content implements android.os.Parcelable {
     private Integer order;
     private String htmlContentTitle;
+    @SerializedName(value="htmlContentUrl", alternate={"htmlUrl"})
     private String htmlContentUrl;
     private String url;
     private String attemptsUrl;
@@ -32,7 +35,9 @@ public class Content implements android.os.Parcelable {
 
     @Id
     private Long id;
-    private String name;
+    @SerializedName(value="title", alternate={"name"})
+    private String title;
+    private String contentType;
     private String image;
     private String description;
     private Boolean isLocked;
@@ -43,6 +48,9 @@ public class Content implements android.os.Parcelable {
     private Boolean active;
     private Long bookmarkId;
     private int videoWatchedPercentage;
+    private String modified;
+    private Long modifiedDate;
+    private Long courseId;
     private Long htmlId;
     private Long videoId;
     private Long attachmentId;
@@ -81,6 +89,10 @@ public class Content implements android.os.Parcelable {
     private transient Long exam__resolvedKey;
 
     // KEEP FIELDS - put your custom fields here
+    public static final String EXAM_TYPE = "Exam";
+    public static final String VIDEO_TYPE = "Video";
+    public static final String ATTACHMENT_TYPE = "Attachment";
+    public static final String HTML_TYPE = "Notes";
     // KEEP FIELDS END
 
     @Generated
@@ -92,7 +104,7 @@ public class Content implements android.os.Parcelable {
     }
 
     @Generated
-    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, Integer chapterId, String chapterSlug, String chapterUrl, Long id, String name, String image, String description, Boolean isLocked, Integer attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, Long htmlId, Long videoId, Long attachmentId, Long examId) {
+    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, Integer chapterId, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, Integer attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Long courseId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
         this.order = order;
         this.htmlContentTitle = htmlContentTitle;
         this.htmlContentUrl = htmlContentUrl;
@@ -102,7 +114,8 @@ public class Content implements android.os.Parcelable {
         this.chapterSlug = chapterSlug;
         this.chapterUrl = chapterUrl;
         this.id = id;
-        this.name = name;
+        this.title = title;
+        this.contentType = contentType;
         this.image = image;
         this.description = description;
         this.isLocked = isLocked;
@@ -113,6 +126,9 @@ public class Content implements android.os.Parcelable {
         this.active = active;
         this.bookmarkId = bookmarkId;
         this.videoWatchedPercentage = videoWatchedPercentage;
+        this.modified = modified;
+        this.modifiedDate = modifiedDate;
+        this.courseId = courseId;
         this.htmlId = htmlId;
         this.videoId = videoId;
         this.attachmentId = attachmentId;
@@ -198,12 +214,20 @@ public class Content implements android.os.Parcelable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
     public String getImage() {
@@ -284,6 +308,30 @@ public class Content implements android.os.Parcelable {
 
     public void setVideoWatchedPercentage(int videoWatchedPercentage) {
         this.videoWatchedPercentage = videoWatchedPercentage;
+    }
+
+    public String getModified() {
+        return modified;
+    }
+
+    public void setModified(String modified) {
+        this.modified = modified;
+    }
+
+    public Long getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Long modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
+
+    public Long getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(Long courseId) {
+        this.courseId = courseId;
     }
 
     public Long getHtmlId() {
@@ -478,7 +526,7 @@ public class Content implements android.os.Parcelable {
         } else {
             id = in.readLong();
         }
-        name = in.readString();
+        title = in.readString();
         image = in.readString();
         description = in.readString();
         byte tmpIsLocked = in.readByte();
@@ -540,7 +588,7 @@ public class Content implements android.os.Parcelable {
             dest.writeByte((byte) 1);
             dest.writeLong(id);
         }
-        dest.writeString(name);
+        dest.writeString(title);
         dest.writeString(image);
         dest.writeString(description);
         dest.writeByte((byte) (isLocked == null ? 0 : isLocked ? 1 : 2));

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/actionbar_background</item>
@@ -24,7 +24,8 @@
         <item name="colorPrimary">@android:color/black</item>
     </style>
 
-    <style name="Button">
+    <style name="Button" parent="Widget.AppCompat.Button.Colored">
+        <item name="backgroundTint">@color/color_primary</item>
         <item name="android:paddingTop">15dp</item>
         <item name="android:paddingBottom">15dp</item>
         <item name="android:paddingRight">20dp</item>

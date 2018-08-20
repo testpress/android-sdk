@@ -40,7 +40,7 @@ public interface CourseService {
 
     @GET(COURSE_LIST_PATH + "{course_id}"+ CHAPTERS_PATH)
     RetrofitCall<TestpressApiResponse<Chapter>> getChapters(
-            @Path(value = "course_id", encoded = true) String courseId,
+            @Path(value = "course_id", encoded = true) long courseId,
             @QueryMap Map<String, Object> queryParams,
             @Header("If-Modified-Since") String latestModifiedDate);
 

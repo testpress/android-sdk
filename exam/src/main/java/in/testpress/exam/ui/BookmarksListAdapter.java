@@ -71,7 +71,7 @@ class BookmarksListAdapter extends SingleTypeAdapter<Bookmark> {
             imageView(1).setImageResource(R.drawable.testpress_question_content_icon);
         } else if (object instanceof Content) {
             Content content = (Content) object;
-            setText(0, content.getName());
+            setText(0, content.getTitle());
             if (content.getHtmlId() != null) {
                 imageView(1).setImageResource(R.drawable.testpress_ebook_content_icon);
             } else if (content.getVideoId() != null) {
