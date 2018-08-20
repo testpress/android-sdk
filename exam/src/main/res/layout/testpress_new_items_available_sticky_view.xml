@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/new_items_available_label"
+    android:background="@drawable/testpress_curved_blue_background"
+    android:paddingLeft="12dp"
+    android:paddingRight="12dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:visibility="gone"
+    >
+
+    <ImageView
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:tint="@color/testpress_button_text_color"
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
+        android:src="@drawable/ic_refresh_black_18dp"
+        />
+
+    <TextView
+        android:text="New Items Available"
+        android:textColor="@color/testpress_button_text_color"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        />
+
+</LinearLayout>

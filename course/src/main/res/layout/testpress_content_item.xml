@@ -1,0 +1,40 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="50dp"
+    android:minHeight="45dp"
+    android:paddingLeft="58dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:src="@drawable/testpress_arrow_right"
+        android:id="@+id/content_image"
+        android:tint="#b3b3b3"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:scaleType="centerInside"
+        />
+
+    <TextView
+        android:id="@+id/lblListItem"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingLeft="12dp"
+        android:textColor="#777"
+        android:textSize="14sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:paddingRight="10dp"
+        />
+
+    <ImageView
+        android:src="@drawable/testpress_lock_filled"
+        android:id="@+id/content_state"
+        android:layout_width="11dp"
+        android:layout_height="10dp"
+        android:layout_marginRight="18dp"
+        android:scaleType="centerInside"
+        />
+
+</LinearLayout>

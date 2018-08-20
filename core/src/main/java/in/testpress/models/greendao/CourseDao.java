@@ -40,6 +40,8 @@ public class CourseDao extends AbstractDao<Course, Long> {
         public final static Property ChildItemsLoaded = new Property(15, boolean.class, "childItemsLoaded", false, "CHILD_ITEMS_LOADED");
     }
 
+    private DaoSession daoSession;
+
 
     public CourseDao(DaoConfig config) {
         super(config);
@@ -47,6 +49,7 @@ public class CourseDao extends AbstractDao<Course, Long> {
     
     public CourseDao(DaoConfig config, DaoSession daoSession) {
         super(config, daoSession);
+        this.daoSession = daoSession;
     }
 
     /** Creates the underlying database table. */
@@ -237,6 +240,12 @@ public class CourseDao extends AbstractDao<Course, Long> {
             stmt.bindLong(15, active ? 1L: 0L);
         }
         stmt.bindLong(16, entity.getChildItemsLoaded() ? 1L: 0L);
+    }
+
+    @Override
+    protected final void attachEntity(Course entity) {
+        super.attachEntity(entity);
+        entity.__setDaoSession(daoSession);
     }
 
     @Override
