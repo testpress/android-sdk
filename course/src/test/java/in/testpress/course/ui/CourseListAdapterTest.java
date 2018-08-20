@@ -70,12 +70,12 @@ public class CourseListAdapterTest {
 
     @Test
     public void testGetIncrementBy() {
-        doCallRealMethod().when(courseListAdapter).getIncrementBy((BaseResourcePager) any());
+        doCallRealMethod().when(courseListAdapter).getIncrementBy((BaseResourcePager) any(), anyInt());
         when(baseResourcePager.getTotalItemsCount()).thenReturn(240);
         when(baseResourcePager.getPerPage()).thenReturn(200);
         baseResourcePager.page = 3;
 
-        Assert.assertEquals(40, courseListAdapter.getIncrementBy(baseResourcePager));
+        Assert.assertEquals(40, courseListAdapter.getIncrementBy(baseResourcePager, 80));
     }
 
     @Test

@@ -1,6 +1,9 @@
 package in.testpress.core;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import in.testpress.models.InstituteSettings;
 
@@ -9,7 +12,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
+@RunWith(PowerMockRunner.class)
 public class TestpressSessionTest {
+
+    @Mock
+    InstituteSettings instituteSettings;
 
     @Test
     public void testConstructor_withNullInstituteSettings() throws Exception {
@@ -23,7 +30,6 @@ public class TestpressSessionTest {
 
     @Test
     public void testConstructor_withNullToken() throws Exception {
-        InstituteSettings instituteSettings = mock(InstituteSettings.class);
         try {
             new TestpressSession(instituteSettings, null);
             fail();
@@ -34,7 +40,6 @@ public class TestpressSessionTest {
 
     @Test
     public void testConstructor_withEmptyToken() throws Exception {
-        InstituteSettings instituteSettings = mock(InstituteSettings.class);
         try {
             new TestpressSession(instituteSettings, "");
             fail();
@@ -45,7 +50,6 @@ public class TestpressSessionTest {
 
     @Test
     public void testBaseUrl_withNullBaseUrl() throws Exception {
-        InstituteSettings instituteSettings = mock(InstituteSettings.class);
         try {
             TestpressSession session = new TestpressSession(instituteSettings, "dummyToken");
             session.setInstituteSettings(null);
@@ -57,7 +61,6 @@ public class TestpressSessionTest {
 
     @Test
     public void testSetToken_withNullToken() throws Exception {
-        InstituteSettings instituteSettings = mock(InstituteSettings.class);
         try {
             TestpressSession session = new TestpressSession(instituteSettings, "dummyToken");
             session.setToken(null);
