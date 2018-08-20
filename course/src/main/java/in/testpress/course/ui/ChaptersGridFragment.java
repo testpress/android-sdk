@@ -91,9 +91,9 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
         if (pager == null) {
             QueryBuilder<Chapter> courseChaptersQueryBuilder = getCourseChaptersQueryBuilder();
             if (parentId.equals("null") && courseChaptersQueryBuilder.count() == 0) {
-                pager = new ChapterPager(courseId, mApiClient);
+                pager = new ChapterPager(Long.parseLong(courseId), mApiClient);
             } else {
-                pager = new ChapterPager(courseId, parentId, mApiClient);
+                pager = new ChapterPager(Long.parseLong(courseId), parentId, mApiClient);
                 QueryBuilder<Chapter> parentChaptersQueryBuilder = getParentChaptersQueryBuilder();
                 if (parentChaptersQueryBuilder.count() > 0) {
                     Chapter latestChapter = parentChaptersQueryBuilder

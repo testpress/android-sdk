@@ -37,7 +37,8 @@
         <item name="android:layout_marginRight">8dp</item>
     </style>
 
-    <style name="TestpressButton">
+    <style name="TestpressButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="backgroundTint">@color/testpress_color_primary</item>
         <item name="android:paddingTop">15dp</item>
         <item name="android:paddingBottom">15dp</item>
         <item name="android:paddingRight">20dp</item>
@@ -51,7 +52,8 @@
         <item name="android:textColor">@color/testpress_button_text_color</item>
     </style>
 
-    <style name="TestpressSmallButton">
+    <style name="TestpressSmallButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="backgroundTint">@color/testpress_color_primary</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textStyle">bold</item>

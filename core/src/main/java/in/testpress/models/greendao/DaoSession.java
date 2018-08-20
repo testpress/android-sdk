@@ -66,7 +66,7 @@ import in.testpress.models.greendao.DirectionTranslationDao;
 
 /**
  * {@inheritDoc}
- * 
+ *
  * @see org.greenrobot.greendao.AbstractDaoSession
  */
 public class DaoSession extends AbstractDaoSession {
@@ -261,7 +261,7 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(Direction.class, directionDao);
         registerDao(DirectionTranslation.class, directionTranslationDao);
     }
-    
+
     public void clear() {
         reviewAttemptDaoConfig.clearIdentityScope();
         reviewItemDaoConfig.clearIdentityScope();
