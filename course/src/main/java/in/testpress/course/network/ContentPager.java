@@ -1,11 +1,15 @@
 package in.testpress.course.network;
 
+import java.text.ParseException;
+
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Content;
-import in.testpress.network.BaseResourcePager;
+import in.testpress.network.BaseDatabaseModelPager;
 import in.testpress.network.RetrofitCall;
 
-public class ContentPager extends BaseResourcePager<Content> {
+import static in.testpress.network.TestpressApiClient.UNFILTERED;
+
+public class ContentPager extends BaseDatabaseModelPager<Content> {
 
     private TestpressCourseApiClient apiClient;
     private long courseId;
@@ -23,7 +27,21 @@ public class ContentPager extends BaseResourcePager<Content> {
     @Override
     public RetrofitCall<TestpressApiResponse<Content>> getItems(int page, int size) {
         queryParams.put(TestpressCourseApiClient.PAGE, page);
+        queryParams.put(UNFILTERED, true);
         return apiClient.getContents(courseId, queryParams);
+    }
+
+    @Override
+    protected Content register(Content content) {
+        if (content != null && content.getModified() != null && !content.getModified().isEmpty()) {
+            try {
+                content.setModifiedDate(simpleDateFormat.parse(content.getModified()).getTime());
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        return content;
     }
 
 }
