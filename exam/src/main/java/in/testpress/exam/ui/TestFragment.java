@@ -31,7 +31,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
@@ -85,21 +84,22 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private CourseAttempt courseAttempt;
     private int currentPosition;
     private int currentSection;
+    private boolean unlockedSections;
     private List<AttemptSection> sections = new ArrayList<>();
     private TestQuestionsPager questionsPager;
     private List<AttemptItem> attemptItemList = new ArrayList<>();
     private CountDownTimer countDownTimer;
     private long millisRemaining;
     private LockableSpinnerItemAdapter sectionSpinnerAdapter;
-    private PlainSpinnerItemAdapter subjectSpinnerAdapter;
+    private PlainSpinnerItemAdapter plainSpinnerAdapter;
     private Language selectedLanguage;
     private Boolean fistTimeCallback = false;
-    private int selectedSubjectOffset;
+    private int selectedPlainSpinnerItemOffset;
     private boolean navigationButtonPressed;
     /*
-     * Map of subjects & its starting point(first question index)
+     * Map of subjects/sections & its starting point(first question index)
      */
-    private HashMap<String, Integer> subjectsOffset = new HashMap<>();
+    private HashMap<String, Integer> plainSpinnerItemOffsets = new HashMap<>();
     private enum Action { PAUSE, END, UPDATE_ANSWER, END_SECTION }
 
     @Override
@@ -120,10 +120,16 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             for (int i = 0; i < sections.size(); i++) {
                 if (sections.get(i).getState().equals(RUNNING)) {
                     currentSection = i;
-                    break;
+                }
+                if (sections.get(i).getDuration() == null ||
+                        sections.get(i).getDuration().equals("0:00:00")) {
+
+                    unlockedSections = true;
                 }
             }
-            questionUrl = sections.get(currentSection).getQuestionsUrlFrag();
+            if (!unlockedSections) {
+                questionUrl = sections.get(currentSection).getQuestionsUrlFrag();
+            }
         }
         apiClient = new TestpressExamApiClient(getActivity());
         questionsPager = new TestQuestionsPager(questionUrl, apiClient);
@@ -222,7 +228,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         panelListAdapter = new TestPanelListAdapter(getLayoutInflater(), filterItems,
                 R.layout.testpress_test_panel_list_item);
 
-        if (sections.size() > 1) {
+        if (sections.size() > 1 && !unlockedSections) {
             sectionSpinnerAdapter = new LockableSpinnerItemAdapter(getActivity());
             for (AttemptSection section : sections) {
                 sectionSpinnerAdapter.addItem(section.getName(), section.getName(), true, 0);
@@ -281,9 +287,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             sectionSpinnerAdapter.setSelectedItem(currentSection);
             primaryQuestionsFilter.setSelection(currentSection);
             questionFilterContainer.setVisibility(View.VISIBLE);
-        } else if (exam.getTemplateType() == 2) {
-            subjectSpinnerAdapter = new PlainSpinnerItemAdapter(getActivity());
-            primaryQuestionsFilter.setAdapter(subjectSpinnerAdapter);
+        } else if (exam.getTemplateType() == 2 || unlockedSections) {
+            plainSpinnerAdapter = new PlainSpinnerItemAdapter(getActivity());
+            primaryQuestionsFilter.setAdapter(plainSpinnerAdapter);
             primaryQuestionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> spinner, View view, int position,
@@ -293,14 +299,14 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                         fistTimeCallback = true;
                         return;
                     }
-                    String subject = subjectSpinnerAdapter.getTag(position);
-                    selectedSubjectOffset = subjectsOffset.get(subject);
+                    String selectedSpinnerItem = plainSpinnerAdapter.getTag(position);
+                    selectedPlainSpinnerItemOffset = plainSpinnerItemOffsets.get(selectedSpinnerItem);
                     if (navigationButtonPressed) {
                         // Spinner item changed by clicking next or prev button
                         navigationButtonPressed = false;
                     } else {
-                        // Spinner item changed by selecting subject in spinner
-                        pager.setCurrentItem(subjectsOffset.get(subject));
+                        // Spinner item changed by selecting subject/section in spinner
+                        pager.setCurrentItem(plainSpinnerItemOffsets.get(selectedSpinnerItem));
                     }
                 }
 
@@ -398,13 +404,19 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         if (slidingPaneLayout.isOpen()) {
             slidingPaneLayout.closePane();
         }
-        if(subjectSpinnerAdapter != null && subjectSpinnerAdapter.getCount() > 1) {
-            String currentSubject = attemptItemList.get(pager.getCurrentItem()).getAttemptQuestion()
-                    .getSubject();
-            if (selectedSubjectOffset != subjectsOffset.get(currentSubject)) {
+        if(plainSpinnerAdapter != null && plainSpinnerAdapter.getCount() > 1) {
+            String currentSpinnerItem;
+            AttemptItem currentAttemptItem = attemptItemList.get(pager.getCurrentItem());
+            if (unlockedSections) {
+                currentSpinnerItem = currentAttemptItem.getAttemptSection().getName();
+            } else {
+                currentSpinnerItem = currentAttemptItem.getAttemptQuestion().getSubject();
+            }
+            if (selectedPlainSpinnerItemOffset != plainSpinnerItemOffsets.get(currentSpinnerItem)) {
                 //  Navigated to prev subject, so change the spinner item
                 navigationButtonPressed = true;
-                primaryQuestionsFilter.setSelection(subjectSpinnerAdapter.getItemPosition(currentSubject));
+                primaryQuestionsFilter
+                        .setSelection(plainSpinnerAdapter.getItemPosition(currentSpinnerItem));
             }
         }
 
@@ -580,46 +592,42 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         }
 
         attemptItemList = items;
-        if (attempt.getRemainingTime() == null || attempt.getRemainingTime().equals("00:00:00")) {
+        if (attempt.getRemainingTime() == null || attempt.getRemainingTime().equals("0:00:00")) {
             endExam();
             return;
         }
-        if (sections.size() <= 1 && exam.getTemplateType() == 2) {
-            // Used to get subjects in order as it fetched
-            List<String> subjectsList = new ArrayList<>();
-            // To Populate the spinner with the subjects
-            HashMap<String, List<AttemptItem>> subjectsWiseItems = new HashMap<>();
-            for (AttemptItem item : items) {
-                if (item.getAttemptQuestion().getSubject() == null || item.getAttemptQuestion()
-                        .getSubject().isEmpty()) {
-                    // If subject is empty, subject = "Uncategorized"
-                    item.getAttemptQuestion().setSubject(getResources()
-                            .getString(R.string.testpress_uncategorized));
-                }
-                if (subjectsWiseItems.containsKey(item.getAttemptQuestion().getSubject())) {
-                    // Check subject is already added if added simply add the item it
-                    subjectsWiseItems.get(item.getAttemptQuestion().getSubject()).add(item);
+        if (sections.size() <= 1 && exam.getTemplateType() == 2 || unlockedSections) {
+            // Used to get items in order as it fetched
+            List<String> spinnerItemsList = new ArrayList<>();
+            HashMap<String, List<AttemptItem>> groupedAttemptItems = new HashMap<>();
+            for (AttemptItem attemptItem : items) {
+                if (unlockedSections) {
+                    String section = attemptItem.getAttemptSection().getName();
+                    groupAttemptItems(section, attemptItem, spinnerItemsList, groupedAttemptItems);
                 } else {
-                    // Add the subject & then add item to it
-                    subjectsWiseItems.put(item.getAttemptQuestion().getSubject(),
-                            new ArrayList<AttemptItem>());
-                    subjectsWiseItems.get(item.getAttemptQuestion().getSubject()).add(item);
-                    subjectsList.add(item.getAttemptQuestion().getSubject());
+                    String subject = attemptItem.getAttemptQuestion().getSubject();
+                    if (subject == null || subject.isEmpty()) {
+                        // If subject is empty, subject = "Uncategorized"
+                        attemptItem.getAttemptQuestion()
+                                .setSubject(getString(R.string.testpress_uncategorized));
+                    }
+                    groupAttemptItems(subject, attemptItem, spinnerItemsList, groupedAttemptItems);
                 }
             }
-            if (subjectsList.size() > 1) {
+            if (spinnerItemsList.size() > 1) {
                 // Clear the previous data stored while loading which might be unordered
                 attemptItemList.clear();
-                // Store each set of subject items to attemptItemList
-                for (String subject : subjectsList) {
-                    subjectsOffset.put(subject, attemptItemList.size()); // Add subjects & it starting point
-                    attemptItemList.addAll(subjectsWiseItems.get(subject));
-                    subjectSpinnerAdapter.addItem(subject, subject, true, 0);
+                // Store each set of items to attemptItemList
+                for (String spinnerItem : spinnerItemsList) {
+                    // Add spinner item & it starting point
+                    plainSpinnerItemOffsets.put(spinnerItem, attemptItemList.size());
+                    attemptItemList.addAll(groupedAttemptItems.get(spinnerItem));
+                    plainSpinnerAdapter.addItem(spinnerItem, spinnerItem, true, 0);
                 }
-                subjectSpinnerAdapter.notifyDataSetChanged();
+                plainSpinnerAdapter.notifyDataSetChanged();
                 primaryQuestionsFilter.setSelection(0); // Set 1st item as default selection
                 questionFilterContainer.setVisibility(View.VISIBLE);
-                selectedSubjectOffset = 0;
+                selectedPlainSpinnerItemOffset = 0;
             }
         }
 
@@ -638,10 +646,24 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             goToQuestion(0);
         }
         String remainingTime = attempt.getRemainingTime();
-        if (sections.size() > 1) {
+        if (sections.size() > 1 && !unlockedSections) {
             remainingTime = sections.get(currentSection).getRemainingTime();
         }
         startCountDownTimer(formatMillisecond(remainingTime));
+    }
+
+    void groupAttemptItems(String spinnerItem, AttemptItem attemptItem, List<String> spinnerItemsList,
+                           HashMap<String, List<AttemptItem>> groupedAttemptItems) {
+
+        if (groupedAttemptItems.containsKey(spinnerItem)) {
+            // Check spinnerItem is already added if added simply add the item it
+            groupedAttemptItems.get(spinnerItem).add(attemptItem);
+        } else {
+            // Add the spinnerItem & then add item to it
+            groupedAttemptItems.put(spinnerItem, new ArrayList<AttemptItem>());
+            groupedAttemptItems.get(spinnerItem).add(attemptItem);
+            spinnerItemsList.add(spinnerItem);
+        }
     }
 
     @Override

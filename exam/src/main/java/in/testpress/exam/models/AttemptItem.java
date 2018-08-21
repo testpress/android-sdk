@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import in.testpress.models.greendao.AttemptSection;
 import in.testpress.util.CommonUtils;
 
 public class AttemptItem implements Parcelable {
@@ -21,6 +22,7 @@ public class AttemptItem implements Parcelable {
     private Boolean currentReview;
     private String shortText;
     private String currentShortText;
+    private AttemptSection attemptSection;
 
     AttemptItem() {
         selectedAnswers = new ArrayList<Integer>();
@@ -28,17 +30,38 @@ public class AttemptItem implements Parcelable {
     }
 
     // Parcelling part
-    public AttemptItem(Parcel parcel){
-        question = (AttemptQuestion) parcel.readParcelable(AttemptQuestion.class.getClassLoader());
-        url = parcel.readString();
-        selectedAnswers = new ArrayList<Integer>();
-        parcel.readList(selectedAnswers, List.class.getClassLoader());
-        savedAnswers = new ArrayList<Integer>();
-        parcel.readList(savedAnswers, List.class.getClassLoader());
-        review = parcel.readByte() != 0;
-        currentReview = parcel.readByte() != 0;
-        shortText = parcel.readString();
-        currentShortText = parcel.readString();
+    protected AttemptItem(Parcel in) {
+        url = in.readString();
+        question = in.readParcelable(AttemptQuestion.class.getClassLoader());
+        byte tmpReview = in.readByte();
+        review = tmpReview == 0 ? null : tmpReview == 1;
+        if (in.readByte() == 0) {
+            index = null;
+        } else {
+            index = in.readInt();
+        }
+        byte tmpCurrentReview = in.readByte();
+        currentReview = tmpCurrentReview == 0 ? null : tmpCurrentReview == 1;
+        shortText = in.readString();
+        currentShortText = in.readString();
+        attemptSection = in.readParcelable(AttemptSection.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(url);
+        dest.writeParcelable(question, flags);
+        dest.writeByte((byte) (review == null ? 0 : review ? 1 : 2));
+        if (index == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(index);
+        }
+        dest.writeByte((byte) (currentReview == null ? 0 : currentReview ? 1 : 2));
+        dest.writeString(shortText);
+        dest.writeString(currentShortText);
+        dest.writeParcelable(attemptSection, flags);
     }
 
     @Override
@@ -46,23 +69,13 @@ public class AttemptItem implements Parcelable {
         return 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeParcelable(question, i);
-        parcel.writeString(url);
-        parcel.writeList(selectedAnswers);
-        parcel.writeList(savedAnswers);
-        parcel.writeByte(CommonUtils.getByteFromBoolean(review));
-        parcel.writeByte(CommonUtils.getByteFromBoolean(currentReview));
-        parcel.writeString(shortText);
-        parcel.writeString(currentShortText);
-    }
-
-    public static final Creator CREATOR = new Creator() {
-        public AttemptItem createFromParcel(Parcel parcel) {
-            return new AttemptItem(parcel);
+    public static final Creator<AttemptItem> CREATOR = new Creator<AttemptItem>() {
+        @Override
+        public AttemptItem createFromParcel(Parcel in) {
+            return new AttemptItem(in);
         }
 
+        @Override
         public AttemptItem[] newArray(int size) {
             return new AttemptItem[size];
         }
@@ -203,5 +216,13 @@ public class AttemptItem implements Parcelable {
 
     public void setCurrentShortText(String currentShortText) {
         this.currentShortText = currentShortText;
+    }
+
+    public AttemptSection getAttemptSection() {
+        return attemptSection;
+    }
+
+    public void setAttemptSection(AttemptSection attemptSection) {
+        this.attemptSection = attemptSection;
     }
 }
