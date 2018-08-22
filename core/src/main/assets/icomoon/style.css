@@ -24,19 +24,23 @@
   content: "\ea52";
   font-size: 1.25rem;
   color: #3399ff;
+  line-height: 1.7rem;
 }
 .icon-checkbox-unchecked:before {
   content: "\ea53";
   font-size: 1.25rem;
   color: #999;
+  line-height: 1.7rem;
 }
 .icon-radio-checked2:before {
   content: "\ea55";
   font-size: 1.25rem;
   color: #3399ff;
+  line-height: 1.7rem;
 }
 .icon-radio-unchecked:before {
   content: "\ea56";
   font-size: 1.25rem;
   color: #aaa;
+  line-height: 1.7rem;
 }

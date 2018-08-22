@@ -227,7 +227,7 @@ public class WebViewUtils {
                 "   <td id='" + id + "' onclick='onRadioOptionClick(this)'" +
                 "       class='option-item table-without-border wrapper'>" +
                 "           <div name='" + id + "' class='icon-radio-unchecked'></div>" +
-                "           <span style='margin-left:10px; margin-top:-2px;'>" + optionText + "</span>" +
+                "           <span style='margin-left:10px; margin-top:-3px;'>" + optionText + "</span>" +
                 "   </td>" +
                 "</tr>";
     }
@@ -238,7 +238,7 @@ public class WebViewUtils {
                 "   <td id='" + id + "' onclick='onCheckBoxOptionClick(this)'" +
                 "       class='option-item table-without-border wrapper'>" +
                 "           <div name='" + id + "' class='icon-checkbox-unchecked'></div>" +
-                "           <span style='margin-left:10px; margin-top:-2px;'>" + optionText + "</span>" +
+                "           <span style='margin-left:10px; margin-top:-3px;'>" + optionText + "</span>" +
                 "   </td>" +
                 "</tr>";
     }

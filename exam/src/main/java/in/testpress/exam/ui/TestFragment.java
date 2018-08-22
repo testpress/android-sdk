@@ -84,7 +84,8 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private CourseAttempt courseAttempt;
     private int currentPosition;
     private int currentSection;
-    private boolean unlockedSections;
+    private boolean lockedSectionExam;
+    private boolean unlockedSectionExam;
     private List<AttemptSection> sections = new ArrayList<>();
     private TestQuestionsPager questionsPager;
     private List<AttemptItem> attemptItemList = new ArrayList<>();
@@ -124,10 +125,11 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 if (sections.get(i).getDuration() == null ||
                         sections.get(i).getDuration().equals("0:00:00")) {
 
-                    unlockedSections = true;
+                    unlockedSectionExam = true;
                 }
             }
-            if (!unlockedSections) {
+            lockedSectionExam = !unlockedSectionExam;
+            if (lockedSectionExam) {
                 questionUrl = sections.get(currentSection).getQuestionsUrlFrag();
             }
         }
@@ -228,7 +230,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         panelListAdapter = new TestPanelListAdapter(getLayoutInflater(), filterItems,
                 R.layout.testpress_test_panel_list_item);
 
-        if (sections.size() > 1 && !unlockedSections) {
+        if (lockedSectionExam) {
             sectionSpinnerAdapter = new LockableSpinnerItemAdapter(getActivity());
             for (AttemptSection section : sections) {
                 sectionSpinnerAdapter.addItem(section.getName(), section.getName(), true, 0);
@@ -287,7 +289,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             sectionSpinnerAdapter.setSelectedItem(currentSection);
             primaryQuestionsFilter.setSelection(currentSection);
             questionFilterContainer.setVisibility(View.VISIBLE);
-        } else if (exam.getTemplateType() == 2 || unlockedSections) {
+        } else if (exam.getTemplateType() == 2 || unlockedSectionExam) {
             plainSpinnerAdapter = new PlainSpinnerItemAdapter(getActivity());
             primaryQuestionsFilter.setAdapter(plainSpinnerAdapter);
             primaryQuestionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -407,7 +409,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         if(plainSpinnerAdapter != null && plainSpinnerAdapter.getCount() > 1) {
             String currentSpinnerItem;
             AttemptItem currentAttemptItem = attemptItemList.get(pager.getCurrentItem());
-            if (unlockedSections) {
+            if (unlockedSectionExam) {
                 currentSpinnerItem = currentAttemptItem.getAttemptSection().getName();
             } else {
                 currentSpinnerItem = currentAttemptItem.getAttemptQuestion().getSubject();
@@ -433,7 +435,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private void updateNextButton(int position) {
         if ((position + 1) == attemptItemList.size()) {
             // Reached last question
-            if (sections.size() > 1) {
+            if (lockedSectionExam) {
                 setEnable(false, next);
             } else {
                 next.setTextColor(ContextCompat.getColor(next.getContext(), R.color.testpress_red));
@@ -457,7 +459,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                         .setTitle(R.string.testpress_end_title)
                         .setMessage(R.string.testpress_end_message);
 
-        if (sections.size() <= 1) {
+        if (!lockedSectionExam) {
             dialogBuilder
                     .setPositiveButton(R.string.testpress_end, new DialogInterface.OnClickListener() {
                         @Override
@@ -503,7 +505,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     @NonNull
     @Override
     public Loader<List<AttemptItem>> onCreateLoader(int id, final Bundle args) {
-        if (sections.size() > 1) {
+        if (lockedSectionExam) {
             progressDialog.setMessage(getString(R.string.testpress_loading_section_questions,
                     sections.get(currentSection).getName()));
 
@@ -596,12 +598,12 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             endExam();
             return;
         }
-        if (sections.size() <= 1 && exam.getTemplateType() == 2 || unlockedSections) {
+        if (sections.size() <= 1 && exam.getTemplateType() == 2 || unlockedSectionExam) {
             // Used to get items in order as it fetched
             List<String> spinnerItemsList = new ArrayList<>();
             HashMap<String, List<AttemptItem>> groupedAttemptItems = new HashMap<>();
             for (AttemptItem attemptItem : items) {
-                if (unlockedSections) {
+                if (unlockedSectionExam) {
                     String section = attemptItem.getAttemptSection().getName();
                     groupAttemptItems(section, attemptItem, spinnerItemsList, groupedAttemptItems);
                 } else {
@@ -646,7 +648,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             goToQuestion(0);
         }
         String remainingTime = attempt.getRemainingTime();
-        if (sections.size() > 1 && !unlockedSections) {
+        if (lockedSectionExam) {
             remainingTime = sections.get(currentSection).getRemainingTime();
         }
         startCountDownTimer(formatMillisecond(remainingTime));
@@ -1067,7 +1069,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 } else if (endExamAlertDialog != null && endExamAlertDialog.isShowing()) {
                     endExamAlertDialog.dismiss();
                 }
-                if (sections.size() > 1) {
+                if (lockedSectionExam) {
                     endSection();
                 } else {
                     endExam();
