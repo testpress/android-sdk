@@ -2,6 +2,7 @@ package in.testpress.course.util;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Handler;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -23,6 +24,8 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
+import java.util.Random;
+
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
@@ -36,6 +39,8 @@ import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 
 public class ExoPlayerUtil {
 
+    private static final int OVERLAY_POSITION_CHANGE_INTERVAL = 15000; // 15s
+
     private Context context;
     private View exoPlayerLayout;
     private String url;
@@ -43,9 +48,19 @@ public class ExoPlayerUtil {
     private PlayerView playerView;
     private LottieAnimationView progressBar;
     private TextView errorMessageTextView;
+    private LinearLayout emailIdLayout;
+    private TextView emailIdTextView;
     private SimpleExoPlayer player;
     private long startPosition;
     private boolean playWhenReady = true;
+    private Handler overlayPositionHandler;
+    private Runnable overlayPositionChangeTask = new Runnable() {
+        @Override
+        public void run() {
+            displayOverlayText();
+            overlayPositionHandler.postDelayed(this, OVERLAY_POSITION_CHANGE_INTERVAL);
+        }
+    };
 
     public ExoPlayerUtil(Context context, View exoPlayerLayout, String url) {
         this.context = context;
@@ -54,16 +69,17 @@ public class ExoPlayerUtil {
         playerView = exoPlayerLayout.findViewById(R.id.exo_player_view);
         progressBar = exoPlayerLayout.findViewById(R.id.exo_player_progress);
         errorMessageTextView = exoPlayerLayout.findViewById(R.id.error_message);
+        TestpressSession session = TestpressSdk.getTestpressSession(context);
+        if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
+            setUserEmailOverlay();
+        }
         playerView.setPlaybackPreparer(new PlaybackPreparer() {
             @Override
             public void preparePlayback() {
                 initializePlayer();
             }
         });
-        TestpressSession session = TestpressSdk.getTestpressSession(context);
-        if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
-            setUserEmailOverlay();
-        }
+
     }
 
     public ExoPlayerUtil(Context context, View exoPlayerLayout, String url, long startPosition,
@@ -88,6 +104,10 @@ public class ExoPlayerUtil {
         }
         MediaSource mediaSource = buildMediaSource(Uri.parse(url));
         player.prepare(mediaSource, false, false);
+        if (overlayPositionHandler != null) {
+            overlayPositionHandler
+                    .postDelayed(overlayPositionChangeTask, OVERLAY_POSITION_CHANGE_INTERVAL);
+        }
     }
 
     public void releasePlayer() {
@@ -96,6 +116,9 @@ public class ExoPlayerUtil {
             playWhenReady = player.getPlayWhenReady();
             player.release();
             player = null;
+            if (overlayPositionHandler != null) {
+                overlayPositionHandler.removeCallbacks(overlayPositionChangeTask);
+            }
         }
     }
 
@@ -170,11 +193,19 @@ public class ExoPlayerUtil {
         } else {
             overlayText = profileDetails.getUsername();
         }
-        TextView textView = exoPlayerLayout.findViewById(R.id.email_id);
-        textView.setText(overlayText);
-        LinearLayout linearLayout = exoPlayerLayout.findViewById(R.id.email_id_layout);
+        emailIdTextView = exoPlayerLayout.findViewById(R.id.email_id);
+        emailIdTextView.setText(overlayText);
+        emailIdLayout = exoPlayerLayout.findViewById(R.id.email_id_layout);
         Animation marquee = AnimationUtils.loadAnimation(context, R.anim.testpress_marquee);
-        linearLayout.startAnimation(marquee);
+        emailIdLayout.startAnimation(marquee);
+        overlayPositionHandler = new Handler();
+    }
+
+    private void displayOverlayText() {
+        int height = Math.max(emailIdLayout.getMeasuredHeight(), 1);
+        Random random = new Random();
+        float randomY = random.nextInt(height) + emailIdLayout.getY();
+        emailIdTextView.setY(randomY);
     }
 
     private class PlayerEventListener extends Player.DefaultEventListener {
