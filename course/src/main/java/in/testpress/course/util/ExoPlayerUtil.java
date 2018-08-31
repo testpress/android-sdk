@@ -186,6 +186,13 @@ public class ExoPlayerUtil {
             } else {
                 progressBar.setVisibility(View.GONE);
             }
+            if (playbackState == Player.STATE_IDLE || playbackState == Player.STATE_ENDED ||
+                    !playWhenReady) {
+
+                playerView.setKeepScreenOn(false);
+            } else {
+                playerView.setKeepScreenOn(true);
+            }
         }
 
         @Override
