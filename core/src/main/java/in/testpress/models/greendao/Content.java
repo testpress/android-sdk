@@ -25,7 +25,7 @@ import in.testpress.core.TestpressSDKDatabase;
 public class Content implements android.os.Parcelable {
     private Integer order;
     private String htmlContentTitle;
-    @SerializedName(value="htmlContentUrl", alternate={"htmlUrl"})
+    @SerializedName(value="html_content_url", alternate={"html_url"})
     private String htmlContentUrl;
     private String url;
     private String attemptsUrl;
