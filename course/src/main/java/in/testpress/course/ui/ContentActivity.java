@@ -14,8 +14,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -31,8 +29,6 @@ import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.gson.JsonObject;
-
-import junit.framework.Assert;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,6 +59,8 @@ import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.AttemptDao;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.BookmarkFolder;
+import in.testpress.models.greendao.Chapter;
+import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.CourseAttempt;
@@ -90,11 +88,15 @@ import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.network.TestpressCourseApiClient.EMBED_CODE;
 import static in.testpress.course.network.TestpressCourseApiClient.EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
+import static in.testpress.course.network.TestpressCourseApiClient.CONTENTS_PATH_V2_4;
 import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
-import static in.testpress.exam.network.TestpressExamApiClient.CONTENTS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.STATE_PAUSED;
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
+import static in.testpress.models.greendao.Content.ATTACHMENT_TYPE;
+import static in.testpress.models.greendao.Content.EXAM_TYPE;
+import static in.testpress.models.greendao.Content.HTML_TYPE;
+import static in.testpress.models.greendao.Content.VIDEO_TYPE;
 
 public class ContentActivity extends BaseToolBarActivity {
 
@@ -126,7 +128,7 @@ public class ContentActivity extends BaseToolBarActivity {
     private Button nextButton;
     private List<Content> contents;
     private Content content;
-    private String contentId;
+    private long contentId;
     private String attemptsUrl;
     private List<CourseAttempt> courseAttemptsFromDB = new ArrayList<>();
     private List<CourseAttempt> courseAttemptsFromNetwork = new ArrayList<>();
@@ -166,9 +168,9 @@ public class ContentActivity extends BaseToolBarActivity {
     private RetrofitCall<Void> deleteBookmarkApiRequest;
     private RetrofitCall<HtmlContent> htmlContentApiRequest;
 
-    public static Intent createIntent(int position, long chapterId, AppCompatActivity activity) {
+    public static Intent createIntent(long contentId, long chapterId, AppCompatActivity activity) {
         Intent intent = new Intent(activity, ContentActivity.class);
-        intent.putExtra(POSITION, position);
+        intent.putExtra(CONTENT_ID, contentId);
         //noinspection ConstantConditions
         intent.putExtra(ACTIONBAR_TITLE, activity.getSupportActionBar().getTitle());
         intent.putExtra(CHAPTER_ID, chapterId);
@@ -177,7 +179,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     public static Intent createIntent(String contentId, Context context) {
         Intent intent = new Intent(context, ContentActivity.class);
-        intent.putExtra(CONTENT_ID, contentId);
+        intent.putExtra(CONTENT_ID, Long.parseLong(contentId));
         return intent;
     }
 
@@ -319,82 +321,108 @@ public class ContentActivity extends BaseToolBarActivity {
         };
         webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
         fullScreenChromeClient = new FullScreenChromeClient(this);
-        chapterId = getIntent().getLongExtra(CHAPTER_ID, 0);
-        if (chapterId != 0) {
-            contents = getContentsFromDB();
+        contentId = getIntent().getLongExtra(CONTENT_ID, 0);
+        if (contentId == 0) {
+            throw new IllegalArgumentException("contentId must not be null.");
         }
-        if (contents == null || contents.isEmpty()) {
-            contentId = getIntent().getStringExtra(CONTENT_ID);
-            if (contentId == null) {
-                Assert.assertNotNull("contentId must not be null.", contents);
-            } else {
+        content = getContentFromDB();
+        chapterId = getIntent().getLongExtra(CHAPTER_ID, 0);
+        if (chapterId == 0) {
+            if (content == null) {
                 updateContent();
+            } else {
+                checkContentType();
             }
             buttonLayout.setVisibility(View.GONE);
         } else {
-            position = getIntent().getIntExtra(POSITION, -1);
-            if (position == -1) {
-                throw new IllegalArgumentException("POSITION must not be null.");
+            Chapter chapter = TestpressSDKDatabase.getChapterDao(this).queryBuilder()
+                    .where(ChapterDao.Properties.Id.eq(chapterId)).list().get(0);
+
+            getSupportActionBar().setTitle(chapter.getName());
+            if (content == null) {
+                updateContent();
+            } else {
+                contents = getContentsFromDB();
+                position = content.getOrder();
+                pageNumber.setText(String.format("%d/%d", position + 1, contents.size()));
+                checkContentType();
+                validateAdjacentNavigationButton();
             }
-            content = contents.get(position);
-            String title = getIntent().getStringExtra(ACTIONBAR_TITLE);
-            Assert.assertNotNull("ACTIONBAR_TITLE must not be null.", title);
-            getSupportActionBar().setTitle(title);
-            pageNumber.setText(String.format("%d/%d", position + 1, contents.size()));
-            checkContentType();
-            validateAdjacentNavigationButton();
+
             exoplayerFullscreenHelper = new ExoplayerFullscreenHelper(this);
             exoplayerFullscreenHelper.initializeOrientationListener();
+
         }
+    }
+
+    private Content getContentFromDB() {
+        List<Content> contents = contentDao.queryBuilder()
+                .where(ContentDao.Properties.Id.eq(contentId)).list();
+
+        if (contents.isEmpty()) {
+            return null;
+        }
+        return contents.get(0);
     }
 
     private void checkContentType() {
         hideContents();
-        if (content.getHtmlContentTitle() != null) {
-            loadContentHtml();
-        } else if (content.getRawVideo() != null) {
-            Video video = content.getRawVideo();
-            setContentTitle(video.getTitle());
-            if (video.getIsDomainRestricted()) {
-                JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty(EMBED_CODE, video.getEmbedCode());
-                String url = courseApiClient.getBaseUrl()+ EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
-                webViewUtils.initWebViewAndPostUrl(url, jsonObject.toString(), this);
-                webView.setWebChromeClient(fullScreenChromeClient);
-            } else if (!content.isNonEmbeddableVideo()) {
-                isNonEmbeddableVideo = false;
-                String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
-                        "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
-
-                webViewUtils.initWebView(html, this);
-                webView.setWebChromeClient(fullScreenChromeClient);
-            } else {
-                isNonEmbeddableVideo = true;
-                TestpressSession session = TestpressSdk.getTestpressSession(this);
-                if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
-                    checkProfileDetailExist(video.getUrl());
-                } else {
-                    initExoPlayer(video.getUrl());
+        switch (content.getContentType()) {
+            case HTML_TYPE:
+                setContentTitle(content.getTitle());
+                loadContentHtml();
+                break;
+            case VIDEO_TYPE:
+                Video video = content.getRawVideo();
+                if (video == null) {
+                    updateContent();
+                    return;
                 }
-            }
-        } else if (content.getRawExam() != null) {
-            onExamContent();
-        } else if (content.getRawAttachment() != null) {
-            displayAttachmentContent();
-        } else {
-            setEmptyText(R.string.testpress_error_loading_contents,
-                    R.string.testpress_some_thing_went_wrong_try_again,
-                    R.drawable.ic_error_outline_black_18dp);
+                setContentTitle(video.getTitle());
+                if (video.getIsDomainRestricted()) {
+                    JsonObject jsonObject = new JsonObject();
+                    jsonObject.addProperty(EMBED_CODE, video.getEmbedCode());
+                    String url = courseApiClient.getBaseUrl() + EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
+                    webViewUtils.initWebViewAndPostUrl(url, jsonObject.toString(), this);
+                    webView.setWebChromeClient(fullScreenChromeClient);
+                } else if (!content.isNonEmbeddableVideo()) {
+                    isNonEmbeddableVideo = false;
+                    String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
+                            "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
+
+                    webViewUtils.initWebView(html, this);
+                    webView.setWebChromeClient(fullScreenChromeClient);
+
+                } else {
+                    isNonEmbeddableVideo = true;
+                    TestpressSession session = TestpressSdk.getTestpressSession(this);
+                    if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
+                        checkProfileDetailExist(video.getUrl());
+                    } else {
+                        initExoPlayer(video.getUrl());
+                    }
+                }
+                break;
+            case EXAM_TYPE:
+                onExamContent();
+                break;
+            case ATTACHMENT_TYPE:
+                displayAttachmentContent();
+                break;
+            default:
+                setEmptyText(R.string.testpress_error_loading_contents,
+                        R.string.testpress_some_thing_went_wrong_try_again,
+                        R.drawable.ic_error_outline_black_18dp);
+                break;
         }
     }
 
     private void loadContentHtml() {
-        setContentTitle(Html.fromHtml(content.getHtmlContentTitle()));
         HtmlContent htmlContent = fetchHtmlContentFromDB();
         if (htmlContent != null) {
             displayHtmlContent(htmlContent);
         } else {
-            loadContentHtmlFromServer();
+            updateContent();
         }
     }
 
@@ -475,6 +503,10 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void displayAttachmentContent() {
         setContentTitle(content.getTitle());
+        if (content.getRawAttachment() == null) {
+            updateContent();
+            return;
+        }
         TextView description = (TextView) findViewById(R.id.attachment_description);
         final Attachment attachment = content.getRawAttachment();
         if (attachment.getDescription() != null && !attachment.getDescription().isEmpty()) {
@@ -500,6 +532,10 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void onExamContent() {
         setContentTitle(content.getTitle());
+        if (content.getRawExam() == null) {
+            updateContent();
+            return;
+        }
         // forceRefresh if already attempts is listed
         boolean forceRefresh = !courseAttemptsFromDB.isEmpty();
         courseAttemptsFromDB.clear();
@@ -832,32 +868,41 @@ public class ContentActivity extends BaseToolBarActivity {
     private void updateContent() {
         showLoadingProgress();
         hideContents();
-        String contentUrl;
-        if (content != null) {
-            contentUrl = content.getUrl();
-        } else {
-            contentUrl = CONTENTS_PATH + contentId;
-        }
-
+        String contentUrl = CONTENTS_PATH_V2_4 + contentId;
         updateContentApiRequest = courseApiClient.getContent(contentUrl)
                 .enqueue(new TestpressCallback<Content>() {
                     @Override
                     public void onSuccess(Content content) {
-                        Video video = content.getRawVideo();
-                        if (video != null) {
-                            videoDao.insertOrReplace(video);
-                            content.setVideoId(video.getId());
+                        switch (content.getContentType()) {
+                            case VIDEO_TYPE:
+                                Video video = content.getRawVideo();
+                                videoDao.insertOrReplace(video);
+                                content.setVideoId(video.getId());
+                                break;
+                            case EXAM_TYPE:
+                                Exam exam = content.getRawExam();
+                                exam.saveLanguages(getBaseContext());
+                                examDao.insertOrReplace(exam);
+                                content.setExamId(exam.getId());
+                                break;
+                            case ATTACHMENT_TYPE:
+                                Attachment attachment = content.getRawAttachment();
+                                attachmentDao.insertOrReplace(attachment);
+                                content.setAttachmentId(attachment.getId());
+                                break;
+                            case HTML_TYPE:
+                                if (ContentActivity.this.content != null &&
+                                        ContentActivity.this.content.getHtmlId() != null) {
+
+                                    content.setHtmlId(ContentActivity.this.content.getHtmlId());
+                                }
+                                break;
                         }
-                        Exam exam = content.getRawExam();
-                        if (exam != null) {
-                            exam.saveLanguages(getBaseContext());
-                            examDao.insertOrReplace(exam);
-                            content.setExamId(exam.getId());
-                        }
-                        Attachment attachment = content.getRawAttachment();
-                        if (attachment != null) {
-                            attachmentDao.insertOrReplace(attachment);
-                            content.setAttachmentId(attachment.getId());
+                        if (ContentActivity.this.content != null) {
+                            content.setModified(ContentActivity.this.content.getModified());
+                            content.setModifiedDate(ContentActivity.this.content.getModifiedDate());
+                            content.setCourseId(ContentActivity.this.content.getCourseId());
+                            content.setActive(ContentActivity.this.content.getActive());
                         }
                         contentDao.insertOrReplace(content);
                         ContentActivity.this.content = content;
@@ -884,7 +929,8 @@ public class ContentActivity extends BaseToolBarActivity {
                         ContentDao.Properties.ChapterId.eq(chapterId),
                         ContentDao.Properties.Active.eq(true)
                 )
-                .orderAsc(ContentDao.Properties.Order).list();
+                .orderAsc(ContentDao.Properties.Order)
+                .listLazy();
     }
 
     private void startCourseExam(boolean discardExamDetails, boolean isPartial) {
@@ -995,11 +1041,11 @@ public class ContentActivity extends BaseToolBarActivity {
         if (position == 0) {
             previousButton.setVisibility(View.INVISIBLE);
         } else {
-            final int previousPosition = position - 1;
             previousButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startActivity(ContentActivity.createIntent(previousPosition, chapterId,
+                    final long previousContentId = contents.get(position - 1).getId();
+                    startActivity(ContentActivity.createIntent(previousContentId, chapterId,
                             ContentActivity.this));
 
                     finish();
@@ -1021,15 +1067,15 @@ public class ContentActivity extends BaseToolBarActivity {
                 }
             });
         } else {
-            final int nextPosition = position + 1;
-            if (contents.get(nextPosition).getIsLocked()) {
+            final Content nextContent = contents.get(position + 1);
+            if (nextContent.getIsLocked()) {
                 nextButton.setVisibility(View.INVISIBLE);
             } else {
                 nextButton.setText(R.string.testpress_next_content);
                 nextButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        startActivity(ContentActivity.createIntent(nextPosition, chapterId,
+                        startActivity(ContentActivity.createIntent(nextContent.getId(), chapterId,
                                 ContentActivity.this));
 
                         finish();

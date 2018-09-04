@@ -123,6 +123,13 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
                 if (item instanceof Chapter) {
                     Snackbar.make(swipeRefreshLayout, R.string.testpress_no_content_description,
                             Snackbar.LENGTH_SHORT).show();
+                } else {
+                    Content content = (Content) item;
+                    startActivity(ContentActivity.createIntent(
+                            content.getId(),
+                            content.getChapterId(),
+                            ExpandableContentsActivity.this)
+                    );
                 }
             }
 
