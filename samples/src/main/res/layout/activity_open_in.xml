@@ -7,45 +7,57 @@
 
     <include layout="@layout/toolbar" />
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center">
+    <ScrollView
+        android:fillViewport="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <android.support.v7.widget.AppCompatButton
-            style="@style/Button"
-            android:layout_marginTop="10dp"
-            android:text="Simple Course"
-            android:id="@+id/simple_course" />
-
-        <android.support.v7.widget.AppCompatButton
-            style="@style/Button"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:text="Gamified Course"
-            android:id="@+id/gamified_course" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center">
 
-        <android.support.v7.widget.AppCompatButton
-            style="@style/Button"
-            android:text="Leaderboard"
-            android:id="@+id/leaderboard" />
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Button"
+                android:layout_marginTop="10dp"
+                android:text="Simple Course"
+                android:id="@+id/simple_course" />
 
-        <android.support.v7.widget.AppCompatButton
-            style="@style/Button"
-            android:text="Chapter Detail"
-            android:id="@+id/chapter_contents" />
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Button"
+                android:layout_width="wrap_content"
+                android:text="Gamified Course"
+                android:id="@+id/gamified_course" />
 
-        <android.support.v7.widget.AppCompatButton
-            style="@style/Button"
-            android:text="Content Detail"
-            android:id="@+id/content_detail" />
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Button"
+                android:text="Leaderboard"
+                android:id="@+id/leaderboard" />
 
-        <android.support.v7.widget.AppCompatButton
-            style="@style/Button"
-            android:text="Fragment"
-            android:id="@+id/fragment_button" />
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Button"
+                android:text="Course detail"
+                android:id="@+id/course_detail" />
 
-    </LinearLayout>
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Button"
+                android:text="Chapter Detail"
+                android:id="@+id/chapter_contents" />
+
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Button"
+                android:text="Content Detail"
+                android:id="@+id/content_detail" />
+
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Button"
+                android:text="Fragment"
+                android:id="@+id/fragment_button" />
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

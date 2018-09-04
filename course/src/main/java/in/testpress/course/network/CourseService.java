@@ -38,6 +38,9 @@ public interface CourseService {
             @QueryMap Map<String, Object> queryParams,
             @Header("If-Modified-Since") String latestModifiedDate);
 
+    @GET(COURSE_LIST_PATH + "{course_id}")
+    RetrofitCall<Course> getCourse(@Path(value = "course_id", encoded = true) long courseId);
+
     @GET(COURSE_LIST_PATH + "{course_id}"+ CHAPTERS_PATH)
     RetrofitCall<TestpressApiResponse<Chapter>> getChapters(
             @Path(value = "course_id", encoded = true) long courseId,

@@ -73,12 +73,6 @@ public class TestpressCourseTest {
         }
         Activity activity = mock(Activity.class);
         try {
-            TestpressCourse.showChapters(activity, "DummyTitle", null, testpressSession);
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertEquals("courseId must not be null.", e.getMessage());
-        }
-        try {
             TestpressCourse.showChapters(activity, "DummyTitle", 0, null);
             fail();
         } catch (IllegalArgumentException e) {
