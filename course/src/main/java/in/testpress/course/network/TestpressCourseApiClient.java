@@ -38,6 +38,8 @@ public class TestpressCourseApiClient extends TestpressApiClient {
 
     public static final String CONTENTS =  "/contents/";
 
+    public static final String CONTENTS_PATH_V2_4 =  "/api/v2.4/contents/";
+
     public static final String ATTEMPTS_PATH =  "/attempts/";
 
     public static final String USER_VIDEOS_PATH =  "/api/v2.3/user_videos/";
