@@ -158,7 +158,7 @@ public class TestpressSDKDaoGenerator {
         content.addIntProperty("order");
         content.addStringProperty("htmlContentTitle");
         content.addStringProperty("htmlContentUrl")
-                .codeBeforeField("@SerializedName(value=\"htmlContentUrl\", alternate={\"htmlUrl\"})");;
+                .codeBeforeField("@SerializedName(value=\"html_content_url\", alternate={\"html_url\"})");;
         content.addStringProperty("url");
         content.addStringProperty("attemptsUrl");
         content.addIntProperty("chapterId");
