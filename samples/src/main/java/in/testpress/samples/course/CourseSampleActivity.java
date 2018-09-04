@@ -2,6 +2,7 @@ package in.testpress.samples.course;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.view.View;
 
@@ -50,37 +51,30 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                 showSDK(R.id.leaderboard);
             }
         });
-        findViewById(R.id.chapter_contents).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ViewUtils.showInputDialogBox(CourseSampleActivity.this, "Enter Chapter Slug",
-                        new ViewUtils.OnInputCompletedListener() {
-                            @Override
-                            public void onInputComplete(String inputText) {
-                                text = inputText;
-                                showSDK(R.id.chapter_contents);
-                            }
-                        });
-            }
-        });
-        findViewById(R.id.content_detail).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ViewUtils.showInputDialogBox(CourseSampleActivity.this, "Enter Content Id",
-                        new ViewUtils.OnInputCompletedListener() {
-                            @Override
-                            public void onInputComplete(String inputText) {
-                                text = inputText;
-                                showSDK(R.id.content_detail);
-                            }
-                });
-            }
-        });
+        setClickListenerToShowInputDialogBox(R.id.course_detail, "Enter Course Id");
+        setClickListenerToShowInputDialogBox(R.id.chapter_contents, "Enter Chapter Slug");
+        setClickListenerToShowInputDialogBox(R.id.content_detail, "Enter Content Id");
         findViewById(R.id.fragment_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(CourseSampleActivity.this, NavigationDrawerActivity.class);
                 startActivity(intent);
+            }
+        });
+    }
+    
+    void setClickListenerToShowInputDialogBox(@IdRes final int viewId, final String title) {
+        findViewById(viewId).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ViewUtils.showInputDialogBox(CourseSampleActivity.this, title,
+                        new ViewUtils.OnInputCompletedListener() {
+                            @Override
+                            public void onInputComplete(String inputText) {
+                                text = inputText;
+                                showSDK(viewId);
+                            }
+                        });
             }
         });
     }
@@ -100,6 +94,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                     break;
                 case R.id.gamified_course:
                 case R.id.leaderboard:
+                case R.id.course_detail:
                 case R.id.chapter_contents:
                 case R.id.content_detail:
                     session.getInstituteSettings()
@@ -119,6 +114,9 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                     break;
                 case R.id.leaderboard:
                     TestpressCourse.showLeaderboard(this, session);
+                    break;
+                case R.id.course_detail:
+                    TestpressCourse.showChapters(this, null, Long.parseLong(text), session);
                     break;
                 case R.id.chapter_contents:
                     String url = session.getInstituteSettings().getBaseUrl() +

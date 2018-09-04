@@ -67,6 +67,10 @@ public class TestpressCourseApiClient extends TestpressApiClient {
         return getCourseService().getCourses(queryParams, latestModifiedDate);
     }
 
+    public RetrofitCall<Course> getCourse(long courseId) {
+        return getCourseService().getCourse(courseId);
+    }
+
     public RetrofitCall<TestpressApiResponse<Chapter>> getChapters(long courseId,
                                                                    Map<String, Object> queryParams,
                                                                    String latestModifiedDate) {

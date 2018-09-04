@@ -37,7 +37,6 @@ import pl.openrnd.multilevellistview.ItemInfo;
 import pl.openrnd.multilevellistview.MultiLevelListView;
 import pl.openrnd.multilevellistview.OnItemClickListener;
 
-import static in.testpress.course.TestpressCourse.COURSE;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.network.TestpressApiClient.MODIFIED_SINCE;
 import static in.testpress.network.TestpressApiClient.ORDER;
@@ -62,17 +61,12 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
     private ExpandableContentsAdapter adapter;
     private ListView listView;
     private boolean chaptersModified;
+    private long courseId;
 
     public static Intent createIntent(String title, long courseId, Context context) {
         Intent intent = new Intent(context, ExpandableContentsActivity.class);
         intent.putExtra(ACTIONBAR_TITLE, title);
         intent.putExtra(COURSE_ID, courseId);
-        return intent;
-    }
-
-    public static Intent createIntent(Course course, Context context) {
-        Intent intent = new Intent(context, ExpandableContentsActivity.class);
-        intent.putExtra(COURSE, course);
         return intent;
     }
 
@@ -174,30 +168,45 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
         courseDao = TestpressSDKDatabase.getCourseDao(this);
         chapterDao = TestpressSDKDatabase.getChapterDao(this);
         contentDao = TestpressSDKDatabase.getContentDao(getBaseContext());
-        apiClient = new TestpressCourseApiClient(this);
-        course = getIntent().getParcelableExtra(COURSE);
-        assert getSupportActionBar() != null;
-        if (course == null) {
-            long courseId = getIntent().getLongExtra(COURSE_ID, 0);
-            String title = getIntent().getStringExtra(ACTIONBAR_TITLE);
-            List<Course> courses = courseDao.queryBuilder()
-                    .where(CourseDao.Properties.Id.eq(courseId)).list();
 
-            if (!courses.isEmpty()) {
-                course = courses.get(0);
-                onCourseAvailable();
-            } else {
-                if (title != null && !title.isEmpty()) {
-                    getSupportActionBar().setTitle(title);
-                }
-                // loadCourse()
-            }
+        apiClient = new TestpressCourseApiClient(this);
+
+        courseId = getIntent().getLongExtra(COURSE_ID, 0);
+        String title = getIntent().getStringExtra(ACTIONBAR_TITLE);
+
+        List<Course> coursesFromDB = courseDao.queryBuilder()
+                .where(CourseDao.Properties.Id.eq(courseId)).list();
+
+        if (!coursesFromDB.isEmpty()) {
+            onCourseAvailable(coursesFromDB.get(0));
         } else {
-            onCourseAvailable();
+            if (title != null && !title.isEmpty()) {
+                assert getSupportActionBar() != null;
+                getSupportActionBar().setTitle(title);
+            }
+            loadCourse(courseId);
         }
     }
 
-    private void onCourseAvailable() {
+    private void loadCourse(long courseId) {
+        swipeRefreshLayout.setRefreshing(true);
+        apiClient.getCourse(courseId).enqueue(new TestpressCallback<Course>() {
+            @Override
+            public void onSuccess(Course course) {
+                courseDao.insertOrReplace(course);
+                swipeRefreshLayout.setRefreshing(false);
+                onCourseAvailable(course);
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                handleError(exception);
+            }
+        });
+    }
+
+    private void onCourseAvailable(Course courseFromDB) {
+        course = courseFromDB;
         //noinspection ConstantConditions
         getSupportActionBar().setTitle(course.getTitle());
         if (course.getChildItemsLoaded()) {
@@ -350,7 +359,9 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
 
     private void restartLoading() {
         swipeRefreshLayout.setRefreshing(true);
-        if (currentPager instanceof ChapterPager) {
+        if (currentPager == null) {
+            loadCourse(courseId);
+        } else if (currentPager instanceof ChapterPager) {
             fetchChapters();
         } else {
             fetchContents();
