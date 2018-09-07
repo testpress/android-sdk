@@ -12,6 +12,7 @@ import in.testpress.util.StringList;
 
 // KEEP INCLUDES - put your custom includes here
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Parcel;
 import java.net.URL;
 import java.text.DateFormat;
@@ -19,6 +20,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+
+import in.testpress.core.TestpressSDKDatabase;
 // KEEP INCLUDES END
 
 /**
@@ -655,6 +658,24 @@ public class Exam implements android.os.Parcelable {
     public boolean canRetake() {
         return getAllowRetake() &&
                 (getAttemptsCount() <= getMaxRetakes() || getMaxRetakes() < 0);
+    }
+
+    public void setLanguages(List<Language> languages) {
+        this.languages = languages;
+    }
+
+    public void saveLanguages(Context context) {
+        LanguageDao languageDao = TestpressSDKDatabase.getLanguageDao(context);
+        languageDao.queryBuilder()
+                .where(LanguageDao.Properties.ExamId.eq(getId()))
+                .buildDelete()
+                .executeDeleteWithoutDetachingEntities();
+
+        List<Language> languages = getLanguages();
+        for (Language language : languages) {
+            language.setExamId(getId());
+        }
+        languageDao.insertOrReplaceInTx(languages);
     }
     // KEEP METHODS END
 

@@ -21,6 +21,7 @@ import in.testpress.models.greendao.BookmarkFolder;
 import in.testpress.models.greendao.ContentType;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
+import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.ReviewItem;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.BookmarksListResponse;
@@ -35,6 +36,7 @@ public class TestpressExamApiClient extends TestpressApiClient {
      * Exams List URL
      */
     public static final String EXAMS_LIST_PATH =  "/api/v2.2.1/exams/";
+    public static final String EXAMS_LIST_v2_3_PATH =  "/api/v2.3/exams/";
 
     public static final String QUESTIONS_PATH =  "api/v2.2/questions/";
     public static final String COMMENTS_PATH =  "/comments/";
@@ -44,6 +46,7 @@ public class TestpressExamApiClient extends TestpressApiClient {
 
     public static final String CONTENTS_PATH =  "/api/v2.2.1/contents/";
     public static final String PERMISSIONS_PATH =  "/permissions/";
+    public static final String LANGUAGES_PATH =  "/languages/";
 
     /**
      * Categories URL
@@ -265,5 +268,9 @@ public class TestpressExamApiClient extends TestpressApiClient {
 
     public RetrofitCall<Permission> checkPermission(long contentId) {
         return getExamService().checkPermission(contentId);
+    }
+
+    public RetrofitCall<TestpressApiResponse<Language>> getLanguages(String examSlug) {
+        return getExamService().getLanguages(examSlug);
     }
 }

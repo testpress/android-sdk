@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,7 +20,9 @@ import android.widget.TextView;
 import junit.framework.Assert;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
@@ -29,8 +32,10 @@ import in.testpress.exam.network.AttemptsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.exam.util.RetakeExamUtil;
+import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.Exam;
+import in.testpress.models.greendao.Language;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
@@ -56,6 +61,8 @@ public class AttemptsActivity extends BaseToolBarActivity
     private TextView emptyDescView;
     private ProgressBar progressBar;
     private Button retryButton;
+
+    private TestpressExamApiClient apiClient;
     private Exam exam;
     private List<Attempt> attempts = new ArrayList<>();
     private AttemptsPager pager;
@@ -78,6 +85,8 @@ public class AttemptsActivity extends BaseToolBarActivity
         progressBar = (ProgressBar) findViewById(R.id.pb_loading);
         UIUtils.setIndeterminateDrawable(this, progressBar, 4);
         startButton.setTypeface(TestpressSdk.getRubikMediumFont(this));
+
+        apiClient = new TestpressExamApiClient(this);
         exam = getIntent().getParcelableExtra(PARAM_EXAM);
         if (exam == null) {
             String examSlug = getIntent().getStringExtra(PARAM_EXAM_SLUG);
@@ -95,7 +104,7 @@ public class AttemptsActivity extends BaseToolBarActivity
                 (exam.getAttemptsCount() == 1 && exam.getPausedAttemptsCount() == 1)) {
             // Show start exam screen with exam details if still exam is not taken or only one
             // paused attempt exist
-            displayStartExamScreen();
+            fetchLanguages();
         } else {
             retryButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -103,7 +112,7 @@ public class AttemptsActivity extends BaseToolBarActivity
                     getSupportLoaderManager().restartLoader(0, null, AttemptsActivity.this);
                 }
             });
-            pager = new AttemptsPager(exam.getAttemptsUrl(), new TestpressExamApiClient(this));
+            pager = new AttemptsPager(exam.getAttemptsUrl(), apiClient);
             getSupportLoaderManager().initLoader(0, null, this);
         }
     }
@@ -205,7 +214,7 @@ public class AttemptsActivity extends BaseToolBarActivity
 
     void loadExam(final String examSlug) {
         progressBar.setVisibility(View.VISIBLE);
-        new TestpressExamApiClient(this).getExam(examSlug)
+        apiClient.getExam(examSlug)
                 .enqueue(new TestpressCallback<Exam>() {
                     @Override
                     public void onSuccess(Exam exam) {
@@ -215,30 +224,50 @@ public class AttemptsActivity extends BaseToolBarActivity
 
                     @Override
                     public void onException(TestpressException exception) {
-                        if (exception.isUnauthenticated()) {
-                            setEmptyText(R.string.testpress_authentication_failed,
-                                    R.string.testpress_exam_no_permission);
-                            retryButton.setVisibility(View.GONE);
-                        } else if (exception.isNetworkError()) {
-                            setEmptyText(R.string.testpress_network_error,
-                                    R.string.testpress_no_internet_try_again);
-                            retryButton.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    progressBar.setVisibility(View.VISIBLE);
-                                    emptyView.setVisibility(View.GONE);
-                                    loadExam(examSlug);
-                                }
-                            });
-                        } else if (exception.getResponse().code() == 404) {
-                            setEmptyText(R.string.testpress_exam_not_available,
-                                    R.string.testpress_exam_not_available_description);
-                            retryButton.setVisibility(View.GONE);
-                        } else  {
-                            setEmptyText(R.string.testpress_error_loading_exam,
-                                    R.string.testpress_some_thing_went_wrong_try_again);
-                            retryButton.setVisibility(View.GONE);
+                        handleError(exception, R.string.testpress_error_loading_exam);
+                        retryButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                progressBar.setVisibility(View.VISIBLE);
+                                emptyView.setVisibility(View.GONE);
+                                loadExam(examSlug);
+                            }
+                        });
+                    }
+                });
+    }
+
+    void fetchLanguages() {
+        progressBar.setVisibility(View.VISIBLE);
+        apiClient.getLanguages(exam.getSlug())
+                .enqueue(new TestpressCallback<TestpressApiResponse<Language>>() {
+                    @Override
+                    public void onSuccess(TestpressApiResponse<Language> apiResponse) {
+                        List<Language> languages = exam.getLanguages();
+                        languages.addAll(apiResponse.getResults());
+                        Map<String, Language> uniqueLanguages = new HashMap<>();
+                        for (Language language : languages) {
+                            uniqueLanguages.put(language.getCode(), language);
                         }
+                        exam.setLanguages(new ArrayList<>(uniqueLanguages.values()));
+                        if (apiResponse.hasMore()) {
+                            fetchLanguages();
+                        } else {
+                            displayStartExamScreen();
+                        }
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        handleError(exception, R.string.testpress_error_loading_languages);
+                        retryButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                progressBar.setVisibility(View.VISIBLE);
+                                emptyView.setVisibility(View.GONE);
+                                fetchLanguages();
+                            }
+                        });
                     }
                 });
     }
@@ -265,16 +294,7 @@ public class AttemptsActivity extends BaseToolBarActivity
         //noinspection ThrowableResultOfMethodCallIgnored
         TestpressException exception = ((ThrowableLoader<List<Attempt>>) loader).clearException();
         if(exception != null) {
-            if (exception.isUnauthenticated()) {
-                setEmptyText(R.string.testpress_authentication_failed,
-                        R.string.testpress_please_login);
-            } else if (exception.isNetworkError()) {
-                setEmptyText(R.string.testpress_network_error,
-                        R.string.testpress_no_internet_try_again);
-            } else {
-                setEmptyText(R.string.testpress_error_loading_attempts,
-                        R.string.testpress_some_thing_went_wrong_try_again);
-            }
+            handleError(exception, R.string.testpress_error_loading_attempts);
             return;
         }
 
@@ -367,8 +387,24 @@ public class AttemptsActivity extends BaseToolBarActivity
         emptyView.setVisibility(View.VISIBLE);
         emptyTitleView.setText(title);
         emptyDescView.setText(description);
+        retryButton.setVisibility(View.GONE);
         scrollView.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
+    }
+
+    void handleError(TestpressException exception, @StringRes int errorMessage) {
+        if (exception.isUnauthenticated()) {
+            setEmptyText(R.string.testpress_authentication_failed,
+                    R.string.testpress_exam_no_permission);
+        } else if (exception.isNetworkError()) {
+            setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again);
+            retryButton.setVisibility(View.VISIBLE);
+        } else if (exception.getResponse().code() == 404) {
+            setEmptyText(R.string.testpress_exam_not_available,
+                    R.string.testpress_exam_not_available_description);
+        } else {
+            setEmptyText(errorMessage, R.string.testpress_some_thing_went_wrong_try_again);
+        }
     }
 
     @Override

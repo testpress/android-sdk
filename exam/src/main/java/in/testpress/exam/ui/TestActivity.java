@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.View;
@@ -17,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +39,7 @@ import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
+import in.testpress.models.greendao.Language;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.Assert;
@@ -129,7 +132,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 if (courseAttempt == null) {
                     checkPermission();
                 } else {
-                    displayStartExamScreen();
+                    checkStartExamScreenState();
                 }
                 return;
             }
@@ -140,7 +143,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
             loadExam(examSlug);
             return;
         }
-        displayStartExamScreen();
+        checkStartExamScreenState();
     }
 
     void checkPermission() {
@@ -150,31 +153,20 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                     @Override
                     public void onSuccess(Permission permission) {
                         TestActivity.this.permission = permission;
-                        displayStartExamScreen();
+                        checkStartExamScreenState();
                     }
 
                     @Override
                     public void onException(TestpressException exception) {
-                        if (exception.isUnauthenticated()) {
-                            setEmptyText(R.string.testpress_authentication_failed,
-                                    R.string.testpress_exam_no_permission);
-                            retryButton.setVisibility(View.GONE);
-                        } else if (exception.isNetworkError()) {
-                            setEmptyText(R.string.testpress_network_error,
-                                    R.string.testpress_no_internet_try_again);
-                            retryButton.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    progressBar.setVisibility(View.VISIBLE);
-                                    emptyView.setVisibility(View.GONE);
-                                    checkPermission();
-                                }
-                            });
-                        } else  {
-                            setEmptyText(R.string.testpress_error_loading_exam,
-                                    R.string.testpress_some_thing_went_wrong_try_again);
-                            retryButton.setVisibility(View.GONE);
-                        }
+                        handleError(exception, R.string.testpress_error_loading_permission);
+                        retryButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                progressBar.setVisibility(View.VISIBLE);
+                                emptyView.setVisibility(View.GONE);
+                                checkPermission();
+                            }
+                        });
                     }
                 });
     }
@@ -189,36 +181,21 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                         if (exam.getPausedAttemptsCount() > 0) {
                             loadAttempts(exam.getAttemptsUrl());
                         } else {
-                            displayStartExamScreen();
+                            checkStartExamScreenState();
                         }
                     }
 
                     @Override
                     public void onException(TestpressException exception) {
-                        if (exception.isUnauthenticated()) {
-                            setEmptyText(R.string.testpress_authentication_failed,
-                                    R.string.testpress_exam_no_permission);
-                            retryButton.setVisibility(View.GONE);
-                        } else if (exception.isNetworkError()) {
-                            setEmptyText(R.string.testpress_network_error,
-                                    R.string.testpress_no_internet_try_again);
-                            retryButton.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    progressBar.setVisibility(View.VISIBLE);
-                                    emptyView.setVisibility(View.GONE);
-                                    loadExam(examSlug);
-                                }
-                            });
-                        } else if (exception.getResponse().code() == 404) {
-                            setEmptyText(R.string.testpress_exam_not_available,
-                                    R.string.testpress_exam_not_available_description);
-                            retryButton.setVisibility(View.GONE);
-                        } else  {
-                            setEmptyText(R.string.testpress_error_loading_exam,
-                                    R.string.testpress_some_thing_went_wrong_try_again);
-                            retryButton.setVisibility(View.GONE);
-                        }
+                        handleError(exception, R.string.testpress_error_loading_exam);
+                        retryButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                progressBar.setVisibility(View.VISIBLE);
+                                emptyView.setVisibility(View.GONE);
+                                loadExam(examSlug);
+                            }
+                        });
                     }
                 });
     }
@@ -237,38 +214,60 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                         } else {
                             TestActivity.this.attempt = attempts.get(0);
                         }
-                        displayStartExamScreen();
+                        checkStartExamScreenState();
                     }
 
                     @Override
                     public void onException(TestpressException exception) {
-                        if (exception.isUnauthenticated()) {
-                            setEmptyText(R.string.testpress_authentication_failed,
-                                    R.string.testpress_please_login);
-                            retryButton.setVisibility(View.GONE);
-                        } else if (exception.isNetworkError()) {
-                            setEmptyText(R.string.testpress_network_error,
-                                    R.string.testpress_no_internet_try_again);
-                            retryButton.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    progressBar.setVisibility(View.VISIBLE);
-                                    emptyView.setVisibility(View.GONE);
-                                    loadAttempts(attemptUrlFrag);
-                                }
-                            });
-                        } else {
-                            setEmptyText(R.string.testpress_error_loading_attempts,
-                                    R.string.testpress_some_thing_went_wrong_try_again);
-                            retryButton.setVisibility(View.GONE);
-                        }
+                        handleError(exception, R.string.testpress_error_loading_attempts);
+                        retryButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                progressBar.setVisibility(View.VISIBLE);
+                                emptyView.setVisibility(View.GONE);
+                                loadAttempts(attemptUrlFrag);
+                            }
+                        });
                     }
                 });
     }
 
-    @SuppressWarnings("ConstantConditions")
-    @SuppressLint("SetTextI18n")
-    void displayStartExamScreen() {
+    void fetchLanguages() {
+        progressBar.setVisibility(View.VISIBLE);
+        apiClient.getLanguages(exam.getSlug())
+                .enqueue(new TestpressCallback<TestpressApiResponse<Language>>() {
+                    @Override
+                    public void onSuccess(TestpressApiResponse<Language> apiResponse) {
+                        List<Language> languages = exam.getLanguages();
+                        languages.addAll(apiResponse.getResults());
+                        Map<String, Language> uniqueLanguages = new HashMap<>();
+                        for (Language language : languages) {
+                            uniqueLanguages.put(language.getCode(), language);
+                        }
+                        exam.setLanguages(new ArrayList<>(uniqueLanguages.values()));
+                        if (apiResponse.hasMore()) {
+                            fetchLanguages();
+                        } else {
+                            displayStartExamScreen();
+                        }
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        handleError(exception, R.string.testpress_error_loading_languages);
+                        retryButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                progressBar.setVisibility(View.VISIBLE);
+                                emptyView.setVisibility(View.GONE);
+                                fetchLanguages();
+                            }
+                        });
+                    }
+                });
+    }
+
+    void checkStartExamScreenState() {
         Button startExam = findViewById(R.id.start_exam);
         LinearLayout attemptActions = findViewById(R.id.attempt_actions);
         if (courseAttempt != null) {
@@ -308,6 +307,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 }
             } else {
                 String action = getIntent().getStringExtra(PARAM_ACTION);
+                assert getSupportActionBar() != null;
                 if (action != null && action.equals(PARAM_VALUE_ACTION_END)) {
                     getSupportActionBar().setTitle(getString(R.string.testpress_end_exam));
                     endExam();
@@ -326,8 +326,13 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
             } else {
                 getSupportLoaderManager().initLoader(RESUME_ATTEMPT_LOADER, null, TestActivity.this);
             }
-            return;
+        } else {
+            fetchLanguages();
         }
+    }
+
+    @SuppressLint("SetTextI18n")
+    void displayStartExamScreen() {
         TextView examTitle = findViewById(R.id.exam_title);
         TextView numberOfQuestions = findViewById(R.id.number_of_questions);
         TextView examDuration = findViewById(R.id.exam_duration);
@@ -520,6 +525,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 }
             }
         } else {
+            handleError(exception, R.string.testpress_error_loading_attempts);
             retryButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -528,25 +534,6 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                     getSupportLoaderManager().restartLoader(loader.getId(), null, TestActivity.this);
                 }
             });
-            if (exception.isUnauthenticated()) {
-                setEmptyText(R.string.testpress_authentication_failed, R.string.testpress_please_login);
-            } else if (exception.isNetworkError()) {
-                setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again);
-            } else if (exception.isClientError()) {
-                setEmptyText(R.string.testpress_cannot_attempt_exam,
-                        R.string.testpress_some_thing_went_wrong_try_again);
-                try {
-                    JSONObject jsonObject = new JSONObject(exception.getResponse().errorBody().string());
-                    emptyDescView.setText(jsonObject.getString("detail"));
-                } catch (JSONException | IOException e) {
-                    e.printStackTrace();
-                }
-                retryButton.setVisibility(View.GONE);
-            } else {
-                setEmptyText(R.string.testpress_error_loading_attempts,
-                        R.string.testpress_some_thing_went_wrong_try_again);
-                retryButton.setVisibility(View.GONE);
-            }
         }
     }
 
@@ -584,7 +571,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         emptyView.setVisibility(View.VISIBLE);
         emptyTitleView.setText(title);
         emptyDescView.setText(description);
-        retryButton.setVisibility(View.VISIBLE);
+        retryButton.setVisibility(View.GONE);
         examDetailsContainer.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
     }
@@ -594,6 +581,30 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         if ((requestCode == CarouselFragment.TEST_TAKEN_REQUEST_CODE) && (Activity.RESULT_OK == resultCode)) {
             setResult(resultCode);
             finish();
+        }
+    }
+
+    void handleError(TestpressException exception, @StringRes int errorMessage) {
+        if (exception.isUnauthenticated()) {
+            setEmptyText(R.string.testpress_authentication_failed,
+                    R.string.testpress_exam_no_permission);
+        } else if (exception.isNetworkError()) {
+            setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again);
+            retryButton.setVisibility(View.VISIBLE);
+        } else if (exception.getResponse().code() == 404) {
+            setEmptyText(R.string.testpress_exam_not_available,
+                    R.string.testpress_exam_not_available_description);
+        } else if (exception.isClientError()) {
+            setEmptyText(R.string.testpress_cannot_attempt_exam,
+                    R.string.testpress_some_thing_went_wrong_try_again);
+            try {
+                JSONObject jsonObject = new JSONObject(exception.getResponse().errorBody().string());
+                emptyDescView.setText(jsonObject.getString("detail"));
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            setEmptyText(errorMessage, R.string.testpress_some_thing_went_wrong_try_again);
         }
     }
 

@@ -101,6 +101,6 @@ public class TestpressApiResponse<T> {
     }
 
     public boolean hasMore() {
-        return !next.equals("null");
+        return getNext() != null;
     }
 }

@@ -101,7 +101,7 @@ public class TestpressApiClient {
             }
         };
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.connectTimeout(2, TimeUnit.MINUTES).readTimeout(2, TimeUnit.MINUTES);
+        httpClient.connectTimeout(1, TimeUnit.MINUTES).readTimeout(1, TimeUnit.MINUTES);
         httpClient.addNetworkInterceptor(interceptor);
 
         // Set log level

@@ -68,6 +68,7 @@ import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.HtmlContent;
 import in.testpress.models.greendao.HtmlContentDao;
+import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.Video;
 import in.testpress.models.greendao.VideoDao;
 import in.testpress.ui.BaseToolBarActivity;
@@ -123,7 +124,8 @@ public class ContentActivity extends BaseToolBarActivity {
     private Content content;
     private String contentId;
     private String attemptsUrl;
-    private List<CourseAttempt> courseAttempts = new ArrayList<>();
+    private List<CourseAttempt> courseAttemptsFromDB = new ArrayList<>();
+    private List<CourseAttempt> courseAttemptsFromNetwork = new ArrayList<>();
     private int position;
     private ContentDao contentDao;
     private HtmlContentDao htmlContentDao;
@@ -467,14 +469,15 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void onExamContent() {
         setContentTitle(content.getName());
-        // forceRefresh if already attempts is listed
-        boolean forceRefresh = !courseAttempts.isEmpty();
-        courseAttempts.clear();
+        // forceRefresh if already attempts is listed(courseAttemptsFromDB is populated)
+        boolean forceRefresh = !courseAttemptsFromDB.isEmpty();
+        courseAttemptsFromDB.clear();
         if (content.getAttemptsCount() > 0) {
             attemptsUrl = content.getAttemptsUrl();
+            courseAttemptsFromNetwork.clear();
             loadAttempts(forceRefresh);
         } else {
-            displayStartExamScreen(null);
+            fetchLanguages(null);
         }
     }
 
@@ -537,7 +540,7 @@ public class ContentActivity extends BaseToolBarActivity {
                                 exam.getMaxRetakes() < 0))) {
 
             if (content.getIsLocked() || !content.getHasStarted() || exam.isEnded()) {
-                if (courseAttempts.isEmpty()) {
+                if (courseAttemptsFromDB.isEmpty()) {
                     TextView webOnlyLabel = (TextView) findViewById(R.id.web_only_label);
                     if (!content.getHasStarted()) {
                         webOnlyLabel.setText(String.format(
@@ -565,7 +568,7 @@ public class ContentActivity extends BaseToolBarActivity {
         if (exam.getDeviceAccessControl() != null &&
                 exam.getDeviceAccessControl().equals("web")) {
             TextView webOnlyLabel;
-            if (courseAttempts.isEmpty()) {
+            if (courseAttemptsFromDB.isEmpty()) {
                 webOnlyLabel = (TextView) findViewById(R.id.web_only_label);
             } else {
                 webOnlyLabel = (TextView) findViewById(R.id.attempt_web_only_label);
@@ -578,26 +581,54 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void loadAttempts(final boolean forceRefresh) {
-        courseAttempts = getCourseAttemptsFromDB();
-        if (courseAttempts.size() > 0 && !forceRefresh) {
+        courseAttemptsFromDB = getCourseAttemptsFromDB();
+        if (courseAttemptsFromDB.size() > 0 && !forceRefresh) {
             onCourseAttemptsLoaded();
         } else {
             showLoadingProgress();
         }
-        courseAttempts.clear();
         examApiClient.getContentAttempts(attemptsUrl)
                 .enqueue(new TestpressCallback<TestpressApiResponse<CourseAttempt>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<CourseAttempt> response) {
-                        courseAttempts.addAll(response.getResults());
+                        courseAttemptsFromNetwork.addAll(response.getResults());
                         if (response.getNext() != null) {
                             attemptsUrl = response.getNext();
                             loadAttempts(forceRefresh);
                         } else {
                             clearContentAttemptsInDB();
-                            saveCourseAttemptInDB(courseAttempts);
-                            courseAttempts = getCourseAttemptsFromDB();
+                            saveCourseAttemptInDB(courseAttemptsFromNetwork);
+                            courseAttemptsFromDB = getCourseAttemptsFromDB();
                             onCourseAttemptsLoaded();
+                        }
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        handleError(exception, false);
+                    }
+                });
+    }
+
+    void fetchLanguages(final CourseAttempt pausedCourseAttempt) {
+        showLoadingProgress();
+        examApiClient.getLanguages(content.getRawExam().getSlug())
+                .enqueue(new TestpressCallback<TestpressApiResponse<Language>>() {
+                    @Override
+                    public void onSuccess(TestpressApiResponse<Language> apiResponse) {
+                        Exam exam = content.getRawExam();
+                        List<Language> languages = exam.getLanguages();
+                        languages.addAll(apiResponse.getResults());
+                        Map<String, Language> uniqueLanguages = new HashMap<>();
+                        for (Language language : languages) {
+                            uniqueLanguages.put(language.getCode(), language);
+                        }
+                        content.getRawExam().setLanguages(new ArrayList<>(uniqueLanguages.values()));
+                        if (apiResponse.hasMore()) {
+                            fetchLanguages(pausedCourseAttempt);
+                        } else {
+                            exam.saveLanguages(getBaseContext());
+                            displayStartExamScreen(pausedCourseAttempt);
                         }
                     }
 
@@ -619,10 +650,10 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void onCourseAttemptsLoaded() {
-        if (courseAttempts.size() == 1 &&
-                courseAttempts.get(0).getAssessment().getState().equals(STATE_PAUSED)) {
+        if (courseAttemptsFromDB.size() == 1 &&
+                courseAttemptsFromDB.get(0).getAssessment().getState().equals(STATE_PAUSED)) {
             // Only one paused attempt
-            displayStartExamScreen(courseAttempts.get(0));
+            fetchLanguages(courseAttemptsFromDB.get(0));
         } else {
             displayAttemptsList();
         }
@@ -634,11 +665,11 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void displayAttemptsList() {
-        courseAttempts = getCourseAttemptsFromDB();
+        courseAttemptsFromDB = getCourseAttemptsFromDB();
         final Exam exam = content.getRawExam();
         final List<CourseAttempt> pausedAttempts = new ArrayList<>();
         if (exam.getPausedAttemptsCount() > 0) {
-            for (CourseAttempt attempt : courseAttempts) {
+            for (CourseAttempt attempt : courseAttemptsFromDB) {
                 if (attempt.getAssessment().getState().equals(STATE_PAUSED)) {
                     pausedAttempts.add(attempt);
                 }
@@ -648,7 +679,7 @@ public class ContentActivity extends BaseToolBarActivity {
         attemptList.setNestedScrollingEnabled(false);
         attemptList.setHasFixedSize(true);
         attemptList.setLayoutManager(new LinearLayoutManager(this));
-        ArrayList<CourseAttempt> attempts = new ArrayList<>(courseAttempts);
+        ArrayList<CourseAttempt> attempts = new ArrayList<>(courseAttemptsFromDB);
         attemptList.setAdapter(new ContentAttemptListAdapter(this, content, attempts));
         attemptList.setVisibility(View.VISIBLE);
         examDetailsLayout.setVisibility(View.GONE);
@@ -660,7 +691,7 @@ public class ContentActivity extends BaseToolBarActivity {
                                    final boolean discardExamDetails) {
 
         if (pausedCourseAttempt == null && canAttemptExam(exam)) {
-            if (courseAttempts.isEmpty()) {
+            if (courseAttemptsFromDB.isEmpty()) {
                 startButton.setText(R.string.testpress_start);
             } else {
                 startButton.setText(R.string.testpress_retake);
@@ -782,6 +813,7 @@ public class ContentActivity extends BaseToolBarActivity {
                         }
                         Exam exam = content.getRawExam();
                         if (exam != null) {
+                            exam.saveLanguages(getBaseContext());
                             examDao.insertOrReplace(exam);
                             content.setExamId(exam.getId());
                         }

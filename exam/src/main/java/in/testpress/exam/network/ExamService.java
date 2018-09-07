@@ -14,6 +14,7 @@ import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.AttemptSection;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
+import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.ReviewItem;
 import in.testpress.network.RetrofitCall;
 import retrofit2.http.Body;
@@ -28,7 +29,9 @@ import retrofit2.http.Url;
 
 import static in.testpress.exam.network.TestpressExamApiClient.ACCESS_CODES_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.CONTENTS_PATH;
+import static in.testpress.exam.network.TestpressExamApiClient.EXAMS_LIST_v2_3_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.EXAMS_PATH;
+import static in.testpress.exam.network.TestpressExamApiClient.LANGUAGES_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.PERMISSIONS_PATH;
 
 public interface ExamService {
@@ -135,6 +138,10 @@ public interface ExamService {
     @GET(CONTENTS_PATH + "{content_id}" + PERMISSIONS_PATH)
     RetrofitCall<Permission> checkPermission(
             @Path(value = "content_id", encoded = true) long contentId);
+
+    @GET(EXAMS_LIST_v2_3_PATH + "{exam_slug}" + LANGUAGES_PATH)
+    RetrofitCall<TestpressApiResponse<Language>> getLanguages(
+            @Path(value = "exam_slug", encoded = true) String examSlug);
 }
 
 

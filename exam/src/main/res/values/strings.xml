@@ -25,6 +25,8 @@
     <string name="testpress_no_attempts_description">To review, start and complete your exams.</string>
     <string name="testpress_error_loading_exams">Loading exams failed</string>
     <string name="testpress_error_loading_exam">Loading exam failed</string>
+    <string name="testpress_error_loading_permission">Loading permission failed</string>
+    <string name="testpress_error_loading_languages">Loading languages failed</string>
     <string name="testpress_error_loading_attempts">Loading attempts failed</string>
     <string name="testpress_error_loading_questions">Loading questions failed</string>
     <string name="testpress_error_loading_bookmarks">Loading bookmarks failed</string>
