@@ -18,6 +18,7 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -564,7 +565,7 @@ public class Exam implements android.os.Parcelable {
         dest.writeByte((byte) (enableRanks == null ? 0 : enableRanks ? 1 : 2));
         dest.writeByte((byte) (showScore == null ? 0 : showScore ? 1 : 2));
         dest.writeByte((byte) (showPercentile == null ? 0 : showPercentile ? 1 : 2));
-        dest.writeTypedList(getLanguages());
+        dest.writeTypedList(getRawLanguages());
     }
 
     @Override
@@ -671,11 +672,21 @@ public class Exam implements android.os.Parcelable {
                 .buildDelete()
                 .executeDeleteWithoutDetachingEntities();
 
-        List<Language> languages = getLanguages();
+        List<Language> languages = getRawLanguages();
         for (Language language : languages) {
             language.setExamId(getId());
         }
         languageDao.insertOrReplaceInTx(languages);
+    }
+
+    public List<Language> getRawLanguages() {
+        if (myDao == null) {
+            if (languages == null) {
+                return Collections.emptyList();
+            }
+            return languages;
+        }
+        return getLanguages();
     }
     // KEEP METHODS END
 

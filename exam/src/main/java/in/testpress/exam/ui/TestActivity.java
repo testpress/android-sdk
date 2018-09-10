@@ -238,7 +238,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                 .enqueue(new TestpressCallback<TestpressApiResponse<Language>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Language> apiResponse) {
-                        List<Language> languages = exam.getLanguages();
+                        List<Language> languages = exam.getRawLanguages();
                         languages.addAll(apiResponse.getResults());
                         Map<String, Language> uniqueLanguages = new HashMap<>();
                         for (Language language : languages) {

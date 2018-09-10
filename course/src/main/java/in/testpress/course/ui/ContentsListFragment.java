@@ -92,7 +92,7 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
                     videoDao.insertOrReplace(video);
                     content.setVideoId(video.getId());
                 } else if (exam != null) {
-                    List<Language> languages = exam.getLanguages();
+                    List<Language> languages = exam.getRawLanguages();
                     for (Language language : languages) {
                         language.setExamId(exam.getId());
                     }

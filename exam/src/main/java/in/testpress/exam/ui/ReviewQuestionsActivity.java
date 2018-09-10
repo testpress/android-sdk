@@ -266,7 +266,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     }
 
     void setUpLanguageOptionsMenu() {
-        final ArrayList<Language> languages = new ArrayList<>(exam.getLanguages());
+        final ArrayList<Language> languages = new ArrayList<>(exam.getRawLanguages());
         if (languages.size() > 1) {
             getMenuInflater().inflate(R.menu.testpress_select_language_menu, optionsMenu);
             selectLanguageMenu = optionsMenu.findItem(R.id.select_language);
@@ -458,7 +458,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
                 .enqueue(new TestpressCallback<TestpressApiResponse<Language>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Language> apiResponse) {
-                        List<Language> languages = exam.getLanguages();
+                        List<Language> languages = exam.getRawLanguages();
                         languages.addAll(apiResponse.getResults());
                         Map<String, Language> uniqueLanguages = new HashMap<>();
                         for (Language language : languages) {
@@ -572,7 +572,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
             } else {
                 panelListAdapter.setItems(reviewItems);
                 pagerAdapter.setReviewItems(reviewItems);
-                ArrayList<Language> languages = new ArrayList<>(exam.getLanguages());
+                ArrayList<Language> languages = new ArrayList<>(exam.getRawLanguages());
                 if (languages.size() > 1) {
                     if (selectedLanguage == null) {
                         int selectedPosition = languageSpinnerAdapter

@@ -318,7 +318,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             });
         }
         Spinner languageSpinner = view.findViewById(R.id.language_spinner);
-        final ArrayList<Language> languages = new ArrayList<>(exam.getLanguages());
+        final ArrayList<Language> languages = new ArrayList<>(exam.getRawLanguages());
         if (languages.size() > 1) {
             ExploreSpinnerAdapter languageSpinnerAdapter =
                     new ExploreSpinnerAdapter(getLayoutInflater(), getResources(), false);

@@ -617,7 +617,7 @@ public class ContentActivity extends BaseToolBarActivity {
                     @Override
                     public void onSuccess(TestpressApiResponse<Language> apiResponse) {
                         Exam exam = content.getRawExam();
-                        List<Language> languages = exam.getLanguages();
+                        List<Language> languages = exam.getRawLanguages();
                         languages.addAll(apiResponse.getResults());
                         Map<String, Language> uniqueLanguages = new HashMap<>();
                         for (Language language : languages) {

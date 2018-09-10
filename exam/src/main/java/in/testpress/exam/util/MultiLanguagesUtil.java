@@ -21,7 +21,7 @@ public class MultiLanguagesUtil {
                                             final LanguageSelectionListener listener) {
 
         View languageLayout = activity.findViewById(R.id.language_layout);
-        final ArrayList<Language> languages = new ArrayList<>(exam.getLanguages());
+        final ArrayList<Language> languages = new ArrayList<>(exam.getRawLanguages());
         if (languages.size() > 1) {
             final ExploreSpinnerAdapter languageSpinnerAdapter =
                     new ExploreSpinnerAdapter(activity.getLayoutInflater(), activity.getResources(), false);
