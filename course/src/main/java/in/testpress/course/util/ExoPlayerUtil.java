@@ -1,6 +1,9 @@
 package in.testpress.course.util;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -61,6 +64,8 @@ public class ExoPlayerUtil {
     private float speedRate = 1;
     private Spinner speedRateSpinner;
     private ExploreSpinnerAdapter speedSpinnerAdapter;
+    private BroadcastReceiver usbConnectionStateReceiver;
+    private boolean usbConnected;
     private Handler overlayPositionHandler;
     private Runnable overlayPositionChangeTask = new Runnable() {
         @Override
@@ -104,6 +109,16 @@ public class ExoPlayerUtil {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+        if (session != null && session.getInstituteSettings().isScreenshotDisabled()) {
+            usbConnectionStateReceiver = new BroadcastReceiver() {
+                public void onReceive(Context context, Intent intent) {
+                    boolean connected = intent.getExtras() != null &&
+                            intent.getExtras().getBoolean("connected");
+
+                    onUSBConnectedStateChanged(connected);
+                }
+            };
+        }
         playerView.setPlaybackPreparer(new PlaybackPreparer() {
             @Override
             public void preparePlayback() {
@@ -140,6 +155,11 @@ public class ExoPlayerUtil {
             overlayPositionHandler
                     .postDelayed(overlayPositionChangeTask, OVERLAY_POSITION_CHANGE_INTERVAL);
         }
+        if (usbConnectionStateReceiver != null) {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction("android.hardware.usb.action.USB_STATE");
+            context.registerReceiver(usbConnectionStateReceiver, filter);
+        }
     }
 
     public void releasePlayer() {
@@ -150,6 +170,27 @@ public class ExoPlayerUtil {
             player = null;
             if (overlayPositionHandler != null) {
                 overlayPositionHandler.removeCallbacks(overlayPositionChangeTask);
+            }
+        }
+        if (usbConnectionStateReceiver != null) {
+            context.unregisterReceiver(usbConnectionStateReceiver);
+        }
+    }
+
+    private void onUSBConnectedStateChanged(boolean connected) {
+        usbConnected = connected;
+        if (connected) {
+            player.setPlayWhenReady(false);
+            player.getPlaybackState();
+            errorMessageTextView.setText(R.string.testpress_usb_connected);
+            errorMessageTextView.setVisibility(View.VISIBLE);
+        } else {
+            if (errorMessageTextView.getText()
+                    .equals(context.getString(R.string.testpress_usb_connected))) {
+
+                errorMessageTextView.setVisibility(View.GONE);
+                player.setPlayWhenReady(true);
+                player.getPlaybackState();
             }
         }
     }
@@ -257,7 +298,10 @@ public class ExoPlayerUtil {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            if (playbackState == Player.STATE_BUFFERING){
+            if (usbConnected) {
+                onUSBConnectedStateChanged(true);
+            }
+            if (playbackState == Player.STATE_BUFFERING) {
                 progressBar.setVisibility(View.VISIBLE);
             } else {
                 progressBar.setVisibility(View.GONE);
