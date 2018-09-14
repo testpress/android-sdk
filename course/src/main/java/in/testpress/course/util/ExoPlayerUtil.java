@@ -3,10 +3,13 @@ package in.testpress.course.util;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -14,6 +17,7 @@ import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -33,6 +37,7 @@ import in.testpress.core.TestpressSession;
 import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
 import in.testpress.models.ProfileDetails;
+import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.UserAgentProvider;
 
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
@@ -53,6 +58,9 @@ public class ExoPlayerUtil {
     private SimpleExoPlayer player;
     private long startPosition;
     private boolean playWhenReady = true;
+    private float speedRate = 1;
+    private Spinner speedRateSpinner;
+    private ExploreSpinnerAdapter speedSpinnerAdapter;
     private Handler overlayPositionHandler;
     private Runnable overlayPositionChangeTask = new Runnable() {
         @Override
@@ -73,21 +81,44 @@ public class ExoPlayerUtil {
         if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
             setUserEmailOverlay();
         }
+        speedRateSpinner = exoPlayerLayout.findViewById(R.id.exo_speed_rate_spinner);
+        String[] speedValues = context.getResources().getStringArray(R.array.exo_speed_values);
+        speedSpinnerAdapter =
+                new ExploreSpinnerAdapter(LayoutInflater.from(context), context.getResources(), false);
+
+        speedSpinnerAdapter.setLayoutId(R.layout.testpress_exo_player_current_speed);
+        for (String speedValue : speedValues) {
+            speedSpinnerAdapter.addItem(speedValue, speedValue + "x", true, 0);
+        }
+        speedRateSpinner.setAdapter(speedSpinnerAdapter);
+        speedRateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                ExoPlayerUtil.this.speedRate = Float.parseFloat(speedSpinnerAdapter.getTag(position));
+                if (player != null) {
+                    player.setPlaybackParameters(new PlaybackParameters(ExoPlayerUtil.this.speedRate));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
         playerView.setPlaybackPreparer(new PlaybackPreparer() {
             @Override
             public void preparePlayback() {
                 initializePlayer();
             }
         });
-
     }
 
     public ExoPlayerUtil(Context context, View exoPlayerLayout, String url, long startPosition,
-                         boolean playWhenReady) {
+                         boolean playWhenReady, float speedRate) {
 
         this(context, exoPlayerLayout, url);
         this.startPosition = startPosition;
         this.playWhenReady = playWhenReady;
+        setSpeedRate(speedRate);
     }
 
     public void initializePlayer() {
@@ -101,6 +132,7 @@ public class ExoPlayerUtil {
             playerView.setPlayer(player);
             player.setPlayWhenReady(playWhenReady);
             player.seekTo(startPosition);
+            player.setPlaybackParameters(new PlaybackParameters(speedRate));
         }
         MediaSource mediaSource = buildMediaSource(Uri.parse(url));
         player.prepare(mediaSource, false, false);
@@ -142,6 +174,19 @@ public class ExoPlayerUtil {
 
     public void setPlayWhenReady(boolean playWhenReady) {
         this.playWhenReady = playWhenReady;
+    }
+
+    public float getSpeedRate() {
+        return speedRate;
+    }
+
+    public void setSpeedRate(float speedRate) {
+        this.speedRate = speedRate;
+
+        int itemPosition = speedSpinnerAdapter.getItemPositionFromTag(
+                String.valueOf(speedRate).replace(".0", ""));
+
+        speedRateSpinner.setSelection(itemPosition);
     }
 
     public void onStart() {

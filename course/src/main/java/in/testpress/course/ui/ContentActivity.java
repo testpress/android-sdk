@@ -85,6 +85,7 @@ import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
 import static in.testpress.core.TestpressSdk.EXO_PLAYER_FULLSCREEN_REQUEST_CODE;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.ui.ExoPlayerActivity.PLAY_WHEN_READY;
+import static in.testpress.course.ui.ExoPlayerActivity.SPEED_RATE;
 import static in.testpress.course.ui.ExoPlayerActivity.START_POSITION;
 import static in.testpress.course.ui.ExoPlayerActivity.VIDEO_URL;
 import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
@@ -433,6 +434,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 Intent intent = new Intent(ContentActivity.this, ExoPlayerActivity.class);
                 intent.putExtra(VIDEO_URL, content.getRawVideo().getUrl());
                 intent.putExtra(START_POSITION, Math.max(0, exoPlayerUtil.getStartPosition()));
+                intent.putExtra(SPEED_RATE, exoPlayerUtil.getSpeedRate());
                 exoPlayerUtil.releasePlayer();
                 startActivityForResult(intent, EXO_PLAYER_FULLSCREEN_REQUEST_CODE);
             }
@@ -782,6 +784,7 @@ public class ContentActivity extends BaseToolBarActivity {
         } else if (requestCode == EXO_PLAYER_FULLSCREEN_REQUEST_CODE) {
             exoPlayerUtil.setStartPosition(data.getLongExtra(START_POSITION, 0));
             exoPlayerUtil.setPlayWhenReady(data.getBooleanExtra(PLAY_WHEN_READY, true));
+            exoPlayerUtil.setSpeedRate(data.getFloatExtra(SPEED_RATE, 1));
         }
     }
 

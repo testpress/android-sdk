@@ -20,6 +20,7 @@ public class ExoPlayerActivity extends AppCompatActivity {
     public static final String VIDEO_URL = "videoUrl";
     public static final String START_POSITION = "startPosition";
     public static final String PLAY_WHEN_READY = "playWhenReady";
+    public static final String SPEED_RATE = "speedRate";
 
     private ExoPlayerUtil exoPlayerUtil;
 
@@ -43,8 +44,9 @@ public class ExoPlayerActivity extends AppCompatActivity {
         fullScreenIconView.setImageResource(R.drawable.testpress_fullscreen_exit);
         String url = getIntent().getStringExtra(VIDEO_URL);
         long startPosition = getIntent().getLongExtra(START_POSITION, 0);
+        float speedRate = getIntent().getFloatExtra(SPEED_RATE, 1);
         View exoPlayerLayout = findViewById(R.id.exo_player_layout);
-        exoPlayerUtil = new ExoPlayerUtil(this, exoPlayerLayout, url, startPosition, true);
+        exoPlayerUtil = new ExoPlayerUtil(this, exoPlayerLayout, url, startPosition, true, speedRate);
     }
 
     @Override
@@ -82,6 +84,7 @@ public class ExoPlayerActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.putExtra(START_POSITION, Math.max(0, exoPlayerUtil.getStartPosition()));
         intent.putExtra(PLAY_WHEN_READY, exoPlayerUtil.isPlayWhenReady());
+        intent.putExtra(SPEED_RATE, exoPlayerUtil.getSpeedRate());
         return intent;
     }
 

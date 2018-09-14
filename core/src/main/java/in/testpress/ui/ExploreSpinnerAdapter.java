@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.graphics.Paint;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.support.annotation.LayoutRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,10 +22,11 @@ import in.testpress.R;
 public class ExploreSpinnerAdapter extends BaseAdapter {
 
     private int mDotSize;
-    private boolean mTopLevel;
+    protected boolean mTopLevel;
     protected LayoutInflater inflater;
     private Resources resources;
     private boolean hideSpinner; // Icon will be used instead of showing the selected item in spinner.
+    private int layoutId;
 
     public ExploreSpinnerAdapter(LayoutInflater inflater, Resources resources, boolean topLevel) {
         this.inflater = inflater;
@@ -160,10 +162,7 @@ public class ExploreSpinnerAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View view, ViewGroup parent) {
         if (view == null || !view.getTag().toString().equals("NON_DROPDOWN")) {
-            view = inflater.inflate(mTopLevel
-                            ? R.layout.testpress_explore_spinner_item_actionbar
-                            : R.layout.testpress_explore_spinner_item,
-                    parent, false);
+            view = inflater.inflate(getLayoutId(), parent, false);
             view.setTag("NON_DROPDOWN");
         }
         TextView textView = (TextView) view.findViewById(android.R.id.text1);
@@ -172,6 +171,20 @@ public class ExploreSpinnerAdapter extends BaseAdapter {
             view.setVisibility(View.GONE);
         }
         return view;
+    }
+
+    @LayoutRes
+    protected int getLayoutId() {
+        if (layoutId != 0) {
+            return layoutId;
+        }
+        return mTopLevel
+                ? R.layout.testpress_explore_spinner_item_actionbar
+                : R.layout.testpress_explore_spinner_item;
+    }
+
+    public void setLayoutId(int layoutId) {
+        this.layoutId = layoutId;
     }
 
     public void hideSpinner(boolean hideSelectedItem) {

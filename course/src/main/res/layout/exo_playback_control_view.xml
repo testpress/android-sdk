@@ -14,12 +14,15 @@
      limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
     android:layoutDirection="ltr"
     android:background="#CC000000"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:ignore="UnusedAttribute"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -78,21 +81,32 @@
             android:includeFontPadding="false"
             android:textColor="#FFBEBEBE"/>
 
+        <Spinner android:id="@+id/exo_speed_rate_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:gravity="center"
+            style="@style/Widget.Testpress.HeaderBar.Spinner.Base"
+            />
+
         <FrameLayout
             android:id="@+id/exo_fullscreen_button"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_gravity="right">
+            android:layout_marginLeft="3dp"
+            android:layout_gravity="right"
+            >
 
-        <ImageView
-             android:id="@+id/exo_fullscreen_icon"
-             android:layout_width="18dp"
-             android:layout_height="18dp"
-             android:layout_gravity="center"
-             android:adjustViewBounds="true"
-             android:scaleType="fitCenter"
-             android:tint="@android:color/white"
-             android:src="@drawable/testpress_fullscreen"/>
+            <ImageView
+                android:id="@+id/exo_fullscreen_icon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:tint="@android:color/white"
+                android:src="@drawable/testpress_fullscreen"
+                />
 
         </FrameLayout>
 

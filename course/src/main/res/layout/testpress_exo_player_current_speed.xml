@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@android:id/text1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minWidth="30dp"
+    android:textSize="10sp"
+    android:paddingTop="2dp"
+    android:paddingLeft="6dp"
+    android:paddingBottom="2dp"
+    android:paddingRight="6dp"
+    android:includeFontPadding="false"
+    android:gravity="center"
+    android:textColor="@color/testpress_text_gray"
+    android:background="@drawable/testpress_white_curved_edge_background"
+    tools:ignore="SmallSp"
+    />

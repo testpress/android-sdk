@@ -41,4 +41,11 @@
 
     <string name="testpress_learn">Learn</string>
 
+    <string-array name="exo_speed_values">
+        <item>1</item>
+        <item>1.2</item>
+        <item>1.5</item>
+        <item>2</item>
+    </string-array>
+
 </resources>
