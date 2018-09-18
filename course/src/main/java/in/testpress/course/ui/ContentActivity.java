@@ -69,6 +69,7 @@ import in.testpress.models.greendao.HtmlContent;
 import in.testpress.models.greendao.HtmlContentDao;
 import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.Video;
+import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.models.greendao.VideoDao;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ZoomableImageActivity;
@@ -145,6 +146,8 @@ public class ContentActivity extends BaseToolBarActivity {
     private FullScreenChromeClient fullScreenChromeClient;
     private ExoPlayerUtil exoPlayerUtil;
     private FrameLayout exoPlayerMainFrame;
+    private boolean isEmbeddableVideo;
+    private VideoAttempt videoAttempt;
 
     public static Intent createIntent(int position, long chapterId, AppCompatActivity activity) {
         Intent intent = new Intent(activity, ContentActivity.class);
@@ -325,21 +328,22 @@ public class ContentActivity extends BaseToolBarActivity {
         } else if (content.getRawVideo() != null) {
             Video video = content.getRawVideo();
             setContentTitle(video.getTitle());
-            if (video.getEmbedCode() == null || video.getEmbedCode().isEmpty() ||
-                    video.getUrl().endsWith(".mp4")) {
+            isEmbeddableVideo = video.getEmbedCode() != null && !video.getEmbedCode().isEmpty() &&
+                    !video.getUrl().endsWith(".mp4");
 
+            if (isEmbeddableVideo) {
+                String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
+                        "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
+
+                webViewUtils.initWebView(html, this);
+                webView.setWebChromeClient(fullScreenChromeClient);
+            } else {
                 TestpressSession session = TestpressSdk.getTestpressSession(this);
                 if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
                     checkProfileDetailExist(video.getUrl());
                 } else {
                     initExoPlayer(video.getUrl());
                 }
-            } else {
-                String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
-                        "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
-
-                webViewUtils.initWebView(html, this);
-                webView.setWebChromeClient(fullScreenChromeClient);
             }
         } else if (content.getRawExam() != null) {
             onExamContent();
@@ -418,10 +422,21 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void initExoPlayer(String videoUrl) {
-        exoPlayerUtil = new ExoPlayerUtil(this, exoPlayerMainFrame, videoUrl);
-        exoPlayerMainFrame.setVisibility(View.VISIBLE);
-        exoPlayerUtil.initializePlayer();
-        createContentAttempt();
+        if (videoAttempt == null) {
+            createContentAttempt();
+        } else {
+            long lastPosition;
+            try {
+                // Convert seconds to ms
+                lastPosition = (long) Float.parseFloat(videoAttempt.getLastPosition()) * 1000;
+            } catch (NumberFormatException e) {
+                lastPosition = 0;
+            }
+            exoPlayerUtil = new ExoPlayerUtil(this, exoPlayerMainFrame, videoUrl, lastPosition);
+            exoPlayerUtil.setVideoAttemptId(videoAttempt.getId());
+            exoPlayerMainFrame.setVisibility(View.VISIBLE);
+            exoPlayerUtil.initializePlayer();
+        }
     }
 
     private void displayAttachmentContent() {
@@ -724,8 +739,10 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void createContentAttempt() {
-        Map<String, Object> data = new HashMap<>();
-        examApiClient.createContentAttempt(content.getAttemptsUrl(), data)
+        if (content.getRawVideo() != null && !isEmbeddableVideo) {
+            showLoadingProgress();
+        }
+        courseApiClient.createContentAttempt(content.getId())
                 .enqueue(new TestpressCallback<CourseAttempt>() {
                     @Override
                     public void onSuccess(CourseAttempt courseAttempt) {
@@ -734,11 +751,18 @@ public class ContentActivity extends BaseToolBarActivity {
                                     TESTPRESS_CONTENT_SHARED_PREFS, Context.MODE_PRIVATE);
                             prefs.edit().putBoolean(FORCE_REFRESH, true).apply();
                         }
+                        if (content.getRawVideo() != null && !isEmbeddableVideo) {
+                            swipeRefresh.setRefreshing(false);
+                            videoAttempt = courseAttempt.getRawVideoAttempt();
+                            initExoPlayer(content.getRawVideo().getUrl());
+                        }
                     }
 
                     @Override
                     public void onException(TestpressException exception) {
-                        if (!exception.isNetworkError()) {
+                        if (content.getRawVideo() != null && !isEmbeddableVideo) {
+                            handleError(exception, false);
+                        } else if (!exception.isNetworkError()) {
                             exception.printStackTrace();
                         }
                     }

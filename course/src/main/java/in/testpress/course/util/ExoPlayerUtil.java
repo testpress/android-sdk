@@ -10,6 +10,7 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,8 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import in.testpress.core.TestpressCallback;
@@ -46,15 +49,19 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
+import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.models.ProfileDetails;
+import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.UserAgentProvider;
 
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
+import static in.testpress.course.network.TestpressCourseApiClient.LAST_POSITION;
 
 public class ExoPlayerUtil {
 
     private static final int OVERLAY_POSITION_CHANGE_INTERVAL = 15000; // 15s
+    private static final int VIDEO_ATTEMPT_UPDATE_INTERVAL = 3000; // 3s
 
     private FrameLayout exoPlayerMainFrame;
     private View exoPlayerLayout;
@@ -68,6 +75,7 @@ public class ExoPlayerUtil {
     private Dialog fullscreenDialog;
 
     private Activity activity;
+    private long videoAttemptId;
     private String url;
     private long startPosition;
     private boolean playWhenReady = true;
@@ -85,11 +93,22 @@ public class ExoPlayerUtil {
         }
     };
     private boolean fullscreen = false;
+    private boolean errorOnVideoAttemptUpdate;
+    private Handler videoAttemptUpdateHandler;
+    private Runnable videoAttemptUpdateTask = new Runnable() {
+        @Override
+        public void run() {
+            updateVideoAttempt();
+        }
+    };
 
-    public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url) {
+    public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
+                         long startPosition) {
+
         this.activity = activity;
         this.exoPlayerMainFrame = exoPlayerMainFrame;
         this.url = url;
+        this.startPosition = startPosition;
         exoPlayerLayout = exoPlayerMainFrame.findViewById(R.id.exo_player_layout);
         playerView = exoPlayerMainFrame.findViewById(R.id.exo_player_view);
         fullscreenIcon = exoPlayerMainFrame.findViewById(R.id.exo_fullscreen_icon);
@@ -144,8 +163,7 @@ public class ExoPlayerUtil {
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          long startPosition, boolean playWhenReady, float speedRate) {
 
-        this(activity, exoPlayerMainFrame, url);
-        this.startPosition = startPosition;
+        this(activity, exoPlayerMainFrame, url, startPosition);
         this.playWhenReady = playWhenReady;
         setSpeedRate(speedRate);
     }
@@ -187,6 +205,7 @@ public class ExoPlayerUtil {
         }
         MediaSource mediaSource = buildMediaSource(Uri.parse(url));
         player.prepare(mediaSource, false, false);
+        startVideoAttemptUpdateHandler();
         if (overlayPositionHandler != null) {
             overlayPositionHandler
                     .postDelayed(overlayPositionChangeTask, OVERLAY_POSITION_CHANGE_INTERVAL);
@@ -200,6 +219,7 @@ public class ExoPlayerUtil {
 
     public void releasePlayer() {
         if (player != null) {
+            removeVideoAttemptUpdateHandler();
             startPosition = Math.max(0, player.getContentPosition());
             playWhenReady = player.getPlayWhenReady();
             player.release();
@@ -216,10 +236,7 @@ public class ExoPlayerUtil {
     private void onUSBConnectedStateChanged(boolean connected) {
         usbConnected = connected;
         if (connected) {
-            player.setPlayWhenReady(false);
-            player.getPlaybackState();
-            errorMessageTextView.setText(R.string.testpress_usb_connected);
-            errorMessageTextView.setVisibility(View.VISIBLE);
+            displayError(R.string.testpress_usb_connected);
         } else {
             if (errorMessageTextView.getText()
                     .equals(activity.getString(R.string.testpress_usb_connected))) {
@@ -264,6 +281,10 @@ public class ExoPlayerUtil {
                 String.valueOf(speedRate).replace(".0", ""));
 
         speedRateSpinner.setSelection(itemPosition);
+    }
+
+    public void setVideoAttemptId(long videoAttemptId) {
+        this.videoAttemptId = videoAttemptId;
     }
 
     public void onStart() {
@@ -359,12 +380,68 @@ public class ExoPlayerUtil {
         startOverlayMarquee();
     }
 
+    private void startVideoAttemptUpdateHandler() {
+        if (videoAttemptId != 0 && videoAttemptUpdateHandler == null) {
+            videoAttemptUpdateHandler = new Handler();
+            videoAttemptUpdateHandler
+                    .postDelayed(videoAttemptUpdateTask, VIDEO_ATTEMPT_UPDATE_INTERVAL);
+        }
+    }
+
+    private void removeVideoAttemptUpdateHandler() {
+        if (videoAttemptUpdateHandler != null) {
+            videoAttemptUpdateHandler.removeCallbacks(videoAttemptUpdateTask);
+            videoAttemptUpdateHandler = null;
+        }
+    }
+
+    private void updateVideoAttempt() {
+        Map<String, Object> parameters = new HashMap<>();
+        // Get content position & convert from ms to seconds
+        parameters.put(LAST_POSITION, Math.max(0, (float) player.getContentPosition()) / 1000);
+        new TestpressCourseApiClient(activity).updateVideoAttempt(videoAttemptId, parameters)
+                .enqueue(new TestpressCallback<CourseAttempt>() {
+                    @Override
+                    public void onSuccess(CourseAttempt courseAttempt) {
+                        errorOnVideoAttemptUpdate = false;
+                        if (videoAttemptUpdateHandler != null) {
+                            videoAttemptUpdateHandler
+                                    .postDelayed(videoAttemptUpdateTask, VIDEO_ATTEMPT_UPDATE_INTERVAL);
+                        }
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        errorOnVideoAttemptUpdate = true;
+                        handleError(exception.isNetworkError());
+                    }
+                });
+    }
+
+    private void displayError(@StringRes int message) {
+        player.setPlayWhenReady(false);
+        player.getPlaybackState();
+        errorMessageTextView.setText(message);
+        errorMessageTextView.setVisibility(View.VISIBLE);
+    }
+
+    private void handleError(boolean networkError) {
+        if (networkError) {
+            displayError(R.string.testpress_no_internet_try_again);
+        } else {
+            displayError(R.string.testpress_some_thing_went_wrong_try_again);
+        }
+    }
+
     private class PlayerEventListener extends Player.DefaultEventListener {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             if (usbConnected) {
                 onUSBConnectedStateChanged(true);
+            } else if (errorOnVideoAttemptUpdate) {
+                errorMessageTextView.setVisibility(View.GONE);
+                updateVideoAttempt();
             }
             if (playbackState == Player.STATE_BUFFERING) {
                 progressBar.setVisibility(View.VISIBLE);
@@ -375,19 +452,16 @@ public class ExoPlayerUtil {
                     !playWhenReady) {
 
                 playerView.setKeepScreenOn(false);
+                removeVideoAttemptUpdateHandler();
             } else {
                 playerView.setKeepScreenOn(true);
+                startVideoAttemptUpdateHandler();
             }
         }
 
         @Override
         public void onPlayerError(ExoPlaybackException exception) {
-            if (exception.type == TYPE_SOURCE) {
-                errorMessageTextView.setText(R.string.testpress_no_internet_try_again);
-            } else {
-                errorMessageTextView.setText(R.string.testpress_some_thing_went_wrong_try_again);
-            }
-            errorMessageTextView.setVisibility(View.VISIBLE);
+            handleError(exception.type == TYPE_SOURCE);
         }
     }
 }

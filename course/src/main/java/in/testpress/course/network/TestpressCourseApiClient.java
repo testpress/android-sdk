@@ -5,6 +5,7 @@ import android.content.Context;
 import java.util.Map;
 
 import in.testpress.core.TestpressSdk;
+import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.HtmlContent;
 import in.testpress.course.models.Reputation;
 import in.testpress.models.greendao.Chapter;
@@ -20,6 +21,7 @@ public class TestpressCourseApiClient extends TestpressApiClient {
      * Query Params
      */
     public static final String COURSE_ID = "course_id";
+    public static final String LAST_POSITION =  "last_position";
 
     /**
      * Course List Url
@@ -27,6 +29,12 @@ public class TestpressCourseApiClient extends TestpressApiClient {
     public static final String COURSE_LIST_PATH =  "/api/v2.2.1/courses/";
 
     public static final String CHAPTERS_PATH =  "/chapters/";
+
+    public static final String CONTENTS_PATH =  "/api/v2.3/contents/";
+
+    public static final String ATTEMPTS_PATH =  "/attempts/";
+
+    public static final String USER_VIDEOS_PATH =  "/api/v2.3/user_videos/";
 
     public static final String LEADERBOARD_PATH =  "/api/v2.2/leaderboard/";
 
@@ -70,6 +78,16 @@ public class TestpressCourseApiClient extends TestpressApiClient {
 
     public RetrofitCall<Content> getContent(String contentUrl) {
         return getCourseService().getContent(contentUrl);
+    }
+
+    public RetrofitCall<CourseAttempt> createContentAttempt(long contentId) {
+        return getCourseService().createContentAttempt(contentId);
+    }
+
+    public RetrofitCall<CourseAttempt> updateVideoAttempt(long videoAttemptId,
+                                                          Map<String, Object> parameters) {
+
+        return getCourseService().updateVideoAttempt(videoAttemptId, parameters);
     }
 
     public RetrofitCall<TestpressApiResponse<Reputation>> getLeaderboard(
