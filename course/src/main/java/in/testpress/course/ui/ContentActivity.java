@@ -146,7 +146,7 @@ public class ContentActivity extends BaseToolBarActivity {
     private FullScreenChromeClient fullScreenChromeClient;
     private ExoPlayerUtil exoPlayerUtil;
     private FrameLayout exoPlayerMainFrame;
-    private boolean isMp4Video;
+    private boolean isEmbeddableVideo;
     private VideoAttempt videoAttempt;
 
     public static Intent createIntent(int position, long chapterId, AppCompatActivity activity) {
@@ -328,22 +328,22 @@ public class ContentActivity extends BaseToolBarActivity {
         } else if (content.getRawVideo() != null) {
             Video video = content.getRawVideo();
             setContentTitle(video.getTitle());
-            isMp4Video = video.getEmbedCode() == null || video.getEmbedCode().isEmpty() ||
-                    video.getUrl().endsWith(".mp4");
+            isEmbeddableVideo = video.getEmbedCode() != null && !video.getEmbedCode().isEmpty() &&
+                    !video.getUrl().endsWith(".mp4");
 
-            if (isMp4Video) {
+            if (isEmbeddableVideo) {
+                String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
+                        "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
+
+                webViewUtils.initWebView(html, this);
+                webView.setWebChromeClient(fullScreenChromeClient);
+            } else {
                 TestpressSession session = TestpressSdk.getTestpressSession(this);
                 if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
                     checkProfileDetailExist(video.getUrl());
                 } else {
                     initExoPlayer(video.getUrl());
                 }
-            } else {
-                String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
-                        "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
-
-                webViewUtils.initWebView(html, this);
-                webView.setWebChromeClient(fullScreenChromeClient);
             }
         } else if (content.getRawExam() != null) {
             onExamContent();
@@ -739,7 +739,7 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void createContentAttempt() {
-        if (isMp4Video) {
+        if (content.getRawVideo() != null && !isEmbeddableVideo) {
             showLoadingProgress();
         }
         courseApiClient.createContentAttempt(content.getId())
@@ -751,7 +751,7 @@ public class ContentActivity extends BaseToolBarActivity {
                                     TESTPRESS_CONTENT_SHARED_PREFS, Context.MODE_PRIVATE);
                             prefs.edit().putBoolean(FORCE_REFRESH, true).apply();
                         }
-                        if (isMp4Video) {
+                        if (content.getRawVideo() != null && !isEmbeddableVideo) {
                             swipeRefresh.setRefreshing(false);
                             videoAttempt = courseAttempt.getRawVideoAttempt();
                             initExoPlayer(content.getRawVideo().getUrl());
@@ -760,7 +760,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
                     @Override
                     public void onException(TestpressException exception) {
-                        if (isMp4Video) {
+                        if (content.getRawVideo() != null && !isEmbeddableVideo) {
                             handleError(exception, false);
                         } else if (!exception.isNetworkError()) {
                             exception.printStackTrace();

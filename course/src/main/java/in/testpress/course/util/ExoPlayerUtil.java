@@ -205,13 +205,7 @@ public class ExoPlayerUtil {
         }
         MediaSource mediaSource = buildMediaSource(Uri.parse(url));
         player.prepare(mediaSource, false, false);
-        if (videoAttemptId != 0) {
-            if (videoAttemptUpdateHandler == null) {
-                videoAttemptUpdateHandler = new Handler();
-            }
-            videoAttemptUpdateHandler
-                    .postDelayed(videoAttemptUpdateTask, VIDEO_ATTEMPT_UPDATE_INTERVAL);
-        }
+        startVideoAttemptUpdateHandler();
         if (overlayPositionHandler != null) {
             overlayPositionHandler
                     .postDelayed(overlayPositionChangeTask, OVERLAY_POSITION_CHANGE_INTERVAL);
@@ -225,10 +219,7 @@ public class ExoPlayerUtil {
 
     public void releasePlayer() {
         if (player != null) {
-            if (videoAttemptUpdateHandler != null) {
-                videoAttemptUpdateHandler.removeCallbacks(videoAttemptUpdateTask);
-                videoAttemptUpdateHandler = null;
-            }
+            removeVideoAttemptUpdateHandler();
             startPosition = Math.max(0, player.getContentPosition());
             playWhenReady = player.getPlayWhenReady();
             player.release();
@@ -389,6 +380,21 @@ public class ExoPlayerUtil {
         startOverlayMarquee();
     }
 
+    private void startVideoAttemptUpdateHandler() {
+        if (videoAttemptId != 0 && videoAttemptUpdateHandler == null) {
+            videoAttemptUpdateHandler = new Handler();
+            videoAttemptUpdateHandler
+                    .postDelayed(videoAttemptUpdateTask, VIDEO_ATTEMPT_UPDATE_INTERVAL);
+        }
+    }
+
+    private void removeVideoAttemptUpdateHandler() {
+        if (videoAttemptUpdateHandler != null) {
+            videoAttemptUpdateHandler.removeCallbacks(videoAttemptUpdateTask);
+            videoAttemptUpdateHandler = null;
+        }
+    }
+
     private void updateVideoAttempt() {
         Map<String, Object> parameters = new HashMap<>();
         // Get content position & convert from ms to seconds
@@ -446,8 +452,10 @@ public class ExoPlayerUtil {
                     !playWhenReady) {
 
                 playerView.setKeepScreenOn(false);
+                removeVideoAttemptUpdateHandler();
             } else {
                 playerView.setKeepScreenOn(true);
+                startVideoAttemptUpdateHandler();
             }
         }
 
