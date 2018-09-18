@@ -1,16 +1,23 @@
 package in.testpress.course.util;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Handler;
-import android.view.LayoutInflater;
+import android.support.annotation.DrawableRes;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -49,16 +56,19 @@ public class ExoPlayerUtil {
 
     private static final int OVERLAY_POSITION_CHANGE_INTERVAL = 15000; // 15s
 
-    private Context context;
+    private FrameLayout exoPlayerMainFrame;
     private View exoPlayerLayout;
-    private String url;
-
     private PlayerView playerView;
     private LottieAnimationView progressBar;
     private TextView errorMessageTextView;
     private LinearLayout emailIdLayout;
     private TextView emailIdTextView;
     private SimpleExoPlayer player;
+    private ImageView fullscreenIcon;
+    private Dialog fullscreenDialog;
+
+    private Activity activity;
+    private String url;
     private long startPosition;
     private boolean playWhenReady = true;
     private float speedRate = 1;
@@ -74,22 +84,25 @@ public class ExoPlayerUtil {
             overlayPositionHandler.postDelayed(this, OVERLAY_POSITION_CHANGE_INTERVAL);
         }
     };
+    private boolean fullscreen = false;
 
-    public ExoPlayerUtil(Context context, View exoPlayerLayout, String url) {
-        this.context = context;
-        this.exoPlayerLayout = exoPlayerLayout;
+    public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url) {
+        this.activity = activity;
+        this.exoPlayerMainFrame = exoPlayerMainFrame;
         this.url = url;
-        playerView = exoPlayerLayout.findViewById(R.id.exo_player_view);
-        progressBar = exoPlayerLayout.findViewById(R.id.exo_player_progress);
-        errorMessageTextView = exoPlayerLayout.findViewById(R.id.error_message);
-        TestpressSession session = TestpressSdk.getTestpressSession(context);
+        exoPlayerLayout = exoPlayerMainFrame.findViewById(R.id.exo_player_layout);
+        playerView = exoPlayerMainFrame.findViewById(R.id.exo_player_view);
+        fullscreenIcon = exoPlayerMainFrame.findViewById(R.id.exo_fullscreen_icon);
+        progressBar = exoPlayerMainFrame.findViewById(R.id.exo_player_progress);
+        errorMessageTextView = exoPlayerMainFrame.findViewById(R.id.error_message);
+        TestpressSession session = TestpressSdk.getTestpressSession(activity);
         if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
             setUserEmailOverlay();
         }
-        speedRateSpinner = exoPlayerLayout.findViewById(R.id.exo_speed_rate_spinner);
-        String[] speedValues = context.getResources().getStringArray(R.array.exo_speed_values);
+        speedRateSpinner = exoPlayerMainFrame.findViewById(R.id.exo_speed_rate_spinner);
+        String[] speedValues = activity.getResources().getStringArray(R.array.exo_speed_values);
         speedSpinnerAdapter =
-                new ExploreSpinnerAdapter(LayoutInflater.from(context), context.getResources(), false);
+                new ExploreSpinnerAdapter(activity.getLayoutInflater(), activity.getResources(), false);
 
         speedSpinnerAdapter.setLayoutId(R.layout.testpress_exo_player_current_speed);
         for (String speedValue : speedValues) {
@@ -125,22 +138,45 @@ public class ExoPlayerUtil {
                 initializePlayer();
             }
         });
+        initFullscreenDialog();
     }
 
-    public ExoPlayerUtil(Context context, View exoPlayerLayout, String url, long startPosition,
-                         boolean playWhenReady, float speedRate) {
+    public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
+                         long startPosition, boolean playWhenReady, float speedRate) {
 
-        this(context, exoPlayerLayout, url);
+        this(activity, exoPlayerMainFrame, url);
         this.startPosition = startPosition;
         this.playWhenReady = playWhenReady;
         setSpeedRate(speedRate);
+    }
+
+    private void initFullscreenDialog() {
+        fullscreenDialog = new Dialog(activity, android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
+            public void onBackPressed() {
+                if (fullscreen) {
+                    closeFullscreenDialog();
+                }
+                super.onBackPressed();
+            }
+        };
+        FrameLayout fullScreenButton = playerView.findViewById(R.id.exo_fullscreen_button);
+        fullScreenButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!fullscreen) {
+                    openFullscreenDialog();
+                } else {
+                    closeFullscreenDialog();
+                }
+            }
+        });
     }
 
     public void initializePlayer() {
         errorMessageTextView.setVisibility(View.GONE);
         if (player == null) {
             progressBar.setVisibility(View.VISIBLE);
-            player = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(context),
+            player = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(activity),
                     new DefaultTrackSelector(), new DefaultLoadControl());
 
             player.addListener(new PlayerEventListener());
@@ -158,7 +194,7 @@ public class ExoPlayerUtil {
         if (usbConnectionStateReceiver != null) {
             IntentFilter filter = new IntentFilter();
             filter.addAction("android.hardware.usb.action.USB_STATE");
-            context.registerReceiver(usbConnectionStateReceiver, filter);
+            activity.registerReceiver(usbConnectionStateReceiver, filter);
         }
     }
 
@@ -173,7 +209,7 @@ public class ExoPlayerUtil {
             }
         }
         if (usbConnectionStateReceiver != null) {
-            context.unregisterReceiver(usbConnectionStateReceiver);
+            activity.unregisterReceiver(usbConnectionStateReceiver);
         }
     }
 
@@ -186,7 +222,7 @@ public class ExoPlayerUtil {
             errorMessageTextView.setVisibility(View.VISIBLE);
         } else {
             if (errorMessageTextView.getText()
-                    .equals(context.getString(R.string.testpress_usb_connected))) {
+                    .equals(activity.getString(R.string.testpress_usb_connected))) {
 
                 errorMessageTextView.setVisibility(View.GONE);
                 player.setPlayWhenReady(true);
@@ -196,7 +232,7 @@ public class ExoPlayerUtil {
     }
 
     private MediaSource buildMediaSource(Uri uri) {
-        String userAgent = UserAgentProvider.get(context);
+        String userAgent = UserAgentProvider.get(activity);
         return new ExtractorMediaSource.Factory(new DefaultHttpDataSourceFactory(userAgent))
                 .createMediaSource(uri);
     }
@@ -259,7 +295,7 @@ public class ExoPlayerUtil {
         if (profileDetails != null) {
             setUserEmailOverlay(profileDetails);
         } else {
-            TestpressUserDetails.getInstance().load(context, new TestpressCallback<ProfileDetails>() {
+            TestpressUserDetails.getInstance().load(activity, new TestpressCallback<ProfileDetails>() {
                 @Override
                 public void onSuccess(ProfileDetails userDetails) {
                     setUserEmailOverlay(userDetails);
@@ -279,12 +315,15 @@ public class ExoPlayerUtil {
         } else {
             overlayText = profileDetails.getUsername();
         }
-        emailIdTextView = exoPlayerLayout.findViewById(R.id.email_id);
+        emailIdTextView = exoPlayerMainFrame.findViewById(R.id.email_id);
         emailIdTextView.setText(overlayText);
-        emailIdLayout = exoPlayerLayout.findViewById(R.id.email_id_layout);
-        Animation marquee = AnimationUtils.loadAnimation(context, R.anim.testpress_marquee);
-        emailIdLayout.startAnimation(marquee);
+        emailIdLayout = exoPlayerMainFrame.findViewById(R.id.email_id_layout);
         overlayPositionHandler = new Handler();
+    }
+
+    private void startOverlayMarquee() {
+        Animation marquee = AnimationUtils.loadAnimation(activity, R.anim.testpress_marquee);
+        emailIdLayout.startAnimation(marquee);
     }
 
     private void displayOverlayText() {
@@ -292,6 +331,32 @@ public class ExoPlayerUtil {
         Random random = new Random();
         float randomY = random.nextInt(height) + emailIdLayout.getY();
         emailIdTextView.setY(randomY);
+        startOverlayMarquee();
+    }
+
+    private void openFullscreenDialog() {
+        exoPlayerMainFrame.removeView(exoPlayerLayout);
+        fullscreenDialog.addContentView(exoPlayerLayout, new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        setFullscreenIcon(R.drawable.testpress_fullscreen_exit);
+        fullscreen = true;
+        fullscreenDialog.show();
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    }
+
+    private void closeFullscreenDialog() {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        ((ViewGroup) exoPlayerLayout.getParent()).removeView(exoPlayerLayout);
+        exoPlayerMainFrame.addView(exoPlayerLayout);
+        fullscreen = false;
+        fullscreenDialog.dismiss();
+        setFullscreenIcon(R.drawable.testpress_fullscreen);
+    }
+
+    private void setFullscreenIcon(@DrawableRes int imageResId) {
+        fullscreenIcon.setImageDrawable(ContextCompat.getDrawable(activity, imageResId));
+        startOverlayMarquee();
     }
 
     private class PlayerEventListener extends Player.DefaultEventListener {

@@ -1,11 +1,10 @@
 package in.testpress.course.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.FrameLayout;
 
 import com.google.android.exoplayer2.ui.PlayerView;
 
@@ -32,21 +31,13 @@ public class ExoPlayerActivity extends AppCompatActivity {
         PlayerView playerView = findViewById(R.id.exo_player_view);
         int matchParent = ConstraintLayout.LayoutParams.MATCH_PARENT;
         playerView.setLayoutParams(new ConstraintLayout.LayoutParams(matchParent, matchParent));
-        ImageView fullScreenIconView = findViewById(R.id.exo_fullscreen_icon);
-        findViewById(R.id.exo_fullscreen_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setResult(RESULT_OK, getDataToSetResult());
-                exoPlayerUtil.releasePlayer();
-                finish();
-            }
-        });
-        fullScreenIconView.setImageResource(R.drawable.testpress_fullscreen_exit);
+        findViewById(R.id.exo_fullscreen_button).setVisibility(View.GONE);
         String url = getIntent().getStringExtra(VIDEO_URL);
         long startPosition = getIntent().getLongExtra(START_POSITION, 0);
         float speedRate = getIntent().getFloatExtra(SPEED_RATE, 1);
-        View exoPlayerLayout = findViewById(R.id.exo_player_layout);
-        exoPlayerUtil = new ExoPlayerUtil(this, exoPlayerLayout, url, startPosition, true, speedRate);
+        FrameLayout exoPlayerMainFrame = findViewById(R.id.exo_player_main_frame);
+        exoPlayerUtil =
+                new ExoPlayerUtil(this, exoPlayerMainFrame, url, startPosition, true, speedRate);
     }
 
     @Override
@@ -71,21 +62,6 @@ public class ExoPlayerActivity extends AppCompatActivity {
     public void onStop() {
         super.onStop();
         exoPlayerUtil.onStop();
-    }
-
-    @Override
-    public void onBackPressed() {
-        setResult(RESULT_CANCELED, getDataToSetResult());
-        exoPlayerUtil.releasePlayer();
-        super.onBackPressed();
-    }
-
-    Intent getDataToSetResult() {
-        Intent intent = new Intent();
-        intent.putExtra(START_POSITION, Math.max(0, exoPlayerUtil.getStartPosition()));
-        intent.putExtra(PLAY_WHEN_READY, exoPlayerUtil.isPlayWhenReady());
-        intent.putExtra(SPEED_RATE, exoPlayerUtil.getSpeedRate());
-        return intent;
     }
 
 }

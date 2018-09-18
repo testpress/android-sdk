@@ -28,7 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.google.android.exoplayer2.ui.PlayerView;
 
 import junit.framework.Assert;
 
@@ -82,12 +81,7 @@ import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
 import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
-import static in.testpress.core.TestpressSdk.EXO_PLAYER_FULLSCREEN_REQUEST_CODE;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
-import static in.testpress.course.ui.ExoPlayerActivity.PLAY_WHEN_READY;
-import static in.testpress.course.ui.ExoPlayerActivity.SPEED_RATE;
-import static in.testpress.course.ui.ExoPlayerActivity.START_POSITION;
-import static in.testpress.course.ui.ExoPlayerActivity.VIDEO_URL;
 import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.CONTENTS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.STATE_PAUSED;
@@ -149,9 +143,8 @@ public class ContentActivity extends BaseToolBarActivity {
     private FolderSpinnerAdapter folderSpinnerAdapter;
     private WebViewUtils webViewUtils;
     private FullScreenChromeClient fullScreenChromeClient;
-    private PlayerView playerView;
     private ExoPlayerUtil exoPlayerUtil;
-    private View exoPlayerLayout;
+    private FrameLayout exoPlayerMainFrame;
 
     public static Intent createIntent(int position, long chapterId, AppCompatActivity activity) {
         Intent intent = new Intent(activity, ContentActivity.class);
@@ -198,8 +191,7 @@ public class ContentActivity extends BaseToolBarActivity {
         previousButton = (Button) findViewById(R.id.previous);
         nextButton = (Button) findViewById(R.id.next);
         retryButton = (Button) findViewById(R.id.retry_button);
-        playerView = findViewById(R.id.exo_player_view);
-        exoPlayerLayout = findViewById(R.id.exo_player_layout);
+        exoPlayerMainFrame = findViewById(R.id.exo_player_main_frame);
         toast = Toast.makeText(this, R.string.testpress_no_internet_try_again, Toast.LENGTH_SHORT);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         TextView pageNumber = (TextView) findViewById(R.id.page_number);
@@ -426,20 +418,8 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void initExoPlayer(String videoUrl) {
-        exoPlayerUtil = new ExoPlayerUtil(this, exoPlayerLayout, videoUrl);
-        FrameLayout fullScreenButton = playerView.findViewById(R.id.exo_fullscreen_button);
-        fullScreenButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ContentActivity.this, ExoPlayerActivity.class);
-                intent.putExtra(VIDEO_URL, content.getRawVideo().getUrl());
-                intent.putExtra(START_POSITION, Math.max(0, exoPlayerUtil.getStartPosition()));
-                intent.putExtra(SPEED_RATE, exoPlayerUtil.getSpeedRate());
-                exoPlayerUtil.releasePlayer();
-                startActivityForResult(intent, EXO_PLAYER_FULLSCREEN_REQUEST_CODE);
-            }
-        });
-        exoPlayerLayout.setVisibility(View.VISIBLE);
+        exoPlayerUtil = new ExoPlayerUtil(this, exoPlayerMainFrame, videoUrl);
+        exoPlayerMainFrame.setVisibility(View.VISIBLE);
         exoPlayerUtil.initializePlayer();
         createContentAttempt();
     }
@@ -781,10 +761,6 @@ public class ContentActivity extends BaseToolBarActivity {
                 }
                 updateContent();
             }
-        } else if (requestCode == EXO_PLAYER_FULLSCREEN_REQUEST_CODE) {
-            exoPlayerUtil.setStartPosition(data.getLongExtra(START_POSITION, 0));
-            exoPlayerUtil.setPlayWhenReady(data.getBooleanExtra(PLAY_WHEN_READY, true));
-            exoPlayerUtil.setSpeedRate(data.getFloatExtra(SPEED_RATE, 1));
         }
     }
 
