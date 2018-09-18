@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 16;
+    private static final int VERSION = 17;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -45,6 +45,9 @@ public class TestpressSDKDaoGenerator {
         Entity attempt = addAttempt(schema);
         addCourseContentToCourseAttempt(courseAttempt, content);
         addAttemptToCourseAttempt(courseAttempt, attempt);
+        Entity videoAttempt = addVideoAttempt(schema);
+        addVideoAttemptToCourseAttempt(courseAttempt, videoAttempt);
+        addVideoToVideoAttempt(videoAttempt, video);
         Entity attemptSection = addAttemptSection(schema);
         addSectionToAttempt(attempt, attemptSection);
 
@@ -108,6 +111,16 @@ public class TestpressSDKDaoGenerator {
     private static void addAttemptToCourseAttempt(Entity courseAttempt, Entity attempt) {
         Property attemptId = courseAttempt.addLongProperty("attemptId").getProperty();
         courseAttempt.addToOne(attempt, attemptId, "assessment");
+    }
+
+    private static void addVideoAttemptToCourseAttempt(Entity courseAttempt, Entity videoAttempt) {
+        Property videoAttemptId = courseAttempt.addLongProperty("videoAttemptId").getProperty();
+        courseAttempt.addToOne(videoAttempt, videoAttemptId, "video");
+    }
+
+    private static void addVideoToVideoAttempt(Entity videoAttempt, Entity videoContent) {
+        Property videoContentId = videoAttempt.addLongProperty("videoContentId").getProperty();
+        videoAttempt.addToOne(videoContent, videoContentId, "videoContent");
     }
 
     private static void addExamToContent(Entity content, Entity exam) {
@@ -182,6 +195,15 @@ public class TestpressSDKDaoGenerator {
         video.addStringProperty("embedCode");
         video.implementsInterface("android.os.Parcelable");
         return video;
+    }
+
+    private static Entity addVideoAttempt(Schema schema) {
+        Entity videoAttempt = schema.addEntity("VideoAttempt");
+        videoAttempt.addLongProperty("id").primaryKey();
+        videoAttempt.addStringProperty("lastPosition");
+        videoAttempt.addIntProperty("state");
+        videoAttempt.addStringProperty("watchedDuration");
+        return videoAttempt;
     }
 
     private static Entity addLanguage(Schema schema, Entity exam) {
