@@ -182,7 +182,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
             @Override
             public void onPageSelected(int position) {
-                goToQuestion(position);
+                goToQuestion(position, true);
             }
 
             @Override
@@ -396,11 +396,13 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         }
     }
 
-    private void goToQuestion(int position) {
+    private void goToQuestion(int position, boolean saveCurrentOptions) {
         if (attemptItemList.isEmpty()) {
             return;
         }
-        saveResult(currentPosition, Action.UPDATE_ANSWER);
+        if (saveCurrentOptions) {
+            saveResult(currentPosition, Action.UPDATE_ANSWER);
+        }
         currentPosition = position;
         panelListAdapter.setCurrentAttemptItemIndex(position + 1);
         if (slidingPaneLayout.isOpen()) {
@@ -645,7 +647,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         if (pager.getCurrentItem() != 0) {
             pager.setCurrentItem(0);
         } else {
-            goToQuestion(0);
+            goToQuestion(0, false);
         }
         String remainingTime = attempt.getRemainingTime();
         if (lockedSectionExam) {
@@ -685,6 +687,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     private void saveResult(final int position, final Action action) {
+        if (attemptItemList.size() <= position) {
+            return;
+        }
         final AttemptItem attemptItem = attemptItemList.get(position);
         if (attemptItem.hasChanged()) {
             if (action != Action.UPDATE_ANSWER) {
