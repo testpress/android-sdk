@@ -1058,7 +1058,8 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 millisRemaining = millisUntilFinished;
                 final String formattedTime = formatTime(millisUntilFinished);
                 timer.setText(formattedTime);
-                if(((millisUntilFinished / 1000) % 60) == 0) {
+                long seconds = millisUntilFinished / 1000;
+                if ((seconds % 60) == 0 && (seconds / 60) != 0) {
                     sendHeartBeat();
                 }
             }
