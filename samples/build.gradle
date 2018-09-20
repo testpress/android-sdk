@@ -47,7 +47,7 @@ dependencies {
     // Facebook sdk may use the different version of customtabs, To avoid the lint errors & crashes
     // declare same version of support lib
     api rootProject.customtabs
-    api 'com.google.android.gms:play-services-auth:10.2.0'
+    api 'com.google.android.gms:play-services-auth:16.0.0'
     api 'com.facebook.android:facebook-android-sdk:4.20.0'
     testImplementation rootProject.junit
 }

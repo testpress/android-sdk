@@ -1,6 +1,8 @@
 package in.testpress.util;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,6 +66,13 @@ public class CommonUtils {
                 retrofitCall.cancel();
             }
         }
+    }
+
+    public static boolean isUsbConnected(Context context) {
+        IntentFilter filter = new IntentFilter("android.hardware.usb.action.USB_STATE");
+        Intent intent = context.registerReceiver(null, filter);
+        return intent != null && intent.getExtras() != null &&
+                intent.getExtras().getBoolean("connected");
     }
 
 }

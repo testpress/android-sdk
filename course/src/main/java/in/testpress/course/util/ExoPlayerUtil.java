@@ -12,6 +12,10 @@ import android.os.Handler;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.media.MediaControlIntent;
+import android.support.v7.media.MediaRouteSelector;
+import android.support.v7.media.MediaRouter;
+import android.support.v7.media.MediaRouter.RouteInfo;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -53,8 +57,10 @@ import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.models.ProfileDetails;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.ui.ExploreSpinnerAdapter;
+import in.testpress.util.CommonUtils;
 import in.testpress.util.UserAgentProvider;
 
+import static android.support.v7.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 import static in.testpress.course.network.TestpressCourseApiClient.LAST_POSITION;
 
@@ -83,7 +89,9 @@ public class ExoPlayerUtil {
     private Spinner speedRateSpinner;
     private ExploreSpinnerAdapter speedSpinnerAdapter;
     private BroadcastReceiver usbConnectionStateReceiver;
-    private boolean usbConnected;
+    private MediaRouter mediaRouter;
+    private MediaRouteSelector mediaRouteSelector;
+    private MediaRouter.Callback mediaRouterCallback;
     private Handler overlayPositionHandler;
     private Runnable overlayPositionChangeTask = new Runnable() {
         @Override
@@ -98,7 +106,9 @@ public class ExoPlayerUtil {
     private Runnable videoAttemptUpdateTask = new Runnable() {
         @Override
         public void run() {
-            updateVideoAttempt();
+            if (!isScreenCasted()) {
+                updateVideoAttempt();
+            }
         }
     };
 
@@ -142,14 +152,7 @@ public class ExoPlayerUtil {
             }
         });
         if (session != null && session.getInstituteSettings().isScreenshotDisabled()) {
-            usbConnectionStateReceiver = new BroadcastReceiver() {
-                public void onReceive(Context context, Intent intent) {
-                    boolean connected = intent.getExtras() != null &&
-                            intent.getExtras().getBoolean("connected");
-
-                    onUSBConnectedStateChanged(connected);
-                }
-            };
+            initScreenRecordTrackers();
         }
         playerView.setPlaybackPreparer(new PlaybackPreparer() {
             @Override
@@ -211,9 +214,10 @@ public class ExoPlayerUtil {
                     .postDelayed(overlayPositionChangeTask, OVERLAY_POSITION_CHANGE_INTERVAL);
         }
         if (usbConnectionStateReceiver != null) {
-            IntentFilter filter = new IntentFilter();
-            filter.addAction("android.hardware.usb.action.USB_STATE");
+            IntentFilter filter = new IntentFilter("android.hardware.usb.action.USB_STATE");
             activity.registerReceiver(usbConnectionStateReceiver, filter);
+            mediaRouter.addCallback(mediaRouteSelector, mediaRouterCallback,
+                    MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
         }
     }
 
@@ -230,22 +234,28 @@ public class ExoPlayerUtil {
         }
         if (usbConnectionStateReceiver != null) {
             activity.unregisterReceiver(usbConnectionStateReceiver);
+            mediaRouter.removeCallback(mediaRouterCallback);
         }
     }
 
-    private void onUSBConnectedStateChanged(boolean connected) {
-        usbConnected = connected;
-        if (connected) {
-            displayError(R.string.testpress_usb_connected);
-        } else {
-            if (errorMessageTextView.getText()
-                    .equals(activity.getString(R.string.testpress_usb_connected))) {
+    private void initScreenRecordTrackers() {
+        usbConnectionStateReceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                boolean connected = intent.getExtras() != null &&
+                        intent.getExtras().getBoolean("connected");
 
-                errorMessageTextView.setVisibility(View.GONE);
-                player.setPlayWhenReady(true);
-                player.getPlaybackState();
+                if (connected) {
+                    displayError(R.string.testpress_usb_connected);
+                } else {
+                    hideError(R.string.testpress_usb_connected);
+                }
             }
-        }
+        };
+        mediaRouter = MediaRouter.getInstance(activity);
+        mediaRouterCallback = new MediaRouter.Callback(){};
+        mediaRouteSelector = new MediaRouteSelector.Builder()
+                .addControlCategory(MediaControlIntent.CATEGORY_LIVE_VIDEO)
+                .build();
     }
 
     private MediaSource buildMediaSource(Uri uri) {
@@ -425,6 +435,14 @@ public class ExoPlayerUtil {
         errorMessageTextView.setVisibility(View.VISIBLE);
     }
 
+    private void hideError(@StringRes int message) {
+        if (errorMessageTextView.getText().equals(activity.getString(message))) {
+            errorMessageTextView.setVisibility(View.GONE);
+            player.setPlayWhenReady(true);
+            player.getPlaybackState();
+        }
+    }
+
     private void handleError(boolean networkError) {
         if (networkError) {
             displayError(R.string.testpress_no_internet_try_again);
@@ -433,15 +451,31 @@ public class ExoPlayerUtil {
         }
     }
 
+    private boolean isScreenCasted() {
+        if (mediaRouter != null) {
+            for (RouteInfo info : mediaRouter.getRoutes()) {
+                if (info.getConnectionState() == CONNECTION_STATE_CONNECTED) {
+                    displayError(R.string.testpress_disconnect_live_video);
+                    return true;
+                }
+            }
+        }
+        hideError(R.string.testpress_disconnect_live_video);
+        return false;
+    }
+
     private class PlayerEventListener extends Player.DefaultEventListener {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            if (usbConnected) {
-                onUSBConnectedStateChanged(true);
-            } else if (errorOnVideoAttemptUpdate) {
-                errorMessageTextView.setVisibility(View.GONE);
-                updateVideoAttempt();
+            if (!isScreenCasted() && CommonUtils.isUsbConnected(activity)) {
+                displayError(R.string.testpress_usb_connected);
+            } else {
+                hideError(R.string.testpress_usb_connected);
+                if (errorOnVideoAttemptUpdate) {
+                    errorMessageTextView.setVisibility(View.GONE);
+                    updateVideoAttempt();
+                }
             }
             if (playbackState == Player.STATE_BUFFERING) {
                 progressBar.setVisibility(View.VISIBLE);
@@ -464,4 +498,5 @@ public class ExoPlayerUtil {
             handleError(exception.type == TYPE_SOURCE);
         }
     }
+
 }
