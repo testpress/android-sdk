@@ -12,6 +12,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 
 public abstract class BaseNavigationDrawerActivity extends AppCompatActivity {
@@ -55,6 +60,9 @@ public abstract class BaseNavigationDrawerActivity extends AppCompatActivity {
                 displayHome();
                 selectedItem = 0;
                 break;
+            case R.id.logout:
+                logout();
+                break;
         }
         drawerLayout.closeDrawers();
     }
@@ -65,6 +73,17 @@ public abstract class BaseNavigationDrawerActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new HomeFragment())
                 .commit();
+    }
+
+    protected void logout() {
+        TestpressSdk.clearActiveSession(this);
+        LoginManager.getInstance().logOut();
+        GoogleSignInOptions signInOptions =
+                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build();
+
+        GoogleSignIn.getClient(this, signInOptions).signOut();
+        TestpressSDKDatabase.clearDatabase(this);
+        finish();
     }
 
     @Override

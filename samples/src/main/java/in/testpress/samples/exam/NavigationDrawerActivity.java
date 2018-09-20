@@ -3,9 +3,6 @@ package in.testpress.samples.exam;
 import android.content.Intent;
 import android.view.MenuItem;
 
-import com.facebook.login.LoginManager;
-
-import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.TestpressExam;
@@ -30,12 +27,6 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                 break;
             case R.id.exams_categories:
                 showSDK(2);
-                break;
-            case R.id.logout:
-                TestpressSdk.clearActiveSession(this);
-                LoginManager.getInstance().logOut();
-                TestpressSDKDatabase.clearDatabase(this);
-                finish();
                 break;
         }
         super.onDrawerItemSelected(menuItem);
