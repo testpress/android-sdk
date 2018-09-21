@@ -78,7 +78,6 @@ public class AccessCodeFragment extends Fragment {
             }
         });
         accessCodeView.requestFocus();
-        UIUtils.showSoftKeyboard(getActivity(), accessCodeView);
         return view;
     }
 
