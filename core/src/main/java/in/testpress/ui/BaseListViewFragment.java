@@ -87,7 +87,7 @@ public abstract class BaseListViewFragment<E> extends Fragment
             getLoaderManager().initLoader(0, null, this);
             firstCallBack = false;
         } else {
-            if (items.isEmpty()) {
+            if (isItemsEmpty()) {
                 if (exception != null){
                     // Set error message in empty view
                     getErrorMessage(exception);
@@ -378,12 +378,7 @@ public abstract class BaseListViewFragment<E> extends Fragment
             swipeRefreshLayout.setRefreshing(false);
         } else {
             hide(emptyView);
-            swipeRefreshLayout.post(new Runnable() {
-                @Override
-                public void run() {
-                    swipeRefreshLayout.setRefreshing(true);
-                }
-            });
+            swipeRefreshLayout.setRefreshing(true);
         }
         return this;
     }

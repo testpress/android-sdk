@@ -27,7 +27,8 @@ import static in.testpress.core.TestpressSdk.COURSE_CONTENT_LIST_REQUEST_CODE;
 public class TestpressCourse {
 
     public static final String COURSE_ID = "courseId";
-    public static final String PARENT_ID = "parentId";
+    public static final String PARENT_CHAPTER_ID = "parentChapterId";
+    public static final String CHAPTER_ID = "chapterId";
     public static final String CHAPTER_URL = "chapterUrl";
 
     /**

@@ -411,13 +411,14 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     void displayReviewItems() {
         String rawQuery = "SELECT LANGUAGE FROM REVIEW_QUESTION AS Q " +
                 "INNER JOIN REVIEW_ITEM AS I ON I.QUESTION_ID=Q.ID " +
-                "WHERE I.ATTEMPT_ID=" + attempt.getId() + " " +
+                "WHERE I.ATTEMPT_ID=" + attempt.getId() + " AND LANGUAGE IS NOT NULL " +
                 "UNION " +
                 "SELECT LANGUAGE FROM REVIEW_QUESTION_TRANSLATION AS T " +
                 "INNER JOIN (SELECT AQ.ID AS AQ_ID FROM REVIEW_QUESTION AS AQ " +
                 "   INNER JOIN REVIEW_ITEM AS RI ON RI.QUESTION_ID=AQ.ID" +
                 "   WHERE RI.ATTEMPT_ID=" + attempt.getId() + ") AS C " +
                 "ON T.QUESTION_ID=AQ_ID " +
+                "WHERE LANGUAGE IS NOT NULL " +
                 "ORDER BY LANGUAGE;";
 
         Cursor cursor =

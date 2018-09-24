@@ -32,7 +32,7 @@ import in.testpress.util.UIUtils;
 
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
-import static in.testpress.course.TestpressCourse.PARENT_ID;
+import static in.testpress.course.TestpressCourse.PARENT_CHAPTER_ID;
 import static in.testpress.course.ui.ContentActivity.FORCE_REFRESH;
 import static in.testpress.course.ui.ContentActivity.GO_TO_MENU;
 import static in.testpress.course.ui.ContentActivity.TESTPRESS_CONTENT_SHARED_PREFS;
@@ -176,11 +176,11 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
 
     void onChapterLoaded(Chapter chapter) {
         this.chapter = chapter;
-        //noinspection ConstantConditions
+        // noinspection ConstantConditions
         getSupportActionBar().setTitle(chapter.getName());
         if (chapter.getActive() && chapter.getChildrenCount() > 0) {
             getIntent().putExtra(COURSE_ID, chapter.getCourseId().toString());
-            getIntent().putExtra(PARENT_ID, chapter.getId().toString());
+            getIntent().putExtra(PARENT_CHAPTER_ID, chapter.getId().toString());
             loadChildChapters();
         } else if (chapter.getActive() && chapter.getContentsCount() > 0) {
             getIntent().putExtra(CONTENTS_URL_FRAG, chapter.getContentUrl());
@@ -231,7 +231,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     protected Bundle getDataToSetResult() {
         Bundle data = super.getDataToSetResult();
         if (chapter != null && chapter.getActive()) {
-            Integer parentId = chapter.getParentId();
+            Long parentId = chapter.getParentId();
             if (parentId != null) {
                 data.putString(CHAPTER_URL, chapter.getParentUrl());
             } else {

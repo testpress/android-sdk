@@ -4,13 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -33,18 +34,17 @@ import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.network.BaseResourcePager;
 import in.testpress.ui.BaseToolBarActivity;
-import pl.openrnd.multilevellistview.ItemInfo;
-import pl.openrnd.multilevellistview.MultiLevelListView;
-import pl.openrnd.multilevellistview.OnItemClickListener;
+import in.testpress.util.ViewUtils;
 
 import static in.testpress.course.TestpressCourse.COURSE_ID;
+import static in.testpress.course.TestpressCourse.PARENT_CHAPTER_ID;
 import static in.testpress.network.TestpressApiClient.MODIFIED_SINCE;
 import static in.testpress.network.TestpressApiClient.ORDER;
 import static in.testpress.network.TestpressApiClient.UNFILTERED;
 
 public class ExpandableContentsActivity extends BaseToolBarActivity {
 
-    private SwipeRefreshLayout swipeRefreshLayout;
+    SwipeRefreshLayout swipeRefreshLayout;
     private LinearLayout newContentsAvailableLabel;
     private View emptyView;
     private ImageView emptyViewImage;
@@ -58,15 +58,21 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
     private ContentDao contentDao;
     private TestpressCourseApiClient apiClient;
     private BaseResourcePager currentPager;
-    private ExpandableContentsAdapter adapter;
-    private ListView listView;
     private boolean chaptersModified;
     private long courseId;
+    private long parentChapterId;
 
     public static Intent createIntent(String title, long courseId, Context context) {
+        return createIntent(title, courseId, 0, context);
+    }
+
+    public static Intent createIntent(String title, long courseId, long parentChapterId,
+                                      Context context) {
+
         Intent intent = new Intent(context, ExpandableContentsActivity.class);
         intent.putExtra(ACTIONBAR_TITLE, title);
         intent.putExtra(COURSE_ID, courseId);
+        intent.putExtra(PARENT_CHAPTER_ID, parentChapterId);
         return intent;
     }
 
@@ -105,66 +111,6 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
             }
         });
 
-        final MultiLevelListView multiLevelListView = findViewById(R.id.listView);
-        adapter = new ExpandableContentsAdapter(this);
-        multiLevelListView.setAdapter(adapter);
-        listView = findViewById(android.R.id.list);
-        multiLevelListView.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClicked(MultiLevelListView parent, View view, Object item,
-                                      ItemInfo itemInfo) {
-
-                if (item instanceof Chapter) {
-                    Snackbar.make(swipeRefreshLayout, R.string.testpress_no_content_description,
-                            Snackbar.LENGTH_SHORT).show();
-                } else {
-                    Content content = (Content) item;
-                    startActivity(ContentActivity.createIntent(
-                            content.getId(),
-                            content.getChapterId(),
-                            ExpandableContentsActivity.this)
-                    );
-                }
-            }
-
-            @Override
-            public void onGroupItemClicked(MultiLevelListView parent, View view, Object item,
-                                           ItemInfo itemInfo) {
-
-                Chapter chapter = (Chapter) item;
-                if (chapter.getRawChildrenCount(getBaseContext()) == 1) {
-                    Chapter childChapter = chapterDao.queryBuilder()
-                            .where(ChapterDao.Properties.ParentId.eq(chapter.getId())).list().get(0);
-
-                    int activePosition = listView.getPositionForView(view);
-                    if (adapter.isExpandable(childChapter) && activePosition != -1) {
-                        activePosition++;
-                        listView.performItemClick(
-                                listView.getAdapter().getView(activePosition, null, null),
-                                activePosition,
-                                listView.getAdapter().getItemId(activePosition)
-                        );
-                    }
-                }
-            }
-        });
-        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-                                 int totalItemCount) {
-
-                if (listView.getChildAt(0) != null) {
-                    swipeRefreshLayout.setEnabled(listView.getFirstVisiblePosition() == 0
-                            && listView.getChildAt(0).getTop() == 0);
-                }
-            }
-        });
-
         courseDao = TestpressSDKDatabase.getCourseDao(this);
         chapterDao = TestpressSDKDatabase.getChapterDao(this);
         contentDao = TestpressSDKDatabase.getContentDao(getBaseContext());
@@ -172,6 +118,7 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
         apiClient = new TestpressCourseApiClient(this);
 
         courseId = getIntent().getLongExtra(COURSE_ID, 0);
+        parentChapterId = getIntent().getLongExtra(PARENT_CHAPTER_ID, 0);
         String title = getIntent().getStringExtra(ACTIONBAR_TITLE);
 
         List<Course> coursesFromDB = courseDao.queryBuilder()
@@ -186,6 +133,66 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
             }
             loadCourse(courseId);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.testpress_list_grid, menu);
+        MenuItem list = menu.findItem(R.id.list);
+        MenuItem grid = menu.findItem(R.id.grid);
+        ViewUtils.setMenuIconsColor(this, new MenuItem[] { list, grid });
+        Fragment currentFragment = getCurrentFragment();
+        if (currentFragment != null) {
+            if (currentFragment instanceof ExpandableContentsFragment) {
+                list.setVisible(false);
+                grid.setVisible(true);
+            } else {
+                list.setVisible(true);
+                grid.setVisible(false);
+            }
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (R.id.list == item.getItemId()) {
+            Fragment fragment = getCurrentFragment();
+            if (fragment instanceof NewChaptersGridFragment) {
+                NewChaptersGridFragment gridFragment = (NewChaptersGridFragment) fragment;
+                try {
+                    parentChapterId = Long.parseLong(gridFragment.parentChapterId);
+                } catch (NumberFormatException e) {
+                    // parentChapterId = null
+                }
+            } else if (fragment instanceof ContentsListFragment) {
+                ContentsListFragment contentsListFragment = (ContentsListFragment) fragment;
+                parentChapterId = contentsListFragment.chapterId;
+            }
+            showFragment(ExpandableContentsFragment.getInstance(courseId, parentChapterId));
+            return true;
+        } else if (R.id.grid == item.getItemId()) {
+            ExpandableContentsFragment expandableContentsFragment =
+                    (ExpandableContentsFragment) getCurrentFragment();
+
+            parentChapterId = expandableContentsFragment.parentChapterId;
+            List<Chapter> chaptersFromDB = chapterDao.queryBuilder()
+                    .where(ChapterDao.Properties.Id.eq(parentChapterId))
+                    .list();
+
+            if (!chaptersFromDB.isEmpty()) {
+                Chapter chapter = chaptersFromDB.get(0);
+                if (chapter.getRawChildrenCount(this) == 0) {
+                    showFragment(ContentsListFragment.getInstance(parentChapterId));
+                } else {
+                    showFragment(NewChaptersGridFragment.getInstance(courseId, parentChapterId));
+                }
+            } else {
+                showFragment(NewChaptersGridFragment.getInstance(courseId, parentChapterId));
+            }
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void loadCourse(long courseId) {
@@ -213,7 +220,7 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
             displayChapters();
             currentPager = new ChapterPager(course.getId(), apiClient);
             if (getParentChaptersQueryBuilder().count() != 0) {
-                Chapter chapter = getAllChaptersQueryBuilder()
+                Chapter chapter = Chapter.getAllChaptersQueryBuilder(this, courseId)
                         .orderDesc(ChapterDao.Properties.ModifiedDate).list().get(0);
 
                 currentPager.setQueryParams(MODIFIED_SINCE, chapter.getModified());
@@ -227,13 +234,6 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
         }
     }
 
-    private QueryBuilder<Chapter> getParentChaptersQueryBuilder() {
-        return getAllChaptersQueryBuilder().where(
-                ChapterDao.Properties.Active.eq(true),
-                ChapterDao.Properties.ParentId.isNull()
-        ).orderAsc(ChapterDao.Properties.Order);
-    }
-
     void displayChapters() {
         newContentsAvailableLabel.setVisibility(View.GONE);
         List<Chapter> chapters = getParentChaptersQueryBuilder().list();
@@ -242,15 +242,18 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
                     R.drawable.testpress_learn_flat_icon);
         } else {
             emptyView.setVisibility(View.GONE);
-            adapter.setDataItems(chapters);
-            if (chapters.size() == 1 && adapter.isExpandable(chapters.get(0))) {
-                listView.performItemClick(
-                        listView.getAdapter().getView(0, null, null),
-                        0,
-                        listView.getAdapter().getItemId(0)
-                );
+            Fragment fragment = getCurrentFragment();
+            if (fragment == null || fragment instanceof NewChaptersGridFragment) {
+                showFragment(NewChaptersGridFragment.getInstance(courseId, parentChapterId));
+            } else if (fragment instanceof ContentsListFragment) {
+                showFragment(ContentsListFragment.getInstance(parentChapterId));
             }
         }
+    }
+
+    private void showFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
+                .commitAllowingStateLoss();
     }
 
     private void fetchChapters() {
@@ -353,8 +356,41 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        Fragment fragment = getCurrentFragment();
+        if (fragment instanceof NewChaptersGridFragment) {
+            NewChaptersGridFragment gridFragment = (NewChaptersGridFragment) fragment;
+            if (gridFragment.parentChapterId.equals("null")) {
+                super.onBackPressed();
+            } else {
+                gridFragment.displayChildChapters(getParentChapterId(gridFragment.parentChapterId));
+            }
+        } else if (fragment instanceof ContentsListFragment) {
+            ContentsListFragment contentsListFragment = (ContentsListFragment) fragment;
+            showFragment(NewChaptersGridFragment.getInstance(
+                    courseId,
+                    getParentChapterId(contentsListFragment.chapterId)
+            ));
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    Long getParentChapterId(Object chapterId) {
+        List<Chapter> chapters = chapterDao.queryBuilder()
+                .where(ChapterDao.Properties.Id.eq(chapterId))
+                .list();
+
+        return chapters.get(0).getParentId();
+    }
+
     private boolean isItemsEmpty() {
         return getParentChaptersQueryBuilder().count() == 0;
+    }
+
+    private QueryBuilder<Chapter> getParentChaptersQueryBuilder() {
+        return Chapter.getRootChaptersQueryBuilder(this, courseId);
     }
 
     private void restartLoading() {
@@ -366,10 +402,6 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
         } else {
             fetchContents();
         }
-    }
-
-    private QueryBuilder<Chapter> getAllChaptersQueryBuilder() {
-        return chapterDao.queryBuilder().where(ChapterDao.Properties.CourseId.eq(course.getId()));
     }
 
     void displayError(int title, int description, int imageRes) {
@@ -387,6 +419,10 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
         emptyViewImage.setImageResource(imageRes);
         emptyDescView.setText(description);
         retryButton.setVisibility(View.VISIBLE);
+    }
+
+    private Fragment getCurrentFragment() {
+        return getSupportFragmentManager().findFragmentById(R.id.fragment_container);
     }
 
     @Override

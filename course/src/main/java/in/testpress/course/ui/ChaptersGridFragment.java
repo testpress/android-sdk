@@ -29,13 +29,13 @@ import in.testpress.util.ImageUtils;
 import in.testpress.util.UIUtils;
 
 import static in.testpress.course.TestpressCourse.COURSE_ID;
-import static in.testpress.course.TestpressCourse.PARENT_ID;
+import static in.testpress.course.TestpressCourse.PARENT_CHAPTER_ID;
 
 public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
 
     private TestpressCourseApiClient mApiClient;
     private String courseId;
-    private String parentId = "null";
+    private String parentChapterId = "null";
     private DisplayImageOptions mOptions;
     private ImageLoader mImageLoader;
     private ChapterDao chapterDao;
@@ -47,8 +47,8 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
         if (getArguments() == null || courseId == null || courseId.isEmpty()) {
             throw new IllegalArgumentException("COURSE_ID must not be null or empty");
         }
-        if (getArguments().getString(PARENT_ID) != null) {
-            parentId = getArguments().getString(PARENT_ID);
+        if (getArguments().getString(PARENT_CHAPTER_ID) != null) {
+            parentChapterId = getArguments().getString(PARENT_CHAPTER_ID);
         }
         mApiClient = new TestpressCourseApiClient(getActivity());
         mOptions = ImageUtils.getPlaceholdersOption();
@@ -73,10 +73,10 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
 
     private QueryBuilder<Chapter> getParentChaptersQueryBuilder() {
         WhereCondition parentCondition;
-        if (parentId.equals("null")) {
+        if (parentChapterId.equals("null")) {
             parentCondition = ChapterDao.Properties.ParentId.isNull();
         } else {
-            parentCondition = ChapterDao.Properties.ParentId.eq(parentId);
+            parentCondition = ChapterDao.Properties.ParentId.eq(parentChapterId);
         }
         return getCourseChaptersQueryBuilder().where(parentCondition);
     }
@@ -90,10 +90,10 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
     protected ChapterPager getPager() {
         if (pager == null) {
             QueryBuilder<Chapter> courseChaptersQueryBuilder = getCourseChaptersQueryBuilder();
-            if (parentId.equals("null") && courseChaptersQueryBuilder.count() == 0) {
+            if (parentChapterId.equals("null") && courseChaptersQueryBuilder.count() == 0) {
                 pager = new ChapterPager(Long.parseLong(courseId), mApiClient);
             } else {
-                pager = new ChapterPager(Long.parseLong(courseId), parentId, mApiClient);
+                pager = new ChapterPager(Long.parseLong(courseId), parentChapterId, mApiClient);
                 QueryBuilder<Chapter> parentChaptersQueryBuilder = getParentChaptersQueryBuilder();
                 if (parentChaptersQueryBuilder.count() > 0) {
                     Chapter latestChapter = parentChaptersQueryBuilder

@@ -41,7 +41,7 @@ public class Content implements android.os.Parcelable {
     private String image;
     private String description;
     private Boolean isLocked;
-    private Integer attemptsCount;
+    private int attemptsCount;
     private String start;
     private String end;
     private Boolean hasStarted;
@@ -104,7 +104,7 @@ public class Content implements android.os.Parcelable {
     }
 
     @Generated
-    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, Integer chapterId, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, Integer attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Long courseId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
+    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, Integer chapterId, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Long courseId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
         this.order = order;
         this.htmlContentTitle = htmlContentTitle;
         this.htmlContentUrl = htmlContentUrl;
@@ -254,11 +254,11 @@ public class Content implements android.os.Parcelable {
         this.isLocked = isLocked;
     }
 
-    public Integer getAttemptsCount() {
+    public int getAttemptsCount() {
         return attemptsCount;
     }
 
-    public void setAttemptsCount(Integer attemptsCount) {
+    public void setAttemptsCount(int attemptsCount) {
         this.attemptsCount = attemptsCount;
     }
 
@@ -531,11 +531,7 @@ public class Content implements android.os.Parcelable {
         description = in.readString();
         byte tmpIsLocked = in.readByte();
         isLocked = tmpIsLocked == 0 ? null : tmpIsLocked == 1;
-        if (in.readByte() == 0) {
-            attemptsCount = null;
-        } else {
-            attemptsCount = in.readInt();
-        }
+        attemptsCount = in.readInt();
         start = in.readString();
         end = in.readString();
         byte tmpHasStarted = in.readByte();
@@ -592,12 +588,7 @@ public class Content implements android.os.Parcelable {
         dest.writeString(image);
         dest.writeString(description);
         dest.writeByte((byte) (isLocked == null ? 0 : isLocked ? 1 : 2));
-        if (attemptsCount == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(attemptsCount);
-        }
+        dest.writeInt(attemptsCount);
         dest.writeString(start);
         dest.writeString(end);
         dest.writeByte((byte) (hasStarted == null ? 0 : hasStarted ? 1 : 2));

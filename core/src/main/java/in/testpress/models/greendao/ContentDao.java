@@ -41,7 +41,7 @@ public class ContentDao extends AbstractDao<Content, Long> {
         public final static Property Image = new Property(11, String.class, "image", false, "IMAGE");
         public final static Property Description = new Property(12, String.class, "description", false, "DESCRIPTION");
         public final static Property IsLocked = new Property(13, Boolean.class, "isLocked", false, "IS_LOCKED");
-        public final static Property AttemptsCount = new Property(14, Integer.class, "attemptsCount", false, "ATTEMPTS_COUNT");
+        public final static Property AttemptsCount = new Property(14, int.class, "attemptsCount", false, "ATTEMPTS_COUNT");
         public final static Property Start = new Property(15, String.class, "start", false, "START");
         public final static Property End = new Property(16, String.class, "end", false, "END");
         public final static Property HasStarted = new Property(17, Boolean.class, "hasStarted", false, "HAS_STARTED");
@@ -88,7 +88,7 @@ public class ContentDao extends AbstractDao<Content, Long> {
                 "\"IMAGE\" TEXT," + // 11: image
                 "\"DESCRIPTION\" TEXT," + // 12: description
                 "\"IS_LOCKED\" INTEGER," + // 13: isLocked
-                "\"ATTEMPTS_COUNT\" INTEGER," + // 14: attemptsCount
+                "\"ATTEMPTS_COUNT\" INTEGER NOT NULL ," + // 14: attemptsCount
                 "\"START\" TEXT," + // 15: start
                 "\"END\" TEXT," + // 16: end
                 "\"HAS_STARTED\" INTEGER," + // 17: hasStarted
@@ -183,11 +183,7 @@ public class ContentDao extends AbstractDao<Content, Long> {
         if (isLocked != null) {
             stmt.bindLong(14, isLocked ? 1L: 0L);
         }
- 
-        Integer attemptsCount = entity.getAttemptsCount();
-        if (attemptsCount != null) {
-            stmt.bindLong(15, attemptsCount);
-        }
+        stmt.bindLong(15, entity.getAttemptsCount());
  
         String start = entity.getStart();
         if (start != null) {
@@ -324,11 +320,7 @@ public class ContentDao extends AbstractDao<Content, Long> {
         if (isLocked != null) {
             stmt.bindLong(14, isLocked ? 1L: 0L);
         }
- 
-        Integer attemptsCount = entity.getAttemptsCount();
-        if (attemptsCount != null) {
-            stmt.bindLong(15, attemptsCount);
-        }
+        stmt.bindLong(15, entity.getAttemptsCount());
  
         String start = entity.getStart();
         if (start != null) {
@@ -420,7 +412,7 @@ public class ContentDao extends AbstractDao<Content, Long> {
             cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // image
             cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // description
             cursor.isNull(offset + 13) ? null : cursor.getShort(offset + 13) != 0, // isLocked
-            cursor.isNull(offset + 14) ? null : cursor.getInt(offset + 14), // attemptsCount
+            cursor.getInt(offset + 14), // attemptsCount
             cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // start
             cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16), // end
             cursor.isNull(offset + 17) ? null : cursor.getShort(offset + 17) != 0, // hasStarted
@@ -454,7 +446,7 @@ public class ContentDao extends AbstractDao<Content, Long> {
         entity.setImage(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
         entity.setDescription(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
         entity.setIsLocked(cursor.isNull(offset + 13) ? null : cursor.getShort(offset + 13) != 0);
-        entity.setAttemptsCount(cursor.isNull(offset + 14) ? null : cursor.getInt(offset + 14));
+        entity.setAttemptsCount(cursor.getInt(offset + 14));
         entity.setStart(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
         entity.setEnd(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
         entity.setHasStarted(cursor.isNull(offset + 17) ? null : cursor.getShort(offset + 17) != 0);

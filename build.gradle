@@ -59,5 +59,5 @@ ext {
     lottie = 'com.airbnb.android:lottie:2.5.4'
     exoPlayerCore = 'com.google.android.exoplayer:exoplayer-core:' + exoPlayer
     exoPlayerUI = 'com.google.android.exoplayer:exoplayer-ui:' + exoPlayer
-    multiLevelListView = 'pl.openrnd.android:multi-level-listview:1.0.1'
+    multiLevelListView = 'com.github.testpress:android-multi-level-listview:v1.0.3'
 }
