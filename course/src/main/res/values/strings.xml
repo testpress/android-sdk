@@ -14,7 +14,7 @@
     <string name="testpress_chapter_not_available_description">Chapter is no longer available or not published yet.</string>
 
     <string name="testpress_no_content">No Content Available</string>
-    <string name="testpress_no_content_description">This chapter didn\'t contain any contents now. Please try after some time.</string>
+    <string name="testpress_no_content_description">This chapter didn\'t contain any contents now.\nPlease try after some time.</string>
     <string name="testpress_error_loading_contents">Loading contents failed</string>
 
     <string name="testpress_content_not_available">Content not available</string>

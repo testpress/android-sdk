@@ -172,7 +172,7 @@ public class TestpressSDKDaoGenerator {
         content.addStringProperty("image");
         content.addStringProperty("description");
         content.addBooleanProperty("isLocked");
-        content.addIntProperty("attemptsCount");
+        content.addIntProperty("attemptsCount").notNull();
         content.addStringProperty("start");
         content.addStringProperty("end");
         content.addBooleanProperty("hasStarted");
@@ -337,7 +337,7 @@ public class TestpressSDKDaoGenerator {
         chapter.addStringProperty("courseUrl");
         chapter.addStringProperty("contentUrl");
         chapter.addStringProperty("childrenUrl");
-        chapter.addIntProperty("parentId");
+        chapter.addLongProperty("parentId");
         chapter.addStringProperty("parentSlug");
         chapter.addStringProperty("parentUrl");
         chapter.addBooleanProperty("leaf");

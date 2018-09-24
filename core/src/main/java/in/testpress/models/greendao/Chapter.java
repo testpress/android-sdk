@@ -10,6 +10,8 @@ import android.content.Context;
 import java.util.List;
 
 import in.testpress.core.TestpressSDKDatabase;
+
+import org.greenrobot.greendao.query.QueryBuilder;
 // KEEP INCLUDES END
 
 /**
@@ -30,7 +32,7 @@ public class Chapter {
     private String courseUrl;
     private String contentUrl;
     private String childrenUrl;
-    private Integer parentId;
+    private Long parentId;
     private String parentSlug;
     private String parentUrl;
     private Boolean leaf;
@@ -54,7 +56,7 @@ public class Chapter {
     }
 
     @Generated
-    public Chapter(Long id, String name, String description, String slug, String image, String modified, Long modifiedDate, Integer courseId, String courseUrl, String contentUrl, String childrenUrl, Integer parentId, String parentSlug, String parentUrl, Boolean leaf, String url, Integer requiredTrophyCount, Boolean isLocked, Integer order, Integer contentsCount, Integer childrenCount, Boolean active) {
+    public Chapter(Long id, String name, String description, String slug, String image, String modified, Long modifiedDate, Integer courseId, String courseUrl, String contentUrl, String childrenUrl, Long parentId, String parentSlug, String parentUrl, Boolean leaf, String url, Integer requiredTrophyCount, Boolean isLocked, Integer order, Integer contentsCount, Integer childrenCount, Boolean active) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -167,11 +169,11 @@ public class Chapter {
         this.childrenUrl = childrenUrl;
     }
 
-    public Integer getParentId() {
+    public Long getParentId() {
         return parentId;
     }
 
-    public void setParentId(Integer parentId) {
+    public void setParentId(Long parentId) {
         this.parentId = parentId;
     }
 
@@ -276,6 +278,23 @@ public class Chapter {
                 .where(ContentDao.Properties.ChapterId.eq(getId())).list();
 
         return contentsFromDB.size();
+    }
+
+    public static QueryBuilder<Chapter> getAllChaptersQueryBuilder(Context context, long courseId) {
+        return TestpressSDKDatabase.getChapterDao(context).queryBuilder()
+                .where(ChapterDao.Properties.CourseId.eq(courseId));
+    }
+
+    public static QueryBuilder<Chapter> getAllActiveChaptersQueryBuilder(Context context,
+                                                                         long courseId) {
+        return getAllChaptersQueryBuilder(context, courseId)
+                .where(ChapterDao.Properties.Active.eq(true));
+    }
+
+    public static QueryBuilder<Chapter> getRootChaptersQueryBuilder(Context context, long courseId) {
+        return getAllActiveChaptersQueryBuilder(context, courseId)
+                .where(ChapterDao.Properties.ParentId.isNull())
+                .orderAsc(ChapterDao.Properties.Order);
     }
     // KEEP METHODS END
 

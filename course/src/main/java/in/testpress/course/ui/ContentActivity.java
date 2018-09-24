@@ -85,6 +85,7 @@ import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
 import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
+import static in.testpress.course.TestpressCourse.CHAPTER_ID;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.network.TestpressCourseApiClient.EMBED_CODE;
 import static in.testpress.course.network.TestpressCourseApiClient.EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
@@ -105,8 +106,6 @@ public class ContentActivity extends BaseToolBarActivity {
     public static final String FORCE_REFRESH = "forceRefreshContentList";
     public static final String GO_TO_MENU = "gotoMenu";
     public static final String CONTENT_ID = "contentId";
-    public static final String CHAPTER_ID = "chapterId";
-    public static final String POSITION = "position";
 
     public ExoplayerFullscreenHelper exoplayerFullscreenHelper;
     private WebView webView;

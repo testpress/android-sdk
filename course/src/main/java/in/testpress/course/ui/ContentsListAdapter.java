@@ -9,12 +9,11 @@ import com.github.testpress.mikephil.charting.charts.PieChart;
 import com.github.testpress.mikephil.charting.data.PieData;
 import com.github.testpress.mikephil.charting.data.PieDataSet;
 import com.github.testpress.mikephil.charting.data.PieEntry;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
-import java.util.List;
 
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.models.greendao.Content;
@@ -27,20 +26,15 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
 
     private final Activity mActivity;
     private ImageLoader mImageLoader;
-    private DisplayImageOptions mOptions;
     private ContentDao contentDao;
     private long chapterId;
 
-    ContentsListAdapter(Activity activity, final List<Content> items, int layout,
-                        ContentDao contentDao, Long chapterId) {
-
-        super(activity.getLayoutInflater(), layout);
+    ContentsListAdapter(Activity activity, Long chapterId) {
+        super(activity, R.layout.testpress_content_list_item);
         mActivity = activity;
         mImageLoader = ImageUtils.initImageLoader(activity);
-        mOptions = ImageUtils.getPlaceholdersOption();
-        this.contentDao = contentDao;
+        contentDao = TestpressSDKDatabase.getContentDao(activity);
         this.chapterId = chapterId;
-        setItems(items);
     }
 
     @Override
@@ -67,7 +61,6 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         return getItem(position).getId();
     }
 
-
     @Override
     protected int[] getChildViewIds() {
         return new int[] {
@@ -89,11 +82,11 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
             setGone(1, true);
         } else {
             setGone(1, false);
-            mImageLoader.displayImage(content.getImage(), imageView(1), mOptions);
+            mImageLoader.displayImage(content.getImage(), imageView(1));
         }
         Exam exam = content.getRawExam();
         // Validate lock
-        if (content.getIsLocked() || !content.getHasStarted()) {
+        if (content.getIsLocked()) {
             setGone(2, false);
             setGone(3, false);
             setGone(6, true);
@@ -119,7 +112,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
                 @Override
                 public void onClick(View v) {
                     mActivity.startActivity(ContentActivity.createIntent(
-                            position,
+                            content.getId(),
                             chapterId,
                             (AppCompatActivity) mActivity)
                     );
