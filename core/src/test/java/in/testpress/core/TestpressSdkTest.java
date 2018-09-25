@@ -2,6 +2,8 @@ package in.testpress.core;
 
 import android.content.Context;
 
+import junit.framework.AssertionFailedError;
+
 import org.junit.Test;
 
 import in.testpress.models.InstituteSettings;
@@ -18,7 +20,7 @@ public class TestpressSdkTest {
         try {
             TestpressSdk.getTestpressSession(null);
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (AssertionFailedError e) {
             assertEquals("Context must not be null.", e.getMessage());
         }
     }
@@ -29,7 +31,7 @@ public class TestpressSdkTest {
             TestpressSession testpressSession = mock(TestpressSession.class);
             TestpressSdk.setTestpressSession(null, testpressSession);
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (AssertionFailedError e) {
             assertEquals("Context must not be null.", e.getMessage());
         }
     }
@@ -50,7 +52,7 @@ public class TestpressSdkTest {
         try {
             TestpressSdk.clearActiveSession(null);
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (AssertionFailedError e) {
             assertEquals("Context must not be null.", e.getMessage());
         }
     }
@@ -60,7 +62,7 @@ public class TestpressSdkTest {
         try {
             TestpressSdk.hasActiveSession(null);
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (AssertionFailedError e) {
             assertEquals("Context must not be null.", e.getMessage());
         }
     }
@@ -128,7 +130,7 @@ public class TestpressSdkTest {
         try {
             TestpressSdk.setTestpressCourseDBSession(null, "DummyToken");
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (AssertionFailedError e) {
             assertEquals("Context must not be null.", e.getMessage());
         }
         try {
@@ -152,7 +154,7 @@ public class TestpressSdkTest {
         try {
             TestpressSdk.isNewCourseDBSession(null, "DummyToken");
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (AssertionFailedError e) {
             assertEquals("Context must not be null.", e.getMessage());
         }
         try {
@@ -176,7 +178,7 @@ public class TestpressSdkTest {
         try {
             TestpressSdk.setTestpressExamDBSession(null, "DummyToken");
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (AssertionFailedError e) {
             assertEquals("Context must not be null.", e.getMessage());
         }
         try {
@@ -200,7 +202,7 @@ public class TestpressSdkTest {
         try {
             TestpressSdk.isNewExamDBSession(null, "DummyToken");
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (AssertionFailedError e) {
             assertEquals("Context must not be null.", e.getMessage());
         }
         try {

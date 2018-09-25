@@ -1,6 +1,5 @@
 package in.testpress.core;
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,12 +14,12 @@ import in.testpress.models.InstituteSettings;
 import in.testpress.network.AuthorizationErrorResponse;
 import in.testpress.network.TestpressApiClient;
 import in.testpress.util.Assert;
+import in.testpress.util.PreferenceUtils;
 import in.testpress.util.UIUtils;
 
-public final class TestpressSdk {
+import static in.testpress.util.Assert.assertContextNotNull;
 
-    private static SharedPreferences pref;
-    private static SharedPreferences.Editor editor;
+public final class TestpressSdk {
 
     public static final int COURSE_CHAPTER_REQUEST_CODE = 1002;
     public static final int COURSE_CONTENT_LIST_REQUEST_CODE = 1003;
@@ -31,7 +30,6 @@ public final class TestpressSdk {
     public static final String ACTION_PRESSED_HOME = "pressedHomeButton";
 
     private static final String KEY_TESTPRESS_AUTH_TOKEN = "testpressAuthToken";
-    private static final String KEY_TESTPRESS_SHARED_PREFS = "testpressSharedPreferences";
     private static final String KEY_USER_ID = "userId";
     private static final String KEY_TESTPRESS_USER_ID = "testpressUserId";
     private static final String KEY_COURSE_DATABASE_SESSION = "courseDatabaseSession";
@@ -44,20 +42,11 @@ public final class TestpressSdk {
     private static Typeface sRubikMedium;
 
     private static SharedPreferences getPreferences(Context context) {
-        if (pref == null) {
-            validateContext(context);
-            pref = context.getSharedPreferences(KEY_TESTPRESS_SHARED_PREFS, Context.MODE_PRIVATE);
-        }
-        return pref;
+        return PreferenceUtils.getPreferences(context);
     }
 
-    @SuppressLint("CommitPrefEdits")
     private static SharedPreferences.Editor getPreferenceEditor(Context context) {
-        if (editor == null) {
-            validateContext(context);
-            editor = getPreferences(context).edit();
-        }
-        return editor;
+        return PreferenceUtils.getPreferenceEditor(context);
     }
 
     public static void setTestpressSession(@NonNull Context context,
@@ -162,7 +151,7 @@ public final class TestpressSdk {
      * @throws IllegalArgumentException if typeface couldn't be load from the given path.
      */
     public static Typeface getTypeface(@NonNull Context context, @NonNull String fontPath) {
-        validateContext(context);
+        assertContextNotNull(context);
         //noinspection ConstantConditions
         if (fontPath == null || fontPath.isEmpty()) {
             throw new IllegalArgumentException("FontPath must not be null.");
@@ -232,7 +221,8 @@ public final class TestpressSdk {
                                   @NonNull final String accessToken,
                                   @NonNull final Provider provider,
                                   final TestpressCallback<TestpressSession> callback) {
-        validateContext(context);
+
+        assertContextNotNull(context);
         if (userId == null || accessToken == null || provider == null) {
             throw new IllegalArgumentException("UserId & AccessToken & Provider must not be null.");
         }
@@ -310,9 +300,4 @@ public final class TestpressSdk {
                 });
     }
 
-    private static void validateContext(Context context) {
-        if (context == null) {
-            throw new IllegalArgumentException("Context must not be null.");
-        }
-    }
 }

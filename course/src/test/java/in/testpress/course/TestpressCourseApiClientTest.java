@@ -1,5 +1,7 @@
 package in.testpress.course;
 
+import junit.framework.AssertionFailedError;
+
 import org.junit.Test;
 
 import in.testpress.course.network.TestpressCourseApiClient;
@@ -14,7 +16,7 @@ public class TestpressCourseApiClientTest {
         try {
             new TestpressCourseApiClient(null);
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (AssertionFailedError e) {
             assertEquals("Context must not be null.", e.getMessage());
         }
     }
