@@ -320,6 +320,7 @@ public class TestpressSDKDaoGenerator {
         course.addIntProperty("order");
         course.addBooleanProperty("active");
         course.addBooleanProperty("childItemsLoaded").notNull();
+        course.addBooleanProperty("isTocUi");
         course.implementsInterface("android.os.Parcelable");
         return course;
     }

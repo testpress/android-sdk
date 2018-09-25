@@ -34,6 +34,7 @@ import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.network.BaseResourcePager;
 import in.testpress.ui.BaseToolBarActivity;
+import in.testpress.util.PreferenceUtils;
 import in.testpress.util.ViewUtils;
 
 import static in.testpress.course.TestpressCourse.COURSE_ID;
@@ -157,6 +158,7 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.list == item.getItemId()) {
+            setLastCourseUiUsedIsToc(true);
             Fragment fragment = getCurrentFragment();
             if (fragment instanceof NewChaptersGridFragment) {
                 NewChaptersGridFragment gridFragment = (NewChaptersGridFragment) fragment;
@@ -172,6 +174,7 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
             showFragment(ExpandableContentsFragment.getInstance(courseId, parentChapterId));
             return true;
         } else if (R.id.grid == item.getItemId()) {
+            setLastCourseUiUsedIsToc(false);
             ExpandableContentsFragment expandableContentsFragment =
                     (ExpandableContentsFragment) getCurrentFragment();
 
@@ -243,9 +246,18 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
         } else {
             emptyView.setVisibility(View.GONE);
             Fragment fragment = getCurrentFragment();
-            if (fragment == null || fragment instanceof NewChaptersGridFragment) {
+            boolean isTocUi = false;
+            if (fragment == null) {
+                isTocUi = (course.getIsTocUi() == null) ?
+                        PreferenceUtils.isTocUsedAsLastCourseUi(this) : course.getIsTocUi();
+            }
+            if ((fragment == null && isTocUi) || fragment instanceof ExpandableContentsFragment) {
+                showFragment(ExpandableContentsFragment.getInstance(courseId, parentChapterId));
+            } else if (fragment == null || fragment instanceof NewChaptersGridFragment) {
                 showFragment(NewChaptersGridFragment.getInstance(courseId, parentChapterId));
             } else if (fragment instanceof ContentsListFragment) {
+                ContentsListFragment contentsListFragment = (ContentsListFragment) fragment;
+                parentChapterId = contentsListFragment.chapterId;
                 showFragment(ContentsListFragment.getInstance(parentChapterId));
             }
         }
@@ -423,6 +435,12 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
 
     private Fragment getCurrentFragment() {
         return getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+    }
+
+    private void setLastCourseUiUsedIsToc(boolean isTocUi) {
+        course.setIsTocUi(isTocUi);
+        course.update();
+        PreferenceUtils.setLastCourseUiUsedIsToc(this, isTocUi);
     }
 
     @Override

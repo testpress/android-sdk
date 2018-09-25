@@ -40,6 +40,7 @@ public class Course implements android.os.Parcelable {
     private Integer order;
     private Boolean active;
     private boolean childItemsLoaded;
+    private Boolean isTocUi;
 
     /** Used to resolve relations */
     @Generated
@@ -66,7 +67,7 @@ public class Course implements android.os.Parcelable {
     }
 
     @Generated
-    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount, Integer order, Boolean active, boolean childItemsLoaded) {
+    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount, Integer order, Boolean active, boolean childItemsLoaded, Boolean isTocUi) {
         this.id = id;
         this.url = url;
         this.title = title;
@@ -83,6 +84,7 @@ public class Course implements android.os.Parcelable {
         this.order = order;
         this.active = active;
         this.childItemsLoaded = childItemsLoaded;
+        this.isTocUi = isTocUi;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -218,6 +220,14 @@ public class Course implements android.os.Parcelable {
 
     public void setChildItemsLoaded(boolean childItemsLoaded) {
         this.childItemsLoaded = childItemsLoaded;
+    }
+
+    public Boolean getIsTocUi() {
+        return isTocUi;
+    }
+
+    public void setIsTocUi(Boolean isTocUi) {
+        this.isTocUi = isTocUi;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
