@@ -425,14 +425,13 @@ public class ContentActivity extends BaseToolBarActivity {
         if (videoAttempt == null) {
             createContentAttempt();
         } else {
-            long lastPosition;
+            float startPosition;
             try {
-                // Convert seconds to ms
-                lastPosition = (long) Float.parseFloat(videoAttempt.getLastPosition()) * 1000;
+                startPosition = Float.parseFloat(videoAttempt.getLastPosition());
             } catch (NumberFormatException e) {
-                lastPosition = 0;
+                startPosition = 0;
             }
-            exoPlayerUtil = new ExoPlayerUtil(this, exoPlayerMainFrame, videoUrl, lastPosition);
+            exoPlayerUtil = new ExoPlayerUtil(this, exoPlayerMainFrame, videoUrl, startPosition);
             exoPlayerUtil.setVideoAttemptId(videoAttempt.getId());
             exoPlayerMainFrame.setVisibility(View.VISIBLE);
             exoPlayerUtil.initializePlayer();

@@ -33,7 +33,7 @@ public class ExoPlayerActivity extends AppCompatActivity {
         playerView.setLayoutParams(new ConstraintLayout.LayoutParams(matchParent, matchParent));
         findViewById(R.id.exo_fullscreen_button).setVisibility(View.GONE);
         String url = getIntent().getStringExtra(VIDEO_URL);
-        long startPosition = getIntent().getLongExtra(START_POSITION, 0);
+        float startPosition = getIntent().getFloatExtra(START_POSITION, 0);
         float speedRate = getIntent().getFloatExtra(SPEED_RATE, 1);
         FrameLayout exoPlayerMainFrame = findViewById(R.id.exo_player_main_frame);
         exoPlayerUtil =

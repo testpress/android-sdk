@@ -22,6 +22,7 @@ public class TestpressCourseApiClient extends TestpressApiClient {
      */
     public static final String COURSE_ID = "course_id";
     public static final String LAST_POSITION =  "last_position";
+    public static final String TIME_RANGES =  "time_ranges";
 
     /**
      * Course List Url

@@ -63,6 +63,7 @@ import in.testpress.util.UserAgentProvider;
 import static android.support.v7.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 import static in.testpress.course.network.TestpressCourseApiClient.LAST_POSITION;
+import static in.testpress.course.network.TestpressCourseApiClient.TIME_RANGES;
 
 public class ExoPlayerUtil {
 
@@ -83,7 +84,7 @@ public class ExoPlayerUtil {
     private Activity activity;
     private long videoAttemptId;
     private String url;
-    private long startPosition;
+    private float startPosition;
     private boolean playWhenReady = true;
     private float speedRate = 1;
     private Spinner speedRateSpinner;
@@ -113,7 +114,7 @@ public class ExoPlayerUtil {
     };
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
-                         long startPosition) {
+                         float startPosition) {
 
         this.activity = activity;
         this.exoPlayerMainFrame = exoPlayerMainFrame;
@@ -164,7 +165,7 @@ public class ExoPlayerUtil {
     }
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
-                         long startPosition, boolean playWhenReady, float speedRate) {
+                         float startPosition, boolean playWhenReady, float speedRate) {
 
         this(activity, exoPlayerMainFrame, url, startPosition);
         this.playWhenReady = playWhenReady;
@@ -203,7 +204,8 @@ public class ExoPlayerUtil {
             player.addListener(new PlayerEventListener());
             playerView.setPlayer(player);
             player.setPlayWhenReady(playWhenReady);
-            player.seekTo(startPosition);
+            // Convert seconds to ms
+            player.seekTo((long) (startPosition * 1000));
             player.setPlaybackParameters(new PlaybackParameters(speedRate));
         }
         MediaSource mediaSource = buildMediaSource(Uri.parse(url));
@@ -224,7 +226,7 @@ public class ExoPlayerUtil {
     public void releasePlayer() {
         if (player != null) {
             removeVideoAttemptUpdateHandler();
-            startPosition = Math.max(0, player.getContentPosition());
+            startPosition = getCurrentPosition();
             playWhenReady = player.getPlayWhenReady();
             player.release();
             player = null;
@@ -264,11 +266,12 @@ public class ExoPlayerUtil {
                 .createMediaSource(uri);
     }
 
-    public long getStartPosition() {
-        return player.getContentPosition();
+    public float getCurrentPosition() {
+        // Convert milliseconds to seconds
+        return ((float) Math.max(0, player.getContentPosition())) / 1000;
     }
 
-    public void setStartPosition(long startPosition) {
+    public void setStartPosition(float startPosition) {
         this.startPosition = startPosition;
     }
 
@@ -405,10 +408,20 @@ public class ExoPlayerUtil {
         }
     }
 
-    private void updateVideoAttempt() {
+    Map<String, Object> getVideoAttemptParameters() {
         Map<String, Object> parameters = new HashMap<>();
-        // Get content position & convert from ms to seconds
-        parameters.put(LAST_POSITION, Math.max(0, (float) player.getContentPosition()) / 1000);
+        float currentPosition = getCurrentPosition();
+        parameters.put(LAST_POSITION, currentPosition);
+        String[][] timeRanges = new String[][] {{
+                String.valueOf(startPosition),
+                String.valueOf(currentPosition)
+        }};
+        parameters.put(TIME_RANGES, timeRanges);
+        return parameters;
+    }
+
+    private void updateVideoAttempt() {
+        Map<String, Object> parameters = getVideoAttemptParameters();
         new TestpressCourseApiClient(activity).updateVideoAttempt(videoAttemptId, parameters)
                 .enqueue(new TestpressCallback<CourseAttempt>() {
                     @Override
@@ -498,6 +511,12 @@ public class ExoPlayerUtil {
         @Override
         public void onPlayerError(ExoPlaybackException exception) {
             handleError(exception.type == TYPE_SOURCE);
+        }
+
+        @Override
+        public void onPositionDiscontinuity(int reason) {
+            super.onPositionDiscontinuity(reason);
+            startPosition = getCurrentPosition();
         }
     }
 
