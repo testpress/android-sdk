@@ -28,6 +28,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.StringRes;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
@@ -46,7 +48,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+
 import in.testpress.R;
+import in.testpress.core.TestpressException;
 
 import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
@@ -220,6 +225,28 @@ public class ViewUtils {
 
     public static void toast(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
+    public static void handleException(TestpressException exception, View rootLayout) {
+        handleException(exception, rootLayout, R.string.testpress_some_thing_went_wrong_try_again);
+    }
+
+    public static void handleException(TestpressException exception, View rootLayout,
+                                       @StringRes int clientErrorMessage) {
+
+        if(exception.isUnauthenticated()) {
+            showSnackbar(rootLayout, R.string.testpress_authentication_failed);
+        } else if (exception.isNetworkError()) {
+            showSnackbar(rootLayout, R.string.testpress_no_internet_connection);
+        } else if (exception.isClientError()) {
+            showSnackbar(rootLayout, clientErrorMessage);
+        } else {
+            showSnackbar(rootLayout, R.string.testpress_some_thing_went_wrong_try_again);
+        }
+    }
+
+    public static void showSnackbar(View rootLayout, @StringRes int message) {
+        Snackbar.make(rootLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 
     private ViewUtils() {

@@ -75,7 +75,7 @@ public abstract class ThrowableLoader<D> extends AsyncLoader<D> {
      *
      * @return exception
      */
-    public static <T> Exception getException(Loader<List<T>> loader) {
+    public static <T> TestpressException getException(Loader<List<T>> loader) {
         if (loader instanceof ThrowableLoader) {
             return ((ThrowableLoader<List<T>>) loader).clearException();
         } else {

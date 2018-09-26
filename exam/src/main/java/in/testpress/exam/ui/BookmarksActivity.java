@@ -85,7 +85,7 @@ public class BookmarksActivity extends BaseToolBarActivity
     private SwipeRefreshLayout listViewSwipeRefreshLayout;
     private SwipeRefreshLayout viewPagerSwipeRefreshLayout;
     private View contentLayout;
-    private View buttonLayout;
+    View buttonLayout;
     private ListView listView;
     private View emptyView;
     private TextView emptyTitleView;

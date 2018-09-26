@@ -87,7 +87,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     private Spinner spinner;
     private Spinner languageSpinner;
     private View questionLayout;
-    private View buttonLayout;
+    View buttonLayout;
     private ListView questionsListView;
     private View emptyView;
     private TextView emptyTitleView;
@@ -695,10 +695,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         selectedLanguage = new Language(language);
         pagerAdapter.setSelectedLanguage(selectedLanguage);
         panelListAdapter.setSelectedLanguage(selectedLanguage);
-    }
-
-    void setNavigationBarVisible(boolean visible) {
-        buttonLayout.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     protected void setEmptyText(final int title, final int description) {

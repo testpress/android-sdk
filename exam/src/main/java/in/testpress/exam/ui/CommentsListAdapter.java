@@ -39,9 +39,9 @@ import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 import in.testpress.util.ZoomableImageString;
 
-import static in.testpress.exam.ui.ReviewQuestionsFragment.UPDATE_TIME_SPAN;
+import static in.testpress.exam.util.CommentsUtil.UPDATE_TIME_SPAN;
 
-class CommentsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class CommentsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Activity activity;
     private ImageLoader imageLoader;
@@ -52,7 +52,7 @@ class CommentsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private static final int DOWNVOTE = -1;
     private static final int UPVOTE = 1;
 
-    CommentsListAdapter(Activity activity, TestpressExamApiClient apiClient) {
+    public CommentsListAdapter(Activity activity, TestpressExamApiClient apiClient) {
         this.activity = activity;
         imageLoader = ImageUtils.initImageLoader(activity);
         options = new DisplayImageOptions.Builder().cacheInMemory(true)
@@ -238,12 +238,12 @@ class CommentsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         holder.submitDate.setText(FormatDate.getAbbreviatedTimeSpan(submitDateMillis));
     }
 
-    void setComments(List<Comment> comments) {
+    public void setComments(List<Comment> comments) {
         this.comments = new ArrayList<>(comments);
         notifyDataSetChanged();
     }
 
-    void addComments(List<Comment> comments) {
+    public void addComments(List<Comment> comments) {
         this.comments.addAll(comments);
         notifyItemRangeInserted(getItemCount(), comments.size());
     }

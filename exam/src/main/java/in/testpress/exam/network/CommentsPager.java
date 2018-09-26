@@ -7,17 +7,14 @@ import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseResourcePager;
 import retrofit2.Response;
 
-import static in.testpress.exam.network.TestpressExamApiClient.COMMENTS_PATH;
-import static in.testpress.exam.network.TestpressExamApiClient.QUESTIONS_PATH;
-
 public class CommentsPager extends BaseResourcePager<Comment> {
 
     private TestpressExamApiClient apiClient;
-    private final String commentsUrl;
+    private String commentsUrl;
 
-    public CommentsPager(long questionId, TestpressExamApiClient apiClient) {
+    public CommentsPager(String commentsUrl, TestpressExamApiClient apiClient) {
         this.apiClient = apiClient;
-        this.commentsUrl = apiClient.getBaseUrl() + QUESTIONS_PATH + questionId + COMMENTS_PATH;
+        this.commentsUrl = commentsUrl;
     }
 
     @Override

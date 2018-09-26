@@ -1,31 +1,23 @@
 package in.testpress.exam.ui;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.Loader;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.text.SpannableString;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -33,13 +25,7 @@ import android.widget.TextView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.theartofdev.edmodo.cropper.CropImage;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import in.testpress.core.TestpressCallback;
@@ -47,11 +33,9 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
-import in.testpress.exam.models.Comment;
-import in.testpress.exam.network.CommentsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.util.CommentsUtil;
 import in.testpress.exam.util.ImagePickerUtils;
-import in.testpress.models.FileDetails;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.BookmarkDao;
@@ -67,32 +51,20 @@ import in.testpress.models.greendao.ReviewQuestion;
 import in.testpress.models.greendao.ReviewQuestionTranslation;
 import in.testpress.models.greendao.Video;
 import in.testpress.network.RetrofitCall;
-import in.testpress.network.TestpressApiClient;
-import in.testpress.ui.view.BackEventListeningEditText;
 import in.testpress.ui.view.ClosableSpinner;
 import in.testpress.util.CommonUtils;
-import in.testpress.util.FormatDate;
 import in.testpress.util.FullScreenChromeClient;
-import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 import in.testpress.util.WebViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
-import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE;
 import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
-import static in.testpress.exam.network.TestpressExamApiClient.COMMENTS_PATH;
-import static in.testpress.exam.network.TestpressExamApiClient.QUESTIONS_PATH;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 
-public class BookmarksFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<List<Comment>> {
+public class BookmarksFragment extends Fragment {
 
-    public static final String UPDATE_TIME_SPAN = "updateTimeSpan";
-    private static final int NEW_COMMENT_SYNC_INTERVAL = 10000; // 10 sec
-    private static final int PREVIOUS_COMMENTS_LOADER_ID = 0;
-    private static final int NEW_COMMENTS_LOADER_ID = 1;
     static final String PARAM_BOOKMARK_ID = "position";
     static final String PARAM_SELECTED_LANGUAGE = "selectedLanguage";
     private ReviewItem reviewItem;
@@ -102,23 +74,7 @@ public class BookmarksFragment extends Fragment
     private TextView emptyDescView;
     private Button retryButton;
     private ProgressBar progressBar;
-    private LinearLayout commentsLayout;
-    private LinearLayout previousCommentsLoadingLayout;
-    private LinearLayout newCommentsLoadingLayout;
-    private RecyclerView commentsListView;
-    private LinearLayout loadPreviousCommentsLayout;
-    private TextView loadPreviousCommentsText;
-    private LinearLayout loadNewCommentsLayout;
-    private TextView loadNewCommentsText;
-    private BackEventListeningEditText commentsEditText;
-    private ImageButton postCommentButton;
-    private ImageButton imageCommentButton;
     private View rootLayout;
-    private LinearLayout commentBoxLayout;
-    private CommentsPager previousCommentsPager;
-    private CommentsPager newCommentsPager;
-    private CommentsListAdapter commentsAdapter;
-    private ProgressDialog progressDialog;
     private View rightGradientShadow;
     private WebView webView;
     private ClosableSpinner folderSpinner;
@@ -133,34 +89,17 @@ public class BookmarksFragment extends Fragment
     private LottieAnimationView moveBookmarkProgressBar;
     private LottieAnimationView removeBookmarkProgressBar;
     private TextView difficultyPercentageText;
-    private boolean postedNewComment;
     private Bookmark bookmark;
     private BookmarksActivity bookmarksActivity;
     private FullScreenChromeClient fullScreenChromeClient;
     private TestpressExamApiClient apiClient;
-    private List<Comment> comments = new ArrayList<>();
-    @SuppressLint("UseSparseArrays")
-    private HashMap<Integer, Comment> uniqueComments = new HashMap<>();
     ImagePickerUtils imagePickerUtils;
+    private CommentsUtil commentsUtil;
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
-    private Handler newCommentsHandler;
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            //noinspection ArraysAsListWithZeroOrOneArgument
-            commentsAdapter.notifyItemRangeChanged(0, commentsAdapter.getItemCount(),
-                    UPDATE_TIME_SPAN); // Update the time in comments
-
-            getNewCommentsPager().reset();
-            getLoaderManager().restartLoader(NEW_COMMENTS_LOADER_ID, null, BookmarksFragment.this);
-        }
-    };
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
     private RetrofitCall<Bookmark> updateBookmarkAPIRequest;
     private RetrofitCall<Void> deleteBookmarkAPIRequest;
-    private RetrofitCall<Comment> commentAPIRequest;
-    private RetrofitCall<FileDetails> imageUploadAPIRequest;
 
     public static BookmarksFragment getInstance(long bookmarkId, Language selectedLanguage) {
         BookmarksFragment reviewQuestionsFragment = new BookmarksFragment();
@@ -183,6 +122,7 @@ public class BookmarksFragment extends Fragment
 
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
         bookmarkFolderDao = TestpressSDKDatabase.getBookmarkFolderDao(getContext());
+        imagePickerUtils = new ImagePickerUtils(rootLayout, this);
     }
 
     @SuppressLint("AddJavascriptInterface")
@@ -205,19 +145,6 @@ public class BookmarksFragment extends Fragment
         });
         UIUtils.setIndeterminateDrawable(getContext(), progressBar, 4);
         webView = view.findViewById(R.id.web_view);
-        commentsLayout = view.findViewById(R.id.comments_layout);
-        previousCommentsLoadingLayout = view.findViewById(R.id.loading_previous_comments_layout);
-        newCommentsLoadingLayout = view.findViewById(R.id.loading_new_comments_layout);
-        commentsListView = view.findViewById(R.id.comments_list_view);
-        loadPreviousCommentsLayout = view.findViewById(R.id.load_previous_comments_layout);
-        loadPreviousCommentsText = view.findViewById(R.id.load_previous_comments);
-        loadNewCommentsLayout = view.findViewById(R.id.load_new_comments_layout);
-        loadNewCommentsText = view.findViewById(R.id.load_new_comments_text);
-        TextView commentsLabel = view.findViewById(R.id.comments_label);
-        commentsEditText = view.findViewById(R.id.comment_box);
-        commentBoxLayout = view.findViewById(R.id.comment_box_layout);
-        postCommentButton = view.findViewById(R.id.post_comment_button);
-        imageCommentButton = view.findViewById(R.id.image_comment_button);
         bookmarksLayout = view.findViewById(R.id.bookmark_layout);
         rightGradientShadow = view.findViewById(R.id.right_gradient_shadow);
         TextView moveBookmarkText = view.findViewById(R.id.move_bookmark_text);
@@ -283,18 +210,12 @@ public class BookmarksFragment extends Fragment
         TextView usersAnsweredRight = view.findViewById(R.id.users_answered_right);
 
         rootLayout = view;
-        progressDialog = new ProgressDialog(getContext());
-        progressDialog.setMessage(getResources().getString(R.string.testpress_please_wait));
-        progressDialog.setCancelable(false);
-        UIUtils.setIndeterminateDrawable(getContext(), progressDialog, 4);
         ViewUtils.setTypeface(
-                new TextView[] { loadPreviousCommentsText, commentsLabel, loadNewCommentsText,
-                        difficultyTitle, difficultyPercentageText },
+                new TextView[] {difficultyTitle, difficultyPercentageText },
                 TestpressSdk.getRubikMediumFont(view.getContext())
         );
         ViewUtils.setTypeface(
-                new TextView[] { commentsEditText, usersAnsweredRight, moveBookmarkText,
-                        removeBookmarkText },
+                new TextView[] { usersAnsweredRight, moveBookmarkText, removeBookmarkText },
                 TestpressSdk.getRubikRegularFont(view.getContext())
         );
         webViewUtils = new WebViewUtils(webView) {
@@ -305,8 +226,15 @@ public class BookmarksFragment extends Fragment
                 bookmarksLayout.setVisibility(View.VISIBLE);
                 if (reviewItem != null) {
                     setDifficulty(view);
-                    if (commentsAdapter == null && getActivity() != null) {
-                        displayComments();
+                    if (commentsUtil == null && getActivity() != null) {
+                        commentsUtil = new CommentsUtil(
+                                BookmarksFragment.this,
+                                getLoaderManager(),
+                                CommentsUtil.getQuestionCommentsUrl(apiClient, reviewItem),
+                                rootLayout,
+                                ((BookmarksActivity) getActivity()).buttonLayout
+                        );
+                        commentsUtil.displayComments();
                     }
                 }
             }
@@ -585,7 +513,6 @@ public class BookmarksFragment extends Fragment
 
                     @Override
                     public void onException(TestpressException exception) {
-                        setMoveBookmarkProgress(false);
                         handleException(exception);
                     }
                 });
@@ -640,7 +567,6 @@ public class BookmarksFragment extends Fragment
 
                     @Override
                     public void onException(TestpressException exception) {
-                        setMoveBookmarkProgress(false);
                         handleException(exception);
                     }
                 });
@@ -695,7 +621,6 @@ public class BookmarksFragment extends Fragment
 
                     @Override
                     public void onException(TestpressException exception) {
-                        setRemoveBookmarkProgress(false);
                         handleException(exception);
                     }
                 });
@@ -768,279 +693,6 @@ public class BookmarksFragment extends Fragment
         }
     }
 
-    void displayComments() {
-        commentsAdapter = new CommentsListAdapter(getActivity(), apiClient);
-        commentsListView.setNestedScrollingEnabled(false);
-        commentsListView.setLayoutManager(new LinearLayoutManager(getContext()));
-        commentsListView.setAdapter(commentsAdapter);
-        postCommentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickSendCommentButton();
-            }
-        });
-        imageCommentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pickImageFromMobile();
-            }
-        });
-        commentsEditText.setImeBackListener(new BackEventListeningEditText.EditTextImeBackListener() {
-            @Override
-            public void onImeBack(BackEventListeningEditText editText, String text) {
-                // On back press while editing clear focus
-                commentsEditText.clearFocus();
-            }
-        });
-        commentsEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                // Hide/Show navigation bar based on focus change
-                //noinspection ConstantConditions
-                bookmarksActivity.setNavigationBarVisible(!hasFocus);
-            }
-        });
-        loadPreviousCommentsLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadPreviousCommentsLayout.setVisibility(View.GONE);
-                getLoaderManager()
-                        .restartLoader(PREVIOUS_COMMENTS_LOADER_ID, null, BookmarksFragment.this);
-            }
-        });
-        loadNewCommentsLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadNewCommentsLayout.setVisibility(View.GONE);
-                // Display newly loaded comments if exist or restart loader
-                if (comments.size() != commentsAdapter.getItemCount()) {
-                    commentsAdapter.setComments(comments);
-                } else {
-                    getLoaderManager()
-                            .restartLoader(NEW_COMMENTS_LOADER_ID, null, BookmarksFragment.this);
-                }
-            }
-        });
-        imagePickerUtils = new ImagePickerUtils(rootLayout, this);
-        commentsLayout.setVisibility(View.VISIBLE);
-        getLoaderManager().initLoader(PREVIOUS_COMMENTS_LOADER_ID, null, BookmarksFragment.this);
-    }
-
-    @NonNull
-    @SuppressLint("StaticFieldLeak")
-    @Override
-    public Loader<List<Comment>> onCreateLoader(int loaderId, Bundle args) {
-        switch (loaderId) {
-            case PREVIOUS_COMMENTS_LOADER_ID:
-                previousCommentsLoadingLayout.setVisibility(View.VISIBLE);
-                return new ThrowableLoader<List<Comment>>(getContext(), null) {
-                    @Override
-                    public List<Comment> loadData() throws TestpressException {
-                        getPreviousCommentsPager().clearResources().next();
-                        return getPreviousCommentsPager().getResources();
-                    }
-                };
-            default:
-                if (postedNewComment) {
-                    newCommentsLoadingLayout.setVisibility(View.VISIBLE);
-                }
-                return new ThrowableLoader<List<Comment>>(getContext(), null) {
-                    @Override
-                    public List<Comment> loadData() throws TestpressException {
-                        do {
-                            getNewCommentsPager().next();
-                        } while (getNewCommentsPager().hasNext());
-                        return getNewCommentsPager().getResources();
-                    }
-                };
-        }
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    CommentsPager getPreviousCommentsPager() {
-        if (previousCommentsPager == null) {
-            previousCommentsPager = new CommentsPager(reviewItem.getQuestion().getId(), apiClient);
-            previousCommentsPager.queryParams.put(TestpressApiClient.ORDER, "-submit_date");
-            // Query comments till now to paginate afterwards
-            previousCommentsPager.queryParams.put(TestpressApiClient.UNTIL,
-                    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ").format(new Date()));
-        }
-        return previousCommentsPager;
-    }
-
-    CommentsPager getNewCommentsPager() {
-        if (newCommentsPager == null) {
-            newCommentsPager = new CommentsPager(reviewItem.getQuestion().getId(), apiClient);
-        }
-        //  Query comments after the latest comment we already have
-        if (newCommentsPager.queryParams.isEmpty() && comments.size() != 0) {
-            Comment latestComment = comments.get(0);
-            //noinspection ConstantConditions
-            newCommentsPager.queryParams.put(TestpressApiClient.SINCE, latestComment.getSubmitDate());
-        }
-        return newCommentsPager;
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<List<Comment>> loader, List<Comment> comments) {
-        if (getActivity() == null) {
-            return;
-        }
-        switch (loader.getId()) {
-            case PREVIOUS_COMMENTS_LOADER_ID:
-                onPreviousCommentsLoadFinished(loader, comments);
-                break;
-            case NEW_COMMENTS_LOADER_ID:
-                onNewCommentsLoadFinished(loader, comments);
-                break;
-        }
-    }
-
-    void onPreviousCommentsLoadFinished(Loader<List<Comment>> loader, List<Comment> previousComments) {
-        //noinspection ThrowableResultOfMethodCallIgnored
-        final Exception exception = ThrowableLoader.getException(loader);
-        if (exception != null) {
-            exception.printStackTrace();
-            previousCommentsLoadingLayout.setVisibility(View.GONE);
-            // Discard the exception if comments count is 0
-            if (reviewItem.getCommentsCount() == null || reviewItem.getCommentsCount() == 0) {
-                commentBoxLayout.setVisibility(View.VISIBLE);
-            } else if (exception.getCause() instanceof IOException) {
-                if (commentsAdapter.getItemCount() == 0) {
-                    loadPreviousCommentsText.setText(R.string.load_comments);
-                }
-                loadPreviousCommentsLayout.setVisibility(View.VISIBLE);
-                Snackbar.make(rootLayout, R.string.testpress_no_internet_connection,
-                        Snackbar.LENGTH_SHORT).show();
-            } else {
-                Snackbar.make(rootLayout, R.string.testpress_network_error,
-                        Snackbar.LENGTH_SHORT).show();
-            }
-            return;
-        }
-
-        if (previousComments != null && !previousComments.isEmpty()) {
-            // Add the comments to the hash map
-            addComments(previousComments);
-            // Append the comments to the comments in adapter
-            commentsAdapter.addComments(previousComments);
-        }
-        if (commentBoxLayout.getVisibility() == View.GONE) {
-            commentBoxLayout.setVisibility(View.VISIBLE);
-        }
-        if (getPreviousCommentsPager().hasNext()) {
-            loadPreviousCommentsText.setText(R.string.load_previous_comments);
-            loadPreviousCommentsLayout.setVisibility(View.VISIBLE);
-        } else {
-            loadPreviousCommentsLayout.setVisibility(View.GONE);
-        }
-        previousCommentsLoadingLayout.setVisibility(View.GONE);
-        if (newCommentsHandler == null) {
-            newCommentsHandler = new Handler();
-            if (getUserVisibleHint()) {
-                newCommentsHandler.postDelayed(runnable, NEW_COMMENT_SYNC_INTERVAL);
-            }
-        }
-    }
-
-    void onNewCommentsLoadFinished(Loader<List<Comment>> loader, List<Comment> newComments) {
-        //noinspection ThrowableResultOfMethodCallIgnored
-        final Exception exception = ThrowableLoader.getException(loader);
-        if (exception != null) {
-            newCommentsLoadingLayout.setVisibility(View.GONE);
-            if (postedNewComment) {
-                if (exception.getCause() instanceof IOException) {
-                    Snackbar.make(rootLayout, R.string.testpress_no_internet_connection,
-                            Snackbar.LENGTH_SHORT).show();
-                } else {
-                    Snackbar.make(rootLayout, R.string.testpress_network_error,
-                            Snackbar.LENGTH_SHORT).show();
-                }
-                loadNewCommentsText.setText(R.string.load_new_comments);
-                loadNewCommentsLayout.setVisibility(View.VISIBLE);
-            } else {
-                newCommentsHandler.postDelayed(runnable, NEW_COMMENT_SYNC_INTERVAL);
-            }
-            return;
-        }
-
-        newCommentsLoadingLayout.setVisibility(View.GONE);
-        if (!newComments.isEmpty()) {
-            if (postedNewComment) {
-                // Add new comments to the existing comments & set it to the adapter
-                addComments(newComments);
-                commentsAdapter.setComments(comments);
-            } else {
-                // Add new comments to the existing comments
-                addComments(newComments);
-                // Display new comments available label with count
-                int newCommentsCount = comments.size() - commentsAdapter.getItemCount();
-                loadNewCommentsText.setText(getResources().getQuantityString(
-                        R.plurals.new_comments_available, newCommentsCount, newCommentsCount));
-
-                loadNewCommentsLayout.setVisibility(View.VISIBLE);
-            }
-        }
-        if (postedNewComment) {
-            postedNewComment = false;
-        }
-        newCommentsHandler.postDelayed(runnable, NEW_COMMENT_SYNC_INTERVAL);
-    }
-
-    void onClickSendCommentButton() {
-        final String comment = commentsEditText.getText().toString().trim();
-        if (comment.isEmpty()) {
-            return;
-        }
-        if (!progressDialog.isShowing()) {
-            progressDialog.show();
-        }
-        // noinspection deprecation
-        postComment(Html.toHtml(new SpannableString(comment))); // Convert to html to support line breaks
-    }
-
-    void postComment(String comment) {
-        // Clear edit text focus to display the navigation bar
-        commentsEditText.clearFocus(getActivity());
-        String url = apiClient.getBaseUrl() + QUESTIONS_PATH + reviewItem.getQuestionId() +
-                COMMENTS_PATH;
-
-        commentAPIRequest = apiClient.postComment(url, comment)
-                .enqueue(new TestpressCallback<Comment>() {
-                    @Override
-                    public void onSuccess(Comment comment) {
-                        if (getActivity() == null) {
-                            return;
-                        }
-                        commentsEditText.setText("");
-                        progressDialog.dismiss();
-                        Snackbar.make(rootLayout, R.string.comment_posted,
-                                Snackbar.LENGTH_SHORT).show();
-
-                        // Stop new comments sync handler & load new comments now itself
-                        if (newCommentsHandler != null) {
-                            newCommentsHandler.removeCallbacks(runnable);
-                        }
-                        postedNewComment = true;
-                        getNewCommentsPager().reset();
-                        getLoaderManager().destroyLoader(NEW_COMMENTS_LOADER_ID);
-                        getLoaderManager().restartLoader(NEW_COMMENTS_LOADER_ID, null,
-                                BookmarksFragment.this);
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        handleException(exception);
-                    }
-                });
-    }
-
-    public void pickImageFromMobile() {
-        //noinspection ConstantConditions
-        startActivityForResult(CropImage.getPickImageChooserIntent(getContext()),
-                PICK_IMAGE_CHOOSER_REQUEST_CODE);
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -1048,25 +700,7 @@ public class BookmarksFragment extends Fragment
                 new ImagePickerUtils.ImagePickerResultHandler() {
                     @Override
                     public void onSuccessfullyImageCropped(CropImage.ActivityResult result) {
-                        uploadImage(result.getUri().getPath());
-                    }
-                });
-    }
-
-    void uploadImage(String imagePath) {
-        if (!progressDialog.isShowing()) {
-            progressDialog.show();
-        }
-        imageUploadAPIRequest = apiClient.upload(imagePath)
-                .enqueue(new TestpressCallback<FileDetails>() {
-                    @Override
-                    public void onSuccess(FileDetails fileDetails) {
-                        postComment(WebViewUtils.appendImageTags(fileDetails.getUrl()));
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        handleException(exception);
+                        commentsUtil.uploadImage(result.getUri().getPath());
                     }
                 });
     }
@@ -1076,21 +710,6 @@ public class BookmarksFragment extends Fragment
                                            @NonNull int[] grantResults) {
 
         imagePickerUtils.permissionsUtils.onRequestPermissionsResult(requestCode, grantResults);
-    }
-
-    void addComments(List<Comment> commentsList) {
-        for (Comment comment : commentsList) {
-            uniqueComments.put(comment.getId(), comment);
-        }
-        comments = new ArrayList<>(uniqueComments.values());
-        Collections.sort(this.comments, new Comparator<Comment>() {
-            @Override
-            public int compare(Comment o1, Comment o2) {
-                //noinspection ComparatorMethodParameterNotUsed
-                return FormatDate.compareDate(o2.getSubmitDate(), o1.getSubmitDate(),
-                        "yyyy-MM-dd'T'HH:mm:ss", "UTC") ? 1 : -1;
-            }
-        });
     }
 
     protected void setEmptyText(final int title, final int description) {
@@ -1103,12 +722,11 @@ public class BookmarksFragment extends Fragment
 
     @Override
     public void onDestroyView() {
-        if (newCommentsHandler != null) {
-            newCommentsHandler.removeCallbacks(runnable);
+        if (commentsUtil != null) {
+            commentsUtil.onDestroy();
         }
         CommonUtils.cancelAPIRequests(new RetrofitCall[] {
-                bookmarkFoldersLoader, updateBookmarkAPIRequest, deleteBookmarkAPIRequest,
-                commentAPIRequest, imageUploadAPIRequest
+                bookmarkFoldersLoader, updateBookmarkAPIRequest, deleteBookmarkAPIRequest
         });
         final ViewGroup viewGroup = (ViewGroup) webView.getParent();
         if (viewGroup != null) {
@@ -1122,23 +740,14 @@ public class BookmarksFragment extends Fragment
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) {
-            if (newCommentsHandler != null) {
-                newCommentsHandler.postDelayed(runnable, NEW_COMMENT_SYNC_INTERVAL);
-            }
-            if (webView != null) {
+        if (commentsUtil != null) {
+            commentsUtil.setUserVisibleHint(isVisibleToUser);
+        }
+        if (webView != null) {
+            if (isVisibleToUser) {
                 webView.onResume();
-            }
-        } else {
-            if (webView != null) {
+            } else {
                 webView.onPause();
-            }
-            if (commentsEditText != null) {
-                // Hide keyboard on user swiped(moved) to the adjacent question
-                commentsEditText.clearFocus(getActivity());
-            }
-            if (newCommentsHandler != null) {
-                newCommentsHandler.removeCallbacks(runnable);
             }
         }
     }
@@ -1147,20 +756,8 @@ public class BookmarksFragment extends Fragment
         if (getActivity() == null) {
             return;
         }
-        progressDialog.dismiss();
-        if(exception.isUnauthenticated()) {
-            Snackbar.make(rootLayout, R.string.testpress_authentication_failed,
-                    Snackbar.LENGTH_SHORT).show();
-        } else if (exception.isNetworkError()) {
-            Snackbar.make(rootLayout, R.string.testpress_no_internet_connection,
-                    Snackbar.LENGTH_SHORT).show();
-        } else if (exception.isClientError()) {
-            Snackbar.make(rootLayout, R.string.testpress_folder_name_not_allowed,
-                    Snackbar.LENGTH_SHORT).show();
-        } else {
-            Snackbar.make(rootLayout, R.string.testpress_network_error,
-                    Snackbar.LENGTH_SHORT).show();
-        }
+        setRemoveBookmarkProgress(false);
+        ViewUtils.handleException(exception, rootLayout, R.string.testpress_folder_name_not_allowed);
     }
 
     @Override
@@ -1186,10 +783,6 @@ public class BookmarksFragment extends Fragment
     void setBackgroundDrawable(View parentView, int viewId, @DrawableRes int drawableResId) {
         parentView.findViewById(viewId).setBackground(
                 ContextCompat.getDrawable(parentView.getContext(), drawableResId));
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull Loader<List<Comment>> loader) {
     }
 
 }
