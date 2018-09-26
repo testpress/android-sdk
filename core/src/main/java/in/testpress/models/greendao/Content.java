@@ -42,6 +42,7 @@ public class Content implements android.os.Parcelable {
     private Boolean hasStarted;
     private Boolean active;
     private Long bookmarkId;
+    private int videoWatchedPercentage;
     private Long htmlId;
     private Long videoId;
     private Long attachmentId;
@@ -91,7 +92,7 @@ public class Content implements android.os.Parcelable {
     }
 
     @Generated
-    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, Integer chapterId, String chapterSlug, String chapterUrl, Long id, String name, String image, String description, Boolean isLocked, Integer attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
+    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, Integer chapterId, String chapterSlug, String chapterUrl, Long id, String name, String image, String description, Boolean isLocked, Integer attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, Long htmlId, Long videoId, Long attachmentId, Long examId) {
         this.order = order;
         this.htmlContentTitle = htmlContentTitle;
         this.htmlContentUrl = htmlContentUrl;
@@ -111,6 +112,7 @@ public class Content implements android.os.Parcelable {
         this.hasStarted = hasStarted;
         this.active = active;
         this.bookmarkId = bookmarkId;
+        this.videoWatchedPercentage = videoWatchedPercentage;
         this.htmlId = htmlId;
         this.videoId = videoId;
         this.attachmentId = attachmentId;
@@ -274,6 +276,14 @@ public class Content implements android.os.Parcelable {
 
     public void setBookmarkId(Long bookmarkId) {
         this.bookmarkId = bookmarkId;
+    }
+
+    public int getVideoWatchedPercentage() {
+        return videoWatchedPercentage;
+    }
+
+    public void setVideoWatchedPercentage(int videoWatchedPercentage) {
+        this.videoWatchedPercentage = videoWatchedPercentage;
     }
 
     public Long getHtmlId() {
@@ -621,6 +631,12 @@ public class Content implements android.os.Parcelable {
             }
             contentDao.insertOrReplace(content);
         }
+    }
+
+    public boolean isNonEmbeddableVideo() {
+        return getRawVideo() != null && (getRawVideo().getEmbedCode() == null ||
+                getRawVideo().getEmbedCode().isEmpty() ||
+                getRawVideo().getUrl().endsWith(".mp4"));
     }
     // KEEP METHODS END
 

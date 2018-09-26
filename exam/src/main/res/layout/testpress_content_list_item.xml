@@ -52,6 +52,25 @@
 
         </LinearLayout>
 
+        <LinearLayout android:id="@+id/video_completion_progress_container"
+            android:visibility="gone"
+            android:gravity="center"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginRight="10dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/testpress_circle_white_background"
+            >
+
+            <com.github.testpress.mikephil.charting.charts.PieChart
+                android:id="@+id/video_completion_progress_chart"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                />
+
+        </LinearLayout>
+
         <LinearLayout
             android:id="@+id/attempted_tick"
             android:visibility="gone"

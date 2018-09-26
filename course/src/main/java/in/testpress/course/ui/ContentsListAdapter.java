@@ -1,12 +1,18 @@
 package in.testpress.course.ui;
 
 import android.app.Activity;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.github.testpress.mikephil.charting.charts.PieChart;
+import com.github.testpress.mikephil.charting.data.PieData;
+import com.github.testpress.mikephil.charting.data.PieDataSet;
+import com.github.testpress.mikephil.charting.data.PieEntry;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import in.testpress.core.TestpressSdk;
@@ -16,8 +22,6 @@ import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.Exam;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
-
-import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 
 class ContentsListAdapter extends SingleTypeAdapter<Content> {
 
@@ -66,9 +70,12 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
 
     @Override
     protected int[] getChildViewIds() {
-        return new int[] { R.id.content_title, R.id.thumbnail_image, R.id.white_foreground,
-                R.id.lock, R.id.content_item_layout, R.id.exam_info_layout, R.id.attempted_tick,
-                R.id.duration, R.id.no_of_questions };
+        return new int[] {
+                R.id.content_title, R.id.thumbnail_image, R.id.white_foreground, R.id.lock,
+                R.id.content_item_layout, R.id.exam_info_layout, R.id.attempted_tick, R.id.duration,
+                R.id.no_of_questions, R.id.video_completion_progress_chart,
+                R.id.video_completion_progress_container
+        };
     }
 
     @Override
@@ -90,6 +97,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
             setGone(2, false);
             setGone(3, false);
             setGone(6, true);
+            setGone(10, true);
             view(4).setClickable(false);
         } else {
             setGone(2, true);
@@ -97,9 +105,14 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
             if (content.getAttemptsCount() == 0 ||
                     (content.getAttemptsCount() == 1 && exam != null &&
                             exam.getAttemptsCount() == 0 && exam.getPausedAttemptsCount() == 1)) {
+
                 setGone(6, true);
+                setGone(10, true);
+            } else if (content.isNonEmbeddableVideo()) {
+                displayNonEmbeddableVideoProgress(content);
             } else {
                 setGone(6, false);
+                setGone(10, true);
             }
             view(4).setClickable(true);
             view(4).setOnClickListener(new View.OnClickListener() {
@@ -121,6 +134,59 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         } else {
             setGone(5, true);
         }
+    }
+
+    private void displayNonEmbeddableVideoProgress(Content content) {
+        switch (content.getVideoWatchedPercentage()) {
+            case 0:
+                setGone(6, true);
+                setGone(10, true);
+                break;
+            case 100:
+                setGone(6, false);
+                setGone(10, true);
+                break;
+            default:
+                setGone(6, true);
+                displayVideoWatchedPercentage(
+                        (PieChart) view(9),
+                        content.getVideoWatchedPercentage()
+                );
+                setGone(10, false);
+                break;
+        }
+    }
+
+    void displayVideoWatchedPercentage(PieChart chart, int percentage) {
+        PieData data = getVideoProgressPieChartData(percentage);
+        chart.setData(data);
+        chart.setDescription("");
+        chart.setClickable(false);
+        chart.setTouchEnabled(false);
+        chart.setUsePercentValues(true);
+        chart.setCenterText(percentage + "%");
+        chart.setCenterTextSize(6);
+        chart.setCenterTextColor(ContextCompat.getColor(mActivity, R.color.testpress_text_gray));
+        chart.setHoleRadius(85);
+        chart.setTransparentCircleRadius(0);
+        chart.setExtraOffsets(0, 0, 0, 0);
+        chart.getLegend().setEnabled(false);
+    }
+
+    PieData getVideoProgressPieChartData(long watchedDuration) {
+        ArrayList<PieEntry> entries = new ArrayList<>();
+        entries.add(new PieEntry(watchedDuration, 0));
+        entries.add(new PieEntry(100 - watchedDuration, 1));
+
+        PieDataSet dataSet = new PieDataSet(entries, "");
+        ArrayList<Integer> colors = new ArrayList<>();
+        colors.add(ContextCompat.getColor(mActivity, R.color.testpress_green));
+        colors.add(ContextCompat.getColor(mActivity, R.color.testpress_gray_light));
+        dataSet.setColors(colors);
+
+        PieData data = new PieData(dataSet);
+        data.setDrawValues(false);
+        return data;
     }
 
 }

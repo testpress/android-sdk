@@ -328,9 +328,7 @@ public class ContentActivity extends BaseToolBarActivity {
         } else if (content.getRawVideo() != null) {
             Video video = content.getRawVideo();
             setContentTitle(video.getTitle());
-            isEmbeddableVideo = video.getEmbedCode() != null && !video.getEmbedCode().isEmpty() &&
-                    !video.getUrl().endsWith(".mp4");
-
+            isEmbeddableVideo = !content.isNonEmbeddableVideo();
             if (isEmbeddableVideo) {
                 String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
                         "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
