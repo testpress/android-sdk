@@ -37,7 +37,8 @@ public class ExpandableContentsFragment extends Fragment {
     private ExpandableContentsAdapter adapter;
     private ExpandableContentsActivity expandableContentsActivity;
     private List<Long> chapterPathIds = new ArrayList<>();
-    public Long parentChapterId;
+    public long parentChapterId;
+    public int currentExpandedLevel;
 
     public static ExpandableContentsFragment getInstance(long courseId) {
         return getInstance(courseId, null);
@@ -91,21 +92,29 @@ public class ExpandableContentsFragment extends Fragment {
                 Chapter chapter = (Chapter) item;
                 if (!chapterPathIds.isEmpty() && position + 1 < adapter.getFlatItems().size()) {
                     expandChapters(chapterPathIds, position + 1);
-                } else if (chapter.getRawChildrenCount(getContext()) == 1) {
-                    listView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            int childPosition = position + 1;
-                            Node node = adapter.getFlatItems().get(childPosition);
-                            if (node.isExpandable() && !node.isExpanded()) {
-                                multiLevelListView.onGroupItemClicked(
-                                        listView.getAdapter().getView(childPosition, null, null),
-                                        node,
-                                        childPosition
-                                );
+                } else {
+                    if (parentChapterId != 0 && itemInfo.getLevel() <= currentExpandedLevel
+                            && chapter.getId() != parentChapterId) {
+                        
+                        parentChapterId = 0;
+                        currentExpandedLevel = 0;
+                    }
+                    if (chapter.getRawChildrenCount(getContext()) == 1) {
+                        listView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                int childPosition = position + 1;
+                                Node node = adapter.getFlatItems().get(childPosition);
+                                if (node.isExpandable() && !node.isExpanded()) {
+                                    multiLevelListView.onGroupItemClicked(
+                                            listView.getAdapter().getView(childPosition, null, null),
+                                            node,
+                                            childPosition
+                                    );
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
             }
         });
@@ -143,7 +152,7 @@ public class ExpandableContentsFragment extends Fragment {
 
         parentChapterId = getArguments().getLong(PARENT_CHAPTER_ID, 0);
         if (parentChapterId != 0) {
-            chapterPathIds = getChapterPathIds(parentChapterId, chapterPathIds);
+            chapterPathIds = getChapterPathIds(parentChapterId);
             expandChapters(chapterPathIds, 0);
         } else if (rootChapters.size() < 3) {
             for (Chapter chapter : rootChapters) {
@@ -155,7 +164,7 @@ public class ExpandableContentsFragment extends Fragment {
         }
     }
 
-    List<Long> getChapterPathIds(Long parentChapterId, List<Long> chapterPathIds) {
+    List<Long> getChapterPathIds(Long parentChapterId) {
         List<Chapter> chaptersFromDB = TestpressSDKDatabase.getChapterDao(getContext()).queryBuilder()
                 .where(ChapterDao.Properties.Id.eq(parentChapterId))
                 .list();
@@ -166,7 +175,7 @@ public class ExpandableContentsFragment extends Fragment {
             if (parentId == null || parentId == 0) {
                 return chapterPathIds;
             } else {
-                return getChapterPathIds(chaptersFromDB.get(0).getParentId(), chapterPathIds);
+                return getChapterPathIds(chaptersFromDB.get(0).getParentId());
             }
         }
         return Collections.emptyList();
@@ -180,6 +189,9 @@ public class ExpandableContentsFragment extends Fragment {
                 if (node.getObject() instanceof Chapter) {
                     Chapter chapter = (Chapter) node.getObject();
                     if (chapter.getId().equals(currentPathId)) {
+                        if (parentChapterId != 0 && currentPathId == parentChapterId) {
+                            currentExpandedLevel = searchPosition;
+                        }
                         multiLevelListView.onGroupItemClicked(
                                 listView.getAdapter().getView(searchPosition, null, null),
                                 node,

@@ -183,13 +183,8 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
                     .where(ChapterDao.Properties.Id.eq(parentChapterId))
                     .list();
 
-            if (!chaptersFromDB.isEmpty()) {
-                Chapter chapter = chaptersFromDB.get(0);
-                if (chapter.getRawChildrenCount(this) == 0) {
-                    showFragment(ContentsListFragment.getInstance(parentChapterId));
-                } else {
-                    showFragment(NewChaptersGridFragment.getInstance(courseId, parentChapterId));
-                }
+            if (!chaptersFromDB.isEmpty() && chaptersFromDB.get(0).getRawChildrenCount(this) == 0) {
+                showFragment(ContentsListFragment.getInstance(parentChapterId));
             } else {
                 showFragment(NewChaptersGridFragment.getInstance(courseId, parentChapterId));
             }
