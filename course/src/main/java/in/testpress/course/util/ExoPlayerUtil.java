@@ -468,7 +468,9 @@ public class ExoPlayerUtil {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            if (!isScreenCasted() && CommonUtils.isUsbConnected(activity)) {
+            if (usbConnectionStateReceiver != null && !isScreenCasted() &&
+                    CommonUtils.isUsbConnected(activity)) {
+                
                 displayError(R.string.testpress_usb_connected);
             } else {
                 hideError(R.string.testpress_usb_connected);
