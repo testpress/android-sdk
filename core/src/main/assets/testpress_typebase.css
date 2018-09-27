@@ -7,9 +7,14 @@ html {
   -webkit-font-smoothing: antialiased;
   -webkit-user-select: none;
 }
+@font-face {
+    font-family: "symbol";
+    src: url('symbol.ttf');
+}
 body {
     margin: 0px;
 }
+
 /* Copy & Lists */
 p {
   text-align: justify;
