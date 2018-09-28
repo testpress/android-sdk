@@ -11,6 +11,7 @@ import java.util.Map;
 import static in.testpress.course.network.TestpressCourseApiClient.LAST_POSITION;
 import static in.testpress.course.network.TestpressCourseApiClient.TIME_RANGES;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -34,11 +35,20 @@ public class ExoPlayerUtilTest {
         Mockito.doCallRealMethod().when(exoPlayerUtilMocked).getVideoAttemptParameters();
         Map<String, Object> parameters = exoPlayerUtilMocked.getVideoAttemptParameters();
         float lastPosition = (float) parameters.get(LAST_POSITION);
+
+        assertThat("last_position field needs to present on the video attempt parameters",
+                lastPosition,
+                is(notNullValue()));
+
         assertThat("last_position value needs to same as current content position of exo player",
                 lastPosition,
                 is(TEST_CURRENT_POSITION));
 
         String[][] timeRanges = (String[][]) parameters.get(TIME_RANGES);
+
+        assertThat("time_ranges field needs to present on the video attempt parameters",
+                timeRanges,
+                is(notNullValue()));
 
         assertThat("time_ranges start position needs to be start position given to exo player",
                 timeRanges[0][0],
