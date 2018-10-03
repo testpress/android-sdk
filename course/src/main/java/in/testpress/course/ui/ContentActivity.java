@@ -153,6 +153,12 @@ public class ContentActivity extends BaseToolBarActivity {
     private RetrofitCall<CourseAttempt> createAttemptApiRequest;
     private RetrofitCall<Content> updateContentApiRequest;
     private RetrofitCall<ProfileDetails> profileDetailApiRequest;
+    private RetrofitCall<TestpressApiResponse<CourseAttempt>> attemptsApiRequest;
+    private RetrofitCall<TestpressApiResponse<Language>> languagesApiRequest;
+    private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersApiRequest;
+    private RetrofitCall<Bookmark> bookmarkApiRequest;
+    private RetrofitCall<Void> deleteBookmarkApiRequest;
+    private RetrofitCall<HtmlContent> htmlContentApiRequest;
 
     public static Intent createIntent(int position, long chapterId, AppCompatActivity activity) {
         Intent intent = new Intent(activity, ContentActivity.class);
@@ -381,7 +387,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void loadContentHtmlFromServer() {
         showLoadingProgress();
-        courseApiClient.getHtmlContent(content.getHtmlContentUrl())
+        htmlContentApiRequest = courseApiClient.getHtmlContent(content.getHtmlContentUrl())
                 .enqueue(new TestpressCallback<HtmlContent>() {
                     @Override
                     public void onSuccess(HtmlContent htmlContent) {
@@ -587,7 +593,7 @@ public class ContentActivity extends BaseToolBarActivity {
         } else {
             showLoadingProgress();
         }
-        examApiClient.getContentAttempts(attemptsUrl)
+        attemptsApiRequest = examApiClient.getContentAttempts(attemptsUrl)
                 .enqueue(new TestpressCallback<TestpressApiResponse<CourseAttempt>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<CourseAttempt> response) {
@@ -612,7 +618,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     void fetchLanguages(final CourseAttempt pausedCourseAttempt) {
         showLoadingProgress();
-        examApiClient.getLanguages(content.getRawExam().getSlug())
+        languagesApiRequest = examApiClient.getLanguages(content.getRawExam().getSlug())
                 .enqueue(new TestpressCallback<TestpressApiResponse<Language>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Language> apiResponse) {
@@ -870,7 +876,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     void loadBookmarkFolders(String url) {
         setBookmarkProgress(true);
-        examApiClient.getBookmarkFolders(url)
+        bookmarkFoldersApiRequest = examApiClient.getBookmarkFolders(url)
                 .enqueue(new TestpressCallback<ApiResponse<FolderListResponse>>() {
                     @Override
                     public void onSuccess(ApiResponse<FolderListResponse> apiResponse) {
@@ -894,7 +900,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     void bookmark(String folder) {
         setBookmarkProgress(true);
-        examApiClient.bookmark(content.getId(), folder, "chaptercontent", "courses")
+        bookmarkApiRequest = examApiClient.bookmark(content.getId(), folder, "chaptercontent", "courses")
                 .enqueue(new TestpressCallback<Bookmark>() {
                     @Override
                     public void onSuccess(Bookmark bookmark) {
@@ -915,7 +921,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     void deleteBookmark(Long bookmarkId) {
         setBookmarkProgress(true);
-        examApiClient.deleteBookmark(bookmarkId)
+        deleteBookmarkApiRequest = examApiClient.deleteBookmark(bookmarkId)
                 .enqueue(new TestpressCallback<Void>() {
                     @Override
                     public void onSuccess(Void data) {
@@ -1146,11 +1152,12 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        CommonUtils.cancelAPIRequests(new RetrofitCall[] {
-                createAttemptApiRequest, updateContentApiRequest, profileDetailApiRequest
-        });
-        super.onDestroy();
+    public RetrofitCall[] getRetrofitCalls() {
+        return new RetrofitCall[] {
+                createAttemptApiRequest, updateContentApiRequest, profileDetailApiRequest,
+                attemptsApiRequest, languagesApiRequest, bookmarkFoldersApiRequest,
+                bookmarkApiRequest, deleteBookmarkApiRequest, htmlContentApiRequest
+        };
     }
 
     @Override
