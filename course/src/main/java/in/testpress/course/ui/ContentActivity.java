@@ -71,9 +71,11 @@ import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.Video;
 import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.models.greendao.VideoDao;
+import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ZoomableImageActivity;
 import in.testpress.ui.view.ClosableSpinner;
+import in.testpress.util.CommonUtils;
 import in.testpress.util.FormatDate;
 import in.testpress.util.FullScreenChromeClient;
 import in.testpress.util.ViewUtils;
@@ -148,6 +150,9 @@ public class ContentActivity extends BaseToolBarActivity {
     private FrameLayout exoPlayerMainFrame;
     private boolean isEmbeddableVideo;
     private VideoAttempt videoAttempt;
+    private RetrofitCall<CourseAttempt> createAttemptApiRequest;
+    private RetrofitCall<Content> updateContentApiRequest;
+    private RetrofitCall<ProfileDetails> profileDetailApiRequest;
 
     public static Intent createIntent(int position, long chapterId, AppCompatActivity activity) {
         Intent intent = new Intent(activity, ContentActivity.class);
@@ -404,18 +409,19 @@ public class ContentActivity extends BaseToolBarActivity {
             initExoPlayer(videoUrl);
         } else {
             showLoadingProgress();
-            TestpressUserDetails.getInstance().load(this, new TestpressCallback<ProfileDetails>() {
-                @Override
-                public void onSuccess(ProfileDetails userDetails) {
-                    swipeRefresh.setRefreshing(false);
-                    initExoPlayer(videoUrl);
-                }
+            profileDetailApiRequest = TestpressUserDetails.getInstance()
+                    .load(this, new TestpressCallback<ProfileDetails>() {
+                        @Override
+                        public void onSuccess(ProfileDetails userDetails) {
+                            swipeRefresh.setRefreshing(false);
+                            initExoPlayer(videoUrl);
+                        }
 
-                @Override
-                public void onException(TestpressException exception) {
-                    handleError(exception, false);
-                }
-            });
+                        @Override
+                        public void onException(TestpressException exception) {
+                            handleError(exception, false);
+                        }
+                    });
         }
     }
 
@@ -739,7 +745,7 @@ public class ContentActivity extends BaseToolBarActivity {
         if (content.getRawVideo() != null && !isEmbeddableVideo) {
             showLoadingProgress();
         }
-        courseApiClient.createContentAttempt(content.getId())
+        createAttemptApiRequest = courseApiClient.createContentAttempt(content.getId())
                 .enqueue(new TestpressCallback<CourseAttempt>() {
                     @Override
                     public void onSuccess(CourseAttempt courseAttempt) {
@@ -802,7 +808,7 @@ public class ContentActivity extends BaseToolBarActivity {
             contentUrl = CONTENTS_PATH + contentId;
         }
 
-        courseApiClient.getContent(contentUrl)
+        updateContentApiRequest = courseApiClient.getContent(contentUrl)
                 .enqueue(new TestpressCallback<Content>() {
                     @Override
                     public void onSuccess(Content content) {
@@ -1137,6 +1143,14 @@ public class ContentActivity extends BaseToolBarActivity {
         if (exoPlayerUtil != null) {
             exoPlayerUtil.onStop();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        CommonUtils.cancelAPIRequests(new RetrofitCall[] {
+                createAttemptApiRequest, updateContentApiRequest, profileDetailApiRequest
+        });
+        super.onDestroy();
     }
 
     @Override
