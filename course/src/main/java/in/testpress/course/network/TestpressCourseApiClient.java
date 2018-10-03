@@ -12,6 +12,7 @@ import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.TestpressApiResponse;
+import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
 
@@ -85,8 +86,8 @@ public class TestpressCourseApiClient extends TestpressApiClient {
         return getCourseService().createContentAttempt(contentId);
     }
 
-    public RetrofitCall<CourseAttempt> updateVideoAttempt(long videoAttemptId,
-                                                          Map<String, Object> parameters) {
+    public RetrofitCall<VideoAttempt> updateVideoAttempt(long videoAttemptId,
+                                                         Map<String, Object> parameters) {
 
         return getCourseService().updateVideoAttempt(videoAttemptId, parameters);
     }

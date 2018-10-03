@@ -20,6 +20,7 @@ public class Video implements android.os.Parcelable {
     @Id
     private Long id;
     private String embedCode;
+    private Long duration;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -33,11 +34,12 @@ public class Video implements android.os.Parcelable {
     }
 
     @Generated
-    public Video(String title, String url, Long id, String embedCode) {
+    public Video(String title, String url, Long id, String embedCode, Long duration) {
         this.title = title;
         this.url = url;
         this.id = id;
         this.embedCode = embedCode;
+        this.duration = duration;
     }
 
     public String getTitle() {
@@ -70,6 +72,14 @@ public class Video implements android.os.Parcelable {
 
     public void setEmbedCode(String embedCode) {
         this.embedCode = embedCode;
+    }
+
+    public Long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Long duration) {
+        this.duration = duration;
     }
 
     // KEEP METHODS - put your custom methods here

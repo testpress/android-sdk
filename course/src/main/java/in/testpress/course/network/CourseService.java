@@ -9,6 +9,7 @@ import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.TestpressApiResponse;
+import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.network.RetrofitCall;
 
 import retrofit2.http.Body;
@@ -63,7 +64,7 @@ public interface CourseService {
             @Path(value = "content_id", encoded = true) long contentId);
 
     @PUT(USER_VIDEOS_PATH + "{video_attempt_id}/")
-    RetrofitCall<CourseAttempt> updateVideoAttempt(
+    RetrofitCall<VideoAttempt> updateVideoAttempt(
             @Path(value = "video_attempt_id", encoded = true) long videoAttemptId,
             @Body Map<String, Object> parameters);
 

@@ -430,7 +430,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 startPosition = 0;
             }
             exoPlayerUtil = new ExoPlayerUtil(this, exoPlayerMainFrame, videoUrl, startPosition);
-            exoPlayerUtil.setVideoAttemptId(videoAttempt.getId());
+            exoPlayerUtil.setVideoAttemptParameters(videoAttempt.getId(), content);
             exoPlayerMainFrame.setVisibility(View.VISIBLE);
             exoPlayerUtil.initializePlayer();
         }
