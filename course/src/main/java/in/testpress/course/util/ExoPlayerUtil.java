@@ -506,6 +506,8 @@ public class ExoPlayerUtil {
                 if (errorOnVideoAttemptUpdate) {
                     errorMessageTextView.setVisibility(View.GONE);
                     updateVideoAttempt();
+                } else if (playbackState == Player.STATE_READY) {
+                    errorMessageTextView.setVisibility(View.GONE);
                 }
             }
             if (playbackState == Player.STATE_BUFFERING) {
