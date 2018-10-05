@@ -356,6 +356,7 @@ public class ExoPlayerUtil {
         emailIdTextView.setText(overlayText);
         emailIdLayout = exoPlayerMainFrame.findViewById(R.id.email_id_layout);
         overlayPositionHandler = new Handler();
+        startOverlayMarquee();
     }
 
     private void startOverlayMarquee() {
