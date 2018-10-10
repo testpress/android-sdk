@@ -55,7 +55,8 @@ import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.models.ProfileDetails;
-import in.testpress.models.greendao.CourseAttempt;
+import in.testpress.models.greendao.Content;
+import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
 import in.testpress.util.UserAgentProvider;
@@ -83,6 +84,7 @@ public class ExoPlayerUtil {
 
     private Activity activity;
     private long videoAttemptId;
+    private Content content;
     private String url;
     private float startPosition;
     private boolean playWhenReady = true;
@@ -296,8 +298,9 @@ public class ExoPlayerUtil {
         speedRateSpinner.setSelection(itemPosition);
     }
 
-    public void setVideoAttemptId(long videoAttemptId) {
+    public void setVideoAttemptParameters(long videoAttemptId, Content content) {
         this.videoAttemptId = videoAttemptId;
+        this.content = content;
     }
 
     public void onStart() {
@@ -423,11 +426,12 @@ public class ExoPlayerUtil {
     private void updateVideoAttempt() {
         Map<String, Object> parameters = getVideoAttemptParameters();
         new TestpressCourseApiClient(activity).updateVideoAttempt(videoAttemptId, parameters)
-                .enqueue(new TestpressCallback<CourseAttempt>() {
+                .enqueue(new TestpressCallback<VideoAttempt>() {
                     @Override
-                    public void onSuccess(CourseAttempt courseAttempt) {
+                    public void onSuccess(VideoAttempt videoAttempt) {
                         errorOnVideoAttemptUpdate = false;
                         if (videoAttemptUpdateHandler != null) {
+                            updateVideoWatchedPercentage(videoAttempt);
                             videoAttemptUpdateHandler
                                     .postDelayed(videoAttemptUpdateTask, VIDEO_ATTEMPT_UPDATE_INTERVAL);
                         }
@@ -439,6 +443,18 @@ public class ExoPlayerUtil {
                         handleError(exception.isNetworkError());
                     }
                 });
+    }
+
+    void updateVideoWatchedPercentage(VideoAttempt videoAttempt) {
+        long totalDuration = videoAttempt.getRawVideoContent().getDuration();
+        long watchedDuration = (long)
+                (Float.parseFloat(videoAttempt.getWatchedDuration()) * 1000);
+
+        int watchedPercentage =
+                (int) (((watchedDuration * 100) / totalDuration) / 1000);
+
+        content.setVideoWatchedPercentage(watchedPercentage);
+        content.update();
     }
 
     private void displayError(@StringRes int message) {

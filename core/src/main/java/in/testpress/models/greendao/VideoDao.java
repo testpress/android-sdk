@@ -26,6 +26,7 @@ public class VideoDao extends AbstractDao<Video, Long> {
         public final static Property Url = new Property(1, String.class, "url", false, "URL");
         public final static Property Id = new Property(2, Long.class, "id", true, "ID");
         public final static Property EmbedCode = new Property(3, String.class, "embedCode", false, "EMBED_CODE");
+        public final static Property Duration = new Property(4, Long.class, "duration", false, "DURATION");
     }
 
 
@@ -44,7 +45,8 @@ public class VideoDao extends AbstractDao<Video, Long> {
                 "\"TITLE\" TEXT," + // 0: title
                 "\"URL\" TEXT," + // 1: url
                 "\"ID\" INTEGER PRIMARY KEY ," + // 2: id
-                "\"EMBED_CODE\" TEXT);"); // 3: embedCode
+                "\"EMBED_CODE\" TEXT," + // 3: embedCode
+                "\"DURATION\" INTEGER);"); // 4: duration
     }
 
     /** Drops the underlying database table. */
@@ -76,6 +78,11 @@ public class VideoDao extends AbstractDao<Video, Long> {
         if (embedCode != null) {
             stmt.bindString(4, embedCode);
         }
+ 
+        Long duration = entity.getDuration();
+        if (duration != null) {
+            stmt.bindLong(5, duration);
+        }
     }
 
     @Override
@@ -101,6 +108,11 @@ public class VideoDao extends AbstractDao<Video, Long> {
         if (embedCode != null) {
             stmt.bindString(4, embedCode);
         }
+ 
+        Long duration = entity.getDuration();
+        if (duration != null) {
+            stmt.bindLong(5, duration);
+        }
     }
 
     @Override
@@ -114,7 +126,8 @@ public class VideoDao extends AbstractDao<Video, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // title
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // url
             cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // id
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // embedCode
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // embedCode
+            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4) // duration
         );
         return entity;
     }
@@ -125,6 +138,7 @@ public class VideoDao extends AbstractDao<Video, Long> {
         entity.setUrl(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setId(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
         entity.setEmbedCode(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setDuration(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
      }
     
     @Override

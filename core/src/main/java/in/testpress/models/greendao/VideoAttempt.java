@@ -167,6 +167,14 @@ public class VideoAttempt {
     }
 
     // KEEP METHODS - put your custom methods here
+
+    public Video getRawVideoContent() {
+        if (myDao == null || videoContent != null) {
+            return videoContent;
+        }
+        return getVideoContent();
+    }
+
     // KEEP METHODS END
 
 }
