@@ -37,6 +37,11 @@ dependencies {
     api rootProject.mediarouter
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
+    testImplementation rootProject.powermockJunit
+    testImplementation (rootProject.powermockMockio) {
+        exclude group: 'org.mockito'
+    }
+
     androidTestImplementation rootProject.junit
     androidTestImplementation rootProject.testRunner
 }
