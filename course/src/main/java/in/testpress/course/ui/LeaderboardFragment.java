@@ -3,7 +3,6 @@ package in.testpress.course.ui;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -23,11 +22,13 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.course.models.Reputation;
 import in.testpress.course.network.TestpressCourseApiClient;
+import in.testpress.network.RetrofitCall;
+import in.testpress.ui.BaseFragment;
 import in.testpress.util.UIUtils;
 
 import static in.testpress.course.ui.RankListFragment.PARAM_USER_REPUTATION;
 
-public class LeaderboardFragment extends Fragment {
+public class LeaderboardFragment extends BaseFragment {
 
     private LinearLayout carouselView;
     private ViewPager viewPager;
@@ -38,6 +39,8 @@ public class LeaderboardFragment extends Fragment {
     private TextView emptyDescView;
     private Button retryButton;
     private ProgressBar progressBar;
+
+    private RetrofitCall<Reputation> myReputationApiRequest;
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
@@ -81,7 +84,7 @@ public class LeaderboardFragment extends Fragment {
 
     void loadMyReputation() {
         progressBar.setVisibility(View.VISIBLE);
-        new TestpressCourseApiClient(getContext()).getMyRank()
+        myReputationApiRequest = new TestpressCourseApiClient(getContext()).getMyRank()
                 .enqueue(new TestpressCallback<Reputation>() {
                     @Override
                     public void onSuccess(Reputation reputation) {
@@ -128,4 +131,8 @@ public class LeaderboardFragment extends Fragment {
         emptyDescView.setText(description);
     }
 
+    @Override
+    public RetrofitCall[] getRetrofitCalls() {
+        return new RetrofitCall[] { myReputationApiRequest };
+    }
 }

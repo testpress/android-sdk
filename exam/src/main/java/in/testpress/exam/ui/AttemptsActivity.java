@@ -36,6 +36,7 @@ import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Language;
+import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
@@ -66,6 +67,8 @@ public class AttemptsActivity extends BaseToolBarActivity
     private Exam exam;
     private List<Attempt> attempts = new ArrayList<>();
     private AttemptsPager pager;
+    private RetrofitCall<Exam> examApiRequest;
+    private RetrofitCall<TestpressApiResponse<Language>> languagesApiRequest;
 
     @SuppressWarnings({"ConstantConditions", "deprecation"})
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface", "DefaultLocale"})
@@ -214,7 +217,7 @@ public class AttemptsActivity extends BaseToolBarActivity
 
     void loadExam(final String examSlug) {
         progressBar.setVisibility(View.VISIBLE);
-        apiClient.getExam(examSlug)
+        examApiRequest = apiClient.getExam(examSlug)
                 .enqueue(new TestpressCallback<Exam>() {
                     @Override
                     public void onSuccess(Exam exam) {
@@ -239,7 +242,7 @@ public class AttemptsActivity extends BaseToolBarActivity
 
     void fetchLanguages() {
         progressBar.setVisibility(View.VISIBLE);
-        apiClient.getLanguages(exam.getSlug())
+        languagesApiRequest = apiClient.getLanguages(exam.getSlug())
                 .enqueue(new TestpressCallback<TestpressApiResponse<Language>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Language> apiResponse) {
@@ -293,6 +296,7 @@ public class AttemptsActivity extends BaseToolBarActivity
     public void onLoadFinished(Loader<List<Attempt>> loader, List<Attempt> data) {
         //noinspection ThrowableResultOfMethodCallIgnored
         TestpressException exception = ((ThrowableLoader<List<Attempt>>) loader).clearException();
+        getSupportLoaderManager().destroyLoader(loader.getId());
         if(exception != null) {
             handleError(exception, R.string.testpress_error_loading_attempts);
             return;
@@ -405,6 +409,13 @@ public class AttemptsActivity extends BaseToolBarActivity
         } else {
             setEmptyText(errorMessage, R.string.testpress_some_thing_went_wrong_try_again);
         }
+    }
+
+    @Override
+    public RetrofitCall[] getRetrofitCalls() {
+        return new RetrofitCall[] {
+                examApiRequest, languagesApiRequest
+        };
     }
 
     @Override

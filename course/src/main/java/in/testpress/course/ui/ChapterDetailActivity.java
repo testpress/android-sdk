@@ -26,6 +26,7 @@ import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
+import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.UIUtils;
 
@@ -48,6 +49,8 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     private TextView emptyDescView;
     private ProgressBar progressBar;
     private Button retryButton;
+
+    private RetrofitCall<Chapter> chapterApiRequest;
 
     public static Intent createIntent(String title, String courseId, Context context) {
         Intent intent = new Intent(context, ChapterDetailActivity.class);
@@ -141,7 +144,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
 
     void loadChapterFromServer(final String chapterUrl) {
         progressBar.setVisibility(View.VISIBLE);
-        new TestpressCourseApiClient(this).getChapter(chapterUrl)
+        chapterApiRequest = new TestpressCourseApiClient(this).getChapter(chapterUrl)
                 .enqueue(new TestpressCallback<Chapter>() {
                     @Override
                     public void onSuccess(Chapter chapter) {
@@ -238,4 +241,8 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         return data;
     }
 
+    @Override
+    public RetrofitCall[] getRetrofitCalls() {
+        return new RetrofitCall[] { chapterApiRequest };
+    }
 }

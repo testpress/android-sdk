@@ -1,5 +1,6 @@
 package in.testpress.ui;
 
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 
 import org.junit.Test;
@@ -23,25 +24,25 @@ import static org.powermock.api.support.membermodification.MemberMatcher.methods
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ BaseToolBarActivity.class, CommonUtils.class })
-public class BaseToolBarActivityTest {
+@PrepareForTest({ BaseFragment.class, CommonUtils.class })
+public class BaseFragmentTest {
 
     @Mock
     private RetrofitCall retrofitCall;
 
     @Test
-    public void test_onStop_cancelAPIRequests_isCalled() {
-        PowerMockito.suppress(methodsDeclaredIn(AppCompatActivity.class));
-        BaseToolBarActivity activity = mock(BaseToolBarActivity.class);
+    public void testBaseFragment_onStop_cancelAPIRequests_isCalled() {
+        PowerMockito.suppress(methodsDeclaredIn(Fragment.class));
+        BaseFragment fragment = mock(BaseFragment.class);
 
         RetrofitCall[] retrofitCalls = new RetrofitCall[] { retrofitCall };
 
-        when(activity.getRetrofitCalls()).thenReturn(retrofitCalls);
+        when(fragment.getRetrofitCalls()).thenReturn(retrofitCalls);
 
-        doCallRealMethod().when(activity).onDestroy();
-        activity.onDestroy();
+        doCallRealMethod().when(fragment).onDestroyView();
+        fragment.onDestroyView();
 
-        verify(activity, times(1)).getRetrofitCalls();
+        verify(fragment, times(1)).getRetrofitCalls();
         verify(retrofitCall, times(1)).cancel();
 
         PowerMockito.mockStatic(CommonUtils.class);
@@ -52,7 +53,7 @@ public class BaseToolBarActivityTest {
             fail();
         }
 
-        activity.onDestroy();
+        fragment.onDestroyView();
 
         PowerMockito.verifyStatic(times(1));
         CommonUtils.cancelAPIRequests(retrofitCalls);

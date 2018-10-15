@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.view.Menu;
@@ -23,7 +22,6 @@ import android.widget.TextView;
 import junit.framework.Assert;
 
 import org.greenrobot.greendao.query.QueryBuilder;
-import org.greenrobot.greendao.query.WhereCondition;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -111,6 +109,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     protected Boolean spinnerDefaultCallback = true;
     protected int selectedItemPosition = -1;
     private RetrofitCall<TestpressApiResponse<ReviewItem>> reviewItemsLoader;
+    private RetrofitCall<TestpressApiResponse<Language>> languageApiRequest;
     private TestpressExamApiClient apiClient;
     private Menu optionsMenu;
 
@@ -454,7 +453,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
 
     void fetchLanguages() {
         progressBar.setVisibility(View.VISIBLE);
-        apiClient.getLanguages(exam.getSlug())
+        languageApiRequest = apiClient.getLanguages(exam.getSlug())
                 .enqueue(new TestpressCallback<TestpressApiResponse<Language>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Language> apiResponse) {
@@ -723,10 +722,10 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        if (reviewItemsLoader != null) {
-            reviewItemsLoader.cancel();
-        }
-        super.onDestroy();
+    public RetrofitCall[] getRetrofitCalls() {
+        return new RetrofitCall[] {
+                reviewItemsLoader, languageApiRequest
+        };
     }
+
 }

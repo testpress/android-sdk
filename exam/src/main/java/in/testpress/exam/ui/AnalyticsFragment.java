@@ -125,6 +125,7 @@ public class AnalyticsFragment extends Fragment
     public void onLoadFinished(final Loader<List<Subject>> loader, final List<Subject> items) {
         //noinspection ThrowableResultOfMethodCallIgnored
         TestpressException exception = ((ThrowableLoader<List<Subject>>) loader).clearException();
+        getLoaderManager().destroyLoader(loader.getId());
         if(exception != null) {
             if (exception.isNetworkError()) {
                 setEmptyText(R.string.testpress_network_error,

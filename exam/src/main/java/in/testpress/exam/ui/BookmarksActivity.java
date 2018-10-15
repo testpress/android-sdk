@@ -52,7 +52,6 @@ import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.HeaderFooterListAdapter;
 import in.testpress.ui.view.ClosableSpinner;
-import in.testpress.util.CommonUtils;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
@@ -1007,12 +1006,11 @@ public class BookmarksActivity extends BaseToolBarActivity
     }
 
     @Override
-    protected void onStop() {
-        CommonUtils.cancelAPIRequests(new RetrofitCall[] {
+    public RetrofitCall[] getRetrofitCalls() {
+        return new RetrofitCall[] {
                 bookmarkFoldersLoader, updateFolderAPIRequest, deleteFolderAPIRequest,
                 undoBookmarkAPIRequest
-        });
-        super.onStop();
+        };
     }
 
     @Override

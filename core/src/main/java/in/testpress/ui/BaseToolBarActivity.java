@@ -99,9 +99,9 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
+    protected void onDestroy() {
         CommonUtils.cancelAPIRequests(getRetrofitCalls());
-        super.onStop();
+        super.onDestroy();
     }
 
 }

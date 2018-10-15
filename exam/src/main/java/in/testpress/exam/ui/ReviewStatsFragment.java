@@ -3,16 +3,9 @@ package in.testpress.exam.ui;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +30,8 @@ import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
+import in.testpress.network.RetrofitCall;
+import in.testpress.ui.BaseFragment;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 
@@ -46,7 +41,7 @@ import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_COURSE_ATTEMPT;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_EXAM;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_PREVIOUS_ACTIVITY;
 
-public class ReviewStatsFragment extends Fragment {
+public class ReviewStatsFragment extends BaseFragment {
 
     static final String PARAM_SHOW_RETAKE_BUTTON = "showRetakeButton";
 
@@ -86,6 +81,7 @@ public class ReviewStatsFragment extends Fragment {
     private Button timeAnalyticsButton;
     private Attempt attempt;
     private Exam exam;
+    private RetrofitCall<TestpressApiResponse<Attempt>> attemptsApiRequest;
 
     public static void showReviewStatsFragment(FragmentActivity activity, Exam exam, Attempt attempt,
                                                boolean showRetakeButton) {
@@ -306,8 +302,8 @@ public class ReviewStatsFragment extends Fragment {
     }
 
     private void loadAttempt() {
-        new TestpressExamApiClient(getActivity()).getAttempts(exam.getAttemptsUrl(),
-                new HashMap<String, Object>())
+        attemptsApiRequest = new TestpressExamApiClient(getActivity())
+                .getAttempts(exam.getAttemptsUrl(), new HashMap<String, Object>())
                 .enqueue(new TestpressCallback<TestpressApiResponse<Attempt>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Attempt> response) {
@@ -367,6 +363,11 @@ public class ReviewStatsFragment extends Fragment {
             getActivity().setResult(resultCode);
             getActivity().finish();
         }
+    }
+
+    @Override
+    public RetrofitCall[] getRetrofitCalls() {
+        return new RetrofitCall[] { attemptsApiRequest };
     }
 
     protected void setEmptyText(final int title, final int description, int imageRes) {

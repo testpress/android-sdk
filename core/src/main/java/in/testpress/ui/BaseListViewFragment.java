@@ -217,6 +217,7 @@ public abstract class BaseListViewFragment<E> extends Fragment
 
     public void onLoadFinished(final Loader<List<E>> loader, final List<E> items) {
         final TestpressException exception = getException(loader);
+        getLoaderManager().destroyLoader(loader.getId());
         if (exception != null) {
             this.exception = exception;
             int errorMessage = getErrorMessage(exception);
@@ -224,7 +225,6 @@ public abstract class BaseListViewFragment<E> extends Fragment
                 showError(errorMessage);
             }
             showList();
-            getLoaderManager().destroyLoader(loader.getId());
             return;
         }
         this.exception = null;
