@@ -29,14 +29,15 @@ public class TestpressUserDetails {
         this.profileDetails = profileDetails;
     }
 
-    public void load(Context context, TestpressCallback<ProfileDetails> testpressCallback) {
+    public RetrofitCall<ProfileDetails> load(Context context,
+                                             TestpressCallback<ProfileDetails> testpressCallback) {
         callBack = testpressCallback;
-        load(context);
+        return load(context);
     }
 
-    public void load(Context context) {
+    public RetrofitCall<ProfileDetails> load(Context context) {
         if (!TestpressSdk.hasActiveSession(context)) {
-            return;
+            return retrofitCall;
         }
         if (retrofitCall != null) {
             retrofitCall.cancel();
@@ -59,6 +60,7 @@ public class TestpressUserDetails {
                         }
                     }
                 });
+        return retrofitCall;
     }
 
 }

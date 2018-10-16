@@ -10,6 +10,8 @@ import android.view.MenuItem;
 import in.testpress.R;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
+import in.testpress.network.RetrofitCall;
+import in.testpress.util.CommonUtils;
 
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
@@ -90,6 +92,16 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putBoolean(ACTION_PRESSED_HOME, true);
         return bundle;
+    }
+
+    public RetrofitCall[] getRetrofitCalls() {
+        return new RetrofitCall[] {};
+    }
+
+    @Override
+    protected void onStop() {
+        CommonUtils.cancelAPIRequests(getRetrofitCalls());
+        super.onStop();
     }
 
 }

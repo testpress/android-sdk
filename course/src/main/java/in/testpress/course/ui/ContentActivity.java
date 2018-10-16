@@ -71,9 +71,11 @@ import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.Video;
 import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.models.greendao.VideoDao;
+import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ZoomableImageActivity;
 import in.testpress.ui.view.ClosableSpinner;
+import in.testpress.util.CommonUtils;
 import in.testpress.util.FormatDate;
 import in.testpress.util.FullScreenChromeClient;
 import in.testpress.util.ViewUtils;
@@ -148,6 +150,15 @@ public class ContentActivity extends BaseToolBarActivity {
     private FrameLayout exoPlayerMainFrame;
     private boolean isEmbeddableVideo;
     private VideoAttempt videoAttempt;
+    private RetrofitCall<CourseAttempt> createAttemptApiRequest;
+    private RetrofitCall<Content> updateContentApiRequest;
+    private RetrofitCall<ProfileDetails> profileDetailApiRequest;
+    private RetrofitCall<TestpressApiResponse<CourseAttempt>> attemptsApiRequest;
+    private RetrofitCall<TestpressApiResponse<Language>> languagesApiRequest;
+    private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersApiRequest;
+    private RetrofitCall<Bookmark> bookmarkApiRequest;
+    private RetrofitCall<Void> deleteBookmarkApiRequest;
+    private RetrofitCall<HtmlContent> htmlContentApiRequest;
 
     public static Intent createIntent(int position, long chapterId, AppCompatActivity activity) {
         Intent intent = new Intent(activity, ContentActivity.class);
@@ -376,7 +387,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void loadContentHtmlFromServer() {
         showLoadingProgress();
-        courseApiClient.getHtmlContent(content.getHtmlContentUrl())
+        htmlContentApiRequest = courseApiClient.getHtmlContent(content.getHtmlContentUrl())
                 .enqueue(new TestpressCallback<HtmlContent>() {
                     @Override
                     public void onSuccess(HtmlContent htmlContent) {
@@ -404,18 +415,19 @@ public class ContentActivity extends BaseToolBarActivity {
             initExoPlayer(videoUrl);
         } else {
             showLoadingProgress();
-            TestpressUserDetails.getInstance().load(this, new TestpressCallback<ProfileDetails>() {
-                @Override
-                public void onSuccess(ProfileDetails userDetails) {
-                    swipeRefresh.setRefreshing(false);
-                    initExoPlayer(videoUrl);
-                }
+            profileDetailApiRequest = TestpressUserDetails.getInstance()
+                    .load(this, new TestpressCallback<ProfileDetails>() {
+                        @Override
+                        public void onSuccess(ProfileDetails userDetails) {
+                            swipeRefresh.setRefreshing(false);
+                            initExoPlayer(videoUrl);
+                        }
 
-                @Override
-                public void onException(TestpressException exception) {
-                    handleError(exception, false);
-                }
-            });
+                        @Override
+                        public void onException(TestpressException exception) {
+                            handleError(exception, false);
+                        }
+                    });
         }
     }
 
@@ -581,7 +593,7 @@ public class ContentActivity extends BaseToolBarActivity {
         } else {
             showLoadingProgress();
         }
-        examApiClient.getContentAttempts(attemptsUrl)
+        attemptsApiRequest = examApiClient.getContentAttempts(attemptsUrl)
                 .enqueue(new TestpressCallback<TestpressApiResponse<CourseAttempt>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<CourseAttempt> response) {
@@ -606,7 +618,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     void fetchLanguages(final CourseAttempt pausedCourseAttempt) {
         showLoadingProgress();
-        examApiClient.getLanguages(content.getRawExam().getSlug())
+        languagesApiRequest = examApiClient.getLanguages(content.getRawExam().getSlug())
                 .enqueue(new TestpressCallback<TestpressApiResponse<Language>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Language> apiResponse) {
@@ -739,7 +751,7 @@ public class ContentActivity extends BaseToolBarActivity {
         if (content.getRawVideo() != null && !isEmbeddableVideo) {
             showLoadingProgress();
         }
-        courseApiClient.createContentAttempt(content.getId())
+        createAttemptApiRequest = courseApiClient.createContentAttempt(content.getId())
                 .enqueue(new TestpressCallback<CourseAttempt>() {
                     @Override
                     public void onSuccess(CourseAttempt courseAttempt) {
@@ -802,7 +814,7 @@ public class ContentActivity extends BaseToolBarActivity {
             contentUrl = CONTENTS_PATH + contentId;
         }
 
-        courseApiClient.getContent(contentUrl)
+        updateContentApiRequest = courseApiClient.getContent(contentUrl)
                 .enqueue(new TestpressCallback<Content>() {
                     @Override
                     public void onSuccess(Content content) {
@@ -864,7 +876,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     void loadBookmarkFolders(String url) {
         setBookmarkProgress(true);
-        examApiClient.getBookmarkFolders(url)
+        bookmarkFoldersApiRequest = examApiClient.getBookmarkFolders(url)
                 .enqueue(new TestpressCallback<ApiResponse<FolderListResponse>>() {
                     @Override
                     public void onSuccess(ApiResponse<FolderListResponse> apiResponse) {
@@ -888,7 +900,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     void bookmark(String folder) {
         setBookmarkProgress(true);
-        examApiClient.bookmark(content.getId(), folder, "chaptercontent", "courses")
+        bookmarkApiRequest = examApiClient.bookmark(content.getId(), folder, "chaptercontent", "courses")
                 .enqueue(new TestpressCallback<Bookmark>() {
                     @Override
                     public void onSuccess(Bookmark bookmark) {
@@ -909,7 +921,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     void deleteBookmark(Long bookmarkId) {
         setBookmarkProgress(true);
-        examApiClient.deleteBookmark(bookmarkId)
+        deleteBookmarkApiRequest = examApiClient.deleteBookmark(bookmarkId)
                 .enqueue(new TestpressCallback<Void>() {
                     @Override
                     public void onSuccess(Void data) {
@@ -1137,6 +1149,15 @@ public class ContentActivity extends BaseToolBarActivity {
         if (exoPlayerUtil != null) {
             exoPlayerUtil.onStop();
         }
+    }
+
+    @Override
+    public RetrofitCall[] getRetrofitCalls() {
+        return new RetrofitCall[] {
+                createAttemptApiRequest, updateContentApiRequest, profileDetailApiRequest,
+                attemptsApiRequest, languagesApiRequest, bookmarkFoldersApiRequest,
+                bookmarkApiRequest, deleteBookmarkApiRequest, htmlContentApiRequest
+        };
     }
 
     @Override
