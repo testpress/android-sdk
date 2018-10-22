@@ -14,7 +14,7 @@
 
         <activity android:name=".ui.TestActivity"
             android:label="@string/testpress_start_exam"
-            android:theme="@style/TestpressTheme.NoToolBar"
+            android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
         <activity android:name=".ui.AccessCodeActivity"

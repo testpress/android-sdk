@@ -62,7 +62,9 @@ public class Attempt implements android.os.Parcelable {
     private List<AttemptSection> sections;
 
     // KEEP FIELDS - put your custom fields here
+    public static final String NOT_STARTED = "Not Started";
     public static final String RUNNING = "Running";
+    public static final String COMPLETED = "Completed";
     // KEEP FIELDS END
 
     @Generated
@@ -438,6 +440,10 @@ public class Attempt implements android.os.Parcelable {
             return sections;
         }
         return getSections();
+    }
+
+    public void setSections(List<AttemptSection> sections) {
+        this.sections = sections;
     }
 
     public ReviewAttempt getReviewAttempt() {
