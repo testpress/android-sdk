@@ -41,7 +41,7 @@ public class BaseFragmentTest {
         fragment.onDestroyView();
 
         verify(fragment, times(1)).getRetrofitCalls();
-        PowerMockito.verifyStatic(times(1));
+        PowerMockito.verifyStatic(CommonUtils.class, times(1));
         CommonUtils.cancelAPIRequests(retrofitCalls);
     }
 
@@ -54,7 +54,7 @@ public class BaseFragmentTest {
         fragment.onDestroyView();
 
         verify(fragment, times(1)).getDialogs();
-        PowerMockito.verifyStatic(times(1));
+        PowerMockito.verifyStatic(CommonUtils.class, times(1));
         CommonUtils.dismissDialogs(dialogs);
     }
 

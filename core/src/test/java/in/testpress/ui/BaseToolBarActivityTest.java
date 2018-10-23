@@ -54,7 +54,7 @@ public class BaseToolBarActivityTest {
 
         activity.onDestroy();
 
-        PowerMockito.verifyStatic(times(1));
+        PowerMockito.verifyStatic(CommonUtils.class, times(1));
         CommonUtils.cancelAPIRequests(retrofitCalls);
     }
 }
