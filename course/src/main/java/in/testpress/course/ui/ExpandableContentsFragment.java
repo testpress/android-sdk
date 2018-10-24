@@ -135,6 +135,7 @@ public class ExpandableContentsFragment extends Fragment {
                 }
             }
         });
+        setHasOptionsMenu(true);
         return view;
     }
 
