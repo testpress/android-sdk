@@ -425,7 +425,7 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
                     R.string.testpress_no_internet_try_again,
                     R.drawable.testpress_no_wifi);
             retryButton.setVisibility(View.VISIBLE);
-        } else if (exception.getResponse().code() == 404) {
+        } else if (exception.isPageNotFound()) {
             displayError(R.string.testpress_content_not_available,
                     R.string.testpress_content_not_available_description,
                     R.drawable.testpress_alert_warning);

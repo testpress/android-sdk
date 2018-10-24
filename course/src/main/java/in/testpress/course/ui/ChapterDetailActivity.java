@@ -161,7 +161,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                         } else if (exception.isNetworkError()) {
                             setEmptyText(R.string.testpress_network_error,
                                     R.string.testpress_no_internet_try_again);
-                        } else if (exception.getResponse().code() == 404) {
+                        } else if (exception.isPageNotFound()) {
                             setEmptyText(R.string.testpress_chapter_not_available,
                                     R.string.testpress_chapter_not_available_description);
                             retryButton.setVisibility(View.GONE);

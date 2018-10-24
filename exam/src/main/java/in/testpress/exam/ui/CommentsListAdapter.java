@@ -276,9 +276,9 @@ public class CommentsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         int error;
         if (exception.isUnauthenticated()) {
             error = R.string.testpress_authentication_failed;
-        } else if (exception.getCause() instanceof IOException) {
+        } else if (exception.isNetworkError()) {
             error = R.string.testpress_no_internet_try_again;
-        } else if (exception.getResponse().code() == 400) {
+        } else if (exception.isBadRequest()) {
             error = R.string.testpress_self_vote_error;
             if (TestpressSdk.getTestpressUserId(activity) != comment.getUser().getId()) {
                 TestpressSdk.setTestpressUserId(activity, comment.getUser().getId());

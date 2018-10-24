@@ -1080,7 +1080,7 @@ public class ContentActivity extends BaseToolBarActivity {
                     }
                 }
             });
-        }  else if (exception.getResponse().code() == 404) {
+        }  else if (exception.isPageNotFound()) {
             setEmptyText(R.string.testpress_content_not_available,
                     R.string.testpress_content_not_available_description,
                     R.drawable.ic_error_outline_black_18dp);
