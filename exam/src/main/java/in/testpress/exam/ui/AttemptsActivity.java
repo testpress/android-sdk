@@ -403,7 +403,7 @@ public class AttemptsActivity extends BaseToolBarActivity
         } else if (exception.isNetworkError()) {
             setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again);
             retryButton.setVisibility(View.VISIBLE);
-        } else if (exception.getResponse().code() == 404) {
+        } else if (exception.isPageNotFound()) {
             setEmptyText(R.string.testpress_exam_not_available,
                     R.string.testpress_exam_not_available_description);
         } else {
