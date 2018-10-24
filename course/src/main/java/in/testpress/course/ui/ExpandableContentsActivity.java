@@ -14,8 +14,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.greenrobot.greendao.query.QueryBuilder;
-
 import java.util.List;
 
 import in.testpress.core.TestpressCallback;
@@ -34,9 +32,11 @@ import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.network.BaseResourcePager;
 import in.testpress.ui.BaseToolBarActivity;
+import in.testpress.util.Assert;
 import in.testpress.util.PreferenceUtils;
 import in.testpress.util.ViewUtils;
 
+import static in.testpress.course.TestpressCourse.CHAPTER_SLUG;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_CHAPTER_ID;
 import static in.testpress.network.TestpressApiClient.MODIFIED_SINCE;
@@ -74,6 +74,12 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
         intent.putExtra(ACTIONBAR_TITLE, title);
         intent.putExtra(COURSE_ID, courseId);
         intent.putExtra(PARENT_CHAPTER_ID, parentChapterId);
+        return intent;
+    }
+
+    public static Intent createIntent(String chapterSlug, Context context) {
+        Intent intent = new Intent(context, ExpandableContentsActivity.class);
+        intent.putExtra(CHAPTER_SLUG, chapterSlug);
         return intent;
     }
 
@@ -121,17 +127,26 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
         courseId = getIntent().getLongExtra(COURSE_ID, 0);
         parentChapterId = getIntent().getLongExtra(PARENT_CHAPTER_ID, 0);
         String title = getIntent().getStringExtra(ACTIONBAR_TITLE);
+        if (title != null && !title.isEmpty()) {
+            assert getSupportActionBar() != null;
+            getSupportActionBar().setTitle(title);
+        }
+        if (courseId != 0) {
+            checkCourseAvailableInDB();
+        } else {
+            String chapterSlug = getIntent().getStringExtra(CHAPTER_SLUG);
+            Assert.assertNotNullAndNotEmpty("courseId/chapterSlug must need to pass.", chapterSlug);
+            loadChapter(chapterSlug);
+        }
+    }
 
+    void checkCourseAvailableInDB() {
         List<Course> coursesFromDB = courseDao.queryBuilder()
                 .where(CourseDao.Properties.Id.eq(courseId)).list();
 
         if (!coursesFromDB.isEmpty()) {
             onCourseAvailable(coursesFromDB.get(0));
         } else {
-            if (title != null && !title.isEmpty()) {
-                assert getSupportActionBar() != null;
-                getSupportActionBar().setTitle(title);
-            }
             loadCourse(courseId);
         }
     }
@@ -165,7 +180,7 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
                 try {
                     parentChapterId = Long.parseLong(gridFragment.parentChapterId);
                 } catch (NumberFormatException e) {
-                    // parentChapterId = null
+                     parentChapterId = 0;
                 }
             } else if (fragment instanceof ContentsListFragment) {
                 ContentsListFragment contentsListFragment = (ContentsListFragment) fragment;
@@ -179,15 +194,10 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
                     (ExpandableContentsFragment) getCurrentFragment();
 
             parentChapterId = expandableContentsFragment.parentChapterId;
-            List<Chapter> chaptersFromDB = chapterDao.queryBuilder()
-                    .where(ChapterDao.Properties.Id.eq(parentChapterId))
-                    .list();
-
-            if (!chaptersFromDB.isEmpty() && chaptersFromDB.get(0).getRawChildrenCount(this) == 0) {
-                showFragment(ContentsListFragment.getInstance(parentChapterId));
-            } else {
-                showFragment(NewChaptersGridFragment.getInstance(courseId, parentChapterId));
-            }
+            displayChapterDetailView();
+            return true;
+        } else if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -217,7 +227,7 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
         if (course.getChildItemsLoaded()) {
             displayChapters();
             currentPager = new ChapterPager(course.getId(), apiClient);
-            if (getParentChaptersQueryBuilder().count() != 0) {
+            if (!isItemsEmpty()) {
                 Chapter chapter = Chapter.getAllChaptersQueryBuilder(this, courseId)
                         .orderDesc(ChapterDao.Properties.ModifiedDate).list().get(0);
 
@@ -232,30 +242,86 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
         }
     }
 
+    void loadChapter(String chapterSlug) {
+        List<Chapter> chapters = chapterDao.queryBuilder()
+                .where(ChapterDao.Properties.Slug.eq(chapterSlug)).list();
+
+        if (!chapters.isEmpty()) {
+            Chapter chapter = chapters.get(0);
+            if ((chapter.getRawChildrenCount(this) != 0 || chapter.getRawContentsCount(this) != 0)) {
+                onChapterLoaded(chapter);
+                return;
+            }
+            //noinspection ConstantConditions
+            getSupportActionBar().setTitle(chapter.getName());
+        }
+        loadChapterFromServer(chapterSlug);
+    }
+
+    void loadChapterFromServer(String chapterSlug) {
+        swipeRefreshLayout.setRefreshing(true);
+        apiClient.getChapter(chapterSlug)
+                .enqueue(new TestpressCallback<Chapter>() {
+                    @Override
+                    public void onSuccess(Chapter chapter) {
+                        swipeRefreshLayout.setRefreshing(false);
+                        onChapterLoaded(chapter);
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        handleError(exception);
+                    }
+                });
+    }
+
+    void onChapterLoaded(Chapter chapter) {
+        courseId = chapter.getCourseId();
+        parentChapterId = chapter.getId();
+        // noinspection ConstantConditions
+        getSupportActionBar().setTitle(chapter.getName());
+        checkCourseAvailableInDB();
+    }
+
     void displayChapters() {
         newContentsAvailableLabel.setVisibility(View.GONE);
-        List<Chapter> chapters = getParentChaptersQueryBuilder().list();
-        if (chapters.isEmpty()) {
+        if (parentChapterId == 0 && isItemsEmpty()) {
             setEmptyText(R.string.testpress_no_content, R.string.testpress_no_content_description,
                     R.drawable.testpress_learn_flat_icon);
-        } else {
-            emptyView.setVisibility(View.GONE);
-            Fragment fragment = getCurrentFragment();
-            boolean isTocUi = false;
-            if (fragment == null) {
-                isTocUi = (course.getIsTocUi() == null) ?
-                        PreferenceUtils.isTocUsedAsLastCourseUi(this) : course.getIsTocUi();
-            }
-            if ((fragment == null && isTocUi) || fragment instanceof ExpandableContentsFragment) {
-                showFragment(ExpandableContentsFragment.getInstance(courseId, parentChapterId));
-            } else if (fragment == null || fragment instanceof NewChaptersGridFragment) {
-                showFragment(NewChaptersGridFragment.getInstance(courseId, parentChapterId));
-            } else if (fragment instanceof ContentsListFragment) {
-                ContentsListFragment contentsListFragment = (ContentsListFragment) fragment;
-                parentChapterId = contentsListFragment.chapterId;
+            return;
+        }
+        emptyView.setVisibility(View.GONE);
+        Fragment fragment = getCurrentFragment();
+        boolean isTocUi = false;
+        if (fragment == null) {
+            isTocUi = (course.getIsTocUi() == null) ?
+                    PreferenceUtils.isTocUsedAsLastCourseUi(this) : course.getIsTocUi();
+        }
+        if ((fragment == null && isTocUi) || fragment instanceof ExpandableContentsFragment) {
+            showFragment(ExpandableContentsFragment.getInstance(courseId, parentChapterId));
+        } else if (fragment == null) {
+            displayChapterDetailView();
+        } else if (fragment instanceof NewChaptersGridFragment) {
+            showFragment(NewChaptersGridFragment.getInstance(courseId, parentChapterId));
+        } else if (fragment instanceof ContentsListFragment) {
+            ContentsListFragment contentsListFragment = (ContentsListFragment) fragment;
+            parentChapterId = contentsListFragment.chapterId;
+            showFragment(ContentsListFragment.getInstance(parentChapterId));
+        }
+    }
+
+    private void displayChapterDetailView() {
+        if (parentChapterId != 0) {
+            List<Chapter> chaptersFromDB = chapterDao.queryBuilder()
+                    .where(ChapterDao.Properties.Id.eq(parentChapterId))
+                    .list();
+
+            if (chaptersFromDB.isEmpty() || chaptersFromDB.get(0).getRawChildrenCount(this) == 0) {
                 showFragment(ContentsListFragment.getInstance(parentChapterId));
+                return;
             }
         }
+        showFragment(NewChaptersGridFragment.getInstance(courseId, parentChapterId));
     }
 
     private void showFragment(Fragment fragment) {
@@ -350,16 +416,23 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
         if (exception.isCancelled()) {
             return;
         }
-        if (exception.isNetworkError()) {
+        if (exception.isUnauthenticated()) {
+            displayError(R.string.testpress_authentication_failed,
+                    R.string.testpress_no_permission,
+                    R.drawable.testpress_alert_warning);
+        } else if (exception.isNetworkError()) {
             displayError(R.string.testpress_network_error,
                     R.string.testpress_no_internet_try_again,
                     R.drawable.testpress_no_wifi);
-        } else {
-            displayError(R.string.testpress_error_loading_analytics,
+            retryButton.setVisibility(View.VISIBLE);
+        } else if (exception.getResponse().code() == 404) {
+            displayError(R.string.testpress_content_not_available,
+                    R.string.testpress_content_not_available_description,
+                    R.drawable.testpress_alert_warning);
+        } else  {
+            displayError(R.string.testpress_error_loading_contents,
                     R.string.testpress_some_thing_went_wrong_try_again,
                     R.drawable.testpress_alert_warning);
-
-            retryButton.setVisibility(View.GONE);
         }
     }
 
@@ -393,11 +466,7 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
     }
 
     private boolean isItemsEmpty() {
-        return getParentChaptersQueryBuilder().count() == 0;
-    }
-
-    private QueryBuilder<Chapter> getParentChaptersQueryBuilder() {
-        return Chapter.getRootChaptersQueryBuilder(this, courseId);
+        return Chapter.getRootChaptersQueryBuilder(this, courseId).count() == 0;
     }
 
     private void restartLoading() {
@@ -425,7 +494,7 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
         emptyTitleView.setText(title);
         emptyViewImage.setImageResource(imageRes);
         emptyDescView.setText(description);
-        retryButton.setVisibility(View.VISIBLE);
+        retryButton.setVisibility(View.GONE);
     }
 
     private Fragment getCurrentFragment() {
@@ -440,7 +509,9 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
 
     @Override
     protected void onDestroy() {
-        currentPager.cancelAsyncRequest();
+        if (currentPager != null) {
+            currentPager.cancelAsyncRequest();
+        }
         super.onDestroy();
     }
 }

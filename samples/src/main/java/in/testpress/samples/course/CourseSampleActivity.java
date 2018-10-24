@@ -17,7 +17,7 @@ import in.testpress.util.ViewUtils;
 import static in.testpress.core.TestpressSdk.COURSE_CHAPTER_REQUEST_CODE;
 import static in.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE;
 import static in.testpress.core.TestpressSdk.COURSE_CONTENT_LIST_REQUEST_CODE;
-import static in.testpress.course.TestpressCourse.CHAPTER_URL;
+import static in.testpress.course.TestpressCourse.CHAPTER_SLUG;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
 
@@ -119,10 +119,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                     TestpressCourse.showChapters(this, null, Long.parseLong(text), session);
                     break;
                 case R.id.chapter_contents:
-                    String url = session.getInstituteSettings().getBaseUrl() +
-                            "/api/v2.2.1/chapters/" + text + "/";
-
-                    TestpressCourse.showChapterContents(this, url, session);
+                    TestpressCourse.showChapterContents(this, text, session);
                     break;
                 case R.id.content_detail:
                     TestpressCourse.showContentDetail(this, text, session);
@@ -153,11 +150,11 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                             case COURSE_CONTENT_LIST_REQUEST_CODE:
                             case COURSE_CHAPTER_REQUEST_CODE:
                                 int courseId = data.getIntExtra(COURSE_ID, 0);
-                                String chapterUrl = data.getStringExtra(CHAPTER_URL);
-                                if (chapterUrl != null) {
+                                String chapterSlug = data.getStringExtra(CHAPTER_SLUG);
+                                if (chapterSlug != null) {
                                     ViewUtils.toast(this,
-                                            "User pressed home button chapterUrl:" + chapterUrl);
-                                    TestpressCourse.showChapterContents(this, chapterUrl, session);
+                                            "User pressed home button chapterSlug:" + chapterSlug);
+                                    TestpressCourse.showChapterContents(this, chapterSlug, session);
                                 } else if (courseId != 0) {
                                     ViewUtils.toast(this,
                                             "User pressed home button courseId:" + courseId);
