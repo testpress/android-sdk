@@ -86,9 +86,9 @@ import in.testpress.v2_4.models.FolderListResponse;
 
 import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
 import static in.testpress.course.TestpressCourse.CHAPTER_ID;
-import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.network.TestpressCourseApiClient.EMBED_CODE;
 import static in.testpress.course.network.TestpressCourseApiClient.EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
+import static in.testpress.course.TestpressCourse.CHAPTER_SLUG;
 import static in.testpress.course.network.TestpressCourseApiClient.CONTENTS_PATH_V2_4;
 import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.STATE_PAUSED;
@@ -334,10 +334,6 @@ public class ContentActivity extends BaseToolBarActivity {
             }
             buttonLayout.setVisibility(View.GONE);
         } else {
-            Chapter chapter = TestpressSDKDatabase.getChapterDao(this).queryBuilder()
-                    .where(ChapterDao.Properties.Id.eq(chapterId)).list().get(0);
-
-            getSupportActionBar().setTitle(chapter.getName());
             if (content == null) {
                 updateContent();
             } else {
@@ -364,7 +360,18 @@ public class ContentActivity extends BaseToolBarActivity {
         return contents.get(0);
     }
 
+    private void setChapterNameInActionBarTitle(long chapterId) {
+        List<Chapter> chapters = TestpressSDKDatabase.getChapterDao(this).queryBuilder()
+                .where(ChapterDao.Properties.Id.eq(chapterId)).list();
+
+        if (!chapters.isEmpty()) {
+            //noinspection ConstantConditions
+            getSupportActionBar().setTitle(chapters.get(0).getName());
+        }
+    }
+
     private void checkContentType() {
+        setChapterNameInActionBarTitle(content.getChapterId());
         hideContents();
         switch (content.getContentType()) {
             case HTML_TYPE:
@@ -1244,7 +1251,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 Intent intent = new Intent();
                 intent.putExtra(ACTION_PRESSED_HOME, true);
                 if (content != null) {
-                    intent.putExtra(CHAPTER_URL, content.getChapterUrl());
+                    intent.putExtra(CHAPTER_SLUG, content.getChapterSlug());
                 }
                 setResult(RESULT_CANCELED, intent);
                 finish();

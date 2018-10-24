@@ -94,16 +94,16 @@ public class TestpressCourseTest {
             TestpressCourse.showChapterContents(activity, null, testpressSession);
             fail();
         } catch (IllegalArgumentException e) {
-            assertEquals("chapterUrl must not be null or empty.", e.getMessage());
+            assertEquals("chapterSlug must not be null or empty.", e.getMessage());
         }
         try {
             TestpressCourse.showChapterContents(activity, "", testpressSession);
             fail();
         } catch (IllegalArgumentException e) {
-            assertEquals("chapterUrl must not be null or empty.", e.getMessage());
+            assertEquals("chapterSlug must not be null or empty.", e.getMessage());
         }
         try {
-            TestpressCourse.showChapterContents(activity, "DummyUrl", null);
+            TestpressCourse.showChapterContents(activity, "DummySlug", null);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("TestpressSession must not be null.", e.getMessage());
