@@ -280,8 +280,8 @@ public class BookmarksFragment extends BaseFragment {
     }
 
     private void checkContentType() {
-        if (content.getHtml() != null) {
-            HtmlContent htmlContent = content.getHtml();
+        if (content.getHtmlContent() != null) {
+            HtmlContent htmlContent = content.getHtmlContent();
             setContentTitle(Html.fromHtml(htmlContent.getTitle()));
             String html = "<div style='padding-left: 20px; padding-right: 20px;'>" +
                                 htmlContent.getTextHtml() + "</div>";

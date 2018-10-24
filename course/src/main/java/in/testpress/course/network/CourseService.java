@@ -2,16 +2,14 @@ package in.testpress.course.network;
 
 import java.util.Map;
 
-import in.testpress.models.greendao.CourseAttempt;
-import in.testpress.models.greendao.HtmlContent;
 import in.testpress.course.models.Reputation;
+import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.Course;
-import in.testpress.models.TestpressApiResponse;
+import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.network.RetrofitCall;
-
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
@@ -56,10 +54,6 @@ public interface CourseService {
     RetrofitCall<TestpressApiResponse<Content>> getContents(
             @Path(value = "course_id", encoded = true) long courseId,
             @QueryMap Map<String, Object> queryParams);
-
-    @GET("{html_content_url}")
-    RetrofitCall<HtmlContent> getHtmlContent(
-            @Path(value = "html_content_url", encoded = true) String htmlContentUrlFrag);
 
     @GET("{content_url}")
     RetrofitCall<Content> getContent(

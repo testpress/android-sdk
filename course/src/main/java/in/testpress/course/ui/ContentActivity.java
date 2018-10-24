@@ -165,7 +165,6 @@ public class ContentActivity extends BaseToolBarActivity {
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersApiRequest;
     private RetrofitCall<Bookmark> bookmarkApiRequest;
     private RetrofitCall<Void> deleteBookmarkApiRequest;
-    private RetrofitCall<HtmlContent> htmlContentApiRequest;
 
     public static Intent createIntent(long contentId, long chapterId, AppCompatActivity activity) {
         Intent intent = new Intent(activity, ContentActivity.class);
@@ -372,42 +371,13 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void checkContentType() {
         setChapterNameInActionBarTitle(content.getChapterId());
+        setContentTitle(content.getTitle());
         hideContents();
         switch (content.getContentType()) {
             case HTML_TYPE:
-                setContentTitle(content.getTitle());
-                loadContentHtml();
+                displayHtmlContent();
                 break;
             case VIDEO_TYPE:
-                Video video = content.getRawVideo();
-                if (video == null) {
-                    updateContent();
-                    return;
-                }
-                setContentTitle(video.getTitle());
-                if (video.getIsDomainRestricted()) {
-                    JsonObject jsonObject = new JsonObject();
-                    jsonObject.addProperty(EMBED_CODE, video.getEmbedCode());
-                    String url = courseApiClient.getBaseUrl() + EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
-                    webViewUtils.initWebViewAndPostUrl(url, jsonObject.toString(), this);
-                    webView.setWebChromeClient(fullScreenChromeClient);
-                } else if (!content.isNonEmbeddableVideo()) {
-                    isNonEmbeddableVideo = false;
-                    String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
-                            "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
-
-                    webViewUtils.initWebView(html, this);
-                    webView.setWebChromeClient(fullScreenChromeClient);
-
-                } else {
-                    isNonEmbeddableVideo = true;
-                    TestpressSession session = TestpressSdk.getTestpressSession(this);
-                    if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
-                        checkProfileDetailExist(video.getUrl());
-                    } else {
-                        initExoPlayer(video.getUrl());
-                    }
-                }
                 break;
             case EXAM_TYPE:
                 onExamContent();
@@ -423,47 +393,43 @@ public class ContentActivity extends BaseToolBarActivity {
         }
     }
 
-    private void loadContentHtml() {
-        HtmlContent htmlContent = fetchHtmlContentFromDB();
-        if (htmlContent != null) {
-            displayHtmlContent(htmlContent);
-        } else {
+    void displayHtmlContent() {
+        if (content.getRawHtmlContent() == null) {
             updateContent();
+            return;
         }
-    }
-
-    private HtmlContent fetchHtmlContentFromDB() {
-         List<HtmlContent> htmlContentList = htmlContentDao.queryBuilder()
-                 .where(HtmlContentDao.Properties.SourceUrl.eq(content.getHtmlContentUrl())).list();
-
-         if (!htmlContentList.isEmpty()) {
-             return htmlContentList.get(0);
-         }
-         return null;
-    }
-
-    private void loadContentHtmlFromServer() {
-        showLoadingProgress();
-        htmlContentApiRequest = courseApiClient.getHtmlContent(content.getHtmlContentUrl())
-                .enqueue(new TestpressCallback<HtmlContent>() {
-                    @Override
-                    public void onSuccess(HtmlContent htmlContent) {
-                        htmlContent.setSourceUrl(content.getHtmlContentUrl());
-                        htmlContentDao.insertOrReplace(htmlContent);
-                        displayHtmlContent(htmlContent);
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        handleError(exception, false);
-                    }
-                });
-    }
-
-    void displayHtmlContent(HtmlContent htmlContent) {
         String html = "<div style='padding-left: 20px; padding-right: 20px;'>" +
-                htmlContent.getTextHtml() + "</div>";
+                content.getRawHtmlContent().getTextHtml() + "</div>";
+
         webViewUtils.initWebView(html, this);
+    }
+
+    void displayVideoContent() {
+        Video video = content.getRawVideo();
+        if (video == null) {
+            updateContent();
+            return;
+        }
+        if (video.getIsDomainRestricted()) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty(EMBED_CODE, video.getEmbedCode());
+            String url = courseApiClient.getBaseUrl() + EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
+            webViewUtils.initWebViewAndPostUrl(url, jsonObject.toString(), this);
+            webView.setWebChromeClient(fullScreenChromeClient);
+        } else if (!content.isNonEmbeddableVideo()) {
+            String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
+                    "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
+
+            webViewUtils.initWebView(html, this);
+            webView.setWebChromeClient(fullScreenChromeClient);
+        } else {
+            TestpressSession session = TestpressSdk.getTestpressSession(this);
+            if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
+                checkProfileDetailExist(video.getUrl());
+            } else {
+                initExoPlayer(video.getUrl());
+            }
+        }
     }
 
     private void checkProfileDetailExist(final String videoUrl) {
@@ -508,7 +474,6 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void displayAttachmentContent() {
-        setContentTitle(content.getTitle());
         if (content.getRawAttachment() == null) {
             updateContent();
             return;
@@ -537,7 +502,6 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void onExamContent() {
-        setContentTitle(content.getTitle());
         if (content.getRawExam() == null) {
             updateContent();
             return;
@@ -897,11 +861,9 @@ public class ContentActivity extends BaseToolBarActivity {
                                 content.setAttachmentId(attachment.getId());
                                 break;
                             case HTML_TYPE:
-                                if (ContentActivity.this.content != null &&
-                                        ContentActivity.this.content.getHtmlId() != null) {
-
-                                    content.setHtmlId(ContentActivity.this.content.getHtmlId());
-                                }
+                                HtmlContent htmlContent = content.getRawHtmlContent();
+                                htmlContentDao.insertOrReplace(htmlContent);
+                                content.setHtmlId(htmlContent.getId());
                                 break;
                         }
                         if (ContentActivity.this.content != null) {
@@ -915,11 +877,7 @@ public class ContentActivity extends BaseToolBarActivity {
                         if (chapterId != null) {
                             contents = getContentsFromDB();
                         }
-                        if (content.getHtmlContentTitle() == null) {
-                            checkContentType();
-                        } else {
-                            loadContentHtmlFromServer();
-                        }
+                        checkContentType();
                     }
 
                     @Override
@@ -1239,7 +1197,7 @@ public class ContentActivity extends BaseToolBarActivity {
         return new RetrofitCall[] {
                 createAttemptApiRequest, updateContentApiRequest, profileDetailApiRequest,
                 attemptsApiRequest, languagesApiRequest, bookmarkFoldersApiRequest,
-                bookmarkApiRequest, deleteBookmarkApiRequest, htmlContentApiRequest
+                bookmarkApiRequest, deleteBookmarkApiRequest
         };
     }
 
