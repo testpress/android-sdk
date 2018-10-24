@@ -530,8 +530,8 @@ public class ContentDao extends AbstractDao<Content, Long> {
         Content entity = loadCurrent(cursor, 0, lock);
         int offset = getAllColumns().length;
 
-        HtmlContent html = loadCurrentOther(daoSession.getHtmlContentDao(), cursor, offset);
-        entity.setHtml(html);
+        HtmlContent htmlContent = loadCurrentOther(daoSession.getHtmlContentDao(), cursor, offset);
+        entity.setHtmlContent(htmlContent);
         offset += daoSession.getHtmlContentDao().getAllColumns().length;
 
         Video video = loadCurrentOther(daoSession.getVideoDao(), cursor, offset);

@@ -5,13 +5,12 @@ import android.content.Context;
 import java.util.Map;
 
 import in.testpress.core.TestpressSdk;
-import in.testpress.models.greendao.CourseAttempt;
-import in.testpress.models.greendao.HtmlContent;
 import in.testpress.course.models.Reputation;
+import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.Course;
-import in.testpress.models.TestpressApiResponse;
+import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
@@ -85,10 +84,6 @@ public class TestpressCourseApiClient extends TestpressApiClient {
     public RetrofitCall<TestpressApiResponse<Content>> getContents(long courseId,
                                                                    Map<String, Object> queryParams) {
         return getCourseService().getContents(courseId, queryParams);
-    }
-
-    public RetrofitCall<HtmlContent> getHtmlContent(String htmlContentUrlFrag) {
-        return getCourseService().getHtmlContent(htmlContentUrlFrag);
     }
 
     public RetrofitCall<Content> getContent(String contentUrl) {

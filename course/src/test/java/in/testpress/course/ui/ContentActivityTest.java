@@ -9,7 +9,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ContentActivityTest {
 
-    private static final int NUMBER_OF_RETROFIT_CALLS = 9;
+    private static final int NUMBER_OF_RETROFIT_CALLS = 8;
 
     @Test
     public void test_getRetrofitCalls_returnCorrectValues() {

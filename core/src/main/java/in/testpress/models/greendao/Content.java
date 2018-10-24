@@ -65,10 +65,10 @@ public class Content implements android.os.Parcelable {
     private transient ContentDao myDao;
 
     @ToOne(joinProperty = "htmlId")
-    private HtmlContent html;
+    private HtmlContent htmlContent;
 
     @Generated
-    private transient Long html__resolvedKey;
+    private transient Long htmlContent__resolvedKey;
 
     @ToOne(joinProperty = "videoId")
     private Video video;
@@ -368,26 +368,26 @@ public class Content implements android.os.Parcelable {
 
     /** To-one relationship, resolved on first access. */
     @Generated
-    public HtmlContent getHtml() {
+    public HtmlContent getHtmlContent() {
         Long __key = this.htmlId;
-        if (html__resolvedKey == null || !html__resolvedKey.equals(__key)) {
+        if (htmlContent__resolvedKey == null || !htmlContent__resolvedKey.equals(__key)) {
             __throwIfDetached();
             HtmlContentDao targetDao = daoSession.getHtmlContentDao();
-            HtmlContent htmlNew = targetDao.load(__key);
+            HtmlContent htmlContentNew = targetDao.load(__key);
             synchronized (this) {
-                html = htmlNew;
-            	html__resolvedKey = __key;
+                htmlContent = htmlContentNew;
+            	htmlContent__resolvedKey = __key;
             }
         }
-        return html;
+        return htmlContent;
     }
 
     @Generated
-    public void setHtml(HtmlContent html) {
+    public void setHtmlContent(HtmlContent htmlContent) {
         synchronized (this) {
-            this.html = html;
-            htmlId = html == null ? null : html.getId();
-            html__resolvedKey = htmlId;
+            this.htmlContent = htmlContent;
+            htmlId = htmlContent == null ? null : htmlContent.getId();
+            htmlContent__resolvedKey = htmlId;
         }
     }
 
@@ -654,6 +654,13 @@ public class Content implements android.os.Parcelable {
         return getExam();
     }
 
+    public HtmlContent getRawHtmlContent() {
+        if (myDao == null || htmlContent != null) {
+            return htmlContent;
+        }
+        return getHtmlContent();
+    }
+
     public static void save(Context context, List<Content> contents) {
         ContentDao contentDao = TestpressSDKDatabase.getContentDao(context);
         for (int i = 0; i < contents.size(); i++) {
@@ -661,14 +668,9 @@ public class Content implements android.os.Parcelable {
             List<Content> contentsFromDB = contentDao.queryBuilder()
                     .where(ContentDao.Properties.Id.eq(content.getId())).list();
 
-            if (!contentsFromDB.isEmpty()) {
-                Content contentFromDB = contentsFromDB.get(0);
-                if (content.getHtmlId() != null) {
-                    contentFromDB.setHtmlId(content.getHtmlId());
-                }
-                content = contentFromDB;
+            if (contentsFromDB.isEmpty()) {
+                contentDao.insertOrReplace(content);
             }
-            contentDao.insertOrReplace(content);
         }
     }
 
