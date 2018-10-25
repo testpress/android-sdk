@@ -193,11 +193,13 @@ public class ExpandableContentsFragment extends Fragment {
                         if (parentChapterId != 0 && currentPathId == parentChapterId) {
                             currentExpandedLevel = searchPosition;
                         }
-                        multiLevelListView.onGroupItemClicked(
-                                listView.getAdapter().getView(searchPosition, null, null),
-                                node,
-                                searchPosition
-                        );
+                        if (node.isExpandable() && !node.isExpanded()) {
+                            multiLevelListView.onGroupItemClicked(
+                                    listView.getAdapter().getView(searchPosition, null, null),
+                                    node,
+                                    searchPosition
+                            );
+                        }
                         break;
                     }
                 }

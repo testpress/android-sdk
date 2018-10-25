@@ -264,7 +264,10 @@ public class Chapter {
         }
         ChapterDao chapterDao = TestpressSDKDatabase.getChapterDao(context);
         List<Chapter> chaptersFromDB = chapterDao.queryBuilder()
-                .where(ChapterDao.Properties.ParentId.eq(getId())).list();
+                .where(
+                        ChapterDao.Properties.ParentId.eq(getId()),
+                        ChapterDao.Properties.Active.eq(true)
+                ).list();
 
         return chaptersFromDB.size();
     }
@@ -275,7 +278,10 @@ public class Chapter {
         }
         ContentDao contentDao = TestpressSDKDatabase.getContentDao(context);
         List<Content> contentsFromDB = contentDao.queryBuilder()
-                .where(ContentDao.Properties.ChapterId.eq(getId())).list();
+                .where(
+                        ContentDao.Properties.ChapterId.eq(getId()),
+                        ContentDao.Properties.Active.eq(true)
+                ).list();
 
         return contentsFromDB.size();
     }
