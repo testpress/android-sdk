@@ -1,8 +1,8 @@
 package in.testpress.course.ui;
 
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +26,7 @@ import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.Exam;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.UIUtils;
+import in.testpress.util.ViewUtils;
 import pl.openrnd.multilevellistview.ItemInfo;
 import pl.openrnd.multilevellistview.MultiLevelListAdapter;
 
@@ -37,6 +38,8 @@ public class ExpandableContentsAdapter extends MultiLevelListAdapter {
 
     private Context context;
     private ImageLoader mImageLoader;
+    private ObjectAnimator animator;
+    private long backgroundShadeItemId;
 
     ExpandableContentsAdapter(Context context) {
         this.context = context;
@@ -122,6 +125,10 @@ public class ExpandableContentsAdapter extends MultiLevelListAdapter {
                 thumbnailImageView.setVisibility(View.GONE);
                 expandableItemIndicator.setVisibility(View.VISIBLE);
             }
+            if (backgroundShadeItemId == chapter.getId() && itemInfo.isExpanded()) {
+                backgroundShadeItemId = 0;
+                animator = ViewUtils.showColorFadeAnimation(context, animator, convertView);
+            }
         } else {
             LayoutInflater layoutInflater =
                     (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -165,5 +172,12 @@ public class ExpandableContentsAdapter extends MultiLevelListAdapter {
             }
         }
         return convertView;
+    }
+
+    void setBackgroundShadeItemId(long backgroundShadeItemId) {
+        this.backgroundShadeItemId = backgroundShadeItemId;
+        if (animator != null) {
+            animator.end();
+        }
     }
 }

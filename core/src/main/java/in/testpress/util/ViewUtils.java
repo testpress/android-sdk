@@ -16,11 +16,14 @@ package in.testpress.util;
  * limitations under the License.
  */
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
@@ -47,8 +50,6 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.IOException;
 
 import in.testpress.R;
 import in.testpress.core.TestpressException;
@@ -247,6 +248,24 @@ public class ViewUtils {
 
     public static void showSnackbar(View rootLayout, @StringRes int message) {
         Snackbar.make(rootLayout, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    public static ObjectAnimator showColorFadeAnimation(Context context, ObjectAnimator animator,
+                                                        View view) {
+        if (animator == null) {
+            int colorFrom = ContextCompat.getColor(context,
+                    R.color.testpress_blue_light_background_transparent);
+
+            int colorTo = Color.WHITE;
+            int duration = 2000;
+            animator = ObjectAnimator
+                    .ofObject(view, "backgroundColor", new ArgbEvaluator(), colorFrom, colorTo)
+                    .setDuration(duration);
+        } else {
+            animator.setTarget(view);
+        }
+        animator.start();
+        return animator;
     }
 
     private ViewUtils() {
