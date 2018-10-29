@@ -94,10 +94,12 @@ public class ExpandableContentsFragment extends Fragment {
                     expandChapters(chapterPathIds, position + 1);
                 } else {
                     if (parentChapterId != 0 && itemInfo.getLevel() <= currentExpandedLevel
-                            && chapter.getId() != parentChapterId) {
-                        
+                            && ((chapter.getId() == parentChapterId && !itemInfo.isExpanded())
+                            || chapter.getId() != parentChapterId)) {
+
                         parentChapterId = 0;
                         currentExpandedLevel = 0;
+                        adapter.setBackgroundShadeItemId(parentChapterId);
                     }
                     if (chapter.getRawChildrenCount(getContext()) == 1) {
                         listView.post(new Runnable() {
@@ -153,6 +155,7 @@ public class ExpandableContentsFragment extends Fragment {
 
         parentChapterId = getArguments().getLong(PARENT_CHAPTER_ID, 0);
         if (parentChapterId != 0) {
+            adapter.setBackgroundShadeItemId(parentChapterId);
             chapterPathIds = getChapterPathIds(parentChapterId);
             expandChapters(chapterPathIds, 0);
         } else if (rootChapters.size() < 3) {

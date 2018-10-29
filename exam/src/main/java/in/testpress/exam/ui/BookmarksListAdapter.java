@@ -16,6 +16,7 @@ import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ReviewItem;
 import in.testpress.util.SingleTypeAdapter;
+import in.testpress.util.ViewUtils;
 
 /**
  * Adapter that used to show the list of questions in review
@@ -87,19 +88,7 @@ class BookmarksListAdapter extends SingleTypeAdapter<Bookmark> {
         super.update(position, view, item);
         if (backgroundShadePosition == position) {
             backgroundShadePosition = -1;
-            int colorFrom = ContextCompat.getColor(activity,
-                    R.color.testpress_blue_light_background_transparent);
-
-            int colorTo = Color.WHITE;
-            int duration = 2000;
-            if (animator == null) {
-                animator = ObjectAnimator
-                        .ofObject(view, "backgroundColor", new ArgbEvaluator(), colorFrom, colorTo)
-                        .setDuration(duration);
-            } else {
-                animator.setTarget(view);
-            }
-            animator.start();
+            ViewUtils.showColorFadeAnimation(activity, animator, view);
         }
     }
 
