@@ -26,6 +26,7 @@ import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.network.BaseResourcePager;
+import in.testpress.ui.view.ReadMoreTextView;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -83,13 +84,21 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     @Override
     protected int[] getChildViewIds() {
         return new int[] { R.id.course_title, R.id.thumbnail_image, R.id.percentage,
-                R.id.course_item_layout,  R.id.progress_bar_layout};
+                R.id.course_item_layout,  R.id.progress_bar_layout, R.id.course_description};
     }
 
     @Override
     protected void update(final int position, final Course course) {
         setFont(new int[]{0, 2}, TestpressSdk.getRubikMediumFont(mActivity));
         setText(0, course.getTitle());
+        if (course.getDescription() == null || course.getDescription().isEmpty()) {
+            setGone(5, true);
+        } else {
+            ReadMoreTextView descriptionView = (ReadMoreTextView) textView(5);
+            descriptionView.setText(course.getDescription(), true);
+            textView(5).setTypeface(TestpressSdk.getRubikRegularFont(mActivity));
+            setGone(5, false);
+        }
         if (course.getImage() == null || course.getImage().isEmpty()) {
             setGone(1, true);
         } else {

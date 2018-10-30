@@ -36,4 +36,7 @@
     <string name="testpress_go_to_settings">Goto Settings</string>
     <string name="testpress_action_cant_done_without_permission">Action can\'t be done without permission</string>
 
+    <string name="testpress_read_more">Read more</string>
+    <string name="testpress_read_less">Read less</string>
+
 </resources>

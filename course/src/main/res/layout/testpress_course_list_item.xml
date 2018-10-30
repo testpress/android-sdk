@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:padding="20dp"
     android:id="@+id/course_item_layout"
+    android:background="?android:attr/selectableItemBackground"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -30,7 +32,22 @@
             android:textColor="@color/testpress_black"
             android:maxLines="2"
             android:ellipsize="end"
+            android:lineSpacingExtra="3sp"
             android:id="@+id/course_title" />
+
+        <in.testpress.ui.view.ReadMoreTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center_vertical"
+            android:textSize="13sp"
+            android:textColor="@color/testpress_text_gray_dark"
+            android:lineSpacingExtra="7sp"
+            android:id="@+id/course_description"
+            app:trimMode="trimModeLength"
+            app:trimLength="65"
+            app:showTrimExpandedText="false"
+            />
 
         <LinearLayout
             android:id="@+id/progress_bar_layout"
