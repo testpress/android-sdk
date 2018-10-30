@@ -75,14 +75,14 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.AppCompatButton
-                style="@style/TestpressButton"
+                style="@style/TestpressButton.Green"
                 android:id="@+id/start_exam"
                 android:visibility="gone"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:text="@string/testpress_start_exam"
-                android:background="@drawable/testpress_green_button" />
+                />
 
             <LinearLayout
                 android:id="@+id/attempt_actions"
@@ -94,21 +94,21 @@
                 android:layout_margin="10dp" >
 
                 <android.support.v7.widget.AppCompatButton
-                    style="@style/TestpressButton"
+                    style="@style/TestpressButton.Red"
                     android:id="@+id/end_exam"
                     android:layout_weight="1"
                     android:layout_width="0dp"
                     android:layout_marginRight="10dp"
                     android:text="@string/testpress_end"
-                    android:background="@drawable/testpress_red_button" />
+                    />
 
                 <android.support.v7.widget.AppCompatButton
-                    style="@style/TestpressButton"
+                    style="@style/TestpressButton.Green"
                     android:id="@+id/resume_exam"
                     android:layout_weight="1"
                     android:layout_width="0dp"
                     android:text="@string/testpress_resume"
-                    android:background="@drawable/testpress_green_button" />
+                    />
 
             </LinearLayout>
 
