@@ -144,4 +144,14 @@
         <item name="android:layout_marginTop">20dp</item>
     </style>
 
+    <style name="TestpressButton.Green">
+        <item name="colorButtonNormal">@color/testpress_green</item>
+        <item name="backgroundTint">@color/testpress_green</item>
+    </style>
+
+    <style name="TestpressButton.Red">
+        <item name="colorButtonNormal">@color/testpress_red</item>
+        <item name="backgroundTint">@color/testpress_red</item>
+    </style>
+
 </resources>
