@@ -62,6 +62,11 @@ public class FormatDate {
         return getDate(inputString, "yyyy-MM-dd'T'HH:mm:ss", "UTC");
     }
 
+    public static long getTimeMillis(String inputString) {
+        Date date = getDate(inputString, "HH:mm:ss", "UTC");
+        return date != null ? date.getTime() : 0;
+    }
+
     @SuppressLint("SimpleDateFormat")
     public static Date getDate(String inputString, String inputFormat, String timezone) {
         Date date;
