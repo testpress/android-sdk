@@ -186,6 +186,7 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
                 ContentsListFragment contentsListFragment = (ContentsListFragment) fragment;
                 parentChapterId = contentsListFragment.chapterId;
             }
+            setActionBarTitle(course.getTitle());
             showFragment(ExpandableContentsFragment.getInstance(courseId, parentChapterId));
             return true;
         } else if (R.id.grid == item.getItemId()) {
