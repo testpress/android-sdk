@@ -11,6 +11,7 @@ import java.util.Map;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.Video;
 import in.testpress.models.greendao.VideoAttempt;
+import in.testpress.util.FormatDate;
 
 import static in.testpress.course.network.TestpressCourseApiClient.LAST_POSITION;
 import static in.testpress.course.network.TestpressCourseApiClient.TIME_RANGES;
@@ -72,7 +73,7 @@ public class ExoPlayerUtilTest {
     @Test
     public void testExoPlayerUtil_updateVideoWatchedPercentage_updateCorrectValue() {
 
-        final long testTotalDuration = 222222;
+        final String testTotalDuration = "06:22:22";
         final String testWatchedDuration = "111.111";
 
         VideoAttempt videoAttempt = new VideoAttempt();
@@ -94,7 +95,8 @@ public class ExoPlayerUtilTest {
         when(content.getVideoWatchedPercentage()).thenCallRealMethod();
 
         long watchedDuration = (long) (Float.parseFloat(testWatchedDuration) * 1000);
-        int watchedPercentage = (int) (((watchedDuration * 100) / testTotalDuration) / 1000);
+        long totalDuration = FormatDate.getTimeMillis(testTotalDuration);
+        int watchedPercentage = (int) (((watchedDuration * 100) / totalDuration) / 1000);
 
         assertThat("videoWatchedPercentage needs to be valid",
                 content.getVideoWatchedPercentage(),

@@ -206,7 +206,7 @@ public class TestpressSDKDaoGenerator {
         video.addStringProperty("url");
         video.addLongProperty("id").primaryKey();
         video.addStringProperty("embedCode");
-        video.addLongProperty("duration");
+        video.addStringProperty("duration");
         video.addBooleanProperty("isDomainRestricted");
         video.implementsInterface("android.os.Parcelable");
         return video;
