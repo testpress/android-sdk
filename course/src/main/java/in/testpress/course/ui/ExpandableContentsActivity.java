@@ -293,11 +293,7 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
         }
         emptyView.setVisibility(View.GONE);
         Fragment fragment = getCurrentFragment();
-        boolean isTocUi = false;
-        if (fragment == null) {
-            isTocUi = (course.getIsTocUi() == null) ?
-                    PreferenceUtils.isTocUsedAsLastCourseUi(this) : course.getIsTocUi();
-        }
+        boolean isTocUi = (course.getIsTocUi() != null) ? course.getIsTocUi() : true;
         if ((fragment == null && isTocUi) || fragment instanceof ExpandableContentsFragment) {
             showFragment(ExpandableContentsFragment.getInstance(courseId, parentChapterId));
         } else if (fragment == null) {
@@ -505,7 +501,6 @@ public class ExpandableContentsActivity extends BaseToolBarActivity {
     private void setLastCourseUiUsedIsToc(boolean isTocUi) {
         course.setIsTocUi(isTocUi);
         course.update();
-        PreferenceUtils.setLastCourseUiUsedIsToc(this, isTocUi);
     }
 
     @Override
