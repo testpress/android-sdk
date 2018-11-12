@@ -93,23 +93,24 @@ public class ExpandableContentsAdapter extends MultiLevelListAdapter {
             ImageView expandableItemIndicator = convertView.findViewById(R.id.exp_list_indicator);
             LinearLayout contentLayout = convertView.findViewById(R.id.content_layout);
             View divider = convertView.findViewById(R.id.divider);
+            int paddingVertical = (int) UIUtils.getPixelFromDp(context, 15);
             if (itemInfo.getLevel() == 0) {
                 lblListHeader.setTypeface(TestpressSdk.getRubikMediumFont(context));
                 expandableItemIndicator.setVisibility(View.GONE);
                 mImageLoader.displayImage(chapter.getImage(), thumbnailImageView);
                 thumbnailImageView.setVisibility(View.VISIBLE);
-                contentLayout.setPadding(0, 0, 0, 0);
+                contentLayout.setPadding(0, paddingVertical, 0, paddingVertical);
                 divider.setVisibility(View.VISIBLE);
             } else {
                 int marginInDp;
                 if (itemInfo.getLevel() > 1) {
                     divider.setVisibility(View.GONE);
-                    int padding = (int) UIUtils.getPixelFromDp(context, 30);
-                    contentLayout.setPadding(padding, 0, 0, 0);
+                    int paddingLeft = (int) UIUtils.getPixelFromDp(context, 30);
+                    contentLayout.setPadding(paddingLeft, paddingVertical, 0, paddingVertical);
                     marginInDp = 12;
                 } else {
                     divider.setVisibility(View.VISIBLE);
-                    contentLayout.setPadding(0, 0, 0, 0);
+                    contentLayout.setPadding(0, paddingVertical, 0, paddingVertical);
                     marginInDp = 16;
                 }
                 int marginInPx = (int) UIUtils.getPixelFromDp(context, marginInDp);
