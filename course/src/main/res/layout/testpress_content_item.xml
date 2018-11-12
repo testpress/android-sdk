@@ -1,9 +1,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="50dp"
-    android:minHeight="45dp"
+    android:layout_height="wrap_content"
+    android:paddingTop="15dp"
+    android:paddingBottom="15dp"
     android:paddingLeft="58dp"
-    android:gravity="center_vertical"
     android:orientation="horizontal">
 
     <ImageView
@@ -22,8 +22,10 @@
         android:layout_weight="1"
         android:paddingLeft="12dp"
         android:textColor="#777"
-        android:textSize="14sp"
-        android:maxLines="1"
+        android:textSize="13sp"
+        android:lineSpacingExtra="5sp"
+        android:maxLines="2"
+        android:layout_gravity="center_vertical"
         android:ellipsize="end"
         android:paddingRight="10dp"
         />
@@ -35,6 +37,7 @@
         android:layout_height="10dp"
         android:layout_marginRight="18dp"
         android:scaleType="centerInside"
+        android:layout_gravity="center_vertical"
         />
 
 </LinearLayout>
