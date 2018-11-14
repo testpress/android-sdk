@@ -1,6 +1,7 @@
 package in.testpress.util;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,7 +16,11 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 
+import java.io.InputStream;
+
 import in.testpress.R;
+
+import static in.testpress.core.TestpressSdk.PERMISSIONS_REQUEST_CODE;
 
 public class PermissionsUtils {
 
@@ -23,28 +28,17 @@ public class PermissionsUtils {
     private Activity activity;
     private Fragment fragment;
     private String[] permissions;
-    private int permissionRequestCode;
     private PermissionRequestResultHandler resultHandler;
     private boolean checkPermission;
 
-    public PermissionsUtils(Activity activity, View rootLayout, String[] permissions,
-                            int permissionRequestCode,
-                            PermissionRequestResultHandler permissionRequestResultHandler) {
-
+    public PermissionsUtils(Activity activity, View rootLayout, String[] permissions) {
         this.rootLayout = rootLayout;
         this.permissions = permissions;
-        this.permissionRequestCode = permissionRequestCode;
-        resultHandler = permissionRequestResultHandler;
         this.activity = activity;
     }
 
-    public PermissionsUtils(Fragment fragment, View rootLayout, String[] permissions,
-                            int permissionRequestCode,
-                            PermissionRequestResultHandler permissionRequestResultHandler) {
-
-        this(fragment.getActivity(), rootLayout, permissions, permissionRequestCode,
-                permissionRequestResultHandler);
-
+    public PermissionsUtils(Fragment fragment, View rootLayout, String[] permissions) {
+        this(fragment.getActivity(), rootLayout, permissions);
         this.fragment = fragment;
     }
 
@@ -66,16 +60,29 @@ public class PermissionsUtils {
         return false;
     }
 
-    public void requestPermissions() {
-        if (fragment != null) {
-            fragment.requestPermissions(permissions, permissionRequestCode);
+    public boolean checkPermissionRequired(Uri uri) {
+        return checkPermissionRequired() && isUriRequiresPermissions(uri);
+    }
+
+    public void checkPermissionRequired(Uri uri, PermissionRequestResultHandler resultHandler) {
+        if (checkPermissionRequired(uri)) {
+            requestPermissions(resultHandler);
         } else {
-            ActivityCompat.requestPermissions(activity, permissions, permissionRequestCode);
+            resultHandler.onPermissionGranted();
+        }
+    }
+
+    public void requestPermissions(PermissionRequestResultHandler resultHandler) {
+        this.resultHandler = resultHandler;
+        if (fragment != null) {
+            fragment.requestPermissions(permissions, PERMISSIONS_REQUEST_CODE);
+        } else {
+            ActivityCompat.requestPermissions(activity, permissions, PERMISSIONS_REQUEST_CODE);
         }
     }
 
     public void onRequestPermissionsResult(int requestCode, @NonNull int[] grantResults) {
-        if (requestCode == permissionRequestCode) {
+        if (requestCode == PERMISSIONS_REQUEST_CODE) {
             if ((grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 resultHandler.onPermissionGranted();
             } else {
@@ -112,12 +119,32 @@ public class PermissionsUtils {
     public void onResume() {
         if (checkPermission) {
             checkPermission = false;
-            requestPermissions();
+            requestPermissions(resultHandler);
         }
     }
 
     public void setPermissions(String[] permissions) {
         this.permissions = permissions;
+    }
+
+    /**
+     * Test if we can open the given Android URI to test if permission required error is thrown.<br>
+     * Only relevant for API version 23 and above.
+     * https://github.com/ArthurHub/Android-Image-Cropper/blob/2.8.0/cropper/src/main/java/com/theartofdev/edmodo/cropper/CropImage.java#L396
+     *
+     * @param uri the result URI of image pick.
+     */
+    public boolean isUriRequiresPermissions(@NonNull Uri uri) {
+        try {
+            ContentResolver resolver = activity.getContentResolver();
+            InputStream stream = resolver.openInputStream(uri);
+            if (stream != null) {
+                stream.close();
+            }
+            return false;
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     public interface PermissionRequestResultHandler {

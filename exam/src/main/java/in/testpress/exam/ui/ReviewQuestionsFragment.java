@@ -34,7 +34,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.CommentsUtil;
-import in.testpress.exam.util.ImagePickerUtils;
+import in.testpress.exam.util.ImageUtils;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.BookmarkFolder;
 import in.testpress.models.greendao.Language;
@@ -83,7 +83,7 @@ public class ReviewQuestionsFragment extends Fragment {
     ImageView imageView5;
     int percentageCorrect;
     TestpressExamApiClient apiClient;
-    ImagePickerUtils imagePickerUtils;
+    ImageUtils imageUtils;
     private CommentsUtil commentsUtil;
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
@@ -109,7 +109,7 @@ public class ReviewQuestionsFragment extends Fragment {
         Assert.assertNotNull("PARAM_REVIEW_ITEM_ID must not be null", reviewItemId);
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
         reviewItemDao = TestpressSDKDatabase.getReviewItemDao(getContext());
-        imagePickerUtils = new ImagePickerUtils(rootLayout, this);
+        imageUtils = new ImageUtils(rootLayout, this);
 
         List<ReviewItem> reviewItems = reviewItemDao.queryBuilder()
                 .where(ReviewItemDao.Properties.Id.eq(reviewItemId)).list();
@@ -507,8 +507,8 @@ public class ReviewQuestionsFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        imagePickerUtils.onActivityResult(requestCode, resultCode, data,
-                new ImagePickerUtils.ImagePickerResultHandler() {
+        imageUtils.onActivityResult(requestCode, resultCode, data,
+                new ImageUtils.ImagePickerResultHandler() {
                     @Override
                     public void onSuccessfullyImageCropped(CropImage.ActivityResult result) {
                         commentsUtil.uploadImage(result.getUri().getPath());
@@ -520,7 +520,7 @@ public class ReviewQuestionsFragment extends Fragment {
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
 
-        imagePickerUtils.permissionsUtils.onRequestPermissionsResult(requestCode, grantResults);
+        imageUtils.permissionsUtils.onRequestPermissionsResult(requestCode, grantResults);
     }
 
     protected void setEmptyText(final int title, final int description) {
@@ -565,8 +565,8 @@ public class ReviewQuestionsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (imagePickerUtils != null) {
-            imagePickerUtils.permissionsUtils.onResume();
+        if (imageUtils != null) {
+            imageUtils.permissionsUtils.onResume();
         }
         webView.onResume();
     }

@@ -34,7 +34,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.CommentsUtil;
-import in.testpress.exam.util.ImagePickerUtils;
+import in.testpress.exam.util.ImageUtils;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.BookmarkDao;
@@ -92,7 +92,7 @@ public class BookmarksFragment extends BaseFragment {
     private BookmarksActivity bookmarksActivity;
     private FullScreenChromeClient fullScreenChromeClient;
     private TestpressExamApiClient apiClient;
-    ImagePickerUtils imagePickerUtils;
+    ImageUtils imagePickerUtils;
     private CommentsUtil commentsUtil;
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
@@ -121,7 +121,7 @@ public class BookmarksFragment extends BaseFragment {
 
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
         bookmarkFolderDao = TestpressSDKDatabase.getBookmarkFolderDao(getContext());
-        imagePickerUtils = new ImagePickerUtils(rootLayout, this);
+        imagePickerUtils = new ImageUtils(rootLayout, this);
     }
 
     @SuppressLint("AddJavascriptInterface")
@@ -696,7 +696,7 @@ public class BookmarksFragment extends BaseFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         imagePickerUtils.onActivityResult(requestCode, resultCode, data,
-                new ImagePickerUtils.ImagePickerResultHandler() {
+                new ImageUtils.ImagePickerResultHandler() {
                     @Override
                     public void onSuccessfullyImageCropped(CropImage.ActivityResult result) {
                         commentsUtil.uploadImage(result.getUri().getPath());

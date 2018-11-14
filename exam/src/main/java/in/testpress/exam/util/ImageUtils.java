@@ -16,11 +16,10 @@ import static android.app.Activity.RESULT_OK;
 import static com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE;
 import static com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE;
 import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE;
-import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE;
 
-public class ImagePickerUtils {
+public class ImageUtils {
 
-    private static final String[] IMAGE_PICKER_PERMISSIONS = new String[] {
+    private static final String[] IMAGE_PERMISSIONS = new String[] {
             Manifest.permission.READ_EXTERNAL_STORAGE
     };
 
@@ -31,28 +30,18 @@ public class ImagePickerUtils {
     public PermissionsUtils permissionsUtils;
     private int[] aspectRatio = null;
 
-    private PermissionsUtils.PermissionRequestResultHandler permissionRequestResultHandler =
-            new PermissionsUtils.PermissionRequestResultHandler() {
-                @Override
-                public void onPermissionGranted() {
-                    startCropImageActivity(selectedImageUri);
-                }
-            };
-
-    public ImagePickerUtils(View rootLayout, Activity activity) {
+    public ImageUtils(View rootLayout, Activity activity) {
         this.rootLayout = rootLayout;
         this.activity = activity;
-        permissionsUtils = new PermissionsUtils(activity, rootLayout, IMAGE_PICKER_PERMISSIONS,
-                PICK_IMAGE_PERMISSIONS_REQUEST_CODE, permissionRequestResultHandler);
+        permissionsUtils = new PermissionsUtils(activity, rootLayout, IMAGE_PERMISSIONS);
 
     }
 
-    public ImagePickerUtils(View rootLayout, Fragment fragment) {
+    public ImageUtils(View rootLayout, Fragment fragment) {
         this.rootLayout = rootLayout;
         this.fragment = fragment;
         this.activity = fragment.getActivity();
-        permissionsUtils = new PermissionsUtils(fragment, rootLayout, IMAGE_PICKER_PERMISSIONS,
-                PICK_IMAGE_PERMISSIONS_REQUEST_CODE, permissionRequestResultHandler);
+        permissionsUtils = new PermissionsUtils(fragment, rootLayout, IMAGE_PERMISSIONS);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data,
@@ -60,15 +49,14 @@ public class ImagePickerUtils {
 
         if (requestCode == PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == RESULT_OK) {
             selectedImageUri = CropImage.getPickImageResultUri(activity, data);
-            // For API >= 23 we need to check specifically that we have permissions to read external storage.
-            if (permissionsUtils.checkPermissionRequired() &&
-                    CropImage.isUriRequiresPermissions(activity, selectedImageUri)) {
-
-                permissionsUtils.requestPermissions();
-            } else {
-                // No permissions required or already granted
-                startCropImageActivity(selectedImageUri);
-            }
+            permissionsUtils.checkPermissionRequired(
+                    selectedImageUri,
+                    new PermissionsUtils.PermissionRequestResultHandler() {
+                        @Override
+                        public void onPermissionGranted() {
+                            startCropImageActivity(selectedImageUri);
+                        }
+                    });
         } else if (requestCode == CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
