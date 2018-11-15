@@ -12,6 +12,7 @@ public class InstituteSettings {
     private boolean screenshotDisabled;
     private boolean bookmarksEnabled;
     private boolean displayUserEmailOnVideo;
+    private Boolean questionShareDisabled;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -83,6 +84,15 @@ public class InstituteSettings {
 
     public boolean isDisplayUserEmailOnVideo() {
         return displayUserEmailOnVideo;
+    }
+
+    public boolean isQuestionShareDisabled() {
+        return questionShareDisabled != null ? questionShareDisabled : screenshotDisabled;
+    }
+
+    public InstituteSettings setQuestionShareDisabled(boolean questionShareDisabled) {
+        this.questionShareDisabled = questionShareDisabled;
+        return this;
     }
 
     public InstituteSettings setDisplayUserEmailOnVideo(boolean displayUserEmailOnVideo) {

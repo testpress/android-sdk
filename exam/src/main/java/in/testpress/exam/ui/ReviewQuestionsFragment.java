@@ -2,13 +2,18 @@ package in.testpress.exam.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
@@ -35,6 +40,7 @@ import in.testpress.exam.R;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.CommentsUtil;
 import in.testpress.exam.util.ImageUtils;
+import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.BookmarkFolder;
 import in.testpress.models.greendao.Language;
@@ -87,6 +93,7 @@ public class ReviewQuestionsFragment extends Fragment {
     private CommentsUtil commentsUtil;
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
+    private InstituteSettings instituteSettings;
 
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
     private RetrofitCall<Bookmark> bookmarkAPIRequest;
@@ -110,6 +117,8 @@ public class ReviewQuestionsFragment extends Fragment {
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
         reviewItemDao = TestpressSDKDatabase.getReviewItemDao(getContext());
         imageUtils = new ImageUtils(rootLayout, this);
+        //noinspection ConstantConditions
+        instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
 
         List<ReviewItem> reviewItems = reviewItemDao.queryBuilder()
                 .where(ReviewItemDao.Properties.Id.eq(reviewItemId)).list();
@@ -196,6 +205,9 @@ public class ReviewQuestionsFragment extends Fragment {
                     commentsUtil.displayComments();
                 }
                 animationView.bringToFront();
+                if (!instituteSettings.isQuestionShareDisabled()) {
+                    setHasOptionsMenu(true);
+                }
             }
 
             @Override
@@ -208,6 +220,12 @@ public class ReviewQuestionsFragment extends Fragment {
         difficultyPercentageText.setText(percentageCorrect + "%");
         webViewUtils.initWebView(getReviewItemAsHtml(), getActivity());
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.testpress_share, menu);
     }
 
     private void setDifficulty(View view) {
@@ -281,8 +299,7 @@ public class ReviewQuestionsFragment extends Fragment {
                 reviewItem.getIndex() +
                 "</div>";
 
-        //noinspection ConstantConditions
-        if (TestpressSdk.getTestpressSession(getActivity()).getInstituteSettings().isBookmarksEnabled()) {
+        if (instituteSettings.isBookmarksEnabled()) {
             html += WebViewUtils.getBookmarkButtonWithTags(reviewItem.getBookmarkId() != null);
         }
 
@@ -404,12 +421,8 @@ public class ReviewQuestionsFragment extends Fragment {
                     if (reviewItem.getBookmarkId() != null) {
                         deleteBookmark(reviewItem.getBookmarkId());
                     } else {
-                        //noinspection ConstantConditions
-                        String baseUrl = TestpressSdk.getTestpressSession(getActivity())
-                                .getInstituteSettings().getBaseUrl();
-
                         bookmarkFolders.clear();
-                        loadBookmarkFolders(baseUrl + BOOKMARK_FOLDERS_PATH);
+                        loadBookmarkFolders(instituteSettings.getBaseUrl() + BOOKMARK_FOLDERS_PATH);
                     }
                 }
             });
@@ -544,6 +557,7 @@ public class ReviewQuestionsFragment extends Fragment {
             // Remove webView from its parent before destroy to support below kitkat
             viewGroup.removeView(webView);
         }
+        webView.removeAllViews();
         webView.destroy();
         super.onDestroyView();
     }
@@ -569,6 +583,23 @@ public class ReviewQuestionsFragment extends Fragment {
             imageUtils.permissionsUtils.onResume();
         }
         webView.onResume();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.share) {
+            webViewUtils.hideBookmarkButton();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Bitmap bitmap = ImageUtils.getBitmapFromView(webView);
+                    webViewUtils.displayBookmarkButton();
+                    ImageUtils.shareBitmap(bitmap, webView.getContext());
+                }
+            }, 100);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     void handleException(TestpressException exception) {

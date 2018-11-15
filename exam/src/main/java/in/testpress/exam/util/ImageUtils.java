@@ -1,18 +1,34 @@
 package in.testpress.exam.util;
 
-import android.Manifest;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.view.View;
 
 import com.theartofdev.edmodo.cropper.CropImage;
 
-import in.testpress.util.PermissionsUtils;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
+import in.testpress.exam.R;
+import in.testpress.util.PermissionsUtils;
+import in.testpress.util.ViewUtils;
+
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.app.Activity.RESULT_OK;
+import static android.graphics.Bitmap.Config.ARGB_8888;
 import static com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE;
 import static com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE;
 import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE;
@@ -20,7 +36,7 @@ import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_CHOOSER_REQUES
 public class ImageUtils {
 
     private static final String[] IMAGE_PERMISSIONS = new String[] {
-            Manifest.permission.READ_EXTERNAL_STORAGE
+            READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE
     };
 
     private View rootLayout;
@@ -93,6 +109,53 @@ public class ImageUtils {
 
     public void setAspectRatio(int aspectRatioX, int aspectRatioY) {
         aspectRatio = new int[] { aspectRatioX, aspectRatioY };
+    }
+
+    public static Bitmap getBitmapFromView(View view) {
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Drawable bgDrawable = view.getBackground();
+        if (bgDrawable != null) {
+            bgDrawable.draw(canvas);
+        } else {
+            canvas.drawColor(Color.WHITE);
+        }
+        view.draw(canvas);
+        return bitmap;
+    }
+
+    public static void shareBitmap(Bitmap bitmap, Context context) {
+        File image = new File(context.getCacheDir() , "screenshot.png");
+        FileOutputStream outputStream;
+        try {
+            outputStream = new FileOutputStream(image);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
+            outputStream.flush();
+            outputStream.close();
+            shareImage(image, context);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void shareImage(File file, Context context) {
+        Uri uri = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.setType("image/*");
+        intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "");
+        intent.putExtra(android.content.Intent.EXTRA_TEXT, "");
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        try {
+            context.startActivity(Intent.createChooser(intent,
+                    context.getString(R.string.testpress_share_screenshot)));
+
+        } catch (ActivityNotFoundException e) {
+            ViewUtils.toast(context, context.getString(R.string.testpress_no_app_available));
+        }
     }
 
     public interface ImagePickerResultHandler {

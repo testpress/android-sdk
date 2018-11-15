@@ -7,6 +7,7 @@
         android:visible="false"
         app:actionLayout="@layout/testpress_select_language_menu_view"
         app:showAsAction="always"
+        android:menuCategory="container"
         android:title="@string/testpress_select_language" >
     </item>
 

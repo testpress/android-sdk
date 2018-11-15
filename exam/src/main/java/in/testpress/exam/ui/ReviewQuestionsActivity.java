@@ -99,7 +99,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     private MenuItem selectLanguageMenu;
     private ReviewItemDao reviewItemDao;
     private ReviewAttemptDao attemptDao;
-    private Language selectedLanguage;;
+    private Language selectedLanguage;
     private ExploreSpinnerAdapter languageSpinnerAdapter;
     protected ExploreSpinnerAdapter spinnerAdapter;
     /**
@@ -218,6 +218,12 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         reviewItemDao= TestpressSDKDatabase.getReviewItemDao(this);
         attemptDao = TestpressSDKDatabase.getReviewAttemptDao(this);
         reviewAttempt = getReviewAttempt();
+        // Check review items exists for the review attempt, load otherwise.
+        if (reviewItemDao._queryReviewAttempt_ReviewItems(reviewAttempt.getId()).isEmpty()) {
+            loadReviewItemsFromServer(reviewAttempt.getReviewUrl());
+        } else {
+            displayReviewItems();
+        }
         int position = getIntent().getIntExtra(PARAM_POSITION, -1);
         if (position != -1) {
             goToQuestion(position);
@@ -228,8 +234,16 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         optionsMenu = menu;
         setUpLanguageOptionsMenu();
-        getMenuInflater().inflate(R.menu.testpress_filter, menu);
-        filterMenu = menu.findItem(R.id.filter);
+        setupQuestionsFilterOptionsMenu();
+        if (!reviewItems.isEmpty()) {
+            filterMenu.setVisible(true);
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    void setupQuestionsFilterOptionsMenu() {
+        getMenuInflater().inflate(R.menu.testpress_filter, optionsMenu);
+        filterMenu = optionsMenu.findItem(R.id.filter);
         final View circle = filterMenu.getActionView().findViewById(R.id.filter_applied_sticky_tick);
         spinner = filterMenu.getActionView().findViewById(R.id.spinner);
         ViewUtils.setSpinnerIconColor(this, spinner);
@@ -255,56 +269,44 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
             public void onNothingSelected(AdapterView<?> adapterView) {
             }
         });
-        // Check review items exists for the review attempt, load otherwise.
-        if (reviewItemDao._queryReviewAttempt_ReviewItems(reviewAttempt.getId()).isEmpty()) {
-            loadReviewItemsFromServer(reviewAttempt.getReviewUrl());
-        } else {
-            displayReviewItems();
-        }
-        return super.onCreateOptionsMenu(menu);
+        addFilterItemsInSpinner();
     }
 
     void setUpLanguageOptionsMenu() {
         final ArrayList<Language> languages = new ArrayList<>(exam.getRawLanguages());
-        if (languages.size() > 1) {
+        if (languages.size() > 1 && optionsMenu != null && !reviewItems.isEmpty()) {
             getMenuInflater().inflate(R.menu.testpress_select_language_menu, optionsMenu);
             selectLanguageMenu = optionsMenu.findItem(R.id.select_language);
             languageSpinner = selectLanguageMenu.getActionView().findViewById(R.id.language_spinner);
             ViewUtils.setSpinnerIconColor(this, languageSpinner);
-            if (languageSpinnerAdapter == null) {
-                languageSpinnerAdapter =
-                        new ExploreSpinnerAdapter(getLayoutInflater(), getResources(), false);
+            languageSpinnerAdapter =
+                    new ExploreSpinnerAdapter(getLayoutInflater(), getResources(), false);
 
-                languageSpinnerAdapter.hideSpinner(true);
-                for (Language language : languages) {
-                    languageSpinnerAdapter.addItem(language.getCode(), language.getTitle(), true, 0);
-                }
-                languageSpinner.setAdapter(languageSpinnerAdapter);
-                languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position,
-                                               long id) {
+            languageSpinnerAdapter.hideSpinner(true);
+            for (Language language : languages) {
+                languageSpinnerAdapter.addItem(language.getCode(), language.getTitle(), true, 0);
+            }
+            languageSpinner.setAdapter(languageSpinnerAdapter);
+            initSelectedLanguage(languages);
+            languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position,
+                                           long id) {
 
+                    Language language = languages.get(position);
+                    if (!selectedLanguage.getCode().equals(language.getCode())) {
                         // Update existing object so that update will reflect in ReviewQuestionFragment also
-                        selectedLanguage.update(languages.get(position));
+                        selectedLanguage.update(language);
                         exam.setSelectedLanguage(selectedLanguage.getCode());
                         pagerAdapter.notifyDataSetChanged(false);
                         panelListAdapter.notifyDataSetChanged();
                     }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                    }
-                });
-                String selectedLanguageCode = exam.getSelectedLanguage();
-                if (selectedLanguageCode != null && !selectedLanguageCode.isEmpty()) {
-                    int selectedPosition =
-                            languageSpinnerAdapter.getItemPositionFromTag(selectedLanguageCode);
-
-                    initSelectedLanguage(languages.get(selectedPosition));
-                    languageSpinner.setSelection(selectedPosition);
                 }
-            }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
         }
     }
 
@@ -447,7 +449,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         }
         exam.setLanguages(new ArrayList<>(uniqueLanguages.values()));
         setUpLanguageOptionsMenu();
-        addFilterItemsInSpinner();
         onSpinnerItemSelected(0);
     }
 
@@ -494,40 +495,24 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
      *                    FILTER_MARKED}
      */
     protected QueryBuilder<ReviewItem> getQueryBuilder(String filterType) {
-        QueryBuilder<ReviewItem> queryBuilder;
+        QueryBuilder<ReviewItem> queryBuilder = reviewItemDao.queryBuilder()
+                .where(ReviewItemDao.Properties.AttemptId.eq(reviewAttempt.getId()));
+
         switch (filterType) {
-            case FILTER_ALL:
-                queryBuilder = reviewItemDao.queryBuilder()
-                        .where(ReviewItemDao.Properties.AttemptId.eq(reviewAttempt.getId()));
-                break;
             case FILTER_CORRECT:
-                queryBuilder = reviewItemDao.queryBuilder().where(
-                        ReviewItemDao.Properties.AttemptId.eq(reviewAttempt.getId()),
-                        ReviewItemDao.Properties.Result.eq(ANSWERED_CORRECT)
-                );
+                queryBuilder.where(ReviewItemDao.Properties.Result.eq(ANSWERED_CORRECT));
                 break;
             case FILTER_INCORRECT:
-                queryBuilder = reviewItemDao.queryBuilder().where(
-                        ReviewItemDao.Properties.AttemptId.eq(reviewAttempt.getId()),
-                        ReviewItemDao.Properties.Result.eq(ANSWERED_INCORRECT)
+                queryBuilder.where(ReviewItemDao.Properties.Result.eq(ANSWERED_INCORRECT));
+                break;
+            case FILTER_UNANSWERED:
+                queryBuilder.where(queryBuilder.or(
+                        ReviewItemDao.Properties.Result.isNull(),
+                        ReviewItemDao.Properties.Result.eq(UNANSWERED))
                 );
                 break;
-
-            case FILTER_UNANSWERED:
-                queryBuilder = reviewItemDao.queryBuilder()
-                        .where(ReviewItemDao.Properties.AttemptId.eq(reviewAttempt.getId()));
-
-                queryBuilder.where(queryBuilder.or(ReviewItemDao.Properties.Result.isNull(),
-                                ReviewItemDao.Properties.Result.eq(UNANSWERED)));
-
-                break;
             case FILTER_MARKED:
-                queryBuilder = reviewItemDao.queryBuilder().where(
-                        ReviewItemDao.Properties.AttemptId.eq(reviewAttempt.getId()),
-                        ReviewItemDao.Properties.Review.eq(true));
-                break;
-            default:
-                queryBuilder = reviewItemDao.queryBuilder();
+                queryBuilder.where(ReviewItemDao.Properties.Review.eq(true));
                 break;
         }
         return queryBuilder;
@@ -571,20 +556,11 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
             } else {
                 panelListAdapter.setItems(reviewItems);
                 pagerAdapter.setReviewItems(reviewItems);
-                ArrayList<Language> languages = new ArrayList<>(exam.getRawLanguages());
-                if (languages.size() > 1) {
-                    if (selectedLanguage == null) {
-                        int selectedPosition = languageSpinnerAdapter
-                                .getItemPositionFromTag(reviewItems.get(0).getQuestion().getLanguage());
-
-                        initSelectedLanguage(languages.get(selectedPosition));
-                        languageSpinner.setSelection(selectedPosition);
-                    }
-                    selectLanguageMenu.setVisible(true);
-                }
                 pagerAdapter.notifyDataSetChanged(true);
                 goToQuestion(0);
-                filterMenu.setVisible(true);
+                if (filterMenu != null) {
+                    filterMenu.setVisible(true);
+                }
                 questionLayout.setVisibility(View.VISIBLE);
                 buttonLayout.setVisibility(View.VISIBLE);
                 emptyView.setVisibility(View.GONE);
@@ -689,11 +665,22 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         button.setEnabled(enable);
     }
 
-    private void initSelectedLanguage(Language language) {
-        // Create new object so that we can update it without affecting original language list
-        selectedLanguage = new Language(language);
-        pagerAdapter.setSelectedLanguage(selectedLanguage);
-        panelListAdapter.setSelectedLanguage(selectedLanguage);
+    private void initSelectedLanguage(ArrayList<Language> languages) {
+        String selectedLanguageCode = exam.getSelectedLanguage();
+        if (selectedLanguageCode == null || selectedLanguageCode.isEmpty()) {
+            selectedLanguageCode = reviewItems.get(0).getQuestion().getLanguage();
+        }
+        int selectedPosition =
+                languageSpinnerAdapter.getItemPositionFromTag(selectedLanguageCode);
+
+        if (selectedLanguage == null) {
+            // Create new object so that we can update it without affecting original language list
+            selectedLanguage = new Language(languages.get(selectedPosition));
+            pagerAdapter.setSelectedLanguage(selectedLanguage);
+            panelListAdapter.setSelectedLanguage(selectedLanguage);
+        }
+        languageSpinner.setSelection(selectedPosition);
+        selectLanguageMenu.setVisible(true);
     }
 
     protected void setEmptyText(final int title, final int description) {

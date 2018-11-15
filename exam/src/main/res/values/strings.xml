@@ -248,4 +248,8 @@
     </string-array>
     <string name="testpress_can_retake_in_few_min">You can retake this exam %s. Meanwhile review your previous attempt.</string>
 
+    <string name="testpress_share">Share</string>
+    <string name="testpress_share_screenshot">Share Screenshot</string>
+    <string name="testpress_no_app_available">No App Available</string>
+
 </resources>
