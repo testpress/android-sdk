@@ -205,6 +205,7 @@ public abstract class BaseGridFragment<E> extends Fragment
         if (!isUsable()) {
             return;
         }
+        getLoaderManager().destroyLoader(loader.getId());
         final TestpressException exception = getException(loader);
         if (exception != null) {
             this.exception = exception;
@@ -213,7 +214,6 @@ public abstract class BaseGridFragment<E> extends Fragment
                 showError(errorMessage);
             }
             showGrid();
-            getLoaderManager().destroyLoader(loader.getId());
             return;
         }
         this.exception = null;

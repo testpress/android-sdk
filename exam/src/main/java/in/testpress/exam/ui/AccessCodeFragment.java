@@ -3,7 +3,6 @@ package in.testpress.exam.ui;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -23,17 +22,20 @@ import in.testpress.exam.R;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Exam;
+import in.testpress.network.RetrofitCall;
+import in.testpress.ui.BaseFragment;
 import in.testpress.util.TextWatcherAdapter;
 import in.testpress.util.UIUtils;
 
 import static android.support.design.widget.Snackbar.LENGTH_SHORT;
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 
-public class AccessCodeFragment extends Fragment {
+public class AccessCodeFragment extends BaseFragment {
 
     private ProgressDialog progressDialog;
     private EditText accessCodeView;
     private View view;
+    private RetrofitCall<TestpressApiResponse<Exam>> examsApiRequest;
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
@@ -86,7 +88,7 @@ public class AccessCodeFragment extends Fragment {
         UIUtils.hideSoftKeyboard(getActivity());
         final String accessCode = accessCodeView.getText().toString().trim();
         Map<String, Object> queryParams = new HashMap<>();
-        new TestpressExamApiClient(getContext()).getExams(accessCode, queryParams)
+        examsApiRequest = new TestpressExamApiClient(getContext()).getExams(accessCode, queryParams)
                 .enqueue(new TestpressCallback<TestpressApiResponse<Exam>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Exam> response) {
@@ -115,6 +117,11 @@ public class AccessCodeFragment extends Fragment {
                         }
                     }
                 });
+    }
+
+    @Override
+    public RetrofitCall[] getRetrofitCalls() {
+        return new RetrofitCall[] { examsApiRequest };
     }
 
 }

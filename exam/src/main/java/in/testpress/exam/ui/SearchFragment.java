@@ -236,6 +236,7 @@ public class SearchFragment extends Fragment implements AbsListView.OnScrollList
                 getListAdapter().removeFooter(loadingLayout);
             }
         }
+        getLoaderManager().destroyLoader(loader.getId());
         final TestpressException exception = getException(loader);
         if (exception != null) {
             if (!items.isEmpty()) {

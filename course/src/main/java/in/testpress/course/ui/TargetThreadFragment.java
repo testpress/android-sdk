@@ -3,7 +3,6 @@ package in.testpress.course.ui;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -25,11 +24,12 @@ import in.testpress.course.models.Reputation;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
+import in.testpress.ui.BaseFragment;
 import in.testpress.util.Assert;
 
 import static in.testpress.course.ui.RankListFragment.PARAM_USER_REPUTATION;
 
-public class TargetThreadFragment extends Fragment {
+public class TargetThreadFragment extends BaseFragment {
 
     private View emptyView;
     private TextView emptyTitleView;
@@ -202,13 +202,9 @@ public class TargetThreadFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        if (threadsLoader != null) {
-            threadsLoader.cancel();
-        }
-        if (targetsLoader != null) {
-            targetsLoader.cancel();
-        }
-        super.onDestroy();
+    public RetrofitCall[] getRetrofitCalls() {
+        return new RetrofitCall[] {
+                threadsLoader, targetsLoader
+        };
     }
 }

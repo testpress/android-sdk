@@ -6,7 +6,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0'
+        classpath 'com.android.tools.build:gradle:3.2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath 'com.google.gms:google-services:3.2.0'
         // NOTE: Do not place your application dependencies here; they belong
@@ -31,7 +31,7 @@ ext {
     minSdkVersion = 16
     targetSdkVersion = 27
     minSdkVersionForUITest = 18
-    buildToolsVersion = '28.0.2'
+    buildToolsVersion = '28.0.3'
     supportLib = '27.1.1'
     exoPlayer = '2.8.2'
     powermock = '1.6.2'

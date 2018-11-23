@@ -52,6 +52,7 @@ import in.testpress.models.greendao.ReviewQuestionTranslation;
 import in.testpress.models.greendao.ReviewQuestionTranslationDao;
 import in.testpress.models.greendao.SelectedAnswer;
 import in.testpress.models.greendao.SelectedAnswerDao;
+import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
@@ -107,6 +108,7 @@ public class TimeAnalyticsActivity extends BaseToolBarActivity {
     private Button applyFilterButton;
     private Button clearFilterButton;
     private ImageView filterIcon;
+    private RetrofitCall<TestpressApiResponse<ReviewItem>> reviewItemsApiRequest;
 
     public static Intent createIntent(Activity activity, Exam exam, Attempt attempt) {
         Intent intent = new Intent(activity, TimeAnalyticsActivity.class);
@@ -470,7 +472,7 @@ public class TimeAnalyticsActivity extends BaseToolBarActivity {
     }
 
     private void loadReviewItemsFromServer(final ReviewAttempt reviewAttempt, final String url) {
-        new TestpressExamApiClient(this)
+        reviewItemsApiRequest = new TestpressExamApiClient(this)
                 .getReviewItems(url, new HashMap<String, Object>())
                 .enqueue(new TestpressCallback<TestpressApiResponse<ReviewItem>>() {
                     @Override
@@ -681,6 +683,11 @@ public class TimeAnalyticsActivity extends BaseToolBarActivity {
                 "</div>";
 
         return html;
+    }
+
+    @Override
+    public RetrofitCall[] getRetrofitCalls() {
+        return new RetrofitCall[] { reviewItemsApiRequest };
     }
 
     public class TimeAnalyticsListener {

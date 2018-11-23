@@ -9,7 +9,6 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -51,8 +50,8 @@ import in.testpress.models.greendao.ReviewQuestion;
 import in.testpress.models.greendao.ReviewQuestionTranslation;
 import in.testpress.models.greendao.Video;
 import in.testpress.network.RetrofitCall;
+import in.testpress.ui.BaseFragment;
 import in.testpress.ui.view.ClosableSpinner;
-import in.testpress.util.CommonUtils;
 import in.testpress.util.FullScreenChromeClient;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
@@ -63,7 +62,7 @@ import in.testpress.v2_4.models.FolderListResponse;
 import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 
-public class BookmarksFragment extends Fragment {
+public class BookmarksFragment extends BaseFragment {
 
     static final String PARAM_BOOKMARK_ID = "position";
     static final String PARAM_SELECTED_LANGUAGE = "selectedLanguage";
@@ -721,13 +720,17 @@ public class BookmarksFragment extends Fragment {
     }
 
     @Override
+    public RetrofitCall[] getRetrofitCalls() {
+        return new RetrofitCall[] {
+                bookmarkFoldersLoader, updateBookmarkAPIRequest, deleteBookmarkAPIRequest
+        };
+    }
+
+    @Override
     public void onDestroyView() {
         if (commentsUtil != null) {
             commentsUtil.onDestroy();
         }
-        CommonUtils.cancelAPIRequests(new RetrofitCall[] {
-                bookmarkFoldersLoader, updateBookmarkAPIRequest, deleteBookmarkAPIRequest
-        });
         final ViewGroup viewGroup = (ViewGroup) webView.getParent();
         if (viewGroup != null) {
             // Remove webView from its parent before destroy to support below kitkat
