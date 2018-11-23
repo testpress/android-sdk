@@ -1221,6 +1221,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         }
         resumeExamDialog =
                 new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
+                        .setCancelable(false)
                         .setMessage(R.string.testpress_exam_paused)
                         .setPositiveButton(R.string.testpress_resume,
                                 new DialogInterface.OnClickListener() {
