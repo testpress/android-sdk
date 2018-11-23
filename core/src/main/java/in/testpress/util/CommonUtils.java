@@ -1,8 +1,11 @@
 package in.testpress.util;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.annotation.NonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,6 +67,14 @@ public class CommonUtils {
         for (RetrofitCall retrofitCall : retrofitCalls) {
             if (retrofitCall != null) {
                 retrofitCall.cancel();
+            }
+        }
+    }
+
+    public static void dismissDialogs(@NonNull Dialog[] dialogs) {
+        for (Dialog dialog : dialogs) {
+            if (dialog != null && dialog.isShowing()) {
+                dialog.dismiss();
             }
         }
     }

@@ -65,6 +65,8 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     static final String PARAM_ATTEMPT = "attempt";
     static final String PARAM_STATE = "state";
     static final String STATE_PAUSED = "paused";
+    static final String PARAM_PERMISSION = "PARAM_PERMISSION";
+    static final String PARAM_LANGUAGES = "PARAM_LANGUAGES";
     public static final String PARAM_IS_PARTIAL_QUESTIONS = "isPartialQuestions";
     public static final String PARAM_ACTION = "action";
     public static final String PARAM_VALUE_ACTION_END = "end";
@@ -72,11 +74,11 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private static final int RESUME_ATTEMPT_LOADER = 1;
     private static final int END_ATTEMPT_LOADER = 2;
     private TestpressExamApiClient apiClient;
-    private Exam exam;
-    private Attempt attempt;
-    private Content courseContent;
-    private CourseAttempt courseAttempt;
-    private Permission permission;
+    Exam exam;
+    Attempt attempt;
+    Content courseContent;
+    CourseAttempt courseAttempt;
+    Permission permission;
     private boolean discardExamDetails;
     private RelativeLayout progressBar;
     private View examDetailsContainer;
@@ -90,12 +92,18 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private Button startButton;
     private Button endButton;
     private boolean isPartialQuestions;
+    private List<Language> languages;
+    private RetrofitCall<Exam> examApiRequest;
+    private RetrofitCall<Permission> permissionsApiRequest;
+    private RetrofitCall<TestpressApiResponse<Attempt>> attemptsApiRequest;
+    private RetrofitCall<TestpressApiResponse<Language>> languagesApiRequest;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_test);
         examDetailsContainer = findViewById(R.id.exam_details);
+        examDetailsContainer.setVisibility(View.GONE);
         fragmentContainer = findViewById(R.id.fragment_container);
         progressBar = findViewById(R.id.pb_loading);
         webOnlyLabel = findViewById(R.id.web_only_label);
@@ -103,7 +111,6 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         emptyTitleView = findViewById(R.id.empty_title);
         emptyDescView = findViewById(R.id.empty_description);
         retryButton = findViewById(R.id.retry_button);
-        examDetailsContainer.setVisibility(View.GONE);
         startButton = findViewById(R.id.start_exam);
         endButton = findViewById(R.id.end_exam);
         endButton.setOnClickListener(new View.OnClickListener() {
@@ -120,35 +127,56 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         final Intent intent = getIntent();
         Bundle data = intent.getExtras();
         assert data != null;
-        exam = data.getParcelable(PARAM_EXAM);
-        attempt = data.getParcelable(PARAM_ATTEMPT);
         isPartialQuestions = data.getBoolean(PARAM_IS_PARTIAL_QUESTIONS, false);
-        discardExamDetails = getIntent().getBooleanExtra(PARAM_DISCARD_EXAM_DETAILS, false);
-        if (exam == null) {
-            courseContent = data.getParcelable(PARAM_COURSE_CONTENT);
-            courseAttempt = data.getParcelable(PARAM_COURSE_ATTEMPT);
-            if (courseContent != null) {
-                exam = courseContent.getRawExam();
-                if (courseAttempt == null) {
-                    checkPermission();
-                } else {
-                    checkStartExamScreenState();
-                }
-                return;
+        if (savedInstanceState != null && savedInstanceState.get(PARAM_EXAM) != null) {
+            exam = savedInstanceState.getParcelable(PARAM_EXAM);
+            TestFragment testFragment = getCurrentFragment();
+            if (testFragment != null) {
+                attempt = testFragment.attempt;
+                getSupportFragmentManager().beginTransaction().remove(testFragment)
+                        .commitAllowingStateLoss();
+            } else {
+                attempt = savedInstanceState.getParcelable(PARAM_ATTEMPT);
             }
-            String examSlug = data.getString(PARAM_EXAM_SLUG);
+            permission = savedInstanceState.getParcelable(PARAM_PERMISSION);
+            languages = savedInstanceState.getParcelableArrayList(PARAM_LANGUAGES);
+        } else {
+            discardExamDetails = getIntent().getBooleanExtra(PARAM_DISCARD_EXAM_DETAILS, false);
+            exam = data.getParcelable(PARAM_EXAM);
+            attempt = data.getParcelable(PARAM_ATTEMPT);
+        }
+        courseContent = data.getParcelable(PARAM_COURSE_CONTENT);
+        courseAttempt = data.getParcelable(PARAM_COURSE_ATTEMPT);
+        onDataInitialized();
+    }
+
+    void onDataInitialized() {
+        if (courseContent != null) {
+            if (exam == null) {
+                exam = courseContent.getRawExam();
+            }
+            if (courseAttempt == null && permission == null) {
+                checkPermission();
+            } else {
+                if (courseAttempt != null && attempt != null) {
+                    courseAttempt.setAssessment(attempt);
+                }
+                checkStartExamScreenState();
+            }
+        } else if (exam != null) {
+            checkStartExamScreenState();
+        } else {
+            String examSlug = getIntent().getStringExtra(PARAM_EXAM_SLUG);
             if (examSlug == null || examSlug.isEmpty()) {
                 throw new IllegalArgumentException("PARAM_EXAM_SLUG must not be null or empty.");
             }
             loadExam(examSlug);
-            return;
         }
-        checkStartExamScreenState();
     }
 
     void checkPermission() {
         progressBar.setVisibility(View.VISIBLE);
-        apiClient.checkPermission(courseContent.getId())
+        permissionsApiRequest = apiClient.checkPermission(courseContent.getId())
                 .enqueue(new TestpressCallback<Permission>() {
                     @Override
                     public void onSuccess(Permission permission) {
@@ -173,7 +201,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
 
     void loadExam(final String examSlug) {
         progressBar.setVisibility(View.VISIBLE);
-        apiClient.getExam(examSlug)
+        examApiRequest = apiClient.getExam(examSlug)
                 .enqueue(new TestpressCallback<Exam>() {
                     @Override
                     public void onSuccess(Exam exam) {
@@ -204,7 +232,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         progressBar.setVisibility(View.VISIBLE);
         HashMap<String, Object> queryParams = new HashMap<>();
         queryParams.put(PARAM_STATE, STATE_PAUSED);
-        apiClient.getAttempts(attemptUrlFrag, queryParams)
+        attemptsApiRequest = apiClient.getAttempts(attemptUrlFrag, queryParams)
                 .enqueue(new TestpressCallback<TestpressApiResponse<Attempt>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Attempt> response) {
@@ -233,8 +261,12 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     }
 
     void fetchLanguages() {
+        if (languages != null) {
+            displayStartExamScreen();
+            return;
+        }
         progressBar.setVisibility(View.VISIBLE);
-        apiClient.getLanguages(exam.getSlug())
+        languagesApiRequest = apiClient.getLanguages(exam.getSlug())
                 .enqueue(new TestpressCallback<TestpressApiResponse<Language>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<Language> apiResponse) {
@@ -248,6 +280,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                         if (apiResponse.hasMore()) {
                             fetchLanguages();
                         } else {
+                            TestActivity.this.languages = exam.getRawLanguages();
                             displayStartExamScreen();
                         }
                     }
@@ -494,16 +527,13 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         if (progressBar.getVisibility() == View.GONE) {
             return;
         }
+        getSupportLoaderManager().destroyLoader(loader.getId());
         progressBar.setVisibility(View.GONE);
         //noinspection ThrowableResultOfMethodCallIgnored
         TestpressException exception = ((ThrowableLoader<Attempt>) loader).clearException();
         if(exception == null) {
             fragmentContainer.setVisibility(View.VISIBLE);
             if (attempt.getState().equals("Running")) {
-                if (getSupportActionBar() != null) {
-                    getSupportActionBar().hide();
-                }
-                TestFragment testFragment = new TestFragment();
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(TestFragment.PARAM_ATTEMPT, attempt);
                 bundle.putParcelable(TestFragment.PARAM_EXAM, exam);
@@ -512,9 +542,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                     bundle.putParcelable(TestActivity.PARAM_COURSE_ATTEMPT, courseAttempt);
                 }
                 bundle.putBoolean(PARAM_DISCARD_EXAM_DETAILS, discardExamDetails);
-                testFragment.setArguments(bundle);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, testFragment).commitAllowingStateLoss();
+                displayTestFragment(bundle);
             } else {
                 TestpressSession session = TestpressSdk.getTestpressSession(this);
                 Assert.assertNotNull("TestpressSession must not be null.", session);
@@ -537,6 +565,16 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         }
     }
 
+    private void displayTestFragment(Bundle arguments) {
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+        TestFragment testFragment = new TestFragment();
+        testFragment.setArguments(arguments);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, testFragment).commitAllowingStateLoss();
+    }
+
     @Override
     public void onLoaderReset(@NonNull final Loader<Attempt> loader) {
         
@@ -544,13 +582,8 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
 
     @Override
     public void onBackPressed() {
-        TestFragment testFragment = null;
-        try {
-            //noinspection RestrictedApi
-            testFragment = (TestFragment) getSupportFragmentManager().getFragments().get(0);
-        } catch (Exception ignored) {
-        }
-        if(testFragment != null) {
+        TestFragment testFragment = getCurrentFragment();
+        if (testFragment != null) {
             if (testFragment.slidingPaneLayout.isOpen()) {
                 testFragment.slidingPaneLayout.closePane();
             } else {
@@ -606,6 +639,28 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         } else {
             setEmptyText(errorMessage, R.string.testpress_some_thing_went_wrong_try_again);
         }
+    }
+
+    private TestFragment getCurrentFragment() {
+        return (TestFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(PARAM_EXAM, exam);
+        outState.putParcelable(PARAM_ATTEMPT, attempt);
+        outState.putParcelable(PARAM_PERMISSION, permission);
+        if (languages != null) {
+            outState.putParcelableArrayList(PARAM_LANGUAGES, new ArrayList<>(languages));
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public RetrofitCall[] getRetrofitCalls() {
+        return new RetrofitCall[] {
+                examApiRequest, languagesApiRequest, attemptsApiRequest, permissionsApiRequest
+        };
     }
 
 }

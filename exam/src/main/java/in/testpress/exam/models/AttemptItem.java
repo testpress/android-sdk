@@ -45,6 +45,8 @@ public class AttemptItem implements Parcelable {
         shortText = in.readString();
         currentShortText = in.readString();
         attemptSection = in.readParcelable(AttemptSection.class.getClassLoader());
+        in.readList(selectedAnswers, Integer.class.getClassLoader());
+        in.readList(savedAnswers, Integer.class.getClassLoader());
     }
 
     @Override
@@ -62,6 +64,8 @@ public class AttemptItem implements Parcelable {
         dest.writeString(shortText);
         dest.writeString(currentShortText);
         dest.writeParcelable(attemptSection, flags);
+        dest.writeList(selectedAnswers);
+        dest.writeList(savedAnswers);
     }
 
     @Override

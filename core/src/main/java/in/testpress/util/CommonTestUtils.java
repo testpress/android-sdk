@@ -20,6 +20,14 @@ public class CommonTestUtils {
         testGetRetrofitCallsReturnCorrectValues(fragment.getRetrofitCalls(), numberOfCalls);
     }
 
+    public static void testGetDialogsReturnCorrectValues(BaseFragment fragment,
+                                                         int numberOfDialogs) {
+
+        Assert.assertEquals("Check number of Dialogs returned is " + numberOfDialogs,
+                fragment.getDialogs().length,
+                numberOfDialogs);
+    }
+
     private static void testGetRetrofitCallsReturnCorrectValues(RetrofitCall[] retrofitCalls,
                                                                 int numberOfCalls) {
 

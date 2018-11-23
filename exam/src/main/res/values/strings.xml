@@ -39,6 +39,8 @@
     <string name="testpress_error_loading_categories">Loading categories failed</string>
     <string name="testpress_exam_not_available">Exam not available</string>
     <string name="testpress_exam_not_available_description">This is no longer available or not published yet.</string>
+    <string name="testpress_exam_paused">Exam is paused, click resume to continue</string>
+
 
     <string name="testpress_analytics">Analytics</string>
     <string name="testpress_error_loading_analytics">Loading analytics failed</string>

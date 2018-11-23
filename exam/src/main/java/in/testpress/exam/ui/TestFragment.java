@@ -2,12 +2,14 @@ package in.testpress.exam.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -18,6 +20,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,16 +51,23 @@ import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Language;
+import in.testpress.network.RetrofitCall;
+import in.testpress.ui.BaseFragment;
 import in.testpress.ui.ExploreSpinnerAdapter;
+import in.testpress.util.CommonUtils;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 
 import static in.testpress.exam.ui.TestActivity.PARAM_COURSE_ATTEMPT;
 import static in.testpress.exam.ui.TestActivity.PARAM_COURSE_CONTENT;
+import static in.testpress.models.greendao.Attempt.COMPLETED;
+import static in.testpress.models.greendao.Attempt.NOT_STARTED;
 import static in.testpress.models.greendao.Attempt.RUNNING;
 
-public class TestFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>> {
+public class TestFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>> {
+
+    private static final int APP_BACKGROUND_DELAY = 60000; // 1m
 
     static final String PARAM_EXAM = "exam";
     static final String PARAM_ATTEMPT = "attempt";
@@ -68,7 +78,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private ListView questionsListView;
     private TextView timer;
     private Spinner panelQuestionsFilter;
-    private Spinner primaryQuestionsFilter;
+    Spinner primaryQuestionsFilter;
     private RelativeLayout questionFilterContainer;
     private NonSwipeableViewPager pager;
     private TestQuestionPagerAdapter pagerAdapter;
@@ -77,21 +87,25 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     private ProgressDialog progressDialog;
     private AlertDialog endExamAlertDialog;
     private AlertDialog pauseExamAlertDialog;
+    private AlertDialog resumeExamDialog;
     private AlertDialog sectionSwitchAlertDialog;
-    private Attempt attempt;
+    private AlertDialog heartBeatAlertDialog;
+    private AlertDialog saveAnswerAlertDialog;
+    private AlertDialog networkErrorAlertDialog;
+    Attempt attempt;
     private Exam exam;
     private Content courseContent;
     private CourseAttempt courseAttempt;
     private int currentPosition;
-    private int currentSection;
-    private boolean lockedSectionExam;
+    int currentSection;
+    boolean lockedSectionExam;
     private boolean unlockedSectionExam;
-    private List<AttemptSection> sections = new ArrayList<>();
+    List<AttemptSection> sections = new ArrayList<>();
     private TestQuestionsPager questionsPager;
-    private List<AttemptItem> attemptItemList = new ArrayList<>();
-    private CountDownTimer countDownTimer;
-    private long millisRemaining;
-    private LockableSpinnerItemAdapter sectionSpinnerAdapter;
+    List<AttemptItem> attemptItemList = new ArrayList<>();
+    CountDownTimer countDownTimer;
+    long millisRemaining = -1;
+    LockableSpinnerItemAdapter sectionSpinnerAdapter;
     private PlainSpinnerItemAdapter plainSpinnerAdapter;
     private Language selectedLanguage;
     private Boolean fistTimeCallback = false;
@@ -102,10 +116,25 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
      */
     private HashMap<String, Integer> plainSpinnerItemOffsets = new HashMap<>();
     private enum Action { PAUSE, END, UPDATE_ANSWER, END_SECTION }
+    private RetrofitCall<Attempt> heartBeatApiRequest;
+    private RetrofitCall<AttemptSection> endSectionApiRequest;
+    private RetrofitCall<AttemptSection> startSectionApiRequest;
+    private RetrofitCall<CourseAttempt> endContentAttemptApiRequest;
+    private RetrofitCall<Attempt> endAttemptApiRequest;
+    private RetrofitCall<Attempt> resumeExamApiRequest;
+    private Handler appBackgroundStateHandler;
+    private Runnable stopTimerTask = new Runnable() {
+        @Override
+        public void run() {
+            stopTimerOnAppWentBackground();
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        assert getArguments() != null;
         courseContent = getArguments().getParcelable(PARAM_COURSE_CONTENT);
         if (courseContent != null) {
             courseAttempt = getArguments().getParcelable(PARAM_COURSE_ATTEMPT);
@@ -115,6 +144,10 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             attempt = getArguments().getParcelable(PARAM_ATTEMPT);
             exam = getArguments().getParcelable(PARAM_EXAM);
         }
+        if (savedInstanceState != null && savedInstanceState.getParcelable(PARAM_ATTEMPT) != null) {
+            attempt = savedInstanceState.getParcelable(PARAM_ATTEMPT);
+        }
+        assert attempt != null;
         String questionUrl = attempt.getQuestionsUrlFrag();
         sections = attempt.getSections();
         if (sections.size() > 1) {
@@ -127,6 +160,9 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
                     unlockedSectionExam = true;
                 }
+            }
+            if (sections.get(sections.size() - 1).getState().equals(COMPLETED)) {
+                currentSection = sections.size() - 1;
             }
             lockedSectionExam = !unlockedSectionExam;
             if (lockedSectionExam) {
@@ -375,9 +411,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (attemptItemList.isEmpty()) {
-            getLoaderManager().initLoader(0, null, this);
-        }
+        startCountDownTimer();
     }
 
     private void openPanel() {
@@ -500,7 +534,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     void pauseExam() {
-        countDownTimer.cancel();
+        stopTimer();
         saveResult(pager.getCurrentItem(), Action.PAUSE);
     }
 
@@ -576,7 +610,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 }
             });
             builder.setCancelable(false);
-            builder.show();
+            networkErrorAlertDialog = builder.show();
             return;
         }
 
@@ -604,7 +638,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
             // Used to get items in order as it fetched
             List<String> spinnerItemsList = new ArrayList<>();
             HashMap<String, List<AttemptItem>> groupedAttemptItems = new HashMap<>();
-            for (AttemptItem attemptItem : items) {
+            for (AttemptItem attemptItem : attemptItemList) {
                 if (unlockedSectionExam) {
                     String section = attemptItem.getAttemptSection().getName();
                     groupAttemptItems(section, attemptItem, spinnerItemsList, groupedAttemptItems);
@@ -649,11 +683,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         } else {
             goToQuestion(0, false);
         }
-        String remainingTime = attempt.getRemainingTime();
-        if (lockedSectionExam) {
-            remainingTime = sections.get(currentSection).getRemainingTime();
-        }
-        startCountDownTimer(formatMillisecond(remainingTime));
+        startCountDownTimer();
     }
 
     void groupAttemptItems(String spinnerItem, AttemptItem attemptItem, List<String> spinnerItemsList,
@@ -733,7 +763,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                                 returnToHistory();
                                 return;
                             }
-                            countDownTimer.cancel();
+                            stopTimer();
                             progressDialog.dismiss();
                             TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception) {
                                 @Override
@@ -744,7 +774,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                                     saveResult(position, action);
                                 }
                             };
-                            alertDialog.show();
+                            saveAnswerAlertDialog = alertDialog.show();
                         }
                     });
         } else if (action.equals(Action.PAUSE)) {
@@ -754,62 +784,20 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     private void sendHeartBeat() {
-        apiClient.heartbeat(attempt.getHeartBeatUrlFrag()).enqueue(new TestpressCallback<Attempt>() {
-            @Override
-            public void onSuccess(Attempt result) {
-                if (getActivity() == null) {
-                    return;
-                }
-                if (progressDialog.isShowing()) {
-                    startCountDownTimer(millisRemaining);
-                    progressDialog.dismiss();
-                }
-            }
-
-            @Override
-            public void onException(TestpressException exception) {
-                if (getActivity() == null) {
-                    return;
-                }
-                countDownTimer.cancel();
-                TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception) {
+        heartBeatApiRequest = apiClient.heartbeat(attempt.getHeartBeatUrlFrag())
+                .enqueue(new TestpressCallback<Attempt>() {
                     @Override
-                    protected void onRetry() {
-                        showProgress(R.string.testpress_please_wait);
-                        sendHeartBeat();
-                    }
-                };
-                alertDialog.show();
-            }
-        });
-    }
-
-    private void endSection() {
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-        }
-        // Save attemptItem, if option or review is changed
-        final AttemptItem attemptItem = attemptItemList.get(pager.getCurrentItem());
-        if (attemptItem.hasChanged()) {
-            saveResult(pager.getCurrentItem(), Action.END_SECTION);
-            return;
-        }
-        showProgress(R.string.testpress_ending_section);
-        apiClient.updateSection(sections.get(currentSection).getEndUrlFrag())
-                .enqueue(new TestpressCallback<AttemptSection>() {
-                    @Override
-                    public void onSuccess(AttemptSection attemptSection) {
+                    public void onSuccess(Attempt attempt) {
                         if (getActivity() == null) {
                             return;
                         }
-                        sections.set(currentSection, attemptSection);
-                        if (++currentSection == sections.size()) {
-                            endExam();
-                        } else {
-                            sectionSpinnerAdapter.setSelectedItem(currentSection);
-                            sectionSpinnerAdapter.notifyDataSetChanged();
-                            primaryQuestionsFilter.setSelection(currentSection);
-                            startSection();
+                        if (lockedSectionExam) {
+                            sections.set(currentSection, attempt.getSections().get(currentSection));
+                        }
+                        TestFragment.this.attempt = attempt;
+                        if (progressDialog.isShowing()) {
+                            startCountDownTimer(millisRemaining);
+                            progressDialog.dismiss();
                         }
                     }
 
@@ -818,25 +806,71 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                         if (getActivity() == null) {
                             return;
                         }
-                        TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception);
-                        if (exception.isNetworkError()) {
-                            alertDialog.setMessage(R.string.testpress_exam_paused_check_internet_to_end);
-                            alertDialog.setPositiveButton(R.string.testpress_end,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            endSection();
-                                        }
-                                    });
-                        }
-                        alertDialog.show();
+                        stopTimer();
+                        TestEngineAlertDialog alertDialogBuilder = new TestEngineAlertDialog(exception) {
+                            @Override
+                            protected void onRetry() {
+                                showProgress(R.string.testpress_please_wait);
+                                sendHeartBeat();
+                            }
+                        };
+                        heartBeatAlertDialog = alertDialogBuilder.show();
                     }
                 });
     }
 
-    private void startSection() {
+    void endSection() {
+        stopTimer();
+        // Save attemptItem, if option or review is changed
+        final AttemptItem attemptItem = attemptItemList.get(pager.getCurrentItem());
+        if (attemptItem.hasChanged()) {
+            saveResult(pager.getCurrentItem(), Action.END_SECTION);
+            return;
+        }
+        showProgress(R.string.testpress_ending_section);
+        AttemptSection section = sections.get(currentSection);
+        if (section.getState().equals(COMPLETED)) {
+            onSectionEnded();
+            return;
+        }
+        endSectionApiRequest = apiClient.updateSection(section.getEndUrlFrag())
+                .enqueue(new TestpressCallback<AttemptSection>() {
+                    @Override
+                    public void onSuccess(AttemptSection attemptSection) {
+                        if (getActivity() == null) {
+                            return;
+                        }
+                        sections.set(currentSection, attemptSection);
+                        onSectionEnded();
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        showException(
+                                exception,
+                                R.string.testpress_exam_paused_check_internet_to_end,
+                                R.string.testpress_end,
+                                "endSection"
+                        );
+                    }
+                });
+    }
+
+    void onSectionEnded() {
+        if (++currentSection == sections.size()) {
+            endExam();
+        } else {
+            sectionSpinnerAdapter.setSelectedItem(currentSection);
+            sectionSpinnerAdapter.notifyDataSetChanged();
+            primaryQuestionsFilter.setSelection(currentSection);
+            startSection();
+        }
+    }
+
+    void startSection() {
         showProgress(R.string.testpress_starting_section);
-        apiClient.updateSection(sections.get(currentSection).getStartUrlFrag())
+        String sectionStartUrlFrag = sections.get(currentSection).getStartUrlFrag();
+        startSectionApiRequest = apiClient.updateSection(sectionStartUrlFrag)
                 .enqueue(new TestpressCallback<AttemptSection>() {
                     @Override
                     public void onSuccess(AttemptSection section) {
@@ -853,38 +887,26 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
                     @Override
                     public void onException(TestpressException exception) {
-                        if (getActivity() == null) {
-                            return;
-                        }
-                        TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception);
-                        if (exception.isNetworkError()) {
-                            alertDialog.setMessage(R.string.testpress_exam_paused_check_internet);
-                            alertDialog.setPositiveButton(R.string.testpress_resume,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            startSection();
-                                        }
-                                    });
-                        }
-                        alertDialog.show();
+                        showException(
+                                exception,
+                                R.string.testpress_exam_paused_check_internet,
+                                R.string.testpress_resume,
+                                "startSection"
+                        );
                     }
                 });
     }
 
-    private void endExam() {
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-        }
+    void endExam() {
+        stopTimer();
         // Save attemptItem, if option or review is changed
-        final AttemptItem attemptItem = attemptItemList.get(pager.getCurrentItem());
-        if (attemptItem.hasChanged()) {
+        if (!attemptItemList.isEmpty() && attemptItemList.get(pager.getCurrentItem()).hasChanged()) {
             saveResult(pager.getCurrentItem(), Action.END);
             return;
         }
         showProgress(R.string.testpress_ending_exam);
         if (courseContent != null) {
-            apiClient.endContentAttempt(courseAttempt.getEndAttemptUrl())
+            endContentAttemptApiRequest = apiClient.endContentAttempt(courseAttempt.getEndAttemptUrl())
                     .enqueue(new TestpressCallback<CourseAttempt>() {
                         @Override
                         public void onSuccess(CourseAttempt courseAttempt) {
@@ -901,25 +923,16 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
                         @Override
                         public void onException(TestpressException exception) {
-                            if (getActivity() == null) {
-                                return;
-                            }
-                            TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception);
-                            if (exception.isNetworkError()) {
-                                alertDialog.setMessage(R.string.testpress_exam_paused_check_internet_to_end);
-                                alertDialog.setPositiveButton(R.string.testpress_end,
-                                        new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                endExam();
-                                            }
-                                        });
-                            }
-                            alertDialog.show();
+                            showException(
+                                    exception,
+                                    R.string.testpress_exam_paused_check_internet_to_end,
+                                    R.string.testpress_end,
+                                    "endExam"
+                            );
                         }
                     });
         } else {
-            apiClient.endExam(attempt.getEndUrlFrag())
+            endAttemptApiRequest = apiClient.endExam(attempt.getEndUrlFrag())
                     .enqueue(new TestpressCallback<Attempt>() {
                         @Override
                         public void onSuccess(Attempt attempt) {
@@ -935,21 +948,12 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
                         @Override
                         public void onException(TestpressException exception) {
-                            if (getActivity() == null) {
-                                return;
-                            }
-                            TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception);
-                            if (exception.isNetworkError()) {
-                                alertDialog.setMessage(R.string.testpress_exam_paused_check_internet_to_end);
-                                alertDialog.setPositiveButton(R.string.testpress_end,
-                                        new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                endExam();
-                                            }
-                                        });
-                            }
-                            alertDialog.show();
+                            showException(
+                                    exception,
+                                    R.string.testpress_exam_paused_check_internet_to_end,
+                                    R.string.testpress_end,
+                                    "endExam"
+                            );
                         }
                     });
         }
@@ -965,7 +969,10 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @SuppressLint("SimpleDateFormat")
-    private long formatMillisecond(String inputString) {
+    long formatMillisecond(String inputString) {
+        if (inputString == null) {
+            return 0;
+        }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         try {
@@ -1051,13 +1058,41 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
         panelListAdapter.setItems(filterItems.toArray());
     }
 
-    private void startCountDownTimer(long millisInFuture) {
+    void startCountDownTimer() {
+        String remainingTime = attempt.getRemainingTime();
+        if (lockedSectionExam) {
+            AttemptSection section = sections.get(currentSection);
+            if (section.getState().equals(NOT_STARTED)) {
+                startSection();
+                return;
+            }
+            remainingTime = section.getRemainingTime();
+        }
+        long millisRemainingFetchedInAttempt = formatMillisecond(remainingTime);
+        if (millisRemaining == -1 || millisRemaining > millisRemainingFetchedInAttempt) {
+            millisRemaining = millisRemainingFetchedInAttempt;
+        }
+        if (millisRemaining == 0) {
+            onRemainingTimeOver();
+        } else if (attemptItemList.isEmpty()) {
+            getLoaderManager().restartLoader(0, null, this);
+        } else {
+            startCountDownTimer(millisRemaining);
+        }
+    }
+
+    private void updateTimeRemaining(long millisRemaining) {
+        this.millisRemaining = millisRemaining;
+        String formattedTime = formatTime(millisRemaining);
+        timer.setText(formattedTime);
+    }
+
+    void startCountDownTimer(long millisInFuture) {
+        updateTimeRemaining(millisInFuture);
         countDownTimer = new CountDownTimer(millisInFuture, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                millisRemaining = millisUntilFinished;
-                final String formattedTime = formatTime(millisUntilFinished);
-                timer.setText(formattedTime);
+                updateTimeRemaining(millisUntilFinished);
                 long seconds = millisUntilFinished / 1000;
                 if ((seconds % 60) == 0 && (seconds / 60) != 0) {
                     sendHeartBeat();
@@ -1075,11 +1110,7 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
                 } else if (endExamAlertDialog != null && endExamAlertDialog.isShowing()) {
                     endExamAlertDialog.dismiss();
                 }
-                if (lockedSectionExam) {
-                    endSection();
-                } else {
-                    endExam();
-                }
+                onRemainingTimeOver();
             }
         }.start();
     }
@@ -1135,5 +1166,167 @@ public class TestFragment extends Fragment implements LoaderManager.LoaderCallba
 
         textView.setTextColor(ContextCompat.getColor(textView.getContext(), colorRes));
         textView.setClickable(enable);
+    }
+
+    void onRemainingTimeOver() {
+        if (lockedSectionExam) {
+            endSection();
+        } else {
+            endExam();
+        }
+    }
+
+    void stopTimer() {
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+            countDownTimer = null;
+        }
+    }
+
+    void showException(TestpressException exception,
+                       @StringRes final int errorMessage,
+                       @StringRes int positiveButtonText,
+                       final String methodName) {
+
+        if (getActivity() == null) {
+            return;
+        }
+        TestEngineAlertDialog alertDialogBuilder = new TestEngineAlertDialog(exception);
+        if (exception.isNetworkError()) {
+            alertDialogBuilder.setMessage(errorMessage);
+            alertDialogBuilder.setPositiveButton(positiveButtonText,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            switch (methodName) {
+                                case "endSection":
+                                    endSection();
+                                    break;
+                                case "startSection":
+                                    startSection();
+                                    break;
+                                case "endExam":
+                                    endExam();
+                                    break;
+                            }
+                        }
+                    });
+        }
+        networkErrorAlertDialog = alertDialogBuilder.show();
+    }
+
+    void showResumeExamDialog() {
+        if (getActivity() == null) {
+            return;
+        }
+        resumeExamDialog =
+                new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
+                        .setMessage(R.string.testpress_exam_paused)
+                        .setPositiveButton(R.string.testpress_resume,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        resumeExam();
+                                    }
+                                })
+                        .setNegativeButton(R.string.testpress_not_now,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        returnToHistory();
+                                    }
+                                })
+                        .show();
+    }
+
+    void resumeExam() {
+        showProgress(R.string.testpress_please_wait);
+        resumeExamApiRequest = apiClient.startAttempt(attempt.getStartUrlFrag())
+                .enqueue(new TestpressCallback<Attempt>() {
+                    @Override
+                    public void onSuccess(Attempt attempt) {
+                        TestFragment.this.attempt = attempt;
+                        progressDialog.dismiss();
+                        startCountDownTimer();
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        if (getActivity() == null) {
+                            return;
+                        }
+                        progressDialog.dismiss();
+                        TestEngineAlertDialog alertDialogBuilder = new TestEngineAlertDialog(exception) {
+                            @Override
+                            protected void onRetry() {
+                                showProgress(R.string.testpress_please_wait);
+                                resumeExam();
+                            }
+                        };
+                        networkErrorAlertDialog = alertDialogBuilder.show();
+                    }
+                });
+    }
+
+    void stopTimerOnAppWentBackground() {
+        CommonUtils.cancelAPIRequests(getRetrofitCalls());
+        if (countDownTimer != null) {
+            stopTimer();
+        }
+        CommonUtils.dismissDialogs(new Dialog[] {
+                heartBeatAlertDialog, saveAnswerAlertDialog, networkErrorAlertDialog
+        });
+        showResumeExamDialog();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        attempt.setSections(sections);
+        outState.putParcelable(PARAM_ATTEMPT, attempt);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        removeAppBackgroundHandler();
+    }
+
+    void removeAppBackgroundHandler() {
+        if (appBackgroundStateHandler != null) {
+            appBackgroundStateHandler.removeCallbacks(stopTimerTask);
+            appBackgroundStateHandler = null;
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        saveResult(currentPosition, Action.UPDATE_ANSWER);
+        appBackgroundStateHandler = new Handler();
+        appBackgroundStateHandler.postDelayed(stopTimerTask, APP_BACKGROUND_DELAY);
+    }
+
+    @Override
+    public RetrofitCall[] getRetrofitCalls() {
+        return new RetrofitCall[] {
+                heartBeatApiRequest, startSectionApiRequest, endSectionApiRequest,
+                endContentAttemptApiRequest, endAttemptApiRequest, resumeExamApiRequest
+        };
+    }
+
+    @Override
+    public Dialog[] getDialogs() {
+        return new Dialog[] {
+                progressDialog, resumeExamDialog, heartBeatAlertDialog, saveAnswerAlertDialog,
+                networkErrorAlertDialog
+        };
+    }
+
+    @Override
+    public void onDestroy() {
+        stopTimer();
+        removeAppBackgroundHandler();
+        super.onDestroy();
     }
 }

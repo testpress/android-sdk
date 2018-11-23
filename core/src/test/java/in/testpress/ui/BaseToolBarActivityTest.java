@@ -23,7 +23,7 @@ import static org.powermock.api.support.membermodification.MemberMatcher.methods
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ BaseToolBarActivity.class, CommonUtils.class })
+@PrepareForTest({ AppCompatActivity.class, CommonUtils.class })
 public class BaseToolBarActivityTest {
 
     @Mock
