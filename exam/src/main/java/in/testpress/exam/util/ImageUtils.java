@@ -146,7 +146,12 @@ public class ImageUtils {
         intent.setAction(Intent.ACTION_SEND);
         intent.setType("image/*");
         intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "");
-        intent.putExtra(android.content.Intent.EXTRA_TEXT, "");
+        String shareMessage = String.format(
+                context.getString(R.string.testpress_share_screenshot_text),
+                context.getApplicationInfo().loadLabel(context.getPackageManager()),
+                context.getPackageName()
+        );
+        intent.putExtra(android.content.Intent.EXTRA_TEXT, shareMessage);
         intent.putExtra(Intent.EXTRA_STREAM, uri);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         try {

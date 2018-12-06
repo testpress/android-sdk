@@ -251,5 +251,5 @@
     <string name="testpress_share">Share</string>
     <string name="testpress_share_screenshot">Share Screenshot</string>
     <string name="testpress_no_app_available">No App Available</string>
-
+    <string name="testpress_share_screenshot_text">Do check out this question from %1$s. Get it at https://play.google.com/store/apps/details?id=%2$s</string>
 </resources>
