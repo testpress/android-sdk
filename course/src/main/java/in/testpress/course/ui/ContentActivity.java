@@ -1,6 +1,7 @@
 package in.testpress.course.ui;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.gson.JsonObject;
 
 import junit.framework.Assert;
 
@@ -75,7 +77,6 @@ import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ZoomableImageActivity;
 import in.testpress.ui.view.ClosableSpinner;
-import in.testpress.util.CommonUtils;
 import in.testpress.util.FormatDate;
 import in.testpress.util.FullScreenChromeClient;
 import in.testpress.util.ViewUtils;
@@ -85,6 +86,8 @@ import in.testpress.v2_4.models.FolderListResponse;
 
 import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
+import static in.testpress.course.network.TestpressCourseApiClient.EMBED_CODE;
+import static in.testpress.course.network.TestpressCourseApiClient.EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.CONTENTS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.STATE_PAUSED;
@@ -302,6 +305,14 @@ public class ContentActivity extends BaseToolBarActivity {
                     }
                 });
             }
+
+            @Override
+            protected boolean shouldOverrideUrlLoading(Activity activity, String url) {
+                if (url.contains(EMBED_DOMAIN_RESTRICTED_VIDEO_PATH)) {
+                    return false;
+                }
+                return super.shouldOverrideUrlLoading(activity, url);
+            }
         };
         webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
         fullScreenChromeClient = new FullScreenChromeClient(this);
@@ -339,8 +350,13 @@ public class ContentActivity extends BaseToolBarActivity {
         } else if (content.getRawVideo() != null) {
             Video video = content.getRawVideo();
             setContentTitle(video.getTitle());
-            isEmbeddableVideo = !content.isNonEmbeddableVideo();
-            if (isEmbeddableVideo) {
+            if (video.getIsDomainRestricted()) {
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty(EMBED_CODE, video.getEmbedCode());
+                String url = courseApiClient.getBaseUrl() + EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
+                webViewUtils.initWebViewAndPostUrl(url, jsonObject.toString(), this);
+                webView.setWebChromeClient(fullScreenChromeClient);
+            } else if (!content.isNonEmbeddableVideo()) {
                 String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
                         "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
 

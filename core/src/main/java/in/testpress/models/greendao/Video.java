@@ -21,6 +21,7 @@ public class Video implements android.os.Parcelable {
     private Long id;
     private String embedCode;
     private Long duration;
+    private Boolean isDomainRestricted;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -34,12 +35,13 @@ public class Video implements android.os.Parcelable {
     }
 
     @Generated
-    public Video(String title, String url, Long id, String embedCode, Long duration) {
+    public Video(String title, String url, Long id, String embedCode, Long duration, Boolean isDomainRestricted) {
         this.title = title;
         this.url = url;
         this.id = id;
         this.embedCode = embedCode;
         this.duration = duration;
+        this.isDomainRestricted = isDomainRestricted;
     }
 
     public String getTitle() {
@@ -80,6 +82,14 @@ public class Video implements android.os.Parcelable {
 
     public void setDuration(Long duration) {
         this.duration = duration;
+    }
+
+    public Boolean getIsDomainRestricted() {
+        return isDomainRestricted;
+    }
+
+    public void setIsDomainRestricted(Boolean isDomainRestricted) {
+        this.isDomainRestricted = isDomainRestricted;
     }
 
     // KEEP METHODS - put your custom methods here

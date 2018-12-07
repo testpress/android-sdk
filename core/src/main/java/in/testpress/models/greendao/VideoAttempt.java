@@ -174,7 +174,6 @@ public class VideoAttempt {
         }
         return getVideoContent();
     }
-
     // KEEP METHODS END
 
 }

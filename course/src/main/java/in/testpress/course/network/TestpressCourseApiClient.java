@@ -25,6 +25,8 @@ public class TestpressCourseApiClient extends TestpressApiClient {
     public static final String LAST_POSITION =  "last_position";
     public static final String TIME_RANGES =  "time_ranges";
 
+    public static final String EMBED_CODE =  "embed_code";
+
     /**
      * Course List Url
      */
@@ -45,6 +47,8 @@ public class TestpressCourseApiClient extends TestpressApiClient {
     public static final String THREAD_PATH =  "/api/v2.2/me/threats/";
 
     public static final String TARGET_PATH =  "/api/v2.2/me/targets/";
+
+    public static final String EMBED_DOMAIN_RESTRICTED_VIDEO_PATH =  "/embed/domain-restricted-video/";
 
     public TestpressCourseApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));

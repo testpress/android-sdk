@@ -99,6 +99,50 @@ public class WebViewUtils {
                 "text/html", "utf-8", null);
     }
 
+    @SuppressLint({"AddJavascriptInterface", "SetJavaScriptEnabled"})
+    public void initWebViewAndPostUrl(String url, String json, final Activity activity) {
+        initWebView(webView);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                super.onPageStarted(view, url, favicon);
+                WebViewUtils.this.onPageStarted();
+                hasError = false;
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                if (!hasError) {
+                    onLoadFinished();
+                }
+            }
+
+            @SuppressWarnings("deprecation")
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return WebViewUtils.this.shouldOverrideUrlLoading(activity, url);
+            }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request,
+                                        WebResourceError error) {
+
+                super.onReceivedError(view, request, error);
+                if (InternetConnectivityChecker.isConnected(activity)) {
+                    return;
+                }
+                onNetworkError();
+                hasError = true;
+            }
+        });
+        postUrl(url, json);
+    }
+
+    public void postUrl(String url, String json) {
+        webView.postUrl(url, json.getBytes());
+    }
+
     protected void onLoadFinished() {
         webView.setVisibility(View.VISIBLE);
     }
