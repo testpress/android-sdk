@@ -364,6 +364,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 webViewUtils.initWebView(html, this);
                 webView.setWebChromeClient(fullScreenChromeClient);
             } else {
+                isNonEmbeddableVideo = true;
                 TestpressSession session = TestpressSdk.getTestpressSession(this);
                 if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
                     checkProfileDetailExist(video.getUrl());
