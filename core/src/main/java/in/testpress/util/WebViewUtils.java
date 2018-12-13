@@ -36,7 +36,7 @@ public class WebViewUtils {
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setPluginState(WebSettings.PluginState.ON);
-        webSettings.getJavaScriptCanOpenWindowsAutomatically();
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webSettings.setBuiltInZoomControls(false);
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);

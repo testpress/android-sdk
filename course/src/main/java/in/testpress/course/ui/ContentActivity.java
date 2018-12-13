@@ -151,7 +151,7 @@ public class ContentActivity extends BaseToolBarActivity {
     private FullScreenChromeClient fullScreenChromeClient;
     private ExoPlayerUtil exoPlayerUtil;
     private FrameLayout exoPlayerMainFrame;
-    private boolean isEmbeddableVideo;
+    private boolean isNonEmbeddableVideo;
     private VideoAttempt videoAttempt;
     private RetrofitCall<CourseAttempt> createAttemptApiRequest;
     private RetrofitCall<Content> updateContentApiRequest;
@@ -353,10 +353,11 @@ public class ContentActivity extends BaseToolBarActivity {
             if (video.getIsDomainRestricted()) {
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.addProperty(EMBED_CODE, video.getEmbedCode());
-                String url = courseApiClient.getBaseUrl() + EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
+                String url = courseApiClient.getBaseUrl().replace("mathiit", "sandbox") + EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
                 webViewUtils.initWebViewAndPostUrl(url, jsonObject.toString(), this);
                 webView.setWebChromeClient(fullScreenChromeClient);
             } else if (!content.isNonEmbeddableVideo()) {
+                isNonEmbeddableVideo = true;
                 String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
                         "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
 
@@ -764,7 +765,7 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void createContentAttempt() {
-        if (content.getRawVideo() != null && !isEmbeddableVideo) {
+        if (content.getRawVideo() != null && isNonEmbeddableVideo) {
             showLoadingProgress();
         }
         createAttemptApiRequest = courseApiClient.createContentAttempt(content.getId())
@@ -776,7 +777,7 @@ public class ContentActivity extends BaseToolBarActivity {
                                     TESTPRESS_CONTENT_SHARED_PREFS, Context.MODE_PRIVATE);
                             prefs.edit().putBoolean(FORCE_REFRESH, true).apply();
                         }
-                        if (content.getRawVideo() != null && !isEmbeddableVideo) {
+                        if (content.getRawVideo() != null && isNonEmbeddableVideo) {
                             swipeRefresh.setRefreshing(false);
                             videoAttempt = courseAttempt.getRawVideoAttempt();
                             initExoPlayer(content.getRawVideo().getUrl());
@@ -785,7 +786,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
                     @Override
                     public void onException(TestpressException exception) {
-                        if (content.getRawVideo() != null && !isEmbeddableVideo) {
+                        if (content.getRawVideo() != null && isNonEmbeddableVideo) {
                             handleError(exception, false);
                         } else if (!exception.isNetworkError()) {
                             exception.printStackTrace();
