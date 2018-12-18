@@ -357,7 +357,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 webViewUtils.initWebViewAndPostUrl(url, jsonObject.toString(), this);
                 webView.setWebChromeClient(fullScreenChromeClient);
             } else if (!content.isNonEmbeddableVideo()) {
-                isNonEmbeddableVideo = true;
+                isNonEmbeddableVideo = false;
                 String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
                         "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
 
