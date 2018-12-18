@@ -353,7 +353,7 @@ public class ContentActivity extends BaseToolBarActivity {
             if (video.getIsDomainRestricted()) {
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.addProperty(EMBED_CODE, video.getEmbedCode());
-                String url = courseApiClient.getBaseUrl().replace("mathiit", "sandbox") + EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
+                String url = courseApiClient.getBaseUrl()+ EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
                 webViewUtils.initWebViewAndPostUrl(url, jsonObject.toString(), this);
                 webView.setWebChromeClient(fullScreenChromeClient);
             } else if (!content.isNonEmbeddableVideo()) {
