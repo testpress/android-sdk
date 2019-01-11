@@ -164,6 +164,9 @@ public class ExoPlayerUtil {
             }
         });
         initFullscreenDialog();
+
+        // set activity as portrait mode at first
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
@@ -387,7 +390,7 @@ public class ExoPlayerUtil {
             setFullscreenIcon(R.drawable.testpress_fullscreen_exit);
             fullscreen = true;
             fullscreenDialog.show();
-            //activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
     }
 
@@ -396,7 +399,7 @@ public class ExoPlayerUtil {
         if(!iscloseFullscreenDialogCalled) {
             isopenFullscreenDialogCalled = false;
             iscloseFullscreenDialogCalled =true;
-            //activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             ((ViewGroup) exoPlayerLayout.getParent()).removeView(exoPlayerLayout);
             exoPlayerMainFrame.addView(exoPlayerLayout);
             fullscreen = false;

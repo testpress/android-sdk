@@ -10,6 +10,7 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -166,6 +167,10 @@ public class ContentActivity extends BaseToolBarActivity {
     private RetrofitCall<Bookmark> bookmarkApiRequest;
     private RetrofitCall<Void> deleteBookmarkApiRequest;
     private RetrofitCall<HtmlContent> htmlContentApiRequest;
+
+    private OrientationEventListener mOrientationListener;
+    public boolean isLandscape;
+
 
     public static Intent createIntent(int position, long chapterId, AppCompatActivity activity) {
         Intent intent = new Intent(activity, ContentActivity.class);
@@ -346,24 +351,7 @@ public class ContentActivity extends BaseToolBarActivity {
             validateAdjacentNavigationButton();
         }
 
-        mOrientationListener = new OrientationEventListener(this,
-                SensorManager.SENSOR_DELAY_NORMAL) {
-
-            @Override
-            public void onOrientationChanged(int orientation) {
-                Log.v("onOrientationChanged",
-                        "Orientation changed to " + orientation);
-
-            }
-        };
-
-        if (mOrientationListener.canDetectOrientation() == true) {
-            Log.d("onOrientationChanged", "Can detect orientation");
-            mOrientationListener.enable();
-        } else {
-            Log.d("onOrientationChanged", "Cannot detect orientation");
-            mOrientationListener.disable();
-        }
+        intializeOrientationListener();
     }
 
     private void checkContentType() {
@@ -1237,21 +1225,40 @@ public class ContentActivity extends BaseToolBarActivity {
         }
     }
 
-//    @Override
-//    public void onConfigurationChanged(Configuration newConfig) {
-//        super.onConfigurationChanged(newConfig);
-//
-//        if(exoPlayerUtil != null){
-//            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
-//                exoPlayerUtil.onOrientationchange(true);
-//            } else {
-//                exoPlayerUtil.onOrientationchange(false);
-//            }
-//        }
-//    }
+    private void intializeOrientationListener() {
+        mOrientationListener = new OrientationEventListener(this,
+                SensorManager.SENSOR_DELAY_NORMAL) {
 
-    OrientationEventListener mOrientationListener;
+            @Override
+            public void onOrientationChanged(int orientation) {
 
+                // Check does user have turned off the auto rotation
+                boolean isAutoRotationIsON = (android.provider.Settings.System.getInt(getContentResolver(),
+                        Settings.System.ACCELEROMETER_ROTATION, 0) == 1);
+
+                if (exoPlayerUtil!=null && isAutoRotationIsON) {
+                    boolean misLandscape = isLandscape;
+
+                    if ((orientation > 0 && orientation < 20) || (orientation == 170 && orientation < 190)) {
+                        misLandscape = false;
+                    } else if ((orientation > 80 && orientation < 110) || (orientation > 220) && orientation < 270) {
+                        misLandscape = true;
+                    }
+
+                    if (misLandscape != isLandscape) {
+                        isLandscape = misLandscape;
+                        exoPlayerUtil.onOrientationchange(isLandscape);
+                    }
+                }
+            }
+        };
+
+        if (mOrientationListener.canDetectOrientation() == true) {
+            mOrientationListener.enable();
+        } else {
+            mOrientationListener.disable();
+        }
+    }
 
 
 
