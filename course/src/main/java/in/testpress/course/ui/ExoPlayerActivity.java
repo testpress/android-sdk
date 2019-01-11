@@ -92,7 +92,7 @@ public class ExoPlayerActivity extends AppCompatActivity {
                 boolean isAutoRotationIsON = (android.provider.Settings.System.getInt(getContentResolver(),
                         Settings.System.ACCELEROMETER_ROTATION, 0) == 1);
 
-                if (exoPlayerUtil!=null && isAutoRotationIsON) {
+                if (exoPlayerUtil != null && isAutoRotationIsON) {
                     boolean misLandscape = isLandscape;
 
                     if ((orientation > 0 && orientation < 20) || (orientation == 170 && orientation < 190)) {

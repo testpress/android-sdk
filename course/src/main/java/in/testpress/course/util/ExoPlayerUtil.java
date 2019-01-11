@@ -381,8 +381,8 @@ public class ExoPlayerUtil {
     private void openFullscreenDialog() {
 
         if (!isopenFullscreenDialogCalled) {
-            iscloseFullscreenDialogCalled=false;
-            isopenFullscreenDialogCalled=true;
+            iscloseFullscreenDialogCalled = false;
+            isopenFullscreenDialogCalled = true;
             exoPlayerMainFrame.removeView(exoPlayerLayout);
             fullscreenDialog.addContentView(exoPlayerLayout, new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -396,9 +396,9 @@ public class ExoPlayerUtil {
 
     private void closeFullscreenDialog() {
 
-        if(!iscloseFullscreenDialogCalled) {
+        if (!iscloseFullscreenDialogCalled) {
             isopenFullscreenDialogCalled = false;
-            iscloseFullscreenDialogCalled =true;
+            iscloseFullscreenDialogCalled = true;
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             ((ViewGroup) exoPlayerLayout.getParent()).removeView(exoPlayerLayout);
             exoPlayerMainFrame.addView(exoPlayerLayout);
@@ -515,7 +515,7 @@ public class ExoPlayerUtil {
 
     public void onOrientationchange(boolean fullscreen) {
 
-        if (fullscreen){
+        if (fullscreen) {
             openFullscreenDialog();
         } else {
             closeFullscreenDialog();

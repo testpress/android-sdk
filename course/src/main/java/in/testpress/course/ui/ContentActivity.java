@@ -171,7 +171,6 @@ public class ContentActivity extends BaseToolBarActivity {
     private OrientationEventListener mOrientationListener;
     public boolean isLandscape;
 
-
     public static Intent createIntent(int position, long chapterId, AppCompatActivity activity) {
         Intent intent = new Intent(activity, ContentActivity.class);
         intent.putExtra(POSITION, position);
@@ -1242,7 +1241,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 boolean isAutoRotationIsON = (android.provider.Settings.System.getInt(getContentResolver(),
                         Settings.System.ACCELEROMETER_ROTATION, 0) == 1);
 
-                if (exoPlayerUtil!=null && isAutoRotationIsON) {
+                if (exoPlayerUtil != null && isAutoRotationIsON) {
                     boolean misLandscape = isLandscape;
 
                     if ((orientation > 0 && orientation < 20) || (orientation == 170 && orientation < 190)) {
