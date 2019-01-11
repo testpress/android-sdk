@@ -102,8 +102,8 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
         });
         final EditText usernameEditText = (EditText) findViewById(R.id.username);
         final EditText passwordEditText = (EditText) findViewById(R.id.password);
-        usernameEditText.setText("demouser3");
-        passwordEditText.setText("welcome");
+        usernameEditText.setText("testpress");
+        passwordEditText.setText("demo");
         usernameEditText.setSelection(usernameEditText.getText().length());
         findViewById(R.id.testpress_login_button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,7 +119,7 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
     }
 
     private void authenticate(String userId, String accessToken, TestpressSdk.Provider provider) {
-        InstituteSettings instituteSettings = new InstituteSettings("https://psmsimplified.testpress.in");
+        InstituteSettings instituteSettings = new InstituteSettings("https://sandbox.testpress.in");
         TestpressSdk.initialize(this, instituteSettings, userId, accessToken, provider,
                 new TestpressCallback<TestpressSession>() {
                     @Override

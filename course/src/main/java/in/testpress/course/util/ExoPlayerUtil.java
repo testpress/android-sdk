@@ -82,10 +82,13 @@ public class ExoPlayerUtil {
     private ImageView fullscreenIcon;
     private Dialog fullscreenDialog;
 
+
     private Activity activity;
     private long videoAttemptId;
     private Content content;
     private String url;
+    private boolean isopenFullscreenDialogCalled;
+    private boolean iscloseFullscreenDialogCalled;
     private float startPosition;
     private boolean playWhenReady = true;
     private float speedRate = 1;
@@ -375,9 +378,6 @@ public class ExoPlayerUtil {
         startOverlayMarquee();
     }
 
-    public boolean isopenFullscreenDialogCalled;
-    public boolean iscloseFullscreenDialogCalled;
-
     private void openFullscreenDialog() {
 
         if (!isopenFullscreenDialogCalled) {
@@ -514,6 +514,7 @@ public class ExoPlayerUtil {
     }
 
     public void onOrientationchange(boolean fullscreen) {
+
         if (fullscreen){
             openFullscreenDialog();
         } else {

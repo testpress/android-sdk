@@ -51,7 +51,7 @@ public class ExoPlayerActivity extends AppCompatActivity {
         intializeOrientationListener();
     }
 
-        @Override
+    @Override
     public void onStart() {
         super.onStart();
         exoPlayerUtil.onStart();
@@ -73,6 +73,12 @@ public class ExoPlayerActivity extends AppCompatActivity {
     public void onStop() {
         super.onStop();
         exoPlayerUtil.onStop();
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        exoPlayerUtil=null;
     }
 
     private void intializeOrientationListener() {

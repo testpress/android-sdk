@@ -1265,7 +1265,4 @@ public class ContentActivity extends BaseToolBarActivity {
             mOrientationListener.disable();
         }
     }
-
-
-
 }
