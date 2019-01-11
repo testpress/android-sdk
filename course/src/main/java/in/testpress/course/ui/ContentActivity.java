@@ -1181,6 +1181,12 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        exoPlayerUtil = null;
+    }
+
+    @Override
     public RetrofitCall[] getRetrofitCalls() {
         return new RetrofitCall[] {
                 createAttemptApiRequest, updateContentApiRequest, profileDetailApiRequest,
