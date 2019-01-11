@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,7 +17,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.OrientationEventListener;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -341,6 +344,25 @@ public class ContentActivity extends BaseToolBarActivity {
             pageNumber.setText(String.format("%d/%d", position + 1, contents.size()));
             checkContentType();
             validateAdjacentNavigationButton();
+        }
+
+        mOrientationListener = new OrientationEventListener(this,
+                SensorManager.SENSOR_DELAY_NORMAL) {
+
+            @Override
+            public void onOrientationChanged(int orientation) {
+                Log.v("onOrientationChanged",
+                        "Orientation changed to " + orientation);
+
+            }
+        };
+
+        if (mOrientationListener.canDetectOrientation() == true) {
+            Log.d("onOrientationChanged", "Can detect orientation");
+            mOrientationListener.enable();
+        } else {
+            Log.d("onOrientationChanged", "Cannot detect orientation");
+            mOrientationListener.disable();
         }
     }
 
@@ -1215,16 +1237,22 @@ public class ContentActivity extends BaseToolBarActivity {
         }
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
+//    @Override
+//    public void onConfigurationChanged(Configuration newConfig) {
+//        super.onConfigurationChanged(newConfig);
+//
+//        if(exoPlayerUtil != null){
+//            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+//                exoPlayerUtil.onOrientationchange(true);
+//            } else {
+//                exoPlayerUtil.onOrientationchange(false);
+//            }
+//        }
+//    }
 
-        if(exoPlayerUtil != null){
-            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
-                exoPlayerUtil.onOrientationchange(true);
-            } else {
-                exoPlayerUtil.onOrientationchange(false);
-            }
-        } }
+    OrientationEventListener mOrientationListener;
+
+
+
 
 }
