@@ -102,8 +102,8 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
         });
         final EditText usernameEditText = (EditText) findViewById(R.id.username);
         final EditText passwordEditText = (EditText) findViewById(R.id.password);
-        usernameEditText.setText("testpress");
-        passwordEditText.setText("demo");
+        usernameEditText.setText("demouser3");
+        passwordEditText.setText("welcome");
         usernameEditText.setSelection(usernameEditText.getText().length());
         findViewById(R.id.testpress_login_button).setOnClickListener(new View.OnClickListener() {
             @Override

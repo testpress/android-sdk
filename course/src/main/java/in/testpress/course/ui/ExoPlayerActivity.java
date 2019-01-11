@@ -1,5 +1,7 @@
 package in.testpress.course.ui;
 
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -41,6 +43,20 @@ public class ExoPlayerActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if(!exoPlayerUtil.get_isExplicitScreenRotation()){
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+                exoPlayerUtil.onOrientationchange(true);
+            } else {
+                exoPlayerUtil.onOrientationchange(false);
+            }
+        }
+        exoPlayerUtil.set_isExplicitScreenRotation(false);
+    }
+
+        @Override
     public void onStart() {
         super.onStart();
         exoPlayerUtil.onStart();
