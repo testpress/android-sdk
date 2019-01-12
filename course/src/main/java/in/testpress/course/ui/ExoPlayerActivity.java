@@ -1,14 +1,8 @@
 package in.testpress.course.ui;
 
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
-import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.OrientationEventListener;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -16,6 +10,7 @@ import com.google.android.exoplayer2.ui.PlayerView;
 
 import in.testpress.course.R;
 import in.testpress.course.util.ExoPlayerUtil;
+import in.testpress.course.util.ExoplayerFullscreenHelper;
 
 /**
  * A fullscreen activity to play audio or video streams.
@@ -28,9 +23,7 @@ public class ExoPlayerActivity extends AppCompatActivity {
     public static final String SPEED_RATE = "speedRate";
 
     private ExoPlayerUtil exoPlayerUtil;
-
-    private OrientationEventListener mOrientationListener;
-    public boolean isLandscape;
+    private ExoplayerFullscreenHelper exoplayerFullscreenHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +41,8 @@ public class ExoPlayerActivity extends AppCompatActivity {
         exoPlayerUtil =
                 new ExoPlayerUtil(this, exoPlayerMainFrame, url, startPosition, true, speedRate);
 
-        intializeOrientationListener();
+        exoplayerFullscreenHelper = new ExoplayerFullscreenHelper(this, exoPlayerUtil);
+        exoplayerFullscreenHelper.initializeOrientationListener();
     }
 
     @Override
@@ -78,42 +72,6 @@ public class ExoPlayerActivity extends AppCompatActivity {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        exoPlayerUtil=null;
+        exoplayerFullscreenHelper.disableOrientationListener();
     }
-
-    private void intializeOrientationListener() {
-        mOrientationListener = new OrientationEventListener(this,
-                SensorManager.SENSOR_DELAY_NORMAL) {
-
-            @Override
-            public void onOrientationChanged(int orientation) {
-
-                // Check does user have turned off the auto rotation
-                boolean isAutoRotationIsON = (android.provider.Settings.System.getInt(getContentResolver(),
-                        Settings.System.ACCELEROMETER_ROTATION, 0) == 1);
-
-                if (exoPlayerUtil != null && isAutoRotationIsON) {
-                    boolean misLandscape = isLandscape;
-
-                    if ((orientation > 0 && orientation < 20) || (orientation == 170 && orientation < 190)) {
-                        misLandscape = false;
-                    } else if ((orientation > 80 && orientation < 110) || (orientation > 220) && orientation < 270) {
-                        misLandscape = true;
-                    }
-
-                    if (misLandscape != isLandscape) {
-                        isLandscape = misLandscape;
-                        exoPlayerUtil.onOrientationchange(isLandscape);
-                    }
-                }
-            }
-        };
-
-        if (mOrientationListener.canDetectOrientation() == true) {
-            mOrientationListener.enable();
-        } else {
-            mOrientationListener.disable();
-        }
-    }
-
 }

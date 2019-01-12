@@ -390,7 +390,7 @@ public class ExoPlayerUtil {
             setFullscreenIcon(R.drawable.testpress_fullscreen_exit);
             fullscreen = true;
             fullscreenDialog.show();
-            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         }
     }
 
@@ -399,7 +399,7 @@ public class ExoPlayerUtil {
         if (!iscloseFullscreenDialogCalled) {
             isopenFullscreenDialogCalled = false;
             iscloseFullscreenDialogCalled = true;
-            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
             ((ViewGroup) exoPlayerLayout.getParent()).removeView(exoPlayerLayout);
             exoPlayerMainFrame.addView(exoPlayerLayout);
             fullscreen = false;
