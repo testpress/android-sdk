@@ -69,6 +69,7 @@ public class TestpressStore {
 
         init(activity.getApplicationContext(), testpressSession);
         Intent intent = new Intent(activity, ProductsListActivity.class);
+        setExtraParameterToIntent(intent, activity);
         activity.startActivityForResult(intent, STORE_REQUEST_CODE);
     }
 
@@ -98,5 +99,16 @@ public class TestpressStore {
         TestpressSdk.setTestpressSession(applicationContext, testpressSession);
         ImageUtils.initImageLoader(applicationContext);
     }
+
+    private static Intent setExtraParameterToIntent(Intent intent, Activity activity){
+
+        if (activity.getIntent().getStringExtra("title") != "" &&
+                activity.getIntent().getStringExtra("title") != null) {
+            intent.putExtra("title", activity.getIntent().getStringExtra("title"));
+        }
+
+        return intent;
+    }
+
 
 }
