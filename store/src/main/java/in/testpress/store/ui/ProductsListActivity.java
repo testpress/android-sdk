@@ -16,6 +16,10 @@ public class ProductsListActivity extends BaseToolBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_container_layout);
         ProductListFragment.show(this, R.id.fragment_container);
+
+        if (getIntent().getStringExtra("title") != "" && getIntent().getStringExtra("title") != null) {
+            getSupportActionBar().setTitle(getIntent().getStringExtra("title"));
+        }
     }
 
     @Override
