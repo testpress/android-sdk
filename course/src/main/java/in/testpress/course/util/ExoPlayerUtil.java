@@ -82,10 +82,13 @@ public class ExoPlayerUtil {
     private ImageView fullscreenIcon;
     private Dialog fullscreenDialog;
 
+
     private Activity activity;
     private long videoAttemptId;
     private Content content;
     private String url;
+    private boolean isopenFullscreenDialogCalled;
+    private boolean iscloseFullscreenDialogCalled;
     private float startPosition;
     private boolean playWhenReady = true;
     private float speedRate = 1;
@@ -164,6 +167,9 @@ public class ExoPlayerUtil {
             }
         });
         initFullscreenDialog();
+
+        // set activity as portrait mode at first
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
@@ -373,23 +379,33 @@ public class ExoPlayerUtil {
     }
 
     private void openFullscreenDialog() {
-        exoPlayerMainFrame.removeView(exoPlayerLayout);
-        fullscreenDialog.addContentView(exoPlayerLayout, new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        setFullscreenIcon(R.drawable.testpress_fullscreen_exit);
-        fullscreen = true;
-        fullscreenDialog.show();
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        if (!isopenFullscreenDialogCalled) {
+            iscloseFullscreenDialogCalled = false;
+            isopenFullscreenDialogCalled = true;
+            exoPlayerMainFrame.removeView(exoPlayerLayout);
+            fullscreenDialog.addContentView(exoPlayerLayout, new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+            setFullscreenIcon(R.drawable.testpress_fullscreen_exit);
+            fullscreen = true;
+            fullscreenDialog.show();
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        }
     }
 
     private void closeFullscreenDialog() {
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        ((ViewGroup) exoPlayerLayout.getParent()).removeView(exoPlayerLayout);
-        exoPlayerMainFrame.addView(exoPlayerLayout);
-        fullscreen = false;
-        fullscreenDialog.dismiss();
-        setFullscreenIcon(R.drawable.testpress_fullscreen);
+
+        if (!iscloseFullscreenDialogCalled) {
+            isopenFullscreenDialogCalled = false;
+            iscloseFullscreenDialogCalled = true;
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+            ((ViewGroup) exoPlayerLayout.getParent()).removeView(exoPlayerLayout);
+            exoPlayerMainFrame.addView(exoPlayerLayout);
+            fullscreen = false;
+            fullscreenDialog.dismiss();
+            setFullscreenIcon(R.drawable.testpress_fullscreen);
+        }
     }
 
     private void setFullscreenIcon(@DrawableRes int imageResId) {
@@ -495,6 +511,15 @@ public class ExoPlayerUtil {
         }
         hideError(R.string.testpress_disconnect_live_video);
         return false;
+    }
+
+    public void onOrientationChange(boolean fullscreen) {
+
+        if (fullscreen) {
+            openFullscreenDialog();
+        } else {
+            closeFullscreenDialog();
+        }
     }
 
     private class PlayerEventListener extends Player.DefaultEventListener {

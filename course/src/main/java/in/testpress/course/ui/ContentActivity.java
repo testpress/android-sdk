@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -48,6 +49,7 @@ import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.course.util.ExoPlayerUtil;
+import in.testpress.course.util.ExoplayerFullscreenHelper;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.FolderSpinnerAdapter;
@@ -104,6 +106,7 @@ public class ContentActivity extends BaseToolBarActivity {
     public static final String CHAPTER_ID = "chapterId";
     public static final String POSITION = "position";
 
+    public ExoplayerFullscreenHelper exoplayerFullscreenHelper;
     private WebView webView;
     private RelativeLayout mContentView;
     private SwipeRefreshLayout swipeRefresh;
@@ -340,6 +343,8 @@ public class ContentActivity extends BaseToolBarActivity {
             pageNumber.setText(String.format("%d/%d", position + 1, contents.size()));
             checkContentType();
             validateAdjacentNavigationButton();
+            exoplayerFullscreenHelper = new ExoplayerFullscreenHelper(this);
+            exoplayerFullscreenHelper.initializeOrientationListener();
         }
     }
 
@@ -463,6 +468,8 @@ public class ContentActivity extends BaseToolBarActivity {
             exoPlayerUtil.setVideoAttemptParameters(videoAttempt.getId(), content);
             exoPlayerMainFrame.setVisibility(View.VISIBLE);
             exoPlayerUtil.initializePlayer();
+            exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil);
+
         }
     }
 
@@ -1170,6 +1177,12 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        exoplayerFullscreenHelper.disableOrientationListener();
+    }
+
+    @Override
     public RetrofitCall[] getRetrofitCalls() {
         return new RetrofitCall[] {
                 createAttemptApiRequest, updateContentApiRequest, profileDetailApiRequest,
@@ -1213,5 +1226,4 @@ public class ContentActivity extends BaseToolBarActivity {
                     Snackbar.LENGTH_SHORT).show();
         }
     }
-
 }
