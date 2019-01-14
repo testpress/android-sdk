@@ -8,7 +8,7 @@ import android.view.OrientationEventListener;
 public class ExoplayerFullscreenHelper {
 
     private OrientationEventListener mOrientationListener;
-    public boolean isLandscape;
+    public boolean misLandscape;
     private ExoPlayerUtil mexoPlayerUtil;
     private Context mcontext;
 
@@ -33,17 +33,17 @@ public class ExoplayerFullscreenHelper {
                         Settings.System.ACCELEROMETER_ROTATION, 0) == 1);
 
                 if (mexoPlayerUtil != null && isAutoRotationIsON) {
-                    boolean misLandscape = isLandscape;
+                    boolean isLandscape = misLandscape;
 
-                    if ((orientation > 0 && orientation < 20) || (orientation == 170 && orientation < 190)) {
-                        misLandscape = false;
+                    if ((orientation > 0 && orientation < 20) || (orientation > 170 && orientation < 190)) {
+                        isLandscape = false;
                     } else if ((orientation > 80 && orientation < 110) || (orientation > 220) && orientation < 270) {
-                        misLandscape = true;
+                        isLandscape = true;
                     }
 
-                    if (misLandscape != isLandscape) {
-                        isLandscape = misLandscape;
-                        mexoPlayerUtil.onOrientationchange(isLandscape);
+                    if (isLandscape != misLandscape) {
+                        misLandscape = isLandscape;
+                        mexoPlayerUtil.onOrientationChange(misLandscape);
                     }
                 }
             }
@@ -66,7 +66,4 @@ public class ExoplayerFullscreenHelper {
             mOrientationListener.disable();
         }
     }
-
-
-
 }

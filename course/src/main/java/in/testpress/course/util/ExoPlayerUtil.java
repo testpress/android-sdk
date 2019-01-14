@@ -513,7 +513,7 @@ public class ExoPlayerUtil {
         return false;
     }
 
-    public void onOrientationchange(boolean fullscreen) {
+    public void onOrientationChange(boolean fullscreen) {
 
         if (fullscreen) {
             openFullscreenDialog();
