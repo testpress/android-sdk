@@ -378,6 +378,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 displayHtmlContent();
                 break;
             case VIDEO_TYPE:
+                displayVideoContent();
                 break;
             case EXAM_TYPE:
                 onExamContent();
@@ -417,12 +418,14 @@ public class ContentActivity extends BaseToolBarActivity {
             webViewUtils.initWebViewAndPostUrl(url, jsonObject.toString(), this);
             webView.setWebChromeClient(fullScreenChromeClient);
         } else if (!content.isNonEmbeddableVideo()) {
+            isNonEmbeddableVideo = false;
             String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
                     "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
 
             webViewUtils.initWebView(html, this);
             webView.setWebChromeClient(fullScreenChromeClient);
         } else {
+            isNonEmbeddableVideo = true;
             TestpressSession session = TestpressSdk.getTestpressSession(this);
             if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
                 checkProfileDetailExist(video.getUrl());
