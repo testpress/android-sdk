@@ -92,7 +92,7 @@ public class Content implements android.os.Parcelable {
     public static final String EXAM_TYPE = "Exam";
     public static final String VIDEO_TYPE = "Video";
     public static final String ATTACHMENT_TYPE = "Attachment";
-    public static final String HTML_TYPE = "Html";
+    public static final String HTML_TYPE = "Notes";
     // KEEP FIELDS END
 
     @Generated
