@@ -31,6 +31,7 @@ import pl.openrnd.multilevellistview.ItemInfo;
 import pl.openrnd.multilevellistview.MultiLevelListAdapter;
 
 import static in.testpress.models.greendao.Content.ATTACHMENT_TYPE;
+import static in.testpress.models.greendao.Content.EXAM_TYPE;
 import static in.testpress.models.greendao.Content.HTML_TYPE;
 import static in.testpress.models.greendao.Content.VIDEO_TYPE;
 
@@ -150,7 +151,10 @@ public class ExpandableContentsAdapter extends MultiLevelListAdapter {
                     contentImageView.setImageResource(R.drawable.testpress_attachment_content_icon);
                     break;
                 case HTML_TYPE:
-                    contentImageView.setImageResource(R.drawable.testpress_ebook_content_icon);
+                    contentImageView.setImageResource(R.drawable.testpress_html_content);
+                    break;
+                case EXAM_TYPE:
+                    contentImageView.setImageResource(R.drawable.testpress_question_tag);
                     break;
                 default:
                     contentImageView.setImageResource(R.drawable.testpress_test_icon);
