@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -83,8 +85,9 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
 
     @Override
     protected int[] getChildViewIds() {
-        return new int[] { R.id.course_title, R.id.thumbnail_image, R.id.percentage,
-                R.id.course_item_layout,  R.id.progress_bar_layout, R.id.course_description};
+        return new int[]{R.id.course_title, R.id.thumbnail_image, R.id.percentage,
+                R.id.course_item_layout, R.id.progress_bar_layout, R.id.course_description,
+                R.id.course_credit};
     }
 
     @Override
@@ -115,6 +118,17 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
                 }
             }
         });
+
+        LinearLayout linearLayout = view(6);
+
+        // Add total numbers of chapters
+        TextView totalChapterTextView = (TextView) linearLayout.findViewById(R.id.total_chapters);
+        totalChapterTextView.setText(course.getChaptersCount().toString());
+
+        // Add total numbers of contents
+        TextView totalContentTextView = linearLayout.findViewById(R.id.total_contents);
+        totalContentTextView.setText(course.getContentsCount().toString());
+
         // ToDo: Set completed percentage in the progress bar
         setGone(4, true);
     }
