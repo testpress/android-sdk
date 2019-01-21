@@ -55,6 +55,8 @@
 
     <string name="testpress_want_to_cancel">Do you want to cancel?</string>
 
+    <string name="testpress_percentage">%1d%%</string>
+
     <plurals name="testpress_chapter_plural_name">
         <item quantity="one">Chapter</item>
         <item quantity="other">Chapters</item>

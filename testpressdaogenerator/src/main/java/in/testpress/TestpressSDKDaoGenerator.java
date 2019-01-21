@@ -110,15 +110,16 @@ public class TestpressSDKDaoGenerator {
         Entity courseCredit = schema.addEntity("CourseCredit");
         courseCredit.addLongProperty("id").primaryKey();
         courseCredit.addLongProperty("user");
-        courseCredit.addLongProperty("courseId");
+        courseCredit.addLongProperty("course");
         courseCredit.addIntProperty("totalUniqueVideoAttempts");
         courseCredit.addIntProperty("totalAttachmentAttempts");
-        courseCredit.addIntProperty("totalUnique_attachmentAttempts");
+        courseCredit.addIntProperty("totalUniqueAttachmentAttempts");
         courseCredit.addIntProperty("totalHtmlAttempts");
         courseCredit.addIntProperty("totalUniqueHtmlAttempts");
         courseCredit.addIntProperty("totalExamAttempts");
         courseCredit.addIntProperty("totalUniqueExamAttempts");
         courseCredit.addIntProperty("totalQuizAttempts");
+        courseCredit.addIntProperty("totalUniqueQuizAttempts");
         courseCredit.addIntProperty("trophiesCount");
         courseCredit.addIntProperty("goldBadgesCount");
         courseCredit.addIntProperty("silverBadgesCount");

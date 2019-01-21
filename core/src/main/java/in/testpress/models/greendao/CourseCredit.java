@@ -16,15 +16,16 @@ public class CourseCredit {
     @Id
     private Long id;
     private Long user;
-    private Long courseId;
+    private Long course;
     private Integer totalUniqueVideoAttempts;
     private Integer totalAttachmentAttempts;
-    private Integer totalUnique_attachmentAttempts;
+    private Integer totalUniqueAttachmentAttempts;
     private Integer totalHtmlAttempts;
     private Integer totalUniqueHtmlAttempts;
     private Integer totalExamAttempts;
     private Integer totalUniqueExamAttempts;
     private Integer totalQuizAttempts;
+    private Integer totalUniqueQuizAttempts;
     private Integer trophiesCount;
     private Integer goldBadgesCount;
     private Integer silverBadgesCount;
@@ -45,18 +46,19 @@ public class CourseCredit {
     }
 
     @Generated
-    public CourseCredit(Long id, Long user, Long courseId, Integer totalUniqueVideoAttempts, Integer totalAttachmentAttempts, Integer totalUnique_attachmentAttempts, Integer totalHtmlAttempts, Integer totalUniqueHtmlAttempts, Integer totalExamAttempts, Integer totalUniqueExamAttempts, Integer totalQuizAttempts, Integer trophiesCount, Integer goldBadgesCount, Integer silverBadgesCount, Integer bronzeBadgesCount, Integer winsCount, Integer lostCount, Integer highestTrophiesCount) {
+    public CourseCredit(Long id, Long user, Long course, Integer totalUniqueVideoAttempts, Integer totalAttachmentAttempts, Integer totalUniqueAttachmentAttempts, Integer totalHtmlAttempts, Integer totalUniqueHtmlAttempts, Integer totalExamAttempts, Integer totalUniqueExamAttempts, Integer totalQuizAttempts, Integer totalUniqueQuizAttempts, Integer trophiesCount, Integer goldBadgesCount, Integer silverBadgesCount, Integer bronzeBadgesCount, Integer winsCount, Integer lostCount, Integer highestTrophiesCount) {
         this.id = id;
         this.user = user;
-        this.courseId = courseId;
+        this.course = course;
         this.totalUniqueVideoAttempts = totalUniqueVideoAttempts;
         this.totalAttachmentAttempts = totalAttachmentAttempts;
-        this.totalUnique_attachmentAttempts = totalUnique_attachmentAttempts;
+        this.totalUniqueAttachmentAttempts = totalUniqueAttachmentAttempts;
         this.totalHtmlAttempts = totalHtmlAttempts;
         this.totalUniqueHtmlAttempts = totalUniqueHtmlAttempts;
         this.totalExamAttempts = totalExamAttempts;
         this.totalUniqueExamAttempts = totalUniqueExamAttempts;
         this.totalQuizAttempts = totalQuizAttempts;
+        this.totalUniqueQuizAttempts = totalUniqueQuizAttempts;
         this.trophiesCount = trophiesCount;
         this.goldBadgesCount = goldBadgesCount;
         this.silverBadgesCount = silverBadgesCount;
@@ -82,12 +84,12 @@ public class CourseCredit {
         this.user = user;
     }
 
-    public Long getCourseId() {
-        return courseId;
+    public Long getCourse() {
+        return course;
     }
 
-    public void setCourseId(Long courseId) {
-        this.courseId = courseId;
+    public void setCourse(Long course) {
+        this.course = course;
     }
 
     public Integer getTotalUniqueVideoAttempts() {
@@ -106,12 +108,12 @@ public class CourseCredit {
         this.totalAttachmentAttempts = totalAttachmentAttempts;
     }
 
-    public Integer getTotalUnique_attachmentAttempts() {
-        return totalUnique_attachmentAttempts;
+    public Integer getTotalUniqueAttachmentAttempts() {
+        return totalUniqueAttachmentAttempts;
     }
 
-    public void setTotalUnique_attachmentAttempts(Integer totalUnique_attachmentAttempts) {
-        this.totalUnique_attachmentAttempts = totalUnique_attachmentAttempts;
+    public void setTotalUniqueAttachmentAttempts(Integer totalUniqueAttachmentAttempts) {
+        this.totalUniqueAttachmentAttempts = totalUniqueAttachmentAttempts;
     }
 
     public Integer getTotalHtmlAttempts() {
@@ -152,6 +154,14 @@ public class CourseCredit {
 
     public void setTotalQuizAttempts(Integer totalQuizAttempts) {
         this.totalQuizAttempts = totalQuizAttempts;
+    }
+
+    public Integer getTotalUniqueQuizAttempts() {
+        return totalUniqueQuizAttempts;
+    }
+
+    public void setTotalUniqueQuizAttempts(Integer totalUniqueQuizAttempts) {
+        this.totalUniqueQuizAttempts = totalUniqueQuizAttempts;
     }
 
     public Integer getTrophiesCount() {

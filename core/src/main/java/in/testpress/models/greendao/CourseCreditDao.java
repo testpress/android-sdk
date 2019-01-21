@@ -24,22 +24,23 @@ public class CourseCreditDao extends AbstractDao<CourseCredit, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "ID");
         public final static Property User = new Property(1, Long.class, "user", false, "USER");
-        public final static Property CourseId = new Property(2, Long.class, "courseId", false, "COURSE_ID");
+        public final static Property Course = new Property(2, Long.class, "course", false, "COURSE");
         public final static Property TotalUniqueVideoAttempts = new Property(3, Integer.class, "totalUniqueVideoAttempts", false, "TOTAL_UNIQUE_VIDEO_ATTEMPTS");
         public final static Property TotalAttachmentAttempts = new Property(4, Integer.class, "totalAttachmentAttempts", false, "TOTAL_ATTACHMENT_ATTEMPTS");
-        public final static Property TotalUnique_attachmentAttempts = new Property(5, Integer.class, "totalUnique_attachmentAttempts", false, "TOTAL_UNIQUE_ATTACHMENT_ATTEMPTS");
+        public final static Property TotalUniqueAttachmentAttempts = new Property(5, Integer.class, "totalUniqueAttachmentAttempts", false, "TOTAL_UNIQUE_ATTACHMENT_ATTEMPTS");
         public final static Property TotalHtmlAttempts = new Property(6, Integer.class, "totalHtmlAttempts", false, "TOTAL_HTML_ATTEMPTS");
         public final static Property TotalUniqueHtmlAttempts = new Property(7, Integer.class, "totalUniqueHtmlAttempts", false, "TOTAL_UNIQUE_HTML_ATTEMPTS");
         public final static Property TotalExamAttempts = new Property(8, Integer.class, "totalExamAttempts", false, "TOTAL_EXAM_ATTEMPTS");
         public final static Property TotalUniqueExamAttempts = new Property(9, Integer.class, "totalUniqueExamAttempts", false, "TOTAL_UNIQUE_EXAM_ATTEMPTS");
         public final static Property TotalQuizAttempts = new Property(10, Integer.class, "totalQuizAttempts", false, "TOTAL_QUIZ_ATTEMPTS");
-        public final static Property TrophiesCount = new Property(11, Integer.class, "trophiesCount", false, "TROPHIES_COUNT");
-        public final static Property GoldBadgesCount = new Property(12, Integer.class, "goldBadgesCount", false, "GOLD_BADGES_COUNT");
-        public final static Property SilverBadgesCount = new Property(13, Integer.class, "silverBadgesCount", false, "SILVER_BADGES_COUNT");
-        public final static Property BronzeBadgesCount = new Property(14, Integer.class, "bronzeBadgesCount", false, "BRONZE_BADGES_COUNT");
-        public final static Property WinsCount = new Property(15, Integer.class, "winsCount", false, "WINS_COUNT");
-        public final static Property LostCount = new Property(16, Integer.class, "lostCount", false, "LOST_COUNT");
-        public final static Property HighestTrophiesCount = new Property(17, Integer.class, "highestTrophiesCount", false, "HIGHEST_TROPHIES_COUNT");
+        public final static Property TotalUniqueQuizAttempts = new Property(11, Integer.class, "totalUniqueQuizAttempts", false, "TOTAL_UNIQUE_QUIZ_ATTEMPTS");
+        public final static Property TrophiesCount = new Property(12, Integer.class, "trophiesCount", false, "TROPHIES_COUNT");
+        public final static Property GoldBadgesCount = new Property(13, Integer.class, "goldBadgesCount", false, "GOLD_BADGES_COUNT");
+        public final static Property SilverBadgesCount = new Property(14, Integer.class, "silverBadgesCount", false, "SILVER_BADGES_COUNT");
+        public final static Property BronzeBadgesCount = new Property(15, Integer.class, "bronzeBadgesCount", false, "BRONZE_BADGES_COUNT");
+        public final static Property WinsCount = new Property(16, Integer.class, "winsCount", false, "WINS_COUNT");
+        public final static Property LostCount = new Property(17, Integer.class, "lostCount", false, "LOST_COUNT");
+        public final static Property HighestTrophiesCount = new Property(18, Integer.class, "highestTrophiesCount", false, "HIGHEST_TROPHIES_COUNT");
     }
 
 
@@ -57,22 +58,23 @@ public class CourseCreditDao extends AbstractDao<CourseCredit, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"COURSE_CREDIT\" (" + //
                 "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"USER\" INTEGER," + // 1: user
-                "\"COURSE_ID\" INTEGER," + // 2: courseId
+                "\"COURSE\" INTEGER," + // 2: course
                 "\"TOTAL_UNIQUE_VIDEO_ATTEMPTS\" INTEGER," + // 3: totalUniqueVideoAttempts
                 "\"TOTAL_ATTACHMENT_ATTEMPTS\" INTEGER," + // 4: totalAttachmentAttempts
-                "\"TOTAL_UNIQUE_ATTACHMENT_ATTEMPTS\" INTEGER," + // 5: totalUnique_attachmentAttempts
+                "\"TOTAL_UNIQUE_ATTACHMENT_ATTEMPTS\" INTEGER," + // 5: totalUniqueAttachmentAttempts
                 "\"TOTAL_HTML_ATTEMPTS\" INTEGER," + // 6: totalHtmlAttempts
                 "\"TOTAL_UNIQUE_HTML_ATTEMPTS\" INTEGER," + // 7: totalUniqueHtmlAttempts
                 "\"TOTAL_EXAM_ATTEMPTS\" INTEGER," + // 8: totalExamAttempts
                 "\"TOTAL_UNIQUE_EXAM_ATTEMPTS\" INTEGER," + // 9: totalUniqueExamAttempts
                 "\"TOTAL_QUIZ_ATTEMPTS\" INTEGER," + // 10: totalQuizAttempts
-                "\"TROPHIES_COUNT\" INTEGER," + // 11: trophiesCount
-                "\"GOLD_BADGES_COUNT\" INTEGER," + // 12: goldBadgesCount
-                "\"SILVER_BADGES_COUNT\" INTEGER," + // 13: silverBadgesCount
-                "\"BRONZE_BADGES_COUNT\" INTEGER," + // 14: bronzeBadgesCount
-                "\"WINS_COUNT\" INTEGER," + // 15: winsCount
-                "\"LOST_COUNT\" INTEGER," + // 16: lostCount
-                "\"HIGHEST_TROPHIES_COUNT\" INTEGER);"); // 17: highestTrophiesCount
+                "\"TOTAL_UNIQUE_QUIZ_ATTEMPTS\" INTEGER," + // 11: totalUniqueQuizAttempts
+                "\"TROPHIES_COUNT\" INTEGER," + // 12: trophiesCount
+                "\"GOLD_BADGES_COUNT\" INTEGER," + // 13: goldBadgesCount
+                "\"SILVER_BADGES_COUNT\" INTEGER," + // 14: silverBadgesCount
+                "\"BRONZE_BADGES_COUNT\" INTEGER," + // 15: bronzeBadgesCount
+                "\"WINS_COUNT\" INTEGER," + // 16: winsCount
+                "\"LOST_COUNT\" INTEGER," + // 17: lostCount
+                "\"HIGHEST_TROPHIES_COUNT\" INTEGER);"); // 18: highestTrophiesCount
     }
 
     /** Drops the underlying database table. */
@@ -95,9 +97,9 @@ public class CourseCreditDao extends AbstractDao<CourseCredit, Long> {
             stmt.bindLong(2, user);
         }
  
-        Long courseId = entity.getCourseId();
-        if (courseId != null) {
-            stmt.bindLong(3, courseId);
+        Long course = entity.getCourse();
+        if (course != null) {
+            stmt.bindLong(3, course);
         }
  
         Integer totalUniqueVideoAttempts = entity.getTotalUniqueVideoAttempts();
@@ -110,9 +112,9 @@ public class CourseCreditDao extends AbstractDao<CourseCredit, Long> {
             stmt.bindLong(5, totalAttachmentAttempts);
         }
  
-        Integer totalUnique_attachmentAttempts = entity.getTotalUnique_attachmentAttempts();
-        if (totalUnique_attachmentAttempts != null) {
-            stmt.bindLong(6, totalUnique_attachmentAttempts);
+        Integer totalUniqueAttachmentAttempts = entity.getTotalUniqueAttachmentAttempts();
+        if (totalUniqueAttachmentAttempts != null) {
+            stmt.bindLong(6, totalUniqueAttachmentAttempts);
         }
  
         Integer totalHtmlAttempts = entity.getTotalHtmlAttempts();
@@ -140,39 +142,44 @@ public class CourseCreditDao extends AbstractDao<CourseCredit, Long> {
             stmt.bindLong(11, totalQuizAttempts);
         }
  
+        Integer totalUniqueQuizAttempts = entity.getTotalUniqueQuizAttempts();
+        if (totalUniqueQuizAttempts != null) {
+            stmt.bindLong(12, totalUniqueQuizAttempts);
+        }
+ 
         Integer trophiesCount = entity.getTrophiesCount();
         if (trophiesCount != null) {
-            stmt.bindLong(12, trophiesCount);
+            stmt.bindLong(13, trophiesCount);
         }
  
         Integer goldBadgesCount = entity.getGoldBadgesCount();
         if (goldBadgesCount != null) {
-            stmt.bindLong(13, goldBadgesCount);
+            stmt.bindLong(14, goldBadgesCount);
         }
  
         Integer silverBadgesCount = entity.getSilverBadgesCount();
         if (silverBadgesCount != null) {
-            stmt.bindLong(14, silverBadgesCount);
+            stmt.bindLong(15, silverBadgesCount);
         }
  
         Integer bronzeBadgesCount = entity.getBronzeBadgesCount();
         if (bronzeBadgesCount != null) {
-            stmt.bindLong(15, bronzeBadgesCount);
+            stmt.bindLong(16, bronzeBadgesCount);
         }
  
         Integer winsCount = entity.getWinsCount();
         if (winsCount != null) {
-            stmt.bindLong(16, winsCount);
+            stmt.bindLong(17, winsCount);
         }
  
         Integer lostCount = entity.getLostCount();
         if (lostCount != null) {
-            stmt.bindLong(17, lostCount);
+            stmt.bindLong(18, lostCount);
         }
  
         Integer highestTrophiesCount = entity.getHighestTrophiesCount();
         if (highestTrophiesCount != null) {
-            stmt.bindLong(18, highestTrophiesCount);
+            stmt.bindLong(19, highestTrophiesCount);
         }
     }
 
@@ -190,9 +197,9 @@ public class CourseCreditDao extends AbstractDao<CourseCredit, Long> {
             stmt.bindLong(2, user);
         }
  
-        Long courseId = entity.getCourseId();
-        if (courseId != null) {
-            stmt.bindLong(3, courseId);
+        Long course = entity.getCourse();
+        if (course != null) {
+            stmt.bindLong(3, course);
         }
  
         Integer totalUniqueVideoAttempts = entity.getTotalUniqueVideoAttempts();
@@ -205,9 +212,9 @@ public class CourseCreditDao extends AbstractDao<CourseCredit, Long> {
             stmt.bindLong(5, totalAttachmentAttempts);
         }
  
-        Integer totalUnique_attachmentAttempts = entity.getTotalUnique_attachmentAttempts();
-        if (totalUnique_attachmentAttempts != null) {
-            stmt.bindLong(6, totalUnique_attachmentAttempts);
+        Integer totalUniqueAttachmentAttempts = entity.getTotalUniqueAttachmentAttempts();
+        if (totalUniqueAttachmentAttempts != null) {
+            stmt.bindLong(6, totalUniqueAttachmentAttempts);
         }
  
         Integer totalHtmlAttempts = entity.getTotalHtmlAttempts();
@@ -235,39 +242,44 @@ public class CourseCreditDao extends AbstractDao<CourseCredit, Long> {
             stmt.bindLong(11, totalQuizAttempts);
         }
  
+        Integer totalUniqueQuizAttempts = entity.getTotalUniqueQuizAttempts();
+        if (totalUniqueQuizAttempts != null) {
+            stmt.bindLong(12, totalUniqueQuizAttempts);
+        }
+ 
         Integer trophiesCount = entity.getTrophiesCount();
         if (trophiesCount != null) {
-            stmt.bindLong(12, trophiesCount);
+            stmt.bindLong(13, trophiesCount);
         }
  
         Integer goldBadgesCount = entity.getGoldBadgesCount();
         if (goldBadgesCount != null) {
-            stmt.bindLong(13, goldBadgesCount);
+            stmt.bindLong(14, goldBadgesCount);
         }
  
         Integer silverBadgesCount = entity.getSilverBadgesCount();
         if (silverBadgesCount != null) {
-            stmt.bindLong(14, silverBadgesCount);
+            stmt.bindLong(15, silverBadgesCount);
         }
  
         Integer bronzeBadgesCount = entity.getBronzeBadgesCount();
         if (bronzeBadgesCount != null) {
-            stmt.bindLong(15, bronzeBadgesCount);
+            stmt.bindLong(16, bronzeBadgesCount);
         }
  
         Integer winsCount = entity.getWinsCount();
         if (winsCount != null) {
-            stmt.bindLong(16, winsCount);
+            stmt.bindLong(17, winsCount);
         }
  
         Integer lostCount = entity.getLostCount();
         if (lostCount != null) {
-            stmt.bindLong(17, lostCount);
+            stmt.bindLong(18, lostCount);
         }
  
         Integer highestTrophiesCount = entity.getHighestTrophiesCount();
         if (highestTrophiesCount != null) {
-            stmt.bindLong(18, highestTrophiesCount);
+            stmt.bindLong(19, highestTrophiesCount);
         }
     }
 
@@ -281,22 +293,23 @@ public class CourseCreditDao extends AbstractDao<CourseCredit, Long> {
         CourseCredit entity = new CourseCredit( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // user
-            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // courseId
+            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // course
             cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // totalUniqueVideoAttempts
             cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4), // totalAttachmentAttempts
-            cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5), // totalUnique_attachmentAttempts
+            cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5), // totalUniqueAttachmentAttempts
             cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6), // totalHtmlAttempts
             cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7), // totalUniqueHtmlAttempts
             cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8), // totalExamAttempts
             cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9), // totalUniqueExamAttempts
             cursor.isNull(offset + 10) ? null : cursor.getInt(offset + 10), // totalQuizAttempts
-            cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11), // trophiesCount
-            cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12), // goldBadgesCount
-            cursor.isNull(offset + 13) ? null : cursor.getInt(offset + 13), // silverBadgesCount
-            cursor.isNull(offset + 14) ? null : cursor.getInt(offset + 14), // bronzeBadgesCount
-            cursor.isNull(offset + 15) ? null : cursor.getInt(offset + 15), // winsCount
-            cursor.isNull(offset + 16) ? null : cursor.getInt(offset + 16), // lostCount
-            cursor.isNull(offset + 17) ? null : cursor.getInt(offset + 17) // highestTrophiesCount
+            cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11), // totalUniqueQuizAttempts
+            cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12), // trophiesCount
+            cursor.isNull(offset + 13) ? null : cursor.getInt(offset + 13), // goldBadgesCount
+            cursor.isNull(offset + 14) ? null : cursor.getInt(offset + 14), // silverBadgesCount
+            cursor.isNull(offset + 15) ? null : cursor.getInt(offset + 15), // bronzeBadgesCount
+            cursor.isNull(offset + 16) ? null : cursor.getInt(offset + 16), // winsCount
+            cursor.isNull(offset + 17) ? null : cursor.getInt(offset + 17), // lostCount
+            cursor.isNull(offset + 18) ? null : cursor.getInt(offset + 18) // highestTrophiesCount
         );
         return entity;
     }
@@ -305,22 +318,23 @@ public class CourseCreditDao extends AbstractDao<CourseCredit, Long> {
     public void readEntity(Cursor cursor, CourseCredit entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setUser(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
-        entity.setCourseId(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
+        entity.setCourse(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
         entity.setTotalUniqueVideoAttempts(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
         entity.setTotalAttachmentAttempts(cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4));
-        entity.setTotalUnique_attachmentAttempts(cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5));
+        entity.setTotalUniqueAttachmentAttempts(cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5));
         entity.setTotalHtmlAttempts(cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6));
         entity.setTotalUniqueHtmlAttempts(cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7));
         entity.setTotalExamAttempts(cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8));
         entity.setTotalUniqueExamAttempts(cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9));
         entity.setTotalQuizAttempts(cursor.isNull(offset + 10) ? null : cursor.getInt(offset + 10));
-        entity.setTrophiesCount(cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11));
-        entity.setGoldBadgesCount(cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12));
-        entity.setSilverBadgesCount(cursor.isNull(offset + 13) ? null : cursor.getInt(offset + 13));
-        entity.setBronzeBadgesCount(cursor.isNull(offset + 14) ? null : cursor.getInt(offset + 14));
-        entity.setWinsCount(cursor.isNull(offset + 15) ? null : cursor.getInt(offset + 15));
-        entity.setLostCount(cursor.isNull(offset + 16) ? null : cursor.getInt(offset + 16));
-        entity.setHighestTrophiesCount(cursor.isNull(offset + 17) ? null : cursor.getInt(offset + 17));
+        entity.setTotalUniqueQuizAttempts(cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11));
+        entity.setTrophiesCount(cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12));
+        entity.setGoldBadgesCount(cursor.isNull(offset + 13) ? null : cursor.getInt(offset + 13));
+        entity.setSilverBadgesCount(cursor.isNull(offset + 14) ? null : cursor.getInt(offset + 14));
+        entity.setBronzeBadgesCount(cursor.isNull(offset + 15) ? null : cursor.getInt(offset + 15));
+        entity.setWinsCount(cursor.isNull(offset + 16) ? null : cursor.getInt(offset + 16));
+        entity.setLostCount(cursor.isNull(offset + 17) ? null : cursor.getInt(offset + 17));
+        entity.setHighestTrophiesCount(cursor.isNull(offset + 18) ? null : cursor.getInt(offset + 18));
      }
     
     @Override

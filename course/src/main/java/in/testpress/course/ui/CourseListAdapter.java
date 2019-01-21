@@ -13,6 +13,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.List;
 
 import in.testpress.core.TestpressCallback;
@@ -69,6 +70,8 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
                 .setMessage(R.string.testpress_want_to_cancel)
                 .setPositiveButton(R.string.testpress_yes, null)
                 .create();
+
+        fetchCourseDetail(new CourseCreditPager(apiClient));
     }
 
     @Override
@@ -141,10 +144,12 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         contentDetailTextView.setText(mActivity.getResources()
                 .getQuantityString(R.plurals.testpress_content_plural_name, course.getContentsCount()));
 
-        // ToDo: Set completed percentage in the progress bar
-        LinearLayout progressBarlinearLayout = view(3);
-        ((ProgressBar)progressBarlinearLayout.findViewById(R.id.progress_bar)).setProgress(90);
-        ((TextView)progressBarlinearLayout.findViewById(R.id.percentage)).setText("90%");
+        CourseCredit courseCredit = getCourseCreditByCourseId(course.getId());
+        LinearLayout progressBarLinearLayout = view(4);
+        int progress = calculateCourseProgressPercentage(courseCredit, course.getContentsCount());
+        ((ProgressBar)progressBarLinearLayout.findViewById(R.id.progress_bar)).setProgress(progress);
+        ((TextView) progressBarLinearLayout.findViewById(R.id.percentage))
+                .setText(String.format(mActivity.getResources().getString(R.string.testpress_percentage), progress));
     }
     private void showProgressDialog(final Course course) {
         int itemsCount = course.getChaptersCount() + course.getContentsCount();
@@ -235,40 +240,63 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         });
     }
 
-    private void fetchCourseDetail(final Course course, final CourseCreditPager courseCreditPager) {
-        currentPager = courseCreditPager;
+    private void fetchCourseDetail(final CourseCreditPager courseCreditPager) {
         courseCreditPager.enqueueNext(new TestpressCallback<List<CourseCredit>>() {
             @Override
             public void onSuccess(List<CourseCredit> coursesCredits) {
-                if (progressDialog.isIndeterminate()) {
-                    progressDialog.setIndeterminate(false);
-                }
-                progressDialog.incrementProgressBy(
-                        getIncrementBy(courseCreditPager, course.getChaptersCount()));
 
-                if (courseCreditPager.hasMore() && progressDialog.isShowing()) {
-                    fetchCourseDetail(course, courseCreditPager);
+                if (courseCreditPager.hasMore()) {
+                    fetchCourseDetail(courseCreditPager);
                 } else {
                     CourseCreditDao courseCreditDao= TestpressSDKDatabase.getCoursesCreditDao(mActivity);
                     courseCreditDao.insertOrReplaceInTx(coursesCredits);
-                    fetchContents(course, new ContentPager(course.getId(), apiClient));
                 }
             }
 
             @Override
             public void onException(TestpressException exception) {
-                handleError(course, exception);
+                // Exception occurred
             }
         });
     }
 
+    private CourseCredit getCourseCreditByCourseId(long courseId){
+
+        CourseCreditDao courseCreditDao = TestpressSDKDatabase.getCoursesCreditDao(mActivity);
+        List<CourseCredit> courseCreditList = courseCreditDao.queryBuilder()
+                .where(CourseCreditDao.Properties.Course.eq(courseId)).list();
+
+        if (courseCreditList.size() > 0) {
+            return courseCreditList.get(0);
+        } else {
+            fetchCourseDetail(new CourseCreditPager(apiClient));
+        }
+
+        return null;
+    }
+
+    public int calculateCourseProgressPercentage(CourseCredit courseCredit, int totalContents) {
+
+        if (courseCredit != null && totalContents > 0) {
+
+            int total_unique_attempts = courseCredit.getTotalUniqueVideoAttempts()
+                    + courseCredit.getTotalUniqueHtmlAttempts()
+                    + courseCredit.getTotalUniqueQuizAttempts()
+                    + courseCredit.getTotalUniqueExamAttempts()
+                    + courseCredit.getTotalUniqueAttachmentAttempts();
+
+            return (total_unique_attempts * 100) / totalContents;
+        } else {
+            return 0;
+        }
+    }
+
+
     private void restartLoading(Course course) {
         if (currentPager instanceof ChapterPager) {
             fetchChapters(course, (ChapterPager) currentPager);
-        } else if (currentPager instanceof ContentPager) {
-            fetchContents(course, (ContentPager) currentPager);
         } else {
-            fetchCourseDetail(course, (CourseCreditPager) currentPager);
+            fetchContents(course, (ContentPager) currentPager);
         }
     }
 
