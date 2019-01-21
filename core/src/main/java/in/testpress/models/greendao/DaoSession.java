@@ -18,6 +18,7 @@ import in.testpress.models.greendao.SelectedAnswer;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.Content;
+import in.testpress.models.greendao.CourseCredit;
 import in.testpress.models.greendao.HtmlContent;
 import in.testpress.models.greendao.Video;
 import in.testpress.models.greendao.Attachment;
@@ -45,6 +46,7 @@ import in.testpress.models.greendao.SelectedAnswerDao;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.ContentDao;
+import in.testpress.models.greendao.CourseCreditDao;
 import in.testpress.models.greendao.HtmlContentDao;
 import in.testpress.models.greendao.VideoDao;
 import in.testpress.models.greendao.AttachmentDao;
@@ -81,6 +83,7 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig courseDaoConfig;
     private final DaoConfig chapterDaoConfig;
     private final DaoConfig contentDaoConfig;
+    private final DaoConfig courseCreditDaoConfig;
     private final DaoConfig htmlContentDaoConfig;
     private final DaoConfig videoDaoConfig;
     private final DaoConfig attachmentDaoConfig;
@@ -108,6 +111,7 @@ public class DaoSession extends AbstractDaoSession {
     private final CourseDao courseDao;
     private final ChapterDao chapterDao;
     private final ContentDao contentDao;
+    private final CourseCreditDao courseCreditDao;
     private final HtmlContentDao htmlContentDao;
     private final VideoDao videoDao;
     private final AttachmentDao attachmentDao;
@@ -158,6 +162,9 @@ public class DaoSession extends AbstractDaoSession {
 
         contentDaoConfig = daoConfigMap.get(ContentDao.class).clone();
         contentDaoConfig.initIdentityScope(type);
+
+        courseCreditDaoConfig = daoConfigMap.get(CourseCreditDao.class).clone();
+        courseCreditDaoConfig.initIdentityScope(type);
 
         htmlContentDaoConfig = daoConfigMap.get(HtmlContentDao.class).clone();
         htmlContentDaoConfig.initIdentityScope(type);
@@ -217,6 +224,7 @@ public class DaoSession extends AbstractDaoSession {
         courseDao = new CourseDao(courseDaoConfig, this);
         chapterDao = new ChapterDao(chapterDaoConfig, this);
         contentDao = new ContentDao(contentDaoConfig, this);
+        courseCreditDao = new CourseCreditDao(courseCreditDaoConfig, this);
         htmlContentDao = new HtmlContentDao(htmlContentDaoConfig, this);
         videoDao = new VideoDao(videoDaoConfig, this);
         attachmentDao = new AttachmentDao(attachmentDaoConfig, this);
@@ -244,6 +252,7 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(Course.class, courseDao);
         registerDao(Chapter.class, chapterDao);
         registerDao(Content.class, contentDao);
+        registerDao(CourseCredit.class, courseCreditDao);
         registerDao(HtmlContent.class, htmlContentDao);
         registerDao(Video.class, videoDao);
         registerDao(Attachment.class, attachmentDao);
@@ -273,6 +282,7 @@ public class DaoSession extends AbstractDaoSession {
         courseDaoConfig.clearIdentityScope();
         chapterDaoConfig.clearIdentityScope();
         contentDaoConfig.clearIdentityScope();
+        courseCreditDaoConfig.clearIdentityScope();
         htmlContentDaoConfig.clearIdentityScope();
         videoDaoConfig.clearIdentityScope();
         attachmentDaoConfig.clearIdentityScope();
@@ -329,6 +339,10 @@ public class DaoSession extends AbstractDaoSession {
 
     public ContentDao getContentDao() {
         return contentDao;
+    }
+
+    public CourseCreditDao getCourseCreditDao() {
+        return courseCreditDao;
     }
 
     public HtmlContentDao getHtmlContentDao() {

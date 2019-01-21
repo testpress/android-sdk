@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 20;
+    private static final int VERSION = 21;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -30,6 +30,8 @@ public class TestpressSDKDaoGenerator {
         addChapter(schema);
         Entity content = addContent(schema);
         addContentsToCourse(course, content);
+
+        addCourseCredit(schema);
 
         Entity html = addHtmlContent(schema);
         Entity video = addVideo(schema);
@@ -64,7 +66,7 @@ public class TestpressSDKDaoGenerator {
         addDirectionTranslation(schema);
 
         schema.enableKeepSectionsByDefault();
-        new DaoGenerator().generateAll(schema, "../core/src/main/java");
+        new DaoGenerator().generateAll(schema, "core/src/main/java");
     }
 
     private static Entity addAttempt(Schema schema) {
@@ -102,6 +104,30 @@ public class TestpressSDKDaoGenerator {
         courseAttempt.addStringProperty("trophies");
         courseAttempt.implementsInterface("android.os.Parcelable");
         return courseAttempt;
+    }
+
+    private static Entity addCourseCredit(Schema schema) {
+        Entity courseCredit = schema.addEntity("CourseCredit");
+        courseCredit.addLongProperty("id").primaryKey();
+        courseCredit.addLongProperty("user");
+        courseCredit.addLongProperty("courseId");
+        courseCredit.addIntProperty("totalUniqueVideoAttempts");
+        courseCredit.addIntProperty("totalAttachmentAttempts");
+        courseCredit.addIntProperty("totalUnique_attachmentAttempts");
+        courseCredit.addIntProperty("totalHtmlAttempts");
+        courseCredit.addIntProperty("totalUniqueHtmlAttempts");
+        courseCredit.addIntProperty("totalExamAttempts");
+        courseCredit.addIntProperty("totalUniqueExamAttempts");
+        courseCredit.addIntProperty("totalQuizAttempts");
+        courseCredit.addIntProperty("trophiesCount");
+        courseCredit.addIntProperty("goldBadgesCount");
+        courseCredit.addIntProperty("silverBadgesCount");
+        courseCredit.addIntProperty("bronzeBadgesCount");
+        courseCredit.addIntProperty("winsCount");
+        courseCredit.addIntProperty("lostCount");
+        courseCredit.addIntProperty("highestTrophiesCount");
+
+        return courseCredit;
     }
 
     private static void addCourseContentToCourseAttempt(Entity courseAttempt, Entity content) {

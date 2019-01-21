@@ -14,6 +14,7 @@ import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.ContentTypeDao;
 import in.testpress.models.greendao.CourseAttemptDao;
+import in.testpress.models.greendao.CourseCreditDao;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.DaoMaster;
 import in.testpress.models.greendao.DaoSession;
@@ -95,6 +96,10 @@ public class TestpressSDKDatabase {
 
     public static CourseDao getCourseDao(Context context) {
         return getDaoSession(context).getCourseDao();
+    }
+
+    public static CourseCreditDao getCoursesCreditDao(Context context) {
+        return getDaoSession(context).getCourseCreditDao();
     }
 
     public static ChapterDao getChapterDao(Context context) {

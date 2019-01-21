@@ -7,6 +7,7 @@ import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.Course;
+import in.testpress.models.greendao.CourseCredit;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.network.RetrofitCall;
@@ -24,6 +25,7 @@ import static in.testpress.course.network.TestpressCourseApiClient.CHAPTERS_PATH
 import static in.testpress.course.network.TestpressCourseApiClient.CONTENTS;
 import static in.testpress.course.network.TestpressCourseApiClient.CONTENTS_PATH;
 import static in.testpress.course.network.TestpressCourseApiClient.COURSE_LIST_PATH;
+import static in.testpress.course.network.TestpressCourseApiClient.COURSE_CREDITS;
 import static in.testpress.course.network.TestpressCourseApiClient.LEADERBOARD_PATH;
 import static in.testpress.course.network.TestpressCourseApiClient.RANK_PATH;
 import static in.testpress.course.network.TestpressCourseApiClient.TARGET_PATH;
@@ -36,6 +38,10 @@ public interface CourseService {
     RetrofitCall<TestpressApiResponse<Course>> getCourses(
             @QueryMap Map<String, Object> queryParams,
             @Header("If-Modified-Since") String latestModifiedDate);
+
+    @GET(COURSE_CREDITS)
+    RetrofitCall<TestpressApiResponse<CourseCredit>> getCoursesCredit(
+            @QueryMap Map<String, Object> queryParams);
 
     @GET(COURSE_LIST_PATH + "{course_id}")
     RetrofitCall<Course> getCourse(@Path(value = "course_id", encoded = true) long courseId);

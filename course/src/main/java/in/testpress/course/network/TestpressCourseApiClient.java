@@ -10,6 +10,7 @@ import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.Course;
+import in.testpress.models.greendao.CourseCredit;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.network.RetrofitCall;
@@ -30,6 +31,8 @@ public class TestpressCourseApiClient extends TestpressApiClient {
      * Course List Url
      */
     public static final String COURSE_LIST_PATH =  "/api/v2.4/courses/";
+
+    public static final String COURSE_CREDITS = "/api/v2.3/course_credits/";
 
     public static final String CHAPTERS_PATH =  "/chapters/";
 
@@ -65,6 +68,10 @@ public class TestpressCourseApiClient extends TestpressApiClient {
     public RetrofitCall<TestpressApiResponse<Course>> getCourses(Map<String, Object> queryParams,
                                                                  String latestModifiedDate) {
         return getCourseService().getCourses(queryParams, latestModifiedDate);
+    }
+
+    public RetrofitCall<TestpressApiResponse<CourseCredit>> getCoursesCredit(Map<String, Object> queryParams) {
+        return getCourseService().getCoursesCredit(queryParams);
     }
 
     public RetrofitCall<Course> getCourse(long courseId) {

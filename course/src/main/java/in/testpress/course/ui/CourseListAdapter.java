@@ -6,11 +6,13 @@ import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.io.IOException;
 import java.util.List;
 
 import in.testpress.core.TestpressCallback;
@@ -20,12 +22,15 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.course.network.ChapterPager;
 import in.testpress.course.network.ContentPager;
+import in.testpress.course.network.CourseCreditPager;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.Course;
+import in.testpress.models.greendao.CourseCredit;
+import in.testpress.models.greendao.CourseCreditDao;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.network.BaseResourcePager;
 import in.testpress.ui.view.ReadMoreTextView;
@@ -137,9 +142,10 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
                 .getQuantityString(R.plurals.testpress_content_plural_name, course.getContentsCount()));
 
         // ToDo: Set completed percentage in the progress bar
-        //setGone(4, true);
+        LinearLayout progressBarlinearLayout = view(3);
+        ((ProgressBar)progressBarlinearLayout.findViewById(R.id.progress_bar)).setProgress(90);
+        ((TextView)progressBarlinearLayout.findViewById(R.id.percentage)).setText("90%");
     }
-
     private void showProgressDialog(final Course course) {
         int itemsCount = course.getChaptersCount() + course.getContentsCount();
         progressDialog.setMax(itemsCount);
@@ -229,11 +235,40 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         });
     }
 
+    private void fetchCourseDetail(final Course course, final CourseCreditPager courseCreditPager) {
+        currentPager = courseCreditPager;
+        courseCreditPager.enqueueNext(new TestpressCallback<List<CourseCredit>>() {
+            @Override
+            public void onSuccess(List<CourseCredit> coursesCredits) {
+                if (progressDialog.isIndeterminate()) {
+                    progressDialog.setIndeterminate(false);
+                }
+                progressDialog.incrementProgressBy(
+                        getIncrementBy(courseCreditPager, course.getChaptersCount()));
+
+                if (courseCreditPager.hasMore() && progressDialog.isShowing()) {
+                    fetchCourseDetail(course, courseCreditPager);
+                } else {
+                    CourseCreditDao courseCreditDao= TestpressSDKDatabase.getCoursesCreditDao(mActivity);
+                    courseCreditDao.insertOrReplaceInTx(coursesCredits);
+                    fetchContents(course, new ContentPager(course.getId(), apiClient));
+                }
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                handleError(course, exception);
+            }
+        });
+    }
+
     private void restartLoading(Course course) {
         if (currentPager instanceof ChapterPager) {
             fetchChapters(course, (ChapterPager) currentPager);
-        } else {
+        } else if (currentPager instanceof ContentPager) {
             fetchContents(course, (ContentPager) currentPager);
+        } else {
+            fetchCourseDetail(course, (CourseCreditPager) currentPager);
         }
     }
 
