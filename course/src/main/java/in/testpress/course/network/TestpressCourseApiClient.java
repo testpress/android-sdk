@@ -32,7 +32,7 @@ public class TestpressCourseApiClient extends TestpressApiClient {
      */
     public static final String COURSE_LIST_PATH =  "/api/v2.4/courses/";
 
-    public static final String COURSE_CREDITS = "/api/v2.3/course_credits/";
+    public static final String COURSES_CREDITS_PATH = "/api/v2.3/course_credits/";
 
     public static final String CHAPTERS_PATH =  "/chapters/";
 
