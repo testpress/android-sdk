@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -70,8 +72,6 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
                 .setMessage(R.string.testpress_want_to_cancel)
                 .setPositiveButton(R.string.testpress_yes, null)
                 .create();
-
-        fetchCourseDetail(new CourseCreditPager(apiClient));
     }
 
     @Override
@@ -132,6 +132,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         // Add total numbers of chapters
         TextView chapterCountTextView = (TextView) linearLayout.findViewById(R.id.total_chapters);
         TextView chapterDetailTextView = (TextView) linearLayout.findViewById(R.id.chapter_detail_text);
+
         chapterCountTextView.setText(course.getChaptersCount().toString());
         chapterDetailTextView.setText(mActivity.getResources()
                 .getQuantityString(R.plurals.testpress_chapter_plural_name, course.getChaptersCount())
@@ -140,17 +141,21 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         // Add total numbers of contents
         TextView totalContentTextView = linearLayout.findViewById(R.id.total_contents);
         TextView contentDetailTextView = (TextView) linearLayout.findViewById(R.id.content_detail_text);
+
         totalContentTextView.setText(course.getContentsCount().toString());
         contentDetailTextView.setText(mActivity.getResources()
                 .getQuantityString(R.plurals.testpress_content_plural_name, course.getContentsCount()));
 
+        // Add percentage to course completion progress
         CourseCredit courseCredit = getCourseCreditByCourseId(course.getId());
         LinearLayout progressBarLinearLayout = view(4);
         int progress = calculateCourseProgressPercentage(courseCredit, course.getContentsCount());
+
         ((ProgressBar)progressBarLinearLayout.findViewById(R.id.progress_bar)).setProgress(progress);
         ((TextView) progressBarLinearLayout.findViewById(R.id.percentage))
                 .setText(String.format(mActivity.getResources().getString(R.string.testpress_percentage), progress));
     }
+
     private void showProgressDialog(final Course course) {
         int itemsCount = course.getChaptersCount() + course.getContentsCount();
         progressDialog.setMax(itemsCount);
@@ -240,36 +245,13 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         });
     }
 
-    private void fetchCourseDetail(final CourseCreditPager courseCreditPager) {
-        courseCreditPager.enqueueNext(new TestpressCallback<List<CourseCredit>>() {
-            @Override
-            public void onSuccess(List<CourseCredit> coursesCredits) {
-
-                if (courseCreditPager.hasMore()) {
-                    fetchCourseDetail(courseCreditPager);
-                } else {
-                    CourseCreditDao courseCreditDao= TestpressSDKDatabase.getCoursesCreditDao(mActivity);
-                    courseCreditDao.insertOrReplaceInTx(coursesCredits);
-                }
-            }
-
-            @Override
-            public void onException(TestpressException exception) {
-                // Exception occurred
-            }
-        });
-    }
-
     private CourseCredit getCourseCreditByCourseId(long courseId){
-
         CourseCreditDao courseCreditDao = TestpressSDKDatabase.getCoursesCreditDao(mActivity);
         List<CourseCredit> courseCreditList = courseCreditDao.queryBuilder()
                 .where(CourseCreditDao.Properties.Course.eq(courseId)).list();
 
         if (courseCreditList.size() > 0) {
             return courseCreditList.get(0);
-        } else {
-            fetchCourseDetail(new CourseCreditPager(apiClient));
         }
 
         return null;
@@ -290,7 +272,6 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
             return 0;
         }
     }
-
 
     private void restartLoading(Course course) {
         if (currentPager instanceof ChapterPager) {
