@@ -4,18 +4,14 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.List;
 
 import in.testpress.core.TestpressCallback;
@@ -25,7 +21,6 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.course.network.ChapterPager;
 import in.testpress.course.network.ContentPager;
-import in.testpress.course.network.CourseCreditPager;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
@@ -260,7 +255,6 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     public int calculateCourseProgressPercentage(CourseCredit courseCredit, int totalContents) {
 
         if (courseCredit != null && totalContents > 0) {
-
             int total_unique_attempts = courseCredit.getTotalUniqueVideoAttempts()
                     + courseCredit.getTotalUniqueHtmlAttempts()
                     + courseCredit.getTotalUniqueQuizAttempts()

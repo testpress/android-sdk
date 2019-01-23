@@ -19,7 +19,7 @@
 <item android:id="@android:id/progress">
     <scale android:scaleWidth="100%">
         <shape android:shape="rectangle">
-            <corners android:radius="8dip"/>
+            <corners android:radius="5dip"/>
             <solid android:color="@color/testpress_green_light" />
         </shape>
     </scale>

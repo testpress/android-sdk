@@ -2,13 +2,8 @@ package in.testpress.course.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.View;
-
-import java.io.IOException;
 
 import in.testpress.course.R;
-import in.testpress.models.InstituteSettings;
-import in.testpress.models.greendao.CourseCredit;
 import in.testpress.ui.BaseToolBarActivity;
 
 public class CourseListActivity extends BaseToolBarActivity {
@@ -22,4 +17,5 @@ public class CourseListActivity extends BaseToolBarActivity {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                 .commitAllowingStateLoss();
     }
+
 }

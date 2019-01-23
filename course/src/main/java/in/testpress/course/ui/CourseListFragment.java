@@ -3,7 +3,6 @@ package in.testpress.course.ui;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.Loader;
-import android.util.Log;
 
 import org.greenrobot.greendao.AbstractDao;
 
@@ -83,7 +82,6 @@ public class CourseListFragment extends BaseDataBaseFragment<Course, Long> {
         displayDataFromDB();
         fetchCourseCredit(new CourseCreditPager(mApiClient));
         showList();
-
     }
 
     @Override
@@ -131,8 +129,9 @@ public class CourseListFragment extends BaseDataBaseFragment<Course, Long> {
 
             @Override
             public void onException(TestpressException exception) {
-                // Exception occurred
-
+                if (exception.isNetworkError()) {
+                    showError(R.string.testpress_some_thing_went_wrong_try_again);
+                }
             }
         });
     }
