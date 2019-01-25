@@ -27,7 +27,6 @@
         <ImageView android:id="@+id/exp_list_indicator"
             android:visibility="gone"
             android:src="@drawable/testpress_arrow_right"
-            android:tint="#777"
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:padding="1dp"
