@@ -106,7 +106,7 @@ public class ExpandableContentsAdapter extends MultiLevelListAdapter {
                 if (itemInfo.getLevel() > 1) {
                     divider.setVisibility(View.GONE);
                     int paddingLeft = (int) UIUtils.getPixelFromDp(context, 30);
-                    contentLayout.setPadding(paddingLeft, paddingVertical, 0, paddingVertical);
+                    contentLayout.setPadding(paddingLeft*(itemInfo.getLevel()-1), paddingVertical, 0, paddingVertical);
                     marginInDp = 12;
                 } else {
                     divider.setVisibility(View.VISIBLE);
@@ -118,8 +118,16 @@ public class ExpandableContentsAdapter extends MultiLevelListAdapter {
                         (ViewGroup.MarginLayoutParams) expandableItemIndicator.getLayoutParams();
 
                 params.rightMargin = marginInPx;
-                int expandedIndicator = itemInfo.isExpanded() ?
-                        R.drawable.testpress_arrow_down : R.drawable.testpress_arrow_right;
+
+                int expandedIndicator;
+
+                if (itemInfo.getLevel() > 1) {
+                    expandedIndicator = itemInfo.isExpanded() ?
+                            R.drawable.testpress_arrow_down_light : R.drawable.testpress_arrow_right_light;
+                } else {
+                    expandedIndicator = itemInfo.isExpanded() ?
+                            R.drawable.testpress_arrow_down : R.drawable.testpress_arrow_right;
+                }
 
                 expandableItemIndicator.setImageResource(expandedIndicator);
                 lblListHeader.setTypeface(TestpressSdk.getRubikRegularFont(context));
