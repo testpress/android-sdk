@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,36 +89,7 @@ public class ExpandableContentsFragment extends Fragment {
             @Override
             public void onGroupItemClicked(MultiLevelListView parent, final View view, final int position,
                                            Object item, final ItemInfo itemInfo) {
-
-                Chapter chapter = (Chapter) item;
-                if (!chapterPathIds.isEmpty() && position + 1 < adapter.getFlatItems().size()) {
-                    expandChapters(chapterPathIds, position + 1);
-                } else {
-                    if (parentChapterId != 0 && itemInfo.getLevel() <= currentExpandedLevel
-                            && ((chapter.getId() == parentChapterId && !itemInfo.isExpanded())
-                            || chapter.getId() != parentChapterId)) {
-
-                        parentChapterId = 0;
-                        currentExpandedLevel = 0;
-                        adapter.setBackgroundShadeItemId(parentChapterId);
-                    }
-                    if (chapter.getRawChildrenCount(getContext()) == 1) {
-                        listView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                int childPosition = position + 1;
-                                Node node = adapter.getFlatItems().get(childPosition);
-                                if (node.isExpandable() && !node.isExpanded()) {
-                                    multiLevelListView.onGroupItemClicked(
-                                            listView.getAdapter().getView(childPosition, null, null),
-                                            node,
-                                            childPosition
-                                    );
-                                }
-                            }
-                        });
-                    }
-                }
+                Log.d("GroupItemClicked :", "Level="+ (itemInfo.getLevel()+1));
             }
         });
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -164,7 +136,10 @@ public class ExpandableContentsFragment extends Fragment {
                     chapterPathIds.add(chapter.getId());
                 }
             }
-            expandChapters(chapterPathIds, 0);
+
+            for (int rootIndex = 0; rootIndex < rootChapters.size(); rootIndex++) {
+                expandChapters(chapterPathIds, rootIndex);
+            }
         }
     }
 
