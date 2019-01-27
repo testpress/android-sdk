@@ -53,16 +53,19 @@ public class ExpandableContentsAdapter extends MultiLevelListAdapter {
     }
 
     private QueryBuilder getQueryBuilder(Chapter chapter) {
-        if (chapter.getRawChildrenCount(context) > 0) {
+        if (chapter.getRawChildrenCount(context) > 0 && !chapter.getIsLocked()) {
             return TestpressSDKDatabase.getChapterDao(context).queryBuilder().where(
                     ChapterDao.Properties.ParentId.eq(chapter.getId()),
                     ChapterDao.Properties.Active.eq(true)
             ).orderAsc(ChapterDao.Properties.Order);
+        } else if (!chapter.getIsLocked()) {
+            return TestpressSDKDatabase.getContentDao(context).queryBuilder().where(
+                    ContentDao.Properties.ChapterId.eq(chapter.getId()),
+                    ContentDao.Properties.Active.eq(true)
+            ).orderAsc(ContentDao.Properties.Order);
         }
-        return TestpressSDKDatabase.getContentDao(context).queryBuilder().where(
-                ContentDao.Properties.ChapterId.eq(chapter.getId()),
-                ContentDao.Properties.Active.eq(true)
-        ).orderAsc(ContentDao.Properties.Order);
+
+        return TestpressSDKDatabase.getContentDao(context).queryBuilder().limit(0);
     }
 
     @Override
@@ -90,6 +93,10 @@ public class ExpandableContentsAdapter extends MultiLevelListAdapter {
             TextView lblListHeader = convertView.findViewById(R.id.lblListHeader);
             lblListHeader.setText(chapter.getName());
             ImageView thumbnailImageView = convertView.findViewById(R.id.chapter_image);
+
+            if (chapter.getIsLocked()){
+                thumbnailImageView.setAlpha(0.3f);
+            }
             ImageView expandableItemIndicator = convertView.findViewById(R.id.exp_list_indicator);
             LinearLayout contentLayout = convertView.findViewById(R.id.content_layout);
             View divider = convertView.findViewById(R.id.divider);

@@ -74,8 +74,13 @@ public class ExpandableContentsFragment extends Fragment {
                                       ItemInfo itemInfo) {
 
                 if (item instanceof Chapter) {
-                    Snackbar.make(listView, R.string.testpress_no_content_description,
-                            Snackbar.LENGTH_SHORT).show();
+                    Chapter chapter = (Chapter) item;
+                    if (chapter.getIsLocked()) {
+                        displayRequiredTrophies(chapter);
+                    } else {
+                        Snackbar.make(listView, R.string.testpress_no_content_description,
+                                Snackbar.LENGTH_SHORT).show();
+                    }
                 } else {
                     Content content = (Content) item;
                     startActivity(ContentActivity.createIntent(
@@ -89,6 +94,12 @@ public class ExpandableContentsFragment extends Fragment {
             @Override
             public void onGroupItemClicked(MultiLevelListView parent, final View view, final int position,
                                            Object item, final ItemInfo itemInfo) {
+
+                Chapter chapter = (Chapter) item;
+                if (chapter.getIsLocked()) {
+                    displayRequiredTrophies(chapter);
+                }
+
                 Log.d("GroupItemClicked :", "Level="+ (itemInfo.getLevel()+1));
             }
         });
@@ -111,6 +122,11 @@ public class ExpandableContentsFragment extends Fragment {
         });
         setHasOptionsMenu(true);
         return view;
+    }
+
+    public void displayRequiredTrophies(Chapter chapter){
+        String text = getResources().getString(R.string.testpress_less_trophy, chapter.getRequiredTrophyCount());
+        Snackbar.make(listView, text, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
