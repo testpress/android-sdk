@@ -55,4 +55,13 @@
 
     <string name="testpress_want_to_cancel">Do you want to cancel?</string>
 
+    <plurals name="testpress_chapter_plural_name">
+        <item quantity="one">Chapter</item>
+        <item quantity="other">Chapters</item>
+    </plurals>
+
+    <plurals name="testpress_content_plural_name">
+        <item quantity="one">Content</item>
+        <item quantity="other">Contents</item>
+    </plurals>
 </resources>

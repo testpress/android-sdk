@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -19,6 +21,7 @@ import in.testpress.course.R;
 import in.testpress.course.network.ChapterPager;
 import in.testpress.course.network.ContentPager;
 import in.testpress.course.network.TestpressCourseApiClient;
+import in.testpress.course.util.StringUtil;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Content;
@@ -83,8 +86,9 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
 
     @Override
     protected int[] getChildViewIds() {
-        return new int[] { R.id.course_title, R.id.thumbnail_image, R.id.percentage,
-                R.id.course_item_layout,  R.id.progress_bar_layout, R.id.course_description};
+        return new int[]{R.id.course_title, R.id.thumbnail_image, R.id.percentage,
+                R.id.course_item_layout, R.id.progress_bar_layout, R.id.course_description,
+                R.id.course_content_detail};
     }
 
     @Override
@@ -115,9 +119,36 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
                 }
             }
         });
+
+        LinearLayout linearLayout = view(6);
+
+        // Add total numbers of chapters
+        TextView chapterCountTextView = (TextView) linearLayout.findViewById(R.id.total_chapters);
+        TextView chapterDetailTextView = (TextView) linearLayout.findViewById(R.id.chapter_detail_text);
+        chapterCountTextView.setText(course.getChaptersCount().toString());
+        chapterDetailTextView.setText(StringUtil.getPluralString(
+                mActivity,
+                R.plurals.testpress_chapter_plural_name,
+                course.getChaptersCount(),
+                "Chapter"
+        ));
+
+        // Add total numbers of contents
+        TextView totalContentTextView = linearLayout.findViewById(R.id.total_contents);
+        TextView contentDetailTextView = (TextView) linearLayout.findViewById(R.id.content_detail_text);
+        totalContentTextView.setText(course.getContentsCount().toString());
+        contentDetailTextView.setText(StringUtil.getPluralString(
+                mActivity,
+                R.plurals.testpress_content_plural_name,
+                course.getContentsCount(),
+                "Content"
+        ));
+
         // ToDo: Set completed percentage in the progress bar
-        setGone(4, true);
+        //setGone(4, true);
     }
+
+
 
     private void showProgressDialog(final Course course) {
         int itemsCount = course.getChaptersCount() + course.getContentsCount();
