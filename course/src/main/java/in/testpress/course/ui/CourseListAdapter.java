@@ -21,6 +21,7 @@ import in.testpress.course.R;
 import in.testpress.course.network.ChapterPager;
 import in.testpress.course.network.ContentPager;
 import in.testpress.course.network.TestpressCourseApiClient;
+import in.testpress.course.util.StringUtil;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Content;
@@ -125,20 +126,29 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         TextView chapterCountTextView = (TextView) linearLayout.findViewById(R.id.total_chapters);
         TextView chapterDetailTextView = (TextView) linearLayout.findViewById(R.id.chapter_detail_text);
         chapterCountTextView.setText(course.getChaptersCount().toString());
-        chapterDetailTextView.setText(mActivity.getResources()
-                .getQuantityString(R.plurals.testpress_chapter_plural_name, course.getChaptersCount())
-        );
+        chapterDetailTextView.setText(StringUtil.getPluralString(
+                mActivity,
+                R.plurals.testpress_chapter_plural_name,
+                course.getChaptersCount(),
+                "Chapter"
+        ));
 
         // Add total numbers of contents
         TextView totalContentTextView = linearLayout.findViewById(R.id.total_contents);
         TextView contentDetailTextView = (TextView) linearLayout.findViewById(R.id.content_detail_text);
         totalContentTextView.setText(course.getContentsCount().toString());
-        contentDetailTextView.setText(mActivity.getResources()
-                .getQuantityString(R.plurals.testpress_content_plural_name, course.getContentsCount()));
+        contentDetailTextView.setText(StringUtil.getPluralString(
+                mActivity,
+                R.plurals.testpress_content_plural_name,
+                course.getContentsCount(),
+                "Content"
+        ));
 
         // ToDo: Set completed percentage in the progress bar
         //setGone(4, true);
     }
+
+
 
     private void showProgressDialog(final Course course) {
         int itemsCount = course.getChaptersCount() + course.getContentsCount();
