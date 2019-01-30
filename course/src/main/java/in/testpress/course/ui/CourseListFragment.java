@@ -8,12 +8,16 @@ import org.greenrobot.greendao.AbstractDao;
 
 import java.util.List;
 
+import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
+import in.testpress.course.network.CourseCreditPager;
 import in.testpress.course.network.CoursePager;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.models.greendao.Course;
+import in.testpress.models.greendao.CourseCredit;
+import in.testpress.models.greendao.CourseCreditDao;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
@@ -76,6 +80,7 @@ public class CourseListFragment extends BaseDataBaseFragment<Course, Long> {
             courseDao.insertOrReplaceInTx(courses);
         }
         displayDataFromDB();
+        fetchCourseCredit(new CourseCreditPager(mApiClient));
         showList();
     }
 
@@ -107,6 +112,28 @@ public class CourseListFragment extends BaseDataBaseFragment<Course, Long> {
     public void onDestroyView() {
         ((CourseListAdapter) getListAdapter().getWrappedAdapter()).cancelLoadersIfAny();
         super.onDestroyView();
+    }
+
+    public void fetchCourseCredit(final CourseCreditPager courseCreditPager) {
+        courseCreditPager.enqueueNext(new TestpressCallback<List<CourseCredit>>() {
+            @Override
+            public void onSuccess(List<CourseCredit> coursesCredits) {
+
+                if (courseCreditPager.hasMore()) {
+                    fetchCourseCredit(courseCreditPager);
+                } else {
+                    CourseCreditDao courseCreditDao= TestpressSDKDatabase.getCoursesCreditDao(getActivity());
+                    courseCreditDao.insertOrReplaceInTx(coursesCredits);
+                }
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                if (exception.isNetworkError()) {
+                    showError(R.string.testpress_some_thing_went_wrong_try_again);
+                }
+            }
+        });
     }
 
 }

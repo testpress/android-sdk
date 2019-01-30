@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -27,6 +28,8 @@ import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.Course;
+import in.testpress.models.greendao.CourseCredit;
+import in.testpress.models.greendao.CourseCreditDao;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.network.BaseResourcePager;
 import in.testpress.ui.view.ReadMoreTextView;
@@ -125,6 +128,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         // Add total numbers of chapters
         TextView chapterCountTextView = (TextView) linearLayout.findViewById(R.id.total_chapters);
         TextView chapterDetailTextView = (TextView) linearLayout.findViewById(R.id.chapter_detail_text);
+
         chapterCountTextView.setText(course.getChaptersCount().toString());
         chapterDetailTextView.setText(StringUtil.getPluralString(
                 mActivity,
@@ -136,6 +140,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         // Add total numbers of contents
         TextView totalContentTextView = linearLayout.findViewById(R.id.total_contents);
         TextView contentDetailTextView = (TextView) linearLayout.findViewById(R.id.content_detail_text);
+
         totalContentTextView.setText(course.getContentsCount().toString());
         contentDetailTextView.setText(StringUtil.getPluralString(
                 mActivity,
@@ -144,8 +149,14 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
                 "Content"
         ));
 
-        // ToDo: Set completed percentage in the progress bar
-        //setGone(4, true);
+        // Add percentage to course completion progress
+        CourseCredit courseCredit = getCourseCreditByCourseId(course.getId());
+        LinearLayout progressBarLinearLayout = view(4);
+        int progress = calculateCourseProgressPercentage(courseCredit, course.getContentsCount());
+
+        ((ProgressBar)progressBarLinearLayout.findViewById(R.id.progress_bar)).setProgress(progress);
+        ((TextView) progressBarLinearLayout.findViewById(R.id.percentage))
+                .setText(String.format(mActivity.getResources().getString(R.string.testpress_percentage), progress));
     }
 
 
@@ -237,6 +248,33 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
                 handleError(course, exception);
             }
         });
+    }
+
+    private CourseCredit getCourseCreditByCourseId(long courseId){
+        CourseCreditDao courseCreditDao = TestpressSDKDatabase.getCoursesCreditDao(mActivity);
+        List<CourseCredit> courseCreditList = courseCreditDao.queryBuilder()
+                .where(CourseCreditDao.Properties.Course.eq(courseId)).list();
+
+        if (courseCreditList.size() > 0) {
+            return courseCreditList.get(0);
+        }
+
+        return null;
+    }
+
+    public int calculateCourseProgressPercentage(CourseCredit courseCredit, int totalContents) {
+
+        if (courseCredit != null && totalContents > 0) {
+            int total_unique_attempts = courseCredit.getTotalUniqueVideoAttempts()
+                    + courseCredit.getTotalUniqueHtmlAttempts()
+                    + courseCredit.getTotalUniqueQuizAttempts()
+                    + courseCredit.getTotalUniqueExamAttempts()
+                    + courseCredit.getTotalUniqueAttachmentAttempts();
+
+            return (total_unique_attempts * 100) / totalContents;
+        } else {
+            return 0;
+        }
     }
 
     private void restartLoading(Course course) {

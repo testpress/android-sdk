@@ -169,7 +169,7 @@
                 android:layout_marginLeft="10dp"
                 android:text="50%"
                 android:textColor="@color/testpress_text_gray_light"
-                android:textSize="12sp" />
+                android:theme="@style/courseDetailText" />
 
         </LinearLayout>
 

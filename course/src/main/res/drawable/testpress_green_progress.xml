@@ -17,12 +17,12 @@
 </item>
 
 <item android:id="@android:id/progress">
-    <clip>
-        <shape>
-            <corners android:radius="5dip" />
-            <solid android:color="@color/testpress_green_light"/>
+    <scale android:scaleWidth="100%">
+        <shape android:shape="rectangle">
+            <corners android:radius="5dip"/>
+            <solid android:color="@color/testpress_green_light" />
         </shape>
-    </clip>
+    </scale>
 </item>
 
 </layer-list>
