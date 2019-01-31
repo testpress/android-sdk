@@ -35,6 +35,10 @@ dependencies {
 
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
+    testImplementation rootProject.powermockJunit
+    testImplementation(rootProject.powermockMockio) {
+        exclude group: 'org.mockito'
+    }
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

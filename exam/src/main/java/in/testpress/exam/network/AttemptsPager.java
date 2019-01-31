@@ -15,6 +15,10 @@ public class AttemptsPager extends BaseResourcePager<Attempt> {
         this.attemptsUrlFrag = attemptsUrlFrag;
     }
 
+    public void setApiClient(TestpressExamApiClient apiClient) {
+        this.apiClient = apiClient;
+    }
+
     @Override
     protected Object getId(Attempt resource) {
         return resource.getId();

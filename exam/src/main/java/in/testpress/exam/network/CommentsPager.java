@@ -15,6 +15,14 @@ public class CommentsPager extends BaseResourcePager<Comment> {
         this.commentsUrl = commentsUrl;
     }
 
+    public void setApiClient(TestpressExamApiClient apiClient) {
+        this.apiClient = apiClient;
+    }
+
+    public void setCommentsUrl(String commentsUrl) {
+        this.commentsUrl = commentsUrl;
+    }
+
     @Override
     protected Object getId(Comment resource) {
         return resource.getId();

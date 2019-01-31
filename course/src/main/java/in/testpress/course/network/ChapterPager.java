@@ -27,6 +27,22 @@ public class ChapterPager extends BaseDatabaseModelPager<Chapter> {
         this.apiClient = apiClient;
     }
 
+    public ChapterPager() {
+        super();
+    }
+
+    public void setApiClient(TestpressCourseApiClient api) {
+        this.apiClient = api;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
     @Override
     protected Object getId(Chapter resource) {
         return resource.getId();

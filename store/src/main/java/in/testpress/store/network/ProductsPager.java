@@ -15,6 +15,12 @@ public class ProductsPager extends BaseResourcePager<Product> {
         this.apiClient = apiClient;
     }
 
+    public ProductsPager() {}
+
+    public void setApiClient(TestpressStoreApiClient apiClient) {
+        this.apiClient = apiClient;
+    }
+
     @Override
     protected Object getId(Product resource) {
         return resource.getId();

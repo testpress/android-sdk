@@ -15,6 +15,16 @@ public class ContentPager extends BaseResourcePager<Content> {
         this.apiClient = apiClient;
     }
 
+    public ContentPager() {}
+
+    public void setApiClient(TestpressCourseApiClient apiClient) {
+        this.apiClient = apiClient;
+    }
+
+    public void setContentsUrlFrag(String contentsUrlFrag) {
+        this.contentsUrlFrag = contentsUrlFrag;
+    }
+
     @Override
     protected Object getId(Content resource) {
         return resource.getId();

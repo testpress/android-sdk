@@ -16,6 +16,12 @@ public class CoursePager extends BaseDatabaseModelPager<Course> {
         this.apiClient = apiClient;
     }
 
+    public CoursePager() {}
+
+    public void setApiClient(TestpressCourseApiClient apiClient) {
+        this.apiClient = apiClient;
+    }
+
     @Override
     protected Object getId(Course resource) {
         return resource.getId();

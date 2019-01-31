@@ -17,6 +17,10 @@ public class SubjectPager extends BaseResourcePager<Subject> {
         this.baseUrl = baseUrl;
     }
 
+    public void setApiClient(TestpressExamApiClient apiClient) {
+        this.apiClient = apiClient;
+    }
+
     @Override
     protected Object getId(Subject resource) {
         return resource.getId();

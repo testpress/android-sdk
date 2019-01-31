@@ -15,6 +15,14 @@ public class CategoryPager extends BaseResourcePager<Category> {
         this.parentId = parentId;
     }
 
+    public void setApiClient(TestpressExamApiClient apiClient) {
+        this.apiClient = apiClient;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
     @Override
     protected Object getId(Category resource) {
         return resource.getId();

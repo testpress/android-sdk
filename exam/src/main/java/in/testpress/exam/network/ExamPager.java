@@ -23,6 +23,22 @@ public class ExamPager extends BaseResourcePager<Exam> {
         this.category = category;
     }
 
+    public void setApiClient(TestpressExamApiClient apiClient) {
+        this.apiClient = apiClient;
+    }
+
+    public void setAccessCode(String accessCode) {
+        this.accessCode = accessCode;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setSubclass(String subclass) {
+        this.subclass = subclass;
+    }
+
     @Override
     protected Object getId(Exam resource) {
         return resource.getId();

@@ -13,6 +13,12 @@ public class LeaderboardPager extends BaseResourcePager<Reputation> {
         this.apiClient = apiClient;
     }
 
+    public LeaderboardPager() {}
+
+    public void setApiClient(TestpressCourseApiClient apiClient) {
+        this.apiClient = apiClient;
+    }
+
     @Override
     protected Object getId(Reputation resource) {
         return resource.getId();
