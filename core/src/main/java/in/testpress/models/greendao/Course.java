@@ -29,6 +29,8 @@ public class Course {
     private Integer contentsCount;
     private Integer order;
     private Boolean active;
+    private String external_content_link;
+    private String external_link_label;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -42,7 +44,7 @@ public class Course {
     }
 
     @Generated
-    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount, Integer order, Boolean active) {
+    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount, Integer order, Boolean active, String external_content_link, String external_link_label) {
         this.id = id;
         this.url = url;
         this.title = title;
@@ -58,6 +60,8 @@ public class Course {
         this.contentsCount = contentsCount;
         this.order = order;
         this.active = active;
+        this.external_content_link = external_content_link;
+        this.external_link_label = external_link_label;
     }
 
     public Long getId() {
@@ -180,7 +184,32 @@ public class Course {
         this.active = active;
     }
 
+    public String getExternal_content_link() {
+        return external_content_link;
+    }
+
+    public void setExternal_content_link(String external_content_link) {
+        this.external_content_link = external_content_link;
+    }
+
+    public String getExternal_link_label() {
+        return external_link_label;
+    }
+
+    public void setExternal_link_label(String external_link_label) {
+        this.external_link_label = external_link_label;
+    }
+
     // KEEP METHODS - put your custom methods here
+
+    public boolean isCourseForRegistration() {
+
+        if (this.external_content_link != null && !this.external_content_link.equals("")) {
+            return true;
+        }
+
+        return false;
+    }
     // KEEP METHODS END
 
 }
