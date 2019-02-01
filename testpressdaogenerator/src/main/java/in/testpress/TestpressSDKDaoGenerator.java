@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 19;
+    private static final int VERSION = 20;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -63,7 +63,7 @@ public class TestpressSDKDaoGenerator {
         addDirectionTranslation(schema);
 
         schema.enableKeepSectionsByDefault();
-        new DaoGenerator().generateAll(schema, "../core/src/main/java");
+        new DaoGenerator().generateAll(schema, "core/src/main/java");
     }
 
     private static Entity addAttempt(Schema schema) {
@@ -306,6 +306,8 @@ public class TestpressSDKDaoGenerator {
         course.addIntProperty("contentsCount");
         course.addIntProperty("order");
         course.addBooleanProperty("active");
+        course.addStringProperty("external_content_link");
+        course.addStringProperty("external_link_label");
         return course;
     }
 

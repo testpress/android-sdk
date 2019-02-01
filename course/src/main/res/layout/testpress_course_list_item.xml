@@ -26,11 +26,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_marginTop="5dp"
             android:textSize="16sp"
             android:textColor="@color/testpress_black"
             android:maxLines="2"
             android:ellipsize="end"
             android:id="@+id/course_title" />
+
+        <TextView
+            android:id="@+id/external_link_title"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:background="@drawable/customborder"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="Register to unlock course"
+            android:textColor="#3598db"
+            android:textSize="12sp"
+            android:visibility="gone"/>
 
         <LinearLayout
             android:id="@+id/progress_bar_layout"

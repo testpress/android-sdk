@@ -37,6 +37,8 @@ public class CourseDao extends AbstractDao<Course, Long> {
         public final static Property ContentsCount = new Property(12, Integer.class, "contentsCount", false, "CONTENTS_COUNT");
         public final static Property Order = new Property(13, Integer.class, "order", false, "ORDER");
         public final static Property Active = new Property(14, Boolean.class, "active", false, "ACTIVE");
+        public final static Property External_content_link = new Property(15, String.class, "external_content_link", false, "EXTERNAL_CONTENT_LINK");
+        public final static Property External_link_label = new Property(16, String.class, "external_link_label", false, "EXTERNAL_LINK_LABEL");
     }
 
 
@@ -66,7 +68,9 @@ public class CourseDao extends AbstractDao<Course, Long> {
                 "\"CHAPTERS_COUNT\" INTEGER," + // 11: chaptersCount
                 "\"CONTENTS_COUNT\" INTEGER," + // 12: contentsCount
                 "\"ORDER\" INTEGER," + // 13: order
-                "\"ACTIVE\" INTEGER);"); // 14: active
+                "\"ACTIVE\" INTEGER," + // 14: active
+                "\"EXTERNAL_CONTENT_LINK\" TEXT," + // 15: external_content_link
+                "\"EXTERNAL_LINK_LABEL\" TEXT);"); // 16: external_link_label
     }
 
     /** Drops the underlying database table. */
@@ -153,6 +157,16 @@ public class CourseDao extends AbstractDao<Course, Long> {
         if (active != null) {
             stmt.bindLong(15, active ? 1L: 0L);
         }
+ 
+        String external_content_link = entity.getExternal_content_link();
+        if (external_content_link != null) {
+            stmt.bindString(16, external_content_link);
+        }
+ 
+        String external_link_label = entity.getExternal_link_label();
+        if (external_link_label != null) {
+            stmt.bindString(17, external_link_label);
+        }
     }
 
     @Override
@@ -233,6 +247,16 @@ public class CourseDao extends AbstractDao<Course, Long> {
         if (active != null) {
             stmt.bindLong(15, active ? 1L: 0L);
         }
+ 
+        String external_content_link = entity.getExternal_content_link();
+        if (external_content_link != null) {
+            stmt.bindString(16, external_content_link);
+        }
+ 
+        String external_link_label = entity.getExternal_link_label();
+        if (external_link_label != null) {
+            stmt.bindString(17, external_link_label);
+        }
     }
 
     @Override
@@ -257,7 +281,9 @@ public class CourseDao extends AbstractDao<Course, Long> {
             cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11), // chaptersCount
             cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12), // contentsCount
             cursor.isNull(offset + 13) ? null : cursor.getInt(offset + 13), // order
-            cursor.isNull(offset + 14) ? null : cursor.getShort(offset + 14) != 0 // active
+            cursor.isNull(offset + 14) ? null : cursor.getShort(offset + 14) != 0, // active
+            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // external_content_link
+            cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16) // external_link_label
         );
         return entity;
     }
@@ -279,6 +305,8 @@ public class CourseDao extends AbstractDao<Course, Long> {
         entity.setContentsCount(cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12));
         entity.setOrder(cursor.isNull(offset + 13) ? null : cursor.getInt(offset + 13));
         entity.setActive(cursor.isNull(offset + 14) ? null : cursor.getShort(offset + 14) != 0);
+        entity.setExternal_content_link(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
+        entity.setExternal_link_label(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
      }
     
     @Override
