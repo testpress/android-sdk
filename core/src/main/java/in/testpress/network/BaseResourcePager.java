@@ -20,7 +20,7 @@ public abstract class BaseResourcePager<E> {
 
     protected TestpressApiResponse<E> response;
 
-    /**
+    /**work/BaseResourcePager.java
      * Next page to request
      */
     public int page = 1;
@@ -44,6 +44,8 @@ public abstract class BaseResourcePager<E> {
      * Are more pages available?
      */
     protected boolean hasMore;
+
+    protected RetrofitCall<TestpressApiResponse<E>> retrofitCall;
 
     /**
      * Reset the number of the next page to be requested from {@link #next()}
@@ -149,7 +151,7 @@ public abstract class BaseResourcePager<E> {
     }
 
     public RetrofitCall<TestpressApiResponse<E>> enqueueNext(final TestpressCallback<List<E>> callback) {
-        return getItems(page, -1).enqueue(new TestpressCallback<TestpressApiResponse<E>>() {
+        retrofitCall = getItems(page, -1).enqueue(new TestpressCallback<TestpressApiResponse<E>>() {
             @Override
             public void onSuccess(TestpressApiResponse<E> result) {
                 response = result;
@@ -183,6 +185,8 @@ public abstract class BaseResourcePager<E> {
                 callback.onException(exception);
             }
         });
+
+        return retrofitCall;
     }
 
     public boolean hasNext() {
@@ -251,6 +255,16 @@ public abstract class BaseResourcePager<E> {
 
     public void clearQueryParams() {
         queryParams.clear();
+    }
+
+    public Integer getTotalItemsCount() {
+        return response != null ? response.getCount() : 0;
+    }
+
+    public void cancelAsyncRequest() {
+        if (retrofitCall != null) {
+            retrofitCall.cancel();
+        }
     }
 }
 
