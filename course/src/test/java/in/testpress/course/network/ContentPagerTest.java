@@ -25,7 +25,7 @@ public class ContentPagerTest {
 
 
     @Test
-    public void testChapterPager_checkGetItemCallsGetContentOrNot() {
+    public void testContentPager_checkGetItemCallsGetContentOrNot() {
         doCallRealMethod().when(contentPager).getItems(Mockito.<Integer>anyInt(), Mockito.<Integer>anyInt());
         doCallRealMethod().when(contentPager).setApiClient(apiClient);
 

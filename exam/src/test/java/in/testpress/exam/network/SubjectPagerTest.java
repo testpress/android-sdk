@@ -25,7 +25,7 @@ public class SubjectPagerTest {
 
 
     @Test
-    public void testChapterPager_checkGetItemCallsGetSubjectsOrNot() {
+    public void testSubjectPager_checkGetItemCallsGetSubjectsOrNot() {
         doCallRealMethod().when(subjectPager).getItems(anyInt(), anyInt());
         doCallRealMethod().when(subjectPager).setApiClient(apiClient);
 

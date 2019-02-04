@@ -30,7 +30,7 @@ public class BookmarksPagerTest {
 
 
     @Test
-    public void testChapterPager_checkGetItemCallsGetBookmarksOrNot() {
+    public void testBookmarksPager_checkGetItemCallsGetBookmarksOrNot() {
 
         doCallRealMethod().when(bookmarksPager).getItems(bookmarksListResponse);
         doCallRealMethod().when(bookmarksListResponse).getBookmarks();

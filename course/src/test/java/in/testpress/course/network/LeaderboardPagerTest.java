@@ -25,7 +25,7 @@ public class LeaderboardPagerTest {
 
 
     @Test
-    public void testChapterPager_checkGetItemCallsGetLeaderboardOrNot() {
+    public void testLeaderboardPager_checkGetItemCallsGetLeaderboardOrNot() {
         doCallRealMethod().when(leaderboardPager).getItems(Mockito.<Integer>anyInt(), Mockito.<Integer>anyInt());
         doCallRealMethod().when(leaderboardPager).setApiClient(apiClient);
 

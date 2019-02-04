@@ -25,7 +25,7 @@ public class TestQuestionsPagerTest {
 
 
     @Test
-    public void testChapterPager_checkGetItemCallsGetQuestionsOrNot() {
+    public void testTestQuestionsPager_checkGetItemCallsGetQuestionsOrNot() {
         doCallRealMethod().when(testQuestionsPager).getItems(anyInt(), anyInt());
         doCallRealMethod().when(testQuestionsPager).setApiClient(apiClient);
 

@@ -24,7 +24,7 @@ public class CategoryPagerTest {
 
 
     @Test
-    public void testChapterPager_checkGetItemCallsGetCategoriesOrNot() {
+    public void testCategoryPager_checkGetItemCallsGetCategoriesOrNot() {
         doCallRealMethod().when(categoryPager).getItems(anyInt(), anyInt());
         doCallRealMethod().when(categoryPager).setApiClient(apiClient);
 

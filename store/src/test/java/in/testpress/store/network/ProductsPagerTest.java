@@ -24,7 +24,7 @@ public class ProductsPagerTest {
 
 
     @Test
-    public void testChapterPager_checkGetItemCallsGetProductsOrNot() {
+    public void testProductPager_checkGetItemCallsGetProductsOrNot() {
         doCallRealMethod().when(productsPager).getItems(anyInt(), anyInt());
         doCallRealMethod().when(productsPager).setApiClient(apiClient);
 

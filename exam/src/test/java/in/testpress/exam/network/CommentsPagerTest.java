@@ -25,7 +25,7 @@ public class CommentsPagerTest {
 
 
     @Test
-    public void testChapterPager_checkGetItemCallsGetCommentsOrNot() {
+    public void testCommentsPager_checkGetItemCallsGetCommentsOrNot() {
         doCallRealMethod().when(commentsPager).getItems(anyInt(), anyInt());
         doCallRealMethod().when(commentsPager).setApiClient(apiClient);
 

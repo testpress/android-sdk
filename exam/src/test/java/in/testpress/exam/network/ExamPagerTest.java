@@ -24,7 +24,7 @@ public class ExamPagerTest {
 
 
     @Test
-    public void testChapterPager_checkGetItemCallsGetExamsOrNot() {
+    public void testExamPager_checkGetItemCallsGetExamsOrNot() {
         doCallRealMethod().when(examPager).getItems(anyInt(), anyInt());
         doCallRealMethod().when(examPager).setApiClient(apiClient);
 

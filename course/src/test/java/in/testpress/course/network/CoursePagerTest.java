@@ -25,7 +25,7 @@ public class CoursePagerTest {
 
 
     @Test
-    public void testChapterPager_checkGetItemCallsGetCoursesOrNot() {
+    public void testCoursePager_checkGetItemCallsGetCoursesOrNot() {
         doCallRealMethod().when(coursePager).getItems(Mockito.<Integer>anyInt(), Mockito.<Integer>anyInt());
         doCallRealMethod().when(coursePager).setApiClient(apiClient);
 

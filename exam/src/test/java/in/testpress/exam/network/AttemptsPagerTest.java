@@ -25,7 +25,7 @@ public class AttemptsPagerTest {
 
 
     @Test
-    public void testChapterPager_checkGetItemCallsGetAttemptsOrNot() {
+    public void testAttemptsPager_checkGetItemCallsGetAttemptsOrNot() {
         doCallRealMethod().when(attemptsPager).getItems(anyInt(), anyInt());
         doCallRealMethod().when(attemptsPager).setApiClient(apiClient);
 
