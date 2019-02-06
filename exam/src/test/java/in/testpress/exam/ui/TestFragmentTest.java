@@ -23,6 +23,8 @@ import static in.testpress.models.greendao.Attempt.RUNNING;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -39,6 +41,7 @@ public class TestFragmentTest {
     @Mock private Attempt attempt;
     @Mock private TestFragment fragment;
     @Mock private AttemptSection section;
+    @Mock private AttemptSection section2;
     @Mock private List<AttemptItem> attemptItemList;
     @Mock private List<AttemptSection> sections;
 
@@ -54,6 +57,7 @@ public class TestFragmentTest {
         when(attempt.getRemainingTime()).thenReturn(attemptRemainingTime);
         when(fragment.formatMillisecond(attemptRemainingTime)).thenReturn(attemptMillisRemaining);
         when(sections.get(0)).thenReturn(section);
+        when(sections.get(1)).thenReturn(section2);
     }
 
     @Test
@@ -72,6 +76,7 @@ public class TestFragmentTest {
         when(fragment.attemptItemList.isEmpty()).thenReturn(false);
 
         doCallRealMethod().when(fragment).startCountDownTimer();
+        doCallRealMethod().when(fragment).evaluateRemainingMillisecond(anyBoolean(), anyLong(), anyLong());
         fragment.startCountDownTimer();
 
         assertThat("millisRemaining value needs to same as attempt remaining time",
@@ -105,6 +110,7 @@ public class TestFragmentTest {
         long sectionMillisRemaining = Long.parseLong(sectionRemainingTime.split(":")[2]);
         when(section.getRemainingTime()).thenReturn(sectionRemainingTime);
         when(fragment.formatMillisecond(sectionRemainingTime)).thenReturn(sectionMillisRemaining);
+        doCallRealMethod().when(fragment).evaluateRemainingMillisecond(anyBoolean(), anyLong(), anyLong());
         when(section.getState()).thenReturn(RUNNING);
 
         when(fragment.attemptItemList.isEmpty()).thenReturn(false);
@@ -117,6 +123,45 @@ public class TestFragmentTest {
                 is(sectionMillisRemaining));
 
         verify(fragment, times(1)).startCountDownTimer(sectionMillisRemaining);
+    }
+
+    @Test
+    public void test_startCountDownTimer_usesSectionRemainingTime_forLockedSectionExam_for_twoConsecutiveSections() {
+        fragment.lockedSectionExam = true;
+        String sectionRemainingTime = "0:00:10";
+        String section2RemainingTime = "0:00:15";
+        long sectionMillisRemaining = Long.parseLong(sectionRemainingTime.split(":")[2]);
+        when(section.getRemainingTime()).thenReturn(sectionRemainingTime);
+        when(fragment.formatMillisecond(sectionRemainingTime)).thenReturn(sectionMillisRemaining);
+        doCallRealMethod().when(fragment).evaluateRemainingMillisecond(anyBoolean(), anyLong(), anyLong());
+        when(section.getState()).thenReturn(RUNNING);
+
+        long section2MillisRemaining = Long.parseLong(section2RemainingTime.split(":")[2]);
+        when(section2.getRemainingTime()).thenReturn(section2RemainingTime);
+        when(fragment.formatMillisecond(section2RemainingTime)).thenReturn(section2MillisRemaining);
+        doCallRealMethod().when(fragment).evaluateRemainingMillisecond(anyBoolean(), anyLong(), anyLong());
+        when(section2.getState()).thenReturn(RUNNING);
+
+        when(fragment.attemptItemList.isEmpty()).thenReturn(false);
+
+        doCallRealMethod().when(fragment).startCountDownTimer();
+        fragment.startCountDownTimer();
+
+        assertThat("millisRemaining value needs to same as section remaining time",
+                fragment.millisRemaining,
+                is(sectionMillisRemaining));
+
+        verify(fragment, times(1)).startCountDownTimer(sectionMillisRemaining);
+
+        // Second section
+        fragment.currentSection = 1;
+        fragment.startCountDownTimer();
+
+        assertThat("millisRemaining value needs to same as section 2 remaining time",
+                fragment.millisRemaining,
+                is(section2MillisRemaining));
+
+        verify(fragment, times(1)).startCountDownTimer(section2MillisRemaining);
     }
 
     @Test

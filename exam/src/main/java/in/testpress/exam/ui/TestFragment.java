@@ -1069,9 +1069,9 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             remainingTime = section.getRemainingTime();
         }
         long millisRemainingFetchedInAttempt = formatMillisecond(remainingTime);
-        if (millisRemaining == -1 || millisRemaining > millisRemainingFetchedInAttempt) {
-            millisRemaining = millisRemainingFetchedInAttempt;
-        }
+
+        millisRemaining = evaluateRemainingMillisecond(lockedSectionExam, millisRemaining, millisRemainingFetchedInAttempt);
+
         if (millisRemaining == 0) {
             onRemainingTimeOver();
         } else if (attemptItemList.isEmpty()) {
@@ -1085,6 +1085,16 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         this.millisRemaining = millisRemaining;
         String formattedTime = formatTime(millisRemaining);
         timer.setText(formattedTime);
+    }
+
+    public long evaluateRemainingMillisecond(boolean sectionLockedExam, long currentRemainingMillis, long fetchedAttemptRemainingMillis) {
+
+        if (sectionLockedExam) {
+            return fetchedAttemptRemainingMillis;
+        } else if (currentRemainingMillis == -1 || currentRemainingMillis > fetchedAttemptRemainingMillis) {
+            return fetchedAttemptRemainingMillis;
+        }
+        return currentRemainingMillis;
     }
 
     void startCountDownTimer(long millisInFuture) {
