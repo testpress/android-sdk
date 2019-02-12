@@ -11,12 +11,10 @@ import java.util.List;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
-import in.testpress.course.TestpressCourse;
-import in.testpress.models.greendao.Course;
-import in.testpress.models.greendao.CourseDao;
 import in.testpress.course.network.CoursePager;
 import in.testpress.course.network.TestpressCourseApiClient;
-import in.testpress.network.BaseResourcePager;
+import in.testpress.models.greendao.Course;
+import in.testpress.models.greendao.CourseDao;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -72,6 +70,7 @@ public class CourseListFragment extends BaseDataBaseFragment<Course, Long> {
 
         this.exception = null;
         this.items = courses;
+        courses = Course.updateCoursesWithLocalVariables(getActivity(), courses);
         getDao().deleteAll();
         if (!courses.isEmpty()) {
             getDao().insertOrReplaceInTx(courses);
@@ -102,6 +101,12 @@ public class CourseListFragment extends BaseDataBaseFragment<Course, Long> {
     protected void setEmptyText() {
         setEmptyText(R.string.testpress_no_courses, R.string.testpress_no_courses_description,
                     R.drawable.ic_error_outline_black_18dp);
+    }
+
+    @Override
+    public void onDestroyView() {
+        ((CourseListAdapter) getListAdapter().getWrappedAdapter()).cancelLoadersIfAny();
+        super.onDestroyView();
     }
 
 }

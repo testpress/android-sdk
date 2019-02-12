@@ -308,6 +308,7 @@ public class TestpressSDKDaoGenerator {
         course.addBooleanProperty("active");
         course.addStringProperty("external_content_link");
         course.addStringProperty("external_link_label");
+        course.addBooleanProperty("childItemsLoaded").notNull();
         return course;
     }
 
