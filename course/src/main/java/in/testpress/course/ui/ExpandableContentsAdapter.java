@@ -162,7 +162,7 @@ public class ExpandableContentsAdapter extends MultiLevelListAdapter {
             if (content.getIsLocked()) {
                 contentStateImageView.setImageResource(R.drawable.testpress_lock_filled);
                 contentStateImageView.setVisibility(View.VISIBLE);
-            } else if (content.getAttemptsCount() == 0 ||
+            } else if (content.getAttemptsCount() == null || content.getAttemptsCount() == 0 ||
                     (content.getAttemptsCount() == 1 && exam != null &&
                             exam.getAttemptsCount() == 0 && exam.getPausedAttemptsCount() == 1)) {
 
