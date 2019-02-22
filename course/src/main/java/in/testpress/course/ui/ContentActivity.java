@@ -474,7 +474,7 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void displayAttachmentContent() {
-        setContentTitle(content.getName());
+        setContentTitle(content.getTitle());
         TextView description = (TextView) findViewById(R.id.attachment_description);
         final Attachment attachment = content.getRawAttachment();
         if (attachment.getDescription() != null && !attachment.getDescription().isEmpty()) {
@@ -499,7 +499,7 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void onExamContent() {
-        setContentTitle(content.getName());
+        setContentTitle(content.getTitle());
         // forceRefresh if already attempts is listed(courseAttemptsFromDB is populated)
         boolean forceRefresh = !courseAttemptsFromDB.isEmpty();
         courseAttemptsFromDB.clear();
