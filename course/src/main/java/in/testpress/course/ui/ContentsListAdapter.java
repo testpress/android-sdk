@@ -83,7 +83,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         textView(0).setTypeface(TestpressSdk.getRubikMediumFont(mActivity));
         textView(7).setTypeface(TestpressSdk.getRubikMediumFont(mActivity));
         textView(8).setTypeface(TestpressSdk.getRubikMediumFont(mActivity));
-        setText(0, content.getName());
+        setText(0, content.getTitle());
         // Set image
         if (content.getImage() == null || content.getImage().isEmpty()) {
             setGone(1, true);
