@@ -29,7 +29,11 @@ public class ImageUtils {
         } else {
             DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
                     .cacheOnDisk(true).cacheInMemory(true)
+                    .resetViewBeforeLoading(true)
                     .imageScaleType(ImageScaleType.EXACTLY)
+                    .showImageForEmptyUri(R.drawable.testpress_placeholder_icon)
+                    .showImageOnFail(R.drawable.testpress_placeholder_icon)
+                    .showImageOnLoading(R.drawable.testpress_placeholder_icon)
                     .displayer(new FadeInBitmapDisplayer(300)).build();
 
             ImageLoaderConfiguration config =

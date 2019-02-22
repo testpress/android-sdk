@@ -3,6 +3,8 @@ package in.testpress.core;
 import android.content.Context;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import in.testpress.models.InstituteSettings;
 
@@ -11,6 +13,7 @@ import static org.mockito.Mockito.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+@RunWith(PowerMockRunner.class)
 public class TestpressSdkTest {
 
     @Test
@@ -173,6 +176,7 @@ public class TestpressSdkTest {
 
     @Test
     public void testSetExamDB_withNullValues() throws Exception {
+        Context context = mock(Context.class);
         try {
             TestpressSdk.setTestpressExamDBSession(null, "DummyToken");
             fail();
@@ -180,14 +184,12 @@ public class TestpressSdkTest {
             assertEquals("Context must not be null.", e.getMessage());
         }
         try {
-            Context context = mock(Context.class);
             TestpressSdk.setTestpressExamDBSession(context, null);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("SessionToken must not be null or Empty.", e.getMessage());
         }
         try {
-            Context context = mock(Context.class);
             TestpressSdk.setTestpressExamDBSession(context, "");
             fail();
         } catch (IllegalArgumentException e) {

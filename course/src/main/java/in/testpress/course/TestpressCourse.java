@@ -13,8 +13,10 @@ import in.testpress.course.ui.ChapterDetailActivity;
 import in.testpress.course.ui.ContentActivity;
 import in.testpress.course.ui.CourseListActivity;
 import in.testpress.course.ui.CourseListFragment;
+import in.testpress.course.ui.ExpandableContentsActivity;
 import in.testpress.course.ui.LeaderboardActivity;
 import in.testpress.course.ui.LeaderboardFragment;
+import in.testpress.models.greendao.Course;
 import in.testpress.util.Assert;
 import in.testpress.util.ImageUtils;
 
@@ -24,6 +26,7 @@ import static in.testpress.core.TestpressSdk.COURSE_CONTENT_LIST_REQUEST_CODE;
 
 public class TestpressCourse {
 
+    public static final String COURSE = "course";
     public static final String COURSE_ID = "courseId";
     public static final String PARENT_ID = "parentId";
     public static final String CHAPTER_URL = "chapterUrl";
@@ -113,6 +116,27 @@ public class TestpressCourse {
         init(activity.getApplicationContext(), testpressSession);
         activity.startActivityForResult(
                 ChapterDetailActivity.createIntent(courseName, courseId.toString(), activity),
+                COURSE_CHAPTER_REQUEST_CODE
+        );
+    }
+
+    /**
+     * Show chapters of a specific course as new Activity.
+     *
+     * @param activity Activity from which chapters needs to show.
+     * @param course Course which chapters need to be display.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    public static void showChapters(@NonNull Activity activity,
+                                    @NonNull Course course,
+                                    @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Activity must not be null.", activity);
+        Assert.assertNotNull("Course must not be null.", course);
+
+        init(activity.getApplicationContext(), testpressSession);
+        activity.startActivityForResult(
+                ExpandableContentsActivity.createIntent(course, activity),
                 COURSE_CHAPTER_REQUEST_CODE
         );
     }

@@ -7,10 +7,12 @@ import android.support.v4.app.FragmentActivity;
 import org.junit.Test;
 
 import in.testpress.core.TestpressSession;
+import in.testpress.models.greendao.Course;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockingDetails;
 
 public class TestpressCourseTest {
 
@@ -65,6 +67,7 @@ public class TestpressCourseTest {
     @Test
     public void testShowChapters_withNullValues() throws Exception {
         TestpressSession testpressSession = mock(TestpressSession.class);
+        Course course = mock(Course.class);
         try {
             TestpressCourse.showChapters(null, "", 0, testpressSession);
             fail();
@@ -84,6 +87,27 @@ public class TestpressCourseTest {
         } catch (IllegalArgumentException e) {
             assertEquals("TestpressSession must not be null.", e.getMessage());
         }
+        try {
+            TestpressCourse.showChapters(null, course, testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Activity must not be null.", e.getMessage());
+        }
+        try {
+            TestpressCourse.showChapters(activity, null, testpressSession);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Course must not be null.", e.getMessage());
+        }
+        try {
+            TestpressCourse.showChapters(activity, course, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("TestpressSession must not be null.", e.getMessage());
+        }
+
+
+
     }
 
     @Test

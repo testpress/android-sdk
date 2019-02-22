@@ -9,18 +9,19 @@ import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
 
 import static in.testpress.network.TestpressApiClient.PARENT;
+import static in.testpress.network.TestpressApiClient.UNFILTERED;
 
 public class ChapterPager extends BaseDatabaseModelPager<Chapter> {
 
     private TestpressCourseApiClient apiClient;
-    private String courseId;
+    private long courseId;
     private String parentId;
 
-    public ChapterPager(String courseId, TestpressCourseApiClient apiClient) {
+    public ChapterPager(long courseId, TestpressCourseApiClient apiClient) {
         this(courseId, null, apiClient);
     }
 
-    public ChapterPager(String courseId, String parentId, TestpressCourseApiClient apiClient) {
+    public ChapterPager(long courseId, String parentId, TestpressCourseApiClient apiClient) {
         super();
         this.courseId = courseId;
         this.parentId = parentId;
@@ -35,7 +36,7 @@ public class ChapterPager extends BaseDatabaseModelPager<Chapter> {
         this.apiClient = api;
     }
 
-    public void setCourseId(String courseId) {
+    public void setCourseId(long courseId) {
         this.courseId = courseId;
     }
 
@@ -54,6 +55,7 @@ public class ChapterPager extends BaseDatabaseModelPager<Chapter> {
         if (parentId != null) {
             queryParams.put(PARENT, parentId);
         }
+        queryParams.put(UNFILTERED, true);
         return apiClient.getChapters(courseId, queryParams, latestModifiedDate);
     }
 

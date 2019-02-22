@@ -59,6 +59,11 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         progressDialog.setProgressStyle(STYLE_HORIZONTAL);
         progressDialog.setIndeterminate(true);
         progressDialog.setCancelable(false);
+        wantToCancelDialog = new AlertDialog.Builder(mActivity, R.style.TestpressAppCompatAlertDialogStyle)
+                .setTitle(R.string.testpress_are_you_sure)
+                .setMessage(R.string.testpress_want_to_cancel)
+                .setPositiveButton(R.string.testpress_yes, null)
+                .create();
     }
 
     @Override
@@ -142,9 +147,9 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     public void openCourseContentsOrExternalLink(Activity activity, Course course, boolean openCourseContent) {
 
         if (openCourseContent) {
-            activity.startActivity(ChapterDetailActivity.createIntent(
+            activity.startActivity(ExpandableContentsActivity.createIntent(
                     course.getTitle(),
-                    course.getId().toString(),
+                    course.getId(),
                     activity));
         } else {
             Intent intent = new Intent(activity, WebViewActivity.class);
@@ -157,11 +162,8 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     public void showProgressDialog(final Course course) {
         int itemsCount = course.getChaptersCount() + course.getContentsCount();
         progressDialog.setMax(itemsCount);
-        wantToCancelDialog = new AlertDialog.Builder(mActivity, R.style.TestpressAppCompatAlertDialogStyle)
-                .setTitle(R.string.testpress_are_you_sure)
-                .setMessage(R.string.testpress_want_to_cancel)
-                .setPositiveButton(R.string.testpress_yes, null)
-                .setNegativeButton(R.string.testpress_no, new DialogInterface.OnClickListener() {
+        wantToCancelDialog.setButton(BUTTON_NEGATIVE, mActivity.getString(R.string.testpress_no),
+                new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if (!progressDialog.isShowing()) {
@@ -169,7 +171,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
                         }
                         restartLoading(course);
                     }
-                }).create();
+                });
         progressDialog.setButton(BUTTON_NEGATIVE, mActivity.getString(R.string.testpress_cancel),
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -185,7 +187,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         });
         progressDialog.show();
         progressDialog.setProgress(0);
-        fetchChapters(course, new ChapterPager(course.getId().toString(), apiClient));
+        fetchChapters(course, new ChapterPager(course.getId(), apiClient));
     }
 
     public void fetchChapters(final Course course, final ChapterPager chapterPager) {
@@ -196,7 +198,9 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
                 if (progressDialog.isIndeterminate()) {
                     progressDialog.setIndeterminate(false);
                 }
-                progressDialog.incrementProgressBy(getIncrementBy(chapterPager));
+                progressDialog.incrementProgressBy(
+                        getIncrementBy(chapterPager, course.getChaptersCount()));
+
                 if (chapterPager.hasMore() && progressDialog.isShowing()) {
                     fetchChapters(course, chapterPager);
                 } else {
@@ -221,10 +225,13 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
                 if (progressDialog.isIndeterminate()) {
                     progressDialog.setIndeterminate(false);
                 }
-                progressDialog.incrementProgressBy(getIncrementBy(contentPager));
+                progressDialog.incrementProgressBy(
+                        getIncrementBy(contentPager, course.getContentsCount()));
+
                 if (contentPager.hasMore() && progressDialog.isShowing()) {
                     fetchContents(course, contentPager);
                 } else {
+                    progressDialog.setProgress(progressDialog.getMax());
                     ContentDao contentDao = TestpressSDKDatabase.getContentDao(mActivity);
                     contentDao.insertOrReplaceInTx(contents);
                     course.setChildItemsLoaded(true);
@@ -276,14 +283,20 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
                                 restartLoading(course);
                             }
                         })
-                .setNegativeButton(R.string.testpress_cancel, null)
+                .setNegativeButton(R.string.testpress_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        progressDialog.dismiss();
+                        wantToCancelDialog.show();
+                    }
+                })
                 .show();
     }
 
-    public int getIncrementBy(BaseResourcePager pager) {
+    public int getIncrementBy(BaseResourcePager pager,  int totalActiveItems) {
         int totalItemsCount = pager.getTotalItemsCount();
         int totalPages = (totalItemsCount / pager.getPerPage()) + (((totalItemsCount % pager.getPerPage()) != 0) ? 1 : 0);
-        return (pager.page - 1 == totalPages) ? (totalItemsCount % pager.getPerPage()) : pager.getPerPage();
+        return totalActiveItems / totalPages;
     }
 
     public void displayChapters(Course course) {

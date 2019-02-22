@@ -34,7 +34,7 @@ public class ChapterPagerTest {
         chapterPager.getItems(Mockito.<Integer>anyInt(), Mockito.<Integer>anyInt());
 
         verify(apiClient, times(1)).getChapters(
-                Mockito.<String>any(),
+                anyLong(),
                 ArgumentMatchers.<String, Object>anyMap(),
                 Mockito.<String>any()
         );
