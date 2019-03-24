@@ -8,9 +8,13 @@ import android.widget.FrameLayout;
 
 import com.google.android.exoplayer2.ui.PlayerView;
 
+import in.testpress.core.TestpressSdk;
+import in.testpress.core.TestpressSession;
 import in.testpress.course.R;
 import in.testpress.course.util.ExoPlayerUtil;
 import in.testpress.course.util.ExoplayerFullscreenHelper;
+
+import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 
 /**
  * A fullscreen activity to play audio or video streams.
@@ -43,6 +47,7 @@ public class ExoPlayerActivity extends AppCompatActivity {
 
         exoplayerFullscreenHelper = new ExoplayerFullscreenHelper(this, exoPlayerUtil);
         exoplayerFullscreenHelper.initializeOrientationListener();
+        secureContent();
     }
 
     @Override
@@ -55,12 +60,14 @@ public class ExoPlayerActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         exoPlayerUtil.onResume();
+        secureContent();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         exoPlayerUtil.onPause();
+        secureContent();
     }
 
     @Override
@@ -73,5 +80,12 @@ public class ExoPlayerActivity extends AppCompatActivity {
     public void onDestroy(){
         super.onDestroy();
         exoplayerFullscreenHelper.disableOrientationListener();
+    }
+
+    public void secureContent(){
+        TestpressSession session = TestpressSdk.getTestpressSession(this);
+        if (session != null && session.getInstituteSettings().isScreenshotDisabled()) {
+            getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
+        }
     }
 }
