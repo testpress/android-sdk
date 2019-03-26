@@ -101,6 +101,7 @@ public class ReviewStatsFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        instituteSettings = getInstituteSettings();
         exam = getArguments().getParcelable(PARAM_EXAM);
         Assert.assertNotNull("PARAM_EXAM must not be null.", exam);
         instituteSettings = getInstituteSettings();
@@ -218,8 +219,7 @@ public class ReviewStatsFragment extends BaseFragment {
         } else {
             score.setText(attempt.getScore());
         }
-        if ((exam.getShowPercentile()) &&
-                (attempt.getPercentile() == null || attempt.getPercentile().equals("NA"))) {
+        if ((exam.getShowPercentile()) && (attempt.getPercentile() == null || attempt.getPercentile().equals("NA"))) {
             percentileLayout.setVisibility(View.GONE);
         } else {
             percentile.setText(attempt.getPercentile());

@@ -129,6 +129,183 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
+                    <LinearLayout
+                        android:id="@+id/exam_details_for_attempt_list"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:baselineAligned="false"
+                            android:layout_marginTop="15dp" >
+
+                            <LinearLayout
+                                android:gravity="center"
+                                android:id="@+id/total_question_layout"
+                                android:orientation="horizontal"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content">
+
+                                <ImageView
+                                    android:layout_width="30dp"
+                                    android:layout_height="30dp"
+                                    android:layout_marginRight="5dp"
+                                    android:src="@drawable/testpress_questions_flat_icon"/>
+
+                                <LinearLayout
+                                    android:orientation="vertical"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="5dp" >
+
+                                    <TextView
+                                        style="@style/TestpressReviewStatLabel"
+                                        android:text="@string/testpress_total_questions"
+                                        android:layout_gravity="left" />
+
+                                    <TextView
+                                        style="@style/TestpressReviewStatValue"
+                                        android:id="@+id/total_questions"
+                                        android:text="00"
+                                        android:layout_gravity="left" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:gravity="center"
+                                android:orientation="horizontal"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content">
+
+                                <ImageView
+                                    android:layout_width="30dp"
+                                    android:layout_height="32dp"
+                                    android:layout_marginRight="5dp"
+                                    android:src="@drawable/testpress_total_marks_icon"/>
+
+                                <LinearLayout
+                                    android:orientation="vertical"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="5dp" >
+
+                                    <TextView
+                                        style="@style/TestpressReviewStatLabel"
+                                        android:id="@+id/total_marks_label"
+                                        android:text="@string/testpress_total_marks"
+                                        android:layout_gravity="left" />
+
+                                    <TextView
+                                        style="@style/TestpressReviewStatValue"
+                                        android:id="@+id/total_marks"
+                                        android:text="00"
+                                        android:layout_gravity="left" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:baselineAligned="false"
+                            android:layout_marginTop="15dp" >
+
+                            <LinearLayout
+                                android:gravity="center"
+                                android:orientation="horizontal"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content">
+
+                                <ImageView
+                                    android:layout_width="30dp"
+                                    android:layout_height="32dp"
+                                    android:layout_marginRight="5dp"
+                                    android:src="@drawable/testpress_time_flat_icon"/>
+
+                                <LinearLayout
+                                    android:orientation="vertical"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="5dp" >
+
+                                    <TextView
+                                        style="@style/TestpressReviewStatLabel"
+                                        android:id="@+id/total_time_label"
+                                        android:text="@string/testpress_total_time"
+                                        android:layout_gravity="left" />
+
+                                    <TextView
+                                        style="@style/TestpressReviewStatValue"
+                                        android:id="@+id/total_time"
+                                        android:text="00:30:00"
+                                        android:layout_gravity="left" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:gravity="center"
+                                android:orientation="horizontal"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content">
+
+                                <ImageView
+                                    android:layout_width="30dp"
+                                    android:layout_height="32dp"
+                                    android:layout_marginRight="5dp"
+                                    android:src="@drawable/testpress_cutoff_icon"/>
+
+                                <LinearLayout
+                                    android:orientation="vertical"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="5dp" >
+
+                                    <TextView
+                                        style="@style/TestpressReviewStatLabel"
+                                        android:text="@string/testpress_cutoff"
+                                        android:layout_gravity="left" />
+
+                                    <TextView
+                                        style="@style/TestpressReviewStatValue"
+                                        android:id="@+id/cutoff"
+                                        android:text="00"
+                                        android:layout_gravity="left" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginBottom="5dp"
+                            android:background="#e6e6e6"/>
+
+                    </LinearLayout>
+
+
                     <include
                         android:visibility="gone"
                         android:id="@+id/exam_details_layout"
@@ -202,6 +379,21 @@
                 <android.support.v7.widget.AppCompatButton
                     android:id="@+id/start_exam"
                     android:background="@drawable/testpress_green_curved_edge_background"
+                    android:text="@string/testpress_start"
+                    android:gravity="center"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"
+                    android:layout_width="match_parent"
+                    android:layout_height="37dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginTop="20dp" />
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/disable_start_exam"
+                    android:visibility="gone"
+                    android:background="@drawable/testpress_gray_curved_edge_background"
                     android:text="@string/testpress_start"
                     android:gravity="center"
                     android:textSize="16sp"

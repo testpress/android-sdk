@@ -108,6 +108,10 @@ public class ContentActivity extends BaseToolBarActivity {
 
     public ExoplayerFullscreenHelper exoplayerFullscreenHelper;
     private WebView webView;
+    private TextView totalQuestions;
+    private TextView totalMarks;
+    private TextView totalTime;
+    private TextView cutoff;
     private RelativeLayout mContentView;
     private SwipeRefreshLayout swipeRefresh;
     private LinearLayout examContentLayout;
@@ -116,6 +120,7 @@ public class ContentActivity extends BaseToolBarActivity {
     private LinearLayout buttonLayout;
     private LinearLayout emptyContainer;
     private Button startButton;
+    private Button disableStartButton;
     private LinearLayout attachmentContentLayout;
     private TextView emptyTitleView;
     private TextView emptyDescView;
@@ -203,6 +208,7 @@ public class ContentActivity extends BaseToolBarActivity {
         attachmentContentLayout = (LinearLayout) findViewById(R.id.attachment_content_layout);
         emptyContainer = (LinearLayout) findViewById(R.id.empty_container);
         startButton = (Button) findViewById(R.id.start_exam);
+        disableStartButton = (Button) findViewById(R.id.disable_start_exam);
         emptyTitleView = (TextView) findViewById(R.id.empty_title);
         emptyDescView = (TextView) findViewById(R.id.empty_description);
         titleView = (TextView) findViewById(R.id.title);
@@ -565,14 +571,16 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private boolean canAttemptExam(Exam exam) {
+        TextView webOnlyLabel = (TextView) findViewById(R.id.web_only_label);
+        webOnlyLabel.setTypeface(TestpressSdk.getRubikRegularFont(this));
+        webOnlyLabel.setVisibility(View.VISIBLE);
+
         if (exam.getAttemptsCount() == 0 ||
                 ((exam.getAllowRetake()) &&
                         ((exam.getAttemptsCount() + exam.getPausedAttemptsCount()) <= exam.getMaxRetakes() ||
                                 exam.getMaxRetakes() < 0))) {
-
             if (content.getIsLocked() || !content.getHasStarted() || exam.isEnded()) {
                 if (courseAttemptsFromDB.isEmpty()) {
-                    TextView webOnlyLabel = (TextView) findViewById(R.id.web_only_label);
                     if (!content.getHasStarted()) {
                         webOnlyLabel.setText(String.format(
                                 getString(R.string.testpress_can_start_exam_only_after),
@@ -583,14 +591,14 @@ public class ContentActivity extends BaseToolBarActivity {
                     } else {
                         webOnlyLabel.setText(R.string.testpress_score_good_in_previous_exam);
                     }
-                    webOnlyLabel.setTypeface(TestpressSdk.getRubikRegularFont(this));
-                    webOnlyLabel.setVisibility(View.VISIBLE);
+
                 }
                 return false;
             } else {
                 return !isWebOnlyExam(exam);
             }
         } else {
+            webOnlyLabel.setText(R.string.testpress_exam_attempt_unavailable);
             return false;
         }
     }
@@ -716,11 +724,13 @@ public class ContentActivity extends BaseToolBarActivity {
         examDetailsLayout.setVisibility(View.GONE);
         examContentLayout.setVisibility(View.VISIBLE);
         swipeRefresh.setRefreshing(false);
+        populateExamDetails(exam);
     }
 
     private void updateStartButton(final Exam exam, final CourseAttempt pausedCourseAttempt,
                                    final boolean discardExamDetails) {
 
+        disableStartButton.setVisibility(View.GONE);
         if (pausedCourseAttempt == null && canAttemptExam(exam)) {
             if (courseAttemptsFromDB.isEmpty()) {
                 startButton.setText(R.string.testpress_start);
@@ -769,6 +779,7 @@ public class ContentActivity extends BaseToolBarActivity {
             startButton.setVisibility(View.VISIBLE);
         } else {
             startButton.setVisibility(View.GONE);
+            disableStartButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -1227,5 +1238,18 @@ public class ContentActivity extends BaseToolBarActivity {
             Snackbar.make(mContentView, R.string.testpress_network_error,
                     Snackbar.LENGTH_SHORT).show();
         }
+    }
+
+    public void populateExamDetails(Exam exam) {
+        this.findViewById(R.id.exam_details_for_attempt_list).setVisibility(View.VISIBLE);
+        totalQuestions = this.findViewById(R.id.total_questions);
+        totalMarks = this.findViewById(R.id.total_marks);
+        totalTime = this.findViewById(R.id.total_time);
+        cutoff = this.findViewById(R.id.cutoff);
+
+        totalQuestions.setText(exam.getNumberOfQuestions().toString());
+        totalMarks.setText(exam.getTotalMarks());
+        totalTime.setText(exam.getDuration().toString());
+        cutoff.setText(exam.getPassPercentage().toString());
     }
 }
