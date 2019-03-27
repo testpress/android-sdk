@@ -62,6 +62,7 @@ import in.testpress.util.CommonUtils;
 import in.testpress.util.UserAgentProvider;
 
 import static android.support.v7.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
+import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 import static in.testpress.course.network.TestpressCourseApiClient.LAST_POSITION;
 import static in.testpress.course.network.TestpressCourseApiClient.TIME_RANGES;
@@ -387,6 +388,7 @@ public class ExoPlayerUtil {
             fullscreenDialog.addContentView(exoPlayerLayout, new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
+            fullscreenDialog.getWindow().addFlags(FLAG_SECURE);
             setFullscreenIcon(R.drawable.testpress_fullscreen_exit);
             fullscreen = true;
             fullscreenDialog.show();
@@ -397,6 +399,7 @@ public class ExoPlayerUtil {
     private void closeFullscreenDialog() {
 
         if (!iscloseFullscreenDialogCalled) {
+            activity.getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
             isopenFullscreenDialogCalled = false;
             iscloseFullscreenDialogCalled = true;
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);

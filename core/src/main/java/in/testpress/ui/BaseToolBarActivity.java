@@ -104,4 +104,13 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        TestpressSession session = TestpressSdk.getTestpressSession(this);
+        if (session != null && session.getInstituteSettings().isScreenshotDisabled()) {
+            getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
+        }
+    }
+
 }
