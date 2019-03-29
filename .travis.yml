@@ -1,4 +1,5 @@
 language: android
+install: travis_wait 30 mvn install
 jdk: oraclejdk8
 
 sudo: required
@@ -11,7 +12,7 @@ env:
     - ANDROID_BUILD_TOOLS_VERSION=28.0.3
     - ANDROID_ABI=armeabi-v7a
     - ANDROID_TAG=google_apis
-    - ADB_INSTALL_TIMEOUT=20 # minutes (2 minutes by default)
+    - ADB_INSTALL_TIMEOUT=30 # minutes (2 minutes by default)
 
 android:
  components:
