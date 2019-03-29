@@ -100,7 +100,6 @@ public class ReviewStatsFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        instituteSettings = getInstituteSettings();
         exam = getArguments().getParcelable(PARAM_EXAM);
         Assert.assertNotNull("PARAM_EXAM must not be null.", exam);
         attempt = getArguments().getParcelable(PARAM_ATTEMPT);
