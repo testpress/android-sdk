@@ -376,6 +376,20 @@
                     android:layout_weight="1"
                     android:layout_height="0dp"/>
 
+                <TextView
+                    android:id="@+id/attempt_unavailable"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/testpress_red"
+                    android:text="@string/testpress_exam_attempt_unavailable"
+                    android:lineSpacingExtra="5dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:gravity="center"
+                    android:layout_gravity="center" />
+
                 <android.support.v7.widget.AppCompatButton
                     android:id="@+id/start_exam"
                     android:background="@drawable/testpress_green_curved_edge_background"
@@ -394,7 +408,7 @@
                     android:id="@+id/disable_start_exam"
                     android:visibility="gone"
                     android:background="@drawable/testpress_gray_curved_edge_background"
-                    android:text="@string/testpress_start"
+                    android:text="@string/testpress_retake"
                     android:gravity="center"
                     android:textSize="16sp"
                     android:textColor="@android:color/white"
