@@ -111,8 +111,6 @@ public class CourseSampleActivity extends BaseToolBarActivity {
             }
             session.getInstituteSettings().setDisplayUserEmailOnVideo(true);
             session.getInstituteSettings().setScreenshotDisabled(false);
-            session.getInstituteSettings().setDisableStudentAnalytics(false);
-
             TestpressSdk.setTestpressSession(this, session);
             switch (clickedButtonId) {
                 case R.id.simple_course:

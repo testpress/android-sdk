@@ -81,7 +81,6 @@ public class ReviewStatsFragment extends BaseFragment {
     private Button timeAnalyticsButton;
     private Attempt attempt;
     private Exam exam;
-    private InstituteSettings instituteSettings;
     private RetrofitCall<TestpressApiResponse<Attempt>> attemptsApiRequest;
 
     public static void showReviewStatsFragment(FragmentActivity activity, Exam exam, Attempt attempt,
@@ -104,7 +103,6 @@ public class ReviewStatsFragment extends BaseFragment {
         instituteSettings = getInstituteSettings();
         exam = getArguments().getParcelable(PARAM_EXAM);
         Assert.assertNotNull("PARAM_EXAM must not be null.", exam);
-        instituteSettings = getInstituteSettings();
         attempt = getArguments().getParcelable(PARAM_ATTEMPT);
         CourseAttempt courseAttempt = getArguments().getParcelable(PARAM_COURSE_ATTEMPT);
         if (courseAttempt != null) {
@@ -267,11 +265,6 @@ public class ReviewStatsFragment extends BaseFragment {
             reviewQuestionsButton.setVisibility(View.GONE);
             timeAnalyticsButtonLayout.setVisibility(View.GONE);
         }
-
-        if (instituteSettings.getDisableStudentAnalytics()) {
-            analyticsButton.setVisibility(View.GONE);
-        }
-
         if (exam.getAllowPdf()) {
             emailPdfButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -283,6 +276,9 @@ public class ReviewStatsFragment extends BaseFragment {
         } else {
             emailPdfButtonLayout.setVisibility(View.GONE);
         }
+        //noinspection ConstantConditions
+        InstituteSettings settings =
+                TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
 
         if (canAttemptExam() && getArguments().getBoolean(PARAM_SHOW_RETAKE_BUTTON, true)) {
             retakeButton.setOnClickListener(new View.OnClickListener() {
@@ -378,12 +374,5 @@ public class ReviewStatsFragment extends BaseFragment {
         emptyTitleView.setText(title);
         emptyDescView.setText(description);
         emptyViewImage.setImageResource(imageRes);
-    }
-
-    public InstituteSettings getInstituteSettings() {
-        //noinspection ConstantConditions
-        InstituteSettings settings =
-                TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
-        return settings;
     }
 }
