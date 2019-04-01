@@ -265,7 +265,6 @@ public class ReviewStatsFragment extends BaseFragment {
             timeAnalyticsButtonLayout.setVisibility(View.GONE);
         } else {
             reviewQuestionsButton.setVisibility(View.GONE);
-            analyticsButton.setVisibility(View.GONE);
             timeAnalyticsButtonLayout.setVisibility(View.GONE);
         }
 
