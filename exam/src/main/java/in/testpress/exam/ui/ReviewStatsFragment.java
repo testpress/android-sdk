@@ -216,7 +216,8 @@ public class ReviewStatsFragment extends BaseFragment {
         } else {
             score.setText(attempt.getScore());
         }
-        if ((exam.getShowPercentile()) && (attempt.getPercentile() == null || attempt.getPercentile().equals("NA"))) {
+        if ((exam.getShowPercentile()) &&
+                (attempt.getPercentile() == null || attempt.getPercentile().equals("NA"))) {
             percentileLayout.setVisibility(View.GONE);
         } else {
             percentile.setText(attempt.getPercentile());

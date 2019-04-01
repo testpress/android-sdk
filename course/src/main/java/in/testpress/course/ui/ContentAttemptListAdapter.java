@@ -3,10 +3,8 @@ package in.testpress.course.ui;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.media.Image;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +31,7 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private Activity mActivity;
     private Content mContent;
     private List<CourseAttempt> mAttempts = new ArrayList<>();
-    private Boolean toMakeActionVisible;
+    private Boolean toMakeActionLabelVisible;
 
     ContentAttemptListAdapter(Activity activity, Content content,
                                      final List<CourseAttempt> attempts) {
@@ -187,7 +185,7 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     holder.reviewLabel.setVisibility(View.GONE);
                     holder.action_arrow.setVisibility(View.GONE);
 
-                    if (!checkToMakeActionVisibleOrNot()) {
+                    if (!checkToMakeActionLabelVisibleOrNot()) {
                         holder.actionLayout.setVisibility(View.GONE);
                     } else {
                         holder.actionLayout.setVisibility(View.VISIBLE);
@@ -208,25 +206,24 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 holder.actionLabel.setVisibility(View.GONE);
             }
 
-            if (checkToMakeActionVisibleOrNot()) {
+            if (checkToMakeActionLabelVisibleOrNot()) {
                 holder.actionLabel.setVisibility(View.VISIBLE);
             }
         }
     }
 
-    public boolean checkToMakeActionVisibleOrNot() {
-        if (toMakeActionVisible != null) {
-            return toMakeActionVisible;
+    public boolean checkToMakeActionLabelVisibleOrNot() {
+        if (toMakeActionLabelVisible != null) {
+            return toMakeActionLabelVisible;
         }
 
         for (CourseAttempt courseAttempt : mAttempts) {
             if (courseAttempt.getAssessment().getState().equals(TestpressExamApiClient.STATE_PAUSED)) {
-                toMakeActionVisible = true;
+                toMakeActionLabelVisible = true;
                 return true;
             }
         }
-        toMakeActionVisible = false;
+        toMakeActionLabelVisible = false;
         return false;
     }
-
 }

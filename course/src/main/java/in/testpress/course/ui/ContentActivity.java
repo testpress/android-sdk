@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -120,7 +119,7 @@ public class ContentActivity extends BaseToolBarActivity {
     private LinearLayout buttonLayout;
     private LinearLayout emptyContainer;
     private Button startButton;
-    private Button disableStartButton;
+    private Button disabledStartButton;
     private LinearLayout attachmentContentLayout;
     private TextView emptyTitleView;
     private TextView emptyDescView;
@@ -208,7 +207,7 @@ public class ContentActivity extends BaseToolBarActivity {
         attachmentContentLayout = (LinearLayout) findViewById(R.id.attachment_content_layout);
         emptyContainer = (LinearLayout) findViewById(R.id.empty_container);
         startButton = (Button) findViewById(R.id.start_exam);
-        disableStartButton = (Button) findViewById(R.id.disable_start_exam);
+        disabledStartButton = (Button) findViewById(R.id.disabled_start_exam);
         emptyTitleView = (TextView) findViewById(R.id.empty_title);
         emptyDescView = (TextView) findViewById(R.id.empty_description);
         titleView = (TextView) findViewById(R.id.title);
@@ -732,7 +731,7 @@ public class ContentActivity extends BaseToolBarActivity {
     private void updateStartButton(final Exam exam, final CourseAttempt pausedCourseAttempt,
                                    final boolean discardExamDetails) {
 
-        disableStartButton.setVisibility(View.GONE);
+        disabledStartButton.setVisibility(View.GONE);
         if (pausedCourseAttempt == null && canAttemptExam(exam)) {
             if (courseAttemptsFromDB.isEmpty()) {
                 startButton.setText(R.string.testpress_start);
@@ -781,8 +780,9 @@ public class ContentActivity extends BaseToolBarActivity {
             startButton.setVisibility(View.VISIBLE);
         } else {
             startButton.setVisibility(View.GONE);
+
             if (!isRetakeAllowed(exam)) {
-                disableStartButton.setVisibility(View.VISIBLE);
+                disabledStartButton.setVisibility(View.VISIBLE);
             }
         }
     }

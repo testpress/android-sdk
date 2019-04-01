@@ -405,7 +405,7 @@
                     android:layout_marginTop="20dp" />
 
                 <android.support.v7.widget.AppCompatButton
-                    android:id="@+id/disable_start_exam"
+                    android:id="@+id/disabled_start_exam"
                     android:visibility="gone"
                     android:background="@drawable/testpress_gray_curved_edge_background"
                     android:text="@string/testpress_retake"
