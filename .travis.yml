@@ -11,7 +11,7 @@ env:
     - ANDROID_BUILD_TOOLS_VERSION=28.0.3
     - ANDROID_ABI=armeabi-v7a
     - ANDROID_TAG=google_apis
-    - ADB_INSTALL_TIMEOUT=30 # minutes (2 minutes by default)
+    - ADB_INSTALL_TIMEOUT=20 # minutes (2 minutes by default)
 
 android:
  components:
@@ -41,6 +41,6 @@ android:
 # Emulator Management: Create, Start and Wait
 before_script:
   - echo no | android create avd --force -n test -t "android-"$EMULATOR_API_LEVEL --abi $ANDROID_ABI --tag $ANDROID_TAG
-  - emulator -avd test -no-audio -no-window &
+  - emulator -avd test -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
