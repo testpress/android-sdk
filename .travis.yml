@@ -38,7 +38,7 @@ android:
     - sys-img-armeabi-v7a-google_apis-$EMULATOR_API_LEVEL
 
 licenses:
-     - 'android-sdk-license-.+'
+  - 'android-sdk-license-.+'
 
 # Emulator Management: Create, Start and Wait
 before_script:
@@ -49,5 +49,5 @@ before_script:
 
 
 before_install:
-  - yes | sdkmanager "build-tools;28.0.3"
+  - yes | sdkmanager --licenses
 
