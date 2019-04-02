@@ -14,7 +14,7 @@ env:
     - ADB_INSTALL_TIMEOUT=20 # minutes (2 minutes by default)
 
 android:
- components:
+  components:
 #    # latest version of the tools
 #    - tools
 #    - platform-tools
@@ -37,14 +37,14 @@ android:
     # Emulator
     - sys-img-armeabi-v7a-google_apis-$EMULATOR_API_LEVEL
 
-licenses:
-  # White list all android-sdk-license revisions.
-  - 'android-sdk-license-.+'
-  # White list all the licenses.
-  - '.+'
+  licenses:
+    # White list all android-sdk-license revisions.
+    - 'android-sdk-license-.+'
+    # White list all the licenses.
+    - '.+'
 
-install:
-  - echo yes | ${ANDROID_HOME}/tools/bin/sdkmanager "platforms;android-27"
+#install:
+#  - echo yes | ${ANDROID_HOME}/tools/bin/sdkmanager "platforms;android-27"
 
 
 # Emulator Management: Create, Start and Wait
@@ -54,7 +54,7 @@ before_script:
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
 
-before_install:
-  - echo yes | sdkmanager "build-tools;28.0.3"
+#before_install:
+#  - echo yes | sdkmanager "build-tools;28.0.3"
 
 
