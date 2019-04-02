@@ -40,7 +40,6 @@ android:
   licenses:
       - 'android-sdk-license-.+'
 
-
 # Emulator Management: Create, Start and Wait
 before_script:
   - echo no | android create avd --force -n test -t "android-"$EMULATOR_API_LEVEL --abi $ANDROID_ABI --tag $ANDROID_TAG
