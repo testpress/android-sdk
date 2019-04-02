@@ -15,9 +15,9 @@ env:
 
 android:
  components:
-    # latest version of the tools
-    - tools
-    - platform-tools
+#    # latest version of the tools
+#    - tools
+#    - platform-tools
 
     # build tools version
     - build-tools-$ANDROID_BUILD_TOOLS_VERSION
@@ -45,6 +45,3 @@ before_script:
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
 
-
-script:
-  - ./gradlew clean build connectedCheck -PdisablePreDex --stacktrace
