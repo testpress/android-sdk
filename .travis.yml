@@ -14,10 +14,10 @@ env:
     - ADB_INSTALL_TIMEOUT=20 # minutes (2 minutes by default)
 
 android:
- components:
+  components:
     # latest version of the tools
     - tools
-    - platform-tools
+#    - platform-tools
 
     # build tools version
     - build-tools-$ANDROID_BUILD_TOOLS_VERSION
@@ -37,6 +37,11 @@ android:
     # Emulator
     - sys-img-armeabi-v7a-google_apis-$EMULATOR_API_LEVEL
 
+  licenses:
+    # White list all android-sdk-license revisions.
+    - 'android-sdk-license-.+'
+    # White list all the licenses.
+    - '.+'
 
 # Emulator Management: Create, Start and Wait
 before_script:
