@@ -1179,7 +1179,9 @@ public class ContentActivity extends BaseToolBarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        exoplayerFullscreenHelper.disableOrientationListener();
+        if (exoplayerFullscreenHelper != null) {
+            exoplayerFullscreenHelper.disableOrientationListener();
+        }
     }
 
     @Override
