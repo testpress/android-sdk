@@ -11,23 +11,23 @@ import in.testpress.util.Assert;
 
 public class TestpressSession {
     private InstituteSettings instituteSettings;
-    private String token;
+//    private String token;
 
-    public TestpressSession(@NonNull InstituteSettings instituteSettings, @NonNull String token) {
+    public TestpressSession(@NonNull InstituteSettings instituteSettings) {
         setInstituteSettings(instituteSettings);
-        setToken(token);
+//        setToken(token);
     }
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        if (token == null || token.isEmpty()) {
-            throw new IllegalArgumentException("AuthToken must not be null or Empty.");
-        }
-        this.token = token;
-    }
+//    public String getToken() {
+//        return token;
+//    }
+//
+//    public void setToken(String token) {
+//        if (token == null || token.isEmpty()) {
+//            throw new IllegalArgumentException("AuthToken must not be null or Empty.");
+//        }
+//        this.token = token;
+//    }
 
     public InstituteSettings getInstituteSettings() {
         return instituteSettings;

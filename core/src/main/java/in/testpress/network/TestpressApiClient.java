@@ -15,6 +15,8 @@ import in.testpress.core.TestpressSession;
 import in.testpress.models.FileDetails;
 import in.testpress.models.ProfileDetails;
 import in.testpress.models.greendao.AttemptSection;
+import in.testpress.util.AddCookiesInterceptor;
+import in.testpress.util.ReceivedCookiesInterceptor;
 import in.testpress.util.UserAgentProvider;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -29,7 +31,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class TestpressApiClient {
 
     public static final String SOCIAL_AUTH_PATH= "api/v2.2/social-auth/";
-    public static final String TESTPRESS_AUTH_PATH= "api/v2.2/auth-token/";
+    public static final String TESTPRESS_AUTH_PATH= "api/v2.4/login/";
 
     public static final String PROFILE_DETAILS_PATH= "api/v2.2/me/";
 
@@ -89,20 +91,22 @@ public class TestpressApiClient {
                 .create();
 
         // Set headers for all network requests
-        Interceptor interceptor = new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
-                Request.Builder header = chain.request().newBuilder()
-                        .addHeader("User-Agent", UserAgentProvider.get(context));
-                if (testpressSession != null) {
-                    header.addHeader("Authorization", "JWT " + testpressSession.getToken());
-                }
-                return chain.proceed(header.build());
-            }
-        };
+//        Interceptor interceptor = new Interceptor() {
+//            @Override
+//            public okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
+//                Request.Builder header = chain.request().newBuilder()
+//                        .addHeader("User-Agent", UserAgentProvider.get(context));
+//                if (testpressSession != null) {
+//                    header.addHeader("Authorization", "JWT " + testpressSession.getToken());
+//                }
+//                return chain.proceed(header.build());
+//            }
+//        };
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.connectTimeout(1, TimeUnit.MINUTES).readTimeout(1, TimeUnit.MINUTES);
-        httpClient.addNetworkInterceptor(interceptor);
+        httpClient.addInterceptor(new AddCookiesInterceptor(context));
+        httpClient.addInterceptor(new ReceivedCookiesInterceptor(context));
+//        httpClient.addNetworkInterceptor(interceptor);
 
         // Set log level
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();

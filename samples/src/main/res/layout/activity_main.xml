@@ -39,6 +39,11 @@
             android:text="Store"
             android:id="@+id/store" />
 
+        <android.support.v7.widget.AppCompatButton
+            style="@style/Button"
+            android:text="Log out"
+            android:id="@+id/logout" />
+
     </LinearLayout>
 
 </LinearLayout>

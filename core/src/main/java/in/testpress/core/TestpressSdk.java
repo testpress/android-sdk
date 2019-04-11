@@ -236,14 +236,14 @@ public final class TestpressSdk {
         if (userId == null || accessToken == null || provider == null) {
             throw new IllegalArgumentException("UserId & AccessToken & Provider must not be null.");
         }
-        Assert.assertNotNull("InstituteSettings must not be null.", instituteSettings);
-        if (userId.equals(getPreferences(context).getString(KEY_USER_ID, null)) &&
-                hasActiveSession(context)) {
-            if (callback != null) {
-                callback.onSuccess(getTestpressSession(context));
-            }
-            return;
-        }
+//        Assert.assertNotNull("InstituteSettings must not be null.", instituteSettings);
+//        if (userId.equals(getPreferences(context).getString(KEY_USER_ID, null)) &&
+//                hasActiveSession(context)) {
+//            if (callback != null) {
+//                callback.onSuccess(getTestpressSession(context));
+//            }
+//            return;
+//        }
         final ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setMessage(context.getString(R.string.testpress_please_wait));
         progressDialog.setCancelable(false);
@@ -267,7 +267,11 @@ public final class TestpressSdk {
                 .enqueue(new TestpressCallback<TestpressSession>() {
                     @Override
                     public void onSuccess(TestpressSession testpressSession) {
-                        testpressSession.setInstituteSettings(instituteSettings);
+                        if (testpressSession == null) {
+                            testpressSession = new TestpressSession(instituteSettings);
+                        } else {
+                            testpressSession.setInstituteSettings(instituteSettings);
+                        }
                         setTestpressSession(context, testpressSession);
                         SharedPreferences.Editor editor = getPreferenceEditor(context);
                         editor.putString(KEY_USER_ID, userId);

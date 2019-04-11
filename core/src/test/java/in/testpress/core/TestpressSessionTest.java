@@ -55,17 +55,17 @@ public class TestpressSessionTest {
         }
     }
 
-    @Test
-    public void testSetToken_withNullToken() throws Exception {
-        InstituteSettings instituteSettings = mock(InstituteSettings.class);
-        try {
-            TestpressSession session = new TestpressSession(instituteSettings, "dummyToken");
-            session.setToken(null);
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertEquals("AuthToken must not be null or Empty.", e.getMessage());
-        }
-    }
+//    @Test
+//    public void testSetToken_withNullToken() throws Exception {
+//        InstituteSettings instituteSettings = mock(InstituteSettings.class);
+//        try {
+//            TestpressSession session = new TestpressSession(instituteSettings, "dummyToken");
+//            session.setToken(null);
+//            fail();
+//        } catch (IllegalArgumentException e) {
+//            assertEquals("AuthToken must not be null or Empty.", e.getMessage());
+//        }
+//    }
 
     @Test
     public void testSerialize_withNullSession() throws Exception {

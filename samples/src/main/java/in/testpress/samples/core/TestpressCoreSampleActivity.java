@@ -119,7 +119,7 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
     }
 
     private void authenticate(String userId, String accessToken, TestpressSdk.Provider provider) {
-        InstituteSettings instituteSettings = new InstituteSettings("https://sandbox.testpress.in");
+        InstituteSettings instituteSettings = new InstituteSettings("https://bc166913.ngrok.io");
         TestpressSdk.initialize(this, instituteSettings, userId, accessToken, provider,
                 new TestpressCallback<TestpressSession>() {
                     @Override
@@ -128,7 +128,7 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
                             setResult(RESULT_OK);
                             finish();
                         } else {
-                            Snackbar.make(loginView, "Token Generated Successfully",
+                            Snackbar.make(loginView, "Session Initialized Successfully",
                                     Snackbar.LENGTH_LONG).show();
                         }
                     }
@@ -141,7 +141,7 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
                         } else if (e.isClientError()) {
                             Snackbar.make(loginView, e.getMessage(), Snackbar.LENGTH_LONG).show();
                         } else {
-                            Snackbar.make(loginView, "Token Generation Failed",
+                            Snackbar.make(loginView, "Session Initialized Failed",
                                     Snackbar.LENGTH_LONG).show();
                         }
                     }

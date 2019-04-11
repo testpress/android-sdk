@@ -1,13 +1,17 @@
 package in.testpress.samples;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
 
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.network.TestpressExamApiClient;
@@ -56,6 +60,14 @@ public class MainActivity extends BaseToolBarActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, StoreSampleActivity.class);
                 startActivity(intent);
+            }
+        });
+        findViewById(R.id.logout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                TestpressSdk.clearActiveSession(getApplicationContext());
+                TestpressSDKDatabase.clearDatabase(getApplicationContext());
+                Toast.makeText(getApplicationContext(), "Cleared local database", Toast.LENGTH_LONG);
             }
         });
     }
