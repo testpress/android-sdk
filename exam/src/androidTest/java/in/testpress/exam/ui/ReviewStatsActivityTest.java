@@ -46,6 +46,7 @@ public class ReviewStatsActivityTest extends ActivityTestRule<ReviewStatsActivit
                     super.beforeActivityLaunched();
                     InstituteSettings instituteSettings =
                             new InstituteSettings("http://sandbox.testpress.in");
+                    instituteSettings.setDisableStudentAnalytics(false);
 
                     TestpressSdk.setTestpressSession(InstrumentationRegistry.getTargetContext(),
                             new TestpressSession(instituteSettings, USER_TOKEN));
