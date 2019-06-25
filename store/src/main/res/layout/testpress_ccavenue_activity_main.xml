@@ -1,0 +1,25 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/relativeId">
+
+
+
+    <WebView
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/webView"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.02" />
+
+    <FrameLayout
+        android:id="@+id/otp_frame"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignBottom="@+id/webView"
+        android:layout_centerHorizontal="true"></FrameLayout>
+
+</RelativeLayout>

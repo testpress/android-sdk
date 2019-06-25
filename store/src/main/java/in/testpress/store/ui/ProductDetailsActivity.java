@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -55,6 +56,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_product_details_layout);
+        Log.d("Current Activity --", "ProductDetailsActivity");
         if (getIntent().getStringExtra(PRODUCT_SLUG) != null) {
             productSlug = getIntent().getStringExtra(PRODUCT_SLUG);
         } else if (getIntent().getParcelableExtra(PRODUCT) != null) {

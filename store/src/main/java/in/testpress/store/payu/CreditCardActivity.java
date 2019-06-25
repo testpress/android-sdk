@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -45,6 +46,7 @@ public class CreditCardActivity extends BaseToolBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("Current Activity --", "CreditCardActivity");
 
         setContentView(R.layout.testpress_activity_credit_card);
         builder = new AlertDialog.Builder(this, R.style.TestpressAppCompatAlertDialogStyle)

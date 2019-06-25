@@ -24,6 +24,8 @@ public class TestpressStoreApiClient extends TestpressApiClient {
 
     public static final String URL_PAYMENT_RESPONSE_HANDLER = "/payments/response/payu/";
 
+    public static final String URL_CCAVENUE_PAYMENT_RESPONSE_HANDLER = "/payments/response/ccavenue/";
+
     public TestpressStoreApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
     }

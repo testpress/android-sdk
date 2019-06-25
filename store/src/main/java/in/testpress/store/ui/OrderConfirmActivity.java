@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +29,8 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.store.R;
+import in.testpress.store.ccavenue.AvenuesParams;
+import in.testpress.store.ccavenue.CcavenuePaymentWebview;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderConfirmErrorDetails;
 import in.testpress.store.models.OrderItem;
@@ -70,6 +73,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.testpress_shipping_address);
+        Log.d("Current Activity --", "OrderConfirmActivity");
         address = (EditText) findViewById(R.id.address);
         zip = (EditText) findViewById(R.id.zip);
         landmark = (EditText) findViewById(R.id.landmark);
@@ -129,6 +133,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
                     phone.addTextChangedListener(watcher);
                     shippingDetails.setVisibility(View.VISIBLE);
                 } else {
+                    handelCcavenuePayment(order);
                     confirmOrder();
                 }
             }
@@ -193,39 +198,39 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
                     @Override
                     public void onSuccess(Order order) {
                         progressBar.setVisibility(View.GONE);
-
+                        handelCcavenuePayment(order);
                         //noinspection ConstantConditions
-                        String redirectUrl = TestpressSdk.getTestpressSession(OrderConfirmActivity.this)
-                                .getInstituteSettings().getBaseUrl() + URL_PAYMENT_RESPONSE_HANDLER;
-
-                        PaymentParams paymentParams = new PaymentParams();
-                        paymentParams.setKey(order.getApikey());
-                        paymentParams.setTxnId(order.getOrderId());
-                        paymentParams.setAmount(order.getAmount());
-                        paymentParams.setProductInfo(order.getProductInfo());
-                        paymentParams.setFirstName(order.getName());
-                        paymentParams.setEmail(order.getEmail());
-                        paymentParams.setUdf1("");
-                        paymentParams.setUdf2("");
-                        paymentParams.setUdf3("");
-                        paymentParams.setUdf4("");
-                        paymentParams.setUdf5("");
-                        paymentParams.setSurl(redirectUrl);
-                        paymentParams.setFurl(redirectUrl);
-
-                        PayuConfig payuConfig = new PayuConfig();
-                        payuConfig.setEnvironment(PayuConstants.PRODUCTION_ENV);
-
-                        PayuHashes payuHashes = new PayuHashes();
-                        payuHashes.setPaymentHash(order.getChecksum());
-                        paymentParams.setHash(payuHashes.getPaymentHash());
-                        payuHashes.setPaymentRelatedDetailsForMobileSdkHash(order.getMobileSdkHash());
-
-                        Intent intent = new Intent(OrderConfirmActivity.this, PaymentModeActivity.class);
-                        intent.putExtra(PayuConstants.PAYU_CONFIG, payuConfig);
-                        intent.putExtra(PayuConstants.PAYMENT_PARAMS, paymentParams);
-                        intent.putExtra(PayuConstants.PAYU_HASHES, payuHashes);
-                        startActivityForResult(intent, PayuConstants.PAYU_REQUEST_CODE);
+//                        String redirectUrl = TestpressSdk.getTestpressSession(OrderConfirmActivity.this)
+//                                .getInstituteSettings().getBaseUrl() + URL_PAYMENT_RESPONSE_HANDLER;
+//
+//                        PaymentParams paymentParams = new PaymentParams();
+//                        paymentParams.setKey(order.getApikey());
+//                        paymentParams.setTxnId(order.getOrderId());
+//                        paymentParams.setAmount(order.getAmount());
+//                        paymentParams.setProductInfo(order.getProductInfo());
+//                        paymentParams.setFirstName(order.getName());
+//                        paymentParams.setEmail(order.getEmail());
+//                        paymentParams.setUdf1("");
+//                        paymentParams.setUdf2("");
+//                        paymentParams.setUdf3("");
+//                        paymentParams.setUdf4("");
+//                        paymentParams.setUdf5("");
+//                        paymentParams.setSurl(redirectUrl);
+//                        paymentParams.setFurl(redirectUrl);
+//
+//                        PayuConfig payuConfig = new PayuConfig();
+//                        payuConfig.setEnvironment(PayuConstants.PRODUCTION_ENV);
+//
+//                        PayuHashes payuHashes = new PayuHashes();
+//                        payuHashes.setPaymentHash(order.getChecksum());
+//                        paymentParams.setHash(payuHashes.getPaymentHash());
+//                        payuHashes.setPaymentRelatedDetailsForMobileSdkHash(order.getMobileSdkHash());
+//
+//                        Intent intent = new Intent(OrderConfirmActivity.this, PaymentModeActivity.class);
+//                        intent.putExtra(PayuConstants.PAYU_CONFIG, payuConfig);
+//                        intent.putExtra(PayuConstants.PAYMENT_PARAMS, paymentParams);
+//                        intent.putExtra(PayuConstants.PAYU_HASHES, payuHashes);
+//                        startActivityForResult(intent, PayuConstants.PAYU_REQUEST_CODE);
                     }
 
                     @Override
@@ -303,19 +308,20 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
 
     @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(this, R.style.TestpressAppCompatAlertDialogStyle)
-                .setTitle(R.string.testpress_are_you_sure)
-                .setMessage(R.string.testpress_want_to_cancel_order)
-                .setPositiveButton(R.string.testpress_yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent();
-                        setResult(RESULT_CANCELED, intent);
-                        finish();
-                    }
-                })
-                .setNegativeButton(R.string.testpress_no, null)
-                .show();
+        super.onBackPressed();
+//        new AlertDialog.Builder(this, R.style.TestpressAppCompatAlertDialogStyle)
+//                .setTitle(R.string.testpress_are_you_sure)
+//                .setMessage(R.string.testpress_want_to_cancel_order)
+//                .setPositiveButton(R.string.testpress_yes, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        Intent intent = new Intent();
+//                        setResult(RESULT_CANCELED, intent);
+//                        finish();
+//                    }
+//                })
+//                .setNegativeButton(R.string.testpress_no, null)
+//                .show();
     }
 
     protected void setEmptyText(final int title, final int description, final int left) {
@@ -325,5 +331,13 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
         emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0);
         emptyDescView.setText(description);
         retryButton.setVisibility(View.GONE);
+    }
+
+
+    public void handelCcavenuePayment(Order order){
+        Intent intent = new Intent(this, CcavenuePaymentWebview.class);
+        intent.putExtra(AvenuesParams.ENC_VAL, order.getEncData());
+        intent.putExtra(AvenuesParams.ACCESS_CODE, order.getAccessCode());
+        startActivity(intent);
     }
 }

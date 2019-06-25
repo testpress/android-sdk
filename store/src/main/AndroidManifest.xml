@@ -52,6 +52,12 @@
             android:label="@string/testpress_payment_status"
             android:configChanges="orientation|keyboardHidden|screenSize" />
 
+        <activity
+            android:name=".ccavenue.CcavenuePaymentWebview"
+            android:theme="@style/TestpressTheme"
+            android:label="@string/testpress_payment_status"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+
     </application>
 
 </manifest>

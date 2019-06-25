@@ -26,6 +26,8 @@ public class Order implements Parcelable {
     private String zip;
     private String landMark;
     private String productInfo;
+    private String encData;
+    private String accessCode;
 
     // Parcelling part
     public Order(Parcel parcel){
@@ -45,6 +47,8 @@ public class Order implements Parcelable {
         apikey   = parcel.readString();
         zip      = parcel.readString();
         landMark = parcel.readString();
+        encData = parcel.readString();
+        accessCode = parcel.readString();
         parcel.readTypedList(orderItems, OrderItem.CREATOR);
     }
 
@@ -72,6 +76,8 @@ public class Order implements Parcelable {
         parcel.writeString(zip);
         parcel.writeString(landMark);
         parcel.writeTypedList(orderItems);
+        parcel.writeString(encData);
+        parcel.writeString(accessCode);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -386,6 +392,22 @@ public class Order implements Parcelable {
 
     public void setProductInfo(String productInfo) {
         this.productInfo = productInfo;
+    }
+
+    public String getEncData() {
+        return encData;
+    }
+
+    public void setEncData(String encData) {
+        this.encData = encData;
+    }
+
+    public String getAccessCode() {
+        return accessCode;
+    }
+
+    public void setAccessCode(String accessCode) {
+        this.accessCode = accessCode;
     }
 
 }

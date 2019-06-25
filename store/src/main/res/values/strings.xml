@@ -61,4 +61,10 @@
 
     <string name="testpress_have_access_code">Have Access Code?</string>
 
+    <string-array name="tespress_ccavenue_selectAction">
+        <item>Resend OTP</item>
+        <item>Enter OTP Manually</item>
+    </string-array>
+    <string name="tespress_ccavenue_cancel">Cancel</string>
+
 </resources>

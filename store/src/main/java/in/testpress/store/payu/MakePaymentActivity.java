@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -43,6 +44,7 @@ public class MakePaymentActivity extends BaseToolBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_make_payment);
+        Log.d("Current Activity --", "MakePaymentActivity");
         emptyView = (LinearLayout) findViewById(R.id.empty_container);
         emptyViewImage = (ImageView) findViewById(R.id.image_view);
         emptyTitleView = (TextView) findViewById(R.id.empty_title);
