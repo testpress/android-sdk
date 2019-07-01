@@ -26,8 +26,10 @@ import java.util.Map;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
+import in.testpress.models.greendao.ExamDao;
 import in.testpress.exam.network.AttemptsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.MultiLanguagesUtil;
@@ -91,11 +93,20 @@ public class AttemptsActivity extends BaseToolBarActivity
 
         apiClient = new TestpressExamApiClient(this);
         exam = getIntent().getParcelableExtra(PARAM_EXAM);
+        Boolean isDetailsFetched = false;
+        Exam examFromDb = TestpressSDKDatabase.getExamDao(this).queryBuilder().where(ExamDao.Properties.Slug.eq(exam.getSlug())).limit(1).unique();
+        if (examFromDb != null) {
+            isDetailsFetched = examFromDb.getIsDetailsFetched();
+            exam = examFromDb;
+        }
+
         if (exam == null) {
             String examSlug = getIntent().getStringExtra(PARAM_EXAM_SLUG);
             // Throw exception if both exam & exam slug is null
             Assert.assertNotNull("EXAM must not be null.", examSlug);
             loadExam(examSlug);
+        } else if (isDetailsFetched == null || !isDetailsFetched){
+            loadExam(exam.getSlug());
         } else {
             checkExamState();
         }
@@ -222,7 +233,11 @@ public class AttemptsActivity extends BaseToolBarActivity
                     @Override
                     public void onSuccess(Exam exam) {
                         AttemptsActivity.this.exam = exam;
+                        exam.setIsDetailsFetched(true);
+                        TestpressSDKDatabase.getExamDao(AttemptsActivity.this)
+                                .insertOrReplace(exam);
                         checkExamState();
+
                     }
 
                     @Override
