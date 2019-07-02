@@ -41,7 +41,7 @@ import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_COURSE_ATTEMPT;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_EXAM;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_PREVIOUS_ACTIVITY;
 
-    public class ReviewStatsFragment extends BaseFragment {
+public class ReviewStatsFragment extends BaseFragment {
 
     static final String PARAM_SHOW_RETAKE_BUTTON = "showRetakeButton";
 
