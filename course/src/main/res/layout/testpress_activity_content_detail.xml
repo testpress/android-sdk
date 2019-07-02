@@ -384,7 +384,7 @@
                     android:textColor="@color/testpress_red"
                     android:text="@string/testpress_exam_attempt_unavailable"
                     android:lineSpacingExtra="5dp"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginLeft="15dp"
                     android:layout_marginRight="15dp"
                     android:gravity="center"
