@@ -13,6 +13,7 @@ public class InstituteSettings {
     private boolean bookmarksEnabled;
     private boolean displayUserEmailOnVideo;
     private Boolean questionShareDisabled;
+    private Boolean disableStudentAnalytics;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -84,6 +85,14 @@ public class InstituteSettings {
 
     public boolean isDisplayUserEmailOnVideo() {
         return displayUserEmailOnVideo;
+    }
+
+    public boolean getDisableStudentAnalytics() {
+        return disableStudentAnalytics;
+    }
+
+    public void setDisableStudentAnalytics(boolean disableStudentAnalytics) {
+        this.disableStudentAnalytics = disableStudentAnalytics;
     }
 
     public boolean isQuestionShareDisabled() {
