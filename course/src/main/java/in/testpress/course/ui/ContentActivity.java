@@ -601,7 +601,7 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     public boolean isRetakeAllowed(Exam exam) {
-        return ((exam.getAllowRetake()) && ((exam.getAttemptsCount() + exam.getPausedAttemptsCount()) <= exam.getMaxRetakes() || exam.getMaxRetakes() < 0));
+        return ((exam.getAllowRetake()) && (((exam.getAttemptsCount() + exam.getPausedAttemptsCount() <= exam.getMaxRetakes()) || exam.getMaxRetakes() < 0)));
     }
 
     private boolean isWebOnlyExam(Exam exam) {
