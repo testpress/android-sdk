@@ -13,7 +13,7 @@ public class InstituteSettings {
     private boolean bookmarksEnabled;
     private boolean displayUserEmailOnVideo;
     private Boolean questionShareDisabled;
-    private Boolean disableStudentAnalytics;
+    private boolean disableStudentAnalytics;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);

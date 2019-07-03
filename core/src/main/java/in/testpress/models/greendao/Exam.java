@@ -63,6 +63,7 @@ public class Exam implements android.os.Parcelable {
 
     @Convert(converter = in.testpress.util.StringListConverter.class, columnType = String.class)
     private StringList categories;
+    private Boolean isDetailsFetched;
 
     /** Used to resolve relations */
     @Generated
@@ -89,7 +90,7 @@ public class Exam implements android.os.Parcelable {
     }
 
     @Generated
-    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories) {
+    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched) {
         this.totalMarks = totalMarks;
         this.url = url;
         this.id = id;
@@ -119,6 +120,7 @@ public class Exam implements android.os.Parcelable {
         this.showScore = showScore;
         this.showPercentile = showPercentile;
         this.categories = categories;
+        this.isDetailsFetched = isDetailsFetched;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -358,6 +360,14 @@ public class Exam implements android.os.Parcelable {
 
     public void setCategories(StringList categories) {
         this.categories = categories;
+    }
+
+    public Boolean getIsDetailsFetched() {
+        return isDetailsFetched;
+    }
+
+    public void setIsDetailsFetched(Boolean isDetailsFetched) {
+        this.isDetailsFetched = isDetailsFetched;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

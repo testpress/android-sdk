@@ -58,4 +58,6 @@ ext {
     greendao = 'org.greenrobot:greendao:3.2.0'
     imageCropper = 'com.theartofdev.edmodo:android-image-cropper:2.7.0'
     lottie = 'com.airbnb.android:lottie:2.5.4'
+    roboelectric = "org.robolectric:robolectric:4.3"
+    androidxCore = 'androidx.test:core:1.2.0'
 }

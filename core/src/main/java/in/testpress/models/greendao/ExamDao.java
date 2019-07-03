@@ -54,6 +54,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         public final static Property ShowScore = new Property(26, Boolean.class, "showScore", false, "SHOW_SCORE");
         public final static Property ShowPercentile = new Property(27, Boolean.class, "showPercentile", false, "SHOW_PERCENTILE");
         public final static Property Categories = new Property(28, String.class, "categories", false, "CATEGORIES");
+        public final static Property IsDetailsFetched = new Property(29, Boolean.class, "isDetailsFetched", false, "IS_DETAILS_FETCHED");
     }
 
     private DaoSession daoSession;
@@ -101,7 +102,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
                 "\"ENABLE_RANKS\" INTEGER," + // 25: enableRanks
                 "\"SHOW_SCORE\" INTEGER," + // 26: showScore
                 "\"SHOW_PERCENTILE\" INTEGER," + // 27: showPercentile
-                "\"CATEGORIES\" TEXT);"); // 28: categories
+                "\"CATEGORIES\" TEXT," + // 28: categories
+                "\"IS_DETAILS_FETCHED\" INTEGER);"); // 29: isDetailsFetched
     }
 
     /** Drops the underlying database table. */
@@ -258,6 +260,11 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (categories != null) {
             stmt.bindString(29, categoriesConverter.convertToDatabaseValue(categories));
         }
+ 
+        Boolean isDetailsFetched = entity.getIsDetailsFetched();
+        if (isDetailsFetched != null) {
+            stmt.bindLong(30, isDetailsFetched ? 1L: 0L);
+        }
     }
 
     @Override
@@ -408,6 +415,11 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (categories != null) {
             stmt.bindString(29, categoriesConverter.convertToDatabaseValue(categories));
         }
+ 
+        Boolean isDetailsFetched = entity.getIsDetailsFetched();
+        if (isDetailsFetched != null) {
+            stmt.bindLong(30, isDetailsFetched ? 1L: 0L);
+        }
     }
 
     @Override
@@ -452,7 +464,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             cursor.isNull(offset + 25) ? null : cursor.getShort(offset + 25) != 0, // enableRanks
             cursor.isNull(offset + 26) ? null : cursor.getShort(offset + 26) != 0, // showScore
             cursor.isNull(offset + 27) ? null : cursor.getShort(offset + 27) != 0, // showPercentile
-            cursor.isNull(offset + 28) ? null : categoriesConverter.convertToEntityProperty(cursor.getString(offset + 28)) // categories
+            cursor.isNull(offset + 28) ? null : categoriesConverter.convertToEntityProperty(cursor.getString(offset + 28)), // categories
+            cursor.isNull(offset + 29) ? null : cursor.getShort(offset + 29) != 0 // isDetailsFetched
         );
         return entity;
     }
@@ -488,6 +501,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         entity.setShowScore(cursor.isNull(offset + 26) ? null : cursor.getShort(offset + 26) != 0);
         entity.setShowPercentile(cursor.isNull(offset + 27) ? null : cursor.getShort(offset + 27) != 0);
         entity.setCategories(cursor.isNull(offset + 28) ? null : categoriesConverter.convertToEntityProperty(cursor.getString(offset + 28)));
+        entity.setIsDetailsFetched(cursor.isNull(offset + 29) ? null : cursor.getShort(offset + 29) != 0);
      }
     
     @Override

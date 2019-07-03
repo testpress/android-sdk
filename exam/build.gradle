@@ -25,6 +25,10 @@ android {
     lintOptions {
         abortOnError false
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
+    }
 }
 
 dependencies {
@@ -36,6 +40,8 @@ dependencies {
     api rootProject.lottie
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
+    testImplementation rootProject.roboelectric
+    testImplementation rootProject.androidxCore
     testImplementation rootProject.powermockJunit
     testImplementation (rootProject.powermockMockio) {
         exclude group: 'org.mockito'
