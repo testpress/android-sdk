@@ -90,8 +90,11 @@ public class AttemptsActivity extends BaseToolBarActivity
         progressBar = (ProgressBar) findViewById(R.id.pb_loading);
         UIUtils.setIndeterminateDrawable(this, progressBar, 4);
         startButton.setTypeface(TestpressSdk.getRubikMediumFont(this));
-
         apiClient = new TestpressExamApiClient(this);
+        fetchOrCheckExam();
+    }
+
+    void fetchOrCheckExam() {
         exam = getIntent().getParcelableExtra(PARAM_EXAM);
         Boolean isDetailsFetched = false;
         Exam examFromDb = TestpressSDKDatabase.getExamDao(this).queryBuilder().where(ExamDao.Properties.Slug.eq(exam.getSlug())).limit(1).unique();
