@@ -298,6 +298,8 @@ public final class TestpressSdk {
                                     message = errorResponse.getProvider().get(0);
                                 } else if (!errorResponse.getNonFieldErrors().isEmpty()) {
                                     message = errorResponse.getNonFieldErrors().get(0);
+                                } else if (!errorResponse.getUsername().isEmpty()) {
+                                    message = errorResponse.getUsername().get(0);
                                 }
                                 testpressException.setMessage(message);
                             }

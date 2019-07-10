@@ -9,6 +9,7 @@ public class AuthorizationErrorResponse {
     private List<String> accessToken = new ArrayList<String>();
     private List<String> provider = new ArrayList<String>();
     private List<String> nonFieldErrors = new ArrayList<String>();
+    private List<String> username = new ArrayList<String>();
 
     public List<String> getUserId() {
         return userId;
@@ -40,5 +41,13 @@ public class AuthorizationErrorResponse {
 
     public void setNonFieldErrors(List<String> nonFieldErrors) {
         this.nonFieldErrors = nonFieldErrors;
+    }
+
+    public List<String> getUsername() {
+        return username;
+    }
+
+    public void setUsername(List<String> username) {
+        this.username = username;
     }
 }
