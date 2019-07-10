@@ -3,6 +3,7 @@ package in.testpress.course.ui;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -18,6 +19,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -97,6 +100,7 @@ public class WebViewActivity extends BaseToolBarActivity {
         } else {
             finish();
         }
+        clearCookies(getApplicationContext());
 
         if (intent.hasExtra(ACTIVITY_TITLE) && intent.getExtras().getString(ACTIVITY_TITLE) != "") {
             getSupportActionBar().setTitle(intent.getExtras().getString(ACTIVITY_TITLE));
@@ -219,6 +223,23 @@ public class WebViewActivity extends BaseToolBarActivity {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public static void clearCookies(Context context)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            CookieManager.getInstance().removeAllCookies(null);
+            CookieManager.getInstance().flush();
+        } else
+        {
+            CookieSyncManager cookieSyncManager=CookieSyncManager.createInstance(context);
+            cookieSyncManager.startSync();
+            CookieManager cookieManager=CookieManager.getInstance();
+            cookieManager.removeAllCookie();
+            cookieManager.removeSessionCookie();
+            cookieSyncManager.stopSync();
+            cookieSyncManager.sync();
+        }
     }
 
     // Create an image file
