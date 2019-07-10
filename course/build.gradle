@@ -38,6 +38,8 @@ dependencies {
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
     testImplementation rootProject.powermockJunit
+    testImplementation rootProject.roboelectric
+    testImplementation rootProject.androidxCore
     testImplementation (rootProject.powermockMockio) {
         exclude group: 'org.mockito'
     }
