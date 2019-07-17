@@ -11,6 +11,7 @@
         <item name="colorControlNormal">@color/testpress_actionbar_text</item>
         <item name="android:textColorPrimary">@color/testpress_actionbar_text</item>
         <item name="colorButtonNormal">@color/testpress_color_primary</item>
+        <item name="android:statusBarColor">@color/testpress_color_primary</item>
     </style>
 
     <style name="TestpressTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" >
