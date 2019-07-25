@@ -48,6 +48,7 @@ public class TestpressApiClient {
     public static final String PROFILE_DETAILS_PATH= "api/v2.2/me/";
     public static final String ACCOUNT_ACTIVITY_PATH = "api/v2.3/me/login_activity/";
     public static final String LOGOUT_DEVICES = "api/v2.4/auth/logout_devices/";
+    public static final String LOGOUT_PATH = "api/v2.4/logout/";
 
     /**
      * Query Params
