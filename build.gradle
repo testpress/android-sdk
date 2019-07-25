@@ -60,4 +60,5 @@ ext {
     lottie = 'com.airbnb.android:lottie:2.5.4'
     roboelectric = "org.robolectric:robolectric:4.3"
     androidxCore = 'androidx.test:core:1.2.0'
+    mockServer = 'com.squareup.okhttp3:mockwebserver:3.10.0'
 }
