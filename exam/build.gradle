@@ -37,6 +37,7 @@ dependencies {
     testImplementation rootProject.roboelectric
     testImplementation rootProject.androidxCore
     testImplementation rootProject.powermockJunit
+    testImplementation rootProject.mockServer
     testImplementation (rootProject.powermockMockio) {
         exclude group: 'org.mockito'
     }

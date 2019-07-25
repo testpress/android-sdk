@@ -1,16 +1,23 @@
 package in.testpress.network;
 
 import android.content.Context;
+import android.os.Looper;
+import android.support.v7.app.AlertDialog;
+import android.os.Handler;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import in.testpress.R;
 import in.testpress.core.TestpressSession;
 import in.testpress.models.FileDetails;
 import in.testpress.models.ProfileDetails;
@@ -22,6 +29,8 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -32,6 +41,7 @@ public class TestpressApiClient {
     public static final String TESTPRESS_AUTH_PATH= "api/v2.2/auth-token/";
 
     public static final String PROFILE_DETAILS_PATH= "api/v2.2/me/";
+    public static final String LOGOUT_PATH = "api/v2.4/logout/";
 
     /**
      * Query Params
@@ -72,6 +82,16 @@ public class TestpressApiClient {
         this(context, null, checkTestpressSessionIsNull(testpressSession));
     }
 
+    public void showAlert(Context context, String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context,
+                R.style.TestpressAppCompatAlertDialogStyle);
+
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setPositiveButton(R.string.testpress_ok, null);
+        builder.show();
+    }
+
     private TestpressApiClient(final Context context, String baseUrl,
                               final TestpressSession testpressSession) {
         if (context == null) {
@@ -108,6 +128,46 @@ public class TestpressApiClient {
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         httpClient.addInterceptor(httpLoggingInterceptor);
+
+        Interceptor responseCodeInterceptor = new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Request request = chain.request();
+                Response response = chain.proceed(request);
+                final String rawJson = response.body().string();
+
+                if (response.code() >= 400 && response.code() <= 500) {
+                    try {
+                        JSONObject json = new JSONObject(rawJson);
+                        String error_code = json.getString("error_code");
+                        final String detail = json.getString("detail");
+                        final String title;
+
+                        if (error_code.equals("parallel_login_restriction")) {
+                            title = "Parallel Login Restriction";
+                        } else if (error_code.equals("max_login_exceeded")) {
+                            title = "Account Locked";
+                        } else {
+                            title = "Alert";
+                        }
+
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                showAlert(context, title,detail);
+                            }
+                        });
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return response.newBuilder()
+                        .body(ResponseBody.create(response.body().contentType(), rawJson)).build();
+            }
+        };
+
+        httpClient.addInterceptor(responseCodeInterceptor);
 
         retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
