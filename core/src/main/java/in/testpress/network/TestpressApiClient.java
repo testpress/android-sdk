@@ -41,7 +41,7 @@ public class TestpressApiClient {
     public static final String TESTPRESS_AUTH_PATH= "api/v2.2/auth-token/";
 
     public static final String PROFILE_DETAILS_PATH= "api/v2.2/me/";
-    public static final String LOGOUT_PATH = "api/v2.4/logout/";
+    public static final String LOGOUT_PATH = "api/v2.4/auth/logout/";
 
     /**
      * Query Params
@@ -203,6 +203,10 @@ public class TestpressApiClient {
 
     public RetrofitCall<ProfileDetails> getProfileDetails() {
         return getAuthenticationService().getProfileDetails();
+    }
+
+    public RetrofitCall<Void> logout() {
+        return getAuthenticationService().logout();
     }
 
     public RetrofitCall<FileDetails> upload(String filePath) {
