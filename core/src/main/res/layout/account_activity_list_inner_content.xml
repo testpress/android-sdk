@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="4dp"
+    android:paddingBottom="6dp"
+    android:paddingLeft="20dp"
+    android:paddingRight="5dp">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/testpress_color_primary"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:text="@string/device_name"
+        android:marqueeRepeatLimit ="marquee_forever"
+        android:layout_height="wrap_content"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/data"
+        android:layout_below="@id/title">
+
+        <TextView
+            android:id="@+id/lastUsed"
+            android:textSize="12sp"
+            android:text="@string/last_used"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/location"
+            android:textSize="12sp"
+            android:layout_marginRight="10dp"
+            android:text="@string/location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/data">
+
+        <TextView
+            android:id="@+id/ipAddress"
+            android:text="@string/ip_address"
+            android:textSize="12sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+</RelativeLayout>

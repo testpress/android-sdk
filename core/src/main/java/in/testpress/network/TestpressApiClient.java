@@ -15,12 +15,15 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import in.testpress.R;
 import in.testpress.core.TestpressSession;
+import in.testpress.models.AccountActivity;
 import in.testpress.models.FileDetails;
 import in.testpress.models.ProfileDetails;
+import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.AttemptSection;
 import in.testpress.util.UserAgentProvider;
 import okhttp3.Interceptor;
@@ -41,7 +44,8 @@ public class TestpressApiClient {
     public static final String TESTPRESS_AUTH_PATH= "api/v2.2/auth-token/";
 
     public static final String PROFILE_DETAILS_PATH= "api/v2.2/me/";
-    public static final String LOGOUT_PATH = "api/v2.4/logout/";
+    public static final String ACCOUNT_ACTIVITY_PATH = "api/v2.3/me/login_activity/";
+    public static final String LOGOUT_DEVICES = "api/v2.4/auth/logout_devices/";
 
     /**
      * Query Params
@@ -183,6 +187,19 @@ public class TestpressApiClient {
         }
         return testpressSession;
     }
+
+    public AccountActivityService getAccountActivityService() {
+        return retrofit.create(AccountActivityService.class);
+    }
+
+    public RetrofitCall<TestpressApiResponse<AccountActivity>> getAccountActivity(Map<String, Object> queryParams) {
+        return getAccountActivityService().getAccountActivity(queryParams);
+    }
+
+    public RetrofitCall<Void> logoutDevices() {
+        return getAccountActivityService().logoutDevices();
+    }
+
 
     public String getBaseUrl() {
         return retrofit.baseUrl().toString();
