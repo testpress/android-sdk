@@ -5,13 +5,7 @@ android {
     buildToolsVersion rootProject.buildToolsVersion
 
     defaultConfig {
-        if (gradle.startParameter.taskNames.contains("connectedAndroidTest")
-                || gradle.startParameter.taskNames.contains("connectedCheck")) {
-
-            minSdkVersion rootProject.minSdkVersionForUITest
-        } else {
-            minSdkVersion rootProject.minSdkVersion
-        }
+        minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionName VERSION_NAME
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
