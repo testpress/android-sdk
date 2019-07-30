@@ -15,6 +15,7 @@ public class UserDevicesActivity extends BaseToolBarActivity {
 
     private static final String TAG = "UserDevicesActivity";
     private Button logoutDevicesButton;
+    private Button cancelButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +48,14 @@ public class UserDevicesActivity extends BaseToolBarActivity {
                     }
                 });
 
+            }
+        });
+
+        cancelButton = (Button) findViewById(R.id.cancel_button);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
     }

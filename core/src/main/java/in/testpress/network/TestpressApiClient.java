@@ -1,6 +1,7 @@
 package in.testpress.network;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Looper;
 import android.support.v7.app.AlertDialog;
 import android.os.Handler;
@@ -25,6 +26,7 @@ import in.testpress.models.FileDetails;
 import in.testpress.models.ProfileDetails;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.AttemptSection;
+import in.testpress.ui.UserDevicesActivity;
 import in.testpress.util.UserAgentProvider;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -144,24 +146,18 @@ public class TestpressApiClient {
                     try {
                         JSONObject json = new JSONObject(rawJson);
                         String error_code = json.getString("error_code");
-                        final String detail = json.getString("detail");
-                        final String title;
 
                         if (error_code.equals("parallel_login_restriction")) {
-                            title = "Parallel Login Restriction";
-                        } else if (error_code.equals("max_login_exceeded")) {
-                            title = "Account Locked";
-                        } else {
-                            title = "Alert";
+                            Handler handler = new Handler(Looper.getMainLooper());
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Intent intent = new Intent(context, UserDevicesActivity.class);
+                                    context.startActivity(intent);
+                                }
+                            });
                         }
 
-                        Handler handler = new Handler(Looper.getMainLooper());
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                showAlert(context, title,detail);
-                            }
-                        });
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
