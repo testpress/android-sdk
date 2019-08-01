@@ -28,24 +28,13 @@
         android:layout_height="wrap_content"
         android:padding="15dp"
         android:textStyle="bold"
-        android:layout_margin="15dp"
-        android:textColor="#000000"
-        android:visibility="gone"
-        android:textAlignment="center"
-        android:background="#f5f5f5"
-        android:textSize="16sp"
-        android:text="Note : Admin has restricted parallel logged in devices to 1"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:textStyle="bold"
         android:textColor="#fff"
         android:textAlignment="center"
         android:background="#303030"
         android:textSize="16sp"
-        android:text="Note : Admin has restricted parallel logged in devices to 1"/>
+        android:visibility="gone"
+        android:id="@+id/parallel_login_restriction_note"
+        android:text=""/>
 
     <FrameLayout
         android:id="@+id/fragment_container"

@@ -3,12 +3,14 @@ package in.testpress.ui;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import in.testpress.R;
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
+import in.testpress.core.TestpressSession;
 import in.testpress.network.TestpressApiClient;
 
 public class UserDevicesActivity extends BaseToolBarActivity {
@@ -16,19 +18,25 @@ public class UserDevicesActivity extends BaseToolBarActivity {
     private static final String TAG = "UserDevicesActivity";
     private Button logoutDevicesButton;
     private Button cancelButton;
+    private TextView parallelLoginRestrictionInfo;
+    private UserActivityFragment accountActivityFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_devices);
-        final UserActivityFragment accountActivityFragment = new UserActivityFragment();
+        accountActivityFragment = new UserActivityFragment();
         Bundle bundle = getIntent().getExtras();
         accountActivityFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, accountActivityFragment).commitAllowingStateLoss();
 
         getSupportActionBar().setTitle("Login Activity");
+        configureButtons();
+        setInfoText();
+    }
 
+    public void configureButtons() {
         logoutDevicesButton = (Button) findViewById(R.id.logout_devices_button);
         logoutDevicesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,6 +66,17 @@ public class UserDevicesActivity extends BaseToolBarActivity {
                 finish();
             }
         });
+    }
+
+    public void setInfoText() {
+        parallelLoginRestrictionInfo = (TextView) findViewById(R.id.parallel_login_restriction_note);
+        TestpressSession session = TestpressSdk.getTestpressSession(this);
+        String info = "Note : Admin has restricted parallel logged in devices to %s";
+
+        if (session.getInstituteSettings().isParallelLoginRestrictionEnabled()) {
+            parallelLoginRestrictionInfo.setVisibility(View.VISIBLE);
+            parallelLoginRestrictionInfo.setText(String.format(info, session.getInstituteSettings().getMaxParallelLogins()));
+        }
     }
 
 }

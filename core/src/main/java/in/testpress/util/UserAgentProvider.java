@@ -38,15 +38,14 @@ public class UserAgentProvider {
                     } catch (PackageManager.NameNotFoundException e) {
                         e.printStackTrace();
                     }
-                    userAgent = String.format("{\"app_name\":\"%s\", \"app_version\":\"%s\", \"testpress_sdk_version\":\"%s\"," +
-                            "\"os_version\":\"%s\", \"brand\":\"%s\", \"model\":\"%s\", \"locale\":\"%s\"}",
-                            context.getApplicationInfo().loadLabel(context.getPackageManager()), // App name
+                    userAgent = String.format("%s/%s Dalvik/%s (Linux; U; Android %s; %s %s Build/)",
+                            context.getApplicationInfo().loadLabel(context.getPackageManager()),
                             appVersion,
-                            BuildConfig.VERSION_NAME,
-                            Build.VERSION.RELEASE,
+                            System.getProperty("java.vm.version"),
+                            Float.parseFloat(Build.VERSION.RELEASE),
                             Build.BRAND,
                             Build.MODEL,
-                            Locale.getDefault()
+                            Build.BOARD
                     );
                 }
             }

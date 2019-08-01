@@ -14,6 +14,9 @@ public class InstituteSettings {
     private boolean displayUserEmailOnVideo;
     private Boolean questionShareDisabled;
     private boolean disableStudentAnalytics;
+    private boolean enableParallelLoginRestriction;
+    private Integer maxParallelLogins;
+    private Integer lockoutLimit;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -107,5 +110,29 @@ public class InstituteSettings {
     public InstituteSettings setDisplayUserEmailOnVideo(boolean displayUserEmailOnVideo) {
         this.displayUserEmailOnVideo = displayUserEmailOnVideo;
         return this;
+    }
+
+    public boolean isParallelLoginRestrictionEnabled() {
+        return enableParallelLoginRestriction;
+    }
+
+    public void setEnableParallelLoginRestriction(boolean enableParallelLoginRestriction) {
+        this.enableParallelLoginRestriction = enableParallelLoginRestriction;
+    }
+
+    public Integer getMaxParallelLogins() {
+        return maxParallelLogins;
+    }
+
+    public void setMaxParallelLogins(Integer maxParallelLogins) {
+        this.maxParallelLogins = maxParallelLogins;
+    }
+
+    public Integer getLockoutLimit() {
+        return lockoutLimit;
+    }
+
+    public void setLockoutLimit(Integer lockoutLimit) {
+        this.lockoutLimit = lockoutLimit;
     }
 }
