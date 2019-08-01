@@ -38,11 +38,11 @@ public class UserAgentProvider {
                     } catch (PackageManager.NameNotFoundException e) {
                         e.printStackTrace();
                     }
-                    userAgent = String.format("%s/%s Dalvik/%s (Linux; U; Android %s; %s %s Build/)",
+                    userAgent = String.format("%s/%s Dalvik/%s (Linux; U; Android %s; %s %s Build/%S)",
                             context.getApplicationInfo().loadLabel(context.getPackageManager()),
                             appVersion,
                             System.getProperty("java.vm.version"),
-                            Float.parseFloat(Build.VERSION.RELEASE),
+                            Build.VERSION.RELEASE,
                             Build.BRAND,
                             Build.MODEL,
                             Build.BOARD
