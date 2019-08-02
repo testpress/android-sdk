@@ -24,7 +24,7 @@
             android:textColor="#ffffff"
             android:textStyle="bold" />
 
-        <TextView
+        <WebView
             style="@style/TestpressText.PanelListItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
             android:textColor="#ffffff"
             android:textStyle="bold" />
 
-        <TextView
+        <WebView
             style="@style/TestpressText.PanelListItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -90,7 +90,7 @@
             android:textColor="#ffffff"
             android:textStyle="bold" />
 
-        <TextView
+        <WebView
             style="@style/TestpressText.PanelListItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

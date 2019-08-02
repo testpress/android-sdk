@@ -2,8 +2,10 @@ package in.testpress.exam.ui;
 
 import android.graphics.Color;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.webkit.WebView;
 
 import java.util.List;
 
@@ -36,6 +38,9 @@ class TestPanelListAdapter extends SingleTypeAdapter<AttemptItem> {
 
     @Override
     protected void update(final int position, final AttemptItem item) {
+        WebView questionWebView = updater.view.findViewById(R.id.question_all);
+        WebView questionMarked = updater.view.findViewById(R.id.question_marked);
+        WebView questionAnswered = updater.view.findViewById(R.id.question_answered);
         AttemptQuestion attemptQuestion = item.getAttemptQuestion();
         List<AttemptQuestion> translations = attemptQuestion.getTranslations();
         if (translations.size() > 0 && selectedLanguage != null &&
@@ -47,14 +52,15 @@ class TestPanelListAdapter extends SingleTypeAdapter<AttemptItem> {
                 }
             }
         }
-        String question = Html.fromHtml(attemptQuestion.getQuestionHtml()).toString();
+        String question = attemptQuestion.getQuestionHtml();
         if(item.getReview() || item.getCurrentReview()) {
             // Marked question
             updater.view.findViewById(R.id.all_question).setVisibility(View.GONE);
             updater.view.findViewById(R.id.answered_question).setVisibility(View.GONE);
             updater.view.findViewById(R.id.marked_question).setVisibility(View.VISIBLE);
             setNumber(3, item.getIndex());
-            setText(1, question.trim());
+            questionMarked.loadDataWithBaseURL("", question.trim(), "text/html; charset=utf-8", "utf-8", null);
+
         } else if(!item.getSelectedAnswers().isEmpty() || !item.getSavedAnswers().isEmpty()
                 || (item.getShortText() != null && !item.getShortText().isEmpty())
                 || (item.getCurrentShortText() != null && !item.getCurrentShortText().isEmpty())) {
@@ -64,14 +70,18 @@ class TestPanelListAdapter extends SingleTypeAdapter<AttemptItem> {
             updater.view.findViewById(R.id.answered_question).setVisibility(View.VISIBLE);
             updater.view.findViewById(R.id.all_question).setVisibility(View.GONE);
             setNumber(5, item.getIndex());
-            setText(4, question.trim());
+            questionAnswered.loadData(question.trim(), "text/html; charset=utf-8", "utf-8");
+            Log.d("Question List else if", "update: " + question.trim());
+
         } else {
             // Unanswered question
             updater.view.findViewById(R.id.marked_question).setVisibility(View.GONE);
             updater.view.findViewById(R.id.answered_question).setVisibility(View.GONE);
             updater.view.findViewById(R.id.all_question).setVisibility(View.VISIBLE);
             setNumber(2, item.getIndex());
-            setText(0, question.trim());
+//            setText(0, question.trim());
+            Log.d("Question List else", "update: " + question.trim());
+            questionWebView.loadData(question.trim(), "text/html; charset=utf-8", "utf-8");
         }
         updater.view.findViewById(R.id.panel_item_layout).setBackgroundColor(
                 (item.getIndex() == currentAttemptItemIndex) ? Color.parseColor("#80b6dcfb") :
