@@ -87,16 +87,7 @@ public class TestpressApiClient {
     public TestpressApiClient(final Context context, TestpressSession testpressSession) {
         this(context, null, checkTestpressSessionIsNull(testpressSession));
     }
-
-    public void showAlert(Context context, String title, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context,
-                R.style.TestpressAppCompatAlertDialogStyle);
-
-        builder.setTitle(title);
-        builder.setMessage(message);
-        builder.setPositiveButton(R.string.testpress_ok, null);
-        builder.show();
-    }
+    
 
     private TestpressApiClient(final Context context, String baseUrl,
                               final TestpressSession testpressSession) {
