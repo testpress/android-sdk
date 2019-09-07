@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.UserDevicesActivity">
+
+    <include layout="@layout/testpress_toolbar" />
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        layout="@layout/testpress_empty_view"
+        tools:ignore="UnknownIdInLayout" />
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:visibility="gone"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:indeterminate="true"
+         />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:textStyle="bold"
+        android:textColor="#fff"
+        android:textAlignment="center"
+        android:background="#303030"
+        android:textSize="16sp"
+        android:visibility="gone"
+        android:id="@+id/parallel_login_restriction_note"
+        android:text=""/>
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.1"
+        android:orientation="horizontal">
+        <android.support.v7.widget.AppCompatButton
+            style="@style/TestpressButton"
+            android:text="@string/logout_devices"
+            android:id="@+id/logout_devices_button"
+            android:textSize="12sp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            />
+        <android.support.v7.widget.AppCompatButton
+            style="@style/TestpressButton"
+            android:text="Cancel"
+            android:id="@+id/cancel_button"
+            android:textSize="12sp"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_gravity="center_horizontal"
+            />
+    </LinearLayout>
+
+</LinearLayout>

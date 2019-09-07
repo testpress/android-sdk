@@ -55,6 +55,11 @@
                 android:text="Fragment"
                 android:id="@+id/fragment_button" />
 
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Button"
+                android:text="Login Activity"
+                android:id="@+id/login_activity_button" />
+
         </LinearLayout>
 
     </ScrollView>

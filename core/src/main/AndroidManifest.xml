@@ -1,15 +1,18 @@
-<manifest package="in.testpress"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="in.testpress">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <application android:allowBackup="true"
-                 android:supportsRtl="true" >
-
-        <activity android:name=".ui.ZoomableImageActivity"
+    <application
+        android:allowBackup="true"
+        android:supportsRtl="true">
+        <activity android:name=".ui.UserDevicesActivity"
             android:theme="@style/TestpressTheme" />
-
+        <activity
+            android:name=".ui.ZoomableImageActivity"
+            android:theme="@style/TestpressTheme" />
     </application>
 
 </manifest>

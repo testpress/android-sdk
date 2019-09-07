@@ -1,20 +1,32 @@
 package in.testpress.network;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Looper;
+import android.support.v7.app.AlertDialog;
+import android.os.Handler;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import in.testpress.R;
 import in.testpress.core.TestpressSession;
+import in.testpress.models.AccountActivity;
 import in.testpress.models.FileDetails;
 import in.testpress.models.ProfileDetails;
+import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.AttemptSection;
+import in.testpress.ui.UserDevicesActivity;
 import in.testpress.util.UserAgentProvider;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -22,6 +34,8 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -32,6 +46,8 @@ public class TestpressApiClient {
     public static final String TESTPRESS_AUTH_PATH= "api/v2.2/auth-token/";
 
     public static final String PROFILE_DETAILS_PATH= "api/v2.2/me/";
+    public static final String ACCOUNT_ACTIVITY_PATH = "api/v2.3/me/login_activity/";
+    public static final String LOGOUT_DEVICES = "api/v2.4/auth/logout_devices/";
 
     /**
      * Query Params
@@ -71,6 +87,7 @@ public class TestpressApiClient {
     public TestpressApiClient(final Context context, TestpressSession testpressSession) {
         this(context, null, checkTestpressSessionIsNull(testpressSession));
     }
+    
 
     private TestpressApiClient(final Context context, String baseUrl,
                               final TestpressSession testpressSession) {
@@ -109,6 +126,40 @@ public class TestpressApiClient {
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         httpClient.addInterceptor(httpLoggingInterceptor);
 
+        Interceptor responseCodeInterceptor = new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Request request = chain.request();
+                Response response = chain.proceed(request);
+                final String rawJson = response.body().string();
+
+                if (response.code() >= 400 && response.code() <= 500) {
+                    try {
+                        JSONObject json = new JSONObject(rawJson);
+                        String error_code = json.getString("error_code");
+
+                        if (error_code.equals("parallel_login_restriction")) {
+                            Handler handler = new Handler(Looper.getMainLooper());
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Intent intent = new Intent(context, UserDevicesActivity.class);
+                                    context.startActivity(intent);
+                                }
+                            });
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return response.newBuilder()
+                        .body(ResponseBody.create(response.body().contentType(), rawJson)).build();
+            }
+        };
+
+        httpClient.addInterceptor(responseCodeInterceptor);
+
         retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addCallAdapterFactory(new ErrorHandlingCallAdapterFactory())
@@ -123,6 +174,19 @@ public class TestpressApiClient {
         }
         return testpressSession;
     }
+
+    public AccountActivityService getAccountActivityService() {
+        return retrofit.create(AccountActivityService.class);
+    }
+
+    public RetrofitCall<TestpressApiResponse<AccountActivity>> getAccountActivity(Map<String, Object> queryParams) {
+        return getAccountActivityService().getAccountActivity(queryParams);
+    }
+
+    public RetrofitCall<Void> logoutDevices() {
+        return getAccountActivityService().logoutDevices();
+    }
+
 
     public String getBaseUrl() {
         return retrofit.baseUrl().toString();

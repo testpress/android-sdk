@@ -12,6 +12,7 @@ import in.testpress.exam.TestpressExam;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
+import in.testpress.ui.UserDevicesActivity;
 import in.testpress.util.ViewUtils;
 
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
@@ -64,6 +65,12 @@ public class ExamSampleActivity extends BaseToolBarActivity {
                 showSDK(view.getId());
             }
         });
+        findViewById(R.id.login_activity_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showSDK(view.getId());
+            }
+        });
         findViewById(R.id.fragment_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,6 +106,10 @@ public class ExamSampleActivity extends BaseToolBarActivity {
                     break;
                 case R.id.bookmarks:
                     TestpressExam.showBookmarks(this, session);
+                    break;
+                case R.id.login_activity_button:
+                    Intent intent = new Intent(this, UserDevicesActivity.class);
+                    this.startActivity(intent);
                     break;
                 default:
                     TestpressExam.showCategories(this, false, session);
