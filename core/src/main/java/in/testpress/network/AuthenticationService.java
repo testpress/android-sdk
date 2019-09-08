@@ -10,6 +10,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 import static in.testpress.network.TestpressApiClient.PROFILE_DETAILS_PATH;
+import static in.testpress.network.TestpressApiClient.LOGOUT_PATH;
 
 public interface AuthenticationService {
 
@@ -20,5 +21,8 @@ public interface AuthenticationService {
 
     @GET(PROFILE_DETAILS_PATH)
     RetrofitCall<ProfileDetails> getProfileDetails();
+
+    @POST(LOGOUT_PATH)
+    RetrofitCall<Void> logout();
 
 }

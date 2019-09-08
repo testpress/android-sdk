@@ -77,6 +77,13 @@ public final class TestpressSdk {
     }
 
     public static void clearActiveSession(@NonNull Context context) {
+        new TestpressApiClient(context, TestpressSdk.getTestpressSession(context)).logout().enqueue(new TestpressCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {}
+
+            @Override
+            public void onException(TestpressException exception) {}
+        });
         SharedPreferences.Editor editor = getPreferenceEditor(context);
         editor.clear().commit();
     }
