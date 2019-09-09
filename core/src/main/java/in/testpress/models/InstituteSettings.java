@@ -116,23 +116,26 @@ public class InstituteSettings {
         return enableParallelLoginRestriction;
     }
 
-    public void setEnableParallelLoginRestriction(boolean enableParallelLoginRestriction) {
+    public InstituteSettings setEnableParallelLoginRestriction(boolean enableParallelLoginRestriction) {
         this.enableParallelLoginRestriction = enableParallelLoginRestriction;
+        return this;
     }
 
     public Integer getMaxParallelLogins() {
         return maxParallelLogins;
     }
 
-    public void setMaxParallelLogins(Integer maxParallelLogins) {
+    public InstituteSettings setMaxParallelLogins(Integer maxParallelLogins) {
         this.maxParallelLogins = maxParallelLogins;
+        return this;
     }
 
     public Integer getLockoutLimit() {
         return lockoutLimit;
     }
 
-    public void setLockoutLimit(Integer lockoutLimit) {
+    public InstituteSettings setLockoutLimit(Integer lockoutLimit) {
         this.lockoutLimit = lockoutLimit;
+        return this;
     }
 }
