@@ -154,9 +154,14 @@ public class TestpressApiClient {
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    String message = "Your account is locked due to exceed of maximum login limits.";
-                                    message += "Your account will automatically get unlocked within 24 hours.";
-                                    UIUtils.showAlert(context, "Account Locked", message);
+                                String message = context.getString(R.string.max_login_limit_exceeded_error);
+
+                                if (testpressSession.getInstituteSettings().getCooloffTime() != null) {
+                                    message += context.getString(R.string.account_unlock_info) + " %s hours";
+                                    message = String.format(message, testpressSession.getInstituteSettings().getCooloffTime());
+                                }
+
+                                UIUtils.showAlert(context, "Account Locked", message);
                                 }
                             });
                         }
