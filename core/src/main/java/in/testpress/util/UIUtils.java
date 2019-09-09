@@ -7,6 +7,7 @@ import android.os.Build;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -81,5 +82,15 @@ public class UIUtils {
 
     public static void showSnackBar(View view, @StringRes int message) {
         Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    public static void showAlert(Context context, String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context,
+                R.style.TestpressAppCompatAlertDialogStyle);
+
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setPositiveButton(R.string.testpress_ok, null);
+        builder.show();
     }
 }

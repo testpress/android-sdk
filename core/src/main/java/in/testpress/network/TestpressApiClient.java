@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Looper;
 import android.support.v7.app.AlertDialog;
 import android.os.Handler;
+import android.os.Looper;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -27,6 +28,7 @@ import in.testpress.models.ProfileDetails;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.AttemptSection;
 import in.testpress.ui.UserDevicesActivity;
+import in.testpress.util.UIUtils;
 import in.testpress.util.UserAgentProvider;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -138,14 +140,23 @@ public class TestpressApiClient {
                     try {
                         JSONObject json = new JSONObject(rawJson);
                         String error_code = json.getString("error_code");
+                        Handler handler = new Handler(Looper.getMainLooper());
 
                         if (error_code.equals("parallel_login_restriction")) {
-                            Handler handler = new Handler(Looper.getMainLooper());
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
                                     Intent intent = new Intent(context, UserDevicesActivity.class);
                                     context.startActivity(intent);
+                                }
+                            });
+                        } else if (error_code.equals("max_login_exceeded")) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    String message = "Your account is locked due to exceed of maximum login limits.";
+                                    message += "Your account will automatically get unlocked within 24 hours.";
+                                    UIUtils.showAlert(context, "Account Locked", message);
                                 }
                             });
                         }
