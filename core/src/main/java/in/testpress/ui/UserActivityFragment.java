@@ -2,6 +2,7 @@ package in.testpress.ui;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -32,6 +33,10 @@ public class UserActivityFragment extends PagedItemFragment<AccountActivity> {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        TextView emptyTitleView = (TextView) view.findViewById(R.id.empty_title);
+        TextView emptyDescView = (TextView) view.findViewById(R.id.empty_description);
+        emptyTitleView.setText(getString(R.string.no_devices_found));
+        emptyDescView.setText("");
     }
 
     @Override
