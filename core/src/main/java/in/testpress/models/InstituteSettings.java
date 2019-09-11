@@ -17,6 +17,7 @@ public class InstituteSettings {
     private boolean enableParallelLoginRestriction;
     private Integer maxParallelLogins;
     private Integer lockoutLimit;
+    private String cooloffTime;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -136,6 +137,15 @@ public class InstituteSettings {
 
     public InstituteSettings setLockoutLimit(Integer lockoutLimit) {
         this.lockoutLimit = lockoutLimit;
+        return this;
+    }
+
+    public String getCooloffTime() {
+        return cooloffTime;
+    }
+
+    public InstituteSettings setCooloffTime(String cooloffTime) {
+        this.cooloffTime = cooloffTime;
         return this;
     }
 }
