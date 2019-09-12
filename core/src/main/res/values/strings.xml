@@ -40,5 +40,6 @@
     <string name="max_login_limit_exceeded_error">Your account has been locked as it has exceeded maximum devices it can be used.</string>
     <string name="account_unlock_info">Your account will automatically get unlocked within </string>
     <string name="no_devices_found">No devices found</string>
+    <string name="session_cleared_message">Your session has been cleared. Please log out and login again.</string>
 
 </resources>
