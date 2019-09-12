@@ -137,10 +137,19 @@ public class TestpressApiClient {
                 final String rawJson = response.body().string();
 
                 if (response.code() >= 400 && response.code() <= 500) {
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    if (response.code() == 401) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                UIUtils.showAlert(context, "Session Cleared", context.getString(R.string.session_cleared_message));
+                            }
+                        });
+                    }
+
                     try {
                         JSONObject json = new JSONObject(rawJson);
                         String error_code = json.getString("error_code");
-                        Handler handler = new Handler(Looper.getMainLooper());
 
                         if (error_code.equals("parallel_login_restriction")) {
                             handler.post(new Runnable() {
