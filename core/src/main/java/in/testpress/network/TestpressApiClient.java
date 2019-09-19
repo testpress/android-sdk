@@ -142,7 +142,9 @@ public class TestpressApiClient {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                UIUtils.showAlert(context, "Session Cleared", context.getString(R.string.session_cleared_message));
+                                try {
+                                    UIUtils.showAlert(context, "Session Cleared", context.getString(R.string.session_cleared_message));
+                                } catch (Exception ignore) {}
                             }
                         });
                     }
@@ -170,7 +172,9 @@ public class TestpressApiClient {
                                     message = String.format(message, testpressSession.getInstituteSettings().getCooloffTime());
                                 }
 
-                                UIUtils.showAlert(context, "Account Locked", message);
+                                try {
+                                    UIUtils.showAlert(context, "Account Locked", message);
+                                } catch (Exception ignore) {}
                                 }
                             });
                         }
