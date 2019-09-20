@@ -41,5 +41,6 @@
     <string name="account_unlock_info">Your account will automatically get unlocked within </string>
     <string name="no_devices_found">No devices found</string>
     <string name="session_cleared_message">Your session has been cleared. Please log out and login again.</string>
+    <string name="lockout_limit_info">Note : Admin has restricted login attempts to %d</string>
 
 </resources>

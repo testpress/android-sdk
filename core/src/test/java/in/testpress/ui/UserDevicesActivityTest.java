@@ -1,6 +1,7 @@
 package in.testpress.ui;
 
 import android.support.v4.app.Fragment;
+import android.widget.TextView;
 
 import androidx.test.core.app.ApplicationProvider;
 
@@ -11,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
+import in.testpress.R;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.models.AccountActivity;
@@ -38,6 +40,7 @@ public class UserDevicesActivityTest {
     private static final String USER_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6NDYsInVzZXJfaWQiOjQ2LCJlbWFpbCI6IiIsImV4cCI6MTUxOTAzNjUzM30.FUuyJfYNSAw_VcypZsN8_ZHvZra6gHU3njcXmr-TGVU";
     private AccountActivity accountActivity;
     private MockWebServer mockWebServer;
+    private InstituteSettings instituteSettings;
 
 
     public String randomDataString() {
@@ -64,8 +67,9 @@ public class UserDevicesActivityTest {
     public void setUp() throws IOException{
         mockWebServer = new MockWebServer();
         accountActivity = createAccountActivity();
-        InstituteSettings instituteSettings =
+        instituteSettings =
                 new InstituteSettings("http://localhost:9200");
+        instituteSettings.setLockoutLimit(1);
         TestpressSdk.setTestpressSession(ApplicationProvider.getApplicationContext(),
                 new TestpressSession(instituteSettings, USER_TOKEN));
         activity = Robolectric.buildActivity(UserDevicesActivity.class)
@@ -113,6 +117,15 @@ public class UserDevicesActivityTest {
         mockWebServer.takeRequest();
 
         Assert.assertTrue(response.isSuccessful());
+    }
+
+    @Test
+    public void testLoginAttemptRestrictionInfo() {
+        activity.setInfoText();
+        String lockout_limit_info = "Note : Admin has restricted login attempts to %s";
+        TextView info = activity.findViewById(R.id.parallel_login_restriction_note);
+
+        Assert.assertEquals(info.getText(), String.format(lockout_limit_info, instituteSettings.getLockoutLimit()));
     }
 
     @After

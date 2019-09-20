@@ -71,11 +71,11 @@ public class UserDevicesActivity extends BaseToolBarActivity {
     public void setInfoText() {
         parallelLoginRestrictionInfo = (TextView) findViewById(R.id.parallel_login_restriction_note);
         TestpressSession session = TestpressSdk.getTestpressSession(this);
-        String info = "Note : Admin has restricted parallel logged in devices to %s";
+        String info = getString(R.string.lockout_limit_info);
 
-        if (session.getInstituteSettings().isParallelLoginRestrictionEnabled()) {
+        if (session.getInstituteSettings().getLockoutLimit() != null) {
             parallelLoginRestrictionInfo.setVisibility(View.VISIBLE);
-            parallelLoginRestrictionInfo.setText(String.format(info, session.getInstituteSettings().getMaxParallelLogins()));
+            parallelLoginRestrictionInfo.setText(String.format(info, session.getInstituteSettings().getLockoutLimit()));
         }
     }
 
