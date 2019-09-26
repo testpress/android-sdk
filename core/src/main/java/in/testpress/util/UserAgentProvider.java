@@ -4,10 +4,6 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
-import java.util.Locale;
-
-import in.testpress.BuildConfig;
-
 /**
  * Class that builds a User-Agent that is set on all HTTP calls.
  *
@@ -19,8 +15,7 @@ import in.testpress.BuildConfig;
  *
  * Example
  *
- * {"app_name":"Testpress Sdk Sample App", "app_version":"1.0", "sdk_version":"1.0", "os":"6.0",
- * "brand":"motorola", "model":"XT1068", "locale":"en_US"}
+ * testpress/1.1.2 (Dalvik; Android 9; Xiaomi POCO F1 Build/PKQ1.180729.001) okhttp
  *
  */
 public class UserAgentProvider {
@@ -38,14 +33,13 @@ public class UserAgentProvider {
                     } catch (PackageManager.NameNotFoundException e) {
                         e.printStackTrace();
                     }
-                    userAgent = String.format("%s/%s Dalvik/%s (Linux; U; Android %s; %s %s Build/%S)",
+                    userAgent = String.format("%s/%s (Dalvik; Android %s; %s %s Build/%s) okhttp",
                             context.getApplicationInfo().loadLabel(context.getPackageManager()),
                             appVersion,
-                            System.getProperty("java.vm.version"),
                             Build.VERSION.RELEASE,
-                            Build.BRAND,
+                            Build.MANUFACTURER,
                             Build.MODEL,
-                            Build.BOARD
+                            Build.ID
                     );
                 }
             }
