@@ -343,8 +343,6 @@ public class ContentActivity extends BaseToolBarActivity {
             pageNumber.setText(String.format("%d/%d", position + 1, contents.size()));
             checkContentType();
             validateAdjacentNavigationButton();
-            exoplayerFullscreenHelper = new ExoplayerFullscreenHelper(this);
-            exoplayerFullscreenHelper.initializeOrientationListener();
         }
     }
 
@@ -455,6 +453,11 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void initExoPlayer(String videoUrl) {
+        if (exoplayerFullscreenHelper == null) {
+            exoplayerFullscreenHelper = new ExoplayerFullscreenHelper(this);
+            exoplayerFullscreenHelper.initializeOrientationListener();
+        }
+
         if (videoAttempt == null) {
             createContentAttempt();
         } else {
