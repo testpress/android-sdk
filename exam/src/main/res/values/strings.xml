@@ -196,6 +196,7 @@
     <string name="testpress_cutoff">CUTOFF</string>
 
     <string name="testpress_exam_ended">This exam has ended</string>
+    <string name="testpress_exam_attempt_unavailable">You have reached maximum attempts for the exam!</string>
 
     <string name="testpress_access_code">Access Code</string>
     <string name="testpress_enter_access_code">Enter Access Code</string>

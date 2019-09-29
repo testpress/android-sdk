@@ -5,10 +5,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -31,6 +31,7 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private Activity mActivity;
     private Content mContent;
     private List<CourseAttempt> mAttempts = new ArrayList<>();
+    private Boolean toMakeActionLabelVisible;
 
     ContentAttemptListAdapter(Activity activity, Content content,
                                      final List<CourseAttempt> attempts) {
@@ -46,11 +47,13 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         TextView score;
         TextView trophies;
         LinearLayout trophiesLayout;
+        LinearLayout actionLayout;
         TextView reviewLabel;
         LinearLayout pausedAttemptLayout;
         TextView startedDate;
         TextView pausedLabel;
         TextView resumeLabel;
+        ImageView action_arrow;
 
         ViewHolder(View convertView, Context context) {
             super(convertView);
@@ -66,6 +69,8 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             startedDate = ((TextView) convertView.findViewById(R.id.started_date));
             pausedLabel = ((TextView) convertView.findViewById(R.id.paused_label));
             resumeLabel = ((TextView) convertView.findViewById(R.id.resume_label));
+            action_arrow = ((ImageView) convertView.findViewById(R.id.action_arrow));
+            actionLayout = (LinearLayout) convertView.findViewById(R.id.action_layout);
             ViewUtils.setTypeface(new TextView[] {completedDate, correct, score, reviewLabel, trophies,
                     startedDate, pausedLabel, resumeLabel}, TestpressSdk.getRubikRegularFont(context));
         }
@@ -141,6 +146,7 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     }
                 });
                 holder.resumeLabel.setVisibility(isGamificationEnabled ? View.GONE : View.VISIBLE);
+
             } else {
                 holder.completedDate.setText(attempt.getShortDate());
                 holder.correct.setText(attempt.getCorrectCount() + "/" + attempt.getTotalQuestions());
@@ -148,10 +154,12 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 holder.completedAttemptLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Log.e("sssssss","");
                         //noinspection ConstantConditions
-                        TestpressExam.showCourseAttemptReport(mActivity, mContent.getRawExam(),
-                                courseAttempt, TestpressSdk.getTestpressSession(mActivity));
+                        if (mContent.getRawExam().getShowScore()) {
+                            TestpressExam.showCourseAttemptReport(mActivity, mContent.getRawExam(),
+                                    courseAttempt, TestpressSdk.getTestpressSession(mActivity));
+                        }
+
                     }
                 });
                 holder.completedAttemptLayout.setVisibility(View.VISIBLE);
@@ -169,18 +177,53 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 } else {
                     holder.trophiesLayout.setVisibility(View.GONE);
                     holder.reviewLabel.setVisibility(View.VISIBLE);
+                    holder.action_arrow.setVisibility(View.VISIBLE);
+                }
+
+                if (!mContent.getRawExam().getShowScore()) {
+                    holder.trophiesLayout.setVisibility(View.GONE);
+                    holder.reviewLabel.setVisibility(View.GONE);
+                    holder.action_arrow.setVisibility(View.GONE);
+
+                    if (!checkToMakeActionLabelVisibleOrNot()) {
+                        holder.actionLayout.setVisibility(View.GONE);
+                    } else {
+                        holder.actionLayout.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         } else if (viewHolder instanceof HeaderViewHolder)  {
             final HeaderViewHolder holder = (HeaderViewHolder) viewHolder;
             if (isGamificationEnabled) {
                 holder.trophiesLabel.setVisibility(View.VISIBLE);
-                holder.actionLabel.setVisibility(View.GONE);
             } else {
                 holder.trophiesLabel.setVisibility(View.GONE);
+                holder.actionLabel.setVisibility(View.VISIBLE);
+            }
+
+            if (!mContent.getRawExam().getShowScore()) {
+                holder.trophiesLabel.setVisibility(View.GONE);
+                holder.actionLabel.setVisibility(View.GONE);
+            }
+
+            if (checkToMakeActionLabelVisibleOrNot()) {
                 holder.actionLabel.setVisibility(View.VISIBLE);
             }
         }
     }
 
+    public boolean checkToMakeActionLabelVisibleOrNot() {
+        if (toMakeActionLabelVisible != null) {
+            return toMakeActionLabelVisible;
+        }
+
+        for (CourseAttempt courseAttempt : mAttempts) {
+            if (courseAttempt.getAssessment().getState().equals(TestpressExamApiClient.STATE_PAUSED)) {
+                toMakeActionLabelVisible = true;
+                return true;
+            }
+        }
+        toMakeActionLabelVisible = false;
+        return false;
+    }
 }
