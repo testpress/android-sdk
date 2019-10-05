@@ -67,6 +67,7 @@ public class TestpressApiClient {
     public static final String MODIFIED_SINCE = "modified_since";
     public static final String CREATED_SINCE = "created_since";
     public static final String CREATED_UNTIL = "created_until";
+    public static final String PARAM_SHOW_PARALLEL_LOGIN_INFO = "show_parallel_login_restriction_info";
 
     protected final Retrofit retrofit;
 
@@ -158,6 +159,7 @@ public class TestpressApiClient {
                                 @Override
                                 public void run() {
                                     Intent intent = new Intent(context, UserDevicesActivity.class);
+                                    intent.putExtra(PARAM_SHOW_PARALLEL_LOGIN_INFO, true);
                                     context.startActivity(intent);
                                 }
                             });
