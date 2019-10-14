@@ -28,6 +28,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -38,8 +39,10 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
@@ -271,8 +274,17 @@ public class ExoPlayerUtil {
 
     private MediaSource buildMediaSource(Uri uri) {
         String userAgent = UserAgentProvider.get(activity);
-        return new ExtractorMediaSource.Factory(new DefaultHttpDataSourceFactory(userAgent))
-                .createMediaSource(uri);
+        DataSource.Factory dataSourceFactory =
+                new DefaultHttpDataSourceFactory(userAgent);
+        int type = Util.inferContentType(uri);
+        switch (type) {
+            case C.TYPE_HLS:
+                return new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+            case C.TYPE_OTHER:
+                return new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+            default:
+                throw new IllegalStateException("Unsupported type: " + type);
+        }
     }
 
     public float getCurrentPosition() {
