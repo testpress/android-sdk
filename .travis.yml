@@ -14,20 +14,16 @@ env:
     - ADB_INSTALL_TIMEOUT=20 # minutes (2 minutes by default)
 
 before_install:
+  - touch $HOME/.android/repositories.cfg
   - yes | sdkmanager "platforms;android-28"
   - yes | sdkmanager "build-tools;28.0.3"
-
 android:
   components:
     # latest version of the tools
     - tools
 #    - platform-tools
 
-    # build tools version
-    - build-tools-$ANDROID_BUILD_TOOLS_VERSION
-
     # The SDK Version
-    - android-$ANDROID_API_LEVEL
     - android-$EMULATOR_API_LEVEL
 
     # For Google APIs
