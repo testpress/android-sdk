@@ -40,6 +40,7 @@ android:
   licenses:
     # White list all android-sdk-license revisions.
     - 'android-sdk-license-.+'
+    - 'android-sdk-preview-license-.+'
     # White list all the licenses.
     - '.+'
 
