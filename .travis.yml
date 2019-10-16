@@ -17,8 +17,6 @@ android:
   components:
     # latest version of the tools
     - tools
-    - platform-tools
-    - tools
 
     # The SDK Version
     - android-$EMULATOR_API_LEVEL
