@@ -2,7 +2,7 @@ package in.testpress.ui;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
+import androidx.loader.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AbsListView;

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-public class SlidingPaneLayout extends android.support.v4.widget.SlidingPaneLayout {
+public class SlidingPaneLayout extends androidx.slidingpanelayout.widget.SlidingPaneLayout {
 
     public SlidingPaneLayout(Context context) {
         super(context);

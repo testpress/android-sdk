@@ -62,7 +62,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp">
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/previous"
             android:background="@android:color/transparent"
             android:text="@string/testpress_previous"
@@ -80,7 +80,7 @@
             android:layout_gravity="center_vertical"
             android:background="@color/testpress_gray_light" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/question_list_button"
             android:layout_weight="1"
             android:layout_width="0dp"
@@ -101,7 +101,7 @@
             android:layout_gravity="center_vertical"
             android:background="@color/testpress_gray_light" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/next"
             android:background="@android:color/transparent"
             android:text="@string/testpress_next"

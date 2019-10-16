@@ -1,7 +1,7 @@
 package in.testpress.ui;
 
 import android.app.Dialog;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 
 import in.testpress.network.RetrofitCall;
 import in.testpress.util.CommonUtils;

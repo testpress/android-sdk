@@ -8,7 +8,8 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionName VERSION_NAME
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -32,6 +33,7 @@ dependencies {
     api rootProject.httpLogInterceptor
     api rootProject.universalImageLoader
     api rootProject.greendao
+    api rootProject.junit
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
     testImplementation rootProject.powermockJunit

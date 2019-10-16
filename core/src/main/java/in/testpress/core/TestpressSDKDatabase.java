@@ -1,7 +1,7 @@
 package in.testpress.core;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.greenrobot.greendao.database.Database;
 
