@@ -13,6 +13,9 @@ env:
     - ANDROID_TAG=google_apis
     - ADB_INSTALL_TIMEOUT=20 # minutes (2 minutes by default)
 
+before_install:
+  - yes | sdkmanager "platforms;android-28"
+
 android:
   components:
     # latest version of the tools
@@ -40,7 +43,6 @@ android:
   licenses:
     # White list all android-sdk-license revisions.
     - 'android-sdk-license-.+'
-    - 'android-sdk-preview-license-.+'
     # White list all the licenses.
     - '.+'
 
