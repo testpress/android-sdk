@@ -17,7 +17,7 @@ android:
   components:
     # latest version of the tools
     - tools
-    - platform-tools
+    - platform-tools-android-28
 #    - tools
 
     # For Google APIs
@@ -44,8 +44,6 @@ cache:
     - $HOME/.gradle/wrapper/
     - $HOME/.android/build-cache
 
-before_install:
-  - yes | sdkmanager "platforms;android-28"
 
 # Emulator Management: Create, Start and Wait
 before_script:
