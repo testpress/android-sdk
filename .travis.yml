@@ -45,8 +45,8 @@ android:
 
 # Emulator Management: Create, Start and Wait
 before_script:
-  - echo "y" | android update sdk -a --no-ui --filter android-$EMULATOR_API
-  - echo "y" | android update sdk -a --no-ui --filter sys-img-armeabi-v7a-android-$EMULATOR_API
+  - echo "y" | android update sdk -a --no-ui --filter android-$EMULATOR_API_LEVEL
+  - echo "y" | android update sdk -a --no-ui --filter sys-img-armeabi-v7a-android-$EMULATOR_API_LEVEL
   - android list targets | grep -E '^id:' | awk -F '"' '{$1=""; print $2}' # list all targets
   - echo no | android create avd --force -n test -t android-$EMULATOR_API_LEVEL --abi $ANDROID_ABI --tag $ANDROID_TAG
   - emulator -avd test -no-skin -no-window &
