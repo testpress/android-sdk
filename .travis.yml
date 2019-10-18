@@ -45,7 +45,32 @@ android:
 
 # Emulator Management: Create, Start and Wait
 before_script:
-  - echo no | android create avd --force -n test -t "android-"$EMULATOR_API_LEVEL --abi $ANDROID_ABI --tag $ANDROID_TAG
-  - emulator -avd test -no-window &
+  - echo "y" | android update sdk -a --no-ui --filter android-$EMULATOR_API
+  - echo "y" | android update sdk -a --no-ui --filter sys-img-armeabi-v7a-android-$EMULATOR_API
+  - android list targets | grep -E '^id:' | awk -F '"' '{$1=""; print $2}' # list all targets
+  - echo no | android create avd --force -n test -t android-$EMULATOR_API_LEVEL --abi $ANDROID_ABI --tag $ANDROID_TAG
+  - emulator -avd test -no-skin -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
+  - adb wait-for-device get-serialno
+  - cd ${TRAVIS_BUILD_DIR}
+  - chmod +x gradlew
+  - ./gradlew --version
+  - ./gradlew clean
+
+script:
+  - |
+    ./gradlew build assembleAndroidTest
+    retval=$?
+    if [ $retval -ne 0 ]; then
+      echo "error on assembling, exit code: "$retval
+      exit $retval
+    fi
+
+  - |
+    ./gradlew :app:installDebug :app:installDebugAndroidTest
+    retval=$?
+    if [ $retval -ne 0 ]; then
+      echo "error on install, exit code: "$retval
+      exit $retval
+    fi
