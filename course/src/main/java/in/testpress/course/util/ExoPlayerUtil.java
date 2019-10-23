@@ -29,21 +29,19 @@ import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.offline.DownloadHelper;
+import com.google.android.exoplayer2.offline.DownloadRequest;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
 import java.util.HashMap;
@@ -121,6 +119,7 @@ public class ExoPlayerUtil {
             }
         }
     };
+    private DataSource.Factory dataSourceFactory;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition) {
@@ -210,8 +209,7 @@ public class ExoPlayerUtil {
         errorMessageTextView.setVisibility(View.GONE);
         if (player == null) {
             progressBar.setVisibility(View.VISIBLE);
-            player = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(activity),
-                    new DefaultTrackSelector(), new DefaultLoadControl());
+            player = ExoPlayerFactory.newSimpleInstance(activity);
 
             player.addListener(new PlayerEventListener());
             playerView.setPlayer(player);
@@ -271,11 +269,20 @@ public class ExoPlayerUtil {
                 .addControlCategory(MediaControlIntent.CATEGORY_LIVE_VIDEO)
                 .build();
     }
+    private DataSource.Factory buildDataSourceFactory() {
+        return ((TestpressApplication) activity.getApplication()).buildDataSourceFactory();
+    }
 
     private MediaSource buildMediaSource(Uri uri) {
         String userAgent = UserAgentProvider.get(activity);
-        DataSource.Factory dataSourceFactory =
-                new DefaultHttpDataSourceFactory(userAgent);
+        dataSourceFactory = buildDataSourceFactory();
+        DownloadRequest downloadRequest =
+                ((TestpressApplication) activity.getApplication()).getDownloadTracker().getDownloadRequest(uri.buildUpon().clearQuery().build());
+
+        if (downloadRequest != null) {
+            return DownloadHelper.createMediaSource(downloadRequest, dataSourceFactory);
+        }
+
         int type = Util.inferContentType(uri);
         switch (type) {
             case C.TYPE_HLS:
@@ -372,15 +379,19 @@ public class ExoPlayerUtil {
             overlayText = profileDetails.getUsername();
         }
         emailIdTextView = exoPlayerMainFrame.findViewById(R.id.email_id);
-        emailIdTextView.setText(overlayText);
-        emailIdLayout = exoPlayerMainFrame.findViewById(R.id.email_id_layout);
-        overlayPositionHandler = new Handler();
-        startOverlayMarquee();
+        if (emailIdTextView != null) {
+            emailIdTextView.setText(overlayText);
+            emailIdLayout = exoPlayerMainFrame.findViewById(R.id.email_id_layout);
+            overlayPositionHandler = new Handler();
+            startOverlayMarquee();
+        }
     }
 
     private void startOverlayMarquee() {
         Animation marquee = AnimationUtils.loadAnimation(activity, R.anim.testpress_marquee);
-        emailIdLayout.startAnimation(marquee);
+        if (emailIdLayout != null) {
+            emailIdLayout.startAnimation(marquee);
+        }
     }
 
     private void displayOverlayText() {

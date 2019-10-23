@@ -34,7 +34,7 @@ ext {
     minSdkVersionForUITest = 18
     buildToolsVersion = '28.0.3'
     supportLib = '27.1.1'
-    exoPlayer = '2.8.2'
+    exoPlayer = '2.10.6'
     powermock = '1.7.4'
 
     junit = 'junit:junit:4.12'

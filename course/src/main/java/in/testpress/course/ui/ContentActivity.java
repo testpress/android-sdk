@@ -2,14 +2,18 @@ package in.testpress.course.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.RequiresApi;
 import com.google.android.material.snackbar.Snackbar;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,6 +33,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.RenderersFactory;
+import com.google.android.exoplayer2.offline.DownloadService;
 import com.google.gson.JsonObject;
 
 import junit.framework.Assert;
@@ -47,6 +54,8 @@ import in.testpress.core.TestpressSession;
 import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
 import in.testpress.course.network.TestpressCourseApiClient;
+import in.testpress.course.util.TestpressApplication;
+import in.testpress.course.util.DownloadTracker;
 import in.testpress.course.util.ExoPlayerUtil;
 import in.testpress.course.util.ExoplayerFullscreenHelper;
 import in.testpress.exam.TestpressExam;
@@ -164,6 +173,10 @@ public class ContentActivity extends BaseToolBarActivity {
     private RetrofitCall<Bookmark> bookmarkApiRequest;
     private RetrofitCall<Void> deleteBookmarkApiRequest;
     private RetrofitCall<HtmlContent> htmlContentApiRequest;
+    private DownloadTracker downloadTracker;
+    private HashMap<Uri, Integer> progressmap;
+    private boolean useExtensionRenderers;
+    private TestpressApplication application;
 
     public static Intent createIntent(int position, long chapterId, AppCompatActivity activity) {
         Intent intent = new Intent(activity, ContentActivity.class);
@@ -222,6 +235,20 @@ public class ContentActivity extends BaseToolBarActivity {
         bookmarkButtonLayout = findViewById(R.id.bookmark_button_layout);
         bookmarkButtonImage = findViewById(R.id.bookmark_button_image);
         bookmarkButtonText = findViewById(R.id.bookmark_text);
+
+
+
+        application = (TestpressApplication) getApplicationContext();
+        useExtensionRenderers = application.useExtensionRenderers();
+        downloadTracker = application.getDownloadTracker();
+
+        try {
+            DownloadService.start(this, DownloadService.class);
+        } catch (IllegalStateException e) {
+            DownloadService.startForeground(this, DownloadService.class);
+        }
+
+
         bookmarkButtonText.setTypeface(TestpressSdk.getRubikRegularFont(this));
         bookmarkButtonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -385,6 +412,41 @@ public class ContentActivity extends BaseToolBarActivity {
         }
     }
 
+    private void updateDownloadProgress(HashMap progressmap, String state) {
+        Uri uri = Uri.parse(content.getVideo().getUrl()).buildUpon().clearQuery().build();
+        Integer percentage = (Integer) progressmap.get(uri);
+        if (percentage != null) {
+            startButton.setText(String.format("Downloading %s%%", percentage));
+            startButton.setBackground(getResources().getDrawable(R.drawable.testpress_green_curved_edge_background));
+        }
+        checkIfDownloaded();
+    }
+
+    private void checkIfDownloaded() {
+        Uri uri = Uri.parse(content.getVideo().getUrl()).buildUpon().clearQuery().build();
+        int percentage = (int) downloadTracker.getDownloadPercentage(uri);
+
+        if (percentage == 100) {
+            startButton.setText("Delete Download");
+            startButton.setBackground(getResources().getDrawable(R.drawable.testpress_red_curved_edge_background));
+        }
+
+        if (downloadTracker.isRemoved(uri)) {
+            startButton.setText("Download");
+            startButton.setBackground(getResources().getDrawable(R.drawable.testpress_green_curved_edge_background));
+        }
+    }
+
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+        progressmap = (HashMap<Uri, Integer>)intent.getSerializableExtra("progressmap");
+        String state = intent.getStringExtra("state");
+        updateDownloadProgress(progressmap, state);
+        }
+    };
+
     private void loadContentHtml() {
         setContentTitle(Html.fromHtml(content.getHtmlContentTitle()));
         HtmlContent htmlContent = fetchHtmlContentFromDB();
@@ -451,7 +513,37 @@ public class ContentActivity extends BaseToolBarActivity {
         }
     }
 
+    private void downloadButtonClicked(Uri videoUrl) {
+        RenderersFactory renderersFactory = new DefaultRenderersFactory(this);
+        downloadTracker.toggleDownload(
+                getSupportFragmentManager(),
+                content.getVideo().getTitle(),
+                videoUrl,
+                null,
+                renderersFactory);
+    }
+
+
     private void initExoPlayer(String videoUrl) {
+        final Uri uri = Uri.parse(videoUrl);
+        boolean isDownloaded = downloadTracker.isDownloaded(uri);
+        startButton.setVisibility(View.VISIBLE);
+        startButton.setBackground(getResources().getDrawable(R.drawable.testpress_green_curved_edge_background));
+
+        if (isDownloaded) {
+            startButton.setText("Delete Download");
+            startButton.setBackground(getResources().getDrawable(R.drawable.testpress_red_curved_edge_background));
+        } else {
+            startButton.setText("Download");
+        }
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                downloadButtonClicked(uri);
+            }
+        });
+
+
         if (exoplayerFullscreenHelper == null) {
             exoplayerFullscreenHelper = new ExoplayerFullscreenHelper(this);
             exoplayerFullscreenHelper.initializeOrientationListener();
@@ -1144,6 +1236,8 @@ public class ContentActivity extends BaseToolBarActivity {
     @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
     public void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(
+                mMessageReceiver);
         super.onPause();
         webView.onPause();
         toast.cancel();
@@ -1155,6 +1249,7 @@ public class ContentActivity extends BaseToolBarActivity {
     @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
     public void onResume() {
+        registerReceiver(mMessageReceiver, new IntentFilter("custom-event-name"));
         super.onResume();
         webView.onResume();
         if (exoPlayerUtil != null) {
