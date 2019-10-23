@@ -1,16 +1,29 @@
 package in.testpress.course.util;
 
+import android.net.Uri;
+
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.MockitoAnnotations;
+import org.powermock.reflect.Whitebox;
+import org.robolectric.RobolectricTestRunner;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
+import in.testpress.exam.ui.AttemptsActivity;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.Video;
 import in.testpress.models.greendao.VideoAttempt;
+import in.testpress.util.UserAgentProvider;
 
 import static in.testpress.course.network.TestpressCourseApiClient.LAST_POSITION;
 import static in.testpress.course.network.TestpressCourseApiClient.TIME_RANGES;
@@ -22,7 +35,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(RobolectricTestRunner.class)
 public class ExoPlayerUtilTest {
 
     private static final float TEST_START_POSITION = 111.111f;
@@ -33,6 +46,17 @@ public class ExoPlayerUtilTest {
 
     @Mock
     private Content content;
+
+    @Before
+    public void setUpMockito() {
+        MockitoAnnotations.initMocks(this);
+    }
+
+
+    @After
+    public void tearDownMockito() {
+        Mockito.validateMockitoUsage();
+    }
 
     @Test
     public void testExoPlayerUtil_getVideoAttemptParameters_returnCorrectValue() {
@@ -99,6 +123,29 @@ public class ExoPlayerUtilTest {
         assertThat("videoWatchedPercentage needs to be valid",
                 content.getVideoWatchedPercentage(),
                 is(watchedPercentage));
+    }
+
+    public void setUserAgent() throws Exception{
+        Field reader = UserAgentProvider.class.getDeclaredField("userAgent");
+        reader.setAccessible(true);
+        reader.set(UserAgentProvider.class, "exoplayer");
+    }
+
+    @Test
+    public void testbuildMediaSource() throws Exception {
+        setUserAgent();
+        Uri uri = Uri.parse("https://gooogle.com/video.mp4");
+        MediaSource mediaSource = Whitebox.invokeMethod(exoPlayerUtilMocked,
+                "buildMediaSource", uri);
+
+        assert mediaSource instanceof ExtractorMediaSource;
+
+        uri = Uri.parse("https://gooogle.com/video.m3u8");
+        mediaSource = Whitebox.invokeMethod(exoPlayerUtilMocked,
+                "buildMediaSource", uri);
+
+        assert mediaSource instanceof HlsMediaSource;
+
     }
 
 }

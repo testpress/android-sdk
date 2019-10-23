@@ -18,44 +18,44 @@
             android:layout_gravity="center_horizontal"
             android:gravity="center">
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 style="@style/Button"
                 android:layout_marginTop="10dp"
                 android:text="Start Exam"
                 android:id="@+id/start_exam" />
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 style="@style/Button"
                 android:layout_width="wrap_content"
                 android:text="Attempt State"
                 android:id="@+id/attempt_state" />
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 style="@style/Button"
                 android:text="Exams List"
                 android:id="@+id/exam_list" />
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 style="@style/Button"
                 android:text="Categories"
                 android:id="@+id/categories" />
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 style="@style/Button"
                 android:text="Access Code"
                 android:id="@+id/access_code" />
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 style="@style/Button"
                 android:text="Bookmarks"
                 android:id="@+id/bookmarks" />
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 style="@style/Button"
                 android:text="Fragment"
                 android:id="@+id/fragment_button" />
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 style="@style/Button"
                 android:text="Login Activity"
                 android:id="@+id/login_activity_button" />

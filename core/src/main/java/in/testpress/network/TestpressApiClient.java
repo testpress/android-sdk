@@ -3,9 +3,8 @@ package in.testpress.network;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Looper;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.os.Handler;
-import android.os.Looper;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -26,7 +25,6 @@ import in.testpress.models.AccountActivity;
 import in.testpress.models.FileDetails;
 import in.testpress.models.ProfileDetails;
 import in.testpress.models.TestpressApiResponse;
-import in.testpress.models.greendao.AttemptSection;
 import in.testpress.ui.UserDevicesActivity;
 import in.testpress.util.UIUtils;
 import in.testpress.util.UserAgentProvider;

@@ -9,13 +9,13 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Handler;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.StringRes;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.media.MediaControlIntent;
-import android.support.v7.media.MediaRouteSelector;
-import android.support.v7.media.MediaRouter;
-import android.support.v7.media.MediaRouter.RouteInfo;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
+import androidx.mediarouter.media.MediaControlIntent;
+import androidx.mediarouter.media.MediaRouteSelector;
+import androidx.mediarouter.media.MediaRouter;
+import androidx.mediarouter.media.MediaRouter.RouteInfo;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -28,6 +28,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -38,8 +39,10 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
@@ -61,7 +64,7 @@ import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
 import in.testpress.util.UserAgentProvider;
 
-import static android.support.v7.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
+import static androidx.mediarouter.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 import static in.testpress.course.network.TestpressCourseApiClient.LAST_POSITION;
@@ -271,8 +274,17 @@ public class ExoPlayerUtil {
 
     private MediaSource buildMediaSource(Uri uri) {
         String userAgent = UserAgentProvider.get(activity);
-        return new ExtractorMediaSource.Factory(new DefaultHttpDataSourceFactory(userAgent))
-                .createMediaSource(uri);
+        DataSource.Factory dataSourceFactory =
+                new DefaultHttpDataSourceFactory(userAgent);
+        int type = Util.inferContentType(uri);
+        switch (type) {
+            case C.TYPE_HLS:
+                return new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+            case C.TYPE_OTHER:
+                return new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+            default:
+                throw new IllegalStateException("Unsupported type: " + type);
+        }
     }
 
     public float getCurrentPosition() {

@@ -2,11 +2,11 @@ package in.testpress.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.SwipeRefreshLayout;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -143,7 +143,7 @@ public abstract class BaseListViewFragment<E> extends Fragment
         if(!listShown) {
             // Show loading progress
             TypedValue typed_value = new TypedValue();
-            getActivity().getTheme().resolveAttribute(android.support.v7.appcompat.R.attr.actionBarSize, typed_value, true);
+            getActivity().getTheme().resolveAttribute(androidx.appcompat.R.attr.actionBarSize, typed_value, true);
             swipeRefreshLayout.setProgressViewOffset(false, 0, getResources().getDimensionPixelSize(typed_value.resourceId));
             if (isItemsEmpty()) {
                 swipeRefreshLayout.setRefreshing(true);

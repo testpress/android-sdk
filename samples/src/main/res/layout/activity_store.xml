@@ -14,18 +14,18 @@
         android:layout_gravity="center_horizontal"
         android:gravity="center">
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
             android:layout_marginTop="10dp"
             android:text="New Activity"
             android:id="@+id/new_activity_button" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
             android:text="Show Product"
             android:id="@+id/show_product" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
             android:text="Fragment"
             android:id="@+id/fragment_button" />

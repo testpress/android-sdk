@@ -9,14 +9,14 @@
 
     <include layout="@layout/testpress_toolbar" />
 
-    <android.support.v4.widget.SwipeRefreshLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/button_layout"
         android:layout_below="@+id/appbar">
 
-        <android.support.v4.widget.NestedScrollView
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true"
@@ -134,7 +134,7 @@
                         android:id="@+id/exam_details_layout"
                         layout="@layout/testpress_exam_details_layout" />
 
-                    <android.support.v7.widget.RecyclerView
+                    <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/attempt_list"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
@@ -178,7 +178,7 @@
                         android:layout_marginLeft="3dp"
                         android:text="Content description goes here"/>
 
-                    <android.support.v7.widget.AppCompatButton
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/download_attachment"
                         android:layout_gravity="center"
                         style="@style/TestpressSmallButton"
@@ -199,7 +199,7 @@
                     android:layout_weight="1"
                     android:layout_height="0dp"/>
 
-                <android.support.v7.widget.AppCompatButton
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/start_exam"
                     android:background="@drawable/testpress_green_curved_edge_background"
                     android:text="@string/testpress_start"
@@ -214,9 +214,9 @@
                     android:layout_marginTop="20dp" />
 
             </LinearLayout>
-        </android.support.v4.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <include layout="@layout/testpress_empty_view"
         android:layout_above="@+id/button_layout"

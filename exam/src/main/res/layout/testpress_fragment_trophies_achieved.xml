@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/testpress_trophy"/>
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/okay_button"
             android:layout_alignParentBottom="true"
             android:background="@drawable/testpress_green_curved_edge_background"

@@ -13,28 +13,28 @@
         android:layout_gravity="center"
         android:gravity="center">
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
             android:layout_marginTop="10dp"
             android:text="Core"
             android:id="@+id/core" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
             android:text="Exam"
             android:id="@+id/exam" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
             android:text="Course"
             android:id="@+id/course" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
             android:text="Analytics"
             android:id="@+id/analytics" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
             android:text="Store"
             android:id="@+id/store" />

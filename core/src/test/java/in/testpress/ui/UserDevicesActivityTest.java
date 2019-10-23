@@ -1,6 +1,6 @@
 package in.testpress.ui;
 
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.widget.TextView;
 
 import androidx.test.core.app.ApplicationProvider;

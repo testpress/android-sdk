@@ -8,7 +8,7 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionName VERSION_NAME
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -19,6 +19,9 @@ android {
     lintOptions {
         abortOnError false
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -27,6 +30,7 @@ dependencies {
     api rootProject.design
     api 'com.google.android.exoplayer:exoplayer-core:' + rootProject.exoPlayer
     api 'com.google.android.exoplayer:exoplayer-ui:' + rootProject.exoPlayer
+    api 'com.google.android.exoplayer:exoplayer-hls:' + rootProject.exoPlayer
     api rootProject.constraintLayout
     api rootProject.mediarouter
     testImplementation rootProject.junit

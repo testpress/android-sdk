@@ -3,9 +3,9 @@ package in.testpress.exam;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;

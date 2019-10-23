@@ -35,7 +35,7 @@
         android:text="@string/testpress_no_internet_try_again"
         android:gravity="center"/>
 
-    <android.support.v7.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatButton
         style="@style/TestpressSmallButton"
         android:text="@string/testpress_tap_to_retry"
         android:id="@+id/retry_button"

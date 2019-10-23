@@ -14,7 +14,7 @@
         android:layout_marginLeft="15dp"
         />
 
-    <android.support.v7.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/add_folder"
         android:background="@drawable/testpress_green_stroke"
         android:text="@string/testpress_add_folder"
