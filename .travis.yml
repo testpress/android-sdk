@@ -55,30 +55,10 @@ cache:
 
 # Emulator Management: Create, Start and Wait
 before_script:
-  - echo "y" | android update sdk -a --no-ui --filter android-$EMULATOR_API_LEVEL
-  - echo "y" | android update sdk -a --no-ui --filter sys-img-armeabi-v7a-android-$EMULATOR_API_LEVEL
-  - android list targets | grep -E '^id:' | awk -F '"' '{$1=""; print $2}' # list all targets
-  - echo no | android create avd --force -n test -t android-$EMULATOR_API_LEVEL --abi $ANDROID_ABI --tag $ANDROID_TAG
-  - emulator -avd test -no-skin -no-window &
+  - echo no | android create avd --force -n test -t "android-"$EMULATOR_API_LEVEL --abi $ANDROID_ABI --tag $ANDROID_TAG
+  - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
-  - adb wait-for-device get-serialno
-  - cd ${TRAVIS_BUILD_DIR}
-  - chmod +x gradlew
-  - ./gradlew --version
-  - ./gradlew clean
-  - adb -e logcat *:W | tee logcat.log > /dev/null 2>&1 &
-
-after_failure:
-  # - echo 'FAILURE'
-  # Check apt configuration: http://docs.travis-ci.com/user/ci-environment/#apt-configuration
-  # Comment out the lines below to show log about tests with app name customized on exports section.
-  - sudo apt-get install -qq lynx
-  - export MOD_NAME=testpress/android-sdk/core
-  - export LOG_DIR=${TRAVIS_BUILD_DIR}/${MOD_NAME}/build/outputs/reports/androidTests/connected/
-  - lynx --dump ${LOG_DIR}com.android.builder.testing.ConnectedDevice.html > myConnectedDevice.log
-  - lynx --dump ${LOG_DIR}com.android.builder.testing.html > myTesting.log
-  - for file in *.log; do echo "$file"; echo "====================="; cat "$file"; done || true
 
 script:
-  - ./gradlew build connectedCheck --stacktrace
+  - ./gradlew test
