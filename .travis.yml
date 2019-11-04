@@ -70,4 +70,4 @@ before_script:
 
 
 script:
-  - ./gradlew build connectedCheck --stacktrace --debug
+  - ./gradlew build connectedCheck --stacktrace
