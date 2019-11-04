@@ -2,7 +2,7 @@ language: android
 jdk: oraclejdk8
 
 sudo: required
-dist: bionic
+dist: xenial
 
 env:
   global:
