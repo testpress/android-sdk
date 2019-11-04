@@ -43,6 +43,16 @@ android:
     # White list all the licenses.
     - '.+'
 
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
+
 # Emulator Management: Create, Start and Wait
 before_script:
   - echo "y" | android update sdk -a --no-ui --filter android-$EMULATOR_API_LEVEL
@@ -60,12 +70,4 @@ before_script:
 
 
 script:
-  - |
-    ./gradlew installDebug installDebugAndroidTest
-    retval=$?
-    if [ $retval -ne 0 ]; then
-      echo "error on install, exit code: "$retval
-      exit $retval
-    fi
-
-  - ./gradlew build connectedCheck
+  - ./gradlew build connectedCheck --stacktrace --debug
