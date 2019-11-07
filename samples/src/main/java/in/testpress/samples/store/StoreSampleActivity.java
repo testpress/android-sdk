@@ -9,12 +9,12 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
-import in.testpress.samples.core.TestpressCoreSampleActivity;
+import in.testpress.samples.core.LoginActivity;
 import in.testpress.store.TestpressStore;
 import in.testpress.util.Assert;
 import in.testpress.util.ViewUtils;
 
-import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
+import static in.testpress.samples.core.LoginActivity.AUTHENTICATE_REQUEST_CODE;
 import static in.testpress.store.TestpressStore.CONTINUE_PURCHASE;
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 
@@ -69,7 +69,7 @@ public class StoreSampleActivity extends BaseToolBarActivity {
                     break;
             }
         } else {
-            Intent intent = new Intent(this, TestpressCoreSampleActivity.class);
+            Intent intent = new Intent(this, LoginActivity.class);
             startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
         }
     }

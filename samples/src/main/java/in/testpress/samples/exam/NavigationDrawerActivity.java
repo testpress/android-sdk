@@ -8,9 +8,9 @@ import in.testpress.core.TestpressSession;
 import in.testpress.exam.TestpressExam;
 import in.testpress.samples.BaseNavigationDrawerActivity;
 import in.testpress.samples.R;
-import in.testpress.samples.core.TestpressCoreSampleActivity;
+import in.testpress.samples.core.LoginActivity;
 
-import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
+import static in.testpress.samples.core.LoginActivity.AUTHENTICATE_REQUEST_CODE;
 
 public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
 
@@ -50,7 +50,7 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
             }
         } else {
             Intent intent = new Intent(NavigationDrawerActivity.this,
-                    TestpressCoreSampleActivity.class);
+                    LoginActivity.class);
             startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
         }
     }

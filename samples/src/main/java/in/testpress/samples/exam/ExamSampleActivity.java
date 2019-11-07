@@ -11,12 +11,11 @@ import in.testpress.core.TestpressSession;
 import in.testpress.exam.TestpressExam;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
-import in.testpress.samples.core.TestpressCoreSampleActivity;
-import in.testpress.ui.UserDevicesActivity;
+import in.testpress.samples.core.LoginActivity;
 import in.testpress.util.ViewUtils;
 
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
-import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
+import static in.testpress.samples.core.LoginActivity.AUTHENTICATE_REQUEST_CODE;
 
 public class ExamSampleActivity extends BaseToolBarActivity {
 
@@ -65,12 +64,6 @@ public class ExamSampleActivity extends BaseToolBarActivity {
                 showSDK(view.getId());
             }
         });
-        findViewById(R.id.login_activity_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showSDK(view.getId());
-            }
-        });
         findViewById(R.id.fragment_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -107,16 +100,12 @@ public class ExamSampleActivity extends BaseToolBarActivity {
                 case R.id.bookmarks:
                     TestpressExam.showBookmarks(this, session);
                     break;
-                case R.id.login_activity_button:
-                    Intent intent = new Intent(this, UserDevicesActivity.class);
-                    this.startActivity(intent);
-                    break;
                 default:
                     TestpressExam.showCategories(this, false, session);
                     break;
             }
         } else {
-            Intent intent = new Intent(this, TestpressCoreSampleActivity.class);
+            Intent intent = new Intent(this, LoginActivity.class);
             startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
         }
     }

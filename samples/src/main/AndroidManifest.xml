@@ -22,10 +22,14 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".core.TestpressCoreSampleActivity"
+        <activity android:name=".core.LoginActivity"
             android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation|keyboard|screenSize"
-            android:label="Testpress Core Example" />
+            android:label="Login Activity" />
+
+        <activity android:name=".core.CoreSampleActivity"
+            android:configChanges="orientation|keyboard|screenSize"
+            android:label="Core Sample Activity" />
 
         <activity android:name=".exam.ExamSampleActivity"
             android:configChanges="orientation|keyboard|screenSize"

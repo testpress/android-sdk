@@ -4,19 +4,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
-import android.view.WindowManager;
-
-import com.facebook.FacebookSdk;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.network.TestpressExamApiClient;
-import in.testpress.samples.core.TestpressCoreSampleActivity;
+import in.testpress.samples.core.CoreSampleActivity;
+import in.testpress.samples.core.LoginActivity;
 import in.testpress.samples.exam.ExamSampleActivity;
 import in.testpress.samples.course.CourseSampleActivity;
 import in.testpress.samples.store.StoreSampleActivity;
 
-import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
+import static in.testpress.samples.core.LoginActivity.AUTHENTICATE_REQUEST_CODE;
 
 public class MainActivity extends BaseToolBarActivity {
 
@@ -27,7 +25,7 @@ public class MainActivity extends BaseToolBarActivity {
         findViewById(R.id.core).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, TestpressCoreSampleActivity.class);
+                Intent intent = new Intent(MainActivity.this, CoreSampleActivity.class);
                 startActivity(intent);
             }
         });
@@ -69,7 +67,7 @@ public class MainActivity extends BaseToolBarActivity {
                     TestpressSdk.getTestpressSession(MainActivity.this)
             );
         } else {
-            Intent intent = new Intent(MainActivity.this, TestpressCoreSampleActivity.class);
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
         }
     }
