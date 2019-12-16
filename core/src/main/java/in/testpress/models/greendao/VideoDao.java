@@ -30,6 +30,8 @@ public class VideoDao extends AbstractDao<Video, Long> {
         public final static Property IsDomainRestricted = new Property(5, Boolean.class, "isDomainRestricted", false, "IS_DOMAIN_RESTRICTED");
     }
 
+    private DaoSession daoSession;
+
 
     public VideoDao(DaoConfig config) {
         super(config);
@@ -37,6 +39,7 @@ public class VideoDao extends AbstractDao<Video, Long> {
     
     public VideoDao(DaoConfig config, DaoSession daoSession) {
         super(config, daoSession);
+        this.daoSession = daoSession;
     }
 
     /** Creates the underlying database table. */
@@ -125,6 +128,12 @@ public class VideoDao extends AbstractDao<Video, Long> {
         if (isDomainRestricted != null) {
             stmt.bindLong(6, isDomainRestricted ? 1L: 0L);
         }
+    }
+
+    @Override
+    protected final void attachEntity(Video entity) {
+        super.attachEntity(entity);
+        entity.__setDaoSession(daoSession);
     }
 
     @Override

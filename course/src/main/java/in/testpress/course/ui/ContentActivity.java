@@ -370,9 +370,9 @@ public class ContentActivity extends BaseToolBarActivity {
                 isNonEmbeddableVideo = true;
                 TestpressSession session = TestpressSdk.getTestpressSession(this);
                 if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
-                    checkProfileDetailExist(video.getUrl());
+                    checkProfileDetailExist(video.getHlsUrl());
                 } else {
-                    initExoPlayer(video.getUrl());
+                    initExoPlayer(video.getHlsUrl());
                 }
             }
         } else if (content.getRawExam() != null) {
@@ -791,7 +791,7 @@ public class ContentActivity extends BaseToolBarActivity {
                         if (content.getRawVideo() != null && isNonEmbeddableVideo) {
                             swipeRefresh.setRefreshing(false);
                             videoAttempt = courseAttempt.getRawVideoAttempt();
-                            initExoPlayer(content.getRawVideo().getUrl());
+                            initExoPlayer(content.getRawVideo().getHlsUrl());
                         }
                     }
 

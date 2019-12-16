@@ -19,6 +19,7 @@ import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.HtmlContent;
 import in.testpress.models.greendao.Video;
+import in.testpress.models.greendao.Stream;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Language;
@@ -46,6 +47,7 @@ import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.HtmlContentDao;
 import in.testpress.models.greendao.VideoDao;
+import in.testpress.models.greendao.StreamDao;
 import in.testpress.models.greendao.AttachmentDao;
 import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.LanguageDao;
@@ -82,6 +84,7 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig chapterDaoConfig;
     private final DaoConfig htmlContentDaoConfig;
     private final DaoConfig videoDaoConfig;
+    private final DaoConfig streamDaoConfig;
     private final DaoConfig attachmentDaoConfig;
     private final DaoConfig examDaoConfig;
     private final DaoConfig languageDaoConfig;
@@ -109,6 +112,7 @@ public class DaoSession extends AbstractDaoSession {
     private final ChapterDao chapterDao;
     private final HtmlContentDao htmlContentDao;
     private final VideoDao videoDao;
+    private final StreamDao streamDao;
     private final AttachmentDao attachmentDao;
     private final ExamDao examDao;
     private final LanguageDao languageDao;
@@ -161,6 +165,9 @@ public class DaoSession extends AbstractDaoSession {
 
         videoDaoConfig = daoConfigMap.get(VideoDao.class).clone();
         videoDaoConfig.initIdentityScope(type);
+
+        streamDaoConfig = daoConfigMap.get(StreamDao.class).clone();
+        streamDaoConfig.initIdentityScope(type);
 
         attachmentDaoConfig = daoConfigMap.get(AttachmentDao.class).clone();
         attachmentDaoConfig.initIdentityScope(type);
@@ -218,6 +225,7 @@ public class DaoSession extends AbstractDaoSession {
         chapterDao = new ChapterDao(chapterDaoConfig, this);
         htmlContentDao = new HtmlContentDao(htmlContentDaoConfig, this);
         videoDao = new VideoDao(videoDaoConfig, this);
+        streamDao = new StreamDao(streamDaoConfig, this);
         attachmentDao = new AttachmentDao(attachmentDaoConfig, this);
         examDao = new ExamDao(examDaoConfig, this);
         languageDao = new LanguageDao(languageDaoConfig, this);
@@ -245,6 +253,7 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(Chapter.class, chapterDao);
         registerDao(HtmlContent.class, htmlContentDao);
         registerDao(Video.class, videoDao);
+        registerDao(Stream.class, streamDao);
         registerDao(Attachment.class, attachmentDao);
         registerDao(Exam.class, examDao);
         registerDao(Language.class, languageDao);
@@ -274,6 +283,7 @@ public class DaoSession extends AbstractDaoSession {
         chapterDaoConfig.clearIdentityScope();
         htmlContentDaoConfig.clearIdentityScope();
         videoDaoConfig.clearIdentityScope();
+        streamDaoConfig.clearIdentityScope();
         attachmentDaoConfig.clearIdentityScope();
         examDaoConfig.clearIdentityScope();
         languageDaoConfig.clearIdentityScope();
@@ -333,6 +343,10 @@ public class DaoSession extends AbstractDaoSession {
 
     public VideoDao getVideoDao() {
         return videoDao;
+    }
+
+    public StreamDao getStreamDao() {
+        return streamDao;
     }
 
     public AttachmentDao getAttachmentDao() {

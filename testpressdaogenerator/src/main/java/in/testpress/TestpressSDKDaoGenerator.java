@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 21;
+    private static final int VERSION = 22;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -31,12 +31,14 @@ public class TestpressSDKDaoGenerator {
 
         Entity html = addHtmlContent(schema);
         Entity video = addVideo(schema);
+        Entity stream = addStream(schema);
         Entity attachment = addAttachment(schema);
         Entity exam = addExam(schema);
         addLanguage(schema, exam);
         Entity content = addContent(schema);
         addHTMLToContent(content, html);
         addVideoToContent(content, video);
+        addStreamToVideo(stream, video);
         addAttachmentToContent(content, attachment);
         addExamToContent(content, exam);
 
@@ -427,6 +429,15 @@ public class TestpressSDKDaoGenerator {
         return reviewQuestionTranslation;
     }
 
+
+    private static Entity addStream(Schema schema) {
+        Entity stream = schema.addEntity("Stream");
+        stream.addIdProperty().autoincrement();
+        stream.addStringProperty("format");
+        stream.addStringProperty("url");
+        return stream;
+    }
+
     private static Entity addReviewAnswer(Schema schema) {
         Entity reviewAnswer = schema.addEntity("ReviewAnswer");
         reviewAnswer.addLongProperty("id").primaryKey();
@@ -443,6 +454,12 @@ public class TestpressSDKDaoGenerator {
         reviewAnswerTranslation.addBooleanProperty("isCorrect");
         reviewAnswerTranslation.addStringProperty("marks");
         return reviewAnswerTranslation;
+    }
+
+    private static void addStreamToVideo(Entity stream, Entity video) {
+        Property streamId = stream.addLongProperty("videoId").getProperty();
+        ToMany streamsToVideo = video.addToMany(stream, streamId);
+        streamsToVideo.setName("streams");
     }
 
     private static void addAttemptToReviewItem(Entity reviewAttempt, Entity reviewItem) {
