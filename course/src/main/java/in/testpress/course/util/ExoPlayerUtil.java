@@ -236,6 +236,7 @@ public class ExoPlayerUtil {
             @Override
             public void onClick(View v) {
                 MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
+
                 if (mappedTrackInfo != null) {
                     int rendererIndex = C.TRACK_TYPE_DEFAULT;
                     int rendererType = mappedTrackInfo.getRendererType(rendererIndex);
@@ -248,8 +249,12 @@ public class ExoPlayerUtil {
                     Pair<AlertDialog, TrackSelectionView> dialogPair =
                             TrackSelectionView.getDialog(activity, "Quality", trackSelector, rendererIndex);
                     Window window = dialogPair.first.getWindow();
-                    window.setBackgroundDrawable(new ColorDrawable(Color.DKGRAY));
-                    window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+                    if (window != null) {
+                        window.setBackgroundDrawable(new ColorDrawable(Color.DKGRAY));
+                        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                    }
+
                     dialogPair.second.setShowDisableOption(false);
                     dialogPair.second.setAllowAdaptiveSelections(allowAdaptiveSelections);
                     dialogPair.first.show();
