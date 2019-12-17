@@ -109,6 +109,24 @@
                 />
 
         </FrameLayout>
+        <FrameLayout
+            android:id="@+id/exo_resolution_button"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginLeft="3dp"
+            android:layout_gravity="right"
+            >
+            <ImageView
+                android:id="@+id/exo_resolution"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:tint="@android:color/white"
+                android:src="@drawable/ic_edit"
+                />
+        </FrameLayout>
 
     </LinearLayout>
 
