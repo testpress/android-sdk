@@ -1,12 +1,15 @@
 package in.testpress.course.util;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.DrawableRes;
@@ -16,8 +19,12 @@ import android.support.v7.media.MediaControlIntent;
 import android.support.v7.media.MediaRouteSelector;
 import android.support.v7.media.MediaRouter;
 import android.support.v7.media.MediaRouter.RouteInfo;
+import android.util.Log;
+import android.util.Pair;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -39,10 +46,19 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroup;
+import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.ui.TrackSelectionView;
+import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
@@ -121,6 +137,7 @@ public class ExoPlayerUtil {
             }
         }
     };
+    private DefaultTrackSelector trackSelector;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition) {
@@ -170,7 +187,14 @@ public class ExoPlayerUtil {
                 initializePlayer();
             }
         });
+        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+
+        TrackSelection.Factory videoTrackSelectionFactory =
+                new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        trackSelector =
+                new DefaultTrackSelector(videoTrackSelectionFactory);
         initFullscreenDialog();
+        initResolutionSelector();
 
         // set activity as portrait mode at first
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -206,12 +230,45 @@ public class ExoPlayerUtil {
         });
     }
 
+    private void initResolutionSelector() {
+        FrameLayout resolutionButton = playerView.findViewById(R.id.exo_resolution_button);
+        resolutionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
+
+                if (mappedTrackInfo != null) {
+                    int rendererIndex = C.TRACK_TYPE_DEFAULT;
+                    int rendererType = mappedTrackInfo.getRendererType(rendererIndex);
+                    boolean allowAdaptiveSelections =
+                            rendererType == C.TRACK_TYPE_DEFAULT
+                                    || (rendererType == C.TRACK_TYPE_AUDIO
+                                    && mappedTrackInfo.getTypeSupport(C.TRACK_TYPE_VIDEO)
+                                    == MappingTrackSelector.MappedTrackInfo.RENDERER_SUPPORT_NO_TRACKS);
+
+                    Pair<AlertDialog, TrackSelectionView> dialogPair =
+                            TrackSelectionView.getDialog(activity, "Quality", trackSelector, rendererIndex);
+                    Window window = dialogPair.first.getWindow();
+
+                    if (window != null) {
+                        window.setBackgroundDrawable(new ColorDrawable(Color.DKGRAY));
+                        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                    }
+
+                    dialogPair.second.setShowDisableOption(false);
+                    dialogPair.second.setAllowAdaptiveSelections(allowAdaptiveSelections);
+                    dialogPair.first.show();
+                }
+            }
+        });
+    }
+
     public void initializePlayer() {
         errorMessageTextView.setVisibility(View.GONE);
         if (player == null) {
             progressBar.setVisibility(View.VISIBLE);
             player = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(activity),
-                    new DefaultTrackSelector(), new DefaultLoadControl());
+                    trackSelector, new DefaultLoadControl());
 
             player.addListener(new PlayerEventListener());
             playerView.setPlayer(player);
@@ -233,6 +290,8 @@ public class ExoPlayerUtil {
             mediaRouter.addCallback(mediaRouteSelector, mediaRouterCallback,
                     MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
         }
+
+        Log.d("ExoplayerUtil", "onClick: resolution button clicked " + trackSelector.getCurrentMappedTrackInfo());
     }
 
     public void releasePlayer() {
