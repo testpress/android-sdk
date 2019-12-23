@@ -1,13 +1,12 @@
 package in.testpress.course.network;
 
-import java.io.IOException;
 import java.text.ParseException;
 
-import in.testpress.models.greendao.Chapter;
 import in.testpress.models.TestpressApiResponse;
+import in.testpress.models.greendao.Chapter;
 import in.testpress.network.BaseDatabaseModelPager;
+import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
-import retrofit2.Response;
 
 import static in.testpress.network.TestpressApiClient.PARENT;
 
@@ -28,18 +27,34 @@ public class ChapterPager extends BaseDatabaseModelPager<Chapter> {
         this.apiClient = apiClient;
     }
 
+    public ChapterPager() {
+        super();
+    }
+
+    public void setApiClient(TestpressCourseApiClient api) {
+        this.apiClient = api;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
     @Override
     protected Object getId(Chapter resource) {
         return resource.getId();
     }
 
     @Override
-    public Response<TestpressApiResponse<Chapter>> getItems(int page, int size) throws IOException {
+    public RetrofitCall<TestpressApiResponse<Chapter>> getItems(int page, int size) {
         queryParams.put(TestpressApiClient.PAGE, page);
         if (parentId != null) {
             queryParams.put(PARENT, parentId);
         }
-        return apiClient.getChapters(courseId, queryParams, latestModifiedDate).execute();
+        return apiClient.getChapters(courseId, queryParams, latestModifiedDate);
     }
 
     @Override

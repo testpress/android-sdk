@@ -3,7 +3,6 @@ package in.testpress.exam.network;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,11 +27,11 @@ import in.testpress.models.greendao.ReviewQuestion;
 import in.testpress.models.greendao.ReviewQuestionTranslation;
 import in.testpress.models.greendao.Subject;
 import in.testpress.models.greendao.Video;
+import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
 import in.testpress.v2_4.BaseResourcePager;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.BookmarksListResponse;
-import retrofit2.Response;
 
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 import static in.testpress.network.TestpressApiClient.FOLDER;
@@ -81,9 +80,7 @@ public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Boo
     }
 
     @Override
-    public Response<ApiResponse<BookmarksListResponse>> getResponse(int page, int size)
-            throws IOException {
-
+    public RetrofitCall<ApiResponse<BookmarksListResponse>> getResponse(int page, int size) {
         queryParams.put(TestpressApiClient.ORDER, "-created");
         if (folder == null || folder.isEmpty()) {
             queryParams.remove(FOLDER);
@@ -93,7 +90,7 @@ public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Boo
             queryParams.put(FOLDER, folder);
         }
         queryParams.put(TestpressApiClient.PAGE, page);
-        return apiClient.getBookmarks(queryParams).execute();
+        return apiClient.getBookmarks(queryParams);
     }
 
     @Override

@@ -1,12 +1,11 @@
 package in.testpress.course.network;
 
-import java.io.IOException;
 import java.text.ParseException;
 
-import in.testpress.models.greendao.Course;
 import in.testpress.models.TestpressApiResponse;
+import in.testpress.models.greendao.Course;
 import in.testpress.network.BaseDatabaseModelPager;
-import retrofit2.Response;
+import in.testpress.network.RetrofitCall;
 
 public class CoursePager extends BaseDatabaseModelPager<Course> {
 
@@ -17,15 +16,21 @@ public class CoursePager extends BaseDatabaseModelPager<Course> {
         this.apiClient = apiClient;
     }
 
+    public CoursePager() {}
+
+    public void setApiClient(TestpressCourseApiClient apiClient) {
+        this.apiClient = apiClient;
+    }
+
     @Override
     protected Object getId(Course resource) {
         return resource.getId();
     }
 
     @Override
-    public Response<TestpressApiResponse<Course>> getItems(int page, int size) throws IOException {
+    public RetrofitCall<TestpressApiResponse<Course>> getItems(int page, int size) {
         queryParams.put(TestpressCourseApiClient.PAGE, page);
-        return apiClient.getCourses(queryParams, latestModifiedDate).execute();
+        return apiClient.getCourses(queryParams, latestModifiedDate);
     }
 
     @Override
