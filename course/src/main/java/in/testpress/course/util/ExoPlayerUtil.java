@@ -520,9 +520,11 @@ public class ExoPlayerUtil {
                 .enqueue(new TestpressCallback<VideoAttempt>() {
                     @Override
                     public void onSuccess(VideoAttempt videoAttempt) {
+                        if (videoAttempt != null) {
+                            updateVideoWatchedPercentage(videoAttempt);
+                        }
                         errorOnVideoAttemptUpdate = false;
                         if (videoAttemptUpdateHandler != null) {
-                            updateVideoWatchedPercentage(videoAttempt);
                             videoAttemptUpdateHandler
                                     .postDelayed(videoAttemptUpdateTask, VIDEO_ATTEMPT_UPDATE_INTERVAL);
                         }
@@ -531,7 +533,10 @@ public class ExoPlayerUtil {
                     @Override
                     public void onException(TestpressException exception) {
                         errorOnVideoAttemptUpdate = true;
-                        handleError(exception.isNetworkError());
+                        if (videoAttemptUpdateHandler != null) {
+                            videoAttemptUpdateHandler
+                                    .postDelayed(videoAttemptUpdateTask, VIDEO_ATTEMPT_UPDATE_INTERVAL);
+                        }
                     }
                 });
     }
@@ -569,8 +574,6 @@ public class ExoPlayerUtil {
     private void handleError(boolean networkError) {
         if (networkError) {
             displayError(R.string.testpress_no_internet_try_again);
-        } else {
-            displayError(R.string.testpress_some_thing_went_wrong_try_again);
         }
     }
 

@@ -38,7 +38,7 @@ public class TestpressCourseApiClient extends TestpressApiClient {
 
     public static final String ATTEMPTS_PATH =  "/attempts/";
 
-    public static final String USER_VIDEOS_PATH =  "/api/v2.3/user_videos/";
+    public static final String USER_VIDEOS_PATH =  "/api/v2.4/user_videos/";
 
     public static final String LEADERBOARD_PATH =  "/api/v2.2/leaderboard/";
 
