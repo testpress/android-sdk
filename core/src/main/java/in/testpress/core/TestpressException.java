@@ -45,6 +45,7 @@ public class TestpressException extends RuntimeException {
     private final Kind kind;
     private int statusCode;
     private String message;
+    private boolean isCancelled;
 
     TestpressException(String message, Response response, Kind kind, Throwable exception) {
         super(message, exception);
@@ -96,8 +97,16 @@ public class TestpressException extends RuntimeException {
         return kind == Kind.NETWORK;
     }
 
+    public boolean isBadRequest() {
+        return statusCode == 400;
+    }
+
     public boolean isUnauthenticated() {
         return statusCode == 403;
+    }
+
+    public boolean isPageNotFound() {
+        return statusCode == 404;
     }
 
     public boolean isClientError() {
@@ -106,5 +115,13 @@ public class TestpressException extends RuntimeException {
 
     public boolean isServerError() {
         return statusCode >= 500 && statusCode < 600;
+    }
+
+    public boolean isCancelled() {
+        return isCancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        isCancelled = cancelled;
     }
 }

@@ -24,7 +24,7 @@ public class Video implements android.os.Parcelable {
     @Id
     private Long id;
     private String embedCode;
-    private Long duration;
+    private String duration;
     private Boolean isDomainRestricted;
 
     /** Used to resolve relations */
@@ -52,7 +52,7 @@ public class Video implements android.os.Parcelable {
     }
 
     @Generated
-    public Video(String title, String url, Long id, String embedCode, Long duration, Boolean isDomainRestricted) {
+    public Video(String title, String url, Long id, String embedCode, String duration, Boolean isDomainRestricted) {
         this.title = title;
         this.url = url;
         this.id = id;
@@ -100,11 +100,11 @@ public class Video implements android.os.Parcelable {
         this.embedCode = embedCode;
     }
 
-    public Long getDuration() {
+    public String getDuration() {
         return duration;
     }
 
-    public void setDuration(Long duration) {
+    public void setDuration(String duration) {
         this.duration = duration;
     }
 
