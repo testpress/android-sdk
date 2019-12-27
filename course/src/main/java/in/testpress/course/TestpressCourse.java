@@ -30,7 +30,6 @@ public class TestpressCourse {
     public static final String PARENT_CHAPTER_ID = "parentChapterId";
     public static final String CHAPTER_ID = "chapterId";
     public static final String CHAPTER_SLUG = "CHAPTER_SLUG";
-
     /**
      * Use when testpress courses need to be open in a container as a fragment.
      *

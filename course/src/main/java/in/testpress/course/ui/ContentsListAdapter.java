@@ -28,7 +28,6 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
 
     private final Activity mActivity;
     private ImageLoader mImageLoader;
-    private DisplayImageOptions mOptions;
     private ContentDao contentDao;
     private long chapterId;
 
@@ -65,7 +64,6 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         return getItem(position).getId();
     }
 
-
     @Override
     protected int[] getChildViewIds() {
         return new int[] {
@@ -87,7 +85,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
             setGone(1, true);
         } else {
             setGone(1, false);
-            mImageLoader.displayImage(content.getImage(), imageView(1), mOptions);
+            mImageLoader.displayImage(content.getImage(), imageView(1));
         }
         Exam exam = content.getRawExam();
         // Validate lock

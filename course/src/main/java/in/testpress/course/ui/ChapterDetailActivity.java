@@ -189,11 +189,9 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                 .commitAllowingStateLoss();
     }
 
-
     @Override
     public void onBackPressed() {
         Fragment fragment = getCurrentFragment();
-
         Long courseId = getIntent().getLongExtra(COURSE_ID, -1);
         InstituteSettings instituteSettings =
                 TestpressSdk.getTestpressSession(this).getInstituteSettings();
