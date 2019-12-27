@@ -43,11 +43,6 @@ public class FormatDate {
         return  date1 != null && date2 != null && date1.after(date2);
     }
 
-    public static long getTimeMillis(String inputString) {
-        Date date = getDate(inputString, "HH:mm:ss", "UTC");
-        return date != null ? date.getTime() : 0;
-    }
-
     public static String getDate(String startDate, String endDate) {
         if((startDate != null) || (endDate != null)) {
             startDate = formatDate(startDate);
