@@ -1,11 +1,10 @@
 package in.testpress.store.network;
 
-import java.io.IOException;
 
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseResourcePager;
+import in.testpress.network.RetrofitCall;
 import in.testpress.store.models.Product;
-import retrofit2.Response;
 
 import static in.testpress.network.TestpressApiClient.PAGE;
 
@@ -23,9 +22,9 @@ public class ProductsPager extends BaseResourcePager<Product> {
     }
 
     @Override
-    public Response<TestpressApiResponse<Product>> getItems(int page, int size) throws IOException {
+    public RetrofitCall<TestpressApiResponse<Product>> getItems(int page, int size) {
         queryParams.put(PAGE, page);
-        return apiClient.getProducts(queryParams).execute();
+        return apiClient.getProducts(queryParams);
     }
 
 }

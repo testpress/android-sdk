@@ -1,11 +1,10 @@
 package in.testpress.exam.network;
 
-import java.io.IOException;
 
 import in.testpress.exam.models.Comment;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseResourcePager;
-import retrofit2.Response;
+import in.testpress.network.RetrofitCall;
 
 public class CommentsPager extends BaseResourcePager<Comment> {
 
@@ -23,9 +22,9 @@ public class CommentsPager extends BaseResourcePager<Comment> {
     }
 
     @Override
-    public Response<TestpressApiResponse<Comment>> getItems(int page, int size) throws IOException {
+    public RetrofitCall<TestpressApiResponse<Comment>> getItems(int page, int size) {
         queryParams.put(TestpressExamApiClient.PAGE, page);
-        return apiClient.getComments(commentsUrl, queryParams).execute();
+        return apiClient.getComments(commentsUrl, queryParams);
     }
 
     public Integer getCommentsCount() {

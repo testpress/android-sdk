@@ -1,11 +1,10 @@
 package in.testpress.exam.network;
 
-import java.io.IOException;
 
 import in.testpress.exam.models.Subject;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseResourcePager;
-import retrofit2.Response;
+import in.testpress.network.RetrofitCall;
 
 public class SubjectPager extends BaseResourcePager<Subject> {
 
@@ -25,12 +24,12 @@ public class SubjectPager extends BaseResourcePager<Subject> {
     }
 
     @Override
-    public Response<TestpressApiResponse<Subject>> getItems(int page, int size) throws IOException {
+    public RetrofitCall<TestpressApiResponse<Subject>> getItems(int page, int size) {
         queryParams.put(TestpressExamApiClient.PAGE, page);
         if (parentSubjectId != null) {
             queryParams.put(TestpressExamApiClient.PARENT, parentSubjectId);
         }
-        return apiClient.getSubjects(baseUrl, queryParams).execute();
+        return apiClient.getSubjects(baseUrl, queryParams);
     }
 
     @Override

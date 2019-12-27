@@ -5,6 +5,7 @@ import java.io.IOException;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseResourcePager;
+import in.testpress.network.RetrofitCall;
 import retrofit2.Response;
 
 public class AttemptsPager extends BaseResourcePager<Attempt> {
@@ -23,9 +24,9 @@ public class AttemptsPager extends BaseResourcePager<Attempt> {
     }
 
     @Override
-    public Response<TestpressApiResponse<Attempt>> getItems(int page, int size) throws IOException {
+    public RetrofitCall<TestpressApiResponse<Attempt>> getItems(int page, int size) {
         queryParams.put(TestpressExamApiClient.PAGE, page);
-        return apiClient.getAttempts(attemptsUrlFrag, queryParams).execute();
+        return apiClient.getAttempts(attemptsUrlFrag, queryParams);
     }
 
 }
