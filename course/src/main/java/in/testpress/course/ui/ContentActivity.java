@@ -485,7 +485,6 @@ public class ContentActivity extends BaseToolBarActivity {
             exoplayerFullscreenHelper = new ExoplayerFullscreenHelper(this);
             exoplayerFullscreenHelper.initializeOrientationListener();
         }
-        Log.d("ContentActivity", "initExoPlayer: " + videoAttempt);
 
         if (videoAttempt == null) {
             createContentAttempt();
