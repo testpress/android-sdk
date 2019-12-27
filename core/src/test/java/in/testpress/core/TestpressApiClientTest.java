@@ -83,20 +83,20 @@ public class TestpressApiClientTest {
         }
     }
 
-//    @Test
-//    public void testUnAuthorizedUserError() throws Exception {
-//
-//        TestpressApiClient apiClient = new TestpressApiClient(ApplicationProvider.getApplicationContext(), TestpressSdk.getTestpressSession(ApplicationProvider.getApplicationContext()));
-//        AccountActivityPager pager = new AccountActivityPager(apiClient);
-//        MockResponse successResponse = new MockResponse().setResponseCode(401);
-//        mockWebServer.enqueue(successResponse);
-//        pager.getItems(1, 1);
-//        mockWebServer.takeRequest();
-//
-//        AlertDialog alertDialog = (AlertDialog) ShadowAlertDialog.getShownDialogs().get(0);
-//
-//        Assert.assertNotNull(alertDialog);
-//    }
+    @Test
+    public void testUnAuthorizedUserError() throws Exception {
+
+        TestpressApiClient apiClient = new TestpressApiClient(ApplicationProvider.getApplicationContext(), TestpressSdk.getTestpressSession(ApplicationProvider.getApplicationContext()));
+        AccountActivityPager pager = new AccountActivityPager(apiClient);
+        MockResponse successResponse = new MockResponse().setResponseCode(401);
+        mockWebServer.enqueue(successResponse);
+        pager.getItems(1, 1).execute();
+        mockWebServer.takeRequest();
+
+        AlertDialog alertDialog = (AlertDialog) ShadowAlertDialog.getShownDialogs().get(0);
+
+        Assert.assertNotNull(alertDialog);
+    }
 
 
     @After
