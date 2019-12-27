@@ -17,6 +17,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.models.AccountActivity;
 import in.testpress.models.InstituteSettings;
+import in.testpress.network.RetrofitCall;
 import in.testpress.util.SingleTypeAdapter;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -112,7 +113,8 @@ public class UserDevicesActivityTest {
         UserActivityFragment fragment = (UserActivityFragment) activity.getSupportFragmentManager().getFragments().get(0);
         MockResponse successResponse = new MockResponse().setBody(getAccountActivityJSON()).setResponseCode(200);
         mockWebServer.enqueue(successResponse);
-        Response response = fragment.getPager().getItems(1, 1);
+        RetrofitCall retrofitCall = fragment.getPager().getItems(1, 1);
+        Response response = retrofitCall.execute();
         fragment.refreshAdapter();
         mockWebServer.takeRequest();
 
