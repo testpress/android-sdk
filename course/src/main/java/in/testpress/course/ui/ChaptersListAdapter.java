@@ -19,27 +19,27 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
     private final Activity activity;
     private ImageLoader imageLoader;
     private DisplayImageOptions options;
-    private String chapterId;
+    private String courseId;
     private String parentId;
 
-    ChaptersListAdapter(Activity activity, final List<Chapter> items, int layout, String chapterId, String parentId) {
+    ChaptersListAdapter(Activity activity, final List<Chapter> items, int layout, String courseId, String parentId) {
         super(activity.getLayoutInflater(), layout);
         this.activity = activity;
         this.imageLoader = ImageUtils.initImageLoader(activity);
         this.options = ImageUtils.getPlaceholdersOption();
-        this.chapterId = chapterId;
+        this.courseId = courseId;
         this.parentId = parentId;
         setItems(items);
     }
 
     @Override
     public int getCount() {
-        return  (int) Chapter.getParentChaptersQueryBuilder(activity, parentId, chapterId).count();
+        return  (int) Chapter.getParentChaptersQueryBuilder(activity, courseId, parentId).count();
     }
 
     @Override
     public Chapter getItem(int position) {
-        return Chapter.getParentChaptersQueryBuilder(activity, parentId, chapterId).listLazy().get(position);
+        return Chapter.getParentChaptersQueryBuilder(activity, courseId, parentId).listLazy().get(position);
     }
 
     @Override

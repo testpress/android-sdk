@@ -73,7 +73,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     protected SingleTypeAdapter<Chapter> createAdapter(
             List<Chapter> items) {
         return new ChaptersListAdapter(getActivity(), items, R.layout.testpress_chapters_list_item,
-                parentId, courseId);
+                courseId, parentId);
     }
 
 
