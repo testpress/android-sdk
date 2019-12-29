@@ -16,6 +16,7 @@ import in.testpress.course.ui.CourseListActivity;
 import in.testpress.course.ui.CourseListFragment;
 import in.testpress.course.ui.LeaderboardActivity;
 import in.testpress.course.ui.LeaderboardFragment;
+import in.testpress.course.ui.ListCourseFragment;
 import in.testpress.util.Assert;
 import in.testpress.util.ImageUtils;
 
@@ -99,6 +100,16 @@ public class TestpressCourse {
         init(context.getApplicationContext(), testpressSession);
         return new CourseListFragment();
     }
+
+    public static ListCourseFragment getListCourseFragment(@NonNull Context context,
+                                                            @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Context must not be null.", context);
+
+        init(context.getApplicationContext(), testpressSession);
+        return new ListCourseFragment();
+    }
+
 
     public static AvailableCourseListFragment getAvailableCoursesListFragment(@NonNull Context context,
                                                             @NonNull TestpressSession testpressSession) {
