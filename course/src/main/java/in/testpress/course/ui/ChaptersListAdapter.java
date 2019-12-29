@@ -1,6 +1,8 @@
 package in.testpress.course.ui;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -14,6 +16,9 @@ import in.testpress.models.greendao.Chapter;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
 
+import static in.testpress.course.TestpressCourse.CHAPTER_SLUG;
+import static in.testpress.course.TestpressCourse.COURSE_ID;
+
 class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
 
     private final Activity activity;
@@ -21,20 +26,26 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
     private DisplayImageOptions options;
     private String courseId;
     private String parentId;
+    private OnChapterClickListener chapterClickListener;
 
-    ChaptersListAdapter(Activity activity, final List<Chapter> items, int layout, String courseId, String parentId) {
+    ChaptersListAdapter(Activity activity, final List<Chapter> items, int layout, String courseId, String parentId, OnChapterClickListener chapterClickListener) {
         super(activity.getLayoutInflater(), layout);
         this.activity = activity;
         this.imageLoader = ImageUtils.initImageLoader(activity);
         this.options = ImageUtils.getPlaceholdersOption();
         this.courseId = courseId;
         this.parentId = parentId;
+        this.chapterClickListener = chapterClickListener;
         setItems(items);
     }
 
     @Override
     public int getCount() {
         return  (int) Chapter.getParentChaptersQueryBuilder(activity, courseId, parentId).count();
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
     }
 
     @Override
@@ -77,6 +88,7 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
 
     @Override
     protected void update(final int position, final Chapter chapter) {
+        Log.d("ChaptersListAdapter", "update: " + parentId);
         textView(0).setTypeface(TestpressSdk.getRubikMediumFont(activity));
         setText(0, chapter.getName());
         displayThumbnail(chapter);
@@ -87,13 +99,14 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
             view(4).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                activity.startActivity(ChapterDetailActivity.createIntent(
-                    chapter.getUrl(),
-                    activity)
-                );
+                    chapterClickListener.onChapterClick(chapter);
                 }
             });
         }
+    }
+
+    public interface OnChapterClickListener {
+        void onChapterClick(Chapter chapter);
     }
 
 }

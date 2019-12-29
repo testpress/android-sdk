@@ -30,11 +30,17 @@ public class TestpressCourseApiClient extends TestpressApiClient {
     /**
      * Course List Url
      */
-    public static final String COURSE_LIST_PATH =  "/api/v2.2.1/courses/";
+    public static final String COURSE_LIST_PATH =  "/api/v2.4/courses/";
 
     public static final String CHAPTERS_PATH =  "/chapters/";
 
+    public static final String CONTENTS =  "/contents/";
+
     public static final String CONTENTS_PATH =  "/api/v2.3/contents/";
+
+    public static final String CONTENTS_PATH_V2_4 =  "/api/v2.4/contents/";
+
+    public static final String CHAPTERS_PATH_V2_4 =  "/api/v2.4/chapters/";
 
     public static final String ATTEMPTS_PATH =  "/attempts/";
 
@@ -69,13 +75,13 @@ public class TestpressCourseApiClient extends TestpressApiClient {
         return getCourseService().getChapters(courseId, queryParams, latestModifiedDate);
     }
 
-    public RetrofitCall<Chapter> getChapter(String chapterUrl) {
-        return getCourseService().getChapter(chapterUrl);
+    public RetrofitCall<Chapter> getChapter(String chapterSlug) {
+        return getCourseService().getChapter(chapterSlug);
     }
 
-    public RetrofitCall<TestpressApiResponse<Content>> getContents(String chaptersUrlFrag,
+    public RetrofitCall<TestpressApiResponse<Content>> getContents(long courseId,
                                                                    Map<String, Object> queryParams) {
-        return getCourseService().getContents(chaptersUrlFrag, queryParams);
+        return getCourseService().getContents(courseId, queryParams);
     }
 
     public RetrofitCall<HtmlContent> getHtmlContent(String htmlContentUrlFrag) {

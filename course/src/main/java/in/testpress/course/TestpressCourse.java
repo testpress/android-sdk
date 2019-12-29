@@ -27,6 +27,9 @@ public class TestpressCourse {
     public static final String COURSE_ID = "courseId";
     public static final String PARENT_ID = "parentId";
     public static final String CHAPTER_URL = "chapterUrl";
+    public static final String PARENT_CHAPTER_ID = "parentChapterId";
+    public static final String CHAPTER_ID = "chapterId";
+    public static final String CHAPTER_SLUG = "CHAPTER_SLUG";
 
     /**
      * Use when testpress courses need to be open in a container as a fragment.
@@ -112,7 +115,7 @@ public class TestpressCourse {
 
         init(activity.getApplicationContext(), testpressSession);
         activity.startActivityForResult(
-                ChapterDetailActivity.createIntent(courseName, courseId.toString(), activity),
+                ChapterDetailActivity.createIntent(courseName, Long.valueOf(courseId), activity),
                 COURSE_CHAPTER_REQUEST_CODE
         );
     }
@@ -121,19 +124,19 @@ public class TestpressCourse {
      * Load chapter & display child chapters or contents of the chapter in new Activity.
      *
      * @param activity activity from which child list needs to show.
-     * @param chapterUrl Url of the chapter which children needs to show.
+     * @param chapterSlug Slug of the chapter which children needs to show.
      * @param testpressSession TestpressSession got from the core module.
      */
     public static void showChapterContents(@NonNull Activity activity,
-                                           @NonNull String chapterUrl,
+                                           @NonNull String chapterSlug,
                                            @NonNull TestpressSession testpressSession) {
 
         Assert.assertNotNull("Activity must not be null.", activity);
-        Assert.assertNotNullAndNotEmpty("chapterUrl must not be null or empty.", chapterUrl);
+        Assert.assertNotNullAndNotEmpty("chapterUrl must not be null or empty.", chapterSlug);
 
         init(activity.getApplicationContext(), testpressSession);
         activity.startActivityForResult(
-                ChapterDetailActivity.createIntent(chapterUrl, activity),
+                ChapterDetailActivity.createIntent(chapterSlug, activity),
                 COURSE_CONTENT_LIST_REQUEST_CODE
         );
     }
@@ -154,7 +157,7 @@ public class TestpressCourse {
 
         init(activity.getApplicationContext(), testpressSession);
         activity.startActivityForResult(
-                ContentActivity.createIntent(contentId, activity),
+                ContentActivity.createIntent(Long.valueOf(contentId), activity),
                 COURSE_CONTENT_DETAIL_REQUEST_CODE
         );
     }

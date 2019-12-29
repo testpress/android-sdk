@@ -22,6 +22,8 @@ import retrofit2.http.QueryMap;
 
 import static in.testpress.course.network.TestpressCourseApiClient.ATTEMPTS_PATH;
 import static in.testpress.course.network.TestpressCourseApiClient.CHAPTERS_PATH;
+import static in.testpress.course.network.TestpressCourseApiClient.CHAPTERS_PATH_V2_4;
+import static in.testpress.course.network.TestpressCourseApiClient.CONTENTS;
 import static in.testpress.course.network.TestpressCourseApiClient.CONTENTS_PATH;
 import static in.testpress.course.network.TestpressCourseApiClient.COURSE_LIST_PATH;
 import static in.testpress.course.network.TestpressCourseApiClient.LEADERBOARD_PATH;
@@ -43,12 +45,14 @@ public interface CourseService {
             @QueryMap Map<String, Object> queryParams,
             @Header("If-Modified-Since") String latestModifiedDate);
 
-    @GET("{chapter_url}")
-    RetrofitCall<Chapter> getChapter(@Path(value = "chapter_url", encoded = true) String chapterUrl);
+    @GET(CHAPTERS_PATH_V2_4 + "{chapter_slug}")
+    RetrofitCall<Chapter> getChapter(
+            @Path(value = "chapter_slug", encoded = true) String chapterSlug);
 
-    @GET("{contents_url}")
+
+    @GET(COURSE_LIST_PATH + "{course_id}"+ CONTENTS)
     RetrofitCall<TestpressApiResponse<Content>> getContents(
-            @Path(value = "contents_url", encoded = true) String contentsUrlFrag,
+            @Path(value = "course_id", encoded = true) long courseId,
             @QueryMap Map<String, Object> queryParams);
 
     @GET("{html_content_url}")

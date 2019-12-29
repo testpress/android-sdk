@@ -78,6 +78,7 @@ import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
+import in.testpress.util.FormatDate;
 import in.testpress.util.UserAgentProvider;
 
 import static android.support.v7.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
@@ -537,7 +538,7 @@ public class ExoPlayerUtil {
     }
 
     void updateVideoWatchedPercentage(VideoAttempt videoAttempt) {
-        long totalDuration = videoAttempt.getRawVideoContent().getDuration();
+        long totalDuration = Long.valueOf(videoAttempt.getRawVideoContent().getDuration());
         if (totalDuration == 0) {
             return;
         }

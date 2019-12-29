@@ -15,6 +15,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import java.util.ArrayList;
 import java.util.List;
 
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.models.greendao.Content;
@@ -31,16 +32,13 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
     private ContentDao contentDao;
     private long chapterId;
 
-    ContentsListAdapter(Activity activity, final List<Content> items, int layout,
-                        ContentDao contentDao, Long chapterId) {
-
-        super(activity.getLayoutInflater(), layout);
+    ContentsListAdapter(Activity activity, Long chapterId) {
+        super(activity, R.layout.testpress_content_list_item);
         mActivity = activity;
         mImageLoader = ImageUtils.initImageLoader(activity);
         mOptions = ImageUtils.getPlaceholdersOption();
-        this.contentDao = contentDao;
+        contentDao = TestpressSDKDatabase.getContentDao(activity);
         this.chapterId = chapterId;
-        setItems(items);
     }
 
     @Override
@@ -83,7 +81,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         textView(0).setTypeface(TestpressSdk.getRubikMediumFont(mActivity));
         textView(7).setTypeface(TestpressSdk.getRubikMediumFont(mActivity));
         textView(8).setTypeface(TestpressSdk.getRubikMediumFont(mActivity));
-        setText(0, content.getName());
+        setText(0, content.getTitle());
         // Set image
         if (content.getImage() == null || content.getImage().isEmpty()) {
             setGone(1, true);
@@ -93,7 +91,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         }
         Exam exam = content.getRawExam();
         // Validate lock
-        if (content.getIsLocked() || !content.getHasStarted()) {
+        if (content.getIsLocked()) {
             setGone(2, false);
             setGone(3, false);
             setGone(6, true);
@@ -119,7 +117,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
                 @Override
                 public void onClick(View v) {
                     mActivity.startActivity(ContentActivity.createIntent(
-                            position,
+                            content.getId(),
                             chapterId,
                             (AppCompatActivity) mActivity)
                     );
