@@ -1,5 +1,7 @@
 package in.testpress.v2_4;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -119,6 +121,7 @@ public abstract class BaseResourcePager<T, L> {
                     hasMore = false;
                     throw TestpressException.httpError(retrofitResponse);
                 }
+                Log.d("BaseResourcePager", "next: " + resources.size());
                 emptyPage = resources.isEmpty();
                 if (emptyPage)
                     break;

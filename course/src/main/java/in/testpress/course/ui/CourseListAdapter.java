@@ -48,8 +48,10 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     private ProgressDialog progressDialog;
     private AlertDialog wantToCancelDialog;
     private AlertDialog retryDialog;
+    private List<Course> courses;
+    private String product_slug;
 
-    CourseListAdapter(Activity activity, CourseDao courseDao) {
+    CourseListAdapter(Activity activity, CourseDao courseDao, List<Course> courses, String product_slug) {
         super(activity.getLayoutInflater(), R.layout.testpress_course_list_item);
         mActivity = activity;
         mImageLoader = ImageUtils.initImageLoader(activity);
@@ -62,6 +64,8 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
                 .setMessage("Do you want to cancel")
                 .setPositiveButton(R.string.testpress_yes, null)
                 .create();
+        this.courses = courses;
+        this.product_slug = product_slug;
     }
 
     private void initProgressDialog(Context context) {
@@ -74,12 +78,19 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
 
     @Override
     public int getCount() {
-        return (int) mCourseDao.queryBuilder().count();
+        if (!courses.isEmpty()) {
+            return courses.size();
+        }
+        return (int) mCourseDao.queryBuilder().where(CourseDao.Properties.IsProduct.isNull()).count();
     }
 
     @Override
     public Course getItem(int position) {
+        if (!courses.isEmpty()) {
+            return courses.get(position);
+        }
         return mCourseDao.queryBuilder()
+                .where(CourseDao.Properties.IsProduct.isNull())
                 .orderAsc(CourseDao.Properties.Order)
                 .listLazy().get(position);
     }
@@ -147,7 +158,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
             activity.startActivity(ChapterDetailActivity.createIntent(
                     course.getTitle(),
                     course.getId(),
-                    activity));
+                    activity, this.product_slug));
         } else {
             Intent intent = new Intent(activity, WebViewActivity.class);
             intent.putExtra("URL", course.getExternal_content_link());

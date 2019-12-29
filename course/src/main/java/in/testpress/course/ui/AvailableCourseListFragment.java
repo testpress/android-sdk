@@ -1,13 +1,10 @@
-package in.testpress.store.ui;
+package in.testpress.course.ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.View;
-import android.widget.ListView;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
@@ -15,62 +12,48 @@ import java.util.List;
 
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
-import in.testpress.models.greendao.ProductDao;
-import in.testpress.store.R;
+import in.testpress.course.AvailableCourseListAdapter;
+import in.testpress.course.R;
+import in.testpress.course.network.TestpressCourseApiClient;
+import in.testpress.models.greendao.Course;
+import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.Product;
+import in.testpress.models.greendao.ProductDao;
 import in.testpress.store.network.ProductsPager;
 import in.testpress.store.network.TestpressStoreApiClient;
 import in.testpress.ui.BaseListViewFragment;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ThrowableLoader;
-import in.testpress.util.ViewUtils;
 
-import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
+public class AvailableCourseListFragment extends BaseListViewFragment<Product> {
 
-public class ProductListFragment extends BaseListViewFragment<Product> {
-
-    protected TestpressStoreApiClient apiClient;
+    private TestpressCourseApiClient mApiClient;
+    private CourseDao courseDao;
     private ProductsPager refreshPager;
     private ProductDao productDao;
+    protected TestpressStoreApiClient apiClient;
     private ProductsPager pager;
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
-                .replace(containerViewId, new ProductListFragment())
+                .replace(containerViewId, new AvailableCourseListFragment())
                 .commitAllowingStateLoss();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        apiClient = new TestpressStoreApiClient(getActivity());
-        pager = new ProductsPager(apiClient);
-        productDao = TestpressSDKDatabase.getProductDao(getContext());
         super.onCreate(savedInstanceState);
+        mApiClient = new TestpressCourseApiClient(getActivity());
+        apiClient = new TestpressStoreApiClient(getActivity());
+        courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
+        productDao = TestpressSDKDatabase.getProductDao(getContext());
     }
 
-    @Override
-    protected SingleTypeAdapter<Product> createAdapter(List<Product> items) {
-        return new ProductsListAdapter(getActivity(), items);
-    }
-
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        Product product = ((Product) l.getItemAtPosition(position));
-        Intent intent = new Intent(getActivity(), ProductDetailsActivity.class);
-        intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.getSlug());
-        getActivity().startActivityForResult(intent, STORE_REQUEST_CODE);
-    }
-
-
-    private QueryBuilder<Product> getQueryBuilder() {
-        return Product.getQueryBuilder(getContext());
-    }
 
     private ProductsPager getRefreshPager() {
         if (refreshPager == null) {
             refreshPager = new ProductsPager(apiClient);
             QueryBuilder<Product> queryBuilder = getQueryBuilder();
-            if (queryBuilder.count() > 0) {
-            }
         }
         return refreshPager;
     }
@@ -86,32 +69,49 @@ public class ProductListFragment extends BaseListViewFragment<Product> {
 
     @Override
     public Loader<List<Product>> onCreateLoader(int id, Bundle args) {
-        return new ProductsLoader(getContext(), getRefreshPager());
+        return new ProductsLoader(getContext(), getRefreshPager(), courseDao);
     }
+
 
     private static class ProductsLoader extends ThrowableLoader<List<Product>> {
 
         private ProductsPager pager;
+        private CourseDao courseDao;
 
-        ProductsLoader(Context context, ProductsPager pager) {
+        ProductsLoader(Context context, ProductsPager pager, CourseDao courseDao) {
             super(context, null);
             this.pager = pager;
+            this.courseDao = courseDao;
         }
 
         @Override
         public List<Product> loadData() throws TestpressException {
             pager.next();
-            Log.d("ProductListFragment", "onLoadFinished: Products" + pager.getListResponse().getCourses());
-            Log.d("ProductListFragment", "onLoadFinished: Product 1" + pager.getListResponse().getPrices().get(0).getProductId());
+            List<Course> courses = pager.getListResponse().getCourses();
+            for (Course course: courses) {
+                course.setIsProduct(true);
+                courseDao.insertOrReplace(course);
+            }
+            courseDao.insertOrReplaceInTx(courses);
             return pager.getListResponse().getProducts();
         }
     }
+
+    @Override
+    protected SingleTypeAdapter<Product> createAdapter(List<Product> items) {
+        return new AvailableCourseListAdapter(getActivity(), items);
+    }
+
+    private QueryBuilder<Product> getQueryBuilder() {
+        return Product.getQueryBuilder(getContext());
+    }
+
 
 
     @Override
     public void onLoadFinished(Loader<List<Product>> loader, List<Product> products) {
         final TestpressException exception = getException(loader);
-        getActivity().getSupportLoaderManager().destroyLoader(loader.getId());
+
         if (exception != null) {
             this.exception = exception;
             int errorMessage = getErrorMessage(exception);
@@ -130,17 +130,18 @@ public class ProductListFragment extends BaseListViewFragment<Product> {
         if (!products.isEmpty()) {
             productDao.insertOrReplaceInTx(products);
         }
+        getListAdapter().notifyDataSetChanged();
+        getLoaderManager().destroyLoader(loader.getId());
         showList();
     }
+
 
     private void saveItems(ProductsPager pager) {
         List<Product> products = pager.getResources();
         ProductDao productDao = TestpressSDKDatabase.getProductDao(getContext());
+        CourseDao courseDao = TestpressSDKDatabase.getCourseDao(getContext());
         for (int i = 0; i < products.size(); i++) {
             Product product = products.get(i);
-            List<Product> productFromDB = productDao.queryBuilder()
-                    .where(ProductDao.Properties.Id.eq(product.getId())).list();
-            Log.d("ProductListFragment", "saveItems: " + product.getCourseIds());
             productDao.insertOrReplace(product);
         }
 
@@ -150,6 +151,7 @@ public class ProductListFragment extends BaseListViewFragment<Product> {
     protected boolean isItemsEmpty() {
         return productDao.count() == 0;
     }
+
 
     @Override
     protected int getErrorMessage(TestpressException exception) {
@@ -161,28 +163,30 @@ public class ProductListFragment extends BaseListViewFragment<Product> {
             setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again,
                     R.drawable.ic_error_outline_black_18dp);
             return R.string.testpress_no_internet_try_again;
+        } else {
+            setEmptyText(R.string.testpress_error_loading_courses,
+                    R.string.testpress_some_thing_went_wrong_try_again,
+                    R.drawable.ic_error_outline_black_18dp);
         }
-        setEmptyText(R.string.testpress_error_loading_products,
-                R.string.testpress_some_thing_went_wrong_try_again,
-                R.drawable.ic_error_outline_black_18dp);
         return R.string.testpress_some_thing_went_wrong_try_again;
     }
 
     @Override
     protected void setEmptyText() {
-        setEmptyText(R.string.testpress_no_products, R.string.testpress_no_products_description,
-                    R.drawable.testpress_box);
+        setEmptyText(R.string.testpress_no_courses, R.string.testpress_no_courses_description,
+                    R.drawable.ic_error_outline_black_18dp);
     }
 
     @Override
     public void refreshWithProgress() {
         items.clear();
-        pager.reset();
+        refreshPager.reset();
         super.refreshWithProgress();
     }
 
     public void refresh() {
-        getActivity().getSupportLoaderManager().restartLoader(0, null, this);
+        getLoaderManager().restartLoader(0, null, this);
     }
+
 
 }

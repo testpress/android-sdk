@@ -1,5 +1,7 @@
 package in.testpress.course.ui;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.Loader;
@@ -7,6 +9,7 @@ import android.util.Log;
 
 import org.greenrobot.greendao.AbstractDao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import in.testpress.core.TestpressException;
@@ -55,7 +58,8 @@ public class CourseListFragment extends BaseDataBaseFragment<Course, Long> {
 
     @Override
     protected SingleTypeAdapter<Course> createAdapter(List<Course> items) {
-        return new CourseListAdapter(getActivity(), courseDao);
+        List<Course> courses = new ArrayList<>();
+        return new CourseListAdapter(getActivity(), courseDao, courses, null);
     }
 
     @Override
@@ -75,7 +79,7 @@ public class CourseListFragment extends BaseDataBaseFragment<Course, Long> {
         this.exception = null;
         this.items = courses;
         courses = Course.updateCoursesWithLocalVariables(getActivity(), courses);
-        getDao().deleteAll();
+        // getDao().deleteAll();
         if (!courses.isEmpty()) {
             getDao().insertOrReplaceInTx(courses);
         }

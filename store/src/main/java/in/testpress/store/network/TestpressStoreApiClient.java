@@ -13,10 +13,13 @@ import in.testpress.network.TestpressApiClient;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
+import in.testpress.v2_4.models.ApiResponse;
+import in.testpress.v2_4.models.ProductsListResponse;
 
 public class TestpressStoreApiClient extends TestpressApiClient {
 
     public static final String PRODUCTS_LIST_PATH =  "/api/v2.2/products/";
+    public static final String V4_PRODUCTS_LIST_PATH =  "/api/v2.4/products/";
 
     public static final String ORDERS_PATH = "/api/v2.2/orders/";
 
@@ -34,6 +37,10 @@ public class TestpressStoreApiClient extends TestpressApiClient {
 
     public RetrofitCall<TestpressApiResponse<Product>> getProducts(Map<String, Object> queryParams) {
         return getProductService().getProducts(queryParams);
+    }
+
+    public RetrofitCall<ApiResponse<ProductsListResponse>> getv4Products(Map<String, Object> queryParams) {
+        return getProductService().getv4Products(queryParams);
     }
 
     public RetrofitCall<Product> getProductDetail(String productSlug) {

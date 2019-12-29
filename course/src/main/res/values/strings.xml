@@ -51,4 +51,14 @@
         <item>2</item>
     </string-array>
 
+    <plurals name="contents_count">
+        <item quantity="one">1 Content</item>
+        <item quantity="other">%d Contents</item>
+    </plurals>
+
+    <plurals name="chapters_count">
+        <item quantity="one">1 Chapter</item>
+        <item quantity="other">%d Chapters</item>
+    </plurals>
+
 </resources>

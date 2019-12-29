@@ -50,6 +50,7 @@ public class Content implements android.os.Parcelable {
     private int videoWatchedPercentage;
     private String modified;
     private Long modifiedDate;
+    private Boolean freePreview;
     private Long courseId;
     private Long htmlId;
     private Long videoId;
@@ -105,7 +106,7 @@ public class Content implements android.os.Parcelable {
     }
 
     @Generated
-    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, Integer chapterId, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Long courseId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
+    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, Integer chapterId, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Long courseId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
         this.order = order;
         this.htmlContentTitle = htmlContentTitle;
         this.htmlContentUrl = htmlContentUrl;
@@ -129,6 +130,7 @@ public class Content implements android.os.Parcelable {
         this.videoWatchedPercentage = videoWatchedPercentage;
         this.modified = modified;
         this.modifiedDate = modifiedDate;
+        this.freePreview = freePreview;
         this.courseId = courseId;
         this.htmlId = htmlId;
         this.videoId = videoId;
@@ -325,6 +327,14 @@ public class Content implements android.os.Parcelable {
 
     public void setModifiedDate(Long modifiedDate) {
         this.modifiedDate = modifiedDate;
+    }
+
+    public Boolean getFreePreview() {
+        return freePreview;
+    }
+
+    public void setFreePreview(Boolean freePreview) {
+        this.freePreview = freePreview;
     }
 
     public Long getCourseId() {

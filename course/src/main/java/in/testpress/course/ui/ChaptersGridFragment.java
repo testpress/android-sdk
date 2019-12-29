@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -39,11 +40,13 @@ import in.testpress.util.UIUtils;
 
 import static in.testpress.course.TestpressCourse.CHAPTER_SLUG;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
+import static in.testpress.course.TestpressCourse.FROM_PRODUCT;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
 
 import static in.testpress.course.TestpressCourse.CHAPTER_ID;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_CHAPTER_ID;
+import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 import static in.testpress.network.TestpressApiClient.MODIFIED_SINCE;
 import static in.testpress.network.TestpressApiClient.ORDER;
 import static in.testpress.network.TestpressApiClient.UNFILTERED;
@@ -60,12 +63,14 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
     private ContentDao contentDao;
     private Course course;
     private boolean chaptersModified;
+    private String product_slug;
 
 
-    public static ChaptersGridFragment getInstance(long courseId, Long parentChapterId) {
+    public static ChaptersGridFragment getInstance(long courseId, Long parentChapterId, String product_slug) {
         ChaptersGridFragment fragment = new ChaptersGridFragment();
         Bundle bundle = new Bundle();
         bundle.putLong(COURSE_ID, courseId);
+        bundle.putString(PRODUCT_SLUG, product_slug);
         if (parentChapterId != null && parentChapterId != 0) {
             bundle.putString(PARENT_CHAPTER_ID, parentChapterId.toString());
         }
@@ -78,6 +83,7 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
         super.onCreate(savedInstanceState);
         assert getArguments() != null;
         courseId =  getArguments().getLong(COURSE_ID);
+        product_slug = getArguments().getString(PRODUCT_SLUG);
         if (getArguments().getString(PARENT_CHAPTER_ID) != null) {
             parentChapterId = getArguments().getString(PARENT_CHAPTER_ID);
         }
@@ -288,6 +294,7 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Log.d("ChaptersGridFragment", "onClick: ");
                     if (chapter.getRawChildrenCount(getContext()) > 0) {
                         displayChildChapters(chapter.getId());
                     } else {
@@ -310,6 +317,7 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
         ContentsListFragment fragment = new ContentsListFragment();
         Bundle bundle = new Bundle();
         bundle.putLong(CHAPTER_ID, chapter.getId());
+        bundle.putString(PRODUCT_SLUG, product_slug);
         fragment.setArguments(bundle);
         assert getFragmentManager() != null;
 

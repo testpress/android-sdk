@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
+import in.testpress.course.ui.AvailableCourseListFragment;
 import in.testpress.course.ui.ChapterDetailActivity;
 import in.testpress.course.ui.ContentActivity;
 import in.testpress.course.ui.CourseListActivity;
@@ -30,6 +31,8 @@ public class TestpressCourse {
     public static final String PARENT_CHAPTER_ID = "parentChapterId";
     public static final String CHAPTER_ID = "chapterId";
     public static final String CHAPTER_SLUG = "CHAPTER_SLUG";
+    public static final String FROM_PRODUCT = "FROM_PRODUCT";
+    public static final String PRODUCT_SLUG = "PRODUCT_SLUG";
 
     /**
      * Use when testpress courses need to be open in a container as a fragment.
@@ -97,6 +100,15 @@ public class TestpressCourse {
         return new CourseListFragment();
     }
 
+    public static AvailableCourseListFragment getAvailableCoursesListFragment(@NonNull Context context,
+                                                            @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Context must not be null.", context);
+
+        init(context.getApplicationContext(), testpressSession);
+        return new AvailableCourseListFragment();
+    }
+
     /**
      * Show chapters of a specific course as new Activity.
      *
@@ -115,7 +127,7 @@ public class TestpressCourse {
 
         init(activity.getApplicationContext(), testpressSession);
         activity.startActivityForResult(
-                ChapterDetailActivity.createIntent(courseName, Long.valueOf(courseId), activity),
+                ChapterDetailActivity.createIntent(courseName, Long.valueOf(courseId), activity, null),
                 COURSE_CHAPTER_REQUEST_CODE
         );
     }

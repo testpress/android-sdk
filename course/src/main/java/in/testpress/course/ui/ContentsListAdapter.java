@@ -3,6 +3,7 @@ package in.testpress.course.ui;
 import android.app.Activity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 
 import com.github.testpress.mikephil.charting.charts.PieChart;
@@ -18,8 +19,12 @@ import java.util.List;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
+import in.testpress.models.greendao.Chapter;
+import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
+import in.testpress.models.greendao.Course;
+import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.Exam;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
@@ -29,6 +34,8 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
     private final Activity mActivity;
     private ImageLoader mImageLoader;
     private ContentDao contentDao;
+    private CourseDao courseDao;
+    private ChapterDao chapterDao;
     private long chapterId;
 
     ContentsListAdapter(Activity activity, Long chapterId) {
@@ -36,8 +43,10 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         mActivity = activity;
         mImageLoader = ImageUtils.initImageLoader(activity);
         mOptions = ImageUtils.getPlaceholdersOption();
-        contentDao = TestpressSDKDatabase.getContentDao(activity);
         this.chapterId = chapterId;
+        contentDao = TestpressSDKDatabase.getContentDao(activity);
+        chapterDao = TestpressSDKDatabase.getChapterDao(activity);
+        courseDao = TestpressSDKDatabase.getCourseDao(activity);
     }
 
     @Override
@@ -122,6 +131,22 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
                 }
             });
         }
+
+        List<Chapter> chapters = chapterDao.queryBuilder().where(ChapterDao.Properties.Id.eq(this.chapterId)).list();
+
+        if (chapters.size() > 0) {
+            Chapter chapter = chapters.get(0);
+            Course course = courseDao.queryBuilder().where(CourseDao.Properties.Id.eq(chapter.getCourseId())).list().get(0);
+
+            if (course.getIsProduct() != null && course.getIsProduct() && content.getFreePreview() != null && !content.getFreePreview()) {
+                setGone(2, false);
+                setGone(3, false);
+                setGone(6, true);
+                setGone(10, true);
+                view(4).setClickable(false);
+            }
+        }
+
         // Update exam info
         if (exam != null) {
             setGone(5, false);

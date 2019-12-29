@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.HeaderViewListAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -159,6 +160,8 @@ public abstract class BaseListViewFragment<E> extends Fragment
                 refreshWithProgress();
             }
         });
+        listView.addFooterView(new View(getContext()));
+        listView.setFooterDividersEnabled(false);
         configureList(getActivity(), getListView());
     }
 
@@ -326,7 +329,8 @@ public abstract class BaseListViewFragment<E> extends Fragment
     @SuppressWarnings("unchecked")
     protected HeaderFooterListAdapter<SingleTypeAdapter<E>> getListAdapter() {
         if (listView != null) {
-            return (HeaderFooterListAdapter<SingleTypeAdapter<E>>) listView.getAdapter();
+            HeaderViewListAdapter headerViewListAdapter = (HeaderViewListAdapter)listView.getAdapter();
+            return (HeaderFooterListAdapter<SingleTypeAdapter<E>>) headerViewListAdapter.getWrappedAdapter();
         }
         return null;
     }

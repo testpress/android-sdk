@@ -40,6 +40,7 @@ public class CourseDao extends AbstractDao<Course, Long> {
         public final static Property External_content_link = new Property(15, String.class, "external_content_link", false, "EXTERNAL_CONTENT_LINK");
         public final static Property External_link_label = new Property(16, String.class, "external_link_label", false, "EXTERNAL_LINK_LABEL");
         public final static Property ChildItemsLoaded = new Property(17, boolean.class, "childItemsLoaded", false, "CHILD_ITEMS_LOADED");
+        public final static Property IsProduct = new Property(18, Boolean.class, "isProduct", false, "IS_PRODUCT");
     }
 
     private DaoSession daoSession;
@@ -75,7 +76,8 @@ public class CourseDao extends AbstractDao<Course, Long> {
                 "\"ACTIVE\" INTEGER," + // 14: active
                 "\"EXTERNAL_CONTENT_LINK\" TEXT," + // 15: external_content_link
                 "\"EXTERNAL_LINK_LABEL\" TEXT," + // 16: external_link_label
-                "\"CHILD_ITEMS_LOADED\" INTEGER NOT NULL );"); // 17: childItemsLoaded
+                "\"CHILD_ITEMS_LOADED\" INTEGER NOT NULL ," + // 17: childItemsLoaded
+                "\"IS_PRODUCT\" INTEGER);"); // 18: isProduct
     }
 
     /** Drops the underlying database table. */
@@ -173,6 +175,11 @@ public class CourseDao extends AbstractDao<Course, Long> {
             stmt.bindString(17, external_link_label);
         }
         stmt.bindLong(18, entity.getChildItemsLoaded() ? 1L: 0L);
+ 
+        Boolean isProduct = entity.getIsProduct();
+        if (isProduct != null) {
+            stmt.bindLong(19, isProduct ? 1L: 0L);
+        }
     }
 
     @Override
@@ -264,6 +271,11 @@ public class CourseDao extends AbstractDao<Course, Long> {
             stmt.bindString(17, external_link_label);
         }
         stmt.bindLong(18, entity.getChildItemsLoaded() ? 1L: 0L);
+ 
+        Boolean isProduct = entity.getIsProduct();
+        if (isProduct != null) {
+            stmt.bindLong(19, isProduct ? 1L: 0L);
+        }
     }
 
     @Override
@@ -297,7 +309,8 @@ public class CourseDao extends AbstractDao<Course, Long> {
             cursor.isNull(offset + 14) ? null : cursor.getShort(offset + 14) != 0, // active
             cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // external_content_link
             cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16), // external_link_label
-            cursor.getShort(offset + 17) != 0 // childItemsLoaded
+            cursor.getShort(offset + 17) != 0, // childItemsLoaded
+            cursor.isNull(offset + 18) ? null : cursor.getShort(offset + 18) != 0 // isProduct
         );
         return entity;
     }
@@ -322,6 +335,7 @@ public class CourseDao extends AbstractDao<Course, Long> {
         entity.setExternal_content_link(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
         entity.setExternal_link_label(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
         entity.setChildItemsLoaded(cursor.getShort(offset + 17) != 0);
+        entity.setIsProduct(cursor.isNull(offset + 18) ? null : cursor.getShort(offset + 18) != 0);
      }
     
     @Override

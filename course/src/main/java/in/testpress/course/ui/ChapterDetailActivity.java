@@ -35,7 +35,9 @@ import in.testpress.util.UIUtils;
 import static in.testpress.course.TestpressCourse.CHAPTER_SLUG;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
+import static in.testpress.course.TestpressCourse.FROM_PRODUCT;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
+import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 import static in.testpress.course.ui.ContentActivity.FORCE_REFRESH;
 import static in.testpress.course.ui.ContentActivity.GO_TO_MENU;
 import static in.testpress.course.ui.ContentActivity.TESTPRESS_CONTENT_SHARED_PREFS;
@@ -54,13 +56,16 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     private Button retryButton;
     private ChapterDao chapterDao;
     private String chapterSlug;
+    private String product_slug;
 
     private RetrofitCall<Chapter> chapterApiRequest;
 
-    public static Intent createIntent(String title, Long courseId, Context context) {
+    public static Intent createIntent(String title, Long courseId, Context context, String product_slug) {
         Intent intent = new Intent(context, ChapterDetailActivity.class);
         intent.putExtra(ACTIONBAR_TITLE, title);
         intent.putExtra(COURSE_ID, courseId);
+        intent.putExtra(PRODUCT_SLUG, product_slug);
+        Log.d("ChapterDetailActivity", "createIntent: " + product_slug);
         return intent;
     }
 
@@ -78,6 +83,8 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         prefs.edit().clear().apply();
         chapterDao = TestpressSDKDatabase.getChapterDao(this);
         chapterSlug = getIntent().getStringExtra(CHAPTER_SLUG);
+        product_slug = getIntent().getStringExtra(PRODUCT_SLUG);
+        Log.d("ChapterDetailActivity", "onCreate 123: " + product_slug);
         if (chapterSlug != null) {
             emptyView = (LinearLayout) findViewById(R.id.empty_container);
             emptyTitleView = (TextView) findViewById(R.id.empty_title);
@@ -212,9 +219,10 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             }
         } else if (fragment instanceof ContentsListFragment) {
             ContentsListFragment contentsListFragment = (ContentsListFragment) fragment;
-            showFragment(ChaptersListFragment.getInstance(
+            fragment.setArguments(getIntent().getExtras());
+            showFragment(ChaptersGridFragment.getInstance(
                     courseId,
-                    getParentChapterId(contentsListFragment.chapterId)
+                    getParentChapterId(contentsListFragment.chapterId), product_slug
             ));
         } else {
             super.onBackPressed();
@@ -236,10 +244,13 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         if (chapter.getActive() && chapter.getRawChildrenCount(this) > 0) {
             getIntent().putExtra(COURSE_ID, Long.valueOf(chapter.getCourseId()));
             getIntent().putExtra(PARENT_ID, chapter.getId().toString());
+            getIntent().putExtra(PRODUCT_SLUG, product_slug);
             loadChildChapters();
         } else if (chapter.getActive() && chapter.getRawContentsCount(this) > 0) {
             getIntent().putExtra(CONTENTS_URL_FRAG, chapter.getContentUrl());
             getIntent().putExtra(CHAPTER_ID, chapter.getId());
+            getIntent().putExtra(PRODUCT_SLUG, product_slug);
+            Log.d("ContentsListFragment", "onChapterLoaded: " + product_slug);
             loadContents();
         } else {
             setEmptyText(R.string.testpress_no_content,
@@ -256,6 +267,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
 
     private void loadContents() {
         ContentsListFragment fragment = new ContentsListFragment();
+        Log.d("ContentsListFragment", "loadContents: " + getIntent().getStringExtra(PRODUCT_SLUG));
         fragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                 .commitAllowingStateLoss();

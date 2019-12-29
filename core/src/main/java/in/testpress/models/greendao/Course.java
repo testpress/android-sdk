@@ -40,6 +40,7 @@ public class Course {
     private String external_content_link;
     private String external_link_label;
     private boolean childItemsLoaded;
+    private Boolean isProduct;
 
     /** Used to resolve relations */
     @Generated
@@ -66,7 +67,7 @@ public class Course {
     }
 
     @Generated
-    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount, Integer order, Boolean active, String external_content_link, String external_link_label, boolean childItemsLoaded) {
+    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount, Integer order, Boolean active, String external_content_link, String external_link_label, boolean childItemsLoaded, Boolean isProduct) {
         this.id = id;
         this.url = url;
         this.title = title;
@@ -85,6 +86,7 @@ public class Course {
         this.external_content_link = external_content_link;
         this.external_link_label = external_link_label;
         this.childItemsLoaded = childItemsLoaded;
+        this.isProduct = isProduct;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -236,6 +238,14 @@ public class Course {
 
     public void setChildItemsLoaded(boolean childItemsLoaded) {
         this.childItemsLoaded = childItemsLoaded;
+    }
+
+    public Boolean getIsProduct() {
+        return isProduct;
+    }
+
+    public void setIsProduct(Boolean isProduct) {
+        this.isProduct = isProduct;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

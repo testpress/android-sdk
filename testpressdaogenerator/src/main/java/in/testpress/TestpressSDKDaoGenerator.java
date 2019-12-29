@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 22;
+    private static final int VERSION = 24;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -65,8 +65,52 @@ public class TestpressSDKDaoGenerator {
         addDirection(schema);
         addDirectionTranslation(schema);
 
+        Entity product = addProduct(schema);
+        Entity price = addPrice(schema);
+        addProductToPrice(price, product);
+
         schema.enableKeepSectionsByDefault();
         new DaoGenerator().generateAll(schema, "core/src/main/java");
+    }
+
+    private static void addProductToPrice(Entity price, Entity product) {
+        Property productId = price.addLongProperty("productId").getProperty();
+        price.addToOne(product, productId, "product");
+    }
+
+    private static Entity addPrice(Schema schema) {
+        Entity price = schema.addEntity("Price");
+        price.addLongProperty("id").primaryKey();
+        price.addStringProperty("name");
+        price.addStringProperty("price");
+        price.addIntProperty("validity");
+        price.addStringProperty("start_date");
+        price.addStringProperty("end_date");
+        return price;
+    }
+
+    private static Entity addProduct(Schema schema) {
+        Entity product = schema.addEntity("Product");
+        product.addLongProperty("id").primaryKey();
+        product.addStringProperty("title");
+        product.addStringProperty("slug");
+        product.addStringProperty("descriptionHtml");
+        product.addStringProperty("image");
+        product.addStringProperty("startDate");
+        product.addStringProperty("endDate");
+        product.addStringProperty("buyNowText");
+        product.addStringProperty("surl");
+        product.addStringProperty("furl");
+        product.addStringProperty("currentPrice");
+        product.addStringProperty("prices").customType(
+                "in.testpress.util.IntegerList",
+                "in.testpress.util.IntegerListConverter"
+        );
+        product.addStringProperty("courseIds").customType(
+                "in.testpress.util.IntegerList",
+                "in.testpress.util.IntegerListConverter"
+        ).codeBeforeField("@SerializedName(\"courses\")");
+        return product;
     }
 
     private static Entity addAttempt(Schema schema) {
@@ -183,6 +227,7 @@ public class TestpressSDKDaoGenerator {
         content.addIntProperty("videoWatchedPercentage").notNull();
         content.addStringProperty("modified");
         content.addLongProperty("modifiedDate");
+        content.addBooleanProperty("freePreview");
         content.implementsInterface("android.os.Parcelable");
         return content;
     }
@@ -326,6 +371,7 @@ public class TestpressSDKDaoGenerator {
         course.addStringProperty("external_content_link");
         course.addStringProperty("external_link_label");
         course.addBooleanProperty("childItemsLoaded").notNull();
+        course.addBooleanProperty("isProduct");
         return course;
     }
 

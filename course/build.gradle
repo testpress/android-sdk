@@ -46,6 +46,8 @@ dependencies {
 
     androidTestImplementation rootProject.junit
     androidTestImplementation rootProject.testRunner
+    compile project(path: ':store')
+    testImplementation rootProject.mockServer
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

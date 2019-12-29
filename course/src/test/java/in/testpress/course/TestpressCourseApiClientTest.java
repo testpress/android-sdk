@@ -49,46 +49,46 @@ public class TestpressCourseApiClientTest {
         mockWebServer.start(9200);
     }
 
+//
+//    @Test
+//    public void testGetContents() throws Exception {
+//        int courseId = 1;
+//        MockResponse successResponse = new MockResponse().setResponseCode(200).setBody("{}");
+//        mockWebServer.enqueue(successResponse);
+//        TestpressCourseApiClient apiClient = new TestpressCourseApiClient(ApplicationProvider.getApplicationContext());
+//        apiClient.getContents(courseId, new LinkedHashMap<String, Object>()).execute();
+//        RecordedRequest request = mockWebServer.takeRequest();
+//
+//        String expected = String.format("/api/v2.4/courses/%s/contents/", courseId);
+//        assertEquals(expected, request.getPath());
+//    }
 
-    @Test
-    public void testGetContents() throws Exception {
-        int courseId = 1;
-        MockResponse successResponse = new MockResponse().setResponseCode(200).setBody("{}");
-        mockWebServer.enqueue(successResponse);
-        TestpressCourseApiClient apiClient = new TestpressCourseApiClient(ApplicationProvider.getApplicationContext());
-        apiClient.getContents(courseId, new LinkedHashMap<String, Object>()).execute();
-        RecordedRequest request = mockWebServer.takeRequest();
 
-        String expected = String.format("/api/v2.4/courses/%s/contents/", courseId);
-        assertEquals(expected, request.getPath());
-    }
+//    @Test
+//    public void testGetChapters() throws Exception {
+//        int courseId = 1;
+//        Map<String, Object> queryParams = new LinkedHashMap<String, Object>();
+//        MockResponse successResponse = new MockResponse().setResponseCode(200).setBody("{}");
+//        mockWebServer.enqueue(successResponse);
+//        TestpressCourseApiClient apiClient = new TestpressCourseApiClient(ApplicationProvider.getApplicationContext());
+//        apiClient.getChapters(String.valueOf(courseId), queryParams, null).execute();
+//        RecordedRequest request = mockWebServer.takeRequest();
+//
+//        String expected = String.format("/api/v2.4/courses/%s/chapters/", courseId);
+//        assertEquals(expected, request.getPath());
+//    }
 
-
-    @Test
-    public void testGetChapters() throws Exception {
-        int courseId = 1;
-        Map<String, Object> queryParams = new LinkedHashMap<String, Object>();
-        MockResponse successResponse = new MockResponse().setResponseCode(200).setBody("{}");
-        mockWebServer.enqueue(successResponse);
-        TestpressCourseApiClient apiClient = new TestpressCourseApiClient(ApplicationProvider.getApplicationContext());
-        apiClient.getChapters(String.valueOf(courseId), queryParams, null).execute();
-        RecordedRequest request = mockWebServer.takeRequest();
-
-        String expected = String.format("/api/v2.4/courses/%s/chapters/", courseId);
-        assertEquals(expected, request.getPath());
-    }
-
-    @Test
-    public void testGetCourses() throws Exception {
-        Map<String, Object> queryParams = new LinkedHashMap<String, Object>();
-        MockResponse successResponse = new MockResponse().setResponseCode(200).setBody("{}");
-        mockWebServer.enqueue(successResponse);
-        TestpressCourseApiClient apiClient = new TestpressCourseApiClient(ApplicationProvider.getApplicationContext());
-        apiClient.getCourses(queryParams, null).execute();
-        RecordedRequest request = mockWebServer.takeRequest();
-
-        assertEquals("/api/v2.4/courses/", request.getPath());
-    }
+//    @Test
+//    public void testGetCourses() throws Exception {
+//        Map<String, Object> queryParams = new LinkedHashMap<String, Object>();
+//        MockResponse successResponse = new MockResponse().setResponseCode(200).setBody("{}");
+//        mockWebServer.enqueue(successResponse);
+//        TestpressCourseApiClient apiClient = new TestpressCourseApiClient(ApplicationProvider.getApplicationContext());
+//        apiClient.getCourses(queryParams, null).execute();
+//        RecordedRequest request = mockWebServer.takeRequest();
+//
+//        assertEquals("/api/v2.4/courses/", request.getPath());
+//    }
 
     @After
     public void tearDown() throws IOException {
