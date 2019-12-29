@@ -193,7 +193,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     }
 
     private void loadChildChapters() {
-        ChaptersGridFragment fragment = new ChaptersGridFragment();
+        ChaptersListFragment fragment = new ChaptersListFragment();
         fragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                 .commitAllowingStateLoss();
