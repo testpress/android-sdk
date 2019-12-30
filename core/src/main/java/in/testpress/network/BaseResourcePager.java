@@ -6,6 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import in.testpress.core.TestpressRetrofitRequest;
+import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.models.TestpressApiResponse;
 import retrofit2.Response;
@@ -43,6 +45,8 @@ public abstract class BaseResourcePager<E> {
      * Are more pages available?
      */
     protected boolean hasMore;
+
+    protected RetrofitCall<TestpressApiResponse<E>> retrofitCall;
 
     /**
      * Reset the number of the next page to be requested from {@link #next()}
@@ -122,19 +126,10 @@ public abstract class BaseResourcePager<E> {
                 emptyPage = resourcePage.isEmpty();
                 if (emptyPage)
                     break;
-                for (E resource : resourcePage) {
-                    resource = register(resource);
-                    if (resource == null)
-                        continue;
-                    resources.put(getId(resource), resource);
-                }
+                storeReesource(resourcePage);
                 page++;
             }
-            // Set count value to 1 if first load request made after call clear()
-            if (count > 1) {
-                count = 1;
-            }
-
+            resetPageCount();
         } catch (Exception e) {
             hasMore = false;
             if (e instanceof IOException) {
@@ -145,6 +140,57 @@ public abstract class BaseResourcePager<E> {
         }
         hasMore = hasNext() && !emptyPage;
         return hasMore;
+    }
+
+    private void storeReesource(List<E> resourcePage) {
+        for (E resource : resourcePage) {
+            resource = register(resource);
+            if (resource == null)
+                continue;
+            resources.put(getId(resource), resource);
+        }
+    }
+
+    private void resetPageCount() {
+        // Set count value to 1 if first load request made after call clear()
+        if (count > 1) {
+            count = 1;
+        }
+    }
+
+
+    public RetrofitCall<TestpressApiResponse<E>> fetchItemsAsync(
+            final TestpressRetrofitRequest<E> retrofitRequest, final TestpressCallback<List<E>> callback) {
+        retrofitCall = retrofitRequest.getRetrofitCall(page, -1).enqueue(new TestpressCallback<TestpressApiResponse<E>>() {
+            @Override
+            public void onSuccess(TestpressApiResponse<E> result) {
+                response = result;
+                List<E> resourcePage = response.getResults();
+
+                if (resourcePage.isEmpty()) {
+                    hasMore = false;
+                } else {
+                    storeReesource(resourcePage);
+                    page++;
+
+                    if (hasNext()) {
+                        fetchItemsAsync(retrofitRequest, callback);
+                        return;
+                    }
+
+                    hasMore = hasNext();
+                }
+                resetPageCount();
+                callback.onSuccess(getResources());
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                hasMore = false;
+                callback.onException(exception);
+            }
+        });
+        return retrofitCall;
     }
 
     public boolean hasNext() {
