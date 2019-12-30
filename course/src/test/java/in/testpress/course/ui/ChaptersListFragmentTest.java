@@ -25,8 +25,6 @@ import in.testpress.course.R;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
-import in.testpress.ui.UserActivityFragment;
-import in.testpress.ui.UserDevicesActivity;
 import in.testpress.util.SingleTypeAdapter;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -112,6 +110,7 @@ public class ChaptersListFragmentTest {
     @After
     public void tearDown() throws IOException {
         mockWebServer.shutdown();
+        activity.getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
         resetSingleton(TestpressSDKDatabase.class, "database");
         resetSingleton(TestpressSDKDatabase.class, "daoSession");
     }
