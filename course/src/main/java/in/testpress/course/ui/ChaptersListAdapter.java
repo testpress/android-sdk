@@ -75,25 +75,28 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
         }
     }
 
+    private void addOnClickForChapter(final Chapter chapter) {
+        if (!chapter.getIsLocked()) {
+            view(4).setClickable(true);
+            view(4).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.startActivity(ChapterDetailActivity.createIntent(
+                            chapter.getUrl(),
+                            activity)
+                    );
+                }
+            });
+        }
+    }
+
     @Override
     protected void update(final int position, final Chapter chapter) {
         textView(0).setTypeface(TestpressSdk.getRubikMediumFont(activity));
         setText(0, chapter.getName());
         displayThumbnail(chapter);
         showOrLockChapter(chapter);
-
-        if (!chapter.getIsLocked()) {
-            view(4).setClickable(true);
-            view(4).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                activity.startActivity(ChapterDetailActivity.createIntent(
-                    chapter.getUrl(),
-                    activity)
-                );
-                }
-            });
-        }
+        addOnClickForChapter(chapter);
     }
 
 }

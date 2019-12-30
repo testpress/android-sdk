@@ -23,7 +23,7 @@ import static in.testpress.course.TestpressCourse.PARENT_ID;
 
 public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
-    private TestpressCourseApiClient mApiClient;
+    private TestpressCourseApiClient apiClient;
     private String courseId;
     private String parentId = "null";
     private ChapterDao chapterDao;
@@ -41,7 +41,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
             parentId = getArguments().getString(PARENT_ID);
         }
 
-        mApiClient = new TestpressCourseApiClient(getActivity());
+        apiClient = new TestpressCourseApiClient(getActivity());
         chapterDao = TestpressSDKDatabase.getChapterDao(getActivity());
     }
 
@@ -65,7 +65,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
     @Override
     protected void setEmptyText() {
-            setEmptyText(R.string.testpress_no_content, R.string.testpress_no_content_description,
+        setEmptyText(R.string.testpress_no_content, R.string.testpress_no_content_description,
                     R.drawable.ic_error_outline_black_18dp);
     }
 
@@ -83,9 +83,9 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
             QueryBuilder<Chapter> courseChaptersQueryBuilder = Chapter.getCourseChaptersQueryBuilder(getContext(), courseId);
 
             if (parentId.equals("null") && courseChaptersQueryBuilder.count() == 0) {
-                pager = new ChapterPager(courseId, mApiClient);
+                pager = new ChapterPager(courseId, apiClient);
             } else {
-                pager = new ChapterPager(courseId, parentId, mApiClient);
+                pager = new ChapterPager(courseId, parentId, apiClient);
                 QueryBuilder<Chapter> parentChaptersQueryBuilder = Chapter.getParentChaptersQueryBuilder(getContext(), courseId, parentId);
 
                 if (parentChaptersQueryBuilder.count() > 0) {
