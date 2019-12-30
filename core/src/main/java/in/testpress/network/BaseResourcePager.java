@@ -126,7 +126,7 @@ public abstract class BaseResourcePager<E> {
                 emptyPage = resourcePage.isEmpty();
                 if (emptyPage)
                     break;
-                storeReesource(resourcePage);
+                storeResource(resourcePage);
                 page++;
             }
             resetPageCount();
@@ -142,7 +142,7 @@ public abstract class BaseResourcePager<E> {
         return hasMore;
     }
 
-    private void storeReesource(List<E> resourcePage) {
+    private void storeResource(List<E> resourcePage) {
         for (E resource : resourcePage) {
             resource = register(resource);
             if (resource == null)
@@ -168,7 +168,7 @@ public abstract class BaseResourcePager<E> {
                 List<E> resourcePage = response.getResults();
 
                 if (!resourcePage.isEmpty()) {
-                    storeReesource(resourcePage);
+                    storeResource(resourcePage);
                     page++;
 
                     if (hasNext()) {
