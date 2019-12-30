@@ -80,9 +80,11 @@ public class CourseListFragment extends BaseDataBaseFragment<Course, Long> {
         this.items = courses;
         courses = Course.updateCoursesWithLocalVariables(getActivity(), courses);
         // getDao().deleteAll();
+        Log.d("CourseListFragment", "onLoadFinished: 1 " + getDao().count() +" " + courses.size());
         if (!courses.isEmpty()) {
             getDao().insertOrReplaceInTx(courses);
         }
+        Log.d("CourseListFragment", "onLoadFinished: " + getDao().count());
         displayDataFromDB();
         showList();
     }

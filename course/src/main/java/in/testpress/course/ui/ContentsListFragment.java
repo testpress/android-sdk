@@ -33,6 +33,7 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
     long chapterId;
 
     public static ContentsListFragment getInstance(long chapterId) {
+        Log.d("ContentsListFragment", "getInstance: ");
         ContentsListFragment fragment = new ContentsListFragment();
         Bundle bundle = new Bundle();
         bundle.putLong(CHAPTER_ID, chapterId);
@@ -52,7 +53,6 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
         assert getArguments() != null;
         chapterId = getArguments().getLong(CHAPTER_ID);
         product_slug = getArguments().getString(PRODUCT_SLUG);
-        Log.d("ContentsListFragment", "onCreate: " + product_slug);
 
     }
 
@@ -89,6 +89,7 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
         RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
         buyNowButton.setLayoutParams(lp);
         buyNowButton.setVisibility(View.INVISIBLE);
+
         if (product_slug != null) {
             buyNowButton.setVisibility(View.VISIBLE);
             buyNowButton.setOnClickListener(new View.OnClickListener() {

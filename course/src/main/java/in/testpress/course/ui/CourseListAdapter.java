@@ -124,6 +124,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         view(3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("CourseListAdapter", "onClick: " + course.getChildItemsLoaded() + course.getChaptersCount());
                 if (course.getChildItemsLoaded() || course.getChaptersCount() == 0) {
                     openCourseContentsOrExternalLink(mActivity, course, !course.isCourseForRegistration());
                 } else {
@@ -243,6 +244,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
                     progressDialog.setProgress(progressDialog.getMax());
                     ContentDao contentDao = TestpressSDKDatabase.getContentDao(mActivity);
                     contentDao.insertOrReplaceInTx(contents);
+                    Log.d("CourseListAdapter", "onSuccess: " + course.getTitle());
                     course.setChildItemsLoaded(true);
                     mCourseDao.insertOrReplace(course);
                     progressDialog.dismiss();

@@ -1,6 +1,7 @@
 package in.testpress.models.greendao;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.greenrobot.greendao.annotation.*;
 
@@ -329,6 +330,7 @@ public class Course {
 
             if (!coursesFromDB.isEmpty()) {
                 Course courseFromDB = coursesFromDB.get(0);
+                Log.d("Course", "updateCoursesWithLocalVariables: " + courseFromDB.getTitle() + " " + courseFromDB.getChildItemsLoaded());
                 course.setChildItemsLoaded(courseFromDB.getChildItemsLoaded());
             }
         }

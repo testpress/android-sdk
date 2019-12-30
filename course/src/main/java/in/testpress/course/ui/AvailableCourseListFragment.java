@@ -58,14 +58,6 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> {
         return refreshPager;
     }
 
-    protected void displayDataFromDB() {
-        getListAdapter().notifyDataSetChanged();
-
-        if (isItemsEmpty()) {
-            setEmptyText();
-            retryButton.setVisibility(View.GONE);
-        }
-    }
 
     @Override
     public Loader<List<Product>> onCreateLoader(int id, Bundle args) {
@@ -90,9 +82,11 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> {
             List<Course> courses = pager.getListResponse().getCourses();
             for (Course course: courses) {
                 course.setIsProduct(true);
+                course.setChildItemsLoaded(true);
                 courseDao.insertOrReplace(course);
             }
             courseDao.insertOrReplaceInTx(courses);
+            Course.updateCoursesWithLocalVariables(getContext(), courses);
             return pager.getListResponse().getProducts();
         }
     }
@@ -174,7 +168,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> {
     @Override
     protected void setEmptyText() {
         setEmptyText(R.string.testpress_no_courses, R.string.testpress_no_courses_description,
-                    R.drawable.ic_error_outline_black_18dp);
+                R.drawable.ic_error_outline_black_18dp);
     }
 
     @Override

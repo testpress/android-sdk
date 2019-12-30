@@ -65,7 +65,6 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         intent.putExtra(ACTIONBAR_TITLE, title);
         intent.putExtra(COURSE_ID, courseId);
         intent.putExtra(PRODUCT_SLUG, product_slug);
-        Log.d("ChapterDetailActivity", "createIntent: " + product_slug);
         return intent;
     }
 
@@ -84,7 +83,6 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         chapterDao = TestpressSDKDatabase.getChapterDao(this);
         chapterSlug = getIntent().getStringExtra(CHAPTER_SLUG);
         product_slug = getIntent().getStringExtra(PRODUCT_SLUG);
-        Log.d("ChapterDetailActivity", "onCreate 123: " + product_slug);
         if (chapterSlug != null) {
             emptyView = (LinearLayout) findViewById(R.id.empty_container);
             emptyTitleView = (TextView) findViewById(R.id.empty_title);
@@ -121,7 +119,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                     TestpressSdk.getTestpressSession(this).getInstituteSettings();
 
             if (instituteSettings.isCoursesFrontend() &&
-                    instituteSettings.isCoursesGamificationEnabled()) {
+                    instituteSettings.isCoursesGamificationEnabled() && product_slug == null) {
 
                 findViewById(R.id.fragment_carousel).setVisibility(View.VISIBLE);
                 findViewById(R.id.fragment_container).setVisibility(View.GONE);
@@ -220,9 +218,10 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         } else if (fragment instanceof ContentsListFragment) {
             ContentsListFragment contentsListFragment = (ContentsListFragment) fragment;
             fragment.setArguments(getIntent().getExtras());
-            showFragment(ChaptersGridFragment.getInstance(
+            showFragment(ChaptersListFragment.getInstance(
                     courseId,
-                    getParentChapterId(contentsListFragment.chapterId), product_slug
+                    getParentChapterId(contentsListFragment.chapterId),
+                    product_slug
             ));
         } else {
             super.onBackPressed();
@@ -250,7 +249,6 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             getIntent().putExtra(CONTENTS_URL_FRAG, chapter.getContentUrl());
             getIntent().putExtra(CHAPTER_ID, chapter.getId());
             getIntent().putExtra(PRODUCT_SLUG, product_slug);
-            Log.d("ContentsListFragment", "onChapterLoaded: " + product_slug);
             loadContents();
         } else {
             setEmptyText(R.string.testpress_no_content,
@@ -266,6 +264,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     }
 
     private void loadContents() {
+        Log.d("Hello Hello", "loadContents: ");
         ContentsListFragment fragment = new ContentsListFragment();
         Log.d("ContentsListFragment", "loadContents: " + getIntent().getStringExtra(PRODUCT_SLUG));
         fragment.setArguments(getIntent().getExtras());
@@ -303,6 +302,10 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                 data.putString(CHAPTER_SLUG, chapter.getParentSlug());
             } else {
                 data.putLong(COURSE_ID, Long.valueOf(chapter.getCourseId()));
+            }
+
+            if(product_slug != null) {
+                data.putString(PRODUCT_SLUG, product_slug);
             }
         }
         return data;

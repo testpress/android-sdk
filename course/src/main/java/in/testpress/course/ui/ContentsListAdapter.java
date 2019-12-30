@@ -33,6 +33,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
 
     private final Activity mActivity;
     private ImageLoader mImageLoader;
+    private DisplayImageOptions mOptions;
     private ContentDao contentDao;
     private CourseDao courseDao;
     private ChapterDao chapterDao;
@@ -94,7 +95,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
             setGone(1, true);
         } else {
             setGone(1, false);
-            mImageLoader.displayImage(content.getImage(), imageView(1));
+            mImageLoader.displayImage(content.getImage(), imageView(1), mOptions);
         }
         Exam exam = content.getRawExam();
         // Validate lock

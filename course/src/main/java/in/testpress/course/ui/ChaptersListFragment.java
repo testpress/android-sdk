@@ -31,6 +31,7 @@ import static in.testpress.course.TestpressCourse.CHAPTER_ID;
 import static in.testpress.course.TestpressCourse.CHAPTER_SLUG;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_CHAPTER_ID;
+import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 import static in.testpress.network.TestpressApiClient.MODIFIED_SINCE;
 import static in.testpress.network.TestpressApiClient.ORDER;
 import static in.testpress.network.TestpressApiClient.UNFILTERED;
@@ -47,11 +48,14 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> im
     private Course course;
     private boolean chaptersModified;
     private BaseResourcePager currentPager;
+    private String product_slug;
 
-    public static ChaptersListFragment getInstance(long courseId, Long parentChapterId) {
+
+    public static ChaptersListFragment getInstance(long courseId, Long parentChapterId, String product_slug) {
         ChaptersListFragment fragment = new ChaptersListFragment();
         Bundle bundle = new Bundle();
         bundle.putLong(COURSE_ID, courseId);
+        bundle.putString(PRODUCT_SLUG, product_slug);
         if (parentChapterId != null && parentChapterId != 0) {
             bundle.putString(PARENT_CHAPTER_ID, parentChapterId.toString());
         }
@@ -64,6 +68,8 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> im
         super.onCreate(savedInstanceState);
         assert getArguments() != null;
         courseId =  getArguments().getLong(COURSE_ID);
+        product_slug = getArguments().getString(PRODUCT_SLUG);
+
         if (getArguments().getString(PARENT_CHAPTER_ID) != null) {
             parentChapterId = getArguments().getString(PARENT_CHAPTER_ID);
         }
@@ -185,6 +191,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> im
         ContentsListFragment fragment = new ContentsListFragment();
         Bundle bundle = new Bundle();
         bundle.putLong(CHAPTER_ID, chapter.getId());
+        bundle.putString(PRODUCT_SLUG, product_slug);
         fragment.setArguments(bundle);
         assert getFragmentManager() != null;
 

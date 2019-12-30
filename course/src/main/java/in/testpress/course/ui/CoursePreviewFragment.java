@@ -41,7 +41,6 @@ public class CoursePreviewFragment extends BaseListViewFragment<Course> {
     private Button buyNowButton;
 
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +60,8 @@ public class CoursePreviewFragment extends BaseListViewFragment<Course> {
 
     @Override
     protected void setEmptyText() {
-
+        setEmptyText(R.string.testpress_no_courses, R.string.testpress_no_courses_description,
+                R.drawable.ic_error_outline_black_18dp);
     }
 
     @Override
@@ -98,7 +98,6 @@ public class CoursePreviewFragment extends BaseListViewFragment<Course> {
     protected SingleTypeAdapter<Course> createAdapter(
             List<Course> items) {
         courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.in(course_ids)).list();
-        Log.d("CourseListAdapter", "createAdapter: " + product_slug);
         return new CourseListAdapter(getActivity(), courseDao, courses, product_slug);
     }
 

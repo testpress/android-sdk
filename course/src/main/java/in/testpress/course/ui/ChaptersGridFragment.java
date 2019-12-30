@@ -314,6 +314,7 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
     }
 
     private void displayContents(Chapter chapter) {
+        Log.d("ChapterGridFragment", "displayContents: ");
         ContentsListFragment fragment = new ContentsListFragment();
         Bundle bundle = new Bundle();
         bundle.putLong(CHAPTER_ID, chapter.getId());
