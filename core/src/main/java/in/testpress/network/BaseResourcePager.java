@@ -167,9 +167,7 @@ public abstract class BaseResourcePager<E> {
                 response = result;
                 List<E> resourcePage = response.getResults();
 
-                if (resourcePage.isEmpty()) {
-                    hasMore = false;
-                } else {
+                if (!resourcePage.isEmpty()) {
                     storeReesource(resourcePage);
                     page++;
 
@@ -177,9 +175,9 @@ public abstract class BaseResourcePager<E> {
                         fetchItemsAsync(retrofitRequest, callback);
                         return;
                     }
-
-                    hasMore = hasNext();
                 }
+
+                hasMore = hasNext();
                 resetPageCount();
                 callback.onSuccess(getResources());
             }
