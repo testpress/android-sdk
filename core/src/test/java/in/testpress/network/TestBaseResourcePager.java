@@ -27,6 +27,9 @@ import static in.testpress.network.TestpressApiClient.PAGE;
 
 @RunWith(RobolectricTestRunner.class)
 public class TestBaseResourcePager {
+    private SamplePager pager;
+    private TestpressApiClient apiClient;
+
     private class SamplePager extends BaseResourcePager<AccountActivity> {
 
         private TestpressApiClient apiClient;;
@@ -61,6 +64,9 @@ public class TestBaseResourcePager {
         TestpressSdk.setTestpressSession(ApplicationProvider.getApplicationContext(),
                 new TestpressSession(instituteSettings, USER_TOKEN));
         mockWebServer.start(9200);
+
+        apiClient = new TestpressApiClient(ApplicationProvider.getApplicationContext(), TestpressSdk.getTestpressSession(ApplicationProvider.getApplicationContext()));
+        pager = new SamplePager(apiClient);
     }
 
 
@@ -86,8 +92,6 @@ public class TestBaseResourcePager {
 
     @Test
     public void testRetrofitCall() throws Exception{
-        final TestpressApiClient apiClient = new TestpressApiClient(ApplicationProvider.getApplicationContext(), TestpressSdk.getTestpressSession(ApplicationProvider.getApplicationContext()));
-        final SamplePager pager = new SamplePager(apiClient);
         MockResponse successResponse = new MockResponse().setResponseCode(200);
         mockWebServer.enqueue(successResponse);
 
