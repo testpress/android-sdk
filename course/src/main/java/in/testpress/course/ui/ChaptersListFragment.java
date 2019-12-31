@@ -31,18 +31,21 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        courseId =  getArguments().getString(COURSE_ID);
+        storeArgs();
+        apiClient = new TestpressCourseApiClient(getActivity());
+        chapterDao = TestpressSDKDatabase.getChapterDao(getActivity());
+    }
 
-        if (getArguments() == null || courseId == null || courseId.isEmpty()) {
-            throw new IllegalArgumentException("COURSE_ID must not be null or empty");
-        }
+    private void storeArgs() {
+        courseId = getArguments().getString(COURSE_ID);
 
         if (getArguments().getString(PARENT_ID) != null) {
             parentId = getArguments().getString(PARENT_ID);
         }
 
-        apiClient = new TestpressCourseApiClient(getActivity());
-        chapterDao = TestpressSDKDatabase.getChapterDao(getActivity());
+        if (getArguments() == null || courseId == null || courseId.isEmpty()) {
+            throw new IllegalArgumentException("COURSE_ID must not be null or empty");
+        }
     }
 
     @Override
@@ -66,12 +69,11 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     @Override
     protected void setEmptyText() {
         setEmptyText(R.string.testpress_no_content, R.string.testpress_no_content_description,
-                    R.drawable.ic_error_outline_black_18dp);
+                R.drawable.ic_error_outline_black_18dp);
     }
 
     @Override
-    protected SingleTypeAdapter<Chapter> createAdapter(
-            List<Chapter> items) {
+    protected SingleTypeAdapter<Chapter> createAdapter(List<Chapter> items) {
         return new ChaptersListAdapter(getActivity(), courseId, parentId);
     }
 

@@ -25,10 +25,10 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
     ChaptersListAdapter(Activity activity, String courseId, String parentId) {
         super(activity.getLayoutInflater(), R.layout.testpress_chapters_list_item);
         this.activity = activity;
-        this.imageLoader = ImageUtils.initImageLoader(activity);
-        this.options = ImageUtils.getPlaceholdersOption();
         this.courseId = courseId;
         this.parentId = parentId;
+        this.imageLoader = ImageUtils.initImageLoader(activity);
+        this.options = ImageUtils.getPlaceholdersOption();
     }
 
     @Override
