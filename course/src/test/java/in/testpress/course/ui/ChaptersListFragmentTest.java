@@ -57,15 +57,18 @@ public class ChaptersListFragmentTest {
         this.chapter = chapter;
     }
 
+    private void initSession() {
+        instituteSettings =
+                new InstituteSettings("http://localhost:9200");
+        TestpressSdk.setTestpressSession(ApplicationProvider.getApplicationContext(),
+                new TestpressSession(instituteSettings, USER_TOKEN));
+    }
+
     @Before
     public void setUp() throws IOException {
         createChapter();
-        mockWebServer = new MockWebServer();
-        instituteSettings =
-                new InstituteSettings("http://localhost:9200");
-        instituteSettings.setLockoutLimit(1);
-        TestpressSdk.setTestpressSession(ApplicationProvider.getApplicationContext(),
-                new TestpressSession(instituteSettings, USER_TOKEN));
+        initSession();
+        createAndStartMockServer();
         Intent intent = new Intent();
         intent.putExtra(COURSE_ID, "1");
         activity = Robolectric.buildActivity(ChapterDetailActivity.class, intent)
@@ -77,6 +80,10 @@ public class ChaptersListFragmentTest {
         fragment.setArguments(activity.getIntent().getExtras());
         activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                 .commitAllowingStateLoss();
+    }
+
+    private void createAndStartMockServer() throws IOException {
+        mockWebServer = new MockWebServer();
         mockWebServer.start(9200);
     }
 
