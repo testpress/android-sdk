@@ -77,6 +77,18 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         return new ChaptersListAdapter(getActivity(), courseId, parentId);
     }
 
+    private void setLastModifiedForPager() {
+        QueryBuilder<Chapter> parentChaptersQueryBuilder = Chapter.getParentChaptersQueryBuilder(getContext(), courseId, parentId);
+
+        if (parentChaptersQueryBuilder.count() > 0) {
+            Chapter latestChapter = parentChaptersQueryBuilder
+                    .orderDesc(ChapterDao.Properties.ModifiedDate)
+                    .listLazy().get(0);
+
+            ((ChapterPager) pager).setLatestModifiedDate(latestChapter.getModified());
+        }
+    }
+
 
     @Override
     protected BaseResourcePager<Chapter> getPager() {
@@ -87,16 +99,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
                 pager = new ChapterPager(courseId, apiClient);
             } else {
                 pager = new ChapterPager(courseId, parentId, apiClient);
-                QueryBuilder<Chapter> parentChaptersQueryBuilder = Chapter.getParentChaptersQueryBuilder(getContext(), courseId, parentId);
-
-                if (parentChaptersQueryBuilder.count() > 0) {
-                    Chapter latestChapter = parentChaptersQueryBuilder
-                            .orderDesc(ChapterDao.Properties.ModifiedDate)
-                            .listLazy().get(0);
-
-                    ((ChapterPager) pager).setLatestModifiedDate(latestChapter.getModified());
-                }
-
+                setLastModifiedForPager();
             }
         }
         return pager;
