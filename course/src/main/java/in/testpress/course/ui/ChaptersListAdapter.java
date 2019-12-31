@@ -22,14 +22,13 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
     private String courseId;
     private String parentId;
 
-    ChaptersListAdapter(Activity activity, final List<Chapter> items, int layout, String courseId, String parentId) {
-        super(activity.getLayoutInflater(), layout);
+    ChaptersListAdapter(Activity activity, String courseId, String parentId) {
+        super(activity.getLayoutInflater(), R.layout.testpress_chapters_list_item);
         this.activity = activity;
         this.imageLoader = ImageUtils.initImageLoader(activity);
         this.options = ImageUtils.getPlaceholdersOption();
         this.courseId = courseId;
         this.parentId = parentId;
-        setItems(items);
     }
 
     @Override
