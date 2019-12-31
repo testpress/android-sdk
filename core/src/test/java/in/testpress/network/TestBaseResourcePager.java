@@ -43,6 +43,26 @@ public class TestBaseResourcePager {
             return resource.getId();
         }
 
+        public TestpressRetrofitRequest<AccountActivity> getRetrofitCall(final TestpressApiClient apiClient, final SamplePager pager) {
+            return new TestpressRetrofitRequest<AccountActivity>() {
+                @Override
+                public RetrofitCall<TestpressApiResponse<AccountActivity>> getRetrofitCall(
+                        int page, int size) {
+                    return apiClient.getAccountActivity(pager.queryParams);
+                }
+            };
+        }
+
+        public TestpressCallback<List<AccountActivity>> testpressCallback() {
+            return new TestpressCallback<List<AccountActivity>>() {
+                @Override
+                public void onSuccess(List<AccountActivity> result) {}
+
+                @Override
+                public void onException(TestpressException exception) {}
+            };
+        }
+
         @Override
         public Response<TestpressApiResponse<AccountActivity>> getItems(int page, int size) throws IOException {
             queryParams.put(PAGE, page);
@@ -70,32 +90,12 @@ public class TestBaseResourcePager {
     }
 
 
-    public TestpressCallback<List<AccountActivity>> testpressCallback() {
-        return new TestpressCallback<List<AccountActivity>>() {
-            @Override
-            public void onSuccess(List<AccountActivity> result) {}
-
-            @Override
-            public void onException(TestpressException exception) {}
-        };
-    }
-
-    public TestpressRetrofitRequest<AccountActivity> getRetrofitCall(final TestpressApiClient apiClient, final SamplePager pager) {
-        return new TestpressRetrofitRequest<AccountActivity>() {
-            @Override
-            public RetrofitCall<TestpressApiResponse<AccountActivity>> getRetrofitCall(
-                    int page, int size) {
-                return apiClient.getAccountActivity(pager.queryParams);
-            }
-        };
-    }
-
     @Test
     public void testRetrofitCall() throws Exception{
         MockResponse successResponse = new MockResponse().setResponseCode(200);
         mockWebServer.enqueue(successResponse);
 
-        pager.fetchItemsAsync(getRetrofitCall(apiClient, pager), testpressCallback());
+        pager.fetchItemsAsync(pager.getRetrofitCall(apiClient, pager), pager.testpressCallback());
         mockWebServer.takeRequest();
 
         assert pager.retrofitCall != null;
