@@ -89,7 +89,7 @@ import static in.testpress.course.network.TestpressCourseApiClient.TIME_RANGES;
 public class ExoPlayerUtil {
 
     private static final int OVERLAY_POSITION_CHANGE_INTERVAL = 15000; // 15s
-    private static final int VIDEO_ATTEMPT_UPDATE_INTERVAL = 3000; // 3s
+    private static final int VIDEO_ATTEMPT_UPDATE_INTERVAL = 60000; // 60s
 
     private FrameLayout exoPlayerMainFrame;
     private View exoPlayerLayout;
