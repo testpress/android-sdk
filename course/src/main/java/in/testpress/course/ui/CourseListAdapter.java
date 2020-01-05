@@ -51,7 +51,6 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         if (!courses.isEmpty()) {
             return courses.get(position);
         }
-
         return mCourseDao.queryBuilder()
                 .where(CourseDao.Properties.IsMyCourse.eq(true))
                 .orderAsc(CourseDao.Properties.Order)
@@ -114,7 +113,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
             activity.startActivity(ChapterDetailActivity.createIntent(
                     course.getTitle(),
                     course.getId().toString(),
-                    activity));
+                    activity, this.product_slug));
         } else {
             Intent intent = new Intent(activity, WebViewActivity.class);
             intent.putExtra("URL", course.getExternal_content_link());

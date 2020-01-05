@@ -20,6 +20,7 @@ import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.network.BaseResourcePager;
+import in.testpress.store.ui.ProductDetailsActivity;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -33,6 +34,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     private String parentId;
     private ChapterDao chapterDao;
     private CourseDao courseDao;
+    private String product_slug;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
     private void storeArgs() {
         courseId = getArguments().getString(COURSE_ID);
+        product_slug = getArguments().getString(PRODUCT_SLUG);
 
         if (getArguments().getString(PARENT_ID) != null) {
             parentId = getArguments().getString(PARENT_ID);
