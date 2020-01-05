@@ -12,7 +12,7 @@ import in.testpress.core.TestpressSession;
 import in.testpress.course.ui.ChapterDetailActivity;
 import in.testpress.course.ui.ContentActivity;
 import in.testpress.course.ui.CourseListActivity;
-import in.testpress.course.ui.CourseListFragment;
+import in.testpress.course.ui.MyCoursesFragment;
 import in.testpress.course.ui.LeaderboardActivity;
 import in.testpress.course.ui.LeaderboardFragment;
 import in.testpress.util.Assert;
@@ -52,7 +52,7 @@ public class TestpressCourse {
         Assert.assertNotNull("Activity must not be null.", activity);
 
         init(activity.getApplicationContext(), testpressSession);
-        CourseListFragment.show(activity, containerViewId);
+        MyCoursesFragment.show(activity, containerViewId);
     }
 
     /**
@@ -85,13 +85,13 @@ public class TestpressCourse {
      * @param context Context
      * @param testpressSession TestpressSession got from the core module
      */
-    public static CourseListFragment getCoursesListFragment(@NonNull Context context,
-                                                            @NonNull TestpressSession testpressSession) {
+    public static MyCoursesFragment getCoursesListFragment(@NonNull Context context,
+                                                           @NonNull TestpressSession testpressSession) {
 
         Assert.assertNotNull("Context must not be null.", context);
 
         init(context.getApplicationContext(), testpressSession);
-        return new CourseListFragment();
+        return new MyCoursesFragment();
     }
 
     /**

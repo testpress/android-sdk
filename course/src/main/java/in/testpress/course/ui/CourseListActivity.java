@@ -12,7 +12,7 @@ public class CourseListActivity extends BaseToolBarActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_container_layout);
-        CourseListFragment fragment = new CourseListFragment();
+        MyCoursesFragment fragment = new MyCoursesFragment();
         fragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                 .commitAllowingStateLoss();
