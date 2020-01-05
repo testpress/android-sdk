@@ -99,7 +99,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                 //noinspection ConstantConditions
                 getSupportActionBar().setTitle(title);
             } else {
-                String courseId = getIntent().getStringExtra(COURSE_ID);
+                long courseId = getIntent().getLongExtra(COURSE_ID, -1);
                 CourseDao courseDao = TestpressSDKDatabase.getCourseDao(this);
                 List<Course> courses = courseDao.queryBuilder()
                         .where(CourseDao.Properties.Id.eq(courseId)).list();

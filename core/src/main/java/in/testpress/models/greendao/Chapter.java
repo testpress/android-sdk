@@ -277,6 +277,60 @@ public class Chapter {
         }
         return getCourseChaptersQueryBuilder(context, courseId).where(parentCondition);
     }
+    
+    public Integer getRawChildrenCount(Context context) {
+        if (childrenCount != null) {
+            return childrenCount;
+        }
+        ChapterDao chapterDao = TestpressSDKDatabase.getChapterDao(context);
+        List<Chapter> chaptersFromDB = chapterDao.queryBuilder()
+                .where(
+                        ChapterDao.Properties.ParentId.eq(getId()),
+                        ChapterDao.Properties.Active.eq(true)
+                ).list();
+
+        return chaptersFromDB.size();
+    }
+
+    public Integer getRawContentsCount(Context context) {
+        if (contentsCount != null) {
+            return contentsCount;
+        }
+        ContentDao contentDao = TestpressSDKDatabase.getContentDao(context);
+        List<Content> contentsFromDB = contentDao.queryBuilder()
+                .where(
+                        ContentDao.Properties.ChapterId.eq(getId()),
+                        ContentDao.Properties.Active.eq(true)
+                ).list();
+
+        return contentsFromDB.size();
+    }
+
+    public static QueryBuilder<Chapter> getAllChaptersQueryBuilder(
+            Context context, long courseId) {
+        return TestpressSDKDatabase.getChapterDao(context).queryBuilder()
+                .where(ChapterDao.Properties.CourseId.eq(courseId));
+    }
+
+    public static QueryBuilder<Chapter> getAllActiveChaptersQueryBuilder(Context context,
+                                                                         long courseId) {
+        return getAllChaptersQueryBuilder(context, courseId)
+                .where(ChapterDao.Properties.Active.eq(true));
+    }
+
+    public static QueryBuilder<Chapter> getRootChaptersQueryBuilder(Context context, long courseId) {
+        return getAllActiveChaptersQueryBuilder(context, courseId)
+                .where(ChapterDao.Properties.ParentId.isNull())
+                .orderAsc(ChapterDao.Properties.Order);
+    }
+
+    public boolean hasSubChapters(Context context) {
+        return getRawChildrenCount(context) > 0;
+    }
+
+    public boolean hasContents(Context context) {
+        return getRawContentsCount(context) > 0;
+    }
     // KEEP METHODS END
 
 }

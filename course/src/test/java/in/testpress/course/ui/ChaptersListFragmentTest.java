@@ -25,6 +25,8 @@ import in.testpress.course.R;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
+import in.testpress.models.greendao.Course;
+import in.testpress.models.greendao.CourseDao;
 import in.testpress.util.SingleTypeAdapter;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -43,6 +45,13 @@ public class ChaptersListFragmentTest {
     private ChaptersListFragment fragment;
     private MockWebServer mockWebServer;
 
+
+    public void createCourse() {
+        CourseDao dao = TestpressSDKDatabase.getCourseDao(ApplicationProvider.getApplicationContext());
+        Course course = new Course();
+        course.setId((long)1);
+        dao.insertOrReplace(course);
+    }
 
     public void createChapter() {
         ChapterDao chapterDao = TestpressSDKDatabase.getChapterDao(ApplicationProvider.getApplicationContext());
@@ -66,11 +75,12 @@ public class ChaptersListFragmentTest {
 
     @Before
     public void setUp() throws IOException {
+        createCourse();
         createChapter();
         initSession();
         createAndStartMockServer();
         Intent intent = new Intent();
-        intent.putExtra(COURSE_ID, "1");
+        intent.putExtra(COURSE_ID, (long)1);
         activity = Robolectric.buildActivity(ChapterDetailActivity.class, intent)
                 .create()
                 .resume()
@@ -101,17 +111,6 @@ public class ChaptersListFragmentTest {
 
         Assert.assertEquals(chapters.size(), adapter.getCount());
         Assert.assertEquals(adapter.getItem(0), chapter);
-    }
-
-    @Test
-    public void testPager() throws InterruptedException {
-        MockResponse successResponse = new MockResponse().setResponseCode(200);
-        mockWebServer.enqueue(successResponse);
-        mockWebServer.takeRequest();
-        fragment.clearItemsAndRefresh();
-        RecordedRequest request = mockWebServer.takeRequest();
-
-        Assert.assertEquals("/api/v2.2.1/courses/1/chapters/?page=1&parent=null", request.getPath());
     }
 
     @After
