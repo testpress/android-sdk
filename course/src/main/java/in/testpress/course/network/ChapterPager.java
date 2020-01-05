@@ -3,9 +3,11 @@ package in.testpress.course.network;
 import java.io.IOException;
 import java.text.ParseException;
 
+import in.testpress.core.TestpressRetrofitRequest;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseDatabaseModelPager;
+import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
 import retrofit2.Response;
 
@@ -41,6 +43,21 @@ public class ChapterPager extends BaseDatabaseModelPager<Chapter> {
         }
         return apiClient.getChapters(courseId, queryParams, latestModifiedDate).execute();
     }
+
+    public TestpressRetrofitRequest<Chapter> getRetrofitCall() {
+        return new TestpressRetrofitRequest<Chapter>() {
+            @Override
+            public RetrofitCall<TestpressApiResponse<Chapter>> getRetrofitCall(
+                    int page, int size) {
+                queryParams.put(TestpressApiClient.PAGE, page);
+                if (parentId != null) {
+                    queryParams.put(PARENT, parentId);
+                }
+                return apiClient.getChapters(courseId, queryParams, latestModifiedDate);
+            }
+        };
+    }
+
 
     @Override
     protected Chapter register(Chapter chapter) {

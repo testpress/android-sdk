@@ -169,6 +169,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                 questionUrl = sections.get(currentSection).getQuestionsUrlFrag();
             }
         }
+        questionUrl = questionUrl.replace("v2.3", "v2.2");
         apiClient = new TestpressExamApiClient(getActivity());
         questionsPager = new TestQuestionsPager(questionUrl, apiClient);
     }

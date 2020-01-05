@@ -6,7 +6,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -30,6 +32,7 @@ import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.UIUtils;
 
+import static in.testpress.course.TestpressCourse.CHAPTER_SLUG;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
@@ -49,19 +52,21 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     private TextView emptyDescView;
     private ProgressBar progressBar;
     private Button retryButton;
+    private ChapterDao chapterDao;
+    private String chapterSlug;
 
     private RetrofitCall<Chapter> chapterApiRequest;
 
-    public static Intent createIntent(String title, String courseId, Context context) {
+    public static Intent createIntent(String title, Long courseId, Context context) {
         Intent intent = new Intent(context, ChapterDetailActivity.class);
         intent.putExtra(ACTIONBAR_TITLE, title);
         intent.putExtra(COURSE_ID, courseId);
         return intent;
     }
 
-    public static Intent createIntent(String chaptersUrl, Context context) {
+    public static Intent createIntent(String chapterSlug, Context context) {
         Intent intent = new Intent(context, ChapterDetailActivity.class);
-        intent.putExtra(CHAPTER_URL, chaptersUrl);
+        intent.putExtra(CHAPTER_SLUG, chapterSlug);
         return intent;
     }
 
@@ -71,8 +76,9 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         setContentView(R.layout.testpress_activity_carousal);
         prefs = getSharedPreferences(TESTPRESS_CONTENT_SHARED_PREFS, Context.MODE_PRIVATE);
         prefs.edit().clear().apply();
-        final String chapterUrl = getIntent().getStringExtra(CHAPTER_URL);
-        if (chapterUrl != null) {
+        chapterDao = TestpressSDKDatabase.getChapterDao(this);
+        chapterSlug = getIntent().getStringExtra(CHAPTER_SLUG);
+        if (chapterSlug != null) {
             emptyView = (LinearLayout) findViewById(R.id.empty_container);
             emptyTitleView = (TextView) findViewById(R.id.empty_title);
             emptyDescView = (TextView) findViewById(R.id.empty_description);
@@ -83,10 +89,10 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                 @Override
                 public void onClick(View v) {
                     emptyView.setVisibility(View.GONE);
-                    loadChapterFromServer(chapterUrl);
+                    loadChapterFromServer(chapterSlug);
                 }
             });
-            loadChapter(chapterUrl);
+            loadChapter(chapterSlug);
         } else {
             String title = getIntent().getStringExtra(ACTIONBAR_TITLE);
             if (title != null && !title.isEmpty()) {
@@ -125,26 +131,26 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         }
     }
 
-    void loadChapter(final String chapterUrl) {
+    void loadChapter(final String chapterSlug) {
         List<Chapter> chapters = TestpressSDKDatabase.getChapterDao(this).queryBuilder()
-                .where(ChapterDao.Properties.Url.eq(chapterUrl)).list();
+                .where(ChapterDao.Properties.Slug.eq(chapterSlug)).list();
 
         if (chapters.isEmpty() ||
-                (chapters.get(0).getChildrenCount() == 0 && chapters.get(0).getContentsCount() == 0)) {
+                (chapters.get(0).getRawChildrenCount(this) == 0 && chapters.get(0).getRawContentsCount(this) == 0)) {
 
             if (!chapters.isEmpty()) {
                 //noinspection ConstantConditions
                 getSupportActionBar().setTitle(chapters.get(0).getName());
             }
-            loadChapterFromServer(chapterUrl);
+            loadChapterFromServer(chapterSlug);
         } else {
             onChapterLoaded(chapters.get(0));
         }
     }
 
-    void loadChapterFromServer(final String chapterUrl) {
+    void loadChapterFromServer(final String chapterSlug) {
         progressBar.setVisibility(View.VISIBLE);
-        chapterApiRequest = new TestpressCourseApiClient(this).getChapter(chapterUrl)
+        chapterApiRequest = new TestpressCourseApiClient(this).getChapter(chapterSlug)
                 .enqueue(new TestpressCallback<Chapter>() {
                     @Override
                     public void onSuccess(Chapter chapter) {
@@ -174,15 +180,81 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                 });
     }
 
+    private Fragment getCurrentFragment() {
+        return getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+    }
+
+    private void showFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
+                .commitAllowingStateLoss();
+    }
+
+    public void handleBackpressOnChaptersList() {
+        Fragment fragment = getCurrentFragment();
+        ChaptersListFragment chaptersListFragment = (ChaptersListFragment) fragment;
+
+        if (chaptersListFragment.parentChapterId.equals("null")) {
+            super.onBackPressed();
+        } else {
+            chaptersListFragment.showChaptersInFragment(getParentChapterId(chaptersListFragment.parentChapterId));
+        }
+    }
+
+    public void handleBackpressOnContentsList() {
+        long courseId = getIntent().getLongExtra(COURSE_ID, -1);
+        Fragment fragment = getCurrentFragment();
+
+        ContentsListFragment contentsListFragment = (ContentsListFragment) fragment;
+        showFragment(ChaptersListFragment.getInstance(
+                courseId,
+                getParentChapterId(contentsListFragment.chapterId)
+        ));
+    }
+
+    public void handleBackpressForGamifiedInstitute() {
+        Fragment fragment = getCurrentFragment();
+
+        if (fragment instanceof ContentsListFragment && chapter.hasSubChapters(this)) {
+            handleBackpressOnContentsList();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Fragment fragment = getCurrentFragment();
+        InstituteSettings instituteSettings =
+                TestpressSdk.getTestpressSession(this).getInstituteSettings();
+
+        if (instituteSettings.isCoursesFrontend() && instituteSettings.isCoursesGamificationEnabled()) {
+            handleBackpressForGamifiedInstitute();
+        } else if (fragment instanceof ChaptersListFragment) {
+            handleBackpressOnChaptersList();
+        } else if (fragment instanceof ContentsListFragment) {
+            handleBackpressOnContentsList();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+
+    Long getParentChapterId(Object chapterId) {
+        List<Chapter> chapters = chapterDao.queryBuilder()
+                .where(ChapterDao.Properties.Id.eq(chapterId))
+                .list();
+        return chapters.get(0).getParentId();
+    }
+
     void onChapterLoaded(Chapter chapter) {
         this.chapter = chapter;
         //noinspection ConstantConditions
         getSupportActionBar().setTitle(chapter.getName());
-        if (chapter.getActive() && chapter.getChildrenCount() > 0) {
-            getIntent().putExtra(COURSE_ID, chapter.getCourseId().toString());
+        if (chapter.getActive() && chapter.hasSubChapters(this)) {
+            getIntent().putExtra(COURSE_ID, Long.valueOf(chapter.getCourseId()));
             getIntent().putExtra(PARENT_ID, chapter.getId().toString());
             loadChildChapters();
-        } else if (chapter.getActive() && chapter.getContentsCount() > 0) {
+        } else if (chapter.getActive() && chapter.hasContents(this)) {
             getIntent().putExtra(CONTENTS_URL_FRAG, chapter.getContentUrl());
             getIntent().putExtra(CHAPTER_ID, chapter.getId());
             loadContents();
@@ -233,9 +305,9 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         if (chapter != null && chapter.getActive()) {
             Long parentId = chapter.getParentId();
             if (parentId != null) {
-                data.putString(CHAPTER_URL, chapter.getParentUrl());
+                data.putString(CHAPTER_SLUG, chapter.getParentSlug());
             } else {
-                data.putInt(COURSE_ID, chapter.getCourseId());
+                data.putLong(COURSE_ID, Long.valueOf(chapter.getCourseId()));
             }
         }
         return data;

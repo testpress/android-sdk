@@ -49,6 +49,7 @@ public class TestBaseResourcePager {
 
         assert pager.retrofitCall != null;
         assert pager.page == 1;
+        assert pager.getTotalItemsCount() == 0;
         assert !pager.hasMore();
     }
 

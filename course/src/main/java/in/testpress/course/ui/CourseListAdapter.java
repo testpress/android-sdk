@@ -32,13 +32,12 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
 
     @Override
     public int getCount() {
-        return (int) mCourseDao.queryBuilder().where(CourseDao.Properties.Active.eq(true)).count();
+        return (int) mCourseDao.queryBuilder().count();
     }
 
     @Override
     public Course getItem(int position) {
         return mCourseDao.queryBuilder()
-                .where(CourseDao.Properties.Active.eq(true))
                 .orderAsc(CourseDao.Properties.Order)
                 .listLazy().get(position);
     }
@@ -98,7 +97,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         if (openCourseContent) {
             activity.startActivity(ChapterDetailActivity.createIntent(
                     course.getTitle(),
-                    course.getId().toString(),
+                    course.getId(),
                     activity));
         } else {
             Intent intent = new Intent(activity, WebViewActivity.class);

@@ -3,6 +3,7 @@ package in.testpress.course.ui;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.Loader;
+import android.util.Log;
 
 import org.greenrobot.greendao.AbstractDao;
 
@@ -12,6 +13,7 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
 import in.testpress.course.TestpressCourse;
+import in.testpress.course.network.ChapterPager;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.course.network.CoursePager;
@@ -72,6 +74,7 @@ public class CourseListFragment extends BaseDataBaseFragment<Course, Long> {
 
         this.exception = null;
         this.items = courses;
+        courses = Course.updateCoursesWithLocalVariables(getActivity(), courses);
         getDao().deleteAll();
         if (!courses.isEmpty()) {
             getDao().insertOrReplaceInTx(courses);

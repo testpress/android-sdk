@@ -259,5 +259,15 @@ public abstract class BaseResourcePager<E> {
     public void clearQueryParams() {
         queryParams.clear();
     }
+
+    public Integer getTotalItemsCount() {
+        return response != null ? response.getCount() : 0;
+    }
+
+    public void cancelAsyncRequest() {
+        if (retrofitCall != null) {
+            retrofitCall.cancel();
+        }
+    }
 }
 
