@@ -26,6 +26,7 @@ import in.testpress.util.SingleTypeAdapter;
 
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
+import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 
 public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
@@ -95,7 +96,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
     @Override
     protected SingleTypeAdapter<Chapter> createAdapter(List<Chapter> items) {
-        return new ChaptersListAdapter(getActivity(), getCourse(), parentId);
+        return new ChaptersListAdapter(getActivity(), getCourse(), parentId, product_slug);
     }
 
     private Course getCourse() {

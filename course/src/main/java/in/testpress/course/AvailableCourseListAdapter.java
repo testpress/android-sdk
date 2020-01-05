@@ -121,7 +121,7 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
         activity.startActivity(ChapterDetailActivity.createIntent(
                 course.getTitle(),
                 course.getId().toString(),
-                activity));
+                activity, product_slug));
     }
 
 }

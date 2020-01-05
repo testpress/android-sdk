@@ -64,9 +64,10 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         return intent;
     }
 
-    public static Intent createIntent(String chaptersUrl, Context context) {
+    public static Intent createIntent(String chaptersUrl, Context context, String product_slug) {
         Intent intent = new Intent(context, ChapterDetailActivity.class);
         intent.putExtra(CHAPTER_URL, chaptersUrl);
+        intent.putExtra(PRODUCT_SLUG, product_slug);
         return intent;
     }
 
@@ -78,6 +79,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         prefs.edit().clear().apply();
         courseDao = TestpressSDKDatabase.getCourseDao(this);
         product_slug = getIntent().getStringExtra(PRODUCT_SLUG);
+        Log.d("ChapterDetailActivity", "onCreate: " + getIntent().getExtras());
         final String chapterUrl = getIntent().getStringExtra(CHAPTER_URL);
         if (chapterUrl != null) {
             emptyView = (LinearLayout) findViewById(R.id.empty_container);
@@ -306,10 +308,10 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             } else {
                 data.putInt(COURSE_ID, chapter.getCourseId().intValue());
             }
+        }
 
-            if(product_slug != null) {
-                data.putString(PRODUCT_SLUG, product_slug);
-            }
+        if(product_slug != null) {
+            data.putString(PRODUCT_SLUG, product_slug);
         }
         return data;
     }

@@ -114,7 +114,7 @@ public class TestpressCourse {
 
         init(activity.getApplicationContext(), testpressSession);
         activity.startActivityForResult(
-                ChapterDetailActivity.createIntent(courseName, courseId.toString(), activity),
+                ChapterDetailActivity.createIntent(courseName, courseId.toString(), activity, null),
                 COURSE_CHAPTER_REQUEST_CODE
         );
     }
@@ -135,7 +135,7 @@ public class TestpressCourse {
 
         init(activity.getApplicationContext(), testpressSession);
         activity.startActivityForResult(
-                ChapterDetailActivity.createIntent(chapterUrl, activity),
+                ChapterDetailActivity.createIntent(chapterUrl, activity, null),
                 COURSE_CONTENT_LIST_REQUEST_CODE
         );
     }

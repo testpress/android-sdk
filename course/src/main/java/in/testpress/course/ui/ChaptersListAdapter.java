@@ -23,14 +23,16 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
     private String parentId;
     private List<Chapter> chapters;
     private Course course;
+    private String product_slug;
 
-    ChaptersListAdapter(Activity activity, Course course, String parentId) {
+    ChaptersListAdapter(Activity activity, Course course, String parentId, String product_slug) {
         super(activity.getLayoutInflater(), R.layout.testpress_chapters_list_item);
         this.activity = activity;
         this.parentId = parentId;
         this.imageLoader = ImageUtils.initImageLoader(activity);
         this.options = ImageUtils.getPlaceholdersOption();
         this.course = course;
+        this.product_slug = product_slug;
     }
 
     private void loadChapters() {
@@ -96,7 +98,8 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
                 public void onClick(View v) {
                     activity.startActivity(ChapterDetailActivity.createIntent(
                             chapter.getUrl(),
-                            activity)
+                            activity,
+                            product_slug)
                     );
                 }
             });

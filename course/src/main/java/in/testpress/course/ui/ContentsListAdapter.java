@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -160,7 +161,16 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
             setGone(6, true);
             setGone(10, true);
             ((ImageView)view(11)).setImageResource(R.drawable.crown);
-            view(4).setClickable(false);
+            view(4).setClickable(true);
+            view(4).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.d("ProductDetailsActivity", "onClick: " + product_slug);
+                    Intent intent = new Intent(mActivity, ProductDetailsActivity.class);
+                    intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product_slug);
+                    mActivity.startActivityForResult(intent, STORE_REQUEST_CODE);
+                }
+            });
         }
     }
 
@@ -187,33 +197,6 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
                 );
                 setGone(10, false);
                 break;
-        }
-    }
-
-    private void lockNonFreeProductContent(Content content) {
-        List<Chapter> chapters = chapterDao.queryBuilder().where(ChapterDao.Properties.Id.eq(this.chapterId)).list();
-
-        if (chapters.size() > 0) {
-            Chapter chapter = chapters.get(0);
-            Course course = courseDao.queryBuilder().where(CourseDao.Properties.Id.eq(chapter.getCourseId())).list().get(0);
-
-            if (course.getIsProduct() != null && course.getIsProduct() && content.getFreePreview() != null && !content.getFreePreview()) {
-                setGone(2, false);
-                setGone(3, false);
-                setGone(6, true);
-                setGone(10, true);
-
-                ((ImageView)view(11)).setImageResource(R.drawable.crown);
-                view(4).setClickable(true);
-                view(4).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(mActivity, ProductDetailsActivity.class);
-                        intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product_slug);
-                        mActivity.startActivityForResult(intent, STORE_REQUEST_CODE);
-                    }
-                });
-            }
         }
     }
 

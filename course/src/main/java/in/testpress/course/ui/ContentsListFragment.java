@@ -1,6 +1,5 @@
 package in.testpress.course.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 
@@ -19,6 +18,8 @@ import in.testpress.models.greendao.ContentDao;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.Assert;
 import in.testpress.util.SingleTypeAdapter;
+
+import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 
 public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
 
