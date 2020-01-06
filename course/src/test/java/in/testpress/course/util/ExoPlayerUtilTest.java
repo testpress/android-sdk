@@ -77,7 +77,7 @@ public class ExoPlayerUtilTest {
 
         VideoAttempt videoAttempt = new VideoAttempt();
         Video video = new Video();
-        video.setDuration(testTotalDuration);
+        video.setDuration(String.valueOf(testTotalDuration));
         videoAttempt.setVideoContent(video);
         videoAttempt.setWatchedDuration(testWatchedDuration);
 
