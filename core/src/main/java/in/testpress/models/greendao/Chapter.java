@@ -12,8 +12,6 @@ import org.greenrobot.greendao.query.WhereCondition;
 import in.testpress.core.TestpressSDKDatabase;
 
 import java.util.List;
-
-import in.testpress.core.TestpressSDKDatabase;
 // KEEP INCLUDES END
 
 /**

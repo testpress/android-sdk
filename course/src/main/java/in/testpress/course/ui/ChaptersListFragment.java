@@ -86,14 +86,6 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> im
         List<Course> courses = courseDao.queryBuilder()
                 .where(CourseDao.Properties.Id.eq(courseId)).list();
         course = courses.get(0);
-
-        if (!isItemsEmpty()) {
-            Chapter chapter = Chapter.getAllChaptersQueryBuilder(getContext(), courseId)
-                    .orderDesc(ChapterDao.Properties.ModifiedDate).list().get(0);
-
-            currentPager.setQueryParams(MODIFIED_SINCE, chapter.getModified());
-            currentPager.setQueryParams(ORDER, "modified");
-        }
     }
 
     @Override
@@ -275,14 +267,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> im
                 if (currentPager.hasMore()) {
                     fetchChapters();
                 } else {
-                    boolean loadModifiedDataOnly = currentPager.getQueryParams(MODIFIED_SINCE) != null;
-                    currentPager = new ContentPager(courseId, apiClient);
-
-                    if (loadModifiedDataOnly) {
-                        ((ContentPager) currentPager).setLastModifiedQueryParams(contentDao);
-                    } else {
-                        detachExistingChaptersFromDb();
-                    }
+                    detachExistingChaptersFromDb();
                     chapterDao.insertOrReplaceInTx(chapters);
                     setListShown(true);
                     fetchContents();
@@ -304,9 +289,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> im
                 if (currentPager.hasMore()) {
                     fetchContents();
                 } else {
-                    if (currentPager.getQueryParams(MODIFIED_SINCE) == null) {
-                        detachExistingContentsFromDb();
-                    }
+                    detachExistingContentsFromDb();
                     contentDao.insertOrReplaceInTx(contents);
                     if (!course.getChildItemsLoaded()) {
                         course.setChildItemsLoaded(true);
