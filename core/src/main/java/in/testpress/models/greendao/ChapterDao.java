@@ -33,7 +33,7 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
         public final static Property CourseUrl = new Property(8, String.class, "courseUrl", false, "COURSE_URL");
         public final static Property ContentUrl = new Property(9, String.class, "contentUrl", false, "CONTENT_URL");
         public final static Property ChildrenUrl = new Property(10, String.class, "childrenUrl", false, "CHILDREN_URL");
-        public final static Property ParentId = new Property(11, Integer.class, "parentId", false, "PARENT_ID");
+        public final static Property ParentId = new Property(11, Long.class, "parentId", false, "PARENT_ID");
         public final static Property ParentSlug = new Property(12, String.class, "parentSlug", false, "PARENT_SLUG");
         public final static Property ParentUrl = new Property(13, String.class, "parentUrl", false, "PARENT_URL");
         public final static Property Leaf = new Property(14, Boolean.class, "leaf", false, "LEAF");
@@ -148,7 +148,7 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
             stmt.bindString(11, childrenUrl);
         }
  
-        Integer parentId = entity.getParentId();
+        Long parentId = entity.getParentId();
         if (parentId != null) {
             stmt.bindLong(12, parentId);
         }
@@ -263,7 +263,7 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
             stmt.bindString(11, childrenUrl);
         }
  
-        Integer parentId = entity.getParentId();
+        Long parentId = entity.getParentId();
         if (parentId != null) {
             stmt.bindLong(12, parentId);
         }
@@ -338,7 +338,7 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // courseUrl
             cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // contentUrl
             cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // childrenUrl
-            cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11), // parentId
+            cursor.isNull(offset + 11) ? null : cursor.getLong(offset + 11), // parentId
             cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // parentSlug
             cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // parentUrl
             cursor.isNull(offset + 14) ? null : cursor.getShort(offset + 14) != 0, // leaf
@@ -366,7 +366,7 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
         entity.setCourseUrl(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
         entity.setContentUrl(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
         entity.setChildrenUrl(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setParentId(cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11));
+        entity.setParentId(cursor.isNull(offset + 11) ? null : cursor.getLong(offset + 11));
         entity.setParentSlug(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
         entity.setParentUrl(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
         entity.setLeaf(cursor.isNull(offset + 14) ? null : cursor.getShort(offset + 14) != 0);

@@ -26,8 +26,10 @@ public class TestpressSDKDaoGenerator {
         addReviewQuestionToAnswers(reviewQuestion, reviewAnswer);
         addTranslationsToReviewQuestion(reviewQuestion, reviewQuestionTranslation);
         addAnswersToReviewTranslations(reviewQuestionTranslation, reviewAnswerTranslation);
-        addCourse(schema);
+        Entity course = addCourse(schema);
         addChapter(schema);
+        Entity content = addContent(schema);
+        addContentsToCourse(course, content);
 
         Entity html = addHtmlContent(schema);
         Entity video = addVideo(schema);
@@ -35,7 +37,6 @@ public class TestpressSDKDaoGenerator {
         Entity attachment = addAttachment(schema);
         Entity exam = addExam(schema);
         addLanguage(schema, exam);
-        Entity content = addContent(schema);
         addHTMLToContent(content, html);
         addVideoToContent(content, video);
         addStreamToVideo(stream, video);
@@ -132,7 +133,7 @@ public class TestpressSDKDaoGenerator {
 
     private static void addHTMLToContent(Entity content, Entity html) {
         Property htmlId = content.addLongProperty("htmlId").getProperty();
-        content.addToOne(html, htmlId, "html");
+        content.addToOne(html, htmlId, "htmlContent");
     }
 
     private static void addVideoToContent(Entity content, Entity video) {
@@ -158,26 +159,39 @@ public class TestpressSDKDaoGenerator {
         Entity content = schema.addEntity("Content");
         content.addIntProperty("order");
         content.addStringProperty("htmlContentTitle");
-        content.addStringProperty("htmlContentUrl");
+        content.addStringProperty("htmlContentUrl")
+                .codeBeforeField("@SerializedName(value=\"html_content_url\", alternate={\"html_url\"})");;
         content.addStringProperty("url");
         content.addStringProperty("attemptsUrl");
         content.addIntProperty("chapterId");
         content.addStringProperty("chapterSlug");
         content.addStringProperty("chapterUrl");
         content.addLongProperty("id").primaryKey();
-        content.addStringProperty("name");
+        content.addStringProperty("title")
+                .codeBeforeField("@SerializedName(value=\"title\", alternate={\"name\"})");
+
+        content.addStringProperty("contentType");
         content.addStringProperty("image");
         content.addStringProperty("description");
         content.addBooleanProperty("isLocked");
-        content.addIntProperty("attemptsCount");
+        content.addIntProperty("attemptsCount").notNull();
         content.addStringProperty("start");
         content.addStringProperty("end");
         content.addBooleanProperty("hasStarted");
         content.addBooleanProperty("active");
         content.addLongProperty("bookmarkId");
         content.addIntProperty("videoWatchedPercentage").notNull();
+        content.addStringProperty("modified");
+        content.addLongProperty("modifiedDate");
         content.implementsInterface("android.os.Parcelable");
         return content;
+    }
+
+
+    private static void addContentsToCourse(Entity course, Entity content) {
+        Property courseId = content.addLongProperty("courseId").getProperty();
+        ToMany courseToContents = course.addToMany(content, courseId);
+        courseToContents.setName("contents");
     }
 
     private static Entity addAttachment(Schema schema) {
@@ -196,7 +210,7 @@ public class TestpressSDKDaoGenerator {
         video.addStringProperty("url");
         video.addLongProperty("id").primaryKey();
         video.addStringProperty("embedCode");
-        video.addLongProperty("duration");
+        video.addStringProperty("duration");
         video.addBooleanProperty("isDomainRestricted");
         video.implementsInterface("android.os.Parcelable");
         return video;
@@ -311,6 +325,7 @@ public class TestpressSDKDaoGenerator {
         course.addBooleanProperty("active");
         course.addStringProperty("external_content_link");
         course.addStringProperty("external_link_label");
+        course.addBooleanProperty("childItemsLoaded").notNull();
         return course;
     }
 
@@ -327,7 +342,7 @@ public class TestpressSDKDaoGenerator {
         chapter.addStringProperty("courseUrl");
         chapter.addStringProperty("contentUrl");
         chapter.addStringProperty("childrenUrl");
-        chapter.addIntProperty("parentId");
+        chapter.addLongProperty("parentId");
         chapter.addStringProperty("parentSlug");
         chapter.addStringProperty("parentUrl");
         chapter.addBooleanProperty("leaf");
