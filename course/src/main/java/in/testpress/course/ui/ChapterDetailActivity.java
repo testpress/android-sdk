@@ -231,7 +231,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     protected Bundle getDataToSetResult() {
         Bundle data = super.getDataToSetResult();
         if (chapter != null && chapter.getActive()) {
-            Integer parentId = chapter.getParentId();
+            Long parentId = chapter.getParentId();
             if (parentId != null) {
                 data.putString(CHAPTER_URL, chapter.getParentUrl());
             } else {

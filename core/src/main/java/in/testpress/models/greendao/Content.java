@@ -685,6 +685,14 @@ public class Content implements android.os.Parcelable {
                 getRawVideo().getEmbedCode().isEmpty() ||
                 getRawVideo().getUrl().endsWith(".mp4"));
     }
+
+    public String getName() {
+        return title;
+    }
+
+    public HtmlContent getHtml() {
+        return getHtmlContent();
+    }
     // KEEP METHODS END
 
 }
