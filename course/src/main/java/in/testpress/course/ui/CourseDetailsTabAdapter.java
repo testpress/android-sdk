@@ -29,13 +29,13 @@ class CourseDetailsTabAdapter extends FragmentPagerAdapter {
         Fragment fragment;
         switch (position) {
             case 0:
-                fragment = new ChaptersGridFragment();
+                fragment = new ChaptersListFragment();
                 break;
             case 1:
                 fragment = new RankListFragment();
                 break;
             default:
-                fragment = new ChaptersGridFragment();
+                fragment = new ChaptersListFragment();
                 break;
         }
         fragment.setArguments(bundle);
