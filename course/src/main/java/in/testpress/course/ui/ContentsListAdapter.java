@@ -165,7 +165,6 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
             view(4).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d("ProductDetailsActivity", "onClick: " + product_slug);
                     Intent intent = new Intent(mActivity, ProductDetailsActivity.class);
                     intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product_slug);
                     mActivity.startActivityForResult(intent, STORE_REQUEST_CODE);

@@ -51,6 +51,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         if (!courses.isEmpty()) {
             return courses.get(position);
         }
+
         return mCourseDao.queryBuilder()
                 .where(CourseDao.Properties.IsMyCourse.eq(true))
                 .orderAsc(CourseDao.Properties.Order)
