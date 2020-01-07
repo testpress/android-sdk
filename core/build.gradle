@@ -32,6 +32,7 @@ dependencies {
     api rootProject.httpLogInterceptor
     api rootProject.universalImageLoader
     api rootProject.greendao
+    api rootProject.shimmer
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
     testImplementation rootProject.powermockJunit

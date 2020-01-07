@@ -3,6 +3,7 @@ package in.testpress.course.ui;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.util.Log;
+import android.view.View;
 
 import org.greenrobot.greendao.AbstractDao;
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -53,6 +54,18 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
             throw new IllegalArgumentException("COURSE_ID must not be null or empty");
         }
     }
+    
+    @Override
+    public void onViewCreated(View view,
+                              Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        swipeRefreshLayout.setEnabled(false);
+
+        if (isItemsEmpty()) {
+            loadingPlaceholder.setVisibility(View.VISIBLE);
+            loadingPlaceholder.startShimmer();
+        }
+    }
 
     @Override
     protected int getErrorMessage(TestpressException exception) {
@@ -100,6 +113,22 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
             }
         }
         return pager;
+    }
+
+    @Override
+    protected boolean isItemsEmpty() {
+        return Chapter.getParentChaptersQueryBuilder(getActivity(), String.valueOf(courseId), parentId).listLazy().isEmpty();
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Chapter>> loader,
+                               List<Chapter> items) {
+        super.onLoadFinished(loader, items);
+        hideLoadingPlaceholder();
+        swipeRefreshLayout.setEnabled(true);
+        Chapter.getParentChaptersQueryBuilder(getContext(), courseId, parentId).buildDelete().executeDeleteWithoutDetachingEntities();
+        getDao().insertOrReplaceInTx(items);
+        displayDataFromDB();
     }
 
     @Override
