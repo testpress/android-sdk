@@ -270,7 +270,7 @@ public class Chapter {
 
     public static QueryBuilder<Chapter> getParentChaptersQueryBuilder(Context context, String courseId, String parentId) {
         WhereCondition parentCondition;
-        if (parentId.equals("null")) {
+        if (parentId == null) {
             parentCondition = ChapterDao.Properties.ParentId.isNull();
         } else {
             parentCondition = ChapterDao.Properties.ParentId.eq(parentId);

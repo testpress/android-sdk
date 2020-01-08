@@ -29,7 +29,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
     private TestpressCourseApiClient apiClient;
     private String courseId;
-    private String parentId = "null";
+    private String parentId;
     private ChapterDao chapterDao;
     private CourseDao courseDao;
 
@@ -105,7 +105,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         if (pager == null) {
             Course course = getCourse();
 
-            if (parentId.equals("null") && course.hasChapters()) {
+            if (parentId == null && course.hasChapters()) {
                 pager = new ChapterPager(courseId, apiClient);
             } else {
                 pager = new ChapterPager(courseId, parentId, apiClient);
