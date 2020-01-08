@@ -30,7 +30,6 @@ public class Chapter {
     private String image;
     private String modified;
     private Long modifiedDate;
-    private Integer courseId;
     private String courseUrl;
     private String contentUrl;
     private String childrenUrl;
@@ -45,6 +44,7 @@ public class Chapter {
     private Integer contentsCount;
     private Integer childrenCount;
     private Boolean active;
+    private Long courseId;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -58,7 +58,7 @@ public class Chapter {
     }
 
     @Generated
-    public Chapter(Long id, String name, String description, String slug, String image, String modified, Long modifiedDate, Integer courseId, String courseUrl, String contentUrl, String childrenUrl, Long parentId, String parentSlug, String parentUrl, Boolean leaf, String url, Integer requiredTrophyCount, Boolean isLocked, Integer order, Integer contentsCount, Integer childrenCount, Boolean active) {
+    public Chapter(Long id, String name, String description, String slug, String image, String modified, Long modifiedDate, String courseUrl, String contentUrl, String childrenUrl, Long parentId, String parentSlug, String parentUrl, Boolean leaf, String url, Integer requiredTrophyCount, Boolean isLocked, Integer order, Integer contentsCount, Integer childrenCount, Boolean active, Long courseId) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -66,7 +66,6 @@ public class Chapter {
         this.image = image;
         this.modified = modified;
         this.modifiedDate = modifiedDate;
-        this.courseId = courseId;
         this.courseUrl = courseUrl;
         this.contentUrl = contentUrl;
         this.childrenUrl = childrenUrl;
@@ -81,6 +80,7 @@ public class Chapter {
         this.contentsCount = contentsCount;
         this.childrenCount = childrenCount;
         this.active = active;
+        this.courseId = courseId;
     }
 
     public Long getId() {
@@ -137,14 +137,6 @@ public class Chapter {
 
     public void setModifiedDate(Long modifiedDate) {
         this.modifiedDate = modifiedDate;
-    }
-
-    public Integer getCourseId() {
-        return courseId;
-    }
-
-    public void setCourseId(Integer courseId) {
-        this.courseId = courseId;
     }
 
     public String getCourseUrl() {
@@ -257,6 +249,14 @@ public class Chapter {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public Long getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(Long courseId) {
+        this.courseId = courseId;
     }
 
     // KEEP METHODS - put your custom methods here

@@ -51,7 +51,7 @@ public class ChaptersListFragmentTest {
         chapter.setSlug("chapter");
         chapter.setName("Chapter");
         chapter.setContentsCount(3);
-        chapter.setCourseId(1);
+        chapter.setCourseId((long)1);
         chapter.setActive(true);
         chapterDao.insertInTx(chapter);
         this.chapter = chapter;
