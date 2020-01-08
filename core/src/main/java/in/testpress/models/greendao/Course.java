@@ -330,6 +330,10 @@ public class Course {
 
         return false;
     }
+
+    public boolean hasChapters() {
+        return getChapters().size() > 0;
+    }
     // KEEP METHODS END
 
 }
