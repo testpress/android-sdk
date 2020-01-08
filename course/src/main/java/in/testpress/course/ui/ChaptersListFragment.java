@@ -1,6 +1,8 @@
 package in.testpress.course.ui;
 
 import android.os.Bundle;
+import android.support.v4.content.Loader;
+import android.util.Log;
 
 import org.greenrobot.greendao.AbstractDao;
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -14,6 +16,8 @@ import in.testpress.course.network.ChapterPager;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
+import in.testpress.models.greendao.Course;
+import in.testpress.models.greendao.CourseDao;
 import in.testpress.network.BaseResourcePager;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
@@ -27,6 +31,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     private String courseId;
     private String parentId = "null";
     private ChapterDao chapterDao;
+    private CourseDao courseDao;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,6 +39,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         storeArgs();
         apiClient = new TestpressCourseApiClient(getActivity());
         chapterDao = TestpressSDKDatabase.getChapterDao(getActivity());
+        courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
     }
 
     private void storeArgs() {
@@ -89,13 +95,17 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         }
     }
 
+    private Course getCourse() {
+        return courseDao.queryBuilder().where(CourseDao.Properties.Id.eq(courseId)).list().get(0);
+    }
+
 
     @Override
     protected BaseResourcePager<Chapter> getPager() {
         if (pager == null) {
-            QueryBuilder<Chapter> courseChaptersQueryBuilder = Chapter.getCourseChaptersQueryBuilder(getContext(), courseId);
+            Course course = getCourse();
 
-            if (parentId.equals("null") && courseChaptersQueryBuilder.count() == 0) {
+            if (parentId.equals("null") && course.hasChapters()) {
                 pager = new ChapterPager(courseId, apiClient);
             } else {
                 pager = new ChapterPager(courseId, parentId, apiClient);
