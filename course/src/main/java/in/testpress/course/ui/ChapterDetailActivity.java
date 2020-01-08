@@ -130,7 +130,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                 .where(ChapterDao.Properties.Url.eq(chapterUrl)).list();
 
         if (chapters.isEmpty() ||
-                (chapters.get(0).getChildrenCount() == 0 && chapters.get(0).getContentsCount() == 0)) {
+                (chapters.get(0).hasChildren() && chapters.get(0).hasContents())) {
 
             if (!chapters.isEmpty()) {
                 //noinspection ConstantConditions
@@ -178,11 +178,11 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         this.chapter = chapter;
         //noinspection ConstantConditions
         getSupportActionBar().setTitle(chapter.getName());
-        if (chapter.getActive() && chapter.getChildrenCount() > 0) {
+        if (chapter.getActive() && chapter.hasChildren()) {
             getIntent().putExtra(COURSE_ID, chapter.getCourseId().toString());
             getIntent().putExtra(PARENT_ID, chapter.getId().toString());
             loadChildChapters();
-        } else if (chapter.getActive() && chapter.getContentsCount() > 0) {
+        } else if (chapter.getActive() && chapter.hasContents()) {
             getIntent().putExtra(CONTENTS_URL_FRAG, chapter.getContentUrl());
             getIntent().putExtra(CHAPTER_ID, chapter.getId());
             loadContents();

@@ -277,6 +277,14 @@ public class Chapter {
         }
         return getCourseChaptersQueryBuilder(context, courseId).where(parentCondition);
     }
+
+    public boolean hasContents() {
+        return getContentsCount() > 0;
+    }
+
+    public boolean hasChildren() {
+        return getChildrenCount() > 0;
+    }
     // KEEP METHODS END
 
 }
