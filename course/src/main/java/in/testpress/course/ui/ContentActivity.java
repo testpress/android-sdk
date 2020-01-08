@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -341,40 +340,17 @@ public class ContentActivity extends BaseToolBarActivity {
             Assert.assertNotNull("ACTIONBAR_TITLE must not be null.", title);
             getSupportActionBar().setTitle(title);
             pageNumber.setText(String.format("%d/%d", position + 1, contents.size()));
-            checkContentType();
+            loadContent();
             validateAdjacentNavigationButton();
         }
     }
 
-    private void checkContentType() {
+    private void loadContent() {
         hideContents();
         if (content.getHtmlContentTitle() != null) {
             loadContentHtml();
         } else if (content.getRawVideo() != null) {
-            Video video = content.getRawVideo();
-            setContentTitle(video.getTitle());
-            if (video.getIsDomainRestricted()) {
-                JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty(EMBED_CODE, video.getEmbedCode());
-                String url = courseApiClient.getBaseUrl()+ EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
-                webViewUtils.initWebViewAndPostUrl(url, jsonObject.toString(), this);
-                webView.setWebChromeClient(fullScreenChromeClient);
-            } else if (!content.isNonEmbeddableVideo()) {
-                isNonEmbeddableVideo = false;
-                String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
-                        "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
-
-                webViewUtils.initWebView(html, this);
-                webView.setWebChromeClient(fullScreenChromeClient);
-            } else {
-                isNonEmbeddableVideo = true;
-                TestpressSession session = TestpressSdk.getTestpressSession(this);
-                if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
-                    checkProfileDetailExist(video.getHlsUrl());
-                } else {
-                    initExoPlayer(video.getHlsUrl());
-                }
-            }
+            loadVideo(content.getRawVideo());
         } else if (content.getRawExam() != null) {
             onExamContent();
         } else if (content.getRawAttachment() != null) {
@@ -383,6 +359,44 @@ public class ContentActivity extends BaseToolBarActivity {
             setEmptyText(R.string.testpress_error_loading_contents,
                     R.string.testpress_some_thing_went_wrong_try_again,
                     R.drawable.ic_error_outline_black_18dp);
+        }
+    }
+
+    private void loadVideo(Video video) {
+        setContentTitle(video.getTitle());
+        if (video.getIsDomainRestricted()) {
+            loadDomainRestrictedVideo(video);
+        } else if (content.isEmbeddableVideo()) {
+            loadEmbeddableVideo(video);
+        } else {
+            loadNativeVideo(video);
+        }
+    }
+
+    private void loadDomainRestrictedVideo(Video video) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty(EMBED_CODE, video.getEmbedCode());
+        String url = courseApiClient.getBaseUrl()+ EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
+        webViewUtils.initWebViewAndPostUrl(url, jsonObject.toString(), this);
+        webView.setWebChromeClient(fullScreenChromeClient);
+    }
+
+    private void loadEmbeddableVideo(Video video) {
+        isNonEmbeddableVideo = false;
+        String html = "<div style='margin-top: 15px; padding-left: 20px; padding-right: 20px;'" +
+                "class='videoWrapper'>" + video.getEmbedCode() + "</div>";
+
+        webViewUtils.initWebView(html, this);
+        webView.setWebChromeClient(fullScreenChromeClient);
+    }
+
+    private void loadNativeVideo(Video video) {
+        isNonEmbeddableVideo = true;
+        TestpressSession session = TestpressSdk.getTestpressSession(this);
+        if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
+            checkProfileDetailExist(video.getHlsUrl());
+        } else {
+            initExoPlayer(video.getHlsUrl());
         }
     }
 
@@ -868,7 +882,7 @@ public class ContentActivity extends BaseToolBarActivity {
                             contents = getContentsFromDB();
                         }
                         if (content.getHtmlContentTitle() == null) {
-                            checkContentType();
+                            loadContent();
                         } else {
                             loadContentHtmlFromServer();
                         }
@@ -1069,7 +1083,7 @@ public class ContentActivity extends BaseToolBarActivity {
                     if (onUpdateContent) {
                         updateContent();
                     } else {
-                        checkContentType();
+                        loadContent();
                     }
                 }
             });

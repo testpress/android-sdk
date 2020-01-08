@@ -686,6 +686,10 @@ public class Content implements android.os.Parcelable {
                 getRawVideo().getUrl().endsWith(".mp4"));
     }
 
+    public boolean isEmbeddableVideo() {
+        return !isNonEmbeddableVideo();
+    }
+
     public String getName() {
         return title;
     }
