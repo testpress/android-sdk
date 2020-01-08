@@ -175,7 +175,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
 
 
     private boolean isProductAndHasFreePreview(Course course, Content content) {
-        return course.getIsProduct() != null && course.getIsProduct() && content.getFreePreview() != null && !content.getFreePreview();
+        return product_slug != null && content.getFreePreview() != null && !content.getFreePreview();
     }
 
     private void displayNonEmbeddableVideoProgress(Content content) {
