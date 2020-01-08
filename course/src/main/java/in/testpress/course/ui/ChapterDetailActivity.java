@@ -235,7 +235,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             if (parentId != null) {
                 data.putString(CHAPTER_URL, chapter.getParentUrl());
             } else {
-                data.putInt(COURSE_ID, chapter.getCourseId());
+                data.putInt(COURSE_ID, chapter.getCourseId().intValue());
             }
         }
         return data;
