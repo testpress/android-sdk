@@ -6,7 +6,7 @@ import in.testpress.util.CommonTestUtils;
 
 public class ChapterDetailActivityTest {
 
-    private static final int NUMBER_OF_RETROFIT_CALLS = 1;
+    private static final int NUMBER_OF_RETROFIT_CALLS = 2;
 
     @Test
     public void testChapterDetailActivity_getRetrofitCalls_returnCorrectValues() {
