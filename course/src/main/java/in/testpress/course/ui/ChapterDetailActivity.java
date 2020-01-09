@@ -49,6 +49,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     private TextView emptyDescView;
     private ProgressBar progressBar;
     private Button retryButton;
+    private CourseDao courseDao;
 
     private RetrofitCall<Chapter> chapterApiRequest;
     private RetrofitCall<Course> courseApiRequest;
@@ -72,6 +73,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         setContentView(R.layout.testpress_activity_carousal);
         prefs = getSharedPreferences(TESTPRESS_CONTENT_SHARED_PREFS, Context.MODE_PRIVATE);
         prefs.edit().clear().apply();
+        courseDao = TestpressSDKDatabase.getCourseDao(this);
         final String chapterUrl = getIntent().getStringExtra(CHAPTER_URL);
         if (chapterUrl != null) {
             emptyView = (LinearLayout) findViewById(R.id.empty_container);
@@ -176,13 +178,16 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     }
 
     void checkCourseAndLoadChaptersOrContents(String courseId) {
-        final CourseDao courseDao = TestpressSDKDatabase.getCourseDao(this);
         List<Course> courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.eq(courseId)).list();
 
         if (!courses.isEmpty()) {
             loadChaptersOrContents();
         }
 
+        fetchCourseAndLoadChaptersOrContents(courseId);
+    }
+
+    void fetchCourseAndLoadChaptersOrContents(String courseId) {
         progressBar.setVisibility(View.VISIBLE);
         courseApiRequest = new TestpressCourseApiClient(this).getCourse(courseId)
             .enqueue(new TestpressCallback<Course>() {
