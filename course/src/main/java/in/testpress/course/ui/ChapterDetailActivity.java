@@ -51,6 +51,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     private Button retryButton;
 
     private RetrofitCall<Chapter> chapterApiRequest;
+    private RetrofitCall<Course> courseApiRequest;
 
     public static Intent createIntent(String title, String courseId, Context context) {
         Intent intent = new Intent(context, ChapterDetailActivity.class);
@@ -174,9 +175,56 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                 });
     }
 
+    void checkCourseAndLoadChaptersOrContents(String courseId) {
+        final CourseDao courseDao = TestpressSDKDatabase.getCourseDao(this);
+        List<Course> courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.eq(courseId)).list();
+
+        if (!courses.isEmpty()) {
+            loadChaptersOrContents();
+        }
+
+        progressBar.setVisibility(View.VISIBLE);
+        courseApiRequest = new TestpressCourseApiClient(this).getCourse(courseId)
+            .enqueue(new TestpressCallback<Course>() {
+                @Override
+                public void onSuccess(Course course) {
+                    progressBar.setVisibility(View.GONE);
+                    courseDao.insertOrReplace(course);
+                    loadChaptersOrContents();
+                }
+
+                @Override
+                public void onException(TestpressException exception) {
+                    handleException(exception);
+                }
+            });
+    }
+
+    void handleException(TestpressException exception) {
+        if (exception.isUnauthenticated()) {
+            setEmptyText(R.string.testpress_authentication_failed,
+                    R.string.testpress_no_permission);
+            retryButton.setVisibility(View.GONE);
+        } else if (exception.isNetworkError()) {
+            setEmptyText(R.string.testpress_network_error,
+                    R.string.testpress_no_internet_try_again);
+        } else if (exception.getResponse().code() == 404) {
+            setEmptyText(R.string.testpress_chapter_not_available,
+                    R.string.testpress_chapter_not_available_description);
+            retryButton.setVisibility(View.GONE);
+        } else  {
+            setEmptyText(R.string.testpress_error_loading_chapters,
+                    R.string.testpress_some_thing_went_wrong_try_again);
+            retryButton.setVisibility(View.GONE);
+        }
+    }
+
     void onChapterLoaded(Chapter chapter) {
         this.chapter = chapter;
-        //noinspection ConstantConditions
+        checkCourseAndLoadChaptersOrContents(chapter.getCourseId().toString());
+    }
+
+    void loadChaptersOrContents() {
         getSupportActionBar().setTitle(chapter.getName());
         if (chapter.getActive() && chapter.hasChildren()) {
             getIntent().putExtra(COURSE_ID, chapter.getCourseId().toString());
@@ -243,6 +291,6 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
 
     @Override
     public RetrofitCall[] getRetrofitCalls() {
-        return new RetrofitCall[] { chapterApiRequest };
+        return new RetrofitCall[] { chapterApiRequest, courseApiRequest };
     }
 }
