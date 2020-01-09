@@ -518,7 +518,7 @@ public class Content implements android.os.Parcelable {
         if (in.readByte() == 0) {
             chapterId = null;
         } else {
-            chapterId = in.readInt();
+            chapterId = in.readLong();
         }
         chapterSlug = in.readString();
         chapterUrl = in.readString();
@@ -575,7 +575,7 @@ public class Content implements android.os.Parcelable {
             dest.writeByte((byte) 0);
         } else {
             dest.writeByte((byte) 1);
-            dest.writeInt(chapterId);
+            dest.writeLong(chapterId);
         }
         dest.writeString(chapterSlug);
         dest.writeString(chapterUrl);
