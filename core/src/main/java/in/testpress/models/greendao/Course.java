@@ -334,6 +334,11 @@ public class Course {
     public boolean hasChapters() {
         return getChapters().size() > 0;
     }
+
+    public List<Chapter> getRootChapters() {
+        ChapterDao chapterDao = daoSession.getChapterDao();
+        return chapterDao.queryBuilder().where(ChapterDao.Properties.CourseId.eq(getId()), ChapterDao.Properties.ParentId.isNull()).list();
+    }
     // KEEP METHODS END
 
 }

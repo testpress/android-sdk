@@ -11,6 +11,7 @@ import java.util.List;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.models.greendao.Chapter;
+import in.testpress.models.greendao.Course;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -19,26 +20,39 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
     private final Activity activity;
     private ImageLoader imageLoader;
     private DisplayImageOptions options;
-    private String courseId;
     private String parentId;
+    private List<Chapter> chapters;
+    private Course course;
 
-    ChaptersListAdapter(Activity activity, String courseId, String parentId) {
+    ChaptersListAdapter(Activity activity, Course course, String parentId) {
         super(activity.getLayoutInflater(), R.layout.testpress_chapters_list_item);
         this.activity = activity;
-        this.courseId = courseId;
         this.parentId = parentId;
         this.imageLoader = ImageUtils.initImageLoader(activity);
         this.options = ImageUtils.getPlaceholdersOption();
+        this.course = course;
+    }
+
+    private void loadChapters() {
+        if (parentId != null) {
+            Chapter parentChapter = Chapter.get(activity, parentId);
+            parentChapter.resetChildren();
+            this.chapters = parentChapter.getChildren();
+        } else {
+            this.chapters = course.getRootChapters();
+        }
     }
 
     @Override
     public int getCount() {
-        return  (int) Chapter.getParentChaptersQueryBuilder(activity, courseId, parentId).count();
+        loadChapters();
+        return chapters.size();
     }
 
     @Override
     public Chapter getItem(int position) {
-        return Chapter.getParentChaptersQueryBuilder(activity, courseId, parentId).listLazy().get(position);
+        loadChapters();
+        return chapters.get(position);
     }
 
     @Override
