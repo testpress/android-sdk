@@ -117,7 +117,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
     @Override
     protected boolean isItemsEmpty() {
-        return Chapter.getParentChaptersQueryBuilder(getActivity(), String.valueOf(courseId), parentId).listLazy().isEmpty();
+        return getCourse().getRootChapters().isEmpty();
     }
 
     @Override
@@ -126,9 +126,6 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         super.onLoadFinished(loader, items);
         hideLoadingPlaceholder();
         swipeRefreshLayout.setEnabled(true);
-        Chapter.getParentChaptersQueryBuilder(getContext(), courseId, parentId).buildDelete().executeDeleteWithoutDetachingEntities();
-        getDao().insertOrReplaceInTx(items);
-        displayDataFromDB();
     }
 
     @Override
