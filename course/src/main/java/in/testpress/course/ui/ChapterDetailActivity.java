@@ -79,7 +79,6 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         prefs.edit().clear().apply();
         courseDao = TestpressSDKDatabase.getCourseDao(this);
         product_slug = getIntent().getStringExtra(PRODUCT_SLUG);
-        Log.d("ChapterDetailActivity", "onCreate: " + getIntent().getExtras());
         final String chapterUrl = getIntent().getStringExtra(CHAPTER_URL);
         if (chapterUrl != null) {
             emptyView = (LinearLayout) findViewById(R.id.empty_container);
