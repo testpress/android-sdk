@@ -335,7 +335,7 @@ public class Course {
         return getChapters().size() > 0;
     }
 
-    public List<Chapter> getDirectChapters() {
+    public List<Chapter> getRootChapters() {
         ChapterDao chapterDao = daoSession.getChapterDao();
         return chapterDao.queryBuilder().where(ChapterDao.Properties.CourseId.eq(getId()), ChapterDao.Properties.ParentId.isNull()).list();
     }

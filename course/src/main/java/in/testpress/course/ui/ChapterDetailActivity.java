@@ -147,15 +147,14 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
 
     void loadChapterFromServer(final String chapterUrl) {
         progressBar.setVisibility(View.VISIBLE);
-        final ChapterDao chapterDao = TestpressSDKDatabase.getChapterDao(this);
 
         chapterApiRequest = new TestpressCourseApiClient(this).getChapter(chapterUrl)
                 .enqueue(new TestpressCallback<Chapter>() {
                     @Override
                     public void onSuccess(Chapter chapter) {
                         progressBar.setVisibility(View.GONE);
+                        deleteExistingChapterAndInsert(chapter.getId());
                         onChapterLoaded(chapter);
-                        chapterDao.insertOrReplace(chapter);
                     }
 
                     @Override
@@ -178,6 +177,13 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                         }
                     }
                 });
+    }
+
+    void deleteExistingChapterAndInsert(long chapterId) {
+        ChapterDao chapterDao = TestpressSDKDatabase.getChapterDao(this);
+        chapterDao.queryBuilder().where(ChapterDao.Properties.Id.eq(chapterId)).buildDelete().executeDeleteWithoutDetachingEntities();
+        chapterDao.detachAll();
+        chapterDao.insertOrReplace(chapter);
     }
 
     void onChapterLoaded(Chapter chapter) {
