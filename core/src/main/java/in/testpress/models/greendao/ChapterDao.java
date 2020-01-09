@@ -35,21 +35,24 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
         public final static Property CourseUrl = new Property(7, String.class, "courseUrl", false, "COURSE_URL");
         public final static Property ContentUrl = new Property(8, String.class, "contentUrl", false, "CONTENT_URL");
         public final static Property ChildrenUrl = new Property(9, String.class, "childrenUrl", false, "CHILDREN_URL");
-        public final static Property ParentId = new Property(10, Long.class, "parentId", false, "PARENT_ID");
-        public final static Property ParentSlug = new Property(11, String.class, "parentSlug", false, "PARENT_SLUG");
-        public final static Property ParentUrl = new Property(12, String.class, "parentUrl", false, "PARENT_URL");
-        public final static Property Leaf = new Property(13, Boolean.class, "leaf", false, "LEAF");
-        public final static Property Url = new Property(14, String.class, "url", false, "URL");
-        public final static Property RequiredTrophyCount = new Property(15, Integer.class, "requiredTrophyCount", false, "REQUIRED_TROPHY_COUNT");
-        public final static Property IsLocked = new Property(16, Boolean.class, "isLocked", false, "IS_LOCKED");
-        public final static Property Order = new Property(17, Integer.class, "order", false, "ORDER");
-        public final static Property ContentsCount = new Property(18, Integer.class, "contentsCount", false, "CONTENTS_COUNT");
-        public final static Property ChildrenCount = new Property(19, Integer.class, "childrenCount", false, "CHILDREN_COUNT");
-        public final static Property Active = new Property(20, Boolean.class, "active", false, "ACTIVE");
-        public final static Property CourseId = new Property(21, Long.class, "courseId", false, "COURSE_ID");
+        public final static Property ParentSlug = new Property(10, String.class, "parentSlug", false, "PARENT_SLUG");
+        public final static Property ParentUrl = new Property(11, String.class, "parentUrl", false, "PARENT_URL");
+        public final static Property Leaf = new Property(12, Boolean.class, "leaf", false, "LEAF");
+        public final static Property Url = new Property(13, String.class, "url", false, "URL");
+        public final static Property RequiredTrophyCount = new Property(14, Integer.class, "requiredTrophyCount", false, "REQUIRED_TROPHY_COUNT");
+        public final static Property IsLocked = new Property(15, Boolean.class, "isLocked", false, "IS_LOCKED");
+        public final static Property Order = new Property(16, Integer.class, "order", false, "ORDER");
+        public final static Property ContentsCount = new Property(17, Integer.class, "contentsCount", false, "CONTENTS_COUNT");
+        public final static Property ChildrenCount = new Property(18, Integer.class, "childrenCount", false, "CHILDREN_COUNT");
+        public final static Property Active = new Property(19, Boolean.class, "active", false, "ACTIVE");
+        public final static Property CourseId = new Property(20, Long.class, "courseId", false, "COURSE_ID");
+        public final static Property ParentId = new Property(21, Long.class, "parentId", false, "PARENT_ID");
     }
 
+    private DaoSession daoSession;
+
     private Query<Chapter> course_ChaptersQuery;
+    private Query<Chapter> chapter_ChildrenQuery;
 
     public ChapterDao(DaoConfig config) {
         super(config);
@@ -57,6 +60,7 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
     
     public ChapterDao(DaoConfig config, DaoSession daoSession) {
         super(config, daoSession);
+        this.daoSession = daoSession;
     }
 
     /** Creates the underlying database table. */
@@ -73,18 +77,18 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
                 "\"COURSE_URL\" TEXT," + // 7: courseUrl
                 "\"CONTENT_URL\" TEXT," + // 8: contentUrl
                 "\"CHILDREN_URL\" TEXT," + // 9: childrenUrl
-                "\"PARENT_ID\" INTEGER," + // 10: parentId
-                "\"PARENT_SLUG\" TEXT," + // 11: parentSlug
-                "\"PARENT_URL\" TEXT," + // 12: parentUrl
-                "\"LEAF\" INTEGER," + // 13: leaf
-                "\"URL\" TEXT," + // 14: url
-                "\"REQUIRED_TROPHY_COUNT\" INTEGER," + // 15: requiredTrophyCount
-                "\"IS_LOCKED\" INTEGER," + // 16: isLocked
-                "\"ORDER\" INTEGER," + // 17: order
-                "\"CONTENTS_COUNT\" INTEGER," + // 18: contentsCount
-                "\"CHILDREN_COUNT\" INTEGER," + // 19: childrenCount
-                "\"ACTIVE\" INTEGER," + // 20: active
-                "\"COURSE_ID\" INTEGER);"); // 21: courseId
+                "\"PARENT_SLUG\" TEXT," + // 10: parentSlug
+                "\"PARENT_URL\" TEXT," + // 11: parentUrl
+                "\"LEAF\" INTEGER," + // 12: leaf
+                "\"URL\" TEXT," + // 13: url
+                "\"REQUIRED_TROPHY_COUNT\" INTEGER," + // 14: requiredTrophyCount
+                "\"IS_LOCKED\" INTEGER," + // 15: isLocked
+                "\"ORDER\" INTEGER," + // 16: order
+                "\"CONTENTS_COUNT\" INTEGER," + // 17: contentsCount
+                "\"CHILDREN_COUNT\" INTEGER," + // 18: childrenCount
+                "\"ACTIVE\" INTEGER," + // 19: active
+                "\"COURSE_ID\" INTEGER," + // 20: courseId
+                "\"PARENT_ID\" INTEGER);"); // 21: parentId
     }
 
     /** Drops the underlying database table. */
@@ -147,64 +151,64 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
             stmt.bindString(10, childrenUrl);
         }
  
-        Long parentId = entity.getParentId();
-        if (parentId != null) {
-            stmt.bindLong(11, parentId);
-        }
- 
         String parentSlug = entity.getParentSlug();
         if (parentSlug != null) {
-            stmt.bindString(12, parentSlug);
+            stmt.bindString(11, parentSlug);
         }
  
         String parentUrl = entity.getParentUrl();
         if (parentUrl != null) {
-            stmt.bindString(13, parentUrl);
+            stmt.bindString(12, parentUrl);
         }
  
         Boolean leaf = entity.getLeaf();
         if (leaf != null) {
-            stmt.bindLong(14, leaf ? 1L: 0L);
+            stmt.bindLong(13, leaf ? 1L: 0L);
         }
  
         String url = entity.getUrl();
         if (url != null) {
-            stmt.bindString(15, url);
+            stmt.bindString(14, url);
         }
  
         Integer requiredTrophyCount = entity.getRequiredTrophyCount();
         if (requiredTrophyCount != null) {
-            stmt.bindLong(16, requiredTrophyCount);
+            stmt.bindLong(15, requiredTrophyCount);
         }
  
         Boolean isLocked = entity.getIsLocked();
         if (isLocked != null) {
-            stmt.bindLong(17, isLocked ? 1L: 0L);
+            stmt.bindLong(16, isLocked ? 1L: 0L);
         }
  
         Integer order = entity.getOrder();
         if (order != null) {
-            stmt.bindLong(18, order);
+            stmt.bindLong(17, order);
         }
  
         Integer contentsCount = entity.getContentsCount();
         if (contentsCount != null) {
-            stmt.bindLong(19, contentsCount);
+            stmt.bindLong(18, contentsCount);
         }
  
         Integer childrenCount = entity.getChildrenCount();
         if (childrenCount != null) {
-            stmt.bindLong(20, childrenCount);
+            stmt.bindLong(19, childrenCount);
         }
  
         Boolean active = entity.getActive();
         if (active != null) {
-            stmt.bindLong(21, active ? 1L: 0L);
+            stmt.bindLong(20, active ? 1L: 0L);
         }
  
         Long courseId = entity.getCourseId();
         if (courseId != null) {
-            stmt.bindLong(22, courseId);
+            stmt.bindLong(21, courseId);
+        }
+ 
+        Long parentId = entity.getParentId();
+        if (parentId != null) {
+            stmt.bindLong(22, parentId);
         }
     }
 
@@ -262,65 +266,71 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
             stmt.bindString(10, childrenUrl);
         }
  
-        Long parentId = entity.getParentId();
-        if (parentId != null) {
-            stmt.bindLong(11, parentId);
-        }
- 
         String parentSlug = entity.getParentSlug();
         if (parentSlug != null) {
-            stmt.bindString(12, parentSlug);
+            stmt.bindString(11, parentSlug);
         }
  
         String parentUrl = entity.getParentUrl();
         if (parentUrl != null) {
-            stmt.bindString(13, parentUrl);
+            stmt.bindString(12, parentUrl);
         }
  
         Boolean leaf = entity.getLeaf();
         if (leaf != null) {
-            stmt.bindLong(14, leaf ? 1L: 0L);
+            stmt.bindLong(13, leaf ? 1L: 0L);
         }
  
         String url = entity.getUrl();
         if (url != null) {
-            stmt.bindString(15, url);
+            stmt.bindString(14, url);
         }
  
         Integer requiredTrophyCount = entity.getRequiredTrophyCount();
         if (requiredTrophyCount != null) {
-            stmt.bindLong(16, requiredTrophyCount);
+            stmt.bindLong(15, requiredTrophyCount);
         }
  
         Boolean isLocked = entity.getIsLocked();
         if (isLocked != null) {
-            stmt.bindLong(17, isLocked ? 1L: 0L);
+            stmt.bindLong(16, isLocked ? 1L: 0L);
         }
  
         Integer order = entity.getOrder();
         if (order != null) {
-            stmt.bindLong(18, order);
+            stmt.bindLong(17, order);
         }
  
         Integer contentsCount = entity.getContentsCount();
         if (contentsCount != null) {
-            stmt.bindLong(19, contentsCount);
+            stmt.bindLong(18, contentsCount);
         }
  
         Integer childrenCount = entity.getChildrenCount();
         if (childrenCount != null) {
-            stmt.bindLong(20, childrenCount);
+            stmt.bindLong(19, childrenCount);
         }
  
         Boolean active = entity.getActive();
         if (active != null) {
-            stmt.bindLong(21, active ? 1L: 0L);
+            stmt.bindLong(20, active ? 1L: 0L);
         }
  
         Long courseId = entity.getCourseId();
         if (courseId != null) {
-            stmt.bindLong(22, courseId);
+            stmt.bindLong(21, courseId);
         }
+ 
+        Long parentId = entity.getParentId();
+        if (parentId != null) {
+            stmt.bindLong(22, parentId);
+        }
+    }
+
+    @Override
+    protected final void attachEntity(Chapter entity) {
+        super.attachEntity(entity);
+        entity.__setDaoSession(daoSession);
     }
 
     @Override
@@ -341,18 +351,18 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // courseUrl
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // contentUrl
             cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // childrenUrl
-            cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10), // parentId
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // parentSlug
-            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // parentUrl
-            cursor.isNull(offset + 13) ? null : cursor.getShort(offset + 13) != 0, // leaf
-            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // url
-            cursor.isNull(offset + 15) ? null : cursor.getInt(offset + 15), // requiredTrophyCount
-            cursor.isNull(offset + 16) ? null : cursor.getShort(offset + 16) != 0, // isLocked
-            cursor.isNull(offset + 17) ? null : cursor.getInt(offset + 17), // order
-            cursor.isNull(offset + 18) ? null : cursor.getInt(offset + 18), // contentsCount
-            cursor.isNull(offset + 19) ? null : cursor.getInt(offset + 19), // childrenCount
-            cursor.isNull(offset + 20) ? null : cursor.getShort(offset + 20) != 0, // active
-            cursor.isNull(offset + 21) ? null : cursor.getLong(offset + 21) // courseId
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // parentSlug
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // parentUrl
+            cursor.isNull(offset + 12) ? null : cursor.getShort(offset + 12) != 0, // leaf
+            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // url
+            cursor.isNull(offset + 14) ? null : cursor.getInt(offset + 14), // requiredTrophyCount
+            cursor.isNull(offset + 15) ? null : cursor.getShort(offset + 15) != 0, // isLocked
+            cursor.isNull(offset + 16) ? null : cursor.getInt(offset + 16), // order
+            cursor.isNull(offset + 17) ? null : cursor.getInt(offset + 17), // contentsCount
+            cursor.isNull(offset + 18) ? null : cursor.getInt(offset + 18), // childrenCount
+            cursor.isNull(offset + 19) ? null : cursor.getShort(offset + 19) != 0, // active
+            cursor.isNull(offset + 20) ? null : cursor.getLong(offset + 20), // courseId
+            cursor.isNull(offset + 21) ? null : cursor.getLong(offset + 21) // parentId
         );
         return entity;
     }
@@ -369,18 +379,18 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
         entity.setCourseUrl(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setContentUrl(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
         entity.setChildrenUrl(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setParentId(cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10));
-        entity.setParentSlug(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setParentUrl(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
-        entity.setLeaf(cursor.isNull(offset + 13) ? null : cursor.getShort(offset + 13) != 0);
-        entity.setUrl(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
-        entity.setRequiredTrophyCount(cursor.isNull(offset + 15) ? null : cursor.getInt(offset + 15));
-        entity.setIsLocked(cursor.isNull(offset + 16) ? null : cursor.getShort(offset + 16) != 0);
-        entity.setOrder(cursor.isNull(offset + 17) ? null : cursor.getInt(offset + 17));
-        entity.setContentsCount(cursor.isNull(offset + 18) ? null : cursor.getInt(offset + 18));
-        entity.setChildrenCount(cursor.isNull(offset + 19) ? null : cursor.getInt(offset + 19));
-        entity.setActive(cursor.isNull(offset + 20) ? null : cursor.getShort(offset + 20) != 0);
-        entity.setCourseId(cursor.isNull(offset + 21) ? null : cursor.getLong(offset + 21));
+        entity.setParentSlug(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setParentUrl(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setLeaf(cursor.isNull(offset + 12) ? null : cursor.getShort(offset + 12) != 0);
+        entity.setUrl(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
+        entity.setRequiredTrophyCount(cursor.isNull(offset + 14) ? null : cursor.getInt(offset + 14));
+        entity.setIsLocked(cursor.isNull(offset + 15) ? null : cursor.getShort(offset + 15) != 0);
+        entity.setOrder(cursor.isNull(offset + 16) ? null : cursor.getInt(offset + 16));
+        entity.setContentsCount(cursor.isNull(offset + 17) ? null : cursor.getInt(offset + 17));
+        entity.setChildrenCount(cursor.isNull(offset + 18) ? null : cursor.getInt(offset + 18));
+        entity.setActive(cursor.isNull(offset + 19) ? null : cursor.getShort(offset + 19) != 0);
+        entity.setCourseId(cursor.isNull(offset + 20) ? null : cursor.getLong(offset + 20));
+        entity.setParentId(cursor.isNull(offset + 21) ? null : cursor.getLong(offset + 21));
      }
     
     @Override
@@ -419,6 +429,20 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
         }
         Query<Chapter> query = course_ChaptersQuery.forCurrentThread();
         query.setParameter(0, courseId);
+        return query.list();
+    }
+
+    /** Internal query to resolve the "children" to-many relationship of Chapter. */
+    public List<Chapter> _queryChapter_Children(Long parentId) {
+        synchronized (this) {
+            if (chapter_ChildrenQuery == null) {
+                QueryBuilder<Chapter> queryBuilder = queryBuilder();
+                queryBuilder.where(Properties.ParentId.eq(null));
+                chapter_ChildrenQuery = queryBuilder.build();
+            }
+        }
+        Query<Chapter> query = chapter_ChildrenQuery.forCurrentThread();
+        query.setParameter(0, parentId);
         return query.list();
     }
 
