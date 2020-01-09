@@ -177,6 +177,12 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                 });
     }
 
+
+    void onChapterLoaded(Chapter chapter) {
+        this.chapter = chapter;
+        checkCourseAndLoadChaptersOrContents(chapter.getCourseId().toString());
+    }
+
     void checkCourseAndLoadChaptersOrContents(String courseId) {
         List<Course> courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.eq(courseId)).list();
 
@@ -190,19 +196,19 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     void fetchCourseAndLoadChaptersOrContents(String courseId) {
         progressBar.setVisibility(View.VISIBLE);
         courseApiRequest = new TestpressCourseApiClient(this).getCourse(courseId)
-            .enqueue(new TestpressCallback<Course>() {
-                @Override
-                public void onSuccess(Course course) {
-                    progressBar.setVisibility(View.GONE);
-                    courseDao.insertOrReplace(course);
-                    loadChaptersOrContents();
-                }
+                .enqueue(new TestpressCallback<Course>() {
+                    @Override
+                    public void onSuccess(Course course) {
+                        progressBar.setVisibility(View.GONE);
+                        courseDao.insertOrReplace(course);
+                        loadChaptersOrContents();
+                    }
 
-                @Override
-                public void onException(TestpressException exception) {
-                    handleException(exception);
-                }
-            });
+                    @Override
+                    public void onException(TestpressException exception) {
+                        handleException(exception);
+                    }
+                });
     }
 
     void handleException(TestpressException exception) {
@@ -224,10 +230,6 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         }
     }
 
-    void onChapterLoaded(Chapter chapter) {
-        this.chapter = chapter;
-        checkCourseAndLoadChaptersOrContents(chapter.getCourseId().toString());
-    }
 
     void loadChaptersOrContents() {
         getSupportActionBar().setTitle(chapter.getName());
