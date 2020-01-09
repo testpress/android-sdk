@@ -1170,6 +1170,7 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void setContentTitle(CharSequence title) {
+        //noinspection ConstantConditions
         titleView.setText(title);
         boolean bookmarksEnabled = TestpressSdk.getTestpressSession(this).getInstituteSettings()
                 .isBookmarksEnabled();

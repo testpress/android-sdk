@@ -241,11 +241,11 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
 
     void loadChaptersOrContents() {
         getSupportActionBar().setTitle(chapter.getName());
-        if (chapter.getActive() && chapter.hasChildren()) {
+        if (chapter.hasChildren()) {
             getIntent().putExtra(COURSE_ID, chapter.getCourseId().toString());
             getIntent().putExtra(PARENT_ID, chapter.getId().toString());
             loadChildChapters();
-        } else if (chapter.getActive() && chapter.hasContents()) {
+        } else if (chapter.hasContents()) {
             getIntent().putExtra(CONTENTS_URL_FRAG, chapter.getContentUrl());
             getIntent().putExtra(CHAPTER_ID, chapter.getId());
             loadContents();
@@ -293,7 +293,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     @Override
     protected Bundle getDataToSetResult() {
         Bundle data = super.getDataToSetResult();
-        if (chapter != null && chapter.getActive()) {
+        if (chapter != null) {
             Long parentId = chapter.getParentId();
             if (parentId != null) {
                 data.putString(CHAPTER_URL, chapter.getParentUrl());
