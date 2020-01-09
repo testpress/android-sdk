@@ -49,8 +49,10 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     private TextView emptyDescView;
     private ProgressBar progressBar;
     private Button retryButton;
+    private CourseDao courseDao;
 
     private RetrofitCall<Chapter> chapterApiRequest;
+    private RetrofitCall<Course> courseApiRequest;
 
     public static Intent createIntent(String title, String courseId, Context context) {
         Intent intent = new Intent(context, ChapterDetailActivity.class);
@@ -71,6 +73,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         setContentView(R.layout.testpress_activity_carousal);
         prefs = getSharedPreferences(TESTPRESS_CONTENT_SHARED_PREFS, Context.MODE_PRIVATE);
         prefs.edit().clear().apply();
+        courseDao = TestpressSDKDatabase.getCourseDao(this);
         final String chapterUrl = getIntent().getStringExtra(CHAPTER_URL);
         if (chapterUrl != null) {
             emptyView = (LinearLayout) findViewById(R.id.empty_container);
@@ -176,7 +179,58 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
 
     void onChapterLoaded(Chapter chapter) {
         this.chapter = chapter;
-        //noinspection ConstantConditions
+        checkCourseAndLoadChaptersOrContents(chapter.getCourseId().toString());
+    }
+
+    void checkCourseAndLoadChaptersOrContents(String courseId) {
+        List<Course> courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.eq(courseId)).list();
+
+        if (courses.isEmpty()) {
+            fetchCourseAndLoadChaptersOrContents(courseId);
+        } else {
+            loadChaptersOrContents();
+        }
+    }
+
+    void fetchCourseAndLoadChaptersOrContents(String courseId) {
+        progressBar.setVisibility(View.VISIBLE);
+        courseApiRequest = new TestpressCourseApiClient(this).getCourse(courseId)
+                .enqueue(new TestpressCallback<Course>() {
+                    @Override
+                    public void onSuccess(Course course) {
+                        progressBar.setVisibility(View.GONE);
+                        courseDao.insertOrReplace(course);
+                        loadChaptersOrContents();
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        handleException(exception);
+                    }
+                });
+    }
+
+    void handleException(TestpressException exception) {
+        if (exception.isUnauthenticated()) {
+            setEmptyText(R.string.testpress_authentication_failed,
+                    R.string.testpress_no_permission);
+            retryButton.setVisibility(View.GONE);
+        } else if (exception.isNetworkError()) {
+            setEmptyText(R.string.testpress_network_error,
+                    R.string.testpress_no_internet_try_again);
+        } else if (exception.getResponse().code() == 404) {
+            setEmptyText(R.string.testpress_chapter_not_available,
+                    R.string.testpress_chapter_not_available_description);
+            retryButton.setVisibility(View.GONE);
+        } else  {
+            setEmptyText(R.string.testpress_error_loading_chapters,
+                    R.string.testpress_some_thing_went_wrong_try_again);
+            retryButton.setVisibility(View.GONE);
+        }
+    }
+
+
+    void loadChaptersOrContents() {
         getSupportActionBar().setTitle(chapter.getName());
         if (chapter.getActive() && chapter.hasChildren()) {
             getIntent().putExtra(COURSE_ID, chapter.getCourseId().toString());
@@ -243,6 +297,6 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
 
     @Override
     public RetrofitCall[] getRetrofitCalls() {
-        return new RetrofitCall[] { chapterApiRequest };
+        return new RetrofitCall[] { chapterApiRequest, courseApiRequest };
     }
 }
