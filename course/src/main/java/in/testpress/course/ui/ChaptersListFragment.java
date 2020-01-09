@@ -80,7 +80,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
     @Override
     protected SingleTypeAdapter<Chapter> createAdapter(List<Chapter> items) {
-        return new ChaptersListAdapter(getActivity(), courseId, parentId);
+        return new ChaptersListAdapter(getActivity(), getCourse(), parentId);
     }
 
     private void setLastModifiedForPager() {

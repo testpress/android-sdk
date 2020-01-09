@@ -147,12 +147,15 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
 
     void loadChapterFromServer(final String chapterUrl) {
         progressBar.setVisibility(View.VISIBLE);
+        final ChapterDao chapterDao = TestpressSDKDatabase.getChapterDao(this);
+
         chapterApiRequest = new TestpressCourseApiClient(this).getChapter(chapterUrl)
                 .enqueue(new TestpressCallback<Chapter>() {
                     @Override
                     public void onSuccess(Chapter chapter) {
                         progressBar.setVisibility(View.GONE);
                         onChapterLoaded(chapter);
+                        chapterDao.insertOrReplace(chapter);
                     }
 
                     @Override

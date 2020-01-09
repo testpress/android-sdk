@@ -395,6 +395,17 @@ public class Chapter {
     public boolean hasChildren() {
         return getChildrenCount() > 0;
     }
+
+    public static Chapter get(Context context, String chapterId) {
+        ChapterDao chapterDao = TestpressSDKDatabase.getChapterDao(context);
+        List<Chapter> chapters = chapterDao.queryBuilder().where(ChapterDao.Properties.Id.eq(chapterId)).list();
+
+        if (chapters.isEmpty()) {
+            return null;
+        }
+
+        return chapters.get(0);
+    }
     // KEEP METHODS END
 
 }
