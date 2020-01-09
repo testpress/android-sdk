@@ -133,7 +133,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                 .where(ChapterDao.Properties.Url.eq(chapterUrl)).list();
 
         if (chapters.isEmpty() ||
-                (chapters.get(0).hasChildren() && chapters.get(0).hasContents())) {
+                (!chapters.get(0).hasChildren() && !chapters.get(0).hasContents())) {
 
             if (!chapters.isEmpty()) {
                 //noinspection ConstantConditions
