@@ -185,11 +185,11 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     void checkCourseAndLoadChaptersOrContents(String courseId) {
         List<Course> courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.eq(courseId)).list();
 
-        if (!courses.isEmpty()) {
+        if (courses.isEmpty()) {
+            fetchCourseAndLoadChaptersOrContents(courseId);
+        } else {
             loadChaptersOrContents();
         }
-
-        fetchCourseAndLoadChaptersOrContents(courseId);
     }
 
     void fetchCourseAndLoadChaptersOrContents(String courseId) {
