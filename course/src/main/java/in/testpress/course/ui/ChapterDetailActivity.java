@@ -177,7 +177,6 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                 });
     }
 
-
     void onChapterLoaded(Chapter chapter) {
         this.chapter = chapter;
         checkCourseAndLoadChaptersOrContents(chapter.getCourseId().toString());
