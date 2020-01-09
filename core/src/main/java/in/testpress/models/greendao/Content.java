@@ -29,7 +29,6 @@ public class Content implements android.os.Parcelable {
     private String htmlContentUrl;
     private String url;
     private String attemptsUrl;
-    private Integer chapterId;
     private String chapterSlug;
     private String chapterUrl;
 
@@ -51,6 +50,7 @@ public class Content implements android.os.Parcelable {
     private String modified;
     private Long modifiedDate;
     private Long courseId;
+    private Long chapterId;
     private Long htmlId;
     private Long videoId;
     private Long attachmentId;
@@ -105,13 +105,12 @@ public class Content implements android.os.Parcelable {
     }
 
     @Generated
-    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, Integer chapterId, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Long courseId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
+    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Long courseId, Long chapterId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
         this.order = order;
         this.htmlContentTitle = htmlContentTitle;
         this.htmlContentUrl = htmlContentUrl;
         this.url = url;
         this.attemptsUrl = attemptsUrl;
-        this.chapterId = chapterId;
         this.chapterSlug = chapterSlug;
         this.chapterUrl = chapterUrl;
         this.id = id;
@@ -130,6 +129,7 @@ public class Content implements android.os.Parcelable {
         this.modified = modified;
         this.modifiedDate = modifiedDate;
         this.courseId = courseId;
+        this.chapterId = chapterId;
         this.htmlId = htmlId;
         this.videoId = videoId;
         this.attachmentId = attachmentId;
@@ -181,14 +181,6 @@ public class Content implements android.os.Parcelable {
 
     public void setAttemptsUrl(String attemptsUrl) {
         this.attemptsUrl = attemptsUrl;
-    }
-
-    public Integer getChapterId() {
-        return chapterId;
-    }
-
-    public void setChapterId(Integer chapterId) {
-        this.chapterId = chapterId;
     }
 
     public String getChapterSlug() {
@@ -333,6 +325,14 @@ public class Content implements android.os.Parcelable {
 
     public void setCourseId(Long courseId) {
         this.courseId = courseId;
+    }
+
+    public Long getChapterId() {
+        return chapterId;
+    }
+
+    public void setChapterId(Long chapterId) {
+        this.chapterId = chapterId;
     }
 
     public Long getHtmlId() {

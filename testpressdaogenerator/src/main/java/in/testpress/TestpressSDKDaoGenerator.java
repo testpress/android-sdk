@@ -26,12 +26,14 @@ public class TestpressSDKDaoGenerator {
         addReviewQuestionToAnswers(reviewQuestion, reviewAnswer);
         addTranslationsToReviewQuestion(reviewQuestion, reviewQuestionTranslation);
         addAnswersToReviewTranslations(reviewQuestionTranslation, reviewAnswerTranslation);
+
         Entity course = addCourse(schema);
         Entity chapter = addChapter(schema);
         addChaptersToCourse(course, chapter);
         addChaptersToChapter(chapter, chapter);
         Entity content = addContent(schema);
         addContentsToCourse(course, content);
+        addContentsToChapter(chapter, content);
 
         Entity html = addHtmlContent(schema);
         Entity video = addVideo(schema);
@@ -165,7 +167,6 @@ public class TestpressSDKDaoGenerator {
                 .codeBeforeField("@SerializedName(value=\"html_content_url\", alternate={\"html_url\"})");;
         content.addStringProperty("url");
         content.addStringProperty("attemptsUrl");
-        content.addIntProperty("chapterId");
         content.addStringProperty("chapterSlug");
         content.addStringProperty("chapterUrl");
         content.addLongProperty("id").primaryKey();
@@ -199,6 +200,12 @@ public class TestpressSDKDaoGenerator {
         Property parentId = chapter.addLongProperty("parentId").getProperty();
         ToMany childrenToChapters = parentChapter.addToMany(chapter, parentId);
         childrenToChapters.setName("children");
+    }
+
+    private static void addContentsToChapter(Entity chapter, Entity content) {
+        Property courseId = content.addLongProperty("chapterId").getProperty();
+        ToMany chapterToContents = chapter.addToMany(content, courseId);
+        chapterToContents.setName("contents");
     }
 
 

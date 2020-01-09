@@ -63,6 +63,11 @@ public class Chapter {
     })
     private List<Chapter> children;
 
+    @ToMany(joinProperties = {
+        @JoinProperty(name = "id", referencedName = "chapterId")
+    })
+    private List<Content> contents;
+
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
 
@@ -303,6 +308,28 @@ public class Chapter {
     @Generated
     public synchronized void resetChildren() {
         children = null;
+    }
+
+    /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
+    @Generated
+    public List<Content> getContents() {
+        if (contents == null) {
+            __throwIfDetached();
+            ContentDao targetDao = daoSession.getContentDao();
+            List<Content> contentsNew = targetDao._queryChapter_Contents(id);
+            synchronized (this) {
+                if(contents == null) {
+                    contents = contentsNew;
+                }
+            }
+        }
+        return contents;
+    }
+
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    @Generated
+    public synchronized void resetContents() {
+        contents = null;
     }
 
     /**
