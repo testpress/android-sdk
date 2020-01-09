@@ -28,9 +28,11 @@ public class TestpressSDKDaoGenerator {
         addAnswersToReviewTranslations(reviewQuestionTranslation, reviewAnswerTranslation);
 
         Entity course = addCourse(schema);
+
         Entity chapter = addChapter(schema);
         addChaptersToCourse(course, chapter);
-        addChaptersToChapter(chapter, chapter);
+        addChildrenToChapter(chapter, chapter);
+
         Entity content = addContent(schema);
         addContentsToCourse(course, content);
         addContentsToChapter(chapter, content);
@@ -196,7 +198,7 @@ public class TestpressSDKDaoGenerator {
         courseToChapters.setName("chapters");
     }
 
-    private static void addChaptersToChapter(Entity parentChapter, Entity chapter) {
+    private static void addChildrenToChapter(Entity parentChapter, Entity chapter) {
         Property parentId = chapter.addLongProperty("parentId").getProperty();
         ToMany childrenToChapters = parentChapter.addToMany(chapter, parentId);
         childrenToChapters.setName("children");
