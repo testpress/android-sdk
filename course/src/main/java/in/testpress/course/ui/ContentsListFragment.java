@@ -12,16 +12,9 @@ import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
 import in.testpress.course.network.ContentPager;
 import in.testpress.course.network.TestpressCourseApiClient;
-import in.testpress.models.greendao.Attachment;
-import in.testpress.models.greendao.AttachmentDao;
+import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
-import in.testpress.models.greendao.Exam;
-import in.testpress.models.greendao.ExamDao;
-import in.testpress.models.greendao.Language;
-import in.testpress.models.greendao.LanguageDao;
-import in.testpress.models.greendao.Video;
-import in.testpress.models.greendao.VideoDao;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.Assert;
 import in.testpress.util.SingleTypeAdapter;
@@ -62,6 +55,15 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
         return contentDao;
     }
 
+
+    private void deleteContents(long courseId) {
+        contentDao.queryBuilder().where(
+                ContentDao.Properties.CourseId.eq(courseId),
+                ContentDao.Properties.Active.eq(true)
+        ).buildDelete().executeDeleteWithoutDetachingEntities();
+        contentDao.detachAll();
+    }
+
     @Override
     public void onLoadFinished(Loader<List<Content>> loader, List<Content> contents) {
         final TestpressException exception = getException(loader);
@@ -78,43 +80,9 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
 
         this.exception = null;
         this.items = contents;
-        if (!contents.isEmpty()) {
-            for(Content content : contents) {
-                Video video = content.getRawVideo();
-                Attachment attachment = content.getRawAttachment();
-                Exam exam = content.getRawExam();
-                if (attachment != null) {
-                    AttachmentDao attachmentDao = TestpressSDKDatabase.getAttachmentDao(getContext());
-                    attachmentDao.insertOrReplace(attachment);
-                    content.setAttachmentId(attachment.getId());
-                } else if (video != null) {
-                    VideoDao videoDao = TestpressSDKDatabase.getVideoDao(getContext());
-                    videoDao.insertOrReplace(video);
-                    content.setVideoId(video.getId());
-                } else if (exam != null) {
-                    List<Language> languages = exam.getRawLanguages();
-                    for (Language language : languages) {
-                        language.setExamId(exam.getId());
-                    }
-                    LanguageDao languageDao = TestpressSDKDatabase.getLanguageDao(getContext());
-                    languageDao.insertOrReplaceInTx(languages);
-                    ExamDao examDao = TestpressSDKDatabase.getExamDao(getContext());
-                    examDao.insertOrReplace(exam);
-                    content.setExamId(exam.getId());
-                } else if (content.getHtmlContentTitle() != null) {
-                    List<Content> contentsFromDB = getDao().queryBuilder()
-                            .where(ContentDao.Properties.Id.eq(content.getId())).list();
-
-                    if (!contentsFromDB.isEmpty()) {
-                        Content contentFromDB = contentsFromDB.get(0);
-                        if (contentFromDB.getHtmlId() != null) {
-                            content.setHtmlId(contentFromDB.getHtmlId());
-                        }
-                    }
-                }
-                getDao().insertOrReplace(content);
-            }
-        }
+        Chapter chapter = Chapter.get(getContext(), chapterId.toString());
+        deleteContents(chapter.getCourseId());
+        getDao().insertOrReplaceInTx(contents);
         displayDataFromDB();
         showList();
     }
