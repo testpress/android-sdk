@@ -153,7 +153,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                     @Override
                     public void onSuccess(Chapter chapter) {
                         progressBar.setVisibility(View.GONE);
-                        deleteExistingChapterAndInsert(chapter.getId());
+                        deleteExistingChapterAndInsert(chapter);
                         onChapterLoaded(chapter);
                     }
 
@@ -179,9 +179,9 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                 });
     }
 
-    void deleteExistingChapterAndInsert(long chapterId) {
+    void deleteExistingChapterAndInsert(Chapter chapter) {
         ChapterDao chapterDao = TestpressSDKDatabase.getChapterDao(this);
-        chapterDao.queryBuilder().where(ChapterDao.Properties.Id.eq(chapterId)).buildDelete().executeDeleteWithoutDetachingEntities();
+        chapterDao.queryBuilder().where(ChapterDao.Properties.Id.eq(chapter.getId())).buildDelete().executeDeleteWithoutDetachingEntities();
         chapterDao.detachAll();
         chapterDao.insertOrReplace(chapter);
     }
