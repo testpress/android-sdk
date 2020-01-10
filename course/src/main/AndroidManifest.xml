@@ -14,6 +14,10 @@
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
+        <activity android:name=".ui.CoursePreviewActivity"
+            android:theme="@style/TestpressTheme"
+            android:configChanges="orientation|keyboard|screenSize" />
+
         <activity android:name=".ui.ContentActivity"
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />

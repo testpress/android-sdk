@@ -12,11 +12,14 @@ import java.util.List;
 
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
+import in.testpress.course.ui.ChapterDetailActivity;
+import in.testpress.course.ui.CoursePreviewActivity;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.Product;
 import in.testpress.models.greendao.ProductDao;
 import in.testpress.util.ImageUtils;
+import in.testpress.util.IntegerList;
 import in.testpress.util.SingleTypeAdapter;
 
 
@@ -88,6 +91,37 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
 
         ImageView imageView = view(4);
         imageLoader.displayImage(item.getImage(), imageView, options);
+        addOnClickListeners(item);
+    }
+
+    private void addOnClickListeners(final Product product) {
+        view(5).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openCoursesOrChapters(product);
+            }
+        });
+    }
+
+    private void openCoursesOrChapters(Product product) {
+        if (product.getCourseIds().size() > 1) {
+            openCoursesList(product.getCourseIds(), product.getSlug());
+        } else if (product.getCourseIds().size() == 1) {
+            openChapters(product.getCourseIds().get(0), product.getSlug());
+        }
+    }
+
+    private void openCoursesList(IntegerList courseIds, String product_slug) {
+        activity.startActivity(CoursePreviewActivity.createIntent(courseIds, activity, product_slug));
+    }
+
+    private void openChapters(Integer courseId, String product_slug) {
+        List<Course> courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.in(courseId)).list();
+        Course course = courses.get(0);
+        activity.startActivity(ChapterDetailActivity.createIntent(
+                course.getTitle(),
+                course.getId().toString(),
+                activity));
     }
 
 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.github.testpress.mikephil.charting.charts.PieChart;
 import com.github.testpress.mikephil.charting.data.PieData;
@@ -15,10 +16,15 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import java.util.ArrayList;
 import java.util.List;
 
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
+import in.testpress.models.greendao.Chapter;
+import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
+import in.testpress.models.greendao.Course;
+import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.Exam;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
@@ -30,6 +36,8 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
     private DisplayImageOptions mOptions;
     private ContentDao contentDao;
     private long chapterId;
+    private CourseDao courseDao;
+    private ChapterDao chapterDao;
 
     ContentsListAdapter(Activity activity, final List<Content> items, int layout,
                         ContentDao contentDao, Long chapterId) {
@@ -41,6 +49,8 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         this.contentDao = contentDao;
         this.chapterId = chapterId;
         setItems(items);
+        chapterDao = TestpressSDKDatabase.getChapterDao(activity);
+        courseDao = TestpressSDKDatabase.getCourseDao(activity);
     }
 
     @Override
@@ -72,7 +82,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
                 R.id.content_title, R.id.thumbnail_image, R.id.white_foreground, R.id.lock,
                 R.id.content_item_layout, R.id.exam_info_layout, R.id.attempted_tick, R.id.duration,
                 R.id.no_of_questions, R.id.video_completion_progress_chart,
-                R.id.video_completion_progress_container
+                R.id.video_completion_progress_container, R.id.lock_image
         };
     }
 
@@ -124,6 +134,8 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
                 }
             });
         }
+
+        handleStoreCourseContent(content);
         // Update exam info
         if (exam != null) {
             setGone(5, false);
@@ -132,6 +144,26 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         } else {
             setGone(5, true);
         }
+    }
+
+    private void handleStoreCourseContent(Content content) {
+        List<Chapter> chapters = chapterDao.queryBuilder().where(ChapterDao.Properties.Id.eq(this.chapterId)).list();
+        Chapter chapter = chapters.get(0);
+        Course course = courseDao.queryBuilder().where(CourseDao.Properties.Id.eq(chapter.getCourseId())).list().get(0);
+
+        if (isProductAndHasFreePreview(course, content)) {
+            setGone(2, false);
+            setGone(3, false);
+            setGone(6, true);
+            setGone(10, true);
+            ((ImageView)view(11)).setImageResource(R.drawable.crown);
+            view(4).setClickable(false);
+        }
+    }
+
+
+    private boolean isProductAndHasFreePreview(Course course, Content content) {
+        return course.getIsProduct() != null && course.getIsProduct() && content.getFreePreview() != null && !content.getFreePreview();
     }
 
     private void displayNonEmbeddableVideoProgress(Content content) {

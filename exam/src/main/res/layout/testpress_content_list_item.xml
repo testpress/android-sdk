@@ -48,6 +48,7 @@
                 android:layout_marginRight="13dp"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
+                android:id="@+id/lock_image"
                 android:src="@drawable/testpress_lock_outline_white" />
 
         </LinearLayout>
