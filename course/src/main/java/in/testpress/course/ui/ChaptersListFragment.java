@@ -62,8 +62,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         swipeRefreshLayout.setEnabled(false);
 
         if (isItemsEmpty()) {
-            loadingPlaceholder.setVisibility(View.VISIBLE);
-            loadingPlaceholder.startShimmer();
+            showLoadingPlaceholder();
         }
     }
 

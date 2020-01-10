@@ -212,6 +212,11 @@ public abstract class BaseListViewFragment<E> extends Fragment
         refreshWithProgress();
     }
 
+    public void showLoadingPlaceholder() {
+        loadingPlaceholder.setVisibility(View.VISIBLE);
+        loadingPlaceholder.startShimmer();
+    }
+
     public void hideLoadingPlaceholder() {
         loadingPlaceholder.stopShimmer();
         loadingPlaceholder.setVisibility(View.GONE);
