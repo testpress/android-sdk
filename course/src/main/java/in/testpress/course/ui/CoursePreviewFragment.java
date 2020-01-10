@@ -29,7 +29,7 @@ public class CoursePreviewFragment extends BaseListViewFragment<Course> {
     private CourseDao courseDao;
     private List<Course> courses = new ArrayList<Course>();
     private ArrayList<Integer> course_ids;
-    private String product_slug;
+    private String productSlug;
 
 
     @Override
@@ -39,7 +39,7 @@ public class CoursePreviewFragment extends BaseListViewFragment<Course> {
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             course_ids = bundle.getIntegerArrayList("course_ids");
-            product_slug = bundle.getString("product_slug");
+            productSlug = bundle.getString("productSlug");
         }
 
     }
@@ -59,7 +59,7 @@ public class CoursePreviewFragment extends BaseListViewFragment<Course> {
     protected SingleTypeAdapter<Course> createAdapter(
             List<Course> items) {
         courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.in(course_ids)).list();
-        return new CourseListAdapter(getActivity(), courseDao, courses, product_slug);
+        return new CourseListAdapter(getActivity(), courseDao, courses, productSlug);
     }
 
     @NonNull

@@ -111,11 +111,11 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
         }
     }
 
-    private void openCoursesList(IntegerList courseIds, String product_slug) {
-        activity.startActivity(CoursePreviewActivity.createIntent(courseIds, activity, product_slug));
+    private void openCoursesList(IntegerList courseIds, String productSlug) {
+        activity.startActivity(CoursePreviewActivity.createIntent(courseIds, activity, productSlug));
     }
 
-    private void openChapters(Integer courseId, String product_slug) {
+    private void openChapters(Integer courseId, String productSlug) {
         List<Course> courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.in(courseId)).list();
         Course course = courses.get(0);
         activity.startActivity(ChapterDetailActivity.createIntent(

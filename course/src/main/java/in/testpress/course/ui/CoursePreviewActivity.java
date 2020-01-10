@@ -10,15 +10,17 @@ import java.util.ArrayList;
 import in.testpress.course.R;
 import in.testpress.ui.BaseToolBarActivity;
 
+import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
+
 
 public class CoursePreviewActivity extends BaseToolBarActivity {
 
     private static final String TAG = "CoursePreviewActivity";
 
-    public static Intent createIntent(ArrayList<Integer> course_ids, Context context, String product_slug) {
+    public static Intent createIntent(ArrayList<Integer> course_ids, Context context, String productSlug) {
         Intent intent = new Intent(context, CoursePreviewActivity.class);
         intent.putExtra("course_ids", course_ids);
-        intent.putExtra("product_slug", product_slug);
+        intent.putExtra(PRODUCT_SLUG, productSlug);
         return intent;
     }
 
