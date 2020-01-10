@@ -28,6 +28,7 @@ public class TestpressCourse {
     public static final String PARENT_ID = "parentId";
     public static final String CHAPTER_URL = "chapterUrl";
     public static final String PRODUCT_SLUG = "productSlug";
+    public static final String COURSE_IDS = "courseIds";
 
     /**
      * Use when testpress courses need to be open in a container as a fragment.

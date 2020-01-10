@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import in.testpress.course.R;
 import in.testpress.ui.BaseToolBarActivity;
 
+import static in.testpress.course.TestpressCourse.COURSE_IDS;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 
 
@@ -17,9 +18,9 @@ public class CoursePreviewActivity extends BaseToolBarActivity {
 
     private static final String TAG = "CoursePreviewActivity";
 
-    public static Intent createIntent(ArrayList<Integer> course_ids, Context context, String productSlug) {
+    public static Intent createIntent(ArrayList<Integer> courseIds, Context context, String productSlug) {
         Intent intent = new Intent(context, CoursePreviewActivity.class);
-        intent.putExtra("course_ids", course_ids);
+        intent.putExtra(COURSE_IDS, courseIds);
         intent.putExtra(PRODUCT_SLUG, productSlug);
         return intent;
     }

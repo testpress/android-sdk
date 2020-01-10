@@ -1,14 +1,10 @@
 package in.testpress.course.ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,17 +14,17 @@ import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
-import in.testpress.store.ui.ProductDetailsActivity;
 import in.testpress.ui.BaseListViewFragment;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ThrowableLoader;
 
-import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
+import static in.testpress.course.TestpressCourse.COURSE_IDS;
+import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 
 public class CoursePreviewFragment extends BaseListViewFragment<Course> {
     private CourseDao courseDao;
     private List<Course> courses = new ArrayList<Course>();
-    private ArrayList<Integer> course_ids;
+    private ArrayList<Integer> courseIds;
     private String productSlug;
 
 
@@ -38,8 +34,8 @@ public class CoursePreviewFragment extends BaseListViewFragment<Course> {
         courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
         Bundle bundle = this.getArguments();
         if (bundle != null) {
-            course_ids = bundle.getIntegerArrayList("course_ids");
-            productSlug = bundle.getString("productSlug");
+            courseIds = bundle.getIntegerArrayList(COURSE_IDS);
+            productSlug = bundle.getString(PRODUCT_SLUG);
         }
 
     }
@@ -58,29 +54,29 @@ public class CoursePreviewFragment extends BaseListViewFragment<Course> {
     @Override
     protected SingleTypeAdapter<Course> createAdapter(
             List<Course> items) {
-        courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.in(course_ids)).list();
+        courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.in(courseIds)).list();
         return new CourseListAdapter(getActivity(), courseDao, courses, productSlug);
     }
 
     @NonNull
     @Override
     public Loader<List<Course>> onCreateLoader(int id, @Nullable Bundle args) {
-        return new CourseLoader(getContext(), courseDao, course_ids);
+        return new CourseLoader(getContext(), courseDao, courseIds);
     }
 
     private static class CourseLoader extends ThrowableLoader<List<Course>> {
         private CourseDao courseDao;
-        private ArrayList<Integer> course_ids;
+        private ArrayList<Integer> courseIds;
 
-        CourseLoader(Context context, CourseDao courseDao, ArrayList<Integer> course_ids) {
+        CourseLoader(Context context, CourseDao courseDao, ArrayList<Integer> courseIds) {
             super(context, null);
             this.courseDao = courseDao;
-            this.course_ids = course_ids;
+            this.courseIds = courseIds;
         }
 
         @Override
         public List<Course> loadData() throws TestpressException {
-            return courseDao.queryBuilder().where(CourseDao.Properties.Id.in(course_ids)).list();
+            return courseDao.queryBuilder().where(CourseDao.Properties.Id.in(courseIds)).list();
         }
     }
 
