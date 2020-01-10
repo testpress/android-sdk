@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.Loader;
+import android.widget.ListView;
 
 import java.util.List;
 
@@ -66,12 +67,33 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> {
             pager.next();
             List<Course> courses = pager.getListResponse().getCourses();
 
-            courses = Course.updateCoursesWithLocalVariables(getContext(), courses);
+            unAssignCourses();
+            Course.updateCoursesWithLocalState(getContext(), courses);
+            assignCourses(courses);
+            deleteExistingCourse();
+            return pager.getListResponse().getProducts();
+        }
+
+        private void unAssignCourses() {
+            List<Course> coursesFromDB = courseDao.queryBuilder().list();
+            for (Course course: coursesFromDB) {
+                course.setIsProduct(false);
+            }
+            courseDao.insertOrReplaceInTx(coursesFromDB);
+        }
+
+        private void assignCourses(List<Course> courses) {
             for (Course course: courses) {
                 course.setIsProduct(true);
-                courseDao.insertOrReplace(course);
             }
-            return pager.getListResponse().getProducts();
+            courseDao.insertOrReplaceInTx(courses);
+        }
+
+        private void deleteExistingCourse() {
+            courseDao.queryBuilder()
+                    .where(CourseDao.Properties.IsMyCourse.notEq(true), CourseDao.Properties.IsProduct.notEq(true))
+                    .buildDelete().executeDeleteWithoutDetachingEntities();
+            courseDao.detachAll();
         }
     }
 

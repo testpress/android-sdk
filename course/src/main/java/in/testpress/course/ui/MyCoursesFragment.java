@@ -3,6 +3,7 @@ package in.testpress.course.ui;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.Loader;
+import android.util.Log;
 
 import org.greenrobot.greendao.AbstractDao;
 
@@ -74,30 +75,38 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
 
         this.exception = null;
         this.items = courses;
-        deleteExistingCourse();
-        storeCoursesWithState(courses);
-        this.items = courses;
+
+        unAssignAllCourses();
+        Course.updateCoursesWithLocalState(getContext(), courses);
+        assignCourses(courses);
+        cleanCourses();
         displayDataFromDB();
         showList();
     }
 
-    private void deleteExistingCourse() {
-        getDao().queryBuilder()
-                .where(CourseDao.Properties.IsMyCourse.eq(true))
-                .buildDelete().executeDeleteWithoutDetachingEntities();
-        getDao().detachAll();
-
+    private void unAssignAllCourses() {
+        List<Course> coursesFromDB = getDao().queryBuilder().list();
+        for (Course course: coursesFromDB) {
+            course.setIsMyCourse(false);
+        }
+        getDao().insertOrReplaceInTx(coursesFromDB);
     }
 
-    private void storeCoursesWithState(List<Course> courses) {
-        courses = Course.updateCoursesWithLocalVariables(getContext(), courses);
+    private void assignCourses(List<Course> courses) {
         for (Course course: courses) {
             course.setIsMyCourse(true);
         }
+        getDao().insertOrReplaceInTx(courses);
+    }
 
-        if (!courses.isEmpty()) {
-            getDao().insertOrReplaceInTx(courses);
-        }
+    private void cleanCourses() {
+        getDao().queryBuilder()
+                .where(
+                        CourseDao.Properties.IsMyCourse.notEq(true),
+                        CourseDao.Properties.IsProduct.notEq(true)
+                )
+                .buildDelete().executeDeleteWithoutDetachingEntities();
+        getDao().detachAll();
     }
 
     @Override

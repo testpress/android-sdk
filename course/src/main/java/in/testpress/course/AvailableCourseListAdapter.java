@@ -24,6 +24,8 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
     private ImageLoader imageLoader;
     private DisplayImageOptions options;
     private CourseDao courseDao;
+    private int chaptersCount;
+    private int contentsCount;
 
     public AvailableCourseListAdapter(Activity activity, final List<Product> items) {
         super(activity, R.layout.available_course_list_item);
@@ -40,27 +42,31 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
                 R.id.thumbnail_image, R.id.product_item_layout };
     }
 
-    @Override
-    protected void update(final int position, final Product item) {
-        List<Course> courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.in(item.getCourseIds())).list();
-        int chaptersCount = 0;
-        int contentsCount = 0;
-        String price = String.format("₹%s", item.getCurrentPrice());
+    private void calculateChaptersAndContentsCount(Product product) {
+        List<Course> courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.in(product.getCourseIds())).list();
+        chaptersCount = 0;
+        contentsCount = 0;
 
         for (Course course: courses) {
             chaptersCount += course.getChaptersCount();
             contentsCount += course.getContentsCount();
         }
+    }
 
+    @Override
+    protected void update(final int position, final Product item) {
         setFont(new int[]{0, 1, 2, 3}, TestpressSdk.getRubikMediumFont(activity));
         setText(0, item.getTitle());
+
+        calculateChaptersAndContentsCount(item);
         setText(1,  activity.getResources().getQuantityString(R.plurals.chapters_count,
                 chaptersCount, chaptersCount));
-        setGone(1, false);
         setText(2,  activity.getResources().getQuantityString(R.plurals.contents_count,
                 contentsCount, contentsCount));
-        setGone(2, false);
+
+        String price = String.format("₹%s", item.getCurrentPrice());
         setText(3, price);
+
         ImageView imageView = view(4);
         imageLoader.displayImage(item.getImage(), imageView, options);
     }

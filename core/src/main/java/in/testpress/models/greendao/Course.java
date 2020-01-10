@@ -364,12 +364,10 @@ public class Course {
         return chapterDao.queryBuilder().where(ChapterDao.Properties.CourseId.eq(getId()), ChapterDao.Properties.ParentId.isNull()).list();
     }
     
-    public static List<Course> updateCoursesWithLocalVariables(Context context,
-                                                               List<Course> courses) {
+    public static void updateCoursesWithLocalState(Context context, List<Course> courses) {
 
         CourseDao courseDao = TestpressSDKDatabase.getCourseDao(context);
-        for (int i = 0; i < courses.size(); i++) {
-            Course course = courses.get(i);
+        for (Course course: courses) {
             List<Course> coursesFromDB = courseDao.queryBuilder()
                     .where(CourseDao.Properties.Id.eq(course.getId())).list();
 
@@ -379,7 +377,6 @@ public class Course {
                 course.setIsProduct(courseFromDB.getIsProduct());
             }
         }
-        return courses;
     }
     // KEEP METHODS END
 
