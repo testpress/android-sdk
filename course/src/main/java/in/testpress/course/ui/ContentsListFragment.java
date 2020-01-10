@@ -30,7 +30,7 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
     private String contentsUrlFrag;
     private ContentDao contentDao;
     private Long chapterId;
-    private String product_slug;
+    private String productSlug;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,7 +43,7 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
         contentDao = TestpressSDKDatabase.getContentDao(getContext());
         chapterId = getArguments().getLong(CHAPTER_ID);
         Assert.assertNotNull("chapterId must not be null.", chapterId);
-        product_slug = getArguments().getString(PRODUCT_SLUG);
+        productSlug = getArguments().getString(PRODUCT_SLUG);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
 
     @Override
     protected SingleTypeAdapter<Content> createAdapter(List<Content> items) {
-        return new ContentsListAdapter(getActivity(), chapterId, product_slug);
+        return new ContentsListAdapter(getActivity(), chapterId, productSlug);
     }
 
     @Override

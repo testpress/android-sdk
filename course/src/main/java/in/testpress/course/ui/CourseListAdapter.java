@@ -114,7 +114,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
             activity.startActivity(ChapterDetailActivity.createIntent(
                     course.getTitle(),
                     course.getId().toString(),
-                    activity, this.product_slug));
+                    activity, this.productSlug));
         } else {
             Intent intent = new Intent(activity, WebViewActivity.class);
             intent.putExtra("URL", course.getExternal_content_link());

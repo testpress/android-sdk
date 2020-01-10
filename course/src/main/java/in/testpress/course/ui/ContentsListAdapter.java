@@ -43,9 +43,9 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
     private CourseDao courseDao;
     private ChapterDao chapterDao;
     private long chapterId;
-    private String product_slug;
+    private String productSlug;
 
-    ContentsListAdapter(Activity activity, Long chapterId, String product_slug) {
+    ContentsListAdapter(Activity activity, Long chapterId, String productSlug) {
         super(activity, R.layout.testpress_content_list_item);
         mActivity = activity;
         mImageLoader = ImageUtils.initImageLoader(activity);
@@ -54,7 +54,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         contentDao = TestpressSDKDatabase.getContentDao(activity);
         chapterDao = TestpressSDKDatabase.getChapterDao(activity);
         courseDao = TestpressSDKDatabase.getCourseDao(activity);
-        this.product_slug = product_slug;
+        this.productSlug = productSlug;
     }
 
     @Override
@@ -166,7 +166,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(mActivity, ProductDetailsActivity.class);
-                    intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product_slug);
+                    intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, productSlug);
                     mActivity.startActivityForResult(intent, STORE_REQUEST_CODE);
                 }
             });
@@ -175,7 +175,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
 
 
     private boolean isProductAndHasFreePreview(Course course, Content content) {
-        return product_slug != null && content.getFreePreview() != null && !content.getFreePreview();
+        return productSlug != null && content.getFreePreview() != null && !content.getFreePreview();
     }
 
     private void displayNonEmbeddableVideoProgress(Content content) {

@@ -35,7 +35,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     private String parentId;
     private ChapterDao chapterDao;
     private CourseDao courseDao;
-    private String product_slug;
+    private String productSlug;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,7 +48,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
     private void storeArgs() {
         courseId = getArguments().getString(COURSE_ID);
-        product_slug = getArguments().getString(PRODUCT_SLUG);
+        productSlug = getArguments().getString(PRODUCT_SLUG);
 
         if (getArguments().getString(PARENT_ID) != null) {
             parentId = getArguments().getString(PARENT_ID);
@@ -96,7 +96,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
     @Override
     protected SingleTypeAdapter<Chapter> createAdapter(List<Chapter> items) {
-        return new ChaptersListAdapter(getActivity(), getCourse(), parentId, product_slug);
+        return new ChaptersListAdapter(getActivity(), getCourse(), parentId, productSlug);
     }
 
     private Course getCourse() {
