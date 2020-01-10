@@ -47,8 +47,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
     public int getCount() {
         return (int) contentDao.queryBuilder()
                 .where(
-                        ContentDao.Properties.ChapterId.eq(chapterId),
-                        ContentDao.Properties.Active.eq(true)
+                        ContentDao.Properties.ChapterId.eq(chapterId)
                 ).count();
     }
 
@@ -56,8 +55,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
     public Content getItem(int position) {
         return contentDao.queryBuilder()
                 .where(
-                        ContentDao.Properties.ChapterId.eq(chapterId),
-                        ContentDao.Properties.Active.eq(true)
+                        ContentDao.Properties.ChapterId.eq(chapterId)
                 )
                 .orderAsc(ContentDao.Properties.Order).listLazy().get(position);
     }
@@ -93,7 +91,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         }
         Exam exam = content.getRawExam();
         // Validate lock
-        if (content.getIsLocked() || !content.getHasStarted()) {
+        if (content.getIsLocked()) {
             setGone(2, false);
             setGone(3, false);
             setGone(6, true);

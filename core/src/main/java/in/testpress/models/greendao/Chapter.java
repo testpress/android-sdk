@@ -389,11 +389,19 @@ public class Chapter {
     }
 
     public boolean hasContents() {
-        return getContentsCount() > 0;
+        if (contentsCount != null) {
+            return getContentsCount() > 0;
+        }
+
+        return getContents().size() > 0;
     }
 
     public boolean hasChildren() {
-        return getChildrenCount() > 0;
+        if (childrenCount != null) {
+            return getChildrenCount() > 0;
+        }
+
+        return getChildren().size() > 0;
     }
 
     public static Chapter get(Context context, String chapterId) {

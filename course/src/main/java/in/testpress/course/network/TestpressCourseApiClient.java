@@ -30,11 +30,13 @@ public class TestpressCourseApiClient extends TestpressApiClient {
     /**
      * Course List Url
      */
-    public static final String COURSE_LIST_PATH =  "/api/v2.2.1/courses/";
+    public static final String COURSE_LIST_PATH =  "/api/v2.4/courses/";
 
     public static final String CHAPTERS_PATH =  "/chapters/";
 
     public static final String CONTENTS_PATH =  "/api/v2.3/contents/";
+
+    public static final String CONTENTS_PATH_v2_4 =  "/api/v2.4/contents/";
 
     public static final String ATTEMPTS_PATH =  "/attempts/";
 

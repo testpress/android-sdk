@@ -62,6 +62,8 @@ import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.AttemptDao;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.BookmarkFolder;
+import in.testpress.models.greendao.Chapter;
+import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.CourseAttempt;
@@ -87,13 +89,18 @@ import in.testpress.v2_4.models.FolderListResponse;
 
 import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
+import static in.testpress.course.network.TestpressCourseApiClient.CONTENTS_PATH_v2_4;
 import static in.testpress.course.network.TestpressCourseApiClient.EMBED_CODE;
 import static in.testpress.course.network.TestpressCourseApiClient.EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
-import static in.testpress.exam.network.TestpressExamApiClient.CONTENTS_PATH;
 import static in.testpress.exam.network.TestpressExamApiClient.STATE_PAUSED;
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
+import static in.testpress.models.greendao.Content.ATTACHMENT_TYPE;
+import static in.testpress.models.greendao.Content.EXAM_TYPE;
+import static in.testpress.models.greendao.Content.HTML_TYPE;
+import static in.testpress.models.greendao.Content.NOTES_TYPE;
+import static in.testpress.models.greendao.Content.VIDEO_TYPE;
 
 public class ContentActivity extends BaseToolBarActivity {
 
@@ -168,7 +175,6 @@ public class ContentActivity extends BaseToolBarActivity {
     public static Intent createIntent(int position, long chapterId, AppCompatActivity activity) {
         Intent intent = new Intent(activity, ContentActivity.class);
         intent.putExtra(POSITION, position);
-        //noinspection ConstantConditions
         intent.putExtra(ACTIONBAR_TITLE, activity.getSupportActionBar().getTitle());
         intent.putExtra(CHAPTER_ID, chapterId);
         return intent;
@@ -347,22 +353,38 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void loadContent() {
         hideContents();
-        if (content.getHtmlContentTitle() != null) {
-            loadContentHtml();
-        } else if (content.getRawVideo() != null) {
-            loadVideo(content.getRawVideo());
-        } else if (content.getRawExam() != null) {
-            onExamContent();
-        } else if (content.getRawAttachment() != null) {
-            displayAttachmentContent();
-        } else {
-            setEmptyText(R.string.testpress_error_loading_contents,
-                    R.string.testpress_some_thing_went_wrong_try_again,
-                    R.drawable.ic_error_outline_black_18dp);
+        setContentTitle(content.getTitle());
+
+        switch (content.getContentType()) {
+            case HTML_TYPE:
+                displayHtmlContent();
+                break;
+            case VIDEO_TYPE:
+                loadVideo(content.getRawVideo());
+                break;
+            case EXAM_TYPE:
+                onExamContent();
+                break;
+            case ATTACHMENT_TYPE:
+                displayAttachmentContent();
+                break;
+            case NOTES_TYPE:
+                displayHtmlContent();
+                break;
+            default:
+                setEmptyText(R.string.testpress_error_loading_contents,
+                        R.string.testpress_some_thing_went_wrong_try_again,
+                        R.drawable.ic_error_outline_black_18dp);
+                break;
         }
     }
 
     private void loadVideo(Video video) {
+        if (video == null) {
+            updateContent();
+            return;
+        }
+
         setContentTitle(video.getTitle());
         if (video.getIsDomainRestricted()) {
             loadDomainRestrictedVideo(video);
@@ -404,7 +426,7 @@ public class ContentActivity extends BaseToolBarActivity {
         setContentTitle(Html.fromHtml(content.getHtmlContentTitle()));
         HtmlContent htmlContent = fetchHtmlContentFromDB();
         if (htmlContent != null) {
-            displayHtmlContent(htmlContent);
+            displayHtmlContent();
         } else {
             loadContentHtmlFromServer();
         }
@@ -428,7 +450,7 @@ public class ContentActivity extends BaseToolBarActivity {
                     public void onSuccess(HtmlContent htmlContent) {
                         htmlContent.setSourceUrl(content.getHtmlContentUrl());
                         htmlContentDao.insertOrReplace(htmlContent);
-                        displayHtmlContent(htmlContent);
+                        displayHtmlContent();
                     }
 
                     @Override
@@ -438,9 +460,14 @@ public class ContentActivity extends BaseToolBarActivity {
                 });
     }
 
-    void displayHtmlContent(HtmlContent htmlContent) {
+    void displayHtmlContent() {
+        if (content.getRawHtmlContent() == null) {
+            updateContent();
+            return;
+        }
+
         String html = "<div style='padding-left: 20px; padding-right: 20px;'>" +
-                htmlContent.getTextHtml() + "</div>";
+        content.getRawHtmlContent().getTextHtml() + "</div>";
         webViewUtils.initWebView(html, this);
     }
 
@@ -492,6 +519,12 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void displayAttachmentContent() {
         setContentTitle(content.getName());
+
+        if (content.getRawAttachment() == null) {
+            updateContent();
+            return;
+        }
+
         TextView description = (TextView) findViewById(R.id.attachment_description);
         final Attachment attachment = content.getRawAttachment();
         if (attachment.getDescription() != null && !attachment.getDescription().isEmpty()) {
@@ -516,6 +549,11 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void onExamContent() {
+        if (content.getRawExam() == null) {
+            updateContent();
+            return;
+        }
+
         setContentTitle(content.getName());
         // forceRefresh if already attempts is listed(courseAttemptsFromDB is populated)
         boolean forceRefresh = !courseAttemptsFromDB.isEmpty();
@@ -790,7 +828,7 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void createContentAttempt() {
-        if (content.getRawVideo() != null && isNonEmbeddableVideo) {
+        if (content.getRawVideo() != null && content.isNonEmbeddableVideo()) {
             showLoadingProgress();
         }
         createAttemptApiRequest = courseApiClient.createContentAttempt(content.getId())
@@ -802,7 +840,7 @@ public class ContentActivity extends BaseToolBarActivity {
                                     TESTPRESS_CONTENT_SHARED_PREFS, Context.MODE_PRIVATE);
                             prefs.edit().putBoolean(FORCE_REFRESH, true).apply();
                         }
-                        if (content.getRawVideo() != null && isNonEmbeddableVideo) {
+                        if (content.getRawVideo() != null && content.isNonEmbeddableVideo()) {
                             swipeRefresh.setRefreshing(false);
                             videoAttempt = courseAttempt.getRawVideoAttempt();
                             initExoPlayer(content.getRawVideo().getHlsUrl());
@@ -811,7 +849,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
                     @Override
                     public void onException(TestpressException exception) {
-                        if (content.getRawVideo() != null && isNonEmbeddableVideo) {
+                        if (content.getRawVideo() != null && content.isNonEmbeddableVideo()) {
                             handleError(exception, false);
                         } else if (!exception.isNetworkError()) {
                             exception.printStackTrace();
@@ -851,9 +889,9 @@ public class ContentActivity extends BaseToolBarActivity {
         hideContents();
         String contentUrl;
         if (content != null) {
-            contentUrl = content.getUrl();
+            contentUrl = CONTENTS_PATH_v2_4 + content.getId();
         } else {
-            contentUrl = CONTENTS_PATH + contentId;
+            contentUrl = CONTENTS_PATH_v2_4 + contentId;
         }
 
         updateContentApiRequest = courseApiClient.getContent(contentUrl)
@@ -881,11 +919,7 @@ public class ContentActivity extends BaseToolBarActivity {
                         if (chapterId != null) {
                             contents = getContentsFromDB();
                         }
-                        if (content.getHtmlContentTitle() == null) {
-                            loadContent();
-                        } else {
-                            loadContentHtmlFromServer();
-                        }
+                        loadContent();
                     }
 
                     @Override
@@ -1136,8 +1170,8 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void setContentTitle(CharSequence title) {
-        titleView.setText(title);
         //noinspection ConstantConditions
+        titleView.setText(title);
         boolean bookmarksEnabled = TestpressSdk.getTestpressSession(this).getInstituteSettings()
                 .isBookmarksEnabled();
 
