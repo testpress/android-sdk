@@ -18,6 +18,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.facebook.shimmer.ShimmerFrameLayout;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -69,6 +71,7 @@ public abstract class BaseListViewFragment<E> extends Fragment
      */
     protected SwipeRefreshLayout swipeRefreshLayout;
 
+    protected ShimmerFrameLayout loadingPlaceholder;
     /**
      * Is the list currently shown?
      */
@@ -132,6 +135,8 @@ public abstract class BaseListViewFragment<E> extends Fragment
                 onListItemClick((ListView) parent, view, position, id);
             }
         });
+        loadingPlaceholder = view.findViewById(R.id.shimmer_view_container);
+        loadingPlaceholder.setVisibility(View.GONE);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -205,6 +210,16 @@ public abstract class BaseListViewFragment<E> extends Fragment
         items.clear();
         getListAdapter().getWrappedAdapter().setItems(items);
         refreshWithProgress();
+    }
+
+    public void showLoadingPlaceholder() {
+        loadingPlaceholder.setVisibility(View.VISIBLE);
+        loadingPlaceholder.startShimmer();
+    }
+
+    public void hideLoadingPlaceholder() {
+        loadingPlaceholder.stopShimmer();
+        loadingPlaceholder.setVisibility(View.GONE);
     }
 
     /**
@@ -378,12 +393,14 @@ public abstract class BaseListViewFragment<E> extends Fragment
             swipeRefreshLayout.setRefreshing(false);
         } else {
             hide(emptyView);
-            swipeRefreshLayout.post(new Runnable() {
-                @Override
-                public void run() {
-                    swipeRefreshLayout.setRefreshing(true);
-                }
-            });
+            if (swipeRefreshLayout.isEnabled()) {
+                swipeRefreshLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(true);
+                    }
+                });
+            }
         }
         return this;
     }

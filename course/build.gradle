@@ -34,6 +34,7 @@ dependencies {
     api 'com.google.android.exoplayer:exoplayer-hls:' + rootProject.exoPlayer
     api rootProject.constraintLayout
     api rootProject.mediarouter
+    api rootProject.shimmer
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
     testImplementation rootProject.powermockJunit
