@@ -8,6 +8,8 @@ import in.testpress.network.RetrofitCall;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.Product;
 
+import in.testpress.v2_4.models.ApiResponse;
+import in.testpress.v2_4.models.ProductsListResponse;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -22,6 +24,9 @@ public interface ProductService {
 
     @GET(TestpressStoreApiClient.PRODUCTS_LIST_PATH)
     RetrofitCall<TestpressApiResponse<Product>> getProducts(@QueryMap Map<String, Object> options);
+
+    @GET(TestpressStoreApiClient.V4_PRODUCTS_LIST_PATH)
+    RetrofitCall<ApiResponse<ProductsListResponse>> getv4Products(@QueryMap Map<String, Object> options);
 
     @GET(TestpressStoreApiClient.PRODUCTS_LIST_PATH + "{product_slug}")
     RetrofitCall<Product> getProductDetails(

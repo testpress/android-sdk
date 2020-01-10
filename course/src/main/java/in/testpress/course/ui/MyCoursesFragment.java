@@ -6,17 +6,18 @@ import android.support.v4.content.Loader;
 
 import org.greenrobot.greendao.AbstractDao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
 import in.testpress.course.TestpressCourse;
+import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.course.network.CoursePager;
 import in.testpress.course.network.TestpressCourseApiClient;
-import in.testpress.network.BaseResourcePager;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -53,7 +54,8 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
 
     @Override
     protected SingleTypeAdapter<Course> createAdapter(List<Course> items) {
-        return new CourseListAdapter(getActivity(), courseDao);
+        List<Course> courses = new ArrayList<>();
+        return new CourseListAdapter(getActivity(), courseDao, courses, null);
     }
 
     @Override
@@ -72,12 +74,30 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
 
         this.exception = null;
         this.items = courses;
-        getDao().deleteAll();
+        deleteExistingCourse();
+        storeCoursesWithState(courses);
+        this.items = courses;
+        displayDataFromDB();
+        showList();
+    }
+
+    private void deleteExistingCourse() {
+        getDao().queryBuilder()
+                .where(CourseDao.Properties.IsMyCourse.eq(true))
+                .buildDelete().executeDeleteWithoutDetachingEntities();
+        getDao().detachAll();
+
+    }
+
+    private void storeCoursesWithState(List<Course> courses) {
+        courses = Course.updateCoursesWithLocalVariables(getContext(), courses);
+        for (Course course: courses) {
+            course.setIsMyCourse(true);
+        }
+
         if (!courses.isEmpty()) {
             getDao().insertOrReplaceInTx(courses);
         }
-        displayDataFromDB();
-        showList();
     }
 
     @Override

@@ -39,6 +39,7 @@ public class CourseListFragment extends BaseFragment {
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getChildFragmentManager());
         adapter.addFragment(new MyCoursesFragment(), getString(R.string.my_course_title));
+        adapter.addFragment(new AvailableCourseListFragment(), getString(R.string.available_courses_title));
         viewPager.setAdapter(adapter);
     }
 
