@@ -14,6 +14,8 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
 import in.testpress.course.TestpressCourse;
+import in.testpress.course.enums.CourseType;
+import in.testpress.course.util.ManageCourseStates;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
@@ -76,37 +78,10 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
         this.exception = null;
         this.items = courses;
 
-        unAssignAllCourses();
-        Course.updateCoursesWithLocalState(getContext(), courses);
-        assignCourses(courses);
-        cleanCourses();
+        ManageCourseStates manageCourseStates = new ManageCourseStates(CourseType.MY_COURSE, courseDao, courses);
+        manageCourseStates.removeCourses();
         displayDataFromDB();
         showList();
-    }
-
-    private void unAssignAllCourses() {
-        List<Course> coursesFromDB = getDao().queryBuilder().list();
-        for (Course course: coursesFromDB) {
-            course.setIsMyCourse(false);
-        }
-        getDao().insertOrReplaceInTx(coursesFromDB);
-    }
-
-    private void assignCourses(List<Course> courses) {
-        for (Course course: courses) {
-            course.setIsMyCourse(true);
-        }
-        getDao().insertOrReplaceInTx(courses);
-    }
-
-    private void cleanCourses() {
-        getDao().queryBuilder()
-                .where(
-                        CourseDao.Properties.IsMyCourse.notEq(true),
-                        CourseDao.Properties.IsProduct.notEq(true)
-                )
-                .buildDelete().executeDeleteWithoutDetachingEntities();
-        getDao().detachAll();
     }
 
     @Override

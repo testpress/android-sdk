@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.widget.ListView;
 
 import java.util.List;
@@ -12,7 +13,9 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.AvailableCourseListAdapter;
 import in.testpress.course.R;
+import in.testpress.course.enums.CourseType;
 import in.testpress.course.network.CourseProductPager;
+import in.testpress.course.util.ManageCourseStates;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.Product;
@@ -22,7 +25,7 @@ import in.testpress.ui.BaseListViewFragment;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ThrowableLoader;
 
-public class AvailableCourseListFragment extends BaseListViewFragment<Product> {
+public class AvailableCourseListFragment extends BaseListViewFragment<Product>  {
 
     private CourseDao courseDao;
     private CourseProductPager pager;
@@ -67,33 +70,9 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> {
             pager.next();
             List<Course> courses = pager.getListResponse().getCourses();
 
-            unAssignCourses();
-            Course.updateCoursesWithLocalState(getContext(), courses);
-            assignCourses(courses);
-            deleteExistingCourse();
+            ManageCourseStates manageCourseStates = new ManageCourseStates(CourseType.PRODUCT_COURSE, courseDao, courses);
+            manageCourseStates.removeCourses();
             return pager.getListResponse().getProducts();
-        }
-
-        private void unAssignCourses() {
-            List<Course> coursesFromDB = courseDao.queryBuilder().list();
-            for (Course course: coursesFromDB) {
-                course.setIsProduct(false);
-            }
-            courseDao.insertOrReplaceInTx(coursesFromDB);
-        }
-
-        private void assignCourses(List<Course> courses) {
-            for (Course course: courses) {
-                course.setIsProduct(true);
-            }
-            courseDao.insertOrReplaceInTx(courses);
-        }
-
-        private void deleteExistingCourse() {
-            courseDao.queryBuilder()
-                    .where(CourseDao.Properties.IsMyCourse.notEq(true), CourseDao.Properties.IsProduct.notEq(true))
-                    .buildDelete().executeDeleteWithoutDetachingEntities();
-            courseDao.detachAll();
         }
     }
 
@@ -124,9 +103,10 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> {
                 showError(errorMessage);
             }
         } else {
-            getListAdapter().getWrappedAdapter().setItems(products);
             this.items = products;
+            getListAdapter().getWrappedAdapter().setItems(products);
             deleteAndInsertProductsInDB(products);
+            showList();
         }
 
         getListAdapter().notifyDataSetChanged();
