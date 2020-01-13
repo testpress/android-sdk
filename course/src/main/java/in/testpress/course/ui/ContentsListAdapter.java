@@ -104,7 +104,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         }
         Exam exam = content.getRawExam();
         // Validate lock
-        if (content.getIsLocked()) {
+        if (content.getIsLocked() || content.getIsScheduled()) {
             setGone(2, false);
             setGone(3, false);
             setGone(6, true);
@@ -155,7 +155,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         Chapter chapter = chapters.get(0);
         Course course = courseDao.queryBuilder().where(CourseDao.Properties.Id.eq(chapter.getCourseId())).list().get(0);
 
-        if (shouldOpenPaymentPage(course, content)) {
+        if (shouldOpenPaymentPage(course, content) && !content.getIsScheduled()) {
             setGone(2, false);
             setGone(3, false);
             setGone(6, true);
