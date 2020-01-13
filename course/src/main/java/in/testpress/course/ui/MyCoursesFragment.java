@@ -20,14 +20,14 @@ import in.testpress.network.BaseResourcePager;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
 
-public class CourseListFragment extends BaseDataBaseFragment<Course, Long> {
+public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
 
     private TestpressCourseApiClient mApiClient;
     private CourseDao courseDao;
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
-                .replace(containerViewId, new CourseListFragment())
+                .replace(containerViewId, new MyCoursesFragment())
                 .commitAllowingStateLoss();
     }
 
