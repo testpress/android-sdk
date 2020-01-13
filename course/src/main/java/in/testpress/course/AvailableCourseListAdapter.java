@@ -1,6 +1,7 @@
 package in.testpress.course;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -47,6 +48,11 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
     @Override
     public int getCount() {
         return (int) productDao.queryBuilder().count();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).getId();
     }
 
     @Override
