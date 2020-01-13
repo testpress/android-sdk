@@ -3,20 +3,24 @@ package in.testpress.course.ui;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.Loader;
+import android.util.Log;
 
 import org.greenrobot.greendao.AbstractDao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
 import in.testpress.course.TestpressCourse;
+import in.testpress.course.enums.CourseType;
+import in.testpress.course.util.ManageCourseStates;
+import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.course.network.CoursePager;
 import in.testpress.course.network.TestpressCourseApiClient;
-import in.testpress.network.BaseResourcePager;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -53,7 +57,8 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
 
     @Override
     protected SingleTypeAdapter<Course> createAdapter(List<Course> items) {
-        return new CourseListAdapter(getActivity(), courseDao);
+        List<Course> courses = new ArrayList<>();
+        return new CourseListAdapter(getActivity(), courseDao, courses, null);
     }
 
     @Override
@@ -72,12 +77,25 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
 
         this.exception = null;
         this.items = courses;
-        getDao().deleteAll();
-        if (!courses.isEmpty()) {
-            getDao().insertOrReplaceInTx(courses);
-        }
+        unassignLocalCourses();
+        storeCourses(courses);
         displayDataFromDB();
         showList();
+    }
+
+    private void unassignLocalCourses() {
+        List<Course> coursesFromDB = courseDao.queryBuilder().where(CourseDao.Properties.IsMyCourse.eq(true)).list();
+        for (Course course: coursesFromDB) {
+            course.setIsMyCourse(false);
+        }
+        courseDao.insertOrReplaceInTx(coursesFromDB);
+    }
+
+    private void storeCourses(List<Course> courses) {
+        for (Course course: courses) {
+            course.setIsMyCourse(true);
+        }
+        courseDao.insertOrReplaceInTx(courses);
     }
 
     @Override

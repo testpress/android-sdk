@@ -2,11 +2,14 @@ package in.testpress.course.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import java.util.List;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
@@ -21,23 +24,36 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     private ImageLoader mImageLoader;
     private DisplayImageOptions mOptions;
     private CourseDao mCourseDao;
+    private List<Course> courses;
+    private String product_slug;
 
-    CourseListAdapter(Activity activity, CourseDao courseDao) {
+    CourseListAdapter(Activity activity, CourseDao courseDao, List<Course> courses, String product_slug) {
         super(activity.getLayoutInflater(), R.layout.testpress_course_list_item);
         mActivity = activity;
         mImageLoader = ImageUtils.initImageLoader(activity);
         mOptions = ImageUtils.getPlaceholdersOption();
         mCourseDao = courseDao;
+        this.courses = courses;
+        this.product_slug = product_slug;
     }
 
     @Override
     public int getCount() {
-        return (int) mCourseDao.queryBuilder().count();
+        if (!courses.isEmpty()) {
+            return courses.size();
+        }
+
+        return (int) mCourseDao.queryBuilder().where(CourseDao.Properties.IsMyCourse.eq(true)).count();
     }
 
     @Override
     public Course getItem(int position) {
+        if (!courses.isEmpty()) {
+            return courses.get(position);
+        }
+
         return mCourseDao.queryBuilder()
+                .where(CourseDao.Properties.IsMyCourse.eq(true))
                 .orderAsc(CourseDao.Properties.Order)
                 .listLazy().get(position);
     }
