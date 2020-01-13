@@ -98,11 +98,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
         swipeRefreshLayout.setRefreshing(false);
 
         if (exception != null) {
-            int errorMessage = getErrorMessage(exception);
-
-            if (!isItemsEmpty()) {
-                showError(errorMessage);
-            }
+            handleException(exception);
             getLoaderManager().destroyLoader(loader.getId());
 
         } else {
@@ -118,6 +114,14 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
         }
     }
 
+
+    private void handleException(TestpressException exception) {
+        int errorMessage = getErrorMessage(exception);
+
+        if (!isItemsEmpty()) {
+            showError(errorMessage);
+        }
+    }
 
     @Override
     protected boolean isItemsEmpty() {
