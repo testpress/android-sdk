@@ -132,7 +132,8 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
                     mActivity.startActivity(ContentActivity.createIntent(
                             position,
                             chapterId,
-                            (AppCompatActivity) mActivity)
+                            (AppCompatActivity) mActivity,
+                            productSlug)
                     );
                 }
             });

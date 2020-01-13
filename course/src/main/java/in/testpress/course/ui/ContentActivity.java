@@ -89,6 +89,7 @@ import in.testpress.v2_4.models.FolderListResponse;
 
 import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
+import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 import static in.testpress.course.network.TestpressCourseApiClient.CONTENTS_PATH_v2_4;
 import static in.testpress.course.network.TestpressCourseApiClient.EMBED_CODE;
 import static in.testpress.course.network.TestpressCourseApiClient.EMBED_DOMAIN_RESTRICTED_VIDEO_PATH;
@@ -171,12 +172,15 @@ public class ContentActivity extends BaseToolBarActivity {
     private RetrofitCall<Bookmark> bookmarkApiRequest;
     private RetrofitCall<Void> deleteBookmarkApiRequest;
     private RetrofitCall<HtmlContent> htmlContentApiRequest;
+    private String productSlug;
+    private TextView pageNumber;
 
-    public static Intent createIntent(int position, long chapterId, AppCompatActivity activity) {
+    public static Intent createIntent(int position, long chapterId, AppCompatActivity activity, String productSlug) {
         Intent intent = new Intent(activity, ContentActivity.class);
         intent.putExtra(POSITION, position);
         intent.putExtra(ACTIONBAR_TITLE, activity.getSupportActionBar().getTitle());
         intent.putExtra(CHAPTER_ID, chapterId);
+        intent.putExtra(PRODUCT_SLUG, productSlug);
         return intent;
     }
 
@@ -219,7 +223,7 @@ public class ContentActivity extends BaseToolBarActivity {
         exoPlayerMainFrame = findViewById(R.id.exo_player_main_frame);
         toast = Toast.makeText(this, R.string.testpress_no_internet_try_again, Toast.LENGTH_SHORT);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        TextView pageNumber = (TextView) findViewById(R.id.page_number);
+        pageNumber = (TextView) findViewById(R.id.page_number);
         ViewUtils.setTypeface(
                 new TextView[] {titleView, previousButton, nextButton, startButton, pageNumber},
                 TestpressSdk.getRubikMediumFont(this)
@@ -348,6 +352,15 @@ public class ContentActivity extends BaseToolBarActivity {
             pageNumber.setText(String.format("%d/%d", position + 1, contents.size()));
             loadContent();
             validateAdjacentNavigationButton();
+        }
+        hideNavigationForProductPreview();
+
+    }
+
+    private void hideNavigationForProductPreview() {
+        productSlug = getIntent().getStringExtra(PRODUCT_SLUG);
+        if (productSlug != null) {
+            hideNavigationButtons();
         }
     }
 
@@ -1037,8 +1050,14 @@ public class ContentActivity extends BaseToolBarActivity {
         folderSpinnerAdapter.notifyDataSetChanged();
     }
 
+    private void hideNavigationButtons() {
+        pageNumber.setVisibility(View.GONE);
+        previousButton.setVisibility(View.GONE);
+        nextButton.setVisibility(View.GONE);
+    }
+
     private void validateAdjacentNavigationButton() {
-        if (contents == null) {
+        if (contents == null || productSlug != null) {
             // Discard navigation buttons if deep linked
             return;
         }
@@ -1051,7 +1070,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 @Override
                 public void onClick(View v) {
                     startActivity(ContentActivity.createIntent(previousPosition, chapterId,
-                            ContentActivity.this));
+                            ContentActivity.this, productSlug));
 
                     finish();
                 }
@@ -1081,7 +1100,7 @@ public class ContentActivity extends BaseToolBarActivity {
                     @Override
                     public void onClick(View v) {
                         startActivity(ContentActivity.createIntent(nextPosition, chapterId,
-                                ContentActivity.this));
+                                ContentActivity.this, productSlug));
 
                         finish();
                     }
