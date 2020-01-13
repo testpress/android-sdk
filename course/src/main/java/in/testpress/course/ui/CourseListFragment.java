@@ -13,8 +13,12 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import in.testpress.core.TestpressSdk;
+import in.testpress.core.TestpressSession;
 import in.testpress.course.R;
 import in.testpress.ui.BaseFragment;
+
+import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 
 public class CourseListFragment extends BaseFragment {
     @Override
@@ -39,7 +43,9 @@ public class CourseListFragment extends BaseFragment {
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getChildFragmentManager());
         adapter.addFragment(new MyCoursesFragment(), getString(R.string.my_course_title));
-        adapter.addFragment(new AvailableCourseListFragment(), getString(R.string.available_courses_title));
+
+        TestpressSession session = TestpressSdk.getTestpressSession(getContext());
+        adapter.addFragment(new AvailableCourseListFragment(), session.getInstituteSettings().getStoreLabel());
         viewPager.setAdapter(adapter);
     }
 

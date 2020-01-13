@@ -112,6 +112,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
             session.getInstituteSettings().setDisplayUserEmailOnVideo(true);
             session.getInstituteSettings().setScreenshotDisabled(false);
             session.getInstituteSettings().setDisableStudentAnalytics(false);
+            session.getInstituteSettings().setStoreLabel("Available Courses");
 
             TestpressSdk.setTestpressSession(this, session);
             switch (clickedButtonId) {

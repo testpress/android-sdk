@@ -18,6 +18,7 @@ public class InstituteSettings {
     private Integer maxParallelLogins;
     private Integer lockoutLimit;
     private String cooloffTime;
+    private String storeLabel;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -147,5 +148,13 @@ public class InstituteSettings {
     public InstituteSettings setCooloffTime(String cooloffTime) {
         this.cooloffTime = cooloffTime;
         return this;
+    }
+
+    public String getStoreLabel() {
+        return storeLabel;
+    }
+
+    public void setStoreLabel(String storeLabel) {
+        this.storeLabel = storeLabel;
     }
 }
