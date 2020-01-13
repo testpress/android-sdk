@@ -43,6 +43,7 @@
 
     <string name="testpress_usb_connected">Disconnect USB!. Your device is connected to PC, Please disconnect the USB data connection to play videos.</string>
     <string name="testpress_disconnect_live_video">Stop screen sharing!. Your device is casted to projector/monitor, Please stop it &amp; retry to play videos.</string>
+    <string name="my_course_title">My Courses</string>
 
     <string-array name="exo_speed_values">
         <item>1</item>
