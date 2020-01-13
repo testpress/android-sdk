@@ -14,6 +14,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.Product;
+import in.testpress.models.greendao.ProductDao;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -24,6 +25,7 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
     private ImageLoader imageLoader;
     private DisplayImageOptions options;
     private CourseDao courseDao;
+    private ProductDao productDao;
     private int chaptersCount;
     private int contentsCount;
 
@@ -33,7 +35,18 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
         this.imageLoader = ImageUtils.initImageLoader(activity);
         this.options = ImageUtils.getPlaceholdersOption();
         courseDao = TestpressSDKDatabase.getCourseDao(activity);
+        productDao = TestpressSDKDatabase.getProductDao(activity);
         setItems(items);
+    }
+
+    @Override
+    public Product getItem(int position) {
+        return productDao.queryBuilder().listLazy().get(position);
+    }
+
+    @Override
+    public int getCount() {
+        return (int) productDao.queryBuilder().count();
     }
 
     @Override
