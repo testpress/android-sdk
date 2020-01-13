@@ -49,6 +49,8 @@ public class Content implements android.os.Parcelable {
     private int videoWatchedPercentage;
     private String modified;
     private Long modifiedDate;
+    private Boolean freePreview;
+    private Boolean isScheduled;
     private Long courseId;
     private Long chapterId;
     private Long htmlId;
@@ -105,7 +107,7 @@ public class Content implements android.os.Parcelable {
     }
 
     @Generated
-    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Long courseId, Long chapterId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
+    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, Long courseId, Long chapterId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
         this.order = order;
         this.htmlContentTitle = htmlContentTitle;
         this.htmlContentUrl = htmlContentUrl;
@@ -128,6 +130,8 @@ public class Content implements android.os.Parcelable {
         this.videoWatchedPercentage = videoWatchedPercentage;
         this.modified = modified;
         this.modifiedDate = modifiedDate;
+        this.freePreview = freePreview;
+        this.isScheduled = isScheduled;
         this.courseId = courseId;
         this.chapterId = chapterId;
         this.htmlId = htmlId;
@@ -317,6 +321,22 @@ public class Content implements android.os.Parcelable {
 
     public void setModifiedDate(Long modifiedDate) {
         this.modifiedDate = modifiedDate;
+    }
+
+    public Boolean getFreePreview() {
+        return freePreview;
+    }
+
+    public void setFreePreview(Boolean freePreview) {
+        this.freePreview = freePreview;
+    }
+
+    public Boolean getIsScheduled() {
+        return isScheduled;
+    }
+
+    public void setIsScheduled(Boolean isScheduled) {
+        this.isScheduled = isScheduled;
     }
 
     public Long getCourseId() {

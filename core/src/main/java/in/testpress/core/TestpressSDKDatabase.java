@@ -22,6 +22,7 @@ import in.testpress.models.greendao.DirectionTranslationDao;
 import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.HtmlContentDao;
 import in.testpress.models.greendao.LanguageDao;
+import in.testpress.models.greendao.ProductDao;
 import in.testpress.models.greendao.ReviewAnswerDao;
 import in.testpress.models.greendao.ReviewAnswerTranslationDao;
 import in.testpress.models.greendao.ReviewAttemptDao;
@@ -151,6 +152,10 @@ public class TestpressSDKDatabase {
 
     public static BookmarkDao getBookmarkDao(Context context) {
         return getDaoSession(context).getBookmarkDao();
+    }
+
+    public static ProductDao getProductDao(Context context) {
+        return getDaoSession(context).getProductDao();
     }
 
     public static ContentTypeDao getContentTypeDao(Context context) {
