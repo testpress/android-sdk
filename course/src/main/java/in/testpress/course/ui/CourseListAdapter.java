@@ -25,16 +25,16 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     private DisplayImageOptions mOptions;
     private CourseDao mCourseDao;
     private List<Course> courses;
-    private String product_slug;
+    private String productSlug;
 
-    CourseListAdapter(Activity activity, CourseDao courseDao, List<Course> courses, String product_slug) {
+    CourseListAdapter(Activity activity, CourseDao courseDao, List<Course> courses, String productSlug) {
         super(activity.getLayoutInflater(), R.layout.testpress_course_list_item);
         mActivity = activity;
         mImageLoader = ImageUtils.initImageLoader(activity);
         mOptions = ImageUtils.getPlaceholdersOption();
         mCourseDao = courseDao;
         this.courses = courses;
-        this.product_slug = product_slug;
+        this.productSlug = productSlug;
     }
 
     @Override
