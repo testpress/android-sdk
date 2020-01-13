@@ -77,11 +77,25 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
 
         this.exception = null;
         this.items = courses;
-
-        ManageCourseStates manageCourseStates = new ManageCourseStates(CourseType.MY_COURSE, courseDao, courses);
-        manageCourseStates.removeCourses();
+        unassignLocalCourses();
+        storeCourses(courses);
         displayDataFromDB();
         showList();
+    }
+
+    private void unassignLocalCourses() {
+        List<Course> coursesFromDB = courseDao.queryBuilder().where(CourseDao.Properties.IsMyCourse.eq(true)).list();
+        for (Course course: coursesFromDB) {
+            course.setIsMyCourse(false);
+        }
+        courseDao.insertOrReplaceInTx(coursesFromDB);
+    }
+
+    private void storeCourses(List<Course> courses) {
+        for (Course course: courses) {
+            course.setIsMyCourse(true);
+        }
+        courseDao.insertOrReplaceInTx(courses);
     }
 
     @Override

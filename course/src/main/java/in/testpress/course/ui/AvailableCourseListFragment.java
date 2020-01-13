@@ -70,8 +70,9 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
             pager.next();
             List<Course> courses = pager.getListResponse().getCourses();
 
-            ManageCourseStates manageCourseStates = new ManageCourseStates(CourseType.PRODUCT_COURSE, courseDao, courses);
-            manageCourseStates.removeCourses();
+            ManageCourseStates manageCourseStates = new ManageCourseStates(CourseType.PRODUCT_COURSE, courseDao);
+            manageCourseStates.updateCoursesWithLocalState(courses);
+            courseDao.insertOrReplaceInTx(courses);
             return pager.getListResponse().getProducts();
         }
     }
@@ -102,15 +103,15 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
             if (!isItemsEmpty()) {
                 showError(errorMessage);
             }
+            getLoaderManager().destroyLoader(loader.getId());
+
         } else {
             this.items = products;
             getListAdapter().getWrappedAdapter().setItems(products);
             deleteAndInsertProductsInDB(products);
             showList();
+            getListAdapter().notifyDataSetChanged();
         }
-
-        getListAdapter().notifyDataSetChanged();
-        getLoaderManager().destroyLoader(loader.getId());
 
         if(isItemsEmpty()) {
             setEmptyText();
