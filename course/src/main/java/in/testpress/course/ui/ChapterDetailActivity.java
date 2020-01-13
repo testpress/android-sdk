@@ -33,6 +33,7 @@ import in.testpress.util.UIUtils;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
+import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 import static in.testpress.course.ui.ContentActivity.FORCE_REFRESH;
 import static in.testpress.course.ui.ContentActivity.GO_TO_MENU;
 import static in.testpress.course.ui.ContentActivity.TESTPRESS_CONTENT_SHARED_PREFS;
@@ -53,17 +54,20 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
 
     private RetrofitCall<Chapter> chapterApiRequest;
     private RetrofitCall<Course> courseApiRequest;
+    private String productSlug;
 
-    public static Intent createIntent(String title, String courseId, Context context) {
+    public static Intent createIntent(String title, String courseId, Context context, String productSlug) {
         Intent intent = new Intent(context, ChapterDetailActivity.class);
         intent.putExtra(ACTIONBAR_TITLE, title);
         intent.putExtra(COURSE_ID, courseId);
+        intent.putExtra(PRODUCT_SLUG, productSlug);
         return intent;
     }
 
-    public static Intent createIntent(String chaptersUrl, Context context) {
+    public static Intent createIntent(String chaptersUrl, Context context, String productSlug) {
         Intent intent = new Intent(context, ChapterDetailActivity.class);
         intent.putExtra(CHAPTER_URL, chaptersUrl);
+        intent.putExtra(PRODUCT_SLUG, productSlug);
         return intent;
     }
 
@@ -74,6 +78,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         prefs = getSharedPreferences(TESTPRESS_CONTENT_SHARED_PREFS, Context.MODE_PRIVATE);
         prefs.edit().clear().apply();
         courseDao = TestpressSDKDatabase.getCourseDao(this);
+        productSlug = getIntent().getStringExtra(PRODUCT_SLUG);
         final String chapterUrl = getIntent().getStringExtra(CHAPTER_URL);
         if (chapterUrl != null) {
             emptyView = (LinearLayout) findViewById(R.id.empty_container);
@@ -111,7 +116,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                     TestpressSdk.getTestpressSession(this).getInstituteSettings();
 
             if (instituteSettings.isCoursesFrontend() &&
-                    instituteSettings.isCoursesGamificationEnabled()) {
+                    instituteSettings.isCoursesGamificationEnabled() && productSlug == null) {
 
                 findViewById(R.id.fragment_carousel).setVisibility(View.VISIBLE);
                 findViewById(R.id.fragment_container).setVisibility(View.GONE);
@@ -244,10 +249,12 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         if (chapter.hasChildren()) {
             getIntent().putExtra(COURSE_ID, chapter.getCourseId().toString());
             getIntent().putExtra(PARENT_ID, chapter.getId().toString());
+            getIntent().putExtra(PRODUCT_SLUG, productSlug);
             loadChildChapters();
         } else if (chapter.hasContents()) {
             getIntent().putExtra(CONTENTS_URL_FRAG, chapter.getContentUrl());
             getIntent().putExtra(CHAPTER_ID, chapter.getId());
+            getIntent().putExtra(PRODUCT_SLUG, productSlug);
             loadContents();
         } else {
             setEmptyText(R.string.testpress_no_content,
@@ -300,6 +307,10 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             } else {
                 data.putInt(COURSE_ID, chapter.getCourseId().intValue());
             }
+        }
+
+        if(productSlug != null) {
+            data.putString(PRODUCT_SLUG, productSlug);
         }
         return data;
     }

@@ -19,6 +19,8 @@ import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.Assert;
 import in.testpress.util.SingleTypeAdapter;
 
+import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
+
 public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
 
     public static final String CONTENTS_URL_FRAG = "contentsUrlFrag";
@@ -28,6 +30,7 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
     private String contentsUrlFrag;
     private ContentDao contentDao;
     private Long chapterId;
+    private String productSlug;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,7 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
         contentDao = TestpressSDKDatabase.getContentDao(getContext());
         chapterId = getArguments().getLong(CHAPTER_ID);
         Assert.assertNotNull("chapterId must not be null.", chapterId);
+        productSlug = getArguments().getString(PRODUCT_SLUG);
     }
 
     @Override
@@ -89,8 +93,7 @@ public class ContentsListFragment extends BaseDataBaseFragment<Content, Long> {
 
     @Override
     protected SingleTypeAdapter<Content> createAdapter(List<Content> items) {
-        return new ContentsListAdapter(getActivity(), items, R.layout.testpress_content_list_item,
-                contentDao, chapterId);
+        return new ContentsListAdapter(getActivity(), chapterId, productSlug);
     }
 
     @Override

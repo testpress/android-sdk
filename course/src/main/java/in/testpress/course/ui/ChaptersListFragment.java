@@ -20,11 +20,13 @@ import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.network.BaseResourcePager;
+import in.testpress.store.ui.ProductDetailsActivity;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
 
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
+import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 
 public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
@@ -33,6 +35,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     private String parentId;
     private ChapterDao chapterDao;
     private CourseDao courseDao;
+    private String productSlug;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
     private void storeArgs() {
         courseId = getArguments().getString(COURSE_ID);
+        productSlug = getArguments().getString(PRODUCT_SLUG);
 
         if (getArguments().getString(PARENT_ID) != null) {
             parentId = getArguments().getString(PARENT_ID);
@@ -92,7 +96,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
     @Override
     protected SingleTypeAdapter<Chapter> createAdapter(List<Chapter> items) {
-        return new ChaptersListAdapter(getActivity(), getCourse(), parentId);
+        return new ChaptersListAdapter(getActivity(), getCourse(), parentId, productSlug);
     }
 
     private Course getCourse() {

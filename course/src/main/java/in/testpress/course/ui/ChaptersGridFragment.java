@@ -161,7 +161,7 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
                 public void onClick(View v) {
                     getActivity().startActivity(ChapterDetailActivity.createIntent(
                             chapter.getUrl(),
-                            getContext())
+                            getContext(), null)
                     );
                 }
             });
