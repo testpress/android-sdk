@@ -20,9 +20,6 @@ import static in.testpress.network.TestpressApiClient.PAGE;
 public class CourseProductPager extends BaseResourcePager<ProductsListResponse, Product> {
 
     private TestpressStoreApiClient apiClient;
-    private final Map<Object, Price> prices = new LinkedHashMap<>();
-    private final Map<Object, Course> courses = new LinkedHashMap<>();
-
     public CourseProductPager(TestpressStoreApiClient apiClient) {
         this.apiClient = apiClient;
     }
@@ -42,22 +39,7 @@ public class CourseProductPager extends BaseResourcePager<ProductsListResponse, 
 
     @Override
     public List<Product> getItems(ProductsListResponse resultResponse) {
-
-        for (Price price : resultResponse.getPrices()) {
-            prices.put(price.getId(), price);
-        }
-
-        for (Course course: resultResponse.getCourses()) {
-            courses.put(course.getId(), course);
-        }
         return resultResponse.getProducts();
     }
 
-    public ArrayList<Price> getPrices() {
-        return new ArrayList<>(prices.values());
-    }
-
-    public ArrayList<Course> getCourses() {
-        return new ArrayList<>(courses.values());
-    }
 }
