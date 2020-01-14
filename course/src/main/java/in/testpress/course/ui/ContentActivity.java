@@ -562,7 +562,7 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void onExamContent() {
-        if (content.getRawExam() == null) {
+        if (content.getRawExam() == null || content.getAttemptsUrl() == null) {
             updateContent();
             return;
         }
@@ -638,10 +638,10 @@ public class ContentActivity extends BaseToolBarActivity {
                         ((exam.getAttemptsCount() + exam.getPausedAttemptsCount()) <= exam.getMaxRetakes() ||
                                 exam.getMaxRetakes() < 0))) {
 
-            if (content.getIsLocked() || !content.getHasStarted() || exam.isEnded()) {
+            if (content.getIsLocked() || (content.getHasStarted() != null && !content.getHasStarted()) || exam.isEnded()) {
                 if (courseAttemptsFromDB.isEmpty()) {
                     TextView webOnlyLabel = (TextView) findViewById(R.id.web_only_label);
-                    if (!content.getHasStarted()) {
+                    if (content.getHasStarted() != null && !content.getHasStarted()) {
                         webOnlyLabel.setText(String.format(
                                 getString(R.string.testpress_can_start_exam_only_after),
                                 FormatDate.formatDateTime(exam.getStartDate())
