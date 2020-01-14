@@ -67,13 +67,15 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
 
         @Override
         public List<Product> loadData() throws TestpressException {
-            pager.next();
-            List<Course> courses = pager.getListResponse().getCourses();
+            do {
+                pager.next();
+                List<Course> courses = pager.getListResponse().getCourses();
 
-            ManageCourseStates manageCourseStates = new ManageCourseStates(CourseType.PRODUCT_COURSE, courseDao);
-            manageCourseStates.updateCoursesWithLocalState(courses);
-            courseDao.insertOrReplaceInTx(courses);
-            return pager.getListResponse().getProducts();
+                ManageCourseStates manageCourseStates = new ManageCourseStates(CourseType.PRODUCT_COURSE, courseDao);
+                manageCourseStates.updateCoursesWithLocalState(courses);
+                courseDao.insertOrReplaceInTx(courses);
+            } while (pager.hasNext());
+            return pager.getResources();
         }
     }
 

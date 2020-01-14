@@ -89,9 +89,11 @@ public class ContentsListFragment extends BaseListViewFragment<Content> {
 
         @Override
         public List<Content> loadData() throws TestpressException {
-            pager.next();
-            storeContent();
-            return pager.getListResponse().getContents();
+            do {
+                pager.next();
+                storeContent();
+            } while (pager.hasNext());
+            return pager.getResources();
         }
 
         private void storeContent() {
