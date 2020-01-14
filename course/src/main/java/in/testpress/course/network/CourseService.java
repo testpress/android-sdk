@@ -12,6 +12,8 @@ import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.network.RetrofitCall;
 
+import in.testpress.v2_4.models.ApiResponse;
+import in.testpress.v2_4.models.ContentsListResponse;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
@@ -51,7 +53,7 @@ public interface CourseService {
     RetrofitCall<Chapter> getChapter(@Path(value = "chapter_url", encoded = true) String chapterUrl);
 
     @GET("{contents_url}")
-    RetrofitCall<TestpressApiResponse<Content>> getContents(
+    RetrofitCall<ApiResponse<ContentsListResponse>> getContents(
             @Path(value = "contents_url", encoded = true) String contentsUrlFrag,
             @QueryMap Map<String, Object> queryParams);
 

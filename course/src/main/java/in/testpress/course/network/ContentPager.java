@@ -1,13 +1,16 @@
 package in.testpress.course.network;
 
 import java.io.IOException;
+import java.util.List;
 
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Content;
-import in.testpress.network.BaseResourcePager;
+import in.testpress.v2_4.BaseResourcePager;
+import in.testpress.v2_4.models.ApiResponse;
+import in.testpress.v2_4.models.ContentsListResponse;
 import retrofit2.Response;
 
-public class ContentPager extends BaseResourcePager<Content> {
+public class ContentPager extends BaseResourcePager<ContentsListResponse, Content> {
 
     private TestpressCourseApiClient apiClient;
     private String contentsUrlFrag;
@@ -23,9 +26,14 @@ public class ContentPager extends BaseResourcePager<Content> {
     }
 
     @Override
-    public Response<TestpressApiResponse<Content>> getItems(int page, int size) throws IOException {
+    public Response<ApiResponse<ContentsListResponse>> getResponse(
+            int page, int size) throws IOException {
         queryParams.put(TestpressCourseApiClient.PAGE, page);
         return apiClient.getContents(contentsUrlFrag, queryParams).execute();
     }
 
+    @Override
+    public List<Content> getItems(ContentsListResponse resultResponse) {
+        return resultResponse.getContents();
+    }
 }

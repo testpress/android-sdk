@@ -15,6 +15,8 @@ import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
+import in.testpress.v2_4.models.ApiResponse;
+import in.testpress.v2_4.models.ContentsListResponse;
 
 public class TestpressCourseApiClient extends TestpressApiClient {
 
@@ -79,8 +81,8 @@ public class TestpressCourseApiClient extends TestpressApiClient {
         return getCourseService().getChapter(chapterUrl);
     }
 
-    public RetrofitCall<TestpressApiResponse<Content>> getContents(String chaptersUrlFrag,
-                                                                   Map<String, Object> queryParams) {
+    public RetrofitCall<ApiResponse<ContentsListResponse>> getContents(String chaptersUrlFrag,
+                                                                         Map<String, Object> queryParams) {
         return getCourseService().getContents(chaptersUrlFrag, queryParams);
     }
 
