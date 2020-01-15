@@ -45,7 +45,11 @@ public class CourseListFragment extends BaseFragment {
         adapter.addFragment(new MyCoursesFragment(), getString(R.string.my_course_title));
 
         TestpressSession session = TestpressSdk.getTestpressSession(getContext());
-        adapter.addFragment(new AvailableCourseListFragment(), session.getInstituteSettings().getStoreLabel());
+        String storeLabel = "Available Courses";
+        if (session.getInstituteSettings().getStoreLabel() != null && !session.getInstituteSettings().getStoreLabel().isEmpty()) {
+            storeLabel = session.getInstituteSettings().getStoreLabel();
+        }
+        adapter.addFragment(new AvailableCourseListFragment(), storeLabel);
         viewPager.setAdapter(adapter);
     }
 
