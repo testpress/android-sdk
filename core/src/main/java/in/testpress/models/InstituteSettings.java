@@ -154,7 +154,8 @@ public class InstituteSettings {
         return storeLabel;
     }
 
-    public void setStoreLabel(String storeLabel) {
+    public InstituteSettings setStoreLabel(String storeLabel) {
         this.storeLabel = storeLabel;
+        return this;
     }
 }
