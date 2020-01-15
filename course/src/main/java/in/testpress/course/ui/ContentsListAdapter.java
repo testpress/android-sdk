@@ -156,8 +156,8 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
     }
 
     private void displayVideoDuration(Content content) {
-        if (content.getRawVideo() != null) {
-            Video video = content.getRawVideo();
+        Video video = content.getRawVideo();
+        if (video != null && video.getDuration() != null) {
             setGone(14, false);
             setText(15, video.getDuration());
         } else {
