@@ -201,6 +201,32 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="horizontal"
+            android:id="@+id/video_info">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="15dp"
+                android:src="@drawable/testpress_clock"/>
+
+            <TextView
+                android:text="00:00:00"
+                android:layout_marginLeft="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:lineSpacingExtra="4dp"
+                android:textColor="@color/testpress_text_gray_medium"
+                android:maxLines="1"
+                android:id="@+id/video_duration" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>
