@@ -41,11 +41,11 @@
             android:layout_marginEnd="13dp">
 
             <ImageView
-                android:layout_width="10dp"
+                android:layout_width="wrap_content"
                 android:layout_height="16dp"
                 android:scaleType="fitXY"
-                android:layout_marginLeft="13dp"
-                android:layout_marginRight="13dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
                 android:id="@+id/lock_image"
@@ -179,6 +179,25 @@
                     android:id="@+id/no_of_comments" />
 
             </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="horizontal"
+            android:id="@+id/general_info_layout">
+
+            <TextView
+                android:text="Extra Info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:lineSpacingExtra="4dp"
+                android:textColor="@color/testpress_text_gray_medium"
+                android:maxLines="1"
+                android:id="@+id/info" />
 
         </LinearLayout>
 
