@@ -61,6 +61,12 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
         return new CourseListAdapter(getActivity(), courseDao, courses, null);
     }
 
+
+    @Override
+    protected boolean isItemsEmpty() {
+        return getDao().queryBuilder().where(CourseDao.Properties.IsMyCourse.eq(true)).count() == 0;
+    }
+
     @Override
     public void onLoadFinished(Loader<List<Course>> loader, List<Course> courses) {
         final TestpressException exception = getException(loader);
