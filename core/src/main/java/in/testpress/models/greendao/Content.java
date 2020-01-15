@@ -16,6 +16,7 @@ import android.os.Parcel;
 import com.google.gson.annotations.SerializedName;
 
 import in.testpress.core.TestpressSDKDatabase;
+import in.testpress.util.FormatDate;
 // KEEP INCLUDES END
 
 /**
@@ -716,6 +717,16 @@ public class Content implements android.os.Parcelable {
 
     public HtmlContent getHtml() {
         return getHtmlContent();
+    }
+
+    public String getFormattedStart() {
+        if (getStart() != null) {
+            long dateInMillis = FormatDate.getDate(getStart(),
+                    "yyyy-MM-dd'T'HH:mm:ss", "UTC").getTime();
+            return FormatDate.getAbbreviatedTimeSpan(dateInMillis);
+        }
+
+        return null;
     }
     // KEEP METHODS END
 

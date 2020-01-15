@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -28,6 +29,7 @@ import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.Exam;
 import in.testpress.store.ui.ProductDetailsActivity;
+import in.testpress.util.FormatDate;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -85,7 +87,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
                 R.id.content_title, R.id.thumbnail_image, R.id.white_foreground, R.id.lock,
                 R.id.content_item_layout, R.id.exam_info_layout, R.id.attempted_tick, R.id.duration,
                 R.id.no_of_questions, R.id.video_completion_progress_chart,
-                R.id.video_completion_progress_container, R.id.lock_image
+                R.id.video_completion_progress_container, R.id.lock_image, R.id.general_info_layout, R.id.info
         };
     }
 
@@ -94,6 +96,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         textView(0).setTypeface(TestpressSdk.getRubikMediumFont(mActivity));
         textView(7).setTypeface(TestpressSdk.getRubikMediumFont(mActivity));
         textView(8).setTypeface(TestpressSdk.getRubikMediumFont(mActivity));
+        textView(13).setTypeface(TestpressSdk.getRubikMediumFont(mActivity));
         setText(0, content.getName());
         // Set image
         if (content.getImage() == null || content.getImage().isEmpty()) {
@@ -104,7 +107,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         }
         Exam exam = content.getRawExam();
         // Validate lock
-        if (content.getIsLocked() || content.getIsScheduled()) {
+        if (content.getIsLocked() || (content.getIsScheduled() != null && content.getIsScheduled())) {
             setGone(2, false);
             setGone(3, false);
             setGone(6, true);
@@ -148,6 +151,24 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         } else {
             setGone(5, true);
         }
+
+        handleScheduledContent(content);
+    }
+
+    private void handleScheduledContent(Content content) {
+        if (content.getIsScheduled() != null && content.getIsScheduled() == true) {
+            if (content.getFormattedStart() != null) {
+                setText(13, "This will be available on " + content.getFormattedStart());
+            } else {
+                setText(13, "Coming soon");
+            }
+            ((ImageView)view(11)).setImageResource(R.drawable.clock);
+
+            setGone(5, true);
+            setGone(12, false);
+        } else {
+            setGone(12, true);
+        }
     }
 
     private void handleStoreCourseContent(Content content) {
@@ -175,7 +196,10 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
 
 
     private boolean shouldOpenPaymentPage(Course course, Content content) {
-        return productSlug != null && content.getFreePreview() != null && !content.getFreePreview() && !course.getIsMyCourse();
+        if (course.getIsMyCourse() != null && !course.getIsMyCourse()) {
+            return false;
+        }
+        return productSlug != null && (content.getFreePreview() == null || !content.getFreePreview());
     }
 
     private void displayNonEmbeddableVideoProgress(Content content) {
