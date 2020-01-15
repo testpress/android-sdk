@@ -220,7 +220,8 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         reviewAttempt = getReviewAttempt();
         // Check review items exists for the review attempt, load otherwise.
         if (reviewItemDao._queryReviewAttempt_ReviewItems(reviewAttempt.getId()).isEmpty()) {
-            loadReviewItemsFromServer(reviewAttempt.getReviewUrl());
+            String reviewUrl = reviewAttempt.getReviewUrl().replace("v2.3", "v2.2.1");
+            loadReviewItemsFromServer(reviewUrl);
         } else {
             displayReviewItems();
         }
