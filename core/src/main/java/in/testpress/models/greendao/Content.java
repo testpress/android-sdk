@@ -12,6 +12,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.os.Parcel;
+import android.text.format.DateUtils;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -723,7 +724,7 @@ public class Content implements android.os.Parcelable {
         if (getStart() != null) {
             long dateInMillis = FormatDate.getDate(getStart(),
                     "yyyy-MM-dd'T'HH:mm:ss", "UTC").getTime();
-            return FormatDate.getAbbreviatedTimeSpan(dateInMillis);
+            return DateUtils.getRelativeTimeSpanString(dateInMillis).toString();
         }
 
         return null;
