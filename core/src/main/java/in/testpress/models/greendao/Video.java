@@ -184,8 +184,8 @@ public class Video implements android.os.Parcelable {
     }
 
     public String getHlsUrl() {
-        if (this.streams != null) {
-            for (Stream stream : this.streams) {
+        if (this.getStreams() != null) {
+            for (Stream stream : this.getStreams()) {
                 if (stream.getFormat().equals("HLS")) {
                     return stream.getUrl();
                 }
