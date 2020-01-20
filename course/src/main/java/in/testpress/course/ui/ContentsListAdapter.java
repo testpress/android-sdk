@@ -142,7 +142,6 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
             });
         }
 
-        handleStoreCourseContent(content);
         // Update exam info
         if (exam != null) {
             setGone(5, false);
@@ -153,6 +152,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         }
         displayVideoDuration(content);
         handleScheduledContent(content);
+        handleStoreCourseContent(content);
     }
 
     private void displayVideoDuration(Content content) {
