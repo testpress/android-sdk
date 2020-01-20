@@ -66,7 +66,9 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     @Override
     protected int[] getChildViewIds() {
         return new int[] { R.id.course_title, R.id.thumbnail_image, R.id.percentage,
-                R.id.course_item_layout,  R.id.progress_bar_layout, R.id.external_link_title};
+                R.id.course_item_layout,  R.id.progress_bar_layout, R.id.external_link_title,
+                R.id.total_chapters, R.id.total_contents
+        };
     }
 
     @Override
@@ -80,6 +82,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
             setGone(1, false);
             mImageLoader.displayImage(course.getImage(), imageView(1), mOptions);
         }
+        showCount(mActivity, course);
 
         setTextToTextView(course.getExternal_link_label(), (TextView) view(5));
         toggleTextViewVisibility(!course.isCourseForRegistration(), view(5));
@@ -92,6 +95,13 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         });
         // ToDo: Set completed percentage in the progress bar
         setGone(4, true);
+    }
+
+    private void showCount(Activity activity, Course course) {
+        setText(6,  activity.getResources().getQuantityString(R.plurals.chapters_count,
+                course.getChaptersCount(), course.getChaptersCount()));
+        setText(7,  activity.getResources().getQuantityString(R.plurals.contents_count,
+                course.getContentsCount(), course.getContentsCount()));
     }
 
     public void toggleTextViewVisibility(boolean toHide, View view) {
