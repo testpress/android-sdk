@@ -26,9 +26,9 @@ public class CourseAttempt implements android.os.Parcelable {
     private Integer objectId;
     private String objectUrl;
     private String trophies;
-    private Long courseContentId;
-    private Long attemptId;
-    private Long videoAttemptId;
+    private Long chapterContentId;
+    private Long assessmentId;
+    private Long userVideoId;
 
     /** Used to resolve relations */
     @Generated
@@ -38,19 +38,19 @@ public class CourseAttempt implements android.os.Parcelable {
     @Generated
     private transient CourseAttemptDao myDao;
 
-    @ToOne(joinProperty = "courseContentId")
+    @ToOne(joinProperty = "chapterContentId")
     private Content chapterContent;
 
     @Generated
     private transient Long chapterContent__resolvedKey;
 
-    @ToOne(joinProperty = "attemptId")
+    @ToOne(joinProperty = "assessmentId")
     private Attempt assessment;
 
     @Generated
     private transient Long assessment__resolvedKey;
 
-    @ToOne(joinProperty = "videoAttemptId")
+    @ToOne(joinProperty = "userVideoId")
     private VideoAttempt video;
 
     @Generated
@@ -70,15 +70,15 @@ public class CourseAttempt implements android.os.Parcelable {
     }
 
     @Generated
-    public CourseAttempt(Long id, String type, Integer objectId, String objectUrl, String trophies, Long courseContentId, Long attemptId, Long videoAttemptId) {
+    public CourseAttempt(Long id, String type, Integer objectId, String objectUrl, String trophies, Long chapterContentId, Long assessmentId, Long userVideoId) {
         this.id = id;
         this.type = type;
         this.objectId = objectId;
         this.objectUrl = objectUrl;
         this.trophies = trophies;
-        this.courseContentId = courseContentId;
-        this.attemptId = attemptId;
-        this.videoAttemptId = videoAttemptId;
+        this.chapterContentId = chapterContentId;
+        this.assessmentId = assessmentId;
+        this.userVideoId = userVideoId;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -128,34 +128,34 @@ public class CourseAttempt implements android.os.Parcelable {
         this.trophies = trophies;
     }
 
-    public Long getCourseContentId() {
-        return courseContentId;
+    public Long getChapterContentId() {
+        return chapterContentId;
     }
 
-    public void setCourseContentId(Long courseContentId) {
-        this.courseContentId = courseContentId;
+    public void setChapterContentId(Long chapterContentId) {
+        this.chapterContentId = chapterContentId;
     }
 
-    public Long getAttemptId() {
-        return attemptId;
+    public Long getAssessmentId() {
+        return assessmentId;
     }
 
-    public void setAttemptId(Long attemptId) {
-        this.attemptId = attemptId;
+    public void setAssessmentId(Long assessmentId) {
+        this.assessmentId = assessmentId;
     }
 
-    public Long getVideoAttemptId() {
-        return videoAttemptId;
+    public Long getUserVideoId() {
+        return userVideoId;
     }
 
-    public void setVideoAttemptId(Long videoAttemptId) {
-        this.videoAttemptId = videoAttemptId;
+    public void setUserVideoId(Long userVideoId) {
+        this.userVideoId = userVideoId;
     }
 
     /** To-one relationship, resolved on first access. */
     @Generated
     public Content getChapterContent() {
-        Long __key = this.courseContentId;
+        Long __key = this.chapterContentId;
         if (chapterContent__resolvedKey == null || !chapterContent__resolvedKey.equals(__key)) {
             __throwIfDetached();
             ContentDao targetDao = daoSession.getContentDao();
@@ -172,15 +172,15 @@ public class CourseAttempt implements android.os.Parcelable {
     public void setChapterContent(Content chapterContent) {
         synchronized (this) {
             this.chapterContent = chapterContent;
-            courseContentId = chapterContent == null ? null : chapterContent.getId();
-            chapterContent__resolvedKey = courseContentId;
+            chapterContentId = chapterContent == null ? null : chapterContent.getId();
+            chapterContent__resolvedKey = chapterContentId;
         }
     }
 
     /** To-one relationship, resolved on first access. */
     @Generated
     public Attempt getAssessment() {
-        Long __key = this.attemptId;
+        Long __key = this.assessmentId;
         if (assessment__resolvedKey == null || !assessment__resolvedKey.equals(__key)) {
             __throwIfDetached();
             AttemptDao targetDao = daoSession.getAttemptDao();
@@ -197,15 +197,15 @@ public class CourseAttempt implements android.os.Parcelable {
     public void setAssessment(Attempt assessment) {
         synchronized (this) {
             this.assessment = assessment;
-            attemptId = assessment == null ? null : assessment.getId();
-            assessment__resolvedKey = attemptId;
+            assessmentId = assessment == null ? null : assessment.getId();
+            assessment__resolvedKey = assessmentId;
         }
     }
 
     /** To-one relationship, resolved on first access. */
     @Generated
     public VideoAttempt getVideo() {
-        Long __key = this.videoAttemptId;
+        Long __key = this.userVideoId;
         if (video__resolvedKey == null || !video__resolvedKey.equals(__key)) {
             __throwIfDetached();
             VideoAttemptDao targetDao = daoSession.getVideoAttemptDao();
@@ -222,8 +222,8 @@ public class CourseAttempt implements android.os.Parcelable {
     public void setVideo(VideoAttempt video) {
         synchronized (this) {
             this.video = video;
-            videoAttemptId = video == null ? null : video.getId();
-            video__resolvedKey = videoAttemptId;
+            userVideoId = video == null ? null : video.getId();
+            video__resolvedKey = userVideoId;
         }
     }
 
@@ -280,14 +280,14 @@ public class CourseAttempt implements android.os.Parcelable {
         objectUrl = in.readString();
         trophies = in.readString();
         if (in.readByte() == 0) {
-            courseContentId = null;
+            chapterContentId = null;
         } else {
-            courseContentId = in.readLong();
+            chapterContentId = in.readLong();
         }
         if (in.readByte() == 0) {
-            attemptId = null;
+            assessmentId = null;
         } else {
-            attemptId = in.readLong();
+            assessmentId = in.readLong();
         }
         setChapterContent((Content) in.readParcelable(Content.class.getClassLoader()));
         setAssessment((Attempt) in.readParcelable(Attempt.class.getClassLoader()));
@@ -310,17 +310,17 @@ public class CourseAttempt implements android.os.Parcelable {
         }
         dest.writeString(objectUrl);
         dest.writeString(trophies);
-        if (courseContentId == null) {
+        if (chapterContentId == null) {
             dest.writeByte((byte) 0);
         } else {
             dest.writeByte((byte) 1);
-            dest.writeLong(courseContentId);
+            dest.writeLong(chapterContentId);
         }
-        if (attemptId == null) {
+        if (assessmentId == null) {
             dest.writeByte((byte) 0);
         } else {
             dest.writeByte((byte) 1);
-            dest.writeLong(attemptId);
+            dest.writeLong(assessmentId);
         }
         dest.writeParcelable(getRawChapterContent(), flags);
         dest.writeParcelable(getRawAssessment(), flags);
@@ -348,8 +348,8 @@ public class CourseAttempt implements android.os.Parcelable {
         AttemptDao attemptDao = TestpressSDKDatabase.getAttemptDao(context);
         Attempt attempt = getRawAssessment();
         attemptDao.insertOrReplace(attempt);
-        setAttemptId(attempt.getId());
-        setCourseContentId(content.getId());
+        setAssessmentId(attempt.getId());
+        setChapterContentId(content.getId());
         courseAttemptDao.insertOrReplace(this);
     }
 

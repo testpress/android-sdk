@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 24;
+    private static final int VERSION = 25;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -157,17 +157,17 @@ public class TestpressSDKDaoGenerator {
     }
 
     private static void addCourseContentToCourseAttempt(Entity courseAttempt, Entity content) {
-        Property courseContentId = courseAttempt.addLongProperty("courseContentId").getProperty();
+        Property courseContentId = courseAttempt.addLongProperty("chapterContentId").getProperty();
         courseAttempt.addToOne(content, courseContentId, "chapterContent");
     }
 
     private static void addAttemptToCourseAttempt(Entity courseAttempt, Entity attempt) {
-        Property attemptId = courseAttempt.addLongProperty("attemptId").getProperty();
+        Property attemptId = courseAttempt.addLongProperty("assessmentId").getProperty();
         courseAttempt.addToOne(attempt, attemptId, "assessment");
     }
 
     private static void addVideoAttemptToCourseAttempt(Entity courseAttempt, Entity videoAttempt) {
-        Property videoAttemptId = courseAttempt.addLongProperty("videoAttemptId").getProperty();
+        Property videoAttemptId = courseAttempt.addLongProperty("userVideoId").getProperty();
         courseAttempt.addToOne(videoAttempt, videoAttemptId, "video");
     }
 
