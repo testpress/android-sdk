@@ -187,7 +187,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         Chapter chapter = chapters.get(0);
         Course course = courseDao.queryBuilder().where(CourseDao.Properties.Id.eq(chapter.getCourseId())).list().get(0);
 
-        if (shouldOpenPaymentPage(course, content) && !content.getIsScheduled()) {
+        if (shouldOpenPaymentPage(course, content)) {
             setGone(2, false);
             setGone(3, false);
             setGone(6, true);
