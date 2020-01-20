@@ -68,6 +68,12 @@ public class Content implements android.os.Parcelable {
     @Generated
     private transient ContentDao myDao;
 
+    @ToOne(joinProperty = "chapterId")
+    private Chapter chapter;
+
+    @Generated
+    private transient Long chapter__resolvedKey;
+
     @ToOne(joinProperty = "htmlId")
     private HtmlContent htmlContent;
 
@@ -387,6 +393,31 @@ public class Content implements android.os.Parcelable {
 
     public void setExamId(Long examId) {
         this.examId = examId;
+    }
+
+    /** To-one relationship, resolved on first access. */
+    @Generated
+    public Chapter getChapter() {
+        Long __key = this.chapterId;
+        if (chapter__resolvedKey == null || !chapter__resolvedKey.equals(__key)) {
+            __throwIfDetached();
+            ChapterDao targetDao = daoSession.getChapterDao();
+            Chapter chapterNew = targetDao.load(__key);
+            synchronized (this) {
+                chapter = chapterNew;
+            	chapter__resolvedKey = __key;
+            }
+        }
+        return chapter;
+    }
+
+    @Generated
+    public void setChapter(Chapter chapter) {
+        synchronized (this) {
+            this.chapter = chapter;
+            chapterId = chapter == null ? null : chapter.getId();
+            chapter__resolvedKey = chapterId;
+        }
     }
 
     /** To-one relationship, resolved on first access. */

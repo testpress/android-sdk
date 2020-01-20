@@ -551,18 +551,21 @@ public class ContentDao extends AbstractDao<Content, Long> {
             StringBuilder builder = new StringBuilder("SELECT ");
             SqlUtils.appendColumns(builder, "T", getAllColumns());
             builder.append(',');
-            SqlUtils.appendColumns(builder, "T0", daoSession.getHtmlContentDao().getAllColumns());
+            SqlUtils.appendColumns(builder, "T0", daoSession.getChapterDao().getAllColumns());
             builder.append(',');
-            SqlUtils.appendColumns(builder, "T1", daoSession.getVideoDao().getAllColumns());
+            SqlUtils.appendColumns(builder, "T1", daoSession.getHtmlContentDao().getAllColumns());
             builder.append(',');
-            SqlUtils.appendColumns(builder, "T2", daoSession.getAttachmentDao().getAllColumns());
+            SqlUtils.appendColumns(builder, "T2", daoSession.getVideoDao().getAllColumns());
             builder.append(',');
-            SqlUtils.appendColumns(builder, "T3", daoSession.getExamDao().getAllColumns());
+            SqlUtils.appendColumns(builder, "T3", daoSession.getAttachmentDao().getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T4", daoSession.getExamDao().getAllColumns());
             builder.append(" FROM CONTENT T");
-            builder.append(" LEFT JOIN HTML_CONTENT T0 ON T.\"HTML_ID\"=T0.\"ID\"");
-            builder.append(" LEFT JOIN VIDEO T1 ON T.\"VIDEO_ID\"=T1.\"ID\"");
-            builder.append(" LEFT JOIN ATTACHMENT T2 ON T.\"ATTACHMENT_ID\"=T2.\"ID\"");
-            builder.append(" LEFT JOIN EXAM T3 ON T.\"EXAM_ID\"=T3.\"ID\"");
+            builder.append(" LEFT JOIN CHAPTER T0 ON T.\"CHAPTER_ID\"=T0.\"ID\"");
+            builder.append(" LEFT JOIN HTML_CONTENT T1 ON T.\"HTML_ID\"=T1.\"ID\"");
+            builder.append(" LEFT JOIN VIDEO T2 ON T.\"VIDEO_ID\"=T2.\"ID\"");
+            builder.append(" LEFT JOIN ATTACHMENT T3 ON T.\"ATTACHMENT_ID\"=T3.\"ID\"");
+            builder.append(" LEFT JOIN EXAM T4 ON T.\"EXAM_ID\"=T4.\"ID\"");
             builder.append(' ');
             selectDeep = builder.toString();
         }
@@ -572,6 +575,10 @@ public class ContentDao extends AbstractDao<Content, Long> {
     protected Content loadCurrentDeep(Cursor cursor, boolean lock) {
         Content entity = loadCurrent(cursor, 0, lock);
         int offset = getAllColumns().length;
+
+        Chapter chapter = loadCurrentOther(daoSession.getChapterDao(), cursor, offset);
+        entity.setChapter(chapter);
+        offset += daoSession.getChapterDao().getAllColumns().length;
 
         HtmlContent htmlContent = loadCurrentOther(daoSession.getHtmlContentDao(), cursor, offset);
         entity.setHtmlContent(htmlContent);
