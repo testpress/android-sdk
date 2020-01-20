@@ -26,6 +26,7 @@ public class CourseAttempt implements android.os.Parcelable {
     private Integer objectId;
     private String objectUrl;
     private String trophies;
+    private Boolean isForDashboard;
     private Long chapterContentId;
     private Long assessmentId;
     private Long userVideoId;
@@ -70,12 +71,13 @@ public class CourseAttempt implements android.os.Parcelable {
     }
 
     @Generated
-    public CourseAttempt(Long id, String type, Integer objectId, String objectUrl, String trophies, Long chapterContentId, Long assessmentId, Long userVideoId) {
+    public CourseAttempt(Long id, String type, Integer objectId, String objectUrl, String trophies, Boolean isForDashboard, Long chapterContentId, Long assessmentId, Long userVideoId) {
         this.id = id;
         this.type = type;
         this.objectId = objectId;
         this.objectUrl = objectUrl;
         this.trophies = trophies;
+        this.isForDashboard = isForDashboard;
         this.chapterContentId = chapterContentId;
         this.assessmentId = assessmentId;
         this.userVideoId = userVideoId;
@@ -126,6 +128,14 @@ public class CourseAttempt implements android.os.Parcelable {
 
     public void setTrophies(String trophies) {
         this.trophies = trophies;
+    }
+
+    public Boolean getIsForDashboard() {
+        return isForDashboard;
+    }
+
+    public void setIsForDashboard(Boolean isForDashboard) {
+        this.isForDashboard = isForDashboard;
     }
 
     public Long getChapterContentId() {

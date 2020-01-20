@@ -152,6 +152,7 @@ public class TestpressSDKDaoGenerator {
         courseAttempt.addIntProperty("objectId");
         courseAttempt.addStringProperty("objectUrl");
         courseAttempt.addStringProperty("trophies");
+        courseAttempt.addBooleanProperty("isForDashboard");
         courseAttempt.implementsInterface("android.os.Parcelable");
         return courseAttempt;
     }

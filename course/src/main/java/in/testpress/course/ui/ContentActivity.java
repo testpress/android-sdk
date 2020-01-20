@@ -760,7 +760,8 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private List<CourseAttempt> getCourseAttemptsFromDB() {
         return courseAttemptDao.queryBuilder()
-                .where(CourseAttemptDao.Properties.ChapterContentId.eq(content.getId())).list();
+                .where(CourseAttemptDao.Properties.ChapterContentId.eq(content.getId()))
+                .where(CourseAttemptDao.Properties.IsForDashboard.isNull()).list();
     }
 
     private void displayAttemptsList() {

@@ -30,9 +30,10 @@ public class CourseAttemptDao extends AbstractDao<CourseAttempt, Long> {
         public final static Property ObjectId = new Property(2, Integer.class, "objectId", false, "OBJECT_ID");
         public final static Property ObjectUrl = new Property(3, String.class, "objectUrl", false, "OBJECT_URL");
         public final static Property Trophies = new Property(4, String.class, "trophies", false, "TROPHIES");
-        public final static Property ChapterContentId = new Property(5, Long.class, "chapterContentId", false, "CHAPTER_CONTENT_ID");
-        public final static Property AssessmentId = new Property(6, Long.class, "assessmentId", false, "ASSESSMENT_ID");
-        public final static Property UserVideoId = new Property(7, Long.class, "userVideoId", false, "USER_VIDEO_ID");
+        public final static Property IsForDashboard = new Property(5, Boolean.class, "isForDashboard", false, "IS_FOR_DASHBOARD");
+        public final static Property ChapterContentId = new Property(6, Long.class, "chapterContentId", false, "CHAPTER_CONTENT_ID");
+        public final static Property AssessmentId = new Property(7, Long.class, "assessmentId", false, "ASSESSMENT_ID");
+        public final static Property UserVideoId = new Property(8, Long.class, "userVideoId", false, "USER_VIDEO_ID");
     }
 
     private DaoSession daoSession;
@@ -56,9 +57,10 @@ public class CourseAttemptDao extends AbstractDao<CourseAttempt, Long> {
                 "\"OBJECT_ID\" INTEGER," + // 2: objectId
                 "\"OBJECT_URL\" TEXT," + // 3: objectUrl
                 "\"TROPHIES\" TEXT," + // 4: trophies
-                "\"CHAPTER_CONTENT_ID\" INTEGER," + // 5: chapterContentId
-                "\"ASSESSMENT_ID\" INTEGER," + // 6: assessmentId
-                "\"USER_VIDEO_ID\" INTEGER);"); // 7: userVideoId
+                "\"IS_FOR_DASHBOARD\" INTEGER," + // 5: isForDashboard
+                "\"CHAPTER_CONTENT_ID\" INTEGER," + // 6: chapterContentId
+                "\"ASSESSMENT_ID\" INTEGER," + // 7: assessmentId
+                "\"USER_VIDEO_ID\" INTEGER);"); // 8: userVideoId
     }
 
     /** Drops the underlying database table. */
@@ -96,19 +98,24 @@ public class CourseAttemptDao extends AbstractDao<CourseAttempt, Long> {
             stmt.bindString(5, trophies);
         }
  
+        Boolean isForDashboard = entity.getIsForDashboard();
+        if (isForDashboard != null) {
+            stmt.bindLong(6, isForDashboard ? 1L: 0L);
+        }
+ 
         Long chapterContentId = entity.getChapterContentId();
         if (chapterContentId != null) {
-            stmt.bindLong(6, chapterContentId);
+            stmt.bindLong(7, chapterContentId);
         }
  
         Long assessmentId = entity.getAssessmentId();
         if (assessmentId != null) {
-            stmt.bindLong(7, assessmentId);
+            stmt.bindLong(8, assessmentId);
         }
  
         Long userVideoId = entity.getUserVideoId();
         if (userVideoId != null) {
-            stmt.bindLong(8, userVideoId);
+            stmt.bindLong(9, userVideoId);
         }
     }
 
@@ -141,19 +148,24 @@ public class CourseAttemptDao extends AbstractDao<CourseAttempt, Long> {
             stmt.bindString(5, trophies);
         }
  
+        Boolean isForDashboard = entity.getIsForDashboard();
+        if (isForDashboard != null) {
+            stmt.bindLong(6, isForDashboard ? 1L: 0L);
+        }
+ 
         Long chapterContentId = entity.getChapterContentId();
         if (chapterContentId != null) {
-            stmt.bindLong(6, chapterContentId);
+            stmt.bindLong(7, chapterContentId);
         }
  
         Long assessmentId = entity.getAssessmentId();
         if (assessmentId != null) {
-            stmt.bindLong(7, assessmentId);
+            stmt.bindLong(8, assessmentId);
         }
  
         Long userVideoId = entity.getUserVideoId();
         if (userVideoId != null) {
-            stmt.bindLong(8, userVideoId);
+            stmt.bindLong(9, userVideoId);
         }
     }
 
@@ -176,9 +188,10 @@ public class CourseAttemptDao extends AbstractDao<CourseAttempt, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2), // objectId
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // objectUrl
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // trophies
-            cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5), // chapterContentId
-            cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6), // assessmentId
-            cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7) // userVideoId
+            cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0, // isForDashboard
+            cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6), // chapterContentId
+            cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7), // assessmentId
+            cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8) // userVideoId
         );
         return entity;
     }
@@ -190,9 +203,10 @@ public class CourseAttemptDao extends AbstractDao<CourseAttempt, Long> {
         entity.setObjectId(cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2));
         entity.setObjectUrl(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setTrophies(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setChapterContentId(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
-        entity.setAssessmentId(cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6));
-        entity.setUserVideoId(cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7));
+        entity.setIsForDashboard(cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0);
+        entity.setChapterContentId(cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6));
+        entity.setAssessmentId(cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7));
+        entity.setUserVideoId(cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8));
      }
     
     @Override
