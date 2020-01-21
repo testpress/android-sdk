@@ -30,9 +30,9 @@ public class CourseAttemptDao extends AbstractDao<CourseAttempt, Long> {
         public final static Property ObjectId = new Property(2, Integer.class, "objectId", false, "OBJECT_ID");
         public final static Property ObjectUrl = new Property(3, String.class, "objectUrl", false, "OBJECT_URL");
         public final static Property Trophies = new Property(4, String.class, "trophies", false, "TROPHIES");
-        public final static Property CourseContentId = new Property(5, Long.class, "courseContentId", false, "COURSE_CONTENT_ID");
-        public final static Property AttemptId = new Property(6, Long.class, "attemptId", false, "ATTEMPT_ID");
-        public final static Property VideoAttemptId = new Property(7, Long.class, "videoAttemptId", false, "VIDEO_ATTEMPT_ID");
+        public final static Property ChapterContentId = new Property(5, Long.class, "chapterContentId", false, "CHAPTER_CONTENT_ID");
+        public final static Property AssessmentId = new Property(6, Long.class, "assessmentId", false, "ASSESSMENT_ID");
+        public final static Property UserVideoId = new Property(7, Long.class, "userVideoId", false, "USER_VIDEO_ID");
     }
 
     private DaoSession daoSession;
@@ -56,9 +56,9 @@ public class CourseAttemptDao extends AbstractDao<CourseAttempt, Long> {
                 "\"OBJECT_ID\" INTEGER," + // 2: objectId
                 "\"OBJECT_URL\" TEXT," + // 3: objectUrl
                 "\"TROPHIES\" TEXT," + // 4: trophies
-                "\"COURSE_CONTENT_ID\" INTEGER," + // 5: courseContentId
-                "\"ATTEMPT_ID\" INTEGER," + // 6: attemptId
-                "\"VIDEO_ATTEMPT_ID\" INTEGER);"); // 7: videoAttemptId
+                "\"CHAPTER_CONTENT_ID\" INTEGER," + // 5: chapterContentId
+                "\"ASSESSMENT_ID\" INTEGER," + // 6: assessmentId
+                "\"USER_VIDEO_ID\" INTEGER);"); // 7: userVideoId
     }
 
     /** Drops the underlying database table. */
@@ -96,19 +96,19 @@ public class CourseAttemptDao extends AbstractDao<CourseAttempt, Long> {
             stmt.bindString(5, trophies);
         }
  
-        Long courseContentId = entity.getCourseContentId();
-        if (courseContentId != null) {
-            stmt.bindLong(6, courseContentId);
+        Long chapterContentId = entity.getChapterContentId();
+        if (chapterContentId != null) {
+            stmt.bindLong(6, chapterContentId);
         }
  
-        Long attemptId = entity.getAttemptId();
-        if (attemptId != null) {
-            stmt.bindLong(7, attemptId);
+        Long assessmentId = entity.getAssessmentId();
+        if (assessmentId != null) {
+            stmt.bindLong(7, assessmentId);
         }
  
-        Long videoAttemptId = entity.getVideoAttemptId();
-        if (videoAttemptId != null) {
-            stmt.bindLong(8, videoAttemptId);
+        Long userVideoId = entity.getUserVideoId();
+        if (userVideoId != null) {
+            stmt.bindLong(8, userVideoId);
         }
     }
 
@@ -141,19 +141,19 @@ public class CourseAttemptDao extends AbstractDao<CourseAttempt, Long> {
             stmt.bindString(5, trophies);
         }
  
-        Long courseContentId = entity.getCourseContentId();
-        if (courseContentId != null) {
-            stmt.bindLong(6, courseContentId);
+        Long chapterContentId = entity.getChapterContentId();
+        if (chapterContentId != null) {
+            stmt.bindLong(6, chapterContentId);
         }
  
-        Long attemptId = entity.getAttemptId();
-        if (attemptId != null) {
-            stmt.bindLong(7, attemptId);
+        Long assessmentId = entity.getAssessmentId();
+        if (assessmentId != null) {
+            stmt.bindLong(7, assessmentId);
         }
  
-        Long videoAttemptId = entity.getVideoAttemptId();
-        if (videoAttemptId != null) {
-            stmt.bindLong(8, videoAttemptId);
+        Long userVideoId = entity.getUserVideoId();
+        if (userVideoId != null) {
+            stmt.bindLong(8, userVideoId);
         }
     }
 
@@ -176,9 +176,9 @@ public class CourseAttemptDao extends AbstractDao<CourseAttempt, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2), // objectId
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // objectUrl
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // trophies
-            cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5), // courseContentId
-            cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6), // attemptId
-            cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7) // videoAttemptId
+            cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5), // chapterContentId
+            cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6), // assessmentId
+            cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7) // userVideoId
         );
         return entity;
     }
@@ -190,9 +190,9 @@ public class CourseAttemptDao extends AbstractDao<CourseAttempt, Long> {
         entity.setObjectId(cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2));
         entity.setObjectUrl(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setTrophies(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setCourseContentId(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
-        entity.setAttemptId(cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6));
-        entity.setVideoAttemptId(cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7));
+        entity.setChapterContentId(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
+        entity.setAssessmentId(cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6));
+        entity.setUserVideoId(cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7));
      }
     
     @Override
@@ -233,9 +233,9 @@ public class CourseAttemptDao extends AbstractDao<CourseAttempt, Long> {
             builder.append(',');
             SqlUtils.appendColumns(builder, "T2", daoSession.getVideoAttemptDao().getAllColumns());
             builder.append(" FROM COURSE_ATTEMPT T");
-            builder.append(" LEFT JOIN CONTENT T0 ON T.\"COURSE_CONTENT_ID\"=T0.\"ID\"");
-            builder.append(" LEFT JOIN ATTEMPT T1 ON T.\"ATTEMPT_ID\"=T1.\"ID\"");
-            builder.append(" LEFT JOIN VIDEO_ATTEMPT T2 ON T.\"VIDEO_ATTEMPT_ID\"=T2.\"ID\"");
+            builder.append(" LEFT JOIN CONTENT T0 ON T.\"CHAPTER_CONTENT_ID\"=T0.\"ID\"");
+            builder.append(" LEFT JOIN ATTEMPT T1 ON T.\"ASSESSMENT_ID\"=T1.\"ID\"");
+            builder.append(" LEFT JOIN VIDEO_ATTEMPT T2 ON T.\"USER_VIDEO_ID\"=T2.\"ID\"");
             builder.append(' ');
             selectDeep = builder.toString();
         }

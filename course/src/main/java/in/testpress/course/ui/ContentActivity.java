@@ -742,8 +742,8 @@ public class ContentActivity extends BaseToolBarActivity {
         for(CourseAttempt courseAttempt : courseAttemptList) {
             Attempt attempt = courseAttempt.getRawAssessment();
             attemptDao.insertOrReplace(attempt);
-            courseAttempt.setAttemptId(attempt.getId());
-            courseAttempt.setCourseContentId(content.getId());
+            courseAttempt.setAssessmentId(attempt.getId());
+            courseAttempt.setChapterContentId(content.getId());
             courseAttemptDao.insertOrReplace(courseAttempt);
         }
     }
@@ -760,7 +760,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private List<CourseAttempt> getCourseAttemptsFromDB() {
         return courseAttemptDao.queryBuilder()
-                .where(CourseAttemptDao.Properties.CourseContentId.eq(content.getId())).list();
+                .where(CourseAttemptDao.Properties.ChapterContentId.eq(content.getId())).list();
     }
 
     private void displayAttemptsList() {
@@ -892,7 +892,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void clearContentAttemptsInDB() {
         courseAttemptDao.queryBuilder()
-                .where(CourseAttemptDao.Properties.CourseContentId.eq(content.getId()))
+                .where(CourseAttemptDao.Properties.ChapterContentId.eq(content.getId()))
                 .buildDelete()
                 .executeDeleteWithoutDetachingEntities();
     }
