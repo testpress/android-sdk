@@ -74,7 +74,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     @Override
     protected void update(final int position, final Course course) {
 
-        setFont(new int[]{0, 2}, TestpressSdk.getRubikMediumFont(mActivity));
+        setFont(new int[]{0, 2, 6, 7}, TestpressSdk.getRubikMediumFont(mActivity));
         setText(0, course.getTitle());
         if (course.getImage() == null || course.getImage().isEmpty()) {
             setGone(1, true);
