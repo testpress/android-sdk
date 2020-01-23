@@ -205,9 +205,7 @@ public class ReviewQuestionsFragment extends Fragment {
                     commentsUtil.displayComments();
                 }
                 animationView.bringToFront();
-                if (!instituteSettings.isQuestionShareDisabled()) {
-                    setHasOptionsMenu(true);
-                }
+                setHasOptionsMenu(true);
             }
 
             @Override
