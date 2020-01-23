@@ -101,6 +101,7 @@ import static in.testpress.models.greendao.Content.ATTACHMENT_TYPE;
 import static in.testpress.models.greendao.Content.EXAM_TYPE;
 import static in.testpress.models.greendao.Content.HTML_TYPE;
 import static in.testpress.models.greendao.Content.NOTES_TYPE;
+import static in.testpress.models.greendao.Content.QUIZ_TYPE;
 import static in.testpress.models.greendao.Content.VIDEO_TYPE;
 
 public class ContentActivity extends BaseToolBarActivity {
@@ -376,6 +377,9 @@ public class ContentActivity extends BaseToolBarActivity {
                 loadVideo(content.getRawVideo());
                 break;
             case EXAM_TYPE:
+                onExamContent();
+                break;
+            case QUIZ_TYPE:
                 onExamContent();
                 break;
             case ATTACHMENT_TYPE:

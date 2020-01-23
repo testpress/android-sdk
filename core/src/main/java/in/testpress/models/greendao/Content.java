@@ -100,6 +100,7 @@ public class Content implements android.os.Parcelable {
 
     // KEEP FIELDS - put your custom fields here
     public static final String EXAM_TYPE = "Exam";
+    public static final String QUIZ_TYPE = "Quiz";
     public static final String VIDEO_TYPE = "Video";
     public static final String ATTACHMENT_TYPE = "Attachment";
     public static final String HTML_TYPE = "Html";
