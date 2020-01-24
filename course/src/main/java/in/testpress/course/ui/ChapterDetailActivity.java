@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.widget.Button;
@@ -37,6 +38,8 @@ import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 import static in.testpress.course.ui.ContentActivity.FORCE_REFRESH;
 import static in.testpress.course.ui.ContentActivity.GO_TO_MENU;
 import static in.testpress.course.ui.ContentActivity.TESTPRESS_CONTENT_SHARED_PREFS;
+import static in.testpress.store.TestpressStore.PAYMENT_SUCCESS;
+import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 
 public class ChapterDetailActivity extends BaseToolBarActivity {
 
@@ -213,6 +216,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                     @Override
                     public void onSuccess(Course course) {
                         progressBar.setVisibility(View.GONE);
+                        course.setIsMyCourse(true);
                         courseDao.insertOrReplace(course);
                         loadChaptersOrContents();
                     }
@@ -274,6 +278,20 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         fragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                 .commitAllowingStateLoss();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == STORE_REQUEST_CODE) {
+            boolean paymentStatus = data.getBooleanExtra(PAYMENT_SUCCESS, false);
+            if (paymentStatus) {
+                fetchCourseAndLoadChaptersOrContents(chapter.getCourseId().toString());
+            }
+        }
+
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        fragment.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

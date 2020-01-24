@@ -1,6 +1,7 @@
 package in.testpress.course.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,7 +27,10 @@ import in.testpress.util.Assert;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ThrowableLoader;
 
+import static android.app.Activity.RESULT_OK;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
+import static in.testpress.store.TestpressStore.PAYMENT_SUCCESS;
+import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 
 public class ContentsListFragment extends BaseListViewFragment<Content> {
 
@@ -73,6 +77,16 @@ public class ContentsListFragment extends BaseListViewFragment<Content> {
     public void refreshWithProgress() {
         pager.reset();
         super.refreshWithProgress();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == STORE_REQUEST_CODE) {
+            boolean paymentStatus = data.getBooleanExtra(PAYMENT_SUCCESS, false);
+            if (paymentStatus) {
+                refreshWithProgress();
+            }
+        }
     }
 
     private static class ContentLoader extends ThrowableLoader<List<Content>> {

@@ -12,6 +12,7 @@ import in.testpress.store.models.Product;
 import in.testpress.ui.BaseToolBarActivity;
 
 import static in.testpress.store.TestpressStore.CONTINUE_PURCHASE;
+import static in.testpress.store.TestpressStore.PAYMENT_SUCCESS;
 import static in.testpress.store.ui.OrderConfirmActivity.ORDER;
 import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
 
@@ -58,6 +59,7 @@ public class PaymentSuccessActivity extends BaseToolBarActivity {
     private void continuePurchase(boolean continuePurchase) {
         Intent intent = new Intent();
         intent.putExtra(CONTINUE_PURCHASE, continuePurchase);
+        intent.putExtra(PAYMENT_SUCCESS, true);
         setResult(RESULT_OK, intent);
         finish();
     }
