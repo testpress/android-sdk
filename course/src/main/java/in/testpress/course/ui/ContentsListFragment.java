@@ -5,9 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
-import android.util.Log;
-
-import org.greenrobot.greendao.AbstractDao;
 
 import java.util.List;
 
@@ -23,9 +20,7 @@ import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.HtmlContentDao;
 import in.testpress.models.greendao.StreamDao;
-import in.testpress.models.greendao.Video;
 import in.testpress.models.greendao.VideoDao;
-import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.ui.BaseListViewFragment;
 import in.testpress.util.Assert;
 import in.testpress.util.SingleTypeAdapter;
@@ -72,6 +67,12 @@ public class ContentsListFragment extends BaseListViewFragment<Content> {
     @Override
     public Loader<List<Content>> onCreateLoader(int id, @Nullable Bundle args) {
         return new ContentLoader(getContext(), pager, contentDao);
+    }
+
+    @Override
+    public void refreshWithProgress() {
+        pager.reset();
+        super.refreshWithProgress();
     }
 
     private static class ContentLoader extends ThrowableLoader<List<Content>> {
