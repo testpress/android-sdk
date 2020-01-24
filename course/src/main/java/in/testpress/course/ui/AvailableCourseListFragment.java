@@ -47,6 +47,11 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
         pager = new CourseProductPager(apiClient);
     }
 
+    @Override
+    public void refreshWithProgress() {
+        pager.reset();
+        super.refreshWithProgress();
+    }
 
     @Override
     public Loader<List<Product>> onCreateLoader(int id, Bundle args) {
