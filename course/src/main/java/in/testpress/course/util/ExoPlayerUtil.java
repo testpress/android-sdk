@@ -542,7 +542,7 @@ public class ExoPlayerUtil {
     }
 
     void updateVideoWatchedPercentage(VideoAttempt videoAttempt) {
-        long totalDuration = Long.valueOf(videoAttempt.getRawVideoContent().getDuration());
+        long totalDuration = (long)Double.parseDouble(videoAttempt.getRawVideoContent().getDuration());;
         if (totalDuration == 0) {
             return;
         }
