@@ -36,6 +36,7 @@ import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultControlDispatcher;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -290,7 +291,17 @@ public class ExoPlayerUtil {
                     MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
         }
 
-        Log.d("ExoplayerUtil", "onClick: resolution button clicked " + trackSelector.getCurrentMappedTrackInfo());
+        addPlayPauseOnClickListener();
+    }
+
+    private void addPlayPauseOnClickListener() {
+        playerView.setControlDispatcher(new DefaultControlDispatcher() {
+            @Override
+            public boolean dispatchSetPlayWhenReady(Player player, boolean playWhenReady) {
+                updateVideoAttempt();
+                return super.dispatchSetPlayWhenReady(player, playWhenReady);
+            }
+        });
     }
 
     public void releasePlayer() {
