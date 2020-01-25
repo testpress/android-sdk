@@ -1116,9 +1116,9 @@ public class ContentActivity extends BaseToolBarActivity {
     }
 
     private void handleError(TestpressException exception, final boolean onUpdateContent) {
-        if (exception.isUnauthenticated()) {
-            setEmptyText(R.string.testpress_authentication_failed,
-                    R.string.testpress_please_login,
+        if (exception.isForbidden()) {
+            setEmptyText(R.string.permission_denied,
+                    R.string.testpress_no_permission,
                     R.drawable.ic_error_outline_black_18dp);
 
             retryButton.setVisibility(View.GONE);
