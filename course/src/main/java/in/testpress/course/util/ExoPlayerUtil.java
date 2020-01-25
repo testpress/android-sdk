@@ -90,7 +90,6 @@ import static in.testpress.course.network.TestpressCourseApiClient.TIME_RANGES;
 public class ExoPlayerUtil {
 
     private static final int OVERLAY_POSITION_CHANGE_INTERVAL = 15000; // 15s
-    private static final int VIDEO_ATTEMPT_UPDATE_INTERVAL = 60000; // 60s
 
     private FrameLayout exoPlayerMainFrame;
     private View exoPlayerLayout;
@@ -496,21 +495,6 @@ public class ExoPlayerUtil {
         startOverlayMarquee();
     }
 
-    private void startVideoAttemptUpdateHandler() {
-        if (videoAttemptId != 0 && videoAttemptUpdateHandler == null) {
-            videoAttemptUpdateHandler = new Handler();
-            videoAttemptUpdateHandler
-                    .postDelayed(videoAttemptUpdateTask, VIDEO_ATTEMPT_UPDATE_INTERVAL);
-        }
-    }
-
-    private void removeVideoAttemptUpdateHandler() {
-        if (videoAttemptUpdateHandler != null) {
-            videoAttemptUpdateHandler.removeCallbacks(videoAttemptUpdateTask);
-            videoAttemptUpdateHandler = null;
-        }
-    }
-
     Map<String, Object> getVideoAttemptParameters() {
         Map<String, Object> parameters = new HashMap<>();
         float currentPosition = getCurrentPosition();
@@ -533,19 +517,11 @@ public class ExoPlayerUtil {
                             updateVideoWatchedPercentage(videoAttempt);
                         }
                         errorOnVideoAttemptUpdate = false;
-                        if (videoAttemptUpdateHandler != null) {
-                            videoAttemptUpdateHandler
-                                    .postDelayed(videoAttemptUpdateTask, VIDEO_ATTEMPT_UPDATE_INTERVAL);
-                        }
                     }
 
                     @Override
                     public void onException(TestpressException exception) {
                         errorOnVideoAttemptUpdate = true;
-                        if (videoAttemptUpdateHandler != null) {
-                            videoAttemptUpdateHandler
-                                    .postDelayed(videoAttemptUpdateTask, VIDEO_ATTEMPT_UPDATE_INTERVAL);
-                        }
                     }
                 });
     }
