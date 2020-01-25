@@ -279,7 +279,6 @@ public class ExoPlayerUtil {
         }
         MediaSource mediaSource = buildMediaSource(Uri.parse(url));
         player.prepare(mediaSource, false, false);
-        startVideoAttemptUpdateHandler();
         if (overlayPositionHandler != null) {
             overlayPositionHandler
                     .postDelayed(overlayPositionChangeTask, OVERLAY_POSITION_CHANGE_INTERVAL);
@@ -296,7 +295,6 @@ public class ExoPlayerUtil {
 
     public void releasePlayer() {
         if (player != null) {
-            removeVideoAttemptUpdateHandler();
             startPosition = getCurrentPosition();
             playWhenReady = player.getPlayWhenReady();
             player.release();
@@ -514,7 +512,7 @@ public class ExoPlayerUtil {
         return parameters;
     }
 
-    private void updateVideoAttempt() {
+    public void updateVideoAttempt() {
         Map<String, Object> parameters = getVideoAttemptParameters();
         new TestpressCourseApiClient(activity).updateVideoAttempt(videoAttemptId, parameters)
                 .enqueue(new TestpressCallback<VideoAttempt>() {
@@ -625,10 +623,8 @@ public class ExoPlayerUtil {
                     !playWhenReady) {
 
                 playerView.setKeepScreenOn(false);
-                removeVideoAttemptUpdateHandler();
             } else {
                 playerView.setKeepScreenOn(true);
-                startVideoAttemptUpdateHandler();
             }
         }
 
@@ -641,6 +637,12 @@ public class ExoPlayerUtil {
         public void onPositionDiscontinuity(int reason) {
             super.onPositionDiscontinuity(reason);
             startPosition = getCurrentPosition();
+        }
+
+        @Override
+        public void onSeekProcessed() {
+            super.onSeekProcessed();
+            updateVideoAttempt();
         }
     }
 

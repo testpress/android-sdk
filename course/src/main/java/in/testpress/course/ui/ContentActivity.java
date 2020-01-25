@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -1073,6 +1074,7 @@ public class ContentActivity extends BaseToolBarActivity {
             previousButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    exoPlayerUtil.updateVideoAttempt();
                     startActivity(ContentActivity.createIntent(previousPosition, chapterId,
                             ContentActivity.this, productSlug));
 
@@ -1088,6 +1090,7 @@ public class ContentActivity extends BaseToolBarActivity {
             nextButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    exoPlayerUtil.updateVideoAttempt();
                     SharedPreferences prefs = getSharedPreferences(
                             TESTPRESS_CONTENT_SHARED_PREFS, Context.MODE_PRIVATE);
                     prefs.edit().putBoolean(GO_TO_MENU, true).apply();
@@ -1103,6 +1106,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 nextButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        exoPlayerUtil.updateVideoAttempt();
                         startActivity(ContentActivity.createIntent(nextPosition, chapterId,
                                 ContentActivity.this, productSlug));
 
