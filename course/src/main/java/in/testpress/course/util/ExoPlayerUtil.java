@@ -36,6 +36,7 @@ import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultControlDispatcher;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -89,7 +90,6 @@ import static in.testpress.course.network.TestpressCourseApiClient.TIME_RANGES;
 public class ExoPlayerUtil {
 
     private static final int OVERLAY_POSITION_CHANGE_INTERVAL = 15000; // 15s
-    private static final int VIDEO_ATTEMPT_UPDATE_INTERVAL = 60000; // 60s
 
     private FrameLayout exoPlayerMainFrame;
     private View exoPlayerLayout;
@@ -279,7 +279,6 @@ public class ExoPlayerUtil {
         }
         MediaSource mediaSource = buildMediaSource(Uri.parse(url));
         player.prepare(mediaSource, false, false);
-        startVideoAttemptUpdateHandler();
         if (overlayPositionHandler != null) {
             overlayPositionHandler
                     .postDelayed(overlayPositionChangeTask, OVERLAY_POSITION_CHANGE_INTERVAL);
@@ -291,12 +290,21 @@ public class ExoPlayerUtil {
                     MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
         }
 
-        Log.d("ExoplayerUtil", "onClick: resolution button clicked " + trackSelector.getCurrentMappedTrackInfo());
+        addPlayPauseOnClickListener();
+    }
+
+    private void addPlayPauseOnClickListener() {
+        playerView.setControlDispatcher(new DefaultControlDispatcher() {
+            @Override
+            public boolean dispatchSetPlayWhenReady(Player player, boolean playWhenReady) {
+                updateVideoAttempt();
+                return super.dispatchSetPlayWhenReady(player, playWhenReady);
+            }
+        });
     }
 
     public void releasePlayer() {
         if (player != null) {
-            removeVideoAttemptUpdateHandler();
             startPosition = getCurrentPosition();
             playWhenReady = player.getPlayWhenReady();
             player.release();
@@ -487,21 +495,6 @@ public class ExoPlayerUtil {
         startOverlayMarquee();
     }
 
-    private void startVideoAttemptUpdateHandler() {
-        if (videoAttemptId != 0 && videoAttemptUpdateHandler == null) {
-            videoAttemptUpdateHandler = new Handler();
-            videoAttemptUpdateHandler
-                    .postDelayed(videoAttemptUpdateTask, VIDEO_ATTEMPT_UPDATE_INTERVAL);
-        }
-    }
-
-    private void removeVideoAttemptUpdateHandler() {
-        if (videoAttemptUpdateHandler != null) {
-            videoAttemptUpdateHandler.removeCallbacks(videoAttemptUpdateTask);
-            videoAttemptUpdateHandler = null;
-        }
-    }
-
     Map<String, Object> getVideoAttemptParameters() {
         Map<String, Object> parameters = new HashMap<>();
         float currentPosition = getCurrentPosition();
@@ -514,7 +507,7 @@ public class ExoPlayerUtil {
         return parameters;
     }
 
-    private void updateVideoAttempt() {
+    public void updateVideoAttempt() {
         Map<String, Object> parameters = getVideoAttemptParameters();
         new TestpressCourseApiClient(activity).updateVideoAttempt(videoAttemptId, parameters)
                 .enqueue(new TestpressCallback<VideoAttempt>() {
@@ -524,19 +517,11 @@ public class ExoPlayerUtil {
                             updateVideoWatchedPercentage(videoAttempt);
                         }
                         errorOnVideoAttemptUpdate = false;
-                        if (videoAttemptUpdateHandler != null) {
-                            videoAttemptUpdateHandler
-                                    .postDelayed(videoAttemptUpdateTask, VIDEO_ATTEMPT_UPDATE_INTERVAL);
-                        }
                     }
 
                     @Override
                     public void onException(TestpressException exception) {
                         errorOnVideoAttemptUpdate = true;
-                        if (videoAttemptUpdateHandler != null) {
-                            videoAttemptUpdateHandler
-                                    .postDelayed(videoAttemptUpdateTask, VIDEO_ATTEMPT_UPDATE_INTERVAL);
-                        }
                     }
                 });
     }
@@ -625,10 +610,8 @@ public class ExoPlayerUtil {
                     !playWhenReady) {
 
                 playerView.setKeepScreenOn(false);
-                removeVideoAttemptUpdateHandler();
             } else {
                 playerView.setKeepScreenOn(true);
-                startVideoAttemptUpdateHandler();
             }
         }
 
@@ -641,6 +624,12 @@ public class ExoPlayerUtil {
         public void onPositionDiscontinuity(int reason) {
             super.onPositionDiscontinuity(reason);
             startPosition = getCurrentPosition();
+        }
+
+        @Override
+        public void onSeekProcessed() {
+            super.onSeekProcessed();
+            updateVideoAttempt();
         }
     }
 
