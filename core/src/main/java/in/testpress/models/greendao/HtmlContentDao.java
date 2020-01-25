@@ -26,6 +26,7 @@ public class HtmlContentDao extends AbstractDao<HtmlContent, Long> {
         public final static Property Title = new Property(1, String.class, "title", false, "TITLE");
         public final static Property TextHtml = new Property(2, String.class, "textHtml", false, "TEXT_HTML");
         public final static Property SourceUrl = new Property(3, String.class, "sourceUrl", false, "SOURCE_URL");
+        public final static Property ReadTime = new Property(4, String.class, "readTime", false, "READ_TIME");
     }
 
 
@@ -44,7 +45,8 @@ public class HtmlContentDao extends AbstractDao<HtmlContent, Long> {
                 "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"TITLE\" TEXT," + // 1: title
                 "\"TEXT_HTML\" TEXT," + // 2: textHtml
-                "\"SOURCE_URL\" TEXT);"); // 3: sourceUrl
+                "\"SOURCE_URL\" TEXT," + // 3: sourceUrl
+                "\"READ_TIME\" TEXT);"); // 4: readTime
     }
 
     /** Drops the underlying database table. */
@@ -76,6 +78,11 @@ public class HtmlContentDao extends AbstractDao<HtmlContent, Long> {
         if (sourceUrl != null) {
             stmt.bindString(4, sourceUrl);
         }
+ 
+        String readTime = entity.getReadTime();
+        if (readTime != null) {
+            stmt.bindString(5, readTime);
+        }
     }
 
     @Override
@@ -101,6 +108,11 @@ public class HtmlContentDao extends AbstractDao<HtmlContent, Long> {
         if (sourceUrl != null) {
             stmt.bindString(4, sourceUrl);
         }
+ 
+        String readTime = entity.getReadTime();
+        if (readTime != null) {
+            stmt.bindString(5, readTime);
+        }
     }
 
     @Override
@@ -114,7 +126,8 @@ public class HtmlContentDao extends AbstractDao<HtmlContent, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // title
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // textHtml
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // sourceUrl
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // sourceUrl
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // readTime
         );
         return entity;
     }
@@ -125,6 +138,7 @@ public class HtmlContentDao extends AbstractDao<HtmlContent, Long> {
         entity.setTitle(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setTextHtml(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setSourceUrl(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setReadTime(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
      }
     
     @Override

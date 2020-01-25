@@ -26,6 +26,9 @@ public class Video implements android.os.Parcelable {
     private String embedCode;
     private String duration;
     private Boolean isDomainRestricted;
+    private String thumbnail;
+    private String thumbnailMedium;
+    private String thumbnailSmall;
 
     /** Used to resolve relations */
     @Generated
@@ -52,13 +55,16 @@ public class Video implements android.os.Parcelable {
     }
 
     @Generated
-    public Video(String title, String url, Long id, String embedCode, String duration, Boolean isDomainRestricted) {
+    public Video(String title, String url, Long id, String embedCode, String duration, Boolean isDomainRestricted, String thumbnail, String thumbnailMedium, String thumbnailSmall) {
         this.title = title;
         this.url = url;
         this.id = id;
         this.embedCode = embedCode;
         this.duration = duration;
         this.isDomainRestricted = isDomainRestricted;
+        this.thumbnail = thumbnail;
+        this.thumbnailMedium = thumbnailMedium;
+        this.thumbnailSmall = thumbnailSmall;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -114,6 +120,30 @@ public class Video implements android.os.Parcelable {
 
     public void setIsDomainRestricted(Boolean isDomainRestricted) {
         this.isDomainRestricted = isDomainRestricted;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    public String getThumbnailMedium() {
+        return thumbnailMedium;
+    }
+
+    public void setThumbnailMedium(String thumbnailMedium) {
+        this.thumbnailMedium = thumbnailMedium;
+    }
+
+    public String getThumbnailSmall() {
+        return thumbnailSmall;
+    }
+
+    public void setThumbnailSmall(String thumbnailSmall) {
+        this.thumbnailSmall = thumbnailSmall;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

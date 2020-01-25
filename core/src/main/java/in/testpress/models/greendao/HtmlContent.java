@@ -18,6 +18,7 @@ public class HtmlContent {
     private String title;
     private String textHtml;
     private String sourceUrl;
+    private String readTime;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -31,11 +32,12 @@ public class HtmlContent {
     }
 
     @Generated
-    public HtmlContent(Long id, String title, String textHtml, String sourceUrl) {
+    public HtmlContent(Long id, String title, String textHtml, String sourceUrl, String readTime) {
         this.id = id;
         this.title = title;
         this.textHtml = textHtml;
         this.sourceUrl = sourceUrl;
+        this.readTime = readTime;
     }
 
     public Long getId() {
@@ -68,6 +70,14 @@ public class HtmlContent {
 
     public void setSourceUrl(String sourceUrl) {
         this.sourceUrl = sourceUrl;
+    }
+
+    public String getReadTime() {
+        return readTime;
+    }
+
+    public void setReadTime(String readTime) {
+        this.readTime = readTime;
     }
 
     // KEEP METHODS - put your custom methods here

@@ -28,6 +28,9 @@ public class VideoDao extends AbstractDao<Video, Long> {
         public final static Property EmbedCode = new Property(3, String.class, "embedCode", false, "EMBED_CODE");
         public final static Property Duration = new Property(4, String.class, "duration", false, "DURATION");
         public final static Property IsDomainRestricted = new Property(5, Boolean.class, "isDomainRestricted", false, "IS_DOMAIN_RESTRICTED");
+        public final static Property Thumbnail = new Property(6, String.class, "thumbnail", false, "THUMBNAIL");
+        public final static Property ThumbnailMedium = new Property(7, String.class, "thumbnailMedium", false, "THUMBNAIL_MEDIUM");
+        public final static Property ThumbnailSmall = new Property(8, String.class, "thumbnailSmall", false, "THUMBNAIL_SMALL");
     }
 
     private DaoSession daoSession;
@@ -51,7 +54,10 @@ public class VideoDao extends AbstractDao<Video, Long> {
                 "\"ID\" INTEGER PRIMARY KEY ," + // 2: id
                 "\"EMBED_CODE\" TEXT," + // 3: embedCode
                 "\"DURATION\" TEXT," + // 4: duration
-                "\"IS_DOMAIN_RESTRICTED\" INTEGER);"); // 5: isDomainRestricted
+                "\"IS_DOMAIN_RESTRICTED\" INTEGER," + // 5: isDomainRestricted
+                "\"THUMBNAIL\" TEXT," + // 6: thumbnail
+                "\"THUMBNAIL_MEDIUM\" TEXT," + // 7: thumbnailMedium
+                "\"THUMBNAIL_SMALL\" TEXT);"); // 8: thumbnailSmall
     }
 
     /** Drops the underlying database table. */
@@ -93,6 +99,21 @@ public class VideoDao extends AbstractDao<Video, Long> {
         if (isDomainRestricted != null) {
             stmt.bindLong(6, isDomainRestricted ? 1L: 0L);
         }
+ 
+        String thumbnail = entity.getThumbnail();
+        if (thumbnail != null) {
+            stmt.bindString(7, thumbnail);
+        }
+ 
+        String thumbnailMedium = entity.getThumbnailMedium();
+        if (thumbnailMedium != null) {
+            stmt.bindString(8, thumbnailMedium);
+        }
+ 
+        String thumbnailSmall = entity.getThumbnailSmall();
+        if (thumbnailSmall != null) {
+            stmt.bindString(9, thumbnailSmall);
+        }
     }
 
     @Override
@@ -128,6 +149,21 @@ public class VideoDao extends AbstractDao<Video, Long> {
         if (isDomainRestricted != null) {
             stmt.bindLong(6, isDomainRestricted ? 1L: 0L);
         }
+ 
+        String thumbnail = entity.getThumbnail();
+        if (thumbnail != null) {
+            stmt.bindString(7, thumbnail);
+        }
+ 
+        String thumbnailMedium = entity.getThumbnailMedium();
+        if (thumbnailMedium != null) {
+            stmt.bindString(8, thumbnailMedium);
+        }
+ 
+        String thumbnailSmall = entity.getThumbnailSmall();
+        if (thumbnailSmall != null) {
+            stmt.bindString(9, thumbnailSmall);
+        }
     }
 
     @Override
@@ -149,7 +185,10 @@ public class VideoDao extends AbstractDao<Video, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // id
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // embedCode
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // duration
-            cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0 // isDomainRestricted
+            cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0, // isDomainRestricted
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // thumbnail
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // thumbnailMedium
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8) // thumbnailSmall
         );
         return entity;
     }
@@ -162,6 +201,9 @@ public class VideoDao extends AbstractDao<Video, Long> {
         entity.setEmbedCode(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setDuration(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setIsDomainRestricted(cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0);
+        entity.setThumbnail(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setThumbnailMedium(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setThumbnailSmall(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
      }
     
     @Override

@@ -38,6 +38,10 @@ public class Course {
     private boolean childItemsLoaded;
     private Boolean isProduct;
     private Boolean isMyCourse;
+    private Integer examsCount;
+    private Integer videosCount;
+    private Integer htmlContentsCount;
+    private Integer attachmentsCount;
 
     /** Used to resolve relations */
     @Generated
@@ -69,7 +73,7 @@ public class Course {
     }
 
     @Generated
-    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount, Integer order, Boolean active, String external_content_link, String external_link_label, boolean childItemsLoaded, Boolean isProduct, Boolean isMyCourse) {
+    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount, Integer order, Boolean active, String external_content_link, String external_link_label, boolean childItemsLoaded, Boolean isProduct, Boolean isMyCourse, Integer examsCount, Integer videosCount, Integer htmlContentsCount, Integer attachmentsCount) {
         this.id = id;
         this.url = url;
         this.title = title;
@@ -90,6 +94,10 @@ public class Course {
         this.childItemsLoaded = childItemsLoaded;
         this.isProduct = isProduct;
         this.isMyCourse = isMyCourse;
+        this.examsCount = examsCount;
+        this.videosCount = videosCount;
+        this.htmlContentsCount = htmlContentsCount;
+        this.attachmentsCount = attachmentsCount;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -257,6 +265,38 @@ public class Course {
 
     public void setIsMyCourse(Boolean isMyCourse) {
         this.isMyCourse = isMyCourse;
+    }
+
+    public Integer getExamsCount() {
+        return examsCount;
+    }
+
+    public void setExamsCount(Integer examsCount) {
+        this.examsCount = examsCount;
+    }
+
+    public Integer getVideosCount() {
+        return videosCount;
+    }
+
+    public void setVideosCount(Integer videosCount) {
+        this.videosCount = videosCount;
+    }
+
+    public Integer getHtmlContentsCount() {
+        return htmlContentsCount;
+    }
+
+    public void setHtmlContentsCount(Integer htmlContentsCount) {
+        this.htmlContentsCount = htmlContentsCount;
+    }
+
+    public Integer getAttachmentsCount() {
+        return attachmentsCount;
+    }
+
+    public void setAttachmentsCount(Integer attachmentsCount) {
+        this.attachmentsCount = attachmentsCount;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

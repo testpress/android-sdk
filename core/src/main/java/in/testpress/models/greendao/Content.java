@@ -53,6 +53,7 @@ public class Content implements android.os.Parcelable {
     private Long modifiedDate;
     private Boolean freePreview;
     private Boolean isScheduled;
+    private String coverImage;
     private Long courseId;
     private Long chapterId;
     private Long htmlId;
@@ -116,7 +117,7 @@ public class Content implements android.os.Parcelable {
     }
 
     @Generated
-    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, Long courseId, Long chapterId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
+    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, String coverImage, Long courseId, Long chapterId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
         this.order = order;
         this.htmlContentTitle = htmlContentTitle;
         this.htmlContentUrl = htmlContentUrl;
@@ -141,6 +142,7 @@ public class Content implements android.os.Parcelable {
         this.modifiedDate = modifiedDate;
         this.freePreview = freePreview;
         this.isScheduled = isScheduled;
+        this.coverImage = coverImage;
         this.courseId = courseId;
         this.chapterId = chapterId;
         this.htmlId = htmlId;
@@ -346,6 +348,14 @@ public class Content implements android.os.Parcelable {
 
     public void setIsScheduled(Boolean isScheduled) {
         this.isScheduled = isScheduled;
+    }
+
+    public String getCoverImage() {
+        return coverImage;
+    }
+
+    public void setCoverImage(String coverImage) {
+        this.coverImage = coverImage;
     }
 
     public Long getCourseId() {

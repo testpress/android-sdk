@@ -42,6 +42,10 @@ public class CourseDao extends AbstractDao<Course, Long> {
         public final static Property ChildItemsLoaded = new Property(17, boolean.class, "childItemsLoaded", false, "CHILD_ITEMS_LOADED");
         public final static Property IsProduct = new Property(18, Boolean.class, "isProduct", false, "IS_PRODUCT");
         public final static Property IsMyCourse = new Property(19, Boolean.class, "isMyCourse", false, "IS_MY_COURSE");
+        public final static Property ExamsCount = new Property(20, Integer.class, "examsCount", false, "EXAMS_COUNT");
+        public final static Property VideosCount = new Property(21, Integer.class, "videosCount", false, "VIDEOS_COUNT");
+        public final static Property HtmlContentsCount = new Property(22, Integer.class, "htmlContentsCount", false, "HTML_CONTENTS_COUNT");
+        public final static Property AttachmentsCount = new Property(23, Integer.class, "attachmentsCount", false, "ATTACHMENTS_COUNT");
     }
 
     private DaoSession daoSession;
@@ -79,7 +83,11 @@ public class CourseDao extends AbstractDao<Course, Long> {
                 "\"EXTERNAL_LINK_LABEL\" TEXT," + // 16: external_link_label
                 "\"CHILD_ITEMS_LOADED\" INTEGER NOT NULL ," + // 17: childItemsLoaded
                 "\"IS_PRODUCT\" INTEGER," + // 18: isProduct
-                "\"IS_MY_COURSE\" INTEGER);"); // 19: isMyCourse
+                "\"IS_MY_COURSE\" INTEGER," + // 19: isMyCourse
+                "\"EXAMS_COUNT\" INTEGER," + // 20: examsCount
+                "\"VIDEOS_COUNT\" INTEGER," + // 21: videosCount
+                "\"HTML_CONTENTS_COUNT\" INTEGER," + // 22: htmlContentsCount
+                "\"ATTACHMENTS_COUNT\" INTEGER);"); // 23: attachmentsCount
     }
 
     /** Drops the underlying database table. */
@@ -187,6 +195,26 @@ public class CourseDao extends AbstractDao<Course, Long> {
         if (isMyCourse != null) {
             stmt.bindLong(20, isMyCourse ? 1L: 0L);
         }
+ 
+        Integer examsCount = entity.getExamsCount();
+        if (examsCount != null) {
+            stmt.bindLong(21, examsCount);
+        }
+ 
+        Integer videosCount = entity.getVideosCount();
+        if (videosCount != null) {
+            stmt.bindLong(22, videosCount);
+        }
+ 
+        Integer htmlContentsCount = entity.getHtmlContentsCount();
+        if (htmlContentsCount != null) {
+            stmt.bindLong(23, htmlContentsCount);
+        }
+ 
+        Integer attachmentsCount = entity.getAttachmentsCount();
+        if (attachmentsCount != null) {
+            stmt.bindLong(24, attachmentsCount);
+        }
     }
 
     @Override
@@ -288,6 +316,26 @@ public class CourseDao extends AbstractDao<Course, Long> {
         if (isMyCourse != null) {
             stmt.bindLong(20, isMyCourse ? 1L: 0L);
         }
+ 
+        Integer examsCount = entity.getExamsCount();
+        if (examsCount != null) {
+            stmt.bindLong(21, examsCount);
+        }
+ 
+        Integer videosCount = entity.getVideosCount();
+        if (videosCount != null) {
+            stmt.bindLong(22, videosCount);
+        }
+ 
+        Integer htmlContentsCount = entity.getHtmlContentsCount();
+        if (htmlContentsCount != null) {
+            stmt.bindLong(23, htmlContentsCount);
+        }
+ 
+        Integer attachmentsCount = entity.getAttachmentsCount();
+        if (attachmentsCount != null) {
+            stmt.bindLong(24, attachmentsCount);
+        }
     }
 
     @Override
@@ -323,7 +371,11 @@ public class CourseDao extends AbstractDao<Course, Long> {
             cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16), // external_link_label
             cursor.getShort(offset + 17) != 0, // childItemsLoaded
             cursor.isNull(offset + 18) ? null : cursor.getShort(offset + 18) != 0, // isProduct
-            cursor.isNull(offset + 19) ? null : cursor.getShort(offset + 19) != 0 // isMyCourse
+            cursor.isNull(offset + 19) ? null : cursor.getShort(offset + 19) != 0, // isMyCourse
+            cursor.isNull(offset + 20) ? null : cursor.getInt(offset + 20), // examsCount
+            cursor.isNull(offset + 21) ? null : cursor.getInt(offset + 21), // videosCount
+            cursor.isNull(offset + 22) ? null : cursor.getInt(offset + 22), // htmlContentsCount
+            cursor.isNull(offset + 23) ? null : cursor.getInt(offset + 23) // attachmentsCount
         );
         return entity;
     }
@@ -350,6 +402,10 @@ public class CourseDao extends AbstractDao<Course, Long> {
         entity.setChildItemsLoaded(cursor.getShort(offset + 17) != 0);
         entity.setIsProduct(cursor.isNull(offset + 18) ? null : cursor.getShort(offset + 18) != 0);
         entity.setIsMyCourse(cursor.isNull(offset + 19) ? null : cursor.getShort(offset + 19) != 0);
+        entity.setExamsCount(cursor.isNull(offset + 20) ? null : cursor.getInt(offset + 20));
+        entity.setVideosCount(cursor.isNull(offset + 21) ? null : cursor.getInt(offset + 21));
+        entity.setHtmlContentsCount(cursor.isNull(offset + 22) ? null : cursor.getInt(offset + 22));
+        entity.setAttachmentsCount(cursor.isNull(offset + 23) ? null : cursor.getInt(offset + 23));
      }
     
     @Override

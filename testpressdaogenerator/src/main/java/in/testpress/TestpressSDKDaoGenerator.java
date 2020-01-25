@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 25;
+    private static final int VERSION = 26;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -202,6 +202,7 @@ public class TestpressSDKDaoGenerator {
         htmlContent.addStringProperty("title");
         htmlContent.addStringProperty("textHtml");
         htmlContent.addStringProperty("sourceUrl");
+        htmlContent.addStringProperty("readTime");
         return htmlContent;
     }
 
@@ -234,6 +235,7 @@ public class TestpressSDKDaoGenerator {
         content.addLongProperty("modifiedDate");
         content.addBooleanProperty("freePreview");
         content.addBooleanProperty("isScheduled");
+        content.addStringProperty("coverImage");
         content.implementsInterface("android.os.Parcelable");
         return content;
     }
@@ -283,6 +285,9 @@ public class TestpressSDKDaoGenerator {
         video.addStringProperty("embedCode");
         video.addStringProperty("duration");
         video.addBooleanProperty("isDomainRestricted");
+        video.addStringProperty("thumbnail");
+        video.addStringProperty("thumbnailMedium");
+        video.addStringProperty("thumbnailSmall");
         video.implementsInterface("android.os.Parcelable");
         return video;
     }
@@ -399,6 +404,10 @@ public class TestpressSDKDaoGenerator {
         course.addBooleanProperty("childItemsLoaded").notNull();
         course.addBooleanProperty("isProduct");
         course.addBooleanProperty("isMyCourse");
+        course.addIntProperty("examsCount");
+        course.addIntProperty("videosCount");
+        course.addIntProperty("htmlContentsCount");
+        course.addIntProperty("attachmentsCount");
         return course;
     }
 
