@@ -16,6 +16,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -1035,6 +1036,14 @@ public class ContentActivity extends BaseToolBarActivity {
                 });
     }
 
+    @Override
+    public void onBackPressed() {
+        if (exoPlayerUtil != null && content.isNonEmbeddableVideo()) {
+            exoPlayerUtil.updateVideoAttempt();
+        }
+        super.onBackPressed();
+    }
+
     void setBookmarkProgress(boolean show) {
         if (show) {
             bookmarkButtonLayout.setVisibility(View.GONE);
@@ -1074,7 +1083,9 @@ public class ContentActivity extends BaseToolBarActivity {
             previousButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    exoPlayerUtil.updateVideoAttempt();
+                    if (exoPlayerUtil != null && content.isNonEmbeddableVideo()) {
+                        exoPlayerUtil.updateVideoAttempt();
+                    }
                     startActivity(ContentActivity.createIntent(previousPosition, chapterId,
                             ContentActivity.this, productSlug));
 
@@ -1090,7 +1101,9 @@ public class ContentActivity extends BaseToolBarActivity {
             nextButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    exoPlayerUtil.updateVideoAttempt();
+                    if (exoPlayerUtil != null && content.isNonEmbeddableVideo()) {
+                        exoPlayerUtil.updateVideoAttempt();
+                    }
                     SharedPreferences prefs = getSharedPreferences(
                             TESTPRESS_CONTENT_SHARED_PREFS, Context.MODE_PRIVATE);
                     prefs.edit().putBoolean(GO_TO_MENU, true).apply();
@@ -1106,7 +1119,9 @@ public class ContentActivity extends BaseToolBarActivity {
                 nextButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        exoPlayerUtil.updateVideoAttempt();
+                        if (exoPlayerUtil != null && content.isNonEmbeddableVideo()) {
+                            exoPlayerUtil.updateVideoAttempt();
+                        }
                         startActivity(ContentActivity.createIntent(nextPosition, chapterId,
                                 ContentActivity.this, productSlug));
 
@@ -1273,6 +1288,9 @@ public class ContentActivity extends BaseToolBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
+        if (exoPlayerUtil != null && content.isNonEmbeddableVideo()) {
+            exoPlayerUtil.updateVideoAttempt();
+        }
         if(item.getItemId() == android.R.id.home) {
             // Set result with home button pressed true if activity is called by startActivityForResult
             if (getCallingActivity() != null) {
