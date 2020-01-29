@@ -1,6 +1,7 @@
 package in.testpress.course;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,9 +19,12 @@ import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.Product;
 import in.testpress.models.greendao.ProductDao;
+import in.testpress.store.ui.ProductDetailsActivity;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.IntegerList;
 import in.testpress.util.SingleTypeAdapter;
+
+import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 
 
 public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
@@ -61,7 +65,7 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
     @Override
     protected int[] getChildViewIds() {
         return new int[] { R.id.title, R.id.total_chapters, R.id.total_contents, R.id.price,
-                R.id.thumbnail_image, R.id.product_item_layout };
+                R.id.thumbnail_image, R.id.product_item_layout, R.id.counts };
     }
 
     private void calculateChaptersAndContentsCount(Product product) {
@@ -86,6 +90,10 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
         setText(2,  activity.getResources().getQuantityString(R.plurals.contents_count,
                 contentsCount, contentsCount));
 
+        if (item.getCourseIds().size() == 0) {
+            setGone(6, true);
+        }
+
         String price = String.format("₹%s", item.getCurrentPrice());
         setText(3, price);
 
@@ -108,6 +116,10 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
             openCoursesList(product.getCourseIds(), product.getSlug());
         } else if (product.getCourseIds().size() == 1) {
             openChapters(product.getCourseIds().get(0), product.getSlug());
+        } else {
+            Intent intent = new Intent(activity, ProductDetailsActivity.class);
+            intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.getSlug());
+            activity.startActivityForResult(intent, STORE_REQUEST_CODE);
         }
     }
 
