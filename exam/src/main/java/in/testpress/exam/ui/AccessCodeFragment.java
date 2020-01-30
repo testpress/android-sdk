@@ -2,8 +2,8 @@ package in.testpress.exam.ui;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentActivity;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.fragment.app.FragmentActivity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +27,7 @@ import in.testpress.ui.BaseFragment;
 import in.testpress.util.TextWatcherAdapter;
 import in.testpress.util.UIUtils;
 
-import static android.support.design.widget.Snackbar.LENGTH_SHORT;
+import static com.google.android.material.snackbar.Snackbar.LENGTH_SHORT;
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 
 public class AccessCodeFragment extends BaseFragment {

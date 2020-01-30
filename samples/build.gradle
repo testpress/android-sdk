@@ -23,6 +23,7 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         debug {
@@ -49,5 +50,6 @@ dependencies {
     api rootProject.customtabs
     api 'com.google.android.gms:play-services-auth:16.0.0'
     api 'com.facebook.android:facebook-android-sdk:4.20.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
     testImplementation rootProject.junit
 }

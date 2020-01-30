@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="0.1"
         android:orientation="horizontal">
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/TestpressButton"
             android:text="@string/logout_devices"
             android:id="@+id/logout_devices_button"
@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_gravity="center_horizontal"
             />
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/TestpressButton"
             android:text="Cancel"
             android:id="@+id/cancel_button"

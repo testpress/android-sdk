@@ -2,7 +2,7 @@ package in.testpress.ui.view;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.v7.widget.AppCompatSpinner;
+import androidx.appcompat.widget.AppCompatSpinner;
 import android.util.AttributeSet;
 
 public class ClosableSpinner extends AppCompatSpinner {

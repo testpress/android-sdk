@@ -121,7 +121,7 @@
                 android:layout_marginTop="5dp"
                 android:id="@+id/fill_all_details"/>
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/continue_button"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

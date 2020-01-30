@@ -6,13 +6,13 @@
     android:paddingLeft="22dp"
     android:paddingRight="22dp">
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:theme="@style/TestpressTextInputLayoutTheme">
 
-        <android.support.v7.widget.AppCompatEditText
+        <androidx.appcompat.widget.AppCompatEditText
             style="@style/TestpressEditTextStyle"
             android:id="@+id/edit_text"
             android:inputType="textMultiLine"
@@ -20,6 +20,6 @@
             android:maxLines="6"
             android:imeOptions="actionDone" />
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

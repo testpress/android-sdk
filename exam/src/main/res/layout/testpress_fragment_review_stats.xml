@@ -586,7 +586,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/bottom_row">
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/analytics"
             android:background="@drawable/testpress_green_stroke"
             android:text="@string/testpress_analytics"
@@ -600,7 +600,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginTop="15dp" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/review"
             android:background="@drawable/testpress_green_stroke"
             android:text="@string/testpress_solutions"
@@ -636,7 +636,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content">
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/email_mcqs"
                 android:background="@drawable/testpress_green_stroke"
                 android:text="@string/testpress_email_mcqs"
@@ -658,7 +658,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content">
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/retake"
                 android:background="@drawable/testpress_green_stroke"
                 android:text="@string/testpress_retake_exam"
@@ -680,7 +680,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content">
 
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/time_analytics"
                 android:background="@drawable/testpress_green_stroke"
                 android:text="@string/testpress_time_analytics"

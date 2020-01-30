@@ -1,12 +1,11 @@
 package in.testpress.course.ui;
 
 import android.os.Bundle;
-import android.support.v4.content.Loader;
-import android.util.Log;
+import androidx.loader.content.Loader;
+
 import android.view.View;
 
 import org.greenrobot.greendao.AbstractDao;
-import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.List;
 
@@ -20,7 +19,6 @@ import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.network.BaseResourcePager;
-import in.testpress.store.ui.ProductDetailsActivity;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
 

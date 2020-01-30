@@ -1,7 +1,7 @@
 package in.testpress.util;
 
 import android.content.Context;
-import android.support.v4.content.Loader;
+import androidx.loader.content.Loader;
 import android.util.Log;
 
 import java.util.List;

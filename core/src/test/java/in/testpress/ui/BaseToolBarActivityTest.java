@@ -1,6 +1,6 @@
 package in.testpress.ui;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,7 +1,7 @@
 package in.testpress.course.ui;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import in.testpress.course.R;
 import in.testpress.ui.BaseToolBarActivity;

@@ -16,7 +16,7 @@
         android:textColor="@color/testpress_black"
         />
 
-    <android.support.v7.widget.AppCompatEditText
+    <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/access_code"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
         android:maxLength="30"
         />
 
-    <android.support.v7.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatButton
         style="@style/TestpressButton"
         android:enabled="false"
         android:layout_marginTop="20dp"

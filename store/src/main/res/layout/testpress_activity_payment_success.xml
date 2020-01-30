@@ -101,14 +101,14 @@
                 android:layout_margin="20dp"
                 >
 
-                <android.support.v7.widget.AppCompatButton
+                <androidx.appcompat.widget.AppCompatButton
                     style="@style/TestpressButton"
                     android:id="@+id/continue_button"
                     android:layout_width="match_parent"
                     android:text="@string/testpress_continue_purchase"
                     />
 
-                <android.support.v7.widget.AppCompatButton
+                <androidx.appcompat.widget.AppCompatButton
                     style="@style/TestpressButton"
                     android:id="@+id/home_button"
                     android:layout_width="match_parent"

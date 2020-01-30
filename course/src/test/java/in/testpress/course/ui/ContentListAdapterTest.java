@@ -1,7 +1,7 @@
 package in.testpress.course.ui;
 
 import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 
 import com.github.testpress.mikephil.charting.charts.PieChart;
 import com.github.testpress.mikephil.charting.components.Legend;

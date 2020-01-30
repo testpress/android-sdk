@@ -1,6 +1,6 @@
 package in.testpress.core;
 
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.content.Context;
 
 import androidx.test.core.app.ApplicationProvider;
