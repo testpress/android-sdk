@@ -891,25 +891,26 @@ public class ContentDetailFragment extends Fragment {
         updateContentApiRequest = courseApiClient.getContent(contentUrl)
                 .enqueue(new TestpressCallback<Content>() {
                     @Override
-                    public void onSuccess(Content content1) {
-                        Video video = content1.getRawVideo();
+                    public void onSuccess(Content fetchedContent) {
+                        swipeRefresh.setRefreshing(false);
+                        Video video = fetchedContent.getRawVideo();
                         if (video != null) {
                             videoDao.insertOrReplace(video);
-                            content1.setVideoId(video.getId());
+                            fetchedContent.setVideoId(video.getId());
                         }
-                        Exam exam = content1.getRawExam();
+                        Exam exam = fetchedContent.getRawExam();
                         if (exam != null) {
                             exam.saveLanguages(getContext());
                             examDao.insertOrReplace(exam);
-                            content1.setExamId(exam.getId());
+                            fetchedContent.setExamId(exam.getId());
                         }
-                        Attachment attachment = content1.getRawAttachment();
+                        Attachment attachment = fetchedContent.getRawAttachment();
                         if (attachment != null) {
                             attachmentDao.insertOrReplace(attachment);
-                            content1.setAttachmentId(attachment.getId());
+                            fetchedContent.setAttachmentId(attachment.getId());
                         }
-                        contentDao.insertOrReplace(content1);
-                        content = content1;
+                        contentDao.insertOrReplace(fetchedContent);
+                        content = fetchedContent;
                         if (chapterId != null) {
                             contents = getContentsFromDB();
                         }
