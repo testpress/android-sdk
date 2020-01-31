@@ -24,7 +24,7 @@ import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.models.greendao.Content;
 import in.testpress.util.ViewUtils;
 
-class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
+public class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
 
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
@@ -32,7 +32,7 @@ class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private Content mContent;
     private List<CourseAttempt> mAttempts = new ArrayList<>();
 
-    ContentAttemptListAdapter(Activity activity, Content content,
+    public ContentAttemptListAdapter(Activity activity, Content content,
                                      final List<CourseAttempt> attempts) {
         mActivity = activity;
         mContent = content;

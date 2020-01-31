@@ -7,6 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
@@ -66,47 +67,6 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:paddingRight="20dp"
-                    android:paddingLeft="20dp"
-                    android:visibility="gone"
-                    android:id="@+id/exam_content_layout"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <include
-                        android:visibility="gone"
-                        android:id="@+id/exam_details_layout"
-                        layout="@layout/testpress_exam_details_layout" />
-
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/attempt_list"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                    <TextView
-                        android:id="@+id/attempt_web_only_label"
-                        android:visibility="gone"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/testpress_black"
-                        android:text="@string/testpress_web_only_exam_description"
-                        android:lineSpacingExtra="5dp"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginBottom="20dp"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginRight="15dp"
-                        android:gravity="center"
-                        android:layout_gravity="center" />
-
-                </LinearLayout>
-
-                <WebView
-                    android:visibility="gone"
-                    android:id="@+id/web_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
 
                 <LinearLayout
                     android:id="@+id/attachment_content_layout"
@@ -132,32 +92,11 @@
 
                 </LinearLayout>
 
-                <include
-                    android:layout_marginTop="20dp"
-                    android:visibility="gone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    layout="@layout/testpress_exo_player_view" />
-
                 <!-- Empty layout to keep the navigation button in bottom -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_weight="1"
                     android:layout_height="0dp"/>
-
-                <android.support.v7.widget.AppCompatButton
-                    android:id="@+id/start_exam"
-                    android:background="@drawable/testpress_green_curved_edge_background"
-                    android:text="@string/testpress_start"
-                    android:gravity="center"
-                    android:textSize="16sp"
-                    android:textColor="@android:color/white"
-                    android:layout_width="match_parent"
-                    android:layout_height="37dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginBottom="20dp"
-                    android:layout_marginTop="20dp" />
 
             </LinearLayout>
         </android.support.v4.widget.NestedScrollView>

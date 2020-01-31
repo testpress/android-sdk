@@ -102,43 +102,6 @@
 
                 </LinearLayout>
 
-                <WebView
-                    android:visibility="gone"
-                    android:id="@+id/web_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <LinearLayout
-                    android:id="@+id/attachment_content_layout"
-                    android:padding="20dp"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/attachment_description"
-                        android:textColor="@color/testpress_text_gray"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="15dp"
-                        android:layout_marginLeft="3dp"
-                        android:text="Content description goes here"/>
-
-                    <android.support.v7.widget.AppCompatButton
-                        android:id="@+id/download_attachment"
-                        android:layout_gravity="center"
-                        style="@style/TestpressSmallButton"
-                        android:text="@string/testpress_download_attachment" />
-
-                </LinearLayout>
-
-                <include
-                    android:layout_marginTop="20dp"
-                    android:visibility="gone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    layout="@layout/testpress_exo_player_view" />
-
                 <!-- Empty layout to keep the navigation button in bottom -->
                 <View
                     android:layout_width="match_parent"
@@ -192,46 +155,46 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/previous"
-            android:background="@android:color/transparent"
-            android:text="@string/testpress_previous_content"
-            android:gravity="center"
-            android:textSize="14sp"
-            android:textColor="@color/testpress_text_gray"
-            android:drawableTint="@color/testpress_text_gray"
-            android:drawableLeft="@drawable/ic_chevron_left_black_24dp"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp" />
+            <Button
+                android:id="@+id/previous"
+                android:background="@android:color/transparent"
+                android:text="@string/testpress_previous_content"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:textColor="@color/testpress_text_gray"
+                android:drawableTint="@color/testpress_text_gray"
+                android:drawableLeft="@drawable/ic_chevron_left_black_24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp" />
 
-        <TextView
-            android:id="@+id/page_number"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:text="15/20"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:lineSpacingExtra="6dp"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="@color/testpress_text_gray_light"
-            android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/page_number"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="15/20"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:lineSpacingExtra="6dp"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/testpress_text_gray_light"
+                android:layout_height="wrap_content"/>
 
-        <Button
-            android:id="@+id/next"
-            android:background="@android:color/transparent"
-            android:text="@string/testpress_next_content"
-            android:gravity="right|center_vertical"
-            android:textSize="14sp"
-            android:textColor="@color/testpress_text_gray"
-            android:drawableTint="@color/testpress_text_gray"
-            android:drawableRight="@drawable/ic_chevron_right_black_24dp"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp" />
+            <Button
+                android:id="@+id/next"
+                android:background="@android:color/transparent"
+                android:text="@string/testpress_next_content"
+                android:gravity="right|center_vertical"
+                android:textSize="14sp"
+                android:textColor="@color/testpress_text_gray"
+                android:drawableTint="@color/testpress_text_gray"
+                android:drawableRight="@drawable/ic_chevron_right_black_24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp" />
         </LinearLayout>
     </LinearLayout>
 
