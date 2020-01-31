@@ -232,6 +232,10 @@ abstract public class BaseContentDetailFragment extends Fragment implements Book
                 @Override
                 public void onSuccess(Content fetchedContent) {
                    onUpdateContent(fetchedContent);
+                    if (chapterId != null) {
+                        contents = getContentsFromDB();
+                    }
+                   loadContent();
                 }
 
                 @Override

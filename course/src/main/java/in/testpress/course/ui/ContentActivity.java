@@ -13,6 +13,7 @@ import java.util.List;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
 import in.testpress.course.ui.fragments.ContentDetailFragment;
+import in.testpress.course.ui.fragments.content_detail_fragments.AttachmentContentFragment;
 import in.testpress.course.ui.fragments.content_detail_fragments.ExamContentFragment;
 import in.testpress.course.ui.fragments.content_detail_fragments.HtmlContentFragment;
 import in.testpress.models.greendao.Content;
@@ -67,6 +68,11 @@ public class ContentActivity extends BaseToolBarActivity {
             htmlContentFragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, htmlContentFragment).commitAllowingStateLoss();
+        } else if (getContent() != null && getContent().getAttachmentId() != null) {
+            AttachmentContentFragment fragment = new AttachmentContentFragment();
+            fragment.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, fragment).commitAllowingStateLoss();
         }
         else {
             contentDetailFragment = new ContentDetailFragment();
