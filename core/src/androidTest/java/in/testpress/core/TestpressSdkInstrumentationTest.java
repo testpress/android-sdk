@@ -1,7 +1,8 @@
 package in.testpress.core;
 
 import android.graphics.Typeface;
-import android.support.test.InstrumentationRegistry;
+
+import androidx.test.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Test;
