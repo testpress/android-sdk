@@ -5,26 +5,21 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.airbnb.lottie.LottieAnimationView;
-
 import junit.framework.Assert;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import in.testpress.core.TestpressCallback;
@@ -34,21 +29,13 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.course.ui.ContentActivity;
+import in.testpress.course.ui.fragments.BookmarkFragment;
 import in.testpress.exam.network.TestpressExamApiClient;
-import in.testpress.exam.ui.FolderSpinnerAdapter;
-import in.testpress.models.greendao.Attachment;
-import in.testpress.models.greendao.Bookmark;
-import in.testpress.models.greendao.BookmarkFolder;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.CourseAttempt;
-import in.testpress.models.greendao.Exam;
-import in.testpress.models.greendao.Video;
 import in.testpress.network.RetrofitCall;
-import in.testpress.ui.view.ClosableSpinner;
 import in.testpress.util.ViewUtils;
-import in.testpress.v2_4.models.ApiResponse;
-import in.testpress.v2_4.models.FolderListResponse;
 
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 import static in.testpress.course.network.TestpressCourseApiClient.CONTENTS_PATH_v2_4;
@@ -58,10 +45,8 @@ import static in.testpress.course.ui.ContentActivity.CONTENT_ID;
 import static in.testpress.course.ui.ContentActivity.GO_TO_MENU;
 import static in.testpress.course.ui.ContentActivity.POSITION;
 import static in.testpress.course.ui.ContentActivity.TESTPRESS_CONTENT_SHARED_PREFS;
-import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
-import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 
-abstract public class BaseContentDetailFragment extends Fragment {
+abstract public class BaseContentDetailFragment extends Fragment implements BookmarkFragment.BookmarkListener {
     protected SwipeRefreshLayout swipeRefresh;
     protected Content content;
     private String contentId;
@@ -80,15 +65,6 @@ abstract public class BaseContentDetailFragment extends Fragment {
     private TestpressExamApiClient examApiClient;
     private LinearLayout buttonLayout;
 
-
-    private LottieAnimationView animationView;
-    private TextView bookmarkButtonText;
-    private ImageView bookmarkButtonImage;
-    private RelativeLayout bookmarkLayout;
-    private LinearLayout bookmarkButtonLayout;
-    private ArrayList<BookmarkFolder> bookmarkFolders = new ArrayList<>();
-    private ClosableSpinner bookmarkFolderSpinner;
-    private FolderSpinnerAdapter folderSpinnerAdapter;
     private String productSlug;
 
     private Long chapterId;
@@ -104,7 +80,7 @@ abstract public class BaseContentDetailFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {        Log.d("BaseContentDetail", "onViewCreated: ");
         return inflater.inflate(R.layout.testpress_activity_content_detail, container, false);
     }
 
@@ -159,9 +135,13 @@ abstract public class BaseContentDetailFragment extends Fragment {
             Assert.assertNotNull("ACTIONBAR_TITLE must not be null.", title);
             ((ContentActivity)getActivity()).getSupportActionBar().setTitle(title);
         }
-        initBookmark();
         productSlug = getArguments().getString(PRODUCT_SLUG);
         validateAdjacentNavigationButton();
+        BookmarkFragment bookmarkFragment = new BookmarkFragment();
+        bookmarkFragment.setBookmarkListener(this);
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        transaction.replace(R.id.bookmark_fragment_layout, bookmarkFragment);
+        transaction.commit();
     }
 
     private void validateAdjacentNavigationButton() {
@@ -219,77 +199,6 @@ abstract public class BaseContentDetailFragment extends Fragment {
     }
 
 
-    private void initBookmark() {
-        View view = getView();
-        animationView = view.findViewById(R.id.bookmark_loader);
-        animationView.playAnimation();
-        bookmarkLayout = view.findViewById(R.id.bookmark_layout);
-        bookmarkButtonLayout = view.findViewById(R.id.bookmark_button_layout);
-        bookmarkButtonImage = view.findViewById(R.id.bookmark_button_image);
-        bookmarkButtonText = view.findViewById(R.id.bookmark_text);
-        bookmarkButtonText.setTypeface(TestpressSdk.getRubikRegularFont(getActivity()));
-        bookmarkButtonLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (content.getBookmarkId() != null) {
-                    deleteBookmark(content.getBookmarkId());
-                } else {
-                    String baseUrl = TestpressSdk.getTestpressSession(getActivity())
-                            .getInstituteSettings().getBaseUrl();
-
-                    bookmarkFolders.clear();
-                    loadBookmarkFolders(baseUrl + BOOKMARK_FOLDERS_PATH);
-                }
-            }
-        });
-        bookmarkFolderSpinner = view.findViewById(R.id.bookmark_folder_spinner);
-        folderSpinnerAdapter = new FolderSpinnerAdapter(getActivity(), getResources(),
-                new ViewUtils.OnInputCompletedListener() {
-                    @Override
-                    public void onInputComplete(String folderName) {
-                        bookmarkFolderSpinner.dismissPopUp();
-                        bookmark(folderName);
-                    }
-                });
-        folderSpinnerAdapter.hideSpinner(true);
-        bookmarkFolderSpinner.setAdapter(folderSpinnerAdapter);
-        bookmarkFolderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> spinner, View view, int position, long itemId) {
-                if (position == 0) {
-                    return;
-                }
-                bookmark(folderSpinnerAdapter.getTag(position));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-            }
-        });
-    }
-
-    void bookmark(String folder) {
-        setBookmarkProgress(true);
-        examApiClient.bookmark(content.getId(), folder, "chaptercontent", "courses")
-                .enqueue(new TestpressCallback<Bookmark>() {
-                    @Override
-                    public void onSuccess(Bookmark bookmark) {
-                        content.setBookmarkId(bookmark.getId());
-                        contentDao.updateInTx(content);
-                        bookmarkButtonText.setText(R.string.testpress_remove_bookmark);
-                        bookmarkButtonImage.setImageResource(R.drawable.ic_remove_bookmark);
-                        setBookmarkProgress(false);
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        setBookmarkProgress(false);
-                        handleException(exception);
-                    }
-                });
-    }
-
-
     List<Content> getContentsFromDB() {
         return contentDao.queryBuilder()
                 .where(
@@ -307,7 +216,6 @@ abstract public class BaseContentDetailFragment extends Fragment {
         }
     }
 
-    abstract void hideContents();
 
     public void updateContent() {
         showLoadingProgress();
@@ -387,79 +295,6 @@ abstract public class BaseContentDetailFragment extends Fragment {
         }
     }
 
-    void setBookmarkProgress(boolean show) {
-        if (show) {
-            bookmarkButtonLayout.setVisibility(View.GONE);
-            animationView.setVisibility(View.VISIBLE);
-        } else {
-            animationView.setVisibility(View.GONE);
-            bookmarkButtonLayout.setVisibility(View.VISIBLE);
-        }
-    }
-
-    void deleteBookmark(Long bookmarkId) {
-        setBookmarkProgress(true);
-        examApiClient.deleteBookmark(bookmarkId)
-                .enqueue(new TestpressCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void data) {
-                        content.setBookmarkId(null);
-                        contentDao.updateInTx(content);
-                        bookmarkFolderSpinner.setSelection(0);
-                        bookmarkButtonText.setText(R.string.testpress_bookmark_this);
-                        bookmarkButtonImage.setImageResource(R.drawable.ic_bookmark);
-                        setBookmarkProgress(false);
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        setBookmarkProgress(false);
-                        handleException(exception);
-                    }
-                });
-    }
-
-    void loadBookmarkFolders(String url) {
-        setBookmarkProgress(true);
-        examApiClient.getBookmarkFolders(url)
-                .enqueue(new TestpressCallback<ApiResponse<FolderListResponse>>() {
-                    @Override
-                    public void onSuccess(ApiResponse<FolderListResponse> apiResponse) {
-                        bookmarkFolders.addAll(apiResponse.getResults().getFolders());
-                        if (apiResponse.getNext() != null) {
-                            loadBookmarkFolders(apiResponse.getNext());
-                        } else {
-                            addFoldersToSpinner(bookmarkFolders);
-                            setBookmarkProgress(false);
-                            bookmarkFolderSpinner.performClick();
-                        }
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        setBookmarkProgress(false);
-                        handleException(exception);
-                    }
-                });
-    }
-
-    void addFoldersToSpinner(List<BookmarkFolder> bookmarkFolders) {
-        folderSpinnerAdapter.clear();
-        folderSpinnerAdapter.addHeader("-- Select Folder --");
-        for (BookmarkFolder folder: bookmarkFolders) {
-            folderSpinnerAdapter.addItem(folder.getName(), folder.getName(), false, 0);
-        }
-        folderSpinnerAdapter.addItem(null, UNCATEGORIZED, false, 0);
-        folderSpinnerAdapter.notifyDataSetChanged();
-    }
-
-
-    abstract void loadContent();
-
-    abstract void onUpdateContent(Content content);
-
-    abstract void onCreateContentAttempt();
-
     public void createContentAttempt() {
         courseApiClient.createContentAttempt(content.getId())
             .enqueue(new TestpressCallback<CourseAttempt>() {
@@ -479,20 +314,34 @@ abstract public class BaseContentDetailFragment extends Fragment {
             });
     }
 
-    void handleException(TestpressException exception) {
-        if(exception.isUnauthenticated()) {
-            Snackbar.make(contentView, R.string.testpress_authentication_failed,
-                    Snackbar.LENGTH_SHORT).show();
-        } else if (exception.getCause() instanceof IOException) {
-            Snackbar.make(contentView, R.string.testpress_no_internet_connection,
-                    Snackbar.LENGTH_SHORT).show();
-        } else if (exception.isClientError()) {
-            Snackbar.make(contentView, R.string.testpress_folder_name_not_allowed,
-                    Snackbar.LENGTH_SHORT).show();
-        } else {
-            Snackbar.make(contentView, R.string.testpress_network_error,
-                    Snackbar.LENGTH_SHORT).show();
-        }
+    abstract void loadContent();
+
+    abstract void onUpdateContent(Content content);
+
+    abstract void onCreateContentAttempt();
+
+    abstract void hideContents();
+
+    @Override
+    public Long getBookmarkId() {
+        return content.getBookmarkId();
+    }
+
+    @Override
+    public Long getContentId() {
+        return content.getId();
+    }
+
+    @Override
+    public void onBookmarkSuccess(Long bookmarkId) {
+        content.setBookmarkId(bookmarkId);
+        contentDao.updateInTx(content);
+    }
+
+    @Override
+    public void onDeleteBookmarkSuccess() {
+        content.setBookmarkId(null);
+        contentDao.updateInTx(content);
     }
 
 }

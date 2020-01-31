@@ -57,7 +57,6 @@ public class ContentActivity extends BaseToolBarActivity {
         Bundle bundle = getIntent().getExtras();
 
         if (getContent() != null && getContent().getExamId() != null) {
-            Log.d("ContentActivity", "onCreate: examcontent");
             ExamContentFragment examContentFragment = new ExamContentFragment();
             examContentFragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction()
