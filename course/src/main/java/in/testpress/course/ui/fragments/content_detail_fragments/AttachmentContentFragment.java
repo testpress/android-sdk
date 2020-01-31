@@ -18,6 +18,7 @@ import in.testpress.course.R;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.AttachmentDao;
 import in.testpress.models.greendao.Content;
+import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.util.ViewUtils;
 
 public class AttachmentContentFragment extends BaseContentDetailFragment {
@@ -96,7 +97,7 @@ public class AttachmentContentFragment extends BaseContentDetailFragment {
     }
 
     @Override
-    void onCreateContentAttempt() {}
+    void onCreateContentAttempt(CourseAttempt courseAttempt) {}
 
     @Override
     void hideContents() {

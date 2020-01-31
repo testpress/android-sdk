@@ -16,6 +16,7 @@ import in.testpress.course.ui.fragments.ContentDetailFragment;
 import in.testpress.course.ui.fragments.content_detail_fragments.AttachmentContentFragment;
 import in.testpress.course.ui.fragments.content_detail_fragments.ExamContentFragment;
 import in.testpress.course.ui.fragments.content_detail_fragments.HtmlContentFragment;
+import in.testpress.course.ui.fragments.content_detail_fragments.VideoContentFragment;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.ui.BaseToolBarActivity;
@@ -70,6 +71,11 @@ public class ContentActivity extends BaseToolBarActivity {
                     .replace(R.id.fragment_container, htmlContentFragment).commitAllowingStateLoss();
         } else if (getContent() != null && getContent().getAttachmentId() != null) {
             AttachmentContentFragment fragment = new AttachmentContentFragment();
+            fragment.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, fragment).commitAllowingStateLoss();
+        } else if (getContent() != null && getContent().getVideoId() != null) {
+            VideoContentFragment fragment = new VideoContentFragment();
             fragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, fragment).commitAllowingStateLoss();

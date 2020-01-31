@@ -209,14 +209,6 @@ abstract public class BaseContentDetailFragment extends Fragment implements Book
     }
 
 
-    private void showLoadingProgress() {
-        if (!swipeRefresh.isRefreshing()) {
-            swipeRefresh.setVisibility(View.VISIBLE);
-            swipeRefresh.setRefreshing(true);
-        }
-    }
-
-
     public void updateContent() {
         showLoadingProgress();
         hideContents();
@@ -231,7 +223,8 @@ abstract public class BaseContentDetailFragment extends Fragment implements Book
             .enqueue(new TestpressCallback<Content>() {
                 @Override
                 public void onSuccess(Content fetchedContent) {
-                   onUpdateContent(fetchedContent);
+                    swipeRefresh.setRefreshing(false);
+                    onUpdateContent(fetchedContent);
                     if (chapterId != null) {
                         contents = getContentsFromDB();
                     }
@@ -255,7 +248,7 @@ abstract public class BaseContentDetailFragment extends Fragment implements Book
         retryButton.setVisibility(View.VISIBLE);
     }
 
-    private void handleError(TestpressException exception, final boolean onUpdateContent) {
+    protected void handleError(TestpressException exception, final boolean onUpdateContent) {
         if (exception.isForbidden()) {
             setEmptyText(R.string.permission_denied,
                     R.string.testpress_no_permission,
@@ -304,7 +297,7 @@ abstract public class BaseContentDetailFragment extends Fragment implements Book
             .enqueue(new TestpressCallback<CourseAttempt>() {
                 @Override
                 public void onSuccess(CourseAttempt courseAttempt) {
-                    onCreateContentAttempt();
+                    onCreateContentAttempt(courseAttempt);
                 }
 
                 @Override
@@ -318,11 +311,18 @@ abstract public class BaseContentDetailFragment extends Fragment implements Book
             });
     }
 
+    protected void showLoadingProgress() {
+        if (!swipeRefresh.isRefreshing()) {
+            swipeRefresh.setVisibility(View.VISIBLE);
+            swipeRefresh.setRefreshing(true);
+        }
+    }
+
     abstract void loadContent();
 
     abstract void onUpdateContent(Content content);
 
-    abstract void onCreateContentAttempt();
+    abstract void onCreateContentAttempt(CourseAttempt courseAttempt);
 
     abstract void hideContents();
 

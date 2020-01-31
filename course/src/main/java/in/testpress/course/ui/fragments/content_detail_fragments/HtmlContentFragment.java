@@ -15,6 +15,7 @@ import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.models.greendao.Content;
+import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.HtmlContentDao;
 import in.testpress.util.ViewUtils;
 import in.testpress.util.WebViewUtils;
@@ -109,7 +110,7 @@ public class HtmlContentFragment extends BaseContentDetailFragment {
     }
 
     @Override
-    void onCreateContentAttempt() {}
+    void onCreateContentAttempt(CourseAttempt courseAttempt) {}
 
     @Override
     void loadContent() {
