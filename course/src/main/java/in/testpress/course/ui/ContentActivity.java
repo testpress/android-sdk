@@ -579,6 +579,7 @@ public class ContentActivity extends BaseToolBarActivity {
         courseAttemptsFromDB.clear();
         if (content.getAttemptsCount() > 0) {
             attemptsUrl = content.getAttemptsUrl();
+            attemptsUrl = attemptsUrl.replace("v2.3", "v2.2.1");
             courseAttemptsFromNetwork.clear();
             loadAttempts(forceRefresh);
         } else {

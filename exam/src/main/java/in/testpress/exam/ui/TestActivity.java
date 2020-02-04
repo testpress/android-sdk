@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -450,8 +451,10 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                             if (isPartialQuestions) {
                                 data.put(IS_PARTIAL, true);
                             }
+                            String attemptsUrl = courseContent.getAttemptsUrl();
+                            attemptsUrl = attemptsUrl.replace("v2.3", "v2.2.1");
                             call = apiClient
-                                    .createContentAttempt(courseContent.getAttemptsUrl(), data);
+                                    .createContentAttempt(attemptsUrl, data);
                             createdNewAttempt = true;
                             break;
                         case END_ATTEMPT_LOADER:
