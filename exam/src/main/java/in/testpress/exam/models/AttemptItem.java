@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import in.testpress.models.greendao.AttemptSection;
@@ -94,6 +95,8 @@ public class AttemptItem implements Parcelable {
     }
 
     private boolean isSelectedAnswersSynced() {
+        Collections.sort(savedAnswers);
+        Collections.sort(selectedAnswers);
         return savedAnswers.equals(selectedAnswers);
     }
 
