@@ -93,10 +93,24 @@ public class AttemptItem implements Parcelable {
         return savedAnswers;
     }
 
+    private boolean isSelectedAnswersSynced() {
+        return savedAnswers.equals(selectedAnswers);
+    }
+
+    private boolean isMarkForReviewSynced() {
+        return getCurrentReview().equals(getReview());
+    }
+
+    private boolean isShortTextSynced() {
+        if (shortText != null && !shortText.isEmpty()) {
+            return shortText.equals(currentShortText);
+        }
+
+        return currentShortText == null;
+    }
+
     public Boolean hasChanged() {
-        return !savedAnswers.equals(selectedAnswers) || !getCurrentReview().equals(getReview())
-                || (shortText != null && !shortText.equals(currentShortText)) ||
-                (shortText == null && currentShortText != null && !currentShortText.isEmpty());
+        return !isSelectedAnswersSynced() || !isMarkForReviewSynced() || !isShortTextSynced();
     }
 
     /**
