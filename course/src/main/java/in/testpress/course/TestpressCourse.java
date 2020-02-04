@@ -97,6 +97,15 @@ public class TestpressCourse {
         return new CourseListFragment();
     }
 
+    public static MyCoursesFragment getMyCoursesFragment(@NonNull Context context,
+                                                            @NonNull TestpressSession testpressSession) {
+
+        Assert.assertNotNull("Context must not be null.", context);
+
+        init(context.getApplicationContext(), testpressSession);
+        return new MyCoursesFragment();
+    }
+
     /**
      * Show chapters of a specific course as new Activity.
      *
