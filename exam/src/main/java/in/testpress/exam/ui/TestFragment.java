@@ -787,11 +787,15 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     void endSection() {
         stopTimer();
         // Save attemptItem, if option or review is changed
-        final AttemptItem attemptItem = attemptItemList.get(pager.getCurrentItem());
-        if (attemptItem.hasChanged()) {
-            saveResult(pager.getCurrentItem(), Action.END_SECTION);
-            return;
+
+        if (!attemptItemList.isEmpty()) {
+            final AttemptItem attemptItem = attemptItemList.get(pager.getCurrentItem());
+            if (attemptItem.hasChanged()) {
+                saveResult(pager.getCurrentItem(), Action.END_SECTION);
+                return;
+            }
         }
+
         showProgress(R.string.testpress_ending_section);
         AttemptSection section = sections.get(currentSection);
         if (section.getState().equals(COMPLETED)) {
