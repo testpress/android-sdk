@@ -784,42 +784,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         }
     }
 
-    private void sendHeartBeat() {
-        heartBeatApiRequest = apiClient.heartbeat(attempt.getHeartBeatUrlFrag())
-                .enqueue(new TestpressCallback<Attempt>() {
-                    @Override
-                    public void onSuccess(Attempt attempt) {
-                        if (getActivity() == null) {
-                            return;
-                        }
-                        if (lockedSectionExam) {
-                            sections.set(currentSection, attempt.getSections().get(currentSection));
-                        }
-                        TestFragment.this.attempt = attempt;
-                        if (progressDialog.isShowing()) {
-                            startCountDownTimer(millisRemaining);
-                            progressDialog.dismiss();
-                        }
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        if (getActivity() == null) {
-                            return;
-                        }
-                        stopTimer();
-                        TestEngineAlertDialog alertDialogBuilder = new TestEngineAlertDialog(exception) {
-                            @Override
-                            protected void onRetry() {
-                                showProgress(R.string.testpress_please_wait);
-                                sendHeartBeat();
-                            }
-                        };
-                        heartBeatAlertDialog = alertDialogBuilder.show();
-                    }
-                });
-    }
-
     void endSection() {
         stopTimer();
         // Save attemptItem, if option or review is changed
@@ -1104,10 +1068,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
             public void onTick(long millisUntilFinished) {
                 updateTimeRemaining(millisUntilFinished);
-                long seconds = millisUntilFinished / 1000;
-                if ((seconds % 60) == 0 && (seconds / 60) != 0) {
-                    sendHeartBeat();
-                }
             }
 
             public void onFinish() {
