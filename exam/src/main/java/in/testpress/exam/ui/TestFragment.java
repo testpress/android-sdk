@@ -95,7 +95,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     private Content courseContent;
     private CourseAttempt courseAttempt;
     private int currentQuestionIndex;
-    int currentSectionPosition;
     List<AttemptSection> sections = new ArrayList<>();
     private TestQuestionsPager questionsResourcePager;
     List<AttemptItem> attemptItemList = new ArrayList<>();
@@ -146,18 +145,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         assert attempt != null;
         String questionUrl = attempt.getQuestionsUrlFrag();
         sections = attempt.getSections();
-        if (sections.size() > 1) {
-            for (int i = 0; i < sections.size(); i++) {
-                if (sections.get(i).getState().equals(RUNNING)) {
-                    currentSectionPosition = i;
-                }
-            }
-            if (sections.get(sections.size() - 1).getState().equals(COMPLETED)) {
-                currentSectionPosition = sections.size() - 1;
-            }
-            if (attempt.hasSectionalLock()) {
-                questionUrl = sections.get(currentSectionPosition).getQuestionsUrlFrag();
-            }
+        if (attempt.hasSectionalLock()) {
+            questionUrl = sections.get(attempt.getCurrentSectionPosition()).getQuestionsUrlFrag();
         }
         questionUrl = questionUrl.replace("v2.3", "v2.2.1");
         apiClient = new TestpressExamApiClient(getActivity());
@@ -197,10 +186,10 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                         return;
                     }
 
-                    if (position == currentSectionPosition) {
+                    if (position == attempt.getCurrentSectionPosition()) {
                         return;
                     }
-                    sectionsFilter.setSelection(currentSectionPosition);
+                    sectionsFilter.setSelection(attempt.getCurrentSectionPosition());
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
                             R.style.TestpressAppCompatAlertDialogStyle);
 
@@ -211,11 +200,11 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                         builder.setTitle(R.string.testpress_cannot_switch);
                         builder.setMessage(R.string.testpress_cannot_switch_section);
                         builder.setPositiveButton(getString(R.string.testpress_ok), null);
-                    } else if (currentSectionPosition > position) {
+                    } else if (attempt.getCurrentSectionPosition() > position) {
                         builder.setTitle(R.string.testpress_cannot_switch);
                         builder.setMessage(R.string.testpress_already_submitted);
                         builder.setPositiveButton(getString(R.string.testpress_ok), null);
-                    } else if (currentSectionPosition + 1 < position) {
+                    } else if (attempt.getCurrentSectionPosition() + 1 < position) {
                         builder.setTitle(R.string.testpress_cannot_switch);
                         builder.setMessage(R.string.testpress_attempt_sections_in_order);
                         builder.setPositiveButton(getString(R.string.testpress_ok), null);
@@ -237,8 +226,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                 public void onNothingSelected(AdapterView<?> adapterView) {
                 }
             });
-            sectionSpinnerAdapter.setSelectedItem(currentSectionPosition);
-            sectionsFilter.setSelection(currentSectionPosition);
+            sectionSpinnerAdapter.setSelectedItem(attempt.getCurrentSectionPosition());
+            sectionsFilter.setSelection(attempt.getCurrentSectionPosition());
             sectionsFilterContainer.setVisibility(View.VISIBLE);
         } else if (exam.getTemplateType() == 2 || attempt.hasNoSectionalLock()) {
             plainSpinnerAdapter = new PlainSpinnerItemAdapter(getActivity());
@@ -550,7 +539,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     public Loader<List<AttemptItem>> onCreateLoader(int id, final Bundle args) {
         if (attempt.hasSectionalLock()) {
             progressDialog.setMessage(getString(R.string.testpress_loading_section_questions,
-                    sections.get(currentSectionPosition).getName()));
+                    sections.get(attempt.getCurrentSectionPosition()).getName()));
 
             progressDialog.show();
         } else {
@@ -803,7 +792,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         }
 
         showProgress(R.string.testpress_ending_section);
-        AttemptSection section = sections.get(currentSectionPosition);
+        AttemptSection section = sections.get(attempt.getCurrentSectionPosition());
         if (section.getState().equals(COMPLETED)) {
             onSectionEnded();
             return;
@@ -815,7 +804,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                         if (getActivity() == null) {
                             return;
                         }
-                        sections.set(currentSectionPosition, attemptSection);
+                        sections.set(attempt.getCurrentSectionPosition(), attemptSection);
                         attempt.setSections(sections);
                         onSectionEnded();
                     }
@@ -833,20 +822,19 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     void onSectionEnded() {
-        currentSectionPosition = attempt.getCurrentSectionPosition();
-        if (currentSectionPosition == sections.size()) {
+        if (attempt.getCurrentSectionPosition() == sections.size()) {
             endExam();
         } else {
-            sectionSpinnerAdapter.setSelectedItem(currentSectionPosition);
+            sectionSpinnerAdapter.setSelectedItem(attempt.getCurrentSectionPosition());
             sectionSpinnerAdapter.notifyDataSetChanged();
-            sectionsFilter.setSelection(currentSectionPosition);
+            sectionsFilter.setSelection(attempt.getCurrentSectionPosition());
             startSection();
         }
     }
 
     void startSection() {
         showProgress(R.string.testpress_starting_section);
-        String sectionStartUrlFrag = sections.get(currentSectionPosition).getStartUrlFrag();
+        String sectionStartUrlFrag = sections.get(attempt.getCurrentSectionPosition()).getStartUrlFrag();
         startSectionApiRequest = apiClient.updateSection(sectionStartUrlFrag)
                 .enqueue(new TestpressCallback<AttemptSection>() {
                     @Override
@@ -854,7 +842,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                         if (getActivity() == null) {
                             return;
                         }
-                        sections.set(currentSectionPosition, section);
+                        sections.set(attempt.getCurrentSectionPosition(), section);
                         attempt.setSections(sections);
                         questionsResourcePager =
                                 new TestQuestionsPager(section.getQuestionsUrlFrag(), apiClient);
@@ -1039,7 +1027,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     void startCountDownTimer() {
         String remainingTime = attempt.getRemainingTime();
         if (attempt.hasSectionalLock()) {
-            AttemptSection section = sections.get(currentSectionPosition);
+            AttemptSection section = sections.get(attempt.getCurrentSectionPosition());
             if (section.getState().equals(NOT_STARTED)) {
                 startSection();
                 return;
