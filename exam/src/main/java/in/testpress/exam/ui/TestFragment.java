@@ -184,7 +184,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     private void initializeLanguageFilter() {
-        Spinner languageSpinner = getView().findViewById(R.id.language_spinner);
+        Spinner languagesFilter = getView().findViewById(R.id.language_spinner);
         final ArrayList<Language> languages = new ArrayList<>(exam.getRawLanguages());
         ExploreSpinnerAdapter languageSpinnerAdapter =
                 new ExploreSpinnerAdapter(getLayoutInflater(), getResources(), false);
@@ -193,8 +193,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             languageSpinnerAdapter.addItem(language.getCode(), language.getTitle(), true, 0);
         }
         languageSpinnerAdapter.hideSpinner(true);
-        languageSpinner.setAdapter(languageSpinnerAdapter);
-        languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        languagesFilter.setAdapter(languageSpinnerAdapter);
+        languagesFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 // Update existing object so that update will reflect in TestQuestionFragment also
@@ -219,9 +219,9 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             // Create new object so that we can update it without affecting original language list
             selectedLanguage = new Language(languages.get(selectedPosition));
             questionsListAdapter.setSelectedLanguage(selectedLanguage);
-            languageSpinner.setSelection(selectedPosition);
+            languagesFilter.setSelection(selectedPosition);
         }
-        languageSpinner.setVisibility(View.VISIBLE);
+        languagesFilter.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams layoutParams =
                 (RelativeLayout.LayoutParams) timer.getLayoutParams();
 
