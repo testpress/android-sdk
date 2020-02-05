@@ -219,6 +219,10 @@ public class AttemptSection implements android.os.Parcelable {
     public String getEndUrlFrag() {
         return CommonUtils.getUrlFrag(endUrl);
     }
+
+    public boolean hasDuration() {
+        return duration != null && !duration.equals("0:00:00");
+    }
     // KEEP METHODS END
 
 }

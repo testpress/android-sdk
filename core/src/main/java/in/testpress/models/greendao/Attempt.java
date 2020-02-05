@@ -537,6 +537,35 @@ public class Attempt implements android.os.Parcelable {
         }
         return 0;
     }
+
+    public boolean hasSectionalLock() {
+        if (getSections().size() < 2) {
+            return false;
+        }
+
+        for (AttemptSection attemptSection: getSections()) {
+            if (!attemptSection.hasDuration()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean hasNoSectionalLock() {
+        if (getSections().size() < 2) {
+            return false;
+        }
+
+        for (AttemptSection attemptSection: getSections()) {
+            if (!attemptSection.hasDuration()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // KEEP METHODS END
 
 }

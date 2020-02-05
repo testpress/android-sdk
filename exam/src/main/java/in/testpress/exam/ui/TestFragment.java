@@ -96,8 +96,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     private CourseAttempt courseAttempt;
     private int currentPosition;
     int currentSectionPosition;
-    boolean lockedSectionExam;
-    private boolean unlockedSectionExam;
     List<AttemptSection> sections = new ArrayList<>();
     private TestQuestionsPager questionsResourcePager;
     List<AttemptItem> attemptItemList = new ArrayList<>();
@@ -153,17 +151,11 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                 if (sections.get(i).getState().equals(RUNNING)) {
                     currentSectionPosition = i;
                 }
-                if (sections.get(i).getDuration() == null ||
-                        sections.get(i).getDuration().equals("0:00:00")) {
-
-                    unlockedSectionExam = true;
-                }
             }
             if (sections.get(sections.size() - 1).getState().equals(COMPLETED)) {
                 currentSectionPosition = sections.size() - 1;
             }
-            lockedSectionExam = !unlockedSectionExam;
-            if (lockedSectionExam) {
+            if (attempt.hasSectionalLock()) {
                 questionUrl = sections.get(currentSectionPosition).getQuestionsUrlFrag();
             }
         }
@@ -189,7 +181,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         questionsListAdapter = new TestPanelListAdapter(getLayoutInflater(), filterItems,
                 R.layout.testpress_test_panel_list_item);
 
-        if (lockedSectionExam) {
+        if (attempt.hasSectionalLock()) {
             sectionSpinnerAdapter = new LockableSpinnerItemAdapter(getActivity());
             for (AttemptSection section : sections) {
                 sectionSpinnerAdapter.addItem(section.getName(), section.getName(), true, 0);
@@ -248,7 +240,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             sectionSpinnerAdapter.setSelectedItem(currentSectionPosition);
             sectionsFilter.setSelection(currentSectionPosition);
             sectionsFilterContainer.setVisibility(View.VISIBLE);
-        } else if (exam.getTemplateType() == 2 || unlockedSectionExam) {
+        } else if (exam.getTemplateType() == 2 || attempt.hasNoSectionalLock()) {
             plainSpinnerAdapter = new PlainSpinnerItemAdapter(getActivity());
             sectionsFilter.setAdapter(plainSpinnerAdapter);
             sectionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -460,7 +452,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         if(plainSpinnerAdapter != null && plainSpinnerAdapter.getCount() > 1) {
             String currentSpinnerItem;
             AttemptItem currentAttemptItem = attemptItemList.get(viewPager.getCurrentItem());
-            if (unlockedSectionExam) {
+            if (attempt.hasNoSectionalLock()) {
                 currentSpinnerItem = currentAttemptItem.getAttemptSection().getName();
             } else {
                 currentSpinnerItem = currentAttemptItem.getAttemptQuestion().getSubject();
@@ -486,7 +478,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     private void updateNextButton(int position) {
         if ((position + 1) == attemptItemList.size()) {
             // Reached last question
-            if (lockedSectionExam) {
+            if (attempt.hasSectionalLock()) {
                 setEnable(false, next);
             } else {
                 next.setTextColor(ContextCompat.getColor(next.getContext(), R.color.testpress_red));
@@ -510,7 +502,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                         .setTitle(R.string.testpress_end_title)
                         .setMessage(R.string.testpress_end_message);
 
-        if (!lockedSectionExam) {
+        if (attempt.hasNoSectionalLock()) {
             dialogBuilder
                     .setPositiveButton(R.string.testpress_end, new DialogInterface.OnClickListener() {
                         @Override
@@ -556,7 +548,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     @NonNull
     @Override
     public Loader<List<AttemptItem>> onCreateLoader(int id, final Bundle args) {
-        if (lockedSectionExam) {
+        if (attempt.hasSectionalLock()) {
             progressDialog.setMessage(getString(R.string.testpress_loading_section_questions,
                     sections.get(currentSectionPosition).getName()));
 
@@ -649,12 +641,12 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             endExam();
             return;
         }
-        if (sections.size() <= 1 && exam.getTemplateType() == 2 || unlockedSectionExam) {
+        if (sections.size() <= 1 && exam.getTemplateType() == 2 || attempt.hasNoSectionalLock()) {
             // Used to get items in order as it fetched
             List<String> spinnerItemsList = new ArrayList<>();
             HashMap<String, List<AttemptItem>> groupedAttemptItems = new HashMap<>();
             for (AttemptItem attemptItem : attemptItemList) {
-                if (unlockedSectionExam) {
+                if (attempt.hasNoSectionalLock()) {
                     String section = attemptItem.getAttemptSection().getName();
                     groupAttemptItems(section, attemptItem, spinnerItemsList, groupedAttemptItems);
                 } else {
@@ -1046,7 +1038,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
     void startCountDownTimer() {
         String remainingTime = attempt.getRemainingTime();
-        if (lockedSectionExam) {
+        if (attempt.hasSectionalLock()) {
             AttemptSection section = sections.get(currentSectionPosition);
             if (section.getState().equals(NOT_STARTED)) {
                 startSection();
@@ -1056,7 +1048,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         }
         long millisRemainingFetchedInAttempt = formatMillisecond(remainingTime);
 
-        millisRemaining = evaluateRemainingMillisecond(lockedSectionExam, millisRemaining, millisRemainingFetchedInAttempt);
+        millisRemaining = evaluateRemainingMillisecond(attempt.hasSectionalLock(), millisRemaining, millisRemainingFetchedInAttempt);
 
         if (millisRemaining == 0) {
             onRemainingTimeOver();
@@ -1161,7 +1153,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     void onRemainingTimeOver() {
-        if (lockedSectionExam) {
+        if (attempt.hasSectionalLock()) {
             endSection();
         } else {
             endExam();
