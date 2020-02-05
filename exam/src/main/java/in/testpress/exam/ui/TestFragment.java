@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -42,6 +41,7 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.network.TestQuestionsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.ui.loaders.AttemptItemsLoader;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.AttemptSection;
@@ -61,7 +61,6 @@ import static in.testpress.exam.ui.TestActivity.PARAM_COURSE_ATTEMPT;
 import static in.testpress.exam.ui.TestActivity.PARAM_COURSE_CONTENT;
 import static in.testpress.models.greendao.Attempt.COMPLETED;
 import static in.testpress.models.greendao.Attempt.NOT_STARTED;
-import static in.testpress.models.greendao.Attempt.RUNNING;
 
 public class TestFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>> {
 
@@ -96,7 +95,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     private CourseAttempt courseAttempt;
     private int currentQuestionIndex;
     List<AttemptSection> sections = new ArrayList<>();
-    private TestQuestionsPager questionsResourcePager;
+    public TestQuestionsPager questionsResourcePager;
     List<AttemptItem> attemptItemList = new ArrayList<>();
     CountDownTimer countDownTimer;
     long millisRemaining = -1;
@@ -560,24 +559,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             showProgress(R.string.testpress_loading_questions);
         }
         return new AttemptItemsLoader(getActivity(), this);
-    }
-
-    private static class AttemptItemsLoader extends ThrowableLoader<List<AttemptItem>> {
-
-        private TestFragment fragment;
-
-        AttemptItemsLoader(Context context, TestFragment fragment) {
-            super(context, null);
-            this.fragment = fragment;
-        }
-
-        @Override
-        public List<AttemptItem> loadData() throws TestpressException {
-            do {
-                fragment.questionsResourcePager.next();
-            } while (fragment.questionsResourcePager.hasNext());
-            return fragment.questionsResourcePager.getResources();
-        }
     }
 
     @Override
