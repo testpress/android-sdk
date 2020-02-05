@@ -172,10 +172,64 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         bindViews();
         initializeProgressDialog();
         initializeListeners();
+        initializeQuestionsListAdapter();
 
-        questionsListAdapter = new TestPanelListAdapter(getLayoutInflater(), filterItems,
-                R.layout.testpress_test_panel_list_item);
+        if (attempt.hasSections()) {
+            initializeSectionsFilter();
+        }
 
+        if (exam.hasMultipleLanguages()) {
+            initializeLanguageFilter();
+        }
+    }
+
+    private void initializeLanguageFilter() {
+        Spinner languageSpinner = getView().findViewById(R.id.language_spinner);
+        final ArrayList<Language> languages = new ArrayList<>(exam.getRawLanguages());
+        ExploreSpinnerAdapter languageSpinnerAdapter =
+                new ExploreSpinnerAdapter(getLayoutInflater(), getResources(), false);
+
+        for (Language language : languages) {
+            languageSpinnerAdapter.addItem(language.getCode(), language.getTitle(), true, 0);
+        }
+        languageSpinnerAdapter.hideSpinner(true);
+        languageSpinner.setAdapter(languageSpinnerAdapter);
+        languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Update existing object so that update will reflect in TestQuestionFragment also
+                selectedLanguage.update(languages.get(position));
+                exam.setSelectedLanguage(selectedLanguage.getCode());
+                if (viewPagerAdapter != null) {
+                    viewPagerAdapter.notifyDataSetChanged();
+
+                }
+                questionsListAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+        String selectedLanguageCode = exam.getSelectedLanguage();
+        if (selectedLanguageCode != null && !selectedLanguageCode.isEmpty()) {
+            int selectedPosition =
+                    languageSpinnerAdapter.getItemPositionFromTag(selectedLanguageCode);
+
+            // Create new object so that we can update it without affecting original language list
+            selectedLanguage = new Language(languages.get(selectedPosition));
+            questionsListAdapter.setSelectedLanguage(selectedLanguage);
+            languageSpinner.setSelection(selectedPosition);
+        }
+        languageSpinner.setVisibility(View.VISIBLE);
+        RelativeLayout.LayoutParams layoutParams =
+                (RelativeLayout.LayoutParams) timer.getLayoutParams();
+
+        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
+    }
+
+    private void initializeSectionsFilter() {
         if (attempt.hasSectionalLock()) {
             sectionSpinnerAdapter = new LockableSpinnerItemAdapter(getActivity());
             for (AttemptSection section : sections) {
@@ -223,7 +277,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         endSection();
                                     }
-                        });
+                                });
                     }
                     sectionSwitchAlertDialog = builder.show();
                 }
@@ -263,58 +317,11 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                 }
             });
         }
-        Spinner languageSpinner = view.findViewById(R.id.language_spinner);
-        final ArrayList<Language> languages = new ArrayList<>(exam.getRawLanguages());
-        if (languages.size() > 1) {
-            ExploreSpinnerAdapter languageSpinnerAdapter =
-                    new ExploreSpinnerAdapter(getLayoutInflater(), getResources(), false);
+    }
 
-            for (Language language : languages) {
-                languageSpinnerAdapter.addItem(language.getCode(), language.getTitle(), true, 0);
-            }
-            languageSpinnerAdapter.hideSpinner(true);
-            languageSpinner.setAdapter(languageSpinnerAdapter);
-            languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    // Update existing object so that update will reflect in TestQuestionFragment also
-                    selectedLanguage.update(languages.get(position));
-                    exam.setSelectedLanguage(selectedLanguage.getCode());
-                    if (viewPagerAdapter != null) {
-                        viewPagerAdapter.notifyDataSetChanged();
-
-                    }
-                    questionsListAdapter.notifyDataSetChanged();
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                }
-            });
-            String selectedLanguageCode = exam.getSelectedLanguage();
-            if (selectedLanguageCode != null && !selectedLanguageCode.isEmpty()) {
-                int selectedPosition =
-                        languageSpinnerAdapter.getItemPositionFromTag(selectedLanguageCode);
-
-                // Create new object so that we can update it without affecting original language list
-                selectedLanguage = new Language(languages.get(selectedPosition));
-                questionsListAdapter.setSelectedLanguage(selectedLanguage);
-                languageSpinner.setSelection(selectedPosition);
-            }
-            languageSpinner.setVisibility(View.VISIBLE);
-            RelativeLayout.LayoutParams layoutParams =
-                    (RelativeLayout.LayoutParams) timer.getLayoutParams();
-
-            layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
-        } else {
-            languageSpinner.setVisibility(View.GONE);
-            RelativeLayout.LayoutParams layoutParams =
-                    (RelativeLayout.LayoutParams) timer.getLayoutParams();
-
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
-        }
+    private void initializeQuestionsListAdapter() {
+        questionsListAdapter = new TestPanelListAdapter(getLayoutInflater(), filterItems,
+                R.layout.testpress_test_panel_list_item);
     }
 
     private void bindViews() {
@@ -410,6 +417,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             }
         });
     }
+    
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);

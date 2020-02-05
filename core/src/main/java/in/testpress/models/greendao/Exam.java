@@ -698,6 +698,10 @@ public class Exam implements android.os.Parcelable {
         }
         return getLanguages();
     }
+
+    public boolean hasMultipleLanguages() {
+        return getRawLanguages().size() > 1;
+    }
     // KEEP METHODS END
 
 }

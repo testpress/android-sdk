@@ -566,6 +566,9 @@ public class Attempt implements android.os.Parcelable {
         return false;
     }
 
+    public boolean hasSections() {
+        return getSections().size() > 1;
+    }
     // KEEP METHODS END
 
 }
