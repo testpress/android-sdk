@@ -128,8 +128,11 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initializeAttemptAndExamVariables(savedInstanceState);
+        initializeResourcePager();
+    }
 
-        assert getArguments() != null;
+    private void initializeAttemptAndExamVariables(Bundle savedInstanceState) {
         courseContent = getArguments().getParcelable(PARAM_COURSE_CONTENT);
         if (courseContent != null) {
             courseAttempt = getArguments().getParcelable(PARAM_COURSE_ATTEMPT);
@@ -139,12 +142,15 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             attempt = getArguments().getParcelable(PARAM_ATTEMPT);
             exam = getArguments().getParcelable(PARAM_EXAM);
         }
+
         if (savedInstanceState != null && savedInstanceState.getParcelable(PARAM_ATTEMPT) != null) {
             attempt = savedInstanceState.getParcelable(PARAM_ATTEMPT);
         }
-        assert attempt != null;
-        String questionUrl = attempt.getQuestionsUrlFrag();
         sections = attempt.getSections();
+    }
+
+    private void initializeResourcePager() {
+        String questionUrl = attempt.getQuestionsUrlFrag();
         if (attempt.hasSectionalLock()) {
             questionUrl = sections.get(attempt.getCurrentSectionPosition()).getQuestionsUrlFrag();
         }
