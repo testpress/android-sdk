@@ -176,92 +176,16 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.testpress_fragment_test_engine, container, false);
-        previous = view.findViewById(R.id.previous);
-        next = view.findViewById(R.id.next);
-        questionsListView = view.findViewById(R.id.questions_list);
-        timer = view.findViewById(R.id.timer);
-        questionsFilter = view.findViewById(R.id.questions_filter);
-        sectionsFilter = view.findViewById(R.id.primary_questions_filter);
-        sectionsFilterContainer = view.findViewById(R.id.questions_filter_container);
-        viewPager = view.findViewById(R.id.pager);
-        slidingPaneLayout = view.findViewById(R.id.sliding_layout);
-        progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage(getResources().getString(R.string.testpress_loading_questions));
-        progressDialog.setCancelable(false);
-        UIUtils.setIndeterminateDrawable(getActivity(), progressDialog, 4);
-        previous.setVisibility(View.VISIBLE);
-        next.setVisibility(View.VISIBLE);
-        slidingPaneLayout.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
-            @Override
-            public void onPanelSlide(@NonNull View panel, float slideOffset) {
-            }
+        return inflater.inflate(R.layout.testpress_fragment_test_engine, container, false);
+    }
 
-            @Override
-            public void onPanelOpened(@NonNull View panel) {
-                onExpandPanel();
-            }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        bindViews();
+        initializeProgressDialog();
+        initializeListeners();
 
-            @Override
-            public void onPanelClosed(@NonNull View panel) {
-                viewPager.setSwipeEnabled(true);
-                previous.setVisibility(View.VISIBLE);
-                next.setVisibility(View.VISIBLE);
-            }
-        });
-        viewPager.setSwipeEnabled(true);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                goToQuestion(position, true);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
-        view.findViewById(R.id.question_list).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openPanel();
-            }
-        });
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showNextQuestion();
-            }
-        });
-        questionsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                int index = ((AttemptItem) questionsListView.getItemAtPosition(position)).getIndex();
-                viewPager.setCurrentItem(index - 1);
-            }
-        });
-        previous.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showPreviousQuestion();
-            }
-        });
-        view.findViewById(R.id.exit_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                endExamAlert();
-            }
-        });
-        ViewUtils.setDrawableColor(timer, R.color.testpress_actionbar_text);
-        timer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showPauseExamAlert();
-            }
-        });
         questionsListAdapter = new TestPanelListAdapter(getLayoutInflater(), filterItems,
                 R.layout.testpress_test_panel_list_item);
 
@@ -404,9 +328,101 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
         }
-        return view;
     }
 
+    private void bindViews() {
+        View view = getView();
+        previous = view.findViewById(R.id.previous);
+        next = view.findViewById(R.id.next);
+        questionsListView = view.findViewById(R.id.questions_list);
+        timer = view.findViewById(R.id.timer);
+        ViewUtils.setDrawableColor(timer, R.color.testpress_actionbar_text);
+        questionsFilter = view.findViewById(R.id.questions_filter);
+        sectionsFilter = view.findViewById(R.id.primary_questions_filter);
+        sectionsFilterContainer = view.findViewById(R.id.questions_filter_container);
+        viewPager = view.findViewById(R.id.pager);
+        viewPager.setSwipeEnabled(true);
+        slidingPaneLayout = view.findViewById(R.id.sliding_layout);
+    }
+
+    private void initializeProgressDialog() {
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage(getResources().getString(R.string.testpress_loading_questions));
+        progressDialog.setCancelable(false);
+        UIUtils.setIndeterminateDrawable(getActivity(), progressDialog, 4);
+    }
+
+    private void initializeListeners() {
+        View view = getView();
+        slidingPaneLayout.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(@NonNull View panel, float slideOffset) {
+            }
+
+            @Override
+            public void onPanelOpened(@NonNull View panel) {
+                onExpandPanel();
+            }
+
+            @Override
+            public void onPanelClosed(@NonNull View panel) {
+                viewPager.setSwipeEnabled(true);
+                previous.setVisibility(View.VISIBLE);
+                next.setVisibility(View.VISIBLE);
+            }
+        });
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                goToQuestion(position, true);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+        view.findViewById(R.id.question_list).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openPanel();
+            }
+        });
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showNextQuestion();
+            }
+        });
+        questionsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                int index = ((AttemptItem) questionsListView.getItemAtPosition(position)).getIndex();
+                viewPager.setCurrentItem(index - 1);
+            }
+        });
+        previous.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPreviousQuestion();
+            }
+        });
+        view.findViewById(R.id.exit_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                endExamAlert();
+            }
+        });
+        timer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPauseExamAlert();
+            }
+        });
+    }
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
