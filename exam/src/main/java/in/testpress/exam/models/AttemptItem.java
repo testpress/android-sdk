@@ -105,11 +105,11 @@ public class AttemptItem implements Parcelable {
     }
 
     private boolean isShortTextSynced() {
-        if (shortText != null && !shortText.isEmpty()) {
+        if (shortText != null) {
             return shortText.equals(currentShortText);
         }
 
-        return currentShortText == null;
+        return currentShortText == shortText;
     }
 
     public Boolean hasChanged() {
