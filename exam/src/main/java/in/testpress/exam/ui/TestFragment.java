@@ -94,7 +94,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     private Exam exam;
     private Content courseContent;
     private CourseAttempt courseAttempt;
-    private int currentPosition;
+    private int currentQuestionIndex;
     int currentSectionPosition;
     List<AttemptSection> sections = new ArrayList<>();
     private TestQuestionsPager questionsResourcePager;
@@ -442,9 +442,9 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             return;
         }
         if (saveCurrentOptions) {
-            saveResult(currentPosition, Action.UPDATE_ANSWER);
+            saveResult(currentQuestionIndex, Action.UPDATE_ANSWER);
         }
-        currentPosition = position;
+        currentQuestionIndex = position;
         questionsListAdapter.setCurrentAttemptItemIndex(position + 1);
         if (slidingPaneLayout.isOpen()) {
             slidingPaneLayout.closePane();
@@ -1287,7 +1287,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     @Override
     public void onStop() {
         super.onStop();
-        saveResult(currentPosition, Action.UPDATE_ANSWER);
+        saveResult(currentQuestionIndex, Action.UPDATE_ANSWER);
         appBackgroundStateHandler = new Handler();
         appBackgroundStateHandler.postDelayed(stopTimerTask, APP_BACKGROUND_DELAY);
     }
