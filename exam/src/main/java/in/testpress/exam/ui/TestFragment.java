@@ -417,7 +417,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             }
         });
     }
-    
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
