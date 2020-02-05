@@ -182,7 +182,7 @@ public class TestFragmentTest {
         fragment.currentSection = currentSectionPosition;
         when(sections.size()).thenReturn(currentSectionPosition + 2);
 
-        fragment.primaryQuestionsFilter = mock(Spinner.class);
+        fragment.sectionsFilter = mock(Spinner.class);
         fragment.sectionSpinnerAdapter = mock(LockableSpinnerItemAdapter.class);
 
         doCallRealMethod().when(fragment).onSectionEnded();

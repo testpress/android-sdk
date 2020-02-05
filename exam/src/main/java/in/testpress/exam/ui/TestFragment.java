@@ -13,14 +13,12 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,13 +75,13 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     private TextView next;
     private ListView questionsListView;
     private TextView timer;
-    private Spinner panelQuestionsFilter;
-    Spinner primaryQuestionsFilter;
-    private RelativeLayout questionFilterContainer;
-    private NonSwipeableViewPager pager;
-    private TestQuestionPagerAdapter pagerAdapter;
+    private Spinner questionsFilter;
+    Spinner sectionsFilter;
+    private RelativeLayout sectionsFilterContainer;
+    private NonSwipeableViewPager viewPager;
+    private TestQuestionPagerAdapter viewPagerAdapter;
     private List<AttemptItem> filterItems = new ArrayList<>();
-    private TestPanelListAdapter panelListAdapter;
+    private TestPanelListAdapter questionsListAdapter;
     private ProgressDialog progressDialog;
     private AlertDialog endExamAlertDialog;
     private AlertDialog pauseExamAlertDialog;
@@ -101,7 +99,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     boolean lockedSectionExam;
     private boolean unlockedSectionExam;
     List<AttemptSection> sections = new ArrayList<>();
-    private TestQuestionsPager questionsPager;
+    private TestQuestionsPager questionsResourcePager;
     List<AttemptItem> attemptItemList = new ArrayList<>();
     CountDownTimer countDownTimer;
     long millisRemaining = -1;
@@ -171,7 +169,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         }
         questionUrl = questionUrl.replace("v2.3", "v2.2.1");
         apiClient = new TestpressExamApiClient(getActivity());
-        questionsPager = new TestQuestionsPager(questionUrl, apiClient);
+        questionsResourcePager = new TestQuestionsPager(questionUrl, apiClient);
     }
 
     @Override
@@ -183,10 +181,10 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         next = view.findViewById(R.id.next);
         questionsListView = view.findViewById(R.id.questions_list);
         timer = view.findViewById(R.id.timer);
-        panelQuestionsFilter = view.findViewById(R.id.questions_filter);
-        primaryQuestionsFilter = view.findViewById(R.id.primary_questions_filter);
-        questionFilterContainer = view.findViewById(R.id.questions_filter_container);
-        pager = view.findViewById(R.id.pager);
+        questionsFilter = view.findViewById(R.id.questions_filter);
+        sectionsFilter = view.findViewById(R.id.primary_questions_filter);
+        sectionsFilterContainer = view.findViewById(R.id.questions_filter_container);
+        viewPager = view.findViewById(R.id.pager);
         slidingPaneLayout = view.findViewById(R.id.sliding_layout);
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage(getResources().getString(R.string.testpress_loading_questions));
@@ -206,13 +204,13 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
             @Override
             public void onPanelClosed(@NonNull View panel) {
-                pager.setSwipeEnabled(true);
+                viewPager.setSwipeEnabled(true);
                 previous.setVisibility(View.VISIBLE);
                 next.setVisibility(View.VISIBLE);
             }
         });
-        pager.setSwipeEnabled(true);
-        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        viewPager.setSwipeEnabled(true);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             }
@@ -242,7 +240,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 int index = ((AttemptItem) questionsListView.getItemAtPosition(position)).getIndex();
-                pager.setCurrentItem(index - 1);
+                viewPager.setCurrentItem(index - 1);
             }
         });
         previous.setOnClickListener(new View.OnClickListener() {
@@ -264,7 +262,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                 showPauseExamAlert();
             }
         });
-        panelListAdapter = new TestPanelListAdapter(getLayoutInflater(), filterItems,
+        questionsListAdapter = new TestPanelListAdapter(getLayoutInflater(), filterItems,
                 R.layout.testpress_test_panel_list_item);
 
         if (lockedSectionExam) {
@@ -272,8 +270,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             for (AttemptSection section : sections) {
                 sectionSpinnerAdapter.addItem(section.getName(), section.getName(), true, 0);
             }
-            primaryQuestionsFilter.setAdapter(sectionSpinnerAdapter);
-            primaryQuestionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            sectionsFilter.setAdapter(sectionSpinnerAdapter);
+            sectionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> spinner, View view, int position,
                                            long itemId) {
@@ -286,7 +284,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                     if (position == currentSection) {
                         return;
                     }
-                    primaryQuestionsFilter.setSelection(currentSection);
+                    sectionsFilter.setSelection(currentSection);
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
                             R.style.TestpressAppCompatAlertDialogStyle);
 
@@ -324,12 +322,12 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                 }
             });
             sectionSpinnerAdapter.setSelectedItem(currentSection);
-            primaryQuestionsFilter.setSelection(currentSection);
-            questionFilterContainer.setVisibility(View.VISIBLE);
+            sectionsFilter.setSelection(currentSection);
+            sectionsFilterContainer.setVisibility(View.VISIBLE);
         } else if (exam.getTemplateType() == 2 || unlockedSectionExam) {
             plainSpinnerAdapter = new PlainSpinnerItemAdapter(getActivity());
-            primaryQuestionsFilter.setAdapter(plainSpinnerAdapter);
-            primaryQuestionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            sectionsFilter.setAdapter(plainSpinnerAdapter);
+            sectionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> spinner, View view, int position,
                                            long itemId) {
@@ -345,7 +343,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                         navigationButtonPressed = false;
                     } else {
                         // Spinner item changed by selecting subject/section in spinner
-                        pager.setCurrentItem(plainSpinnerItemOffsets.get(selectedSpinnerItem));
+                        viewPager.setCurrentItem(plainSpinnerItemOffsets.get(selectedSpinnerItem));
                     }
                 }
 
@@ -371,11 +369,11 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                     // Update existing object so that update will reflect in TestQuestionFragment also
                     selectedLanguage.update(languages.get(position));
                     exam.setSelectedLanguage(selectedLanguage.getCode());
-                    if (pagerAdapter != null) {
-                        pagerAdapter.notifyDataSetChanged();
+                    if (viewPagerAdapter != null) {
+                        viewPagerAdapter.notifyDataSetChanged();
 
                     }
-                    panelListAdapter.notifyDataSetChanged();
+                    questionsListAdapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -389,7 +387,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
                 // Create new object so that we can update it without affecting original language list
                 selectedLanguage = new Language(languages.get(selectedPosition));
-                panelListAdapter.setSelectedLanguage(selectedLanguage);
+                questionsListAdapter.setSelectedLanguage(selectedLanguage);
                 languageSpinner.setSelection(selectedPosition);
             }
             languageSpinner.setVisibility(View.VISIBLE);
@@ -426,8 +424,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     private void showNextQuestion() {
         if (next.getText().equals(getResources().getString(R.string.testpress_end))) {
             endExamAlert();
-        } else if (pager.getCurrentItem() < (pagerAdapter.getCount() - 1)) {
-            pager.setCurrentItem(pager.getCurrentItem() + 1);
+        } else if (viewPager.getCurrentItem() < (viewPagerAdapter.getCount() - 1)) {
+            viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
         }
     }
 
@@ -439,13 +437,13 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             saveResult(currentPosition, Action.UPDATE_ANSWER);
         }
         currentPosition = position;
-        panelListAdapter.setCurrentAttemptItemIndex(position + 1);
+        questionsListAdapter.setCurrentAttemptItemIndex(position + 1);
         if (slidingPaneLayout.isOpen()) {
             slidingPaneLayout.closePane();
         }
         if(plainSpinnerAdapter != null && plainSpinnerAdapter.getCount() > 1) {
             String currentSpinnerItem;
-            AttemptItem currentAttemptItem = attemptItemList.get(pager.getCurrentItem());
+            AttemptItem currentAttemptItem = attemptItemList.get(viewPager.getCurrentItem());
             if (unlockedSectionExam) {
                 currentSpinnerItem = currentAttemptItem.getAttemptSection().getName();
             } else {
@@ -454,7 +452,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             if (selectedPlainSpinnerItemOffset != plainSpinnerItemOffsets.get(currentSpinnerItem)) {
                 //  Navigated to prev subject, so change the spinner item
                 navigationButtonPressed = true;
-                primaryQuestionsFilter
+                sectionsFilter
                         .setSelection(plainSpinnerAdapter.getItemPosition(currentSpinnerItem));
             }
         }
@@ -485,8 +483,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     private void showPreviousQuestion() {
-        if (pager.getCurrentItem() != 0) {
-            pager.setCurrentItem(pager.getCurrentItem() - 1);
+        if (viewPager.getCurrentItem() != 0) {
+            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
         }
     }
 
@@ -536,7 +534,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
     void pauseExam() {
         stopTimer();
-        saveResult(pager.getCurrentItem(), Action.PAUSE);
+        saveResult(viewPager.getCurrentItem(), Action.PAUSE);
     }
 
     @NonNull
@@ -565,9 +563,9 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         @Override
         public List<AttemptItem> loadData() throws TestpressException {
             do {
-                fragment.questionsPager.next();
-            } while (fragment.questionsPager.hasNext());
-            return fragment.questionsPager.getResources();
+                fragment.questionsResourcePager.next();
+            } while (fragment.questionsResourcePager.hasNext());
+            return fragment.questionsResourcePager.getResources();
         }
     }
 
@@ -664,23 +662,23 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                     plainSpinnerAdapter.addItem(spinnerItem, spinnerItem, true, 0);
                 }
                 plainSpinnerAdapter.notifyDataSetChanged();
-                primaryQuestionsFilter.setSelection(0); // Set 1st item as default selection
-                questionFilterContainer.setVisibility(View.VISIBLE);
+                sectionsFilter.setSelection(0); // Set 1st item as default selection
+                sectionsFilterContainer.setVisibility(View.VISIBLE);
                 selectedPlainSpinnerItemOffset = 0;
             }
         }
 
-        pagerAdapter =
+        viewPagerAdapter =
                 new TestQuestionPagerAdapter(getFragmentManager(), attemptItemList, selectedLanguage);
 
-        pager.setAdapter(pagerAdapter);
+        viewPager.setAdapter(viewPagerAdapter);
         for (int i = 0; i< attemptItemList.size(); i++) {
             attemptItemList.get(i).setIndex(i + 1);
         }
-        panelListAdapter.setItems(attemptItemList);
-        questionsListView.setAdapter(panelListAdapter);
-        if (pager.getCurrentItem() != 0) {
-            pager.setCurrentItem(0);
+        questionsListAdapter.setItems(attemptItemList);
+        questionsListView.setAdapter(questionsListAdapter);
+        if (viewPager.getCurrentItem() != 0) {
+            viewPager.setCurrentItem(0);
         } else {
             goToQuestion(0, false);
         }
@@ -789,9 +787,9 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         // Save attemptItem, if option or review is changed
 
         if (!attemptItemList.isEmpty()) {
-            final AttemptItem attemptItem = attemptItemList.get(pager.getCurrentItem());
+            final AttemptItem attemptItem = attemptItemList.get(viewPager.getCurrentItem());
             if (attemptItem.hasChanged()) {
-                saveResult(pager.getCurrentItem(), Action.END_SECTION);
+                saveResult(viewPager.getCurrentItem(), Action.END_SECTION);
                 return;
             }
         }
@@ -831,7 +829,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         } else {
             sectionSpinnerAdapter.setSelectedItem(currentSection);
             sectionSpinnerAdapter.notifyDataSetChanged();
-            primaryQuestionsFilter.setSelection(currentSection);
+            sectionsFilter.setSelection(currentSection);
             startSection();
         }
     }
@@ -847,7 +845,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             return;
                         }
                         sections.set(currentSection, section);
-                        questionsPager =
+                        questionsResourcePager =
                                 new TestQuestionsPager(section.getQuestionsUrlFrag(), apiClient);
 
                         attemptItemList.clear();
@@ -869,8 +867,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     void endExam() {
         stopTimer();
         // Save attemptItem, if option or review is changed
-        if (!attemptItemList.isEmpty() && attemptItemList.get(pager.getCurrentItem()).hasChanged()) {
-            saveResult(pager.getCurrentItem(), Action.END);
+        if (!attemptItemList.isEmpty() && attemptItemList.get(viewPager.getCurrentItem()).hasChanged()) {
+            saveResult(viewPager.getCurrentItem(), Action.END);
             return;
         }
         showProgress(R.string.testpress_ending_exam);
@@ -953,24 +951,24 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     private void onExpandPanel() {
-        if (!attemptItemList.isEmpty() && attemptItemList.get(pager.getCurrentItem()).hasChanged()) {
-            saveResult(pager.getCurrentItem(), Action.UPDATE_ANSWER);
+        if (!attemptItemList.isEmpty() && attemptItemList.get(viewPager.getCurrentItem()).hasChanged()) {
+            saveResult(viewPager.getCurrentItem(), Action.UPDATE_ANSWER);
         }
-        pager.setSwipeEnabled(false);
+        viewPager.setSwipeEnabled(false);
         previous.setVisibility(View.INVISIBLE);
         next.setVisibility(View.INVISIBLE);
         updatePanel();
     }
 
     private void updatePanel() {
-        if (panelQuestionsFilter.getAdapter() == null) {
+        if (questionsFilter.getAdapter() == null) {
             String[] types = {"All", "Answered", "Unanswered", "Marked for review"};
             ExploreSpinnerAdapter typeSpinnerAdapter = new ExploreSpinnerAdapter(
                     getLayoutInflater(), getResources(), false);
 
             typeSpinnerAdapter.addItems(Arrays.asList(types));
-            panelQuestionsFilter.setAdapter(typeSpinnerAdapter);
-            panelQuestionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            questionsFilter.setAdapter(typeSpinnerAdapter);
+            questionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
                     filterQuestions(position);
@@ -980,10 +978,10 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                 public void onNothingSelected(AdapterView<?> adapterView) {
                 }
             });
-        } else if (panelQuestionsFilter.getSelectedItemPosition() != 0) {
-            filterQuestions(panelQuestionsFilter.getSelectedItemPosition());
+        } else if (questionsFilter.getSelectedItemPosition() != 0) {
+            filterQuestions(questionsFilter.getSelectedItemPosition());
         } else {
-            panelListAdapter.notifyDataSetChanged();
+            questionsListAdapter.notifyDataSetChanged();
         }
     }
 
@@ -1024,7 +1022,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                 filterItems = attemptItemList;
                 break;
         }
-        panelListAdapter.setItems(filterItems.toArray());
+        questionsListAdapter.setItems(filterItems.toArray());
     }
 
     void startCountDownTimer() {
