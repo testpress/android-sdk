@@ -516,6 +516,27 @@ public class Attempt implements android.os.Parcelable {
     public String getHeartBeatUrlFrag() {
         return getUrlFrag() + "heartbeat/";
     }
+
+    private boolean isSectionRunningOrNotStarted(AttemptSection attemptSection) {
+        String state = attemptSection.getState();
+        return state.equals(RUNNING) || state.equals(NOT_STARTED);
+    }
+
+    public int getCurrentSectionPosition() {
+        List<AttemptSection> attemptSections = getSections();
+        if (attemptSections.size() > 1) {
+            int i = 0;
+            for (; i < attemptSections.size(); i++) {
+                AttemptSection attemptSection = attemptSections.get(i);
+                if (isSectionRunningOrNotStarted(attemptSection)) {
+                    return i;
+                }
+            }
+            // Let us simply return the last section position since all are completed
+            return i;
+        }
+        return 0;
+    }
     // KEEP METHODS END
 
 }

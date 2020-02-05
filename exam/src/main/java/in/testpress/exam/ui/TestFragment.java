@@ -808,6 +808,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             return;
                         }
                         sections.set(currentSectionPosition, attemptSection);
+                        attempt.setSections(sections);
                         onSectionEnded();
                     }
 
@@ -824,7 +825,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     void onSectionEnded() {
-        if (++currentSectionPosition == sections.size()) {
+        currentSectionPosition = attempt.getCurrentSectionPosition();
+        if (currentSectionPosition == sections.size()) {
             endExam();
         } else {
             sectionSpinnerAdapter.setSelectedItem(currentSectionPosition);
@@ -845,6 +847,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             return;
                         }
                         sections.set(currentSectionPosition, section);
+                        attempt.setSections(sections);
                         questionsResourcePager =
                                 new TestQuestionsPager(section.getQuestionsUrlFrag(), apiClient);
 
