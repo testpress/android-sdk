@@ -154,7 +154,7 @@ public class TestFragmentTest {
         verify(fragment, times(1)).startCountDownTimer(sectionMillisRemaining);
 
         // Second section
-        fragment.currentSection = 1;
+        fragment.currentSectionPosition = 1;
         fragment.startCountDownTimer();
 
         assertThat("millisRemaining value needs to same as section 2 remaining time",
@@ -167,7 +167,7 @@ public class TestFragmentTest {
     @Test
     public void test_onSectionEnded_endExam_ifReachedLastSection() {
         int currentSectionPosition = 2;
-        fragment.currentSection = currentSectionPosition;
+        fragment.currentSectionPosition = currentSectionPosition;
         when(sections.size()).thenReturn(currentSectionPosition + 1);
 
         doCallRealMethod().when(fragment).onSectionEnded();
@@ -179,7 +179,7 @@ public class TestFragmentTest {
     @Test
     public void test_onSectionEnded_startSection_ifNextSectionAvailable() {
         int currentSectionPosition = 2;
-        fragment.currentSection = currentSectionPosition;
+        fragment.currentSectionPosition = currentSectionPosition;
         when(sections.size()).thenReturn(currentSectionPosition + 2);
 
         fragment.sectionsFilter = mock(Spinner.class);
