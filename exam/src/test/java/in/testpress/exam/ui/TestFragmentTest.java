@@ -62,7 +62,7 @@ public class TestFragmentTest {
 
     @Test
     public void test_startCountDownTimer_startsNewSection_ifSectionNotStarted() {
-        fragment.lockedSectionExam = true;
+        when(fragment.attempt.hasSectionalLock()).thenReturn(true);
         when(section.getState()).thenReturn(NOT_STARTED);
 
         doCallRealMethod().when(fragment).startCountDownTimer();
@@ -105,7 +105,7 @@ public class TestFragmentTest {
 
     @Test
     public void test_startCountDownTimer_usesSectionRemainingTime_forLockedSectionExam() {
-        fragment.lockedSectionExam = true;
+        when(fragment.attempt.hasSectionalLock()).thenReturn(true);
         String sectionRemainingTime = "0:00:10";
         long sectionMillisRemaining = Long.parseLong(sectionRemainingTime.split(":")[2]);
         when(section.getRemainingTime()).thenReturn(sectionRemainingTime);
@@ -127,7 +127,7 @@ public class TestFragmentTest {
 
     @Test
     public void test_startCountDownTimer_usesSectionRemainingTime_forLockedSectionExam_for_twoConsecutiveSections() {
-        fragment.lockedSectionExam = true;
+        when(fragment.attempt.hasSectionalLock()).thenReturn(true);
         String sectionRemainingTime = "0:00:10";
         String section2RemainingTime = "0:00:15";
         long sectionMillisRemaining = Long.parseLong(sectionRemainingTime.split(":")[2]);
@@ -154,7 +154,7 @@ public class TestFragmentTest {
         verify(fragment, times(1)).startCountDownTimer(sectionMillisRemaining);
 
         // Second section
-        fragment.currentSectionPosition = 1;
+        when(fragment.attempt.getCurrentSectionPosition()).thenReturn(1);
         fragment.startCountDownTimer();
 
         assertThat("millisRemaining value needs to same as section 2 remaining time",
@@ -179,7 +179,7 @@ public class TestFragmentTest {
     @Test
     public void test_onSectionEnded_startSection_ifNextSectionAvailable() {
         int currentSectionPosition = 2;
-        fragment.currentSectionPosition = currentSectionPosition;
+        when(fragment.attempt.getCurrentSectionPosition()).thenReturn(currentSectionPosition);
         when(sections.size()).thenReturn(currentSectionPosition + 2);
 
         fragment.sectionsFilter = mock(Spinner.class);
@@ -204,7 +204,7 @@ public class TestFragmentTest {
 
     @Test
     public void test_onRemainingTimeOver_endSection_ifLockedSectionExam() {
-        fragment.lockedSectionExam = true;
+        when(fragment.attempt.hasSectionalLock()).thenReturn(true);
 
         doCallRealMethod().when(fragment).onRemainingTimeOver();
         fragment.onRemainingTimeOver();
