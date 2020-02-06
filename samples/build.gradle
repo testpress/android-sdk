@@ -27,6 +27,7 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.config
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
             signingConfig signingConfigs.config

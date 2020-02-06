@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
@@ -41,6 +42,7 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.network.TestQuestionsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.ui.fragments.attempt.SectionsFilterFragment;
 import in.testpress.exam.ui.loaders.AttemptItemsLoader;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
 import in.testpress.models.greendao.Attempt;
@@ -62,7 +64,7 @@ import static in.testpress.exam.ui.TestActivity.PARAM_COURSE_CONTENT;
 import static in.testpress.models.greendao.Attempt.COMPLETED;
 import static in.testpress.models.greendao.Attempt.NOT_STARTED;
 
-public class TestFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>> {
+public class TestFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>>, SectionsFilterFragment.OnSectionSelectedListener {
 
     private static final int APP_BACKGROUND_DELAY = 60000; // 1m
 
@@ -75,8 +77,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     private ListView questionsListView;
     private TextView timer;
     private Spinner questionsFilter;
-    Spinner sectionsFilter;
-    private RelativeLayout sectionsFilterContainer;
     private NonSwipeableViewPager viewPager;
     private TestQuestionPagerAdapter viewPagerAdapter;
     private List<AttemptItem> filterItems = new ArrayList<>();
@@ -109,7 +109,61 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
      * Map of subjects/sections & its starting point(first question index)
      */
     private HashMap<String, Integer> plainSpinnerItemOffsets = new HashMap<>();
-    private enum Action { PAUSE, END, UPDATE_ANSWER, END_SECTION }
+    private SectionsFilterFragment sectionsFilterFragment;
+
+    @Override
+    public int getCurrentSectionPosition() {
+        return attempt.getCurrentSectionPosition();
+    }
+
+    @Override
+    public void lockedSectionSelected(String value, int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+                R.style.TestpressAppCompatAlertDialogStyle);
+
+        if ((courseContent != null && courseContent.getAttemptsCount() <= 1) ||
+                (courseContent == null && (exam.getAttemptsCount() == 0 ||
+                        (exam.getAttemptsCount() == 1 && exam.getPausedAttemptsCount() == 1)))) {
+
+            builder.setTitle(R.string.testpress_cannot_switch);
+            builder.setMessage(R.string.testpress_cannot_switch_section);
+            builder.setPositiveButton(getString(R.string.testpress_ok), null);
+        } else if (attempt.getCurrentSectionPosition() > position) {
+            builder.setTitle(R.string.testpress_cannot_switch);
+            builder.setMessage(R.string.testpress_already_submitted);
+            builder.setPositiveButton(getString(R.string.testpress_ok), null);
+        } else if (attempt.getCurrentSectionPosition() + 1 < position) {
+            builder.setTitle(R.string.testpress_cannot_switch);
+            builder.setMessage(R.string.testpress_attempt_sections_in_order);
+            builder.setPositiveButton(getString(R.string.testpress_ok), null);
+        } else {
+            builder.setTitle(R.string.testpress_switch_section);
+            builder.setMessage(R.string.testpress_switch_section_message);
+            builder.setPositiveButton(getString(R.string.testpress_end_section),
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            endSection();
+                        }
+                    });
+        }
+        sectionSwitchAlertDialog = builder.show();
+    }
+
+    @Override
+    public void sectionSelected(String value, int position) {
+        selectedPlainSpinnerItemOffset = plainSpinnerItemOffsets.get(value);
+        if (navigationButtonPressed) {
+            // Spinner item changed by clicking next or prev button
+            navigationButtonPressed = false;
+        } else {
+            // Spinner item changed by selecting subject/section in spinner
+            viewPager.setCurrentItem(plainSpinnerItemOffsets.get(value));
+        }
+    }
+
+    private enum Action {PAUSE, END, UPDATE_ANSWER, END_SECTION}
+
     private RetrofitCall<Attempt> heartBeatApiRequest;
     private RetrofitCall<AttemptSection> endSectionApiRequest;
     private RetrofitCall<AttemptSection> startSectionApiRequest;
@@ -229,93 +283,10 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     private void initializeSectionsFilter() {
-        if (attempt.hasSectionalLock()) {
-            sectionSpinnerAdapter = new LockableSpinnerItemAdapter(getActivity());
-            for (AttemptSection section : sections) {
-                sectionSpinnerAdapter.addItem(section.getName(), section.getName(), true, 0);
-            }
-            sectionsFilter.setAdapter(sectionSpinnerAdapter);
-            sectionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> spinner, View view, int position,
-                                           long itemId) {
-
-                    if (!fistTimeCallback) {
-                        fistTimeCallback = true;
-                        return;
-                    }
-
-                    if (position == attempt.getCurrentSectionPosition()) {
-                        return;
-                    }
-                    sectionsFilter.setSelection(attempt.getCurrentSectionPosition());
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
-                            R.style.TestpressAppCompatAlertDialogStyle);
-
-                    if ((courseContent != null && courseContent.getAttemptsCount() <= 1) ||
-                            (courseContent == null && (exam.getAttemptsCount() == 0 ||
-                                    (exam.getAttemptsCount() == 1 && exam.getPausedAttemptsCount() == 1)))) {
-
-                        builder.setTitle(R.string.testpress_cannot_switch);
-                        builder.setMessage(R.string.testpress_cannot_switch_section);
-                        builder.setPositiveButton(getString(R.string.testpress_ok), null);
-                    } else if (attempt.getCurrentSectionPosition() > position) {
-                        builder.setTitle(R.string.testpress_cannot_switch);
-                        builder.setMessage(R.string.testpress_already_submitted);
-                        builder.setPositiveButton(getString(R.string.testpress_ok), null);
-                    } else if (attempt.getCurrentSectionPosition() + 1 < position) {
-                        builder.setTitle(R.string.testpress_cannot_switch);
-                        builder.setMessage(R.string.testpress_attempt_sections_in_order);
-                        builder.setPositiveButton(getString(R.string.testpress_ok), null);
-                    } else {
-                        builder.setTitle(R.string.testpress_switch_section);
-                        builder.setMessage(R.string.testpress_switch_section_message);
-                        builder.setPositiveButton(getString(R.string.testpress_end_section),
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        endSection();
-                                    }
-                                });
-                    }
-                    sectionSwitchAlertDialog = builder.show();
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> adapterView) {
-                }
-            });
-            sectionSpinnerAdapter.setSelectedItem(attempt.getCurrentSectionPosition());
-            sectionsFilter.setSelection(attempt.getCurrentSectionPosition());
-            sectionsFilterContainer.setVisibility(View.VISIBLE);
-        } else if (exam.getTemplateType() == 2 || attempt.hasNoSectionalLock()) {
-            plainSpinnerAdapter = new PlainSpinnerItemAdapter(getActivity());
-            sectionsFilter.setAdapter(plainSpinnerAdapter);
-            sectionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> spinner, View view, int position,
-                                           long itemId) {
-
-                    if (!fistTimeCallback) {
-                        fistTimeCallback = true;
-                        return;
-                    }
-                    String selectedSpinnerItem = plainSpinnerAdapter.getTag(position);
-                    selectedPlainSpinnerItemOffset = plainSpinnerItemOffsets.get(selectedSpinnerItem);
-                    if (navigationButtonPressed) {
-                        // Spinner item changed by clicking next or prev button
-                        navigationButtonPressed = false;
-                    } else {
-                        // Spinner item changed by selecting subject/section in spinner
-                        viewPager.setCurrentItem(plainSpinnerItemOffsets.get(selectedSpinnerItem));
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> adapterView) {
-                }
-            });
-        }
+        sectionsFilterFragment = new SectionsFilterFragment();
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        transaction.replace(R.id.sections_filter_container, sectionsFilterFragment);
+        transaction.commit();
     }
 
     private void initializeQuestionsListAdapter() {
@@ -331,8 +302,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         timer = view.findViewById(R.id.timer);
         ViewUtils.setDrawableColor(timer, R.color.testpress_actionbar_text);
         questionsFilter = view.findViewById(R.id.questions_filter);
-        sectionsFilter = view.findViewById(R.id.primary_questions_filter);
-        sectionsFilterContainer = view.findViewById(R.id.questions_filter_container);
         viewPager = view.findViewById(R.id.pager);
         viewPager.setSwipeEnabled(true);
         slidingPaneLayout = view.findViewById(R.id.sliding_layout);
@@ -424,7 +393,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     private void openPanel() {
-        if(slidingPaneLayout.isOpen()) {
+        if (slidingPaneLayout.isOpen()) {
             slidingPaneLayout.closePane();
         } else {
             slidingPaneLayout.openPane();
@@ -451,7 +420,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         if (slidingPaneLayout.isOpen()) {
             slidingPaneLayout.closePane();
         }
-        if(plainSpinnerAdapter != null && plainSpinnerAdapter.getCount() > 1) {
+        if (plainSpinnerAdapter != null && plainSpinnerAdapter.getCount() > 1) {
             String currentSpinnerItem;
             AttemptItem currentAttemptItem = attemptItemList.get(viewPager.getCurrentItem());
             if (attempt.hasNoSectionalLock()) {
@@ -537,7 +506,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         pauseExam();
                                     }
-                        })
+                                })
                         .setNegativeButton(R.string.testpress_cancel, null)
                         .show();
     }
@@ -574,7 +543,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         getLoaderManager().destroyLoader(loader.getId());
         //noinspection ThrowableResultOfMethodCallIgnored
         TestpressException exception = ((ThrowableLoader<List<AttemptItem>>) loader).clearException();
-        if(exception != null) {
+        if (exception != null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
                     R.style.TestpressAppCompatAlertDialogStyle);
             builder.setPositiveButton(R.string.testpress_retry_again, new DialogInterface.OnClickListener() {
@@ -655,7 +624,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                 }
                 plainSpinnerAdapter.notifyDataSetChanged();
                 sectionsFilter.setSelection(0); // Set 1st item as default selection
-                sectionsFilterContainer.setVisibility(View.VISIBLE);
                 selectedPlainSpinnerItemOffset = 0;
             }
         }
@@ -664,7 +632,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                 new TestQuestionPagerAdapter(getFragmentManager(), attemptItemList, selectedLanguage);
 
         viewPager.setAdapter(viewPagerAdapter);
-        for (int i = 0; i< attemptItemList.size(); i++) {
+        for (int i = 0; i < attemptItemList.size(); i++) {
             attemptItemList.get(i).setIndex(i + 1);
         }
         questionsListAdapter.setItems(attemptItemList);
@@ -695,7 +663,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     public void onLoaderReset(@NonNull final Loader<List<AttemptItem>> loader) {
     }
 
-    private  void returnToHistory() {
+    private void returnToHistory() {
         if (getActivity() == null) {
             return;
         }
@@ -983,7 +951,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         List<AttemptItem> answeredItems = new ArrayList<>();
         List<AttemptItem> unansweredItems = new ArrayList<>();
         List<AttemptItem> markedItems = new ArrayList<>();
-        for(int i = 0; i< attemptItemList.size(); i++) {
+        for (int i = 0; i < attemptItemList.size(); i++) {
             AttemptItem attemptItem = attemptItemList.get(i);
             try {
                 if (attemptItem.getReview() || attemptItem.getCurrentReview()) {
@@ -992,10 +960,10 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if(!attemptItem.getSelectedAnswers().isEmpty() || !attemptItem.getSavedAnswers().isEmpty()
+            if (!attemptItem.getSelectedAnswers().isEmpty() || !attemptItem.getSavedAnswers().isEmpty()
                     || (attemptItem.getShortText() != null && !attemptItem.getShortText().isEmpty())
                     || (attemptItem.getCurrentShortText() != null
-                        && !attemptItem.getCurrentShortText().isEmpty())) {
+                    && !attemptItem.getCurrentShortText().isEmpty())) {
 
                 answeredItems.add(attemptItem);
             } else {
@@ -1117,7 +1085,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             }
         }
 
-        protected void onRetry() {}
+        protected void onRetry() {
+        }
     }
 
     private void showProgress(@StringRes int stringResId) {
@@ -1241,7 +1210,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         if (countDownTimer != null) {
             stopTimer();
         }
-        CommonUtils.dismissDialogs(new Dialog[] {
+        CommonUtils.dismissDialogs(new Dialog[]{
                 heartBeatAlertDialog, saveAnswerAlertDialog, networkErrorAlertDialog
         });
         showResumeExamDialog();
@@ -1277,7 +1246,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
     @Override
     public RetrofitCall[] getRetrofitCalls() {
-        return new RetrofitCall[] {
+        return new RetrofitCall[]{
                 heartBeatApiRequest, startSectionApiRequest, endSectionApiRequest,
                 endContentAttemptApiRequest, endAttemptApiRequest, resumeExamApiRequest
         };
@@ -1285,7 +1254,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
     @Override
     public Dialog[] getDialogs() {
-        return new Dialog[] {
+        return new Dialog[]{
                 progressDialog, resumeExamDialog, heartBeatAlertDialog, saveAnswerAlertDialog,
                 networkErrorAlertDialog
         };
