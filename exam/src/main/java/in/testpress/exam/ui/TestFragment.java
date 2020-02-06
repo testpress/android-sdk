@@ -799,7 +799,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                         if (getActivity() == null) {
                             return;
                         }
-                        sections.set(attempt.getCurrentSectionPosition(), attemptSection);
+                        sections.set(attemptSection.getOrder(), attemptSection);
                         attempt.setSections(sections);
                         onSectionEnded();
                     }
@@ -837,7 +837,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                         if (getActivity() == null) {
                             return;
                         }
-                        sections.set(attempt.getCurrentSectionPosition(), section);
+                        sections.set(section.getOrder(), section);
                         attempt.setSections(sections);
                         questionsResourcePager =
                                 new TestQuestionsPager(section.getQuestionsUrlFrag(), apiClient);
