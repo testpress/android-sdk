@@ -1214,6 +1214,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                     @Override
                     public void onSuccess(Attempt attempt) {
                         TestFragment.this.attempt = attempt;
+                        sections = attempt.getSections();
                         progressDialog.dismiss();
                         startCountDownTimer();
                     }
