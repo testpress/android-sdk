@@ -33,6 +33,7 @@ dependencies {
     api rootProject.universalImageLoader
     api rootProject.greendao
     api rootProject.shimmer
+    api rootProject.junit
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
     testImplementation rootProject.powermockJunit
