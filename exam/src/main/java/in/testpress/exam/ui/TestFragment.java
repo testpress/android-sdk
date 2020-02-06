@@ -817,7 +817,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     void onSectionEnded() {
-        if (attempt.getCurrentSectionPosition() == sections.size()) {
+        if (attempt.getCurrentSectionPosition() == sections.size() - 1) {
             endExam();
         } else {
             sectionSpinnerAdapter.setSelectedItem(attempt.getCurrentSectionPosition());
