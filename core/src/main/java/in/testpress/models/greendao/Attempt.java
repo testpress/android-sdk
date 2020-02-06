@@ -533,7 +533,7 @@ public class Attempt implements android.os.Parcelable {
                 }
             }
             // Let us simply return the last section position since all are completed
-            return i;
+            return attemptSections.size() - 1;
         }
         return 0;
     }
