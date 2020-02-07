@@ -713,6 +713,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             return;
         }
         final AttemptItem attemptItem = attemptItemList.get(position);
+        final int currentSectionPosition = attempt.getCurrentSectionPosition();
+
         if (attemptItem.hasChanged()) {
             if (action != Action.UPDATE_ANSWER) {
                 showProgress(R.string.testpress_saving_last_change);
@@ -728,7 +730,11 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             attemptItem.setSelectedAnswers(newAttemptItem.getSelectedAnswers());
                             attemptItem.setShortText(newAttemptItem.getShortText());
                             attemptItem.setReview(newAttemptItem.getReview());
-                            attemptItemList.set(position, attemptItem);
+
+                            if (sections.get(currentSectionPosition).equals("Running")) {
+                                attemptItemList.set(position, attemptItem);
+                            }
+
                             if (action.equals(Action.PAUSE)) {
                                 progressDialog.dismiss();
                                 returnToHistory();
