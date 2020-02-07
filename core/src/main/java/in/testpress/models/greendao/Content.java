@@ -621,6 +621,7 @@ public class Content implements android.os.Parcelable {
         video = in.readParcelable(Video.class.getClassLoader());
         attachment = in.readParcelable(Attachment.class.getClassLoader());
         exam = in.readParcelable(Exam.class.getClassLoader());
+        contentType = in.readString();
     }
 
     @Override
@@ -679,6 +680,7 @@ public class Content implements android.os.Parcelable {
         dest.writeParcelable(getRawVideo(), flags);
         dest.writeParcelable(getRawAttachment(), flags);
         dest.writeParcelable(getRawExam(), flags);
+        dest.writeString(getContentType());
     }
 
     @Override
