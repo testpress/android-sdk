@@ -569,6 +569,11 @@ public class Attempt implements android.os.Parcelable {
     public boolean hasSections() {
         return getSections().size() > 1;
     }
+
+    public boolean isAllSectionsCompleted() {
+        return (getCurrentSectionPosition() == sections.size() - 1) &&
+                (sections.get(getCurrentSectionPosition()).getState().equals(COMPLETED));
+    }
     // KEEP METHODS END
 
 }

@@ -44,6 +44,7 @@ import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.loaders.AttemptItemsLoader;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
 import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.AttemptDao;
 import in.testpress.models.greendao.AttemptSection;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.CourseAttempt;
@@ -817,7 +818,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     void onSectionEnded() {
-        if (attempt.getCurrentSectionPosition() == sections.size() - 1) {
+        if (attempt.isAllSectionsCompleted()) {
             endExam();
         } else {
             sectionSpinnerAdapter.setSelectedItem(attempt.getCurrentSectionPosition());
