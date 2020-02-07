@@ -167,7 +167,7 @@ public class TestFragmentTest {
     @Test
     public void test_onSectionEnded_endExam_ifReachedLastSection() {
         int lastSectionPosition = 2;
-        when(fragment.attempt.getCurrentSectionPosition()).thenReturn(lastSectionPosition);
+        when(fragment.attempt.isAllSectionsCompleted()).thenReturn(true);
         when(sections.size()).thenReturn(lastSectionPosition);
 
         doCallRealMethod().when(fragment).onSectionEnded();
