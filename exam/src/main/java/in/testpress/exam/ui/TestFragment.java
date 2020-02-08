@@ -708,6 +708,10 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         getActivity().startActivityForResult(intent, CarouselFragment.TEST_TAKEN_REQUEST_CODE);
     }
 
+    private boolean isNonSectionalOrIBPSExam() {
+        return exam.getTemplateType() == 2 || attempt.hasNoSectionalLock();
+    }
+
     private void saveResult(final int position, final Action action) {
         if (attemptItemList.size() <= position) {
             return;
@@ -731,7 +735,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             attemptItem.setShortText(newAttemptItem.getShortText());
                             attemptItem.setReview(newAttemptItem.getReview());
 
-                            if (sections.get(currentSectionPosition).equals("Running")) {
+                            if (isNonSectionalOrIBPSExam() || (attempt.hasSectionalLock() && sections.get(currentSectionPosition).equals("Running"))) {
                                 attemptItemList.set(position, attemptItem);
                             }
 
