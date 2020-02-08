@@ -37,7 +37,6 @@
                 android:dividerHeight="1dp"
                 android:background="#fff" />
 
-            </LinearLayout>
             <in.testpress.exam.ui.view.NonSwipeableViewPager
                 android:id="@+id/pager"
                 android:background="@color/testpress_white"
