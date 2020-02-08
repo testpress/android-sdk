@@ -94,6 +94,7 @@ public class ReviewQuestionsFragment extends Fragment {
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
     private InstituteSettings instituteSettings;
+    private boolean loadComments = false;
 
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
     private RetrofitCall<Bookmark> bookmarkAPIRequest;
@@ -194,7 +195,7 @@ public class ReviewQuestionsFragment extends Fragment {
                 }
                 setDifficulty(view);
                 progressBar.setVisibility(View.GONE);
-                if (commentsUtil == null) {
+                if (commentsUtil == null && loadComments) {
                     commentsUtil = new CommentsUtil(
                             ReviewQuestionsFragment.this,
                             getLoaderManager(),
