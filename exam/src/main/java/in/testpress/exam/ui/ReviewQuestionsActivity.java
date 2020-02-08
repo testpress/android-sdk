@@ -9,9 +9,11 @@ import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SlidingPaneLayout;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -102,6 +104,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     private Language selectedLanguage;
     private ExploreSpinnerAdapter languageSpinnerAdapter;
     protected ExploreSpinnerAdapter spinnerAdapter;
+    private View questionsListProgressBar;
     /**
      * When spinnerAdapter is set to spinner, the spinner itself select first item as default,
      * so onItemSelected callback will be called with position 0, we need to omit this callback
@@ -112,6 +115,9 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     private RetrofitCall<TestpressApiResponse<Language>> languageApiRequest;
     private TestpressExamApiClient apiClient;
     private Menu optionsMenu;
+    String reviewUrl;
+    int totalQuestions = 0;
+    private boolean isNetworkRequestLoading = false;
 
     public static Intent createIntent(Activity activity, Exam exam, Attempt attempt) {
         Intent intent = new Intent(activity, ReviewQuestionsActivity.class);
@@ -145,6 +151,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         nextButton = (Button) findViewById(R.id.next);
         questionsListButton = (Button) findViewById(R.id.question_list_button);
         progressBar = (ProgressBar) findViewById(R.id.pb_loading);
+        questionsListProgressBar = (View) LayoutInflater.from(this).inflate(R.layout.progress_bar, null);
         UIUtils.setIndeterminateDrawable(this, progressBar, 4);
         questionLayout = findViewById(R.id.question_layout);
         buttonLayout = findViewById(R.id.button_layout);
@@ -180,6 +187,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         panelListAdapter = new ReviewPanelListAdapter(getLayoutInflater(), reviewItems,
                 R.layout.testpress_test_panel_list_item);
         questionsListView.setAdapter(panelListAdapter);
+        questionsListView.addFooterView(questionsListProgressBar);
         pagerAdapter = new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems);
         pager.setAdapter(pagerAdapter);
         slidingPaneLayout.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
@@ -212,15 +220,17 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
             public void onPageScrollStateChanged(int state) {
             }
         });
+        addListeners();
         apiClient = new TestpressExamApiClient(this);
         spinnerAdapter = new ExploreSpinnerAdapter(getLayoutInflater(), getResources(), true);
         spinnerAdapter.hideSpinner(true);
         reviewItemDao= TestpressSDKDatabase.getReviewItemDao(this);
         attemptDao = TestpressSDKDatabase.getReviewAttemptDao(this);
         reviewAttempt = getReviewAttempt();
+        reviewUrl = reviewAttempt.getReviewUrl().replace("v2.3", "v2.2.1");
         // Check review items exists for the review attempt, load otherwise.
+        totalQuestions = attempt.getTotalQuestions();
         if (reviewItemDao._queryReviewAttempt_ReviewItems(reviewAttempt.getId()).isEmpty()) {
-            String reviewUrl = reviewAttempt.getReviewUrl().replace("v2.3", "v2.2.1");
             loadReviewItemsFromServer(reviewUrl);
         } else {
             displayReviewItems();
@@ -231,13 +241,35 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         }
     }
 
+    private void addListeners() {
+        questionsListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItems, int totalItems) {
+                if (totalItems == totalQuestions || totalItems == 0) {
+                    return;
+                }
+                if ((totalItems - firstVisibleItem) == visibleItems) {
+                    if (totalItems < totalQuestions) {
+                        loadReviewItemsFromServer(reviewUrl);
+                    }
+                }
+            }
+        });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         optionsMenu = menu;
         setUpLanguageOptionsMenu();
         setupQuestionsFilterOptionsMenu();
+        filterMenu.setVisible(false);
+
         if (!reviewItems.isEmpty()) {
-            filterMenu.setVisible(true);
+//            filterMenu.setVisible(true);
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -330,23 +362,31 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
     }
 
     private void loadReviewItemsFromServer(final String url) {
+        if (isNetworkRequestLoading) {
+            return;
+        }
+        isNetworkRequestLoading = true;
+
+        questionsListProgressBar.setVisibility(View.VISIBLE);
         reviewItemsLoader = apiClient.getReviewItems(url, new HashMap<String, Object>())
                 .enqueue(new TestpressCallback<TestpressApiResponse<ReviewItem>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<ReviewItem> response) {
                         reviewItems.addAll(response.getResults());
-                        // Load the next page if exists.
-                        if (response.getNext() != null) {
-                            loadReviewItemsFromServer(response.getNext());
-                        } else {
-                            saveReviewItems();
-                            displayReviewItems();
-                        }
+                        reviewUrl = response.getNext();
+                        totalQuestions = response.getCount();
+                        saveReviewItems();
+                        displayReviewItems();
+                        goToQuestion(pager.getCurrentItem());
+                        isNetworkRequestLoading = false;
+                        questionsListProgressBar.setVisibility(View.GONE);
                     }
 
                     @Override
                     public void onException(TestpressException exception) {
                         handleError(exception, R.string.testpress_error_loading_questions);
+                        isNetworkRequestLoading = false;
+                        questionsListProgressBar.setVisibility(View.GONE);
                         retryButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -558,7 +598,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
                 panelListAdapter.setItems(reviewItems);
                 pagerAdapter.setReviewItems(reviewItems);
                 pagerAdapter.notifyDataSetChanged(true);
-                goToQuestion(0);
                 if (filterMenu != null) {
                     filterMenu.setVisible(true);
                 }
@@ -610,6 +649,11 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         if (reviewItems.isEmpty()) {
             return;
         }
+
+        if ((pagerAdapter.getCount() < totalQuestions) && ((pagerAdapter.getCount() - position) <= 4)) {
+            loadReviewItemsFromServer(reviewUrl);
+        }
+
         if (pager.getCurrentItem() != position) {
             pager.setCurrentItem(position);
         }
@@ -701,7 +745,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         } else if (exception.isNetworkError()) {
             setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again);
             retryButton.setVisibility(View.VISIBLE);
-        } else if (exception.getResponse().code() == 404) {
+        } else if (exception.getResponse() != null && exception.getResponse().code() == 404) {
             setEmptyText(R.string.testpress_exam_not_available,
                     R.string.testpress_exam_not_available_description);
         } else {
