@@ -119,7 +119,7 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
     }
 
     private void authenticate(String userId, String accessToken, TestpressSdk.Provider provider) {
-        InstituteSettings instituteSettings = new InstituteSettings("https://surgerysixer.testpress.in");
+        InstituteSettings instituteSettings = new InstituteSettings("https://4iiteens.testpress.in");
         TestpressSdk.initialize(this, instituteSettings, userId, accessToken, provider,
                 new TestpressCallback<TestpressSession>() {
                     @Override
