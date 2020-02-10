@@ -174,7 +174,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         initializeListeners();
         initializeQuestionsListAdapter();
 
-        if (attempt.hasSections()) {
+        if (attempt.hasSections() || exam.getTemplateType() == 2) {
             initializeSectionsFilter();
         }
 
