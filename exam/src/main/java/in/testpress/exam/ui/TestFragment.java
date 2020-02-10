@@ -505,7 +505,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                         .setTitle(R.string.testpress_end_title)
                         .setMessage(R.string.testpress_end_message);
 
-        if (attempt.hasNoSectionalLock()) {
+        if (attempt.hasNoSectionalLock() || sections.size() < 2) {
             dialogBuilder
                     .setPositiveButton(R.string.testpress_end, new DialogInterface.OnClickListener() {
                         @Override
