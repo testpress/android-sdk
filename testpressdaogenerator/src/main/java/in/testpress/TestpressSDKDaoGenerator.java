@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 27;
+    private static final int VERSION = 28;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -30,8 +30,9 @@ public class TestpressSDKDaoGenerator {
         Entity course = addCourse(schema);
 
         Entity chapter = addChapter(schema);
-        addChaptersToCourse(course, chapter);
-        addChildrenToChapter(chapter, chapter);
+        Property order = chapter.addIntProperty("order").getProperty();
+        addChaptersToCourse(course, chapter, order);
+        addChildrenToChapter(chapter, chapter, order);
 
         Entity content = addContent(schema);
         addContentsToCourse(course, content);
@@ -240,16 +241,18 @@ public class TestpressSDKDaoGenerator {
         return content;
     }
 
-    private static void addChaptersToCourse(Entity course, Entity chapter) {
+    private static void addChaptersToCourse(Entity course, Entity chapter, Property order) {
         Property courseId = chapter.addLongProperty("courseId").getProperty();
         ToMany courseToChapters = course.addToMany(chapter, courseId);
         courseToChapters.setName("chapters");
+        courseToChapters.orderAsc(order);
     }
 
-    private static void addChildrenToChapter(Entity parentChapter, Entity chapter) {
+    private static void addChildrenToChapter(Entity parentChapter, Entity chapter, Property order) {
         Property parentId = chapter.addLongProperty("parentId").getProperty();
         ToMany childrenToChapters = parentChapter.addToMany(chapter, parentId);
         childrenToChapters.setName("children");
+        childrenToChapters.orderAsc(order);
     }
 
     private static void addChapterRelationToContent(Entity chapter, Entity content) {
@@ -429,7 +432,6 @@ public class TestpressSDKDaoGenerator {
         chapter.addStringProperty("url");
         chapter.addIntProperty("requiredTrophyCount");
         chapter.addBooleanProperty("isLocked");
-        chapter.addIntProperty("order");
         chapter.addIntProperty("contentsCount");
         chapter.addIntProperty("childrenCount");
         chapter.addBooleanProperty("active");

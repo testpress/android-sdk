@@ -43,10 +43,10 @@ public class Chapter {
     private String url;
     private Integer requiredTrophyCount;
     private Boolean isLocked;
-    private Integer order;
     private Integer contentsCount;
     private Integer childrenCount;
     private Boolean active;
+    private Integer order;
     private Long courseId;
     private Long parentId;
 
@@ -61,6 +61,7 @@ public class Chapter {
     @ToMany(joinProperties = {
         @JoinProperty(name = "id", referencedName = "parentId")
     })
+    @OrderBy("order ASC")
     private List<Chapter> children;
 
     @ToMany(joinProperties = {
@@ -80,7 +81,7 @@ public class Chapter {
     }
 
     @Generated
-    public Chapter(Long id, String name, String description, String slug, String image, String modified, Long modifiedDate, String courseUrl, String contentUrl, String childrenUrl, String parentSlug, String parentUrl, Boolean leaf, String url, Integer requiredTrophyCount, Boolean isLocked, Integer order, Integer contentsCount, Integer childrenCount, Boolean active, Long courseId, Long parentId) {
+    public Chapter(Long id, String name, String description, String slug, String image, String modified, Long modifiedDate, String courseUrl, String contentUrl, String childrenUrl, String parentSlug, String parentUrl, Boolean leaf, String url, Integer requiredTrophyCount, Boolean isLocked, Integer contentsCount, Integer childrenCount, Boolean active, Integer order, Long courseId, Long parentId) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -97,10 +98,10 @@ public class Chapter {
         this.url = url;
         this.requiredTrophyCount = requiredTrophyCount;
         this.isLocked = isLocked;
-        this.order = order;
         this.contentsCount = contentsCount;
         this.childrenCount = childrenCount;
         this.active = active;
+        this.order = order;
         this.courseId = courseId;
         this.parentId = parentId;
     }
@@ -240,14 +241,6 @@ public class Chapter {
         this.isLocked = isLocked;
     }
 
-    public Integer getOrder() {
-        return order;
-    }
-
-    public void setOrder(Integer order) {
-        this.order = order;
-    }
-
     public Integer getContentsCount() {
         return contentsCount;
     }
@@ -270,6 +263,14 @@ public class Chapter {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public Integer getOrder() {
+        return order;
+    }
+
+    public void setOrder(Integer order) {
+        this.order = order;
     }
 
     public Long getCourseId() {

@@ -54,6 +54,7 @@ public class Course {
     @ToMany(joinProperties = {
         @JoinProperty(name = "id", referencedName = "courseId")
     })
+    @OrderBy("order ASC")
     private List<Chapter> chapters;
 
     @ToMany(joinProperties = {
@@ -397,7 +398,10 @@ public class Course {
 
     public List<Chapter> getRootChapters() {
         ChapterDao chapterDao = daoSession.getChapterDao();
-        return chapterDao.queryBuilder().where(ChapterDao.Properties.CourseId.eq(getId()), ChapterDao.Properties.ParentId.isNull()).list();
+        return chapterDao.queryBuilder()
+                .where(ChapterDao.Properties.CourseId.eq(getId()), ChapterDao.Properties.ParentId.isNull())
+                .orderAsc(ChapterDao.Properties.Order)
+                .list();
     }
     // KEEP METHODS END
 

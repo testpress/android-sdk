@@ -41,10 +41,10 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
         public final static Property Url = new Property(13, String.class, "url", false, "URL");
         public final static Property RequiredTrophyCount = new Property(14, Integer.class, "requiredTrophyCount", false, "REQUIRED_TROPHY_COUNT");
         public final static Property IsLocked = new Property(15, Boolean.class, "isLocked", false, "IS_LOCKED");
-        public final static Property Order = new Property(16, Integer.class, "order", false, "ORDER");
-        public final static Property ContentsCount = new Property(17, Integer.class, "contentsCount", false, "CONTENTS_COUNT");
-        public final static Property ChildrenCount = new Property(18, Integer.class, "childrenCount", false, "CHILDREN_COUNT");
-        public final static Property Active = new Property(19, Boolean.class, "active", false, "ACTIVE");
+        public final static Property ContentsCount = new Property(16, Integer.class, "contentsCount", false, "CONTENTS_COUNT");
+        public final static Property ChildrenCount = new Property(17, Integer.class, "childrenCount", false, "CHILDREN_COUNT");
+        public final static Property Active = new Property(18, Boolean.class, "active", false, "ACTIVE");
+        public final static Property Order = new Property(19, Integer.class, "order", false, "ORDER");
         public final static Property CourseId = new Property(20, Long.class, "courseId", false, "COURSE_ID");
         public final static Property ParentId = new Property(21, Long.class, "parentId", false, "PARENT_ID");
     }
@@ -83,10 +83,10 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
                 "\"URL\" TEXT," + // 13: url
                 "\"REQUIRED_TROPHY_COUNT\" INTEGER," + // 14: requiredTrophyCount
                 "\"IS_LOCKED\" INTEGER," + // 15: isLocked
-                "\"ORDER\" INTEGER," + // 16: order
-                "\"CONTENTS_COUNT\" INTEGER," + // 17: contentsCount
-                "\"CHILDREN_COUNT\" INTEGER," + // 18: childrenCount
-                "\"ACTIVE\" INTEGER," + // 19: active
+                "\"CONTENTS_COUNT\" INTEGER," + // 16: contentsCount
+                "\"CHILDREN_COUNT\" INTEGER," + // 17: childrenCount
+                "\"ACTIVE\" INTEGER," + // 18: active
+                "\"ORDER\" INTEGER," + // 19: order
                 "\"COURSE_ID\" INTEGER," + // 20: courseId
                 "\"PARENT_ID\" INTEGER);"); // 21: parentId
     }
@@ -181,24 +181,24 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
             stmt.bindLong(16, isLocked ? 1L: 0L);
         }
  
-        Integer order = entity.getOrder();
-        if (order != null) {
-            stmt.bindLong(17, order);
-        }
- 
         Integer contentsCount = entity.getContentsCount();
         if (contentsCount != null) {
-            stmt.bindLong(18, contentsCount);
+            stmt.bindLong(17, contentsCount);
         }
  
         Integer childrenCount = entity.getChildrenCount();
         if (childrenCount != null) {
-            stmt.bindLong(19, childrenCount);
+            stmt.bindLong(18, childrenCount);
         }
  
         Boolean active = entity.getActive();
         if (active != null) {
-            stmt.bindLong(20, active ? 1L: 0L);
+            stmt.bindLong(19, active ? 1L: 0L);
+        }
+ 
+        Integer order = entity.getOrder();
+        if (order != null) {
+            stmt.bindLong(20, order);
         }
  
         Long courseId = entity.getCourseId();
@@ -296,24 +296,24 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
             stmt.bindLong(16, isLocked ? 1L: 0L);
         }
  
-        Integer order = entity.getOrder();
-        if (order != null) {
-            stmt.bindLong(17, order);
-        }
- 
         Integer contentsCount = entity.getContentsCount();
         if (contentsCount != null) {
-            stmt.bindLong(18, contentsCount);
+            stmt.bindLong(17, contentsCount);
         }
  
         Integer childrenCount = entity.getChildrenCount();
         if (childrenCount != null) {
-            stmt.bindLong(19, childrenCount);
+            stmt.bindLong(18, childrenCount);
         }
  
         Boolean active = entity.getActive();
         if (active != null) {
-            stmt.bindLong(20, active ? 1L: 0L);
+            stmt.bindLong(19, active ? 1L: 0L);
+        }
+ 
+        Integer order = entity.getOrder();
+        if (order != null) {
+            stmt.bindLong(20, order);
         }
  
         Long courseId = entity.getCourseId();
@@ -357,10 +357,10 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
             cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // url
             cursor.isNull(offset + 14) ? null : cursor.getInt(offset + 14), // requiredTrophyCount
             cursor.isNull(offset + 15) ? null : cursor.getShort(offset + 15) != 0, // isLocked
-            cursor.isNull(offset + 16) ? null : cursor.getInt(offset + 16), // order
-            cursor.isNull(offset + 17) ? null : cursor.getInt(offset + 17), // contentsCount
-            cursor.isNull(offset + 18) ? null : cursor.getInt(offset + 18), // childrenCount
-            cursor.isNull(offset + 19) ? null : cursor.getShort(offset + 19) != 0, // active
+            cursor.isNull(offset + 16) ? null : cursor.getInt(offset + 16), // contentsCount
+            cursor.isNull(offset + 17) ? null : cursor.getInt(offset + 17), // childrenCount
+            cursor.isNull(offset + 18) ? null : cursor.getShort(offset + 18) != 0, // active
+            cursor.isNull(offset + 19) ? null : cursor.getInt(offset + 19), // order
             cursor.isNull(offset + 20) ? null : cursor.getLong(offset + 20), // courseId
             cursor.isNull(offset + 21) ? null : cursor.getLong(offset + 21) // parentId
         );
@@ -385,10 +385,10 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
         entity.setUrl(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
         entity.setRequiredTrophyCount(cursor.isNull(offset + 14) ? null : cursor.getInt(offset + 14));
         entity.setIsLocked(cursor.isNull(offset + 15) ? null : cursor.getShort(offset + 15) != 0);
-        entity.setOrder(cursor.isNull(offset + 16) ? null : cursor.getInt(offset + 16));
-        entity.setContentsCount(cursor.isNull(offset + 17) ? null : cursor.getInt(offset + 17));
-        entity.setChildrenCount(cursor.isNull(offset + 18) ? null : cursor.getInt(offset + 18));
-        entity.setActive(cursor.isNull(offset + 19) ? null : cursor.getShort(offset + 19) != 0);
+        entity.setContentsCount(cursor.isNull(offset + 16) ? null : cursor.getInt(offset + 16));
+        entity.setChildrenCount(cursor.isNull(offset + 17) ? null : cursor.getInt(offset + 17));
+        entity.setActive(cursor.isNull(offset + 18) ? null : cursor.getShort(offset + 18) != 0);
+        entity.setOrder(cursor.isNull(offset + 19) ? null : cursor.getInt(offset + 19));
         entity.setCourseId(cursor.isNull(offset + 20) ? null : cursor.getLong(offset + 20));
         entity.setParentId(cursor.isNull(offset + 21) ? null : cursor.getLong(offset + 21));
      }
@@ -424,6 +424,7 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
             if (course_ChaptersQuery == null) {
                 QueryBuilder<Chapter> queryBuilder = queryBuilder();
                 queryBuilder.where(Properties.CourseId.eq(null));
+                queryBuilder.orderRaw("T.'ORDER' ASC");
                 course_ChaptersQuery = queryBuilder.build();
             }
         }
@@ -438,6 +439,7 @@ public class ChapterDao extends AbstractDao<Chapter, Long> {
             if (chapter_ChildrenQuery == null) {
                 QueryBuilder<Chapter> queryBuilder = queryBuilder();
                 queryBuilder.where(Properties.ParentId.eq(null));
+                queryBuilder.orderRaw("T.'ORDER' ASC");
                 chapter_ChildrenQuery = queryBuilder.build();
             }
         }
