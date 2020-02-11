@@ -49,10 +49,14 @@
     <string name="check_again_later">Please check again later</string>
 
     <string-array name="exo_speed_values">
+        <item>0.5</item>
+        <item>0.75</item>
         <item>1</item>
         <item>1.2</item>
         <item>1.5</item>
         <item>2</item>
+        <item>2.5</item>
+        <item>3</item>
     </string-array>
 
     <plurals name="contents_count">

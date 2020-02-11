@@ -181,6 +181,7 @@ public class ExoPlayerUtil {
         if (session != null && session.getInstituteSettings().isScreenshotDisabled()) {
             initScreenRecordTrackers();
         }
+        setSpeedRate(1);
         playerView.setPlaybackPreparer(new PlaybackPreparer() {
             @Override
             public void preparePlayback() {
