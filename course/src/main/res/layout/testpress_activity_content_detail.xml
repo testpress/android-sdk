@@ -193,6 +193,14 @@
                     android:layout_height="wrap_content"
                     layout="@layout/testpress_exo_player_view" />
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/testpress_text_gray"
+                    android:id="@+id/video_description"
+                    android:visibility="gone"/>
+
+
                 <!-- Empty layout to keep the navigation button in bottom -->
                 <View
                     android:layout_width="match_parent"

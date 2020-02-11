@@ -12,6 +12,7 @@ android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
     defaultConfig {
+        multiDexEnabled true
         applicationId "in.testpress.samples"
         if (gradle.startParameter.taskNames.contains("connectedAndroidTest")
                 || gradle.startParameter.taskNames.contains("connectedCheck")) {
@@ -49,5 +50,6 @@ dependencies {
     api rootProject.customtabs
     api 'com.google.android.gms:play-services-auth:16.0.0'
     api 'com.facebook.android:facebook-android-sdk:4.20.0'
+    implementation 'com.android.support:multidex:1.0.3'
     testImplementation rootProject.junit
 }

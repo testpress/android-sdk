@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,11 +36,20 @@ import com.google.gson.JsonObject;
 
 import junit.framework.Assert;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
@@ -51,6 +61,7 @@ import in.testpress.course.R;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.course.util.ExoPlayerUtil;
 import in.testpress.course.util.ExoplayerFullscreenHelper;
+import in.testpress.course.util.PatternEditableBuilder;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.FolderSpinnerAdapter;
@@ -128,7 +139,7 @@ public class ContentActivity extends BaseToolBarActivity {
     private Button startButton;
     private LinearLayout attachmentContentLayout;
     private TextView emptyTitleView;
-    private TextView emptyDescView;
+    private TextView emptyDescView, videoDescription;
     private Button retryButton;
     private TextView titleView;
     private LinearLayout titleLayout;
@@ -227,6 +238,7 @@ public class ContentActivity extends BaseToolBarActivity {
         toast = Toast.makeText(this, R.string.testpress_no_internet_try_again, Toast.LENGTH_SHORT);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         pageNumber = (TextView) findViewById(R.id.page_number);
+        videoDescription = findViewById(R.id.video_description);
         ViewUtils.setTypeface(
                 new TextView[] {titleView, previousButton, nextButton, startButton, pageNumber},
                 TestpressSdk.getRubikMediumFont(this)
@@ -433,11 +445,39 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void loadNativeVideo(Video video) {
         isNonEmbeddableVideo = true;
+//        parseVideoDescription();
         TestpressSession session = TestpressSdk.getTestpressSession(this);
         if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
             checkProfileDetailExist(video.getHlsUrl());
         } else {
             initExoPlayer(video.getHlsUrl());
+        }
+    }
+
+    private void parseVideoDescription() {
+        if (content.getDescription() != null) {
+            videoDescription.setVisibility(View.VISIBLE);
+            videoDescription.setText(Html.fromHtml(content.getDescription()));
+            final Pattern pattern = Pattern.compile("\\[(.*?)\\]");
+            new PatternEditableBuilder().
+                addPattern(pattern, R.color.testpress_color_primary, new PatternEditableBuilder.SpannableClickedListener() {
+                    @Override
+                    public void onSpanClicked(@NotNull String text) {
+                        Matcher m = pattern.matcher(text);
+                        String timeString = "";
+                        while(m.find()) {
+                            timeString = m.group(1);
+                        }
+                        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+                        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                        try {
+                            Date date = dateFormat.parse(timeString);
+                            exoPlayerUtil.seekTo(date.getTime());
+                        } catch (ParseException ignore) {}
+                    }
+                }).
+                into(videoDescription);
         }
     }
 

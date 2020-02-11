@@ -508,6 +508,10 @@ public class ExoPlayerUtil {
         return parameters;
     }
 
+    public void seekTo(Long milliSeconds) {
+        player.seekTo(milliSeconds);
+    }
+
     public void updateVideoAttempt() {
         Map<String, Object> parameters = getVideoAttemptParameters();
         new TestpressCourseApiClient(activity).updateVideoAttempt(videoAttemptId, parameters)
