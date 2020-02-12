@@ -326,6 +326,10 @@ public class ExoPlayerUtil {
         playerView.setControlDispatcher(new DefaultControlDispatcher() {
             @Override
             public boolean dispatchSetPlayWhenReady(Player player, boolean playWhenReady) {
+                if (playWhenReady) {
+                    audioManager.abandonAudioFocus(audioFocusChangeListener);
+                    audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+                }
                 updateVideoAttempt();
                 return super.dispatchSetPlayWhenReady(player, playWhenReady);
             }
