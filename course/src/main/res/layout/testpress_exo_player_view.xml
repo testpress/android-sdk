@@ -1,8 +1,9 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.exoplayer2.ui.AspectRatioFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/exo_player_main_frame"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    app:resize_mode="fixed_width"
     >
 
     <android.support.constraint.ConstraintLayout
@@ -45,4 +46,4 @@
 
     </android.support.constraint.ConstraintLayout>
 
-</FrameLayout>
+</com.google.android.exoplayer2.ui.AspectRatioFrameLayout>

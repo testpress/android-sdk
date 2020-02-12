@@ -26,7 +26,6 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingTop="20dp"
                 tools:ignore="ScrollViewSize">
 
                 <LinearLayout
@@ -187,21 +186,51 @@
                 </LinearLayout>
 
                 <include
-                    android:layout_marginTop="20dp"
                     android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     layout="@layout/testpress_exo_player_view" />
 
-                <TextView
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_margin="20dp"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/testpress_text_gray"
-                    android:id="@+id/video_description"
-                    android:textColorHighlight="#00FFFFFF"
-                    android:textSize="16dp"
-                    android:visibility="gone"/>
+                    android:id="@+id/video_description_layout"
+                    android:visibility="gone"
+                    android:isScrollContainer="true"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/video_title"
+                        android:layout_width="match_parent"
+                        android:text="Lorem ipsum dolor sit amet, consectetur"
+                        android:gravity="left"
+                        android:lineSpacingExtra="6dp"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:textColor="@color/testpress_black"
+                        android:layout_marginBottom="15dp"
+                        android:layout_height="wrap_content"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="5dp"
+                        android:background="#e6e6e6"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/testpress_text_gray"
+                        android:id="@+id/video_description"
+                        android:textColorHighlight="#00FFFFFF"/>
+                </LinearLayout>
 
 
                 <!-- Empty layout to keep the navigation button in bottom -->

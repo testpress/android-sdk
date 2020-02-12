@@ -11,11 +11,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -32,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.gson.JsonObject;
 
 import junit.framework.Assert;
@@ -139,7 +142,7 @@ public class ContentActivity extends BaseToolBarActivity {
     private Button startButton;
     private LinearLayout attachmentContentLayout;
     private TextView emptyTitleView;
-    private TextView emptyDescView, videoDescription;
+    private TextView emptyDescView, videoDescription, videoTitle;
     private Button retryButton;
     private TextView titleView;
     private LinearLayout titleLayout;
@@ -167,14 +170,14 @@ public class ContentActivity extends BaseToolBarActivity {
     private TextView bookmarkButtonText;
     private ImageView bookmarkButtonImage;
     private RelativeLayout bookmarkLayout;
-    private LinearLayout bookmarkButtonLayout;
+    private LinearLayout bookmarkButtonLayout, videoDescriptionLayout;
     private ArrayList<BookmarkFolder> bookmarkFolders = new ArrayList<>();
     private ClosableSpinner bookmarkFolderSpinner;
     private FolderSpinnerAdapter folderSpinnerAdapter;
     private WebViewUtils webViewUtils;
     private FullScreenChromeClient fullScreenChromeClient;
     private ExoPlayerUtil exoPlayerUtil;
-    private FrameLayout exoPlayerMainFrame;
+    private AspectRatioFrameLayout exoPlayerMainFrame;
     private boolean isNonEmbeddableVideo;
     private VideoAttempt videoAttempt;
     private RetrofitCall<CourseAttempt> createAttemptApiRequest;
@@ -239,6 +242,8 @@ public class ContentActivity extends BaseToolBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         pageNumber = (TextView) findViewById(R.id.page_number);
         videoDescription = findViewById(R.id.video_description);
+        videoTitle = findViewById(R.id.video_title);
+        videoDescriptionLayout = findViewById(R.id.video_description_layout);
         ViewUtils.setTypeface(
                 new TextView[] {titleView, previousButton, nextButton, startButton, pageNumber},
                 TestpressSdk.getRubikMediumFont(this)
@@ -445,7 +450,9 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void loadNativeVideo(Video video) {
         isNonEmbeddableVideo = true;
-        parseVideoDescription();
+        titleLayout.setVisibility(View.GONE);
+        videoDescriptionLayout.setVisibility(View.VISIBLE);
+        videoTitle.setText(content.getTitle());
         TestpressSession session = TestpressSdk.getTestpressSession(this);
         if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
             checkProfileDetailExist(video.getHlsUrl());
@@ -456,11 +463,10 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void parseVideoDescription() {
         if (content.getDescription() != null) {
-            videoDescription.setVisibility(View.VISIBLE);
             videoDescription.setText(Html.fromHtml(content.getDescription()));
             final Pattern pattern = Pattern.compile("\\d\\d:\\d\\d:\\d\\d");
             new PatternEditableBuilder().
-                addPattern(pattern, R.color.testpress_color_primary, new PatternEditableBuilder.SpannableClickedListener() {
+                addPattern(pattern, Color.parseColor("#2D9BE8"), new PatternEditableBuilder.SpannableClickedListener() {
                     @Override
                     public void onSpanClicked(@NotNull String text) {
                         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
@@ -566,10 +572,12 @@ public class ContentActivity extends BaseToolBarActivity {
             exoPlayerUtil = new ExoPlayerUtil(this, exoPlayerMainFrame, videoUrl, startPosition);
             exoPlayerUtil.setVideoAttemptParameters(videoAttempt.getId(), content);
             exoPlayerMainFrame.setVisibility(View.VISIBLE);
+            exoPlayerMainFrame.setAspectRatio(16f/9f);
             exoPlayerUtil.initializePlayer();
             exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil);
 
         }
+        parseVideoDescription();
     }
 
     void removeVideoPlayer() {
