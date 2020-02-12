@@ -195,9 +195,12 @@
 
                 <TextView
                     android:layout_width="match_parent"
+                    android:layout_margin="20dp"
                     android:layout_height="wrap_content"
                     android:textColor="@color/testpress_text_gray"
                     android:id="@+id/video_description"
+                    android:textColorHighlight="#00FFFFFF"
+                    android:textSize="16dp"
                     android:visibility="gone"/>
 
 

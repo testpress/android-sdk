@@ -40,6 +40,7 @@ class PatternEditableBuilder {
                 item.styles!!.onSpanStyled(ds)
             }
             super.updateDrawState(ds)
+            ds.setUnderlineText(false);
         }
 
         override fun onClick(widget: View) {

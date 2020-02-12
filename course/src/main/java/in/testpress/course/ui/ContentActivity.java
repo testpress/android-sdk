@@ -445,7 +445,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
     private void loadNativeVideo(Video video) {
         isNonEmbeddableVideo = true;
-//        parseVideoDescription();
+        parseVideoDescription();
         TestpressSession session = TestpressSdk.getTestpressSession(this);
         if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
             checkProfileDetailExist(video.getHlsUrl());
@@ -458,21 +458,16 @@ public class ContentActivity extends BaseToolBarActivity {
         if (content.getDescription() != null) {
             videoDescription.setVisibility(View.VISIBLE);
             videoDescription.setText(Html.fromHtml(content.getDescription()));
-            final Pattern pattern = Pattern.compile("\\[(.*?)\\]");
+            final Pattern pattern = Pattern.compile("\\d\\d:\\d\\d:\\d\\d");
             new PatternEditableBuilder().
                 addPattern(pattern, R.color.testpress_color_primary, new PatternEditableBuilder.SpannableClickedListener() {
                     @Override
                     public void onSpanClicked(@NotNull String text) {
-                        Matcher m = pattern.matcher(text);
-                        String timeString = "";
-                        while(m.find()) {
-                            timeString = m.group(1);
-                        }
                         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
                         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
                         try {
-                            Date date = dateFormat.parse(timeString);
+                            Date date = dateFormat.parse(text);
                             exoPlayerUtil.seekTo(date.getTime());
                         } catch (ParseException ignore) {}
                     }
