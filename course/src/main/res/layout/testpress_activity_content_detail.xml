@@ -33,6 +33,7 @@
                     android:id="@+id/title_layout"
                     android:orientation="vertical"
                     android:paddingRight="10dp"
+                    android:paddingTop="20dp"
                     android:paddingLeft="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -226,6 +227,7 @@
                         android:layout_width="match_parent"
                         android:layout_marginHorizontal="20dp"
                         android:layout_marginTop="10dp"
+                        android:visibility="gone"
                         android:layout_height="wrap_content"
                         android:textColor="@color/testpress_text_gray"
                         android:id="@+id/video_description"
