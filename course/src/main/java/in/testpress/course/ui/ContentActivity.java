@@ -527,12 +527,19 @@ public class ContentActivity extends BaseToolBarActivity {
             } catch (NumberFormatException e) {
                 startPosition = 0;
             }
+            removeVideoPlayer();
             exoPlayerUtil = new ExoPlayerUtil(this, exoPlayerMainFrame, videoUrl, startPosition);
             exoPlayerUtil.setVideoAttemptParameters(videoAttempt.getId(), content);
             exoPlayerMainFrame.setVisibility(View.VISIBLE);
             exoPlayerUtil.initializePlayer();
             exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil);
 
+        }
+    }
+
+    void removeVideoPlayer() {
+        if (exoPlayerUtil != null) {
+            exoPlayerUtil.releasePlayer();
         }
     }
 
