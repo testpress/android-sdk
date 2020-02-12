@@ -918,6 +918,7 @@ public class ContentActivity extends BaseToolBarActivity {
                 .enqueue(new TestpressCallback<Content>() {
                     @Override
                     public void onSuccess(Content content) {
+                        swipeRefresh.setRefreshing(false);
                         Video video = content.getRawVideo();
                         if (video != null) {
                             videoDao.insertOrReplace(video);
@@ -944,6 +945,7 @@ public class ContentActivity extends BaseToolBarActivity {
 
                     @Override
                     public void onException(TestpressException exception) {
+                        swipeRefresh.setRefreshing(false);
                         handleError(exception, true);
                     }
                 });
