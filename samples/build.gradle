@@ -12,6 +12,7 @@ android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
     defaultConfig {
+        multiDexEnabled true
         applicationId "in.testpress.samples"
         if (gradle.startParameter.taskNames.contains("connectedAndroidTest")
                 || gradle.startParameter.taskNames.contains("connectedCheck")) {
@@ -47,6 +48,7 @@ dependencies {
     // Facebook sdk may use the different version of customtabs, To avoid the lint errors & crashes
     // declare same version of support lib
     api rootProject.customtabs
+    implementation 'com.android.support:multidex:1.0.3'
     api 'com.google.android.gms:play-services-auth:16.0.0'
     api 'com.facebook.android:facebook-android-sdk:4.20.0'
     testImplementation rootProject.junit
