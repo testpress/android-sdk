@@ -42,6 +42,7 @@ dependencies {
     testImplementation rootProject.mockito
     testImplementation rootProject.powermockJunit
     testImplementation rootProject.roboelectric
+    testImplementation "org.robolectric:shadows-supportv4:3.8"
     testImplementation rootProject.androidxCore
     testImplementation rootProject.mockServer
     testImplementation (rootProject.powermockMockio) {
@@ -51,6 +52,7 @@ dependencies {
     androidTestImplementation rootProject.junit
     androidTestImplementation rootProject.testRunner
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'android.arch.lifecycle:extensions:1.1.1'
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

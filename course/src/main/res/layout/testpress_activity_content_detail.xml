@@ -50,62 +50,10 @@
                         android:layout_marginBottom="10dp"
                         android:layout_height="wrap_content"/>
 
-                    <RelativeLayout
-                        android:id="@+id/bookmark_layout"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginRight="15dp"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        >
-
-                        <in.testpress.ui.view.ClosableSpinner
-                            android:id="@+id/bookmark_folder_spinner"
-                            android:layout_centerInParent="true"
-                            android:layout_width="240dp"
-                            android:layout_height="1dp"
-                            android:layout_marginTop="12dp"
-                            android:spinnerMode="dropdown"
-                            android:dropDownWidth="240dp"
-                            />
-
-                        <LinearLayout
-                            android:id="@+id/bookmark_button_layout"
-                            android:layout_centerInParent="true"
-                            android:orientation="horizontal"
-                            android:gravity="center"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <ImageView
-                                android:id="@+id/bookmark_button_image"
-                                android:layout_width="15dp"
-                                android:layout_height="15dp"
-                                android:tint="@color/testpress_text_gray_medium"
-                                android:src="@drawable/ic_bookmark"/>
-
-                            <TextView
-                                android:id="@+id/bookmark_text"
-                                android:layout_marginLeft="7dp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/testpress_bookmark_this"
-                                android:textColor="@color/testpress_text_gray_medium"
-                                />
-
-                        </LinearLayout>
-
-                        <com.airbnb.lottie.LottieAnimationView
-                            android:id="@+id/bookmark_loader"
-                            android:layout_centerInParent="true"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:visibility="gone"
-                            app:lottie_rawRes="@raw/testpress_material_wave_loading"
-                            app:lottie_loop="true"
-                            app:lottie_colorFilter="@color/testpress_color_primary"
-                            app:lottie_autoPlay="true" />
-
-                    </RelativeLayout>
+                        android:layout_height="wrap_content"
+                        android:id="@+id/bookmark_fragment_layout"/>
 
                     <View
                         android:id="@+id/title_separator"

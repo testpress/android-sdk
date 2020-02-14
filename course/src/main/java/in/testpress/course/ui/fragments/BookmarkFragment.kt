@@ -15,6 +15,7 @@ import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.FolderListResponse
 import android.content.Context
 import android.os.Bundle
+import android.support.annotation.VisibleForTesting
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.util.Log
@@ -100,7 +101,8 @@ class BookmarkFragment : Fragment() {
         }
     }
 
-    private fun initializeAdapters() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun initializeAdapters() {
         folderSpinnerAdapter = FolderSpinnerAdapter(activity, resources) { folderName ->
             bookmarkFolderSpinner.dismissPopUp()
             bookmark(folderName)
@@ -109,6 +111,7 @@ class BookmarkFragment : Fragment() {
         bookmarkFolderSpinner.adapter = folderSpinnerAdapter
     }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     private fun showBookmarkStatus() {
         if (isBookmarksEnabled) {
             if (bookmarkListener.bookmarkId != null) {
@@ -172,7 +175,7 @@ class BookmarkFragment : Fragment() {
         examApiClient.getBookmarkFolders(url)
                 .enqueue(object : TestpressCallback<ApiResponse<FolderListResponse>>() {
                     override fun onSuccess(response: ApiResponse<FolderListResponse>) {
-                        bookmarkFolders.addAll(response?.results?.folders ?: arrayListOf())
+                        bookmarkFolders.addAll(response.results?.folders ?: arrayListOf())
                         if (response.next != null) {
                             loadBookmarkFolders(response.next)
                         } else {

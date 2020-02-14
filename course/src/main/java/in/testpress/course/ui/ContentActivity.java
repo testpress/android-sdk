@@ -8,8 +8,10 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -49,6 +51,8 @@ import in.testpress.core.TestpressSession;
 import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
 import in.testpress.course.network.TestpressCourseApiClient;
+import in.testpress.course.ui.fragments.BookmarkFragment;
+import in.testpress.course.ui.fragments.BookmarkListener;
 import in.testpress.course.util.ExoPlayerUtil;
 import in.testpress.course.util.ExoplayerFullscreenHelper;
 import in.testpress.exam.TestpressExam;
@@ -106,7 +110,7 @@ import static in.testpress.models.greendao.Content.NOTES_TYPE;
 import static in.testpress.models.greendao.Content.QUIZ_TYPE;
 import static in.testpress.models.greendao.Content.VIDEO_TYPE;
 
-public class ContentActivity extends BaseToolBarActivity {
+public class ContentActivity extends BaseToolBarActivity implements BookmarkListener {
 
     public static final String ACTIONBAR_TITLE = "title";
     public static final String TESTPRESS_CONTENT_SHARED_PREFS = "testpressContentSharedPreferences";
@@ -152,14 +156,6 @@ public class ContentActivity extends BaseToolBarActivity {
     private TestpressExamApiClient examApiClient;
     private TestpressCourseApiClient courseApiClient;
     private Toast toast;
-    private LottieAnimationView animationView;
-    private TextView bookmarkButtonText;
-    private ImageView bookmarkButtonImage;
-    private RelativeLayout bookmarkLayout;
-    private LinearLayout bookmarkButtonLayout;
-    private ArrayList<BookmarkFolder> bookmarkFolders = new ArrayList<>();
-    private ClosableSpinner bookmarkFolderSpinner;
-    private FolderSpinnerAdapter folderSpinnerAdapter;
     private WebViewUtils webViewUtils;
     private FullScreenChromeClient fullScreenChromeClient;
     private ExoPlayerUtil exoPlayerUtil;
@@ -231,51 +227,6 @@ public class ContentActivity extends BaseToolBarActivity {
                 new TextView[] {titleView, previousButton, nextButton, startButton, pageNumber},
                 TestpressSdk.getRubikMediumFont(this)
         );
-        bookmarkLayout = findViewById(R.id.bookmark_layout);
-        bookmarkButtonLayout = findViewById(R.id.bookmark_button_layout);
-        bookmarkButtonImage = findViewById(R.id.bookmark_button_image);
-        bookmarkButtonText = findViewById(R.id.bookmark_text);
-        bookmarkButtonText.setTypeface(TestpressSdk.getRubikRegularFont(this));
-        bookmarkButtonLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (content.getBookmarkId() != null) {
-                    deleteBookmark(content.getBookmarkId());
-                } else {
-                    String baseUrl = TestpressSdk.getTestpressSession(ContentActivity.this)
-                            .getInstituteSettings().getBaseUrl();
-
-                    bookmarkFolders.clear();
-                    loadBookmarkFolders(baseUrl + BOOKMARK_FOLDERS_PATH);
-                }
-            }
-        });
-        bookmarkFolderSpinner = findViewById(R.id.bookmark_folder_spinner);
-        folderSpinnerAdapter = new FolderSpinnerAdapter(this, getResources(),
-                new ViewUtils.OnInputCompletedListener() {
-                    @Override
-                    public void onInputComplete(String folderName) {
-                        bookmarkFolderSpinner.dismissPopUp();
-                        bookmark(folderName);
-                    }
-                });
-        folderSpinnerAdapter.hideSpinner(true);
-        bookmarkFolderSpinner.setAdapter(folderSpinnerAdapter);
-        bookmarkFolderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> spinner, View view, int position, long itemId) {
-                if (position == 0) {
-                    return;
-                }
-                bookmark(folderSpinnerAdapter.getTag(position));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-            }
-        });
-        animationView = findViewById(R.id.bookmark_loader);
-        animationView.playAnimation();
         examApiClient = new TestpressExamApiClient(this);
         courseApiClient = new TestpressCourseApiClient(this);
         swipeRefresh.setColorSchemeResources(R.color.testpress_color_primary);
@@ -358,6 +309,10 @@ public class ContentActivity extends BaseToolBarActivity {
         }
         hideNavigationForProductPreview();
 
+        BookmarkFragment bookmarkFragment = new BookmarkFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.bookmark_fragment_layout, bookmarkFragment);
+        transaction.commit();
     }
 
     private void hideNavigationForProductPreview() {
@@ -979,72 +934,6 @@ public class ContentActivity extends BaseToolBarActivity {
                 TestpressSdk.getTestpressSession(this));
     }
 
-    void loadBookmarkFolders(String url) {
-        setBookmarkProgress(true);
-        bookmarkFoldersApiRequest = examApiClient.getBookmarkFolders(url)
-                .enqueue(new TestpressCallback<ApiResponse<FolderListResponse>>() {
-                    @Override
-                    public void onSuccess(ApiResponse<FolderListResponse> apiResponse) {
-                        bookmarkFolders.addAll(apiResponse.getResults().getFolders());
-                        if (apiResponse.getNext() != null) {
-                            loadBookmarkFolders(apiResponse.getNext());
-                        } else {
-                            addFoldersToSpinner(bookmarkFolders);
-                            setBookmarkProgress(false);
-                            bookmarkFolderSpinner.performClick();
-                        }
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        setBookmarkProgress(false);
-                        handleException(exception);
-                    }
-                });
-    }
-
-    void bookmark(String folder) {
-        setBookmarkProgress(true);
-        bookmarkApiRequest = examApiClient.bookmark(content.getId(), folder, "chaptercontent", "courses")
-                .enqueue(new TestpressCallback<Bookmark>() {
-                    @Override
-                    public void onSuccess(Bookmark bookmark) {
-                        content.setBookmarkId(bookmark.getId());
-                        contentDao.updateInTx(content);
-                        bookmarkButtonText.setText(R.string.testpress_remove_bookmark);
-                        bookmarkButtonImage.setImageResource(R.drawable.ic_remove_bookmark);
-                        setBookmarkProgress(false);
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        setBookmarkProgress(false);
-                        handleException(exception);
-                    }
-                });
-    }
-
-    void deleteBookmark(Long bookmarkId) {
-        setBookmarkProgress(true);
-        deleteBookmarkApiRequest = examApiClient.deleteBookmark(bookmarkId)
-                .enqueue(new TestpressCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void data) {
-                        content.setBookmarkId(null);
-                        contentDao.updateInTx(content);
-                        bookmarkFolderSpinner.setSelection(0);
-                        bookmarkButtonText.setText(R.string.testpress_bookmark_this);
-                        bookmarkButtonImage.setImageResource(R.drawable.ic_bookmark);
-                        setBookmarkProgress(false);
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        setBookmarkProgress(false);
-                        handleException(exception);
-                    }
-                });
-    }
 
     @Override
     public void onBackPressed() {
@@ -1054,25 +943,6 @@ public class ContentActivity extends BaseToolBarActivity {
         super.onBackPressed();
     }
 
-    void setBookmarkProgress(boolean show) {
-        if (show) {
-            bookmarkButtonLayout.setVisibility(View.GONE);
-            animationView.setVisibility(View.VISIBLE);
-        } else {
-            animationView.setVisibility(View.GONE);
-            bookmarkButtonLayout.setVisibility(View.VISIBLE);
-        }
-    }
-
-    void addFoldersToSpinner(List<BookmarkFolder> bookmarkFolders) {
-        folderSpinnerAdapter.clear();
-        folderSpinnerAdapter.addHeader("-- Select Folder --");
-        for (BookmarkFolder folder: bookmarkFolders) {
-            folderSpinnerAdapter.addItem(folder.getName(), folder.getName(), false, 0);
-        }
-        folderSpinnerAdapter.addItem(null, UNCATEGORIZED, false, 0);
-        folderSpinnerAdapter.notifyDataSetChanged();
-    }
 
     private void hideNavigationButtons() {
         pageNumber.setVisibility(View.GONE);
@@ -1227,18 +1097,6 @@ public class ContentActivity extends BaseToolBarActivity {
         boolean bookmarksEnabled = TestpressSdk.getTestpressSession(this).getInstituteSettings()
                 .isBookmarksEnabled();
 
-        if (content.getRawExam() == null && bookmarksEnabled) {
-            if (content.getBookmarkId() != null) {
-                bookmarkButtonText.setText(R.string.testpress_remove_bookmark);
-                bookmarkButtonImage.setImageResource(R.drawable.ic_remove_bookmark);
-            } else {
-                bookmarkButtonText.setText(R.string.testpress_bookmark_this);
-                bookmarkButtonImage.setImageResource(R.drawable.ic_bookmark);
-            }
-            bookmarkLayout.setVisibility(View.VISIBLE);
-        } else {
-            bookmarkLayout.setVisibility(View.GONE);
-        }
         titleLayout.setVisibility(View.VISIBLE);
     }
 
@@ -1334,4 +1192,30 @@ public class ContentActivity extends BaseToolBarActivity {
                     Snackbar.LENGTH_SHORT).show();
         }
     }
+
+
+    @Nullable
+    @Override
+    public Long getBookmarkId() {
+        return content.getBookmarkId();
+    }
+
+    @Nullable
+    @Override
+    public Long getContentId() {
+        return content.getId();
+    }
+
+    @Override
+    public void onBookmarkSuccess(@Nullable Long bookmarkId) {
+        content.setBookmarkId(bookmarkId);
+        contentDao.updateInTx(content);
+    }
+
+    @Override
+    public void onDeleteBookmarkSuccess() {
+        content.setBookmarkId(null);
+        contentDao.updateInTx(content);
+    }
+
 }
