@@ -106,22 +106,20 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
         contentId = arguments!!.getString(CONTENT_ID)
         position = arguments!!.getInt(POSITION);
         productSlug = arguments!!.getString(PRODUCT_SLUG)
+
+        val onContentLoad = Observer<Content> {
+            content = it!!
+            contentId = content.id.toString()
+            loadContent()
+            initBookmarkFragment()
+        }
+
         if (contentId != null) {
-            viewModel.getContent(contentId!!.toInt()).observe(this, Observer {
-                content = it!!
-                contentId = content.id.toString()
-                loadContent()
-                initBookmarkFragment()
-            })
+            viewModel.getContent(contentId!!.toInt()).observe(this, onContentLoad)
             buttonLayout.visibility = View.GONE
         } else {
             pageNumber.text = String.format("%d/%d", position + 1, viewModel.getChapterContents(chapterId).size)
-            viewModel.getContent(position, chapterId).observe(this, Observer {
-                content = it!!
-                contentId = content.id.toString()
-                loadContent()
-                initBookmarkFragment()
-            })
+            viewModel.getContent(position, chapterId).observe(this, onContentLoad)
         }
     }
 
