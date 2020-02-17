@@ -18,14 +18,10 @@ import android.arch.lifecycle.MutableLiveData
 
 class ContentViewModel(application: Application) : AndroidViewModel(application) {
     var content: MutableLiveData<Content> = MutableLiveData()
-    private var resourceContent: MutableLiveData<Resource<Content>> = MutableLiveData()
+    var resourceContent: MutableLiveData<Resource<Content>> = MutableLiveData()
     private var contentAttempt: MutableLiveData<Resource<CourseAttempt>> = MutableLiveData()
     private val contentDao: ContentDao = TestpressSDKDatabase.getContentDao(getApplication())
-    private val courseApiClient: TestpressCourseApiClient
-
-    init {
-        courseApiClient = TestpressCourseApiClient(getApplication())
-    }
+    private val courseApiClient: TestpressCourseApiClient = TestpressCourseApiClient(getApplication())
 
     fun loadContent(id: Int): LiveData<Resource<Content>> {
         val url = "${CONTENTS_PATH_v2_4}${id}/"
