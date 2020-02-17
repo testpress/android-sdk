@@ -132,7 +132,7 @@ class BookmarkFragment : Fragment() {
 
     private fun bookmark(folderName: String) {
         showAnimation(true)
-        examApiClient.bookmark(bookmarkListener.contentId!!, folderName, "chaptercontent", "courses")
+        examApiClient.bookmark(bookmarkListener.bookmarkContentId!!, folderName, "chaptercontent", "courses")
                 .enqueue(object : TestpressCallback<Bookmark>() {
                     override fun onSuccess(bookmark: Bookmark?) {
                         bookmarkListener.onBookmarkSuccess(bookmark?.id)
@@ -227,7 +227,7 @@ class BookmarkFragment : Fragment() {
 
 interface BookmarkListener {
     val bookmarkId: Long?
-    val contentId: Long?
+    val bookmarkContentId: Long?
     fun onBookmarkSuccess(bookmarkId: Long?)
     fun onDeleteBookmarkSuccess()
 }
