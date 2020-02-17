@@ -50,6 +50,7 @@ class ContentViewModelTest {
 
     @Before
     fun setUp() {
+        setUpChapterAndContent()
         MockitoAnnotations.initMocks(this)
         mockWebServer = MockWebServer()
         val instituteSettings = InstituteSettings("http://localhost:9200")
@@ -88,6 +89,7 @@ class ContentViewModelTest {
 
     @Test
     fun testStoreBookmarkId() {
+        viewModel.content.value = content
         viewModel.storeBookmarkId(24)
         viewModel.getContent(1).observeOnce {
             Assert.assertEquals(it.bookmarkId, 24)
