@@ -168,7 +168,7 @@ class BookmarkFragment : Fragment() {
     }
 
     private fun loadBookmarkFolders(url: String) {
-        showAnimation(false)
+        showAnimation(true)
         examApiClient.getBookmarkFolders(url)
                 .enqueue(object : TestpressCallback<ApiResponse<FolderListResponse>>() {
                     override fun onSuccess(response: ApiResponse<FolderListResponse>) {
