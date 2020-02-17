@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/button_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:background="@color/testpress_white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/previous"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/transparent"
+            android:drawableLeft="@drawable/ic_chevron_left_black_24dp"
+            android:drawableTint="@color/testpress_text_gray"
+            android:gravity="center"
+            android:text="@string/testpress_previous_content"
+            android:textColor="@color/testpress_text_gray"
+            android:textSize="14sp"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/page_number"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:lineSpacingExtra="6dp"
+            android:text="15/20"
+            android:textColor="@color/testpress_text_gray_light"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/next"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/transparent"
+            android:drawableRight="@drawable/ic_chevron_right_black_24dp"
+            android:drawableTint="@color/testpress_text_gray"
+            android:gravity="right|center_vertical"
+            android:text="@string/testpress_next_content"
+            android:textColor="@color/testpress_text_gray"
+            android:textSize="14sp"
+            android:visibility="invisible" />
+    </LinearLayout>
+</LinearLayout>
