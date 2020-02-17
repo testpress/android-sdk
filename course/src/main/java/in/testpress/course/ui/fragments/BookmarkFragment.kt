@@ -51,7 +51,15 @@ class BookmarkFragment : Fragment() {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        bookmarkListener = context as BookmarkListener;
+        if (parentFragment != null) {
+            onAttachToParentFragment(parentFragment)
+        } else {
+            bookmarkListener = context as BookmarkListener;
+        }
+    }
+
+    private fun onAttachToParentFragment(fragment: Fragment?) {
+        bookmarkListener = fragment as BookmarkListener;
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
