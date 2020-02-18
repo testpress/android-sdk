@@ -50,10 +50,12 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var position: Int = -1
     protected lateinit var content: Content
-    protected lateinit var contentDao: ContentDao
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    lateinit var contentDao: ContentDao
     private lateinit var examApiClient: TestpressExamApiClient
     private lateinit var courseApiClient: TestpressCourseApiClient
-    protected open val viewModel: ContentViewModel by lazy { ViewModelProviders.of(this).get(ContentViewModel::class.java) }
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    open lateinit var viewModel: ContentViewModel
 
     override val bookmarkId: Long?
         get() = content.bookmarkId
@@ -65,6 +67,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
         contentDao = TestpressSDKDatabase.getContentDao(activity)
         examApiClient = TestpressExamApiClient(activity);
         courseApiClient = TestpressCourseApiClient(activity)
+        viewModel = ViewModelProviders.of(this).get(ContentViewModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
