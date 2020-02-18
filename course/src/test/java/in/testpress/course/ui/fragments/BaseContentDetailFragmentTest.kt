@@ -72,11 +72,10 @@ class BaseContentDetailFragmentTest {
         contentFragment = spy(contentFragment)
         contentFragment.arguments = bundle
 
-        val activity = Robolectric.buildActivity(FragmentActivity::class.java).create().start().resume().get();
-        val fragmentManager = activity.supportFragmentManager
+        val fragmentManager = FragmentActivity().supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.add(contentFragment, null);
-        fragmentTransaction.commit();
+        fragmentTransaction.add(contentFragment, null)
+        fragmentTransaction.commitAllowingStateLoss()
         contentFragment.viewModel = spy(contentFragment.viewModel)
     }
 
