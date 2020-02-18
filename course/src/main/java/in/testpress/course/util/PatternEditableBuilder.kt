@@ -7,8 +7,7 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
 import android.widget.TextView
-
-import java.util.ArrayList
+import java.util.*
 import java.util.regex.Pattern
 
 
@@ -50,7 +49,6 @@ class PatternEditableBuilder {
         }
     }
 
-
     fun addPattern(pattern: Pattern, spanStyles: SpannableStyleListener?, listener: SpannableClickedListener?): PatternEditableBuilder {
         patterns.add(SpannablePatternItem(pattern, spanStyles, listener))
         return this
@@ -86,13 +84,11 @@ class PatternEditableBuilder {
         return this
     }
 
-
     fun into(textView: TextView) {
         val result = build(textView.text)
         textView.text = result
         textView.movementMethod = LinkMovementMethod.getInstance()
     }
-
 
     fun build(editable: CharSequence): SpannableStringBuilder {
         val stringBuilder = SpannableStringBuilder(editable)
@@ -107,5 +103,4 @@ class PatternEditableBuilder {
         }
         return stringBuilder
     }
-
 }
