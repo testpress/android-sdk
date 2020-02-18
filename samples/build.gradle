@@ -51,5 +51,6 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     api 'com.google.android.gms:play-services-auth:16.0.0'
     api 'com.facebook.android:facebook-android-sdk:4.20.0'
+    implementation 'com.android.support:multidex:1.0.3'
     testImplementation rootProject.junit
 }
