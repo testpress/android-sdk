@@ -13,27 +13,21 @@ import java.util.regex.Pattern
 
 
 class PatternEditableBuilder {
-    internal var patterns: ArrayList<SpannablePatternItem>
+    private var patterns: ArrayList<SpannablePatternItem> = ArrayList()
 
     inner class SpannablePatternItem(var pattern: Pattern, var styles: SpannableStyleListener?, var listener: SpannableClickedListener?)
 
     /* This stores the style listener for a pattern item
        Used to style a particular category of spans */
-    abstract class SpannableStyleListener {
-        var spanTextColor: Int = 0
-
-        constructor(spanTextColor: Int) {
-            this.spanTextColor = spanTextColor
-        }
-
-        internal abstract fun onSpanStyled(ds: TextPaint)
+    abstract class SpannableStyleListener(var spanTextColor: Int) {
+        abstract fun onSpanStyled(ds: TextPaint)
     }
 
     interface SpannableClickedListener {
         fun onSpanClicked(text: String)
     }
 
-    inner class StyledClickableSpan(internal var item: SpannablePatternItem) : ClickableSpan() {
+    inner class StyledClickableSpan(var item: SpannablePatternItem) : ClickableSpan() {
 
         override fun updateDrawState(ds: TextPaint) {
             if (item.styles != null) {
@@ -54,10 +48,6 @@ class PatternEditableBuilder {
             }
             widget.invalidate()
         }
-    }
-
-    init {
-        this.patterns = ArrayList()
     }
 
 
@@ -83,7 +73,7 @@ class PatternEditableBuilder {
 
     fun addPattern(pattern: Pattern, textColor: Int, listener: SpannableClickedListener?): PatternEditableBuilder {
         val styles = object : SpannableStyleListener(textColor) {
-            public override fun onSpanStyled(ds: TextPaint) {
+            override fun onSpanStyled(ds: TextPaint) {
                 ds.linkColor = this.spanTextColor
             }
         }
@@ -105,17 +95,17 @@ class PatternEditableBuilder {
 
 
     fun build(editable: CharSequence): SpannableStringBuilder {
-        val ssb = SpannableStringBuilder(editable)
+        val stringBuilder = SpannableStringBuilder(editable)
         for (item in patterns) {
-            val matcher = item.pattern.matcher(ssb)
+            val matcher = item.pattern.matcher(stringBuilder)
             while (matcher.find()) {
                 val start = matcher.start()
                 val end = matcher.end()
                 val url = StyledClickableSpan(item)
-                ssb.setSpan(url, start, end, 0)
+                stringBuilder.setSpan(url, start, end, 0)
             }
         }
-        return ssb
+        return stringBuilder
     }
 
 }
