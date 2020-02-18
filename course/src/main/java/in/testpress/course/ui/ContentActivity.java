@@ -575,9 +575,8 @@ public class ContentActivity extends BaseToolBarActivity {
             exoPlayerMainFrame.setAspectRatio(16f/9f);
             exoPlayerUtil.initializePlayer();
             exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil);
-
+            parseVideoDescription();
         }
-        parseVideoDescription();
     }
 
     void removeVideoPlayer() {
