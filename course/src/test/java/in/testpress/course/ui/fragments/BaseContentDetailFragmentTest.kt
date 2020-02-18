@@ -13,6 +13,7 @@ import `in`.testpress.models.greendao.Content
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.os.Bundle
+import android.support.v4.app.FragmentActivity
 import android.view.View
 import androidx.test.core.app.ApplicationProvider
 import org.junit.After
@@ -24,6 +25,7 @@ import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.shadows.support.v4.SupportFragmentTestUtil
 import java.lang.reflect.Field
@@ -69,7 +71,12 @@ class BaseContentDetailFragmentTest {
         contentFragment = SampleConcreteContentFragment()
         contentFragment = spy(contentFragment)
         contentFragment.arguments = bundle
-        SupportFragmentTestUtil.startVisibleFragment(contentFragment)
+
+        val activity = Robolectric.buildActivity(FragmentActivity::class.java).create().start().resume().get();
+        val fragmentManager = activity.supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.add(contentFragment, null);
+        fragmentTransaction.commit();
         contentFragment.viewModel = spy(contentFragment.viewModel)
     }
 
