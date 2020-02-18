@@ -34,14 +34,14 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
     private lateinit var emptyDescView: TextView
     private lateinit var pageNumber: TextView
     private lateinit var contentView: RelativeLayout
-    private lateinit var emptyContainer: LinearLayout
+    protected lateinit var emptyContainer: LinearLayout
     private lateinit var buttonLayout: LinearLayout
-    private lateinit var retryButton: Button
+    protected lateinit var retryButton: Button
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var previousButton: Button
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var nextButton: Button
-    private lateinit var swipeRefresh: SwipeRefreshLayout
+    protected lateinit var swipeRefresh: SwipeRefreshLayout
     private lateinit var toast: Toast
 
     private var chapterId: Long = -1
