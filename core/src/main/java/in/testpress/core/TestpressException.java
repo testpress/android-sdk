@@ -96,6 +96,10 @@ public class TestpressException extends RuntimeException {
         return kind == Kind.NETWORK;
     }
 
+    public boolean isPageNotFound() {
+        return statusCode == 404;
+    }
+
     public boolean isForbidden() {
         return statusCode == 403;
     }

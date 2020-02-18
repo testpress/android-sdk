@@ -26,6 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import `in`.testpress.core.TestpressException
+import android.support.annotation.VisibleForTesting
 
 
 abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
@@ -36,20 +37,23 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
     private lateinit var emptyContainer: LinearLayout
     private lateinit var buttonLayout: LinearLayout
     private lateinit var retryButton: Button
-    private lateinit var previousButton: Button
-    private lateinit var nextButton: Button
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var previousButton: Button
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var nextButton: Button
     private lateinit var swipeRefresh: SwipeRefreshLayout
     private lateinit var toast: Toast
 
     private var chapterId: Long = -1
     private var contentId: String? = null
     private var productSlug: String? = null
-    private var position: Int = -1
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var position: Int = -1
     protected lateinit var content: Content
     protected lateinit var contentDao: ContentDao
     private lateinit var examApiClient: TestpressExamApiClient
     private lateinit var courseApiClient: TestpressCourseApiClient
-    protected val viewModel: ContentViewModel by lazy { ViewModelProviders.of(this).get(ContentViewModel::class.java) }
+    protected open val viewModel: ContentViewModel by lazy { ViewModelProviders.of(this).get(ContentViewModel::class.java) }
 
     override val bookmarkId: Long?
         get() = content.bookmarkId
@@ -75,7 +79,8 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
         initNavigationButtons()
     }
 
-    private fun bindViews() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun bindViews() {
         contentView = view!!.findViewById(R.id.main_content)
         emptyContainer = view!!.findViewById(R.id.empty_container)
         emptyTitleView = view!!.findViewById(R.id.empty_title)
@@ -95,13 +100,15 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
         )
     }
 
-    private fun initializeListenters() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun initializeListenters() {
         swipeRefresh.setOnRefreshListener {
             updateContent()
         }
     }
 
-    private fun parseIntentArguments() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun parseIntentArguments() {
         chapterId = arguments!!.getLong(CHAPTER_ID)
         contentId = arguments!!.getString(CONTENT_ID)
         position = arguments!!.getInt(POSITION);
@@ -123,13 +130,15 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
         }
     }
 
-    private fun initNavigationButtons() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun initNavigationButtons() {
         initPrevButton()
         initNextButton()
     }
 
-    private fun initPrevButton() {
-        if (position == 0)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun initPrevButton() {
+        if (position < 1)
             return
 
         val previousPosition = position - 1;
@@ -148,7 +157,8 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
         }
     }
 
-    private fun initNextButton() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun initNextButton() {
         val contents = viewModel.getChapterContents(chapterId)
         if (contents.isEmpty())
             return
@@ -160,6 +170,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
                 pref.edit().putBoolean(GO_TO_MENU, true).apply()
                 finishActivity()
             }
+            nextButton.visibility = View.VISIBLE
         } else {
             val nextPosition = position + 1
             if (!contents[nextPosition].isLocked) {
@@ -173,7 +184,8 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
         }
     }
 
-    protected fun updateContent() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    fun updateContent() {
         viewModel.loadContent(contentId!!.toInt()).observe(this,
                 Observer { resource ->
                     swipeRefresh.isRefreshing = false
@@ -192,40 +204,46 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
                 })
     }
 
-    private fun handleError(exception: TestpressException) {
-        if (exception.isForbidden) {
-            setEmptyText(R.string.permission_denied,
-                    R.string.testpress_no_permission,
-                    R.drawable.ic_error_outline_black_18dp)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun handleError(exception: TestpressException) {
+        when {
+            exception.isForbidden -> {
+                setEmptyText(R.string.permission_denied,
+                        R.string.testpress_no_permission,
+                        R.drawable.ic_error_outline_black_18dp)
 
-            retryButton.visibility = View.GONE
-        } else if (exception.isNetworkError) {
-            if (!swipeRefresh.isRefreshing) {
-                if (!toast.view.isShown) {
-                    toast.show()
+                retryButton.visibility = View.GONE
+            }
+            exception.isNetworkError -> {
+                if (!swipeRefresh.isRefreshing) {
+                    if (!toast.view.isShown) {
+                        toast.show()
+                    }
+                    return
                 }
-                return
+                setEmptyText(R.string.testpress_network_error,
+                        R.string.testpress_no_internet_try_again,
+                        R.drawable.ic_error_outline_black_18dp)
+
+                retryButton.setOnClickListener {
+                    emptyContainer.visibility = View.GONE
+                    viewModel.loadContent(content.id.toInt() ?: contentId!!.toInt())
+                }
             }
-            setEmptyText(R.string.testpress_network_error,
-                    R.string.testpress_no_internet_try_again,
-                    R.drawable.ic_error_outline_black_18dp)
+            exception.isPageNotFound -> {
+                setEmptyText(R.string.testpress_content_not_available,
+                        R.string.testpress_content_not_available_description,
+                        R.drawable.ic_error_outline_black_18dp)
 
-            retryButton.setOnClickListener {
-                emptyContainer.visibility = View.GONE
-                viewModel.loadContent(content.id.toInt() ?: contentId!!.toInt())
+                retryButton.visibility = View.GONE
             }
-        } else if (exception.response.code() == 404) {
-            setEmptyText(R.string.testpress_content_not_available,
-                    R.string.testpress_content_not_available_description,
-                    R.drawable.ic_error_outline_black_18dp)
+            else -> {
+                setEmptyText(R.string.testpress_error_loading_contents,
+                        R.string.testpress_some_thing_went_wrong_try_again,
+                        R.drawable.ic_error_outline_black_18dp)
 
-            retryButton.visibility = View.GONE
-        } else {
-            setEmptyText(R.string.testpress_error_loading_contents,
-                    R.string.testpress_some_thing_went_wrong_try_again,
-                    R.drawable.ic_error_outline_black_18dp)
-
-            retryButton.visibility = View.GONE
+                retryButton.visibility = View.GONE
+            }
         }
     }
 
