@@ -72,10 +72,7 @@ class BaseContentDetailFragmentTest {
         contentFragment = spy(contentFragment)
         contentFragment.arguments = bundle
 
-        val fragmentManager = FragmentActivity().supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.add(contentFragment, null)
-        fragmentTransaction.commitAllowingStateLoss()
+        SupportFragmentTestUtil.startVisibleFragment(contentFragment)
         contentFragment.viewModel = spy(contentFragment.viewModel)
     }
 
