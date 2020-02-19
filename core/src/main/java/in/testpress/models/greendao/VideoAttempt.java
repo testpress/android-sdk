@@ -174,6 +174,14 @@ public class VideoAttempt {
         }
         return getVideoContent();
     }
+
+    public float getLastWatchedPosition() {
+        try {
+            return Float.parseFloat(lastPosition);
+        } catch (NumberFormatException exception) {
+            return 0f;
+        }
+    }
     // KEEP METHODS END
 
 }

@@ -53,7 +53,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     lateinit var contentDao: ContentDao
     private lateinit var examApiClient: TestpressExamApiClient
-    private lateinit var courseApiClient: TestpressCourseApiClient
+    protected lateinit var courseApiClient: TestpressCourseApiClient
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     open lateinit var viewModel: ContentViewModel
 
@@ -196,8 +196,11 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
                         when (resource.status) {
                             Status.SUCCESS -> {
                                 content = resource.data!!
-                                onUpdateContent(content)
+                                onUpdateContent(resource.data!!)
                                 loadContent()
+                                contentDao.detachAll()
+                                val content1 = contentDao.queryBuilder().where(ContentDao.Properties.Id.eq(content.id)).list().get(0)
+                                println("Content 1 : ${content1.attemptsUrl}")
                             }
                             Status.ERROR -> {
                                 handleError(resource.exception!!)
@@ -207,7 +210,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
                 })
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     fun handleError(exception: TestpressException) {
         when {
             exception.isForbidden -> {
@@ -262,6 +265,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
 
     private fun initBookmarkFragment() {
         val bookmarkFragment = BookmarkFragment()
+        println("BookmarkID : ${content.bookmarkId}")
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.bookmark_fragment_layout, bookmarkFragment)
         transaction.commit()
