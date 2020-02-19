@@ -7,9 +7,12 @@ import `in`.testpress.course.enums.Status
 import `in`.testpress.course.models.Resource
 import `in`.testpress.course.network.TestpressCourseApiClient
 import `in`.testpress.course.network.TestpressCourseApiClient.CONTENTS_PATH_v2_4
+import `in`.testpress.course.repositories.ExamRepository
+import `in`.testpress.exam.network.TestpressExamApiClient
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.models.greendao.CourseAttempt
+import `in`.testpress.models.greendao.Language
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
@@ -22,6 +25,7 @@ class ContentViewModel(application: Application) : AndroidViewModel(application)
     private var contentAttempt: MutableLiveData<Resource<CourseAttempt>> = MutableLiveData()
     private val contentDao: ContentDao = TestpressSDKDatabase.getContentDao(getApplication())
     private val courseApiClient: TestpressCourseApiClient = TestpressCourseApiClient(getApplication())
+    private val examRepository = ExamRepository(getApplication(), content)
 
     fun loadContent(id: Int): LiveData<Resource<Content>> {
         val url = "${CONTENTS_PATH_v2_4}${id}/"
@@ -29,6 +33,7 @@ class ContentViewModel(application: Application) : AndroidViewModel(application)
             override fun onSuccess(result: Content?) {
                 content.value = result
                 resourceContent.value = Resource(Status.SUCCESS, result, null)
+                println("loadContent : ${result?.id}")
                 contentDao.insertOrReplaceInTx(result)
             }
 
@@ -73,20 +78,16 @@ class ContentViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun getContent(position: Int, chapterId: Long): MutableLiveData<Content> {
-        if (content.value == null) {
-            val contents = getChapterContents(chapterId)
-            content.value = contents[position]
-        }
+        val contents = getChapterContents(chapterId)
+        content.value = contents[position]
         return content
     }
 
     fun getContent(contentId: Int): MutableLiveData<Content> {
-        if (content.value == null) {
-            if (getContentFromDb(contentId) != null) {
-                content.value = getContentFromDb(contentId)
-            } else {
-                loadContent(contentId)
-            }
+        if (getContentFromDb(contentId) != null) {
+            content.value = getContentFromDb(contentId)
+        } else {
+            loadContent(contentId)
         }
         return content
     }
@@ -94,5 +95,17 @@ class ContentViewModel(application: Application) : AndroidViewModel(application)
     fun storeBookmarkId(bookmarkId: Long?) {
         content.value?.bookmarkId = bookmarkId
         contentDao.updateInTx(content.value)
+    }
+
+    fun loadAttempts(): MutableLiveData<Resource<ArrayList<CourseAttempt>>> {
+        return examRepository.loadAttempts(content.value!!.attemptsUrl)
+    }
+
+    fun fetchLanguages(): MutableLiveData<Resource<ArrayList<Language>>> {
+        return examRepository.fetchLanguages()
+    }
+
+    fun getAttemptsFromDB():List<CourseAttempt> {
+        return examRepository.getContentAttemptsFromDB()
     }
 }
