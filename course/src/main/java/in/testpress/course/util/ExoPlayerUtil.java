@@ -279,9 +279,6 @@ public class ExoPlayerUtil {
                     case (AudioManager.AUDIOFOCUS_LOSS) :
                         player.setPlayWhenReady(false);
                         break;
-                    case (AudioManager.AUDIOFOCUS_GAIN):
-                        player.setPlayWhenReady(true);
-                        break;
                     default:
                         break;
                 }
