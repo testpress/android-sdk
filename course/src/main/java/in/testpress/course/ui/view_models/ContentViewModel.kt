@@ -37,7 +37,6 @@ class ContentViewModel(application: Application) : AndroidViewModel(application)
             override fun onSuccess(result: Content?) {
                 content.value = result
                 resourceContent.value = Resource(Status.SUCCESS, result, null)
-                println("loadContent : ${result?.id}")
                 contentDao.insertOrReplaceInTx(result)
             }
 
@@ -72,7 +71,7 @@ class ContentViewModel(application: Application) : AndroidViewModel(application)
         return contentAttempt
     }
 
-    private fun getContentFromDb(contentId: Int): Content? {
+    fun getContentFromDb(contentId: Int): Content? {
         val contents = contentDao.queryBuilder().where(ContentDao.Properties.Id.eq(contentId)).list()
 
         if (contents.isNotEmpty()) {
