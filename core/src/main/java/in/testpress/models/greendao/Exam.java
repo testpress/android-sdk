@@ -702,6 +702,26 @@ public class Exam implements android.os.Parcelable {
     public boolean hasMultipleLanguages() {
         return getRawLanguages().size() > 1;
     }
+
+    public boolean isWebOnly() {
+        if (deviceAccessControl != null && deviceAccessControl.equals("web")) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean canBeAttempted() {
+        if (isEnded()) {
+            return false;
+        }
+
+        if (attemptsCount == 0|| canRetake()) {
+            return !isWebOnly();
+        }
+
+        return false;
+    }
     // KEEP METHODS END
 
 }

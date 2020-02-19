@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/button_layout"
+        android:layout_below="@+id/appbar">
+
+        <android.support.v4.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:background="#ffffff" >
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="20dp"
+                tools:ignore="ScrollViewSize">
+
+                <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/title_layout"
+                    android:orientation="vertical"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="match_parent"
+                        android:text="Lorem ipsum dolor sit amet, consectetur"
+                        android:gravity="center"
+                        android:lineSpacingExtra="6dp"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/testpress_black"
+                        android:layout_marginBottom="10dp"
+                        android:layout_height="wrap_content"/>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/bookmark_fragment_layout"/>
+
+                    <View
+                        android:id="@+id/title_separator"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="5dp"
+                        android:background="#e6e6e6"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:paddingRight="20dp"
+                    android:paddingLeft="20dp"
+                    android:visibility="gone"
+                    android:id="@+id/exam_content_layout"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <include
+                        android:visibility="gone"
+                        android:id="@+id/exam_details_layout"
+                        layout="@layout/testpress_exam_details_layout" />
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/attempt_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/attempt_web_only_label"
+                        android:visibility="gone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/testpress_black"
+                        android:text="@string/testpress_web_only_exam_description"
+                        android:lineSpacingExtra="5dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginRight="15dp"
+                        android:gravity="center"
+                        android:layout_gravity="center" />
+
+                </LinearLayout>
+
+                <!-- Empty layout to keep the navigation button in bottom -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_height="0dp"/>
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/start_exam"
+                    android:background="@drawable/testpress_green_curved_edge_background"
+                    android:text="@string/testpress_start"
+                    android:gravity="center"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"
+                    android:layout_width="match_parent"
+                    android:layout_height="37dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginTop="20dp" />
+
+            </LinearLayout>
+        </android.support.v4.widget.NestedScrollView>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <include layout="@layout/testpress_empty_view"
+        android:layout_above="@+id/button_layout"
+        android:layout_below="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:ignore="UnknownIdInLayout" />
+
+    <View
+        android:id="@+id/top_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_above="@+id/button_layout"
+        android:background="@drawable/testpress_gradient_shadow_gray_top" />
+
+    <include layout="@layout/content_bottom_navigation" />
+
+</RelativeLayout>
