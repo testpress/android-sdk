@@ -3,12 +3,14 @@ package `in`.testpress.course.ui.view_models
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSDKDatabase
+import `in`.testpress.core.TestpressUserDetails
 import `in`.testpress.course.enums.Status
 import `in`.testpress.course.models.Resource
 import `in`.testpress.course.network.TestpressCourseApiClient
 import `in`.testpress.course.network.TestpressCourseApiClient.CONTENTS_PATH_v2_4
 import `in`.testpress.course.repositories.ExamRepository
 import `in`.testpress.exam.network.TestpressExamApiClient
+import `in`.testpress.models.ProfileDetails
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.models.greendao.CourseAttempt
@@ -22,10 +24,12 @@ import android.arch.lifecycle.MutableLiveData
 class ContentViewModel(application: Application) : AndroidViewModel(application) {
     var content: MutableLiveData<Content> = MutableLiveData()
     var resourceContent: MutableLiveData<Resource<Content>> = MutableLiveData()
-    private var contentAttempt: MutableLiveData<Resource<CourseAttempt>> = MutableLiveData()
+    var contentAttempt: MutableLiveData<Resource<CourseAttempt>> = MutableLiveData()
     private val contentDao: ContentDao = TestpressSDKDatabase.getContentDao(getApplication())
     private val courseApiClient: TestpressCourseApiClient = TestpressCourseApiClient(getApplication())
     private val examRepository = ExamRepository(getApplication(), content)
+    var profileDetails: MutableLiveData<ProfileDetails> = MutableLiveData()
+    var profileDetailsResource: MutableLiveData<Resource<ProfileDetails>> = MutableLiveData()
 
     fun loadContent(id: Int): LiveData<Resource<Content>> {
         val url = "${CONTENTS_PATH_v2_4}${id}/"
@@ -107,5 +111,30 @@ class ContentViewModel(application: Application) : AndroidViewModel(application)
 
     fun getAttemptsFromDB():List<CourseAttempt> {
         return examRepository.getContentAttemptsFromDB()
+    }
+
+    fun getUserProfileDetails(): MutableLiveData<ProfileDetails> {
+        if (profileDetails.value == null) {
+            if (TestpressUserDetails.getInstance().profileDetails != null) {
+                profileDetails.value = TestpressUserDetails.getInstance().profileDetails
+            } else {
+                fetchProfileDetails()
+            }
+        }
+        return profileDetails
+    }
+
+    private fun fetchProfileDetails(): MutableLiveData<Resource<ProfileDetails>> {
+        TestpressUserDetails.getInstance().load(getApplication(), object : TestpressCallback<ProfileDetails>() {
+            override fun onSuccess(result: ProfileDetails?) {
+                profileDetails.value = result
+                profileDetailsResource.value =  Resource(Status.SUCCESS, result, null)
+            }
+
+            override fun onException(exception: TestpressException?) {
+                profileDetailsResource.value =  Resource(Status.ERROR, null, exception)
+            }
+        })
+        return profileDetailsResource
     }
 }
