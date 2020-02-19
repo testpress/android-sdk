@@ -10,6 +10,8 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.DrawableRes;
@@ -81,6 +83,7 @@ import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
 import in.testpress.util.UserAgentProvider;
 
+import static android.content.Context.AUDIO_SERVICE;
 import static android.support.v7.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
@@ -137,6 +140,8 @@ public class ExoPlayerUtil {
             }
         }
     };
+    AudioManager audioManager;
+    AudioManager.OnAudioFocusChangeListener audioFocusChangeListener;
     private DefaultTrackSelector trackSelector;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
@@ -264,6 +269,23 @@ public class ExoPlayerUtil {
         });
     }
 
+    private void initAudioFocusChangeListener() {
+        audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+            public void onAudioFocusChange(int focusChange) {
+                switch (focusChange) {
+                    case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT):
+                        player.setPlayWhenReady(false);
+                        break;
+                    case (AudioManager.AUDIOFOCUS_LOSS) :
+                        player.setPlayWhenReady(false);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+    }
+
     public void initializePlayer() {
         errorMessageTextView.setVisibility(View.GONE);
         if (player == null) {
@@ -274,6 +296,9 @@ public class ExoPlayerUtil {
             player.addListener(new PlayerEventListener());
             playerView.setPlayer(player);
             player.setPlayWhenReady(playWhenReady);
+            audioManager = (AudioManager) activity.getSystemService(AUDIO_SERVICE);
+            initAudioFocusChangeListener();
+            audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             // Convert seconds to ms
             player.seekTo((long) (startPosition * 1000));
             player.setPlaybackParameters(new PlaybackParameters(speedRate));
@@ -298,6 +323,9 @@ public class ExoPlayerUtil {
         playerView.setControlDispatcher(new DefaultControlDispatcher() {
             @Override
             public boolean dispatchSetPlayWhenReady(Player player, boolean playWhenReady) {
+                if (playWhenReady) {
+                    audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+                }
                 updateVideoAttempt();
                 return super.dispatchSetPlayWhenReady(player, playWhenReady);
             }
@@ -305,6 +333,7 @@ public class ExoPlayerUtil {
     }
 
     public void releasePlayer() {
+        audioManager.abandonAudioFocus(audioFocusChangeListener);
         if (player != null) {
             startPosition = getCurrentPosition();
             playWhenReady = player.getPlayWhenReady();
