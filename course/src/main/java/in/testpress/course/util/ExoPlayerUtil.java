@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Handler;
@@ -268,8 +269,7 @@ public class ExoPlayerUtil {
         });
     }
 
-    private void stopBackgroundAudioPlayback() {
-        audioManager = (AudioManager) activity.getSystemService(AUDIO_SERVICE);
+    private void initAudioFocusChangeListener() {
         audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
             public void onAudioFocusChange(int focusChange) {
                 switch (focusChange) {
@@ -287,8 +287,6 @@ public class ExoPlayerUtil {
                 }
             }
         };
-
-        audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
     }
 
     public void initializePlayer() {
@@ -301,7 +299,9 @@ public class ExoPlayerUtil {
             player.addListener(new PlayerEventListener());
             playerView.setPlayer(player);
             player.setPlayWhenReady(playWhenReady);
-            stopBackgroundAudioPlayback();
+            audioManager = (AudioManager) activity.getSystemService(AUDIO_SERVICE);
+            initAudioFocusChangeListener();
+            audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             // Convert seconds to ms
             player.seekTo((long) (startPosition * 1000));
             player.setPlaybackParameters(new PlaybackParameters(speedRate));
@@ -327,7 +327,6 @@ public class ExoPlayerUtil {
             @Override
             public boolean dispatchSetPlayWhenReady(Player player, boolean playWhenReady) {
                 if (playWhenReady) {
-                    audioManager.abandonAudioFocus(audioFocusChangeListener);
                     audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
                 }
                 updateVideoAttempt();
