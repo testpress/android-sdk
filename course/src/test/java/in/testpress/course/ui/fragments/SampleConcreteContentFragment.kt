@@ -9,6 +9,8 @@ import android.os.Bundle
 class SampleConcreteContentFragment : BaseContentDetailFragment() {
     public override lateinit var viewModel: ContentViewModel
 
+    override var isBookmarkEnabled: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(ContentViewModel::class.java)

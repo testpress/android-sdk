@@ -47,6 +47,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
     private var chapterId: Long = -1
     private var contentId: String? = null
     private var productSlug: String? = null
+    open var isBookmarkEnabled = true
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var position: Int = -1
     protected lateinit var content: Content
@@ -121,7 +122,10 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
             content = it!!
             contentId = content.id.toString()
             loadContent()
-            initBookmarkFragment()
+
+            if (isBookmarkEnabled) {
+                initBookmarkFragment()
+            }
         }
 
         if (contentId != null) {

@@ -12,12 +12,8 @@ import android.arch.lifecycle.*
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import junit.framework.Assert
 import okhttp3.mockwebserver.MockWebServer
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.verify
