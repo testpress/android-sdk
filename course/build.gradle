@@ -38,6 +38,7 @@ dependencies {
     api rootProject.constraintLayout
     api rootProject.mediarouter
     api rootProject.shimmer
+    api rootProject.lifeCycleExtensions
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
     testImplementation rootProject.powermockJunit
@@ -45,6 +46,7 @@ dependencies {
     testImplementation rootProject.androidxCore
     testImplementation rootProject.mockServer
     testImplementation "org.robolectric:shadows-supportv4:3.8"
+    testImplementation "android.arch.core:core-testing:1.1.1"
     testImplementation (rootProject.powermockMockio) {
         exclude group: 'org.mockito'
     }
