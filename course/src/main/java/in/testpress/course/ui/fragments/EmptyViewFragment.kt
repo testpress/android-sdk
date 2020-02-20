@@ -54,32 +54,40 @@ class EmptyViewFragment : Fragment() {
 
     fun displayError(exception: TestpressException) {
         when {
-            exception.isForbidden -> {
-                setEmptyText(R.string.permission_denied,
-                        R.string.testpress_no_permission,
-                        R.drawable.ic_error_outline_black_18dp)
-                retryButton.visibility = View.GONE
-            }
-            exception.isNetworkError -> {
-                setEmptyText(R.string.testpress_network_error,
-                        R.string.testpress_no_internet_try_again,
-                        R.drawable.ic_error_outline_black_18dp)
-                retryButton.setOnClickListener {
-                    emptyContainer.visibility = View.GONE
-                    emptyViewListener?.onRetryClick()
-                }
-            }
-            exception.isPageNotFound -> {
-                setEmptyText(R.string.testpress_content_not_available,
-                        R.string.testpress_content_not_available_description,
-                        R.drawable.ic_error_outline_black_18dp)
-            }
-            else -> {
-                setEmptyText(R.string.testpress_error_loading_contents,
-                        R.string.testpress_some_thing_went_wrong_try_again,
-                        R.drawable.ic_error_outline_black_18dp)
-            }
+            exception.isForbidden -> handleForbidden()
+            exception.isNetworkError -> handleNetworkError()
+            exception.isPageNotFound -> handleIsPageNotFound()
+            else -> handleUnknownError()
         }
+    }
+
+    private fun handleForbidden() {
+        setEmptyText(R.string.permission_denied,
+                R.string.testpress_no_permission,
+                R.drawable.ic_error_outline_black_18dp)
+        retryButton.visibility = View.GONE
+    }
+
+    private fun handleNetworkError() {
+        setEmptyText(R.string.testpress_network_error,
+                R.string.testpress_no_internet_try_again,
+                R.drawable.ic_error_outline_black_18dp)
+        retryButton.setOnClickListener {
+            emptyContainer.visibility = View.GONE
+            emptyViewListener?.onRetryClick()
+        }
+    }
+
+    private fun handleIsPageNotFound() {
+        setEmptyText(R.string.testpress_content_not_available,
+                R.string.testpress_content_not_available_description,
+                R.drawable.ic_error_outline_black_18dp)
+    }
+
+    private fun handleUnknownError() {
+        setEmptyText(R.string.testpress_error_loading_contents,
+                R.string.testpress_some_thing_went_wrong_try_again,
+                R.drawable.ic_error_outline_black_18dp)
     }
 
     private fun setEmptyText(title: Int, description: Int, left: Int) {
