@@ -32,17 +32,17 @@ class EmptyViewFragment : Fragment() {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
+        initializeListeners()
+    }
 
-        if (parentFragment != null) {
-            onAttachToParentFragment(parentFragment)
+    private fun initializeListeners() {
+        emptyViewListener = if (parentFragment != null) {
+            parentFragment as? EmptyViewListener
         } else {
-            emptyViewListener = context as? EmptyViewListener
+            context as? EmptyViewListener
         }
     }
 
-    private fun onAttachToParentFragment(fragment: Fragment?) {
-        emptyViewListener = fragment as? EmptyViewListener
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
