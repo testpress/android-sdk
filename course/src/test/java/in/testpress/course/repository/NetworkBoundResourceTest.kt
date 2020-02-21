@@ -11,6 +11,7 @@ import android.arch.lifecycle.Observer
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Assert.assertThat
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
@@ -31,7 +32,8 @@ class NetworkBoundResourceTest {
     private lateinit var handleCreateCall: () -> RetrofitCall<Foo>
     private val fetchedOnce = AtomicBoolean(false)
     private val dbData = MutableLiveData<Foo>()
-    
+    val exception = TestpressException.networkError(IOException())
+
     @Before
     fun setUp() {
         networkBoundResource = object : NetworkBoundResource<Foo, Foo>() {
@@ -53,6 +55,12 @@ class NetworkBoundResourceTest {
         }
     }
 
+    private fun assertInitialValue(observer: Observer<Resource<Foo>>) {
+        networkBoundResource.asLiveData().observeForever(observer)
+        verify(observer).onChanged(Resource.loading(null))
+        reset(observer)
+    }
+
     @Test
     fun basicFromNetwork() {
         val saved = AtomicReference<Foo>()
@@ -64,11 +72,9 @@ class NetworkBoundResourceTest {
         }
         handleCreateCall = { RetrofitCallMock(Resource.success(Foo(1))) }
         val observer = mock<Observer<Resource<Foo>>>()
-        networkBoundResource.asLiveData().observeForever(observer)
-
-        verify(observer).onChanged(Resource.loading(null))
-        reset(observer)
+        assertInitialValue(observer)
         dbData.value = null
+
         assertThat(saved.get(), `is`(Foo(1)))
         verify(observer).onChanged(Resource.success(fetchedDbValue))
     }
@@ -80,14 +86,11 @@ class NetworkBoundResourceTest {
         handleSaveCallResult = {
             saved.set(true)
         }
-        val ioException = IOException()
-        val exception = TestpressException.networkError(ioException)
         handleCreateCall = { RetrofitCallMock(Resource.error(exception, null)) }
         val observer = mock<Observer<Resource<Foo>>>()
-        networkBoundResource.asLiveData().observeForever(observer)
-        verify(observer).onChanged(Resource.loading(null))
-        reset(observer)
+        assertInitialValue(observer)
         dbData.value = null
+
         assertThat(saved.get(), `is`(false))
         verify(observer).onChanged(Resource.error(exception, null))
         verifyNoMoreInteractions(observer)
@@ -102,13 +105,13 @@ class NetworkBoundResourceTest {
             saved = true
         }
         val observer = mock<Observer<Resource<Foo>>>()
-        networkBoundResource.asLiveData().observeForever(observer)
-        verify(observer).onChanged(Resource.loading(null))
-        reset(observer)
+        assertInitialValue(observer)
+
         val dbFoo = Foo(1)
         dbData.value = dbFoo
         verify(observer).onChanged(Resource.success(dbFoo))
         assertThat(saved, `is`(false))
+
         val dbFoo2 = Foo(2)
         dbData.value = dbFoo2
         verify(observer).onChanged(Resource.success(dbFoo2))
@@ -123,16 +126,13 @@ class NetworkBoundResourceTest {
         handleSaveCallResult = {
             saved = true
         }
-        val ioException = IOException()
-        val exception = TestpressException.networkError(ioException)
-
-        val apiResponseLiveData = RetrofitCallMock<Foo>(Resource.error(exception, null))
-        handleCreateCall = { apiResponseLiveData }
+        val apiCall = RetrofitCallMock<Foo>(Resource.error(exception, null))
+        handleCreateCall = { apiCall }
         val observer = mock<Observer<Resource<Foo>>>()
-        networkBoundResource.asLiveData().observeForever(observer)
-        verify(observer).onChanged(Resource.loading(null))
-
+        assertInitialValue(observer)
         dbData.value = dbValue
+
+        verify(observer).onChanged(Resource.loading(dbValue))
         verify(observer).onChanged(Resource.error(exception, dbValue))
 
         assertThat(saved, `is`(false))
@@ -156,14 +156,11 @@ class NetworkBoundResourceTest {
             dbData.setValue(dbValue2)
         }
         val networkResult = Foo(1)
-
-        val apiResponseLiveData = RetrofitCallMock(Resource.success(networkResult))
-        handleCreateCall = { apiResponseLiveData }
+        val apiCall = RetrofitCallMock(Resource.success(networkResult))
+        handleCreateCall = { apiCall }
 
         val observer = mock<Observer<Resource<Foo>>>()
-        networkBoundResource.asLiveData().observeForever(observer)
-        verify(observer).onChanged(Resource.loading(null))
-        reset(observer)
+        assertInitialValue(observer)
 
         dbData.value = dbValue
         verify(observer).onChanged(Resource.loading(dbValue))
