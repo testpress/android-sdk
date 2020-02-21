@@ -16,6 +16,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
+import android.support.annotation.VisibleForTesting
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
@@ -26,18 +27,22 @@ import android.widget.TextView
 
 
 class ContentBottomNavigationFragment : Fragment() {
-
-    private lateinit var previousButton: Button
-    private lateinit var nextButton: Button
-    private lateinit var pageNumber: TextView
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var previousButton: Button
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var nextButton: Button
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var pageNumber: TextView
 
     private var contentId: Int = -1
     private var productSlug: String? = null
-    private lateinit var content: Content
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var content: Content
     private lateinit var contentDao: ContentDao
     private lateinit var courseApiClient: TestpressCourseApiClient
     private lateinit var contentRepository: ContentRepository
-    private lateinit var viewModel: ContentViewModel
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var viewModel: ContentViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,7 +79,8 @@ class ContentBottomNavigationFragment : Fragment() {
         productSlug = arguments!!.getString(PRODUCT_SLUG)
     }
 
-    private fun initNavigationButtons() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun initNavigationButtons() {
         viewModel.getContent(contentId).observe(this, Observer { resource ->
             when (resource?.status) {
                 Status.SUCCESS -> {
@@ -89,7 +95,8 @@ class ContentBottomNavigationFragment : Fragment() {
         })
     }
 
-    private fun initPrevButton(position: Int) {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun initPrevButton(position: Int) {
         if (position < 1)
             return
 
@@ -101,7 +108,9 @@ class ContentBottomNavigationFragment : Fragment() {
         previousButton.visibility = View.VISIBLE
     }
 
-    private fun initNextButton(position: Int) {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun initNextButton(position: Int) {
+        println(viewModel.getChapterContents(content.chapterId))
         val contents = viewModel.getChapterContents(content.chapterId)
 
         if (contents.isEmpty())
