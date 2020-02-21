@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 
 
@@ -33,6 +34,7 @@ class ContentBottomNavigationFragment : Fragment() {
     lateinit var nextButton: Button
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var pageNumber: TextView
+    private lateinit var bottomLayout: LinearLayout
 
     private var contentId: Int = -1
     private var productSlug: String? = null
@@ -63,7 +65,8 @@ class ContentBottomNavigationFragment : Fragment() {
         bindViews()
         parseArguments()
 
-        if (productSlug != null) {
+        if (productSlug == null) {
+            bottomLayout.visibility = View.VISIBLE
             initNavigationButtons()
         }
     }
@@ -72,6 +75,7 @@ class ContentBottomNavigationFragment : Fragment() {
         previousButton = view!!.findViewById(R.id.previous)
         nextButton = view!!.findViewById(R.id.next)
         pageNumber = view!!.findViewById(R.id.page_number)
+        bottomLayout = view!!.findViewById(R.id.bottom_layout)
     }
 
     private fun parseArguments() {

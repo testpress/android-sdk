@@ -55,7 +55,6 @@ class ContentBottomNavigationFragmentTest {
     fun initializeContentFragment() {
         val bundle = Bundle()
         bundle.putInt(CONTENT_ID, 1)
-        bundle.putString(PRODUCT_SLUG, "product")
         data.value = Resource.success(content)
         content.chapterId = 1
         content.isLocked = false
