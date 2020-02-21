@@ -1,6 +1,7 @@
 package `in`.testpress.course.repository
 
 import `in`.testpress.core.TestpressException
+import `in`.testpress.course.enums.DataSource
 import `in`.testpress.course.models.Resource
 import `in`.testpress.course.util.RetrofitCallMock
 import `in`.testpress.course.util.mock
@@ -108,12 +109,8 @@ class NetworkBoundResourceTest {
 
         val dbFoo = Foo(1)
         dbData.value = dbFoo
-        verify(observer).onChanged(Resource.success(dbFoo))
+        verify(observer).onChanged(Resource.success(dbFoo, DataSource.DB))
         assertThat(saved, `is`(false))
-
-        val dbFoo2 = Foo(2)
-        dbData.value = dbFoo2
-        verify(observer).onChanged(Resource.success(dbFoo2))
         verifyNoMoreInteractions(observer)
     }
 
@@ -129,19 +126,12 @@ class NetworkBoundResourceTest {
         handleCreateCall = { apiCall }
         val observer = mock<Observer<Resource<Foo>>>()
         assertInitialValue(observer)
+
         dbData.value = dbValue
-
         verify(observer).onChanged(Resource.loading(dbValue))
-        verify(observer).onChanged(Resource.error(exception, dbValue))
-
         assertThat(saved, `is`(false))
         verify(observer).onChanged(Resource.error(exception, dbValue))
-
-        val dbValue2 = Foo(2)
-        dbData.value = dbValue2
-        verify(observer).onChanged(Resource.error(exception, dbValue2))
         verifyNoMoreInteractions(observer)
-
     }
 
     @Test
