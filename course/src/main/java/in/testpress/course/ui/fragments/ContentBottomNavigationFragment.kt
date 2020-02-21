@@ -38,17 +38,14 @@ class ContentBottomNavigationFragment : Fragment() {
     private var productSlug: String? = null
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var content: Content
-    private lateinit var contentDao: ContentDao
-    private lateinit var courseApiClient: TestpressCourseApiClient
-    private lateinit var contentRepository: ContentRepository
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var viewModel: ContentViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        courseApiClient = TestpressCourseApiClient(context)
-        contentDao = TestpressSDKDatabase.getContentDao(context)
-        contentRepository = ContentRepository(contentDao, courseApiClient)
+        val courseApiClient = TestpressCourseApiClient(context)
+        val contentDao = TestpressSDKDatabase.getContentDao(context)
+        val contentRepository = ContentRepository(contentDao, courseApiClient)
         val viewModelFactory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ContentViewModel(contentRepository) as T
