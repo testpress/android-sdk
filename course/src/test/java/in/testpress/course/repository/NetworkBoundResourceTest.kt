@@ -3,6 +3,7 @@ package `in`.testpress.course.repository
 import `in`.testpress.core.TestpressException
 import `in`.testpress.course.models.Resource
 import `in`.testpress.course.util.RetrofitCallMock
+import `in`.testpress.course.util.mock
 import `in`.testpress.network.RetrofitCall
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.LiveData
@@ -11,7 +12,6 @@ import android.arch.lifecycle.Observer
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Assert.assertThat
 import org.junit.Before
-import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
@@ -173,5 +173,3 @@ class NetworkBoundResourceTest {
 
 
 }
-
-inline fun <reified T> mock(): T = Mockito.mock(T::class.java)

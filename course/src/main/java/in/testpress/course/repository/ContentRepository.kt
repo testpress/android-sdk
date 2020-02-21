@@ -1,13 +1,11 @@
 package `in`.testpress.course.repository
 
-import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.course.models.Resource
 import `in`.testpress.course.network.TestpressCourseApiClient
 import `in`.testpress.course.network.TestpressCourseApiClient.CONTENTS_PATH_v2_4
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.network.RetrofitCall
-import android.app.Application
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 
