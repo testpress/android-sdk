@@ -14,7 +14,6 @@ import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito
 import org.mockito.Mockito.*
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
