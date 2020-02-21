@@ -24,7 +24,9 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
                 fetchFromNetwork(dbSource)
             } else {
                 result.addSource(dbSource) { newData ->
-                    setValue(Resource.success(newData))
+                    newData?.let {
+                        setValue(Resource.success(newData))
+                    }
                 }
             }
         }
