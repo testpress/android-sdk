@@ -2,6 +2,7 @@ package `in`.testpress.course.repository
 
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
+import `in`.testpress.course.enums.DataSource
 import `in`.testpress.course.models.Resource
 import `in`.testpress.network.RetrofitCall
 import android.arch.lifecycle.LiveData
@@ -25,7 +26,7 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
             } else {
                 result.addSource(dbSource) { newData ->
                     newData?.let {
-                        setValue(Resource.success(newData))
+                        setValue(Resource.success(newData, DataSource.DB))
                     }
                 }
             }
