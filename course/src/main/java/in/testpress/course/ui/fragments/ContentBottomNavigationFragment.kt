@@ -65,10 +65,14 @@ class ContentBottomNavigationFragment : Fragment() {
         bindViews()
         parseArguments()
 
-        if (productSlug == null) {
+        if (!isProductPreview()) {
             bottomLayout.visibility = View.VISIBLE
             initNavigationButtons()
         }
+    }
+
+    private fun isProductPreview(): Boolean {
+        return productSlug != null
     }
 
     private fun bindViews() {
