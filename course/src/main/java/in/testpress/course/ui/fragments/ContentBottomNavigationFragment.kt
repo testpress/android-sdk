@@ -110,30 +110,41 @@ class ContentBottomNavigationFragment : Fragment() {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun initNextButton(position: Int) {
-        println(viewModel.getChapterContents(content.chapterId))
         val contents = viewModel.getChapterContents(content.chapterId)
 
         if (contents.isEmpty())
             return
 
-        if (position == (contents.size - 1)) {
-            nextButton.text = getString(R.string.testpress_menu)
+        if (hasNextContent(position, contents)) {
+            openNextContentOnClick(position, contents)
+        } else {
+            openMenuOnClick()
+        }
+    }
+
+    private fun hasNextContent(position: Int, contents: List<Content>): Boolean {
+        return position < (contents.size - 1)
+    }
+
+    private fun openMenuOnClick() {
+        nextButton.text = getString(R.string.testpress_menu)
+        nextButton.setOnClickListener {
+            val pref = activity!!.getSharedPreferences(TESTPRESS_CONTENT_SHARED_PREFS, Context.MODE_PRIVATE)
+            pref.edit().putBoolean(GO_TO_MENU, true).apply()
+            finishActivity()
+        }
+        nextButton.visibility = View.VISIBLE
+    }
+
+    private fun openNextContentOnClick(position: Int, contents: List<Content>) {
+        val nextPosition = position + 1
+        if (!contents[nextPosition].isLocked) {
+            nextButton.text = getString(R.string.testpress_next_content)
             nextButton.setOnClickListener {
-                val pref = activity!!.getSharedPreferences(TESTPRESS_CONTENT_SHARED_PREFS, Context.MODE_PRIVATE)
-                pref.edit().putBoolean(GO_TO_MENU, true).apply()
+                startActivity(createIntent(nextPosition, content.chapterId, activity as AppCompatActivity, productSlug))
                 finishActivity()
             }
             nextButton.visibility = View.VISIBLE
-        } else {
-            val nextPosition = position + 1
-            if (!contents[nextPosition].isLocked) {
-                nextButton.text = getString(R.string.testpress_next_content)
-                nextButton.setOnClickListener {
-                    startActivity(createIntent(nextPosition, content.chapterId, activity as AppCompatActivity, productSlug))
-                    finishActivity()
-                }
-                nextButton.visibility = View.VISIBLE
-            }
         }
     }
 

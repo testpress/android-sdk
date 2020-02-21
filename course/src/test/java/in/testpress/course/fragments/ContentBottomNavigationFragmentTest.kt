@@ -101,6 +101,7 @@ class ContentBottomNavigationFragmentTest {
         `when`(contentFragment.viewModel.getChapterContents(anyLong())).thenReturn(listOf(content))
         contentFragment.initNavigationButtons()
 
+        Assert.assertEquals(contentFragment.pageNumber.text, "1/1")
         verify(contentFragment).initNextButton(0)
         verify(contentFragment).initPrevButton(0)
     }
