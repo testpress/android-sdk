@@ -62,7 +62,10 @@ class ContentBottomNavigationFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         bindViews()
         parseArguments()
-        initNavigationButtons()
+
+        if (productSlug != null) {
+            initNavigationButtons()
+        }
     }
 
     private fun bindViews() {

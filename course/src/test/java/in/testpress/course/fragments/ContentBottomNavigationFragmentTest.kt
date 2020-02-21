@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.core.TestpressSession
 import `in`.testpress.course.R
+import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.models.Resource
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.ui.fragments.ContentBottomNavigationFragment
@@ -36,8 +37,8 @@ class ContentBottomNavigationFragmentTest {
     @Rule
     @JvmField
     val instantExecutorRule = InstantTaskExecutorRule()
-    val data = MutableLiveData<Resource<Content>>()
-    val content = Content(1)
+    private val data = MutableLiveData<Resource<Content>>()
+    private val content = Content(1)
 
     @Before
     fun setUp() {
@@ -54,6 +55,7 @@ class ContentBottomNavigationFragmentTest {
     fun initializeContentFragment() {
         val bundle = Bundle()
         bundle.putInt(CONTENT_ID, 1)
+        bundle.putString(PRODUCT_SLUG, "product")
         data.value = Resource.success(content)
         content.chapterId = 1
         content.isLocked = false
