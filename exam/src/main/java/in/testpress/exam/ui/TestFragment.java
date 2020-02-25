@@ -21,6 +21,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -44,7 +45,6 @@ import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.loaders.AttemptItemsLoader;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
 import in.testpress.models.greendao.Attempt;
-import in.testpress.models.greendao.AttemptDao;
 import in.testpress.models.greendao.AttemptSection;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.CourseAttempt;
@@ -90,6 +90,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     private AlertDialog heartBeatAlertDialog;
     private AlertDialog saveAnswerAlertDialog;
     private AlertDialog networkErrorAlertDialog;
+    private View questionsListProgressBar;
+
     Attempt attempt;
     private Exam exam;
     private Content courseContent;
@@ -124,6 +126,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             stopTimerOnAppWentBackground();
         }
     };
+    public int totalQuestions = 0;
+    private boolean isNextPageQuestionsBeingFetched = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -337,6 +341,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         viewPager = view.findViewById(R.id.pager);
         viewPager.setSwipeEnabled(true);
         slidingPaneLayout = view.findViewById(R.id.sliding_layout);
+        questionsListProgressBar = (View) LayoutInflater.from(getActivity()).inflate(R.layout.progress_bar, null);
+        questionsListView.addFooterView(questionsListProgressBar);
     }
 
     private void initializeProgressDialog() {
@@ -372,6 +378,15 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
             @Override
             public void onPageSelected(int position) {
+                if (
+                        (viewPagerAdapter.getCount() < totalQuestions)
+                        && ((viewPagerAdapter.getCount() - position) <= 4)
+                        && !isNextPageQuestionsBeingFetched
+                ) {
+                    isNextPageQuestionsBeingFetched = true;
+                    questionsListProgressBar.setVisibility(View.VISIBLE);
+                    getLoaderManager().restartLoader(0, null, TestFragment.this);
+                }
                 goToQuestion(position, true);
             }
 
@@ -408,6 +423,28 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             @Override
             public void onClick(View view) {
                 endExamAlert();
+            }
+        });
+        questionsListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItems, int totalItems) {
+
+                boolean hasAllQuestionsFetched = (totalItems == totalQuestions);
+                if (hasAllQuestionsFetched || isNextPageQuestionsBeingFetched) {
+                    return;
+                }
+
+                if ((totalItems - firstVisibleItem) == visibleItems) {
+                    if (totalItems < totalQuestions) {
+                        isNextPageQuestionsBeingFetched = true;
+                        questionsListProgressBar.setVisibility(View.VISIBLE);
+                        getLoaderManager().restartLoader(0, null, TestFragment.this);
+                    }
+                }
             }
         });
         timer.setOnClickListener(new View.OnClickListener() {
@@ -449,7 +486,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         }
         currentQuestionIndex = position;
         questionsListAdapter.setCurrentAttemptItemIndex(position + 1);
-        if (slidingPaneLayout.isOpen()) {
+        if (slidingPaneLayout.isOpen() && !isNextPageQuestionsBeingFetched) {
             slidingPaneLayout.closePane();
         }
         if(plainSpinnerAdapter != null && plainSpinnerAdapter.getCount() > 1) {
@@ -559,7 +596,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         } else {
             showProgress(R.string.testpress_loading_questions);
         }
-        return new AttemptItemsLoader(getActivity(), this);
+        boolean fetchSinglePageOnly = attempt.hasSectionalLock();
+        return new AttemptItemsLoader(getActivity(), this, fetchSinglePageOnly);
     }
 
     @Override
@@ -661,21 +699,32 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             }
         }
 
-        viewPagerAdapter =
-                new TestQuestionPagerAdapter(getFragmentManager(), attemptItemList, selectedLanguage);
-
-        viewPager.setAdapter(viewPagerAdapter);
         for (int i = 0; i< attemptItemList.size(); i++) {
             attemptItemList.get(i).setIndex(i + 1);
         }
         questionsListAdapter.setItems(attemptItemList);
-        questionsListView.setAdapter(questionsListAdapter);
-        if (viewPager.getCurrentItem() != 0) {
-            viewPager.setCurrentItem(0);
+
+        int currentQuestion = 0;
+        if (isNextPageQuestionsBeingFetched) {
+            if (viewPager != null) {
+                currentQuestion = viewPager.getCurrentItem();
+            }
+        } else {
+            questionsListView.setAdapter(questionsListAdapter);
+            startCountDownTimer();
+        }
+        viewPagerAdapter =
+                new TestQuestionPagerAdapter(getFragmentManager(), attemptItemList, selectedLanguage);
+
+        viewPager.setAdapter(viewPagerAdapter);
+
+        if (isNextPageQuestionsBeingFetched || viewPager.getCurrentItem() != 0) {
+            viewPager.setCurrentItem(currentQuestion);
         } else {
             goToQuestion(0, false);
         }
-        startCountDownTimer();
+        questionsListProgressBar.setVisibility(View.GONE);
+        isNextPageQuestionsBeingFetched = false;
     }
 
     void groupAttemptItems(String spinnerItem, AttemptItem attemptItem, List<String> spinnerItemsList,

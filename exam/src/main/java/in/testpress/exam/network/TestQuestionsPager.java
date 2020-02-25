@@ -28,4 +28,8 @@ public class TestQuestionsPager extends BaseResourcePager<AttemptItem> {
         return apiClient.getQuestions(questionsUrlFrag, queryParams).execute();
     }
 
+    public TestpressApiResponse<AttemptItem> getResponse() {
+        return response;
+    }
+
 }
