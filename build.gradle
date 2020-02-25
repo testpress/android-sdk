@@ -40,7 +40,7 @@ ext {
     powermock = '1.7.4'
 
     junit = 'junit:junit:4.12'
-    mockito = 'org.mockito:mockito-core:2.8.9'
+    mockito = 'org.mockito:mockito-inline:2.8.9'
     powermockJunit = 'org.powermock:powermock-module-junit4:' + powermock
     powermockMockio = 'org.powermock:powermock-api-mockito2:' + powermock
     testRunner = 'com.android.support.test:runner:0.5'
