@@ -1,4 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -26,6 +29,9 @@ android {
 }
 
 dependencies {
+    def core_version = "1.2.0"
+    def core_testing_version = "2.1.0"
+    def room_version = "2.2.4"
     api rootProject.design
     api rootProject.retrofit2
     api rootProject.gsonConverter
@@ -46,6 +52,17 @@ dependencies {
 
     androidTestImplementation rootProject.junit
     androidTestImplementation rootProject.testRunner
+    androidTestImplementation rootProject.espressoCore
+    androidTestImplementation rootProject.uiautomator
+    androidTestImplementation "androidx.arch.core:core-testing:$core_testing_version"
+    implementation "androidx.arch.core:core-runtime:2.1.0"
+    implementation "androidx.core:core-ktx:$core_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+repositories {
+    mavenCentral()
+}
