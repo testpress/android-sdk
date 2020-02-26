@@ -3,7 +3,7 @@ package in.testpress.course.pagers;
 import java.io.IOException;
 
 import in.testpress.course.models.Reputation;
-import in.testpress.course.network.TestpressCourseApiClient;
+import in.testpress.course.api.TestpressCourseApiClient;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseResourcePager;
 import retrofit2.Response;

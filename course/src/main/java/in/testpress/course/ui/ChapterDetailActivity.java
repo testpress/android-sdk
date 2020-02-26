@@ -21,7 +21,7 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
-import in.testpress.course.network.TestpressCourseApiClient;
+import in.testpress.course.api.TestpressCourseApiClient;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;

@@ -1,4 +1,4 @@
-package in.testpress.course.network;
+package in.testpress.course.api;
 
 import java.util.Map;
 
@@ -22,15 +22,15 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 
-import static in.testpress.course.network.TestpressCourseApiClient.ATTEMPTS_PATH;
-import static in.testpress.course.network.TestpressCourseApiClient.CHAPTERS_PATH;
-import static in.testpress.course.network.TestpressCourseApiClient.CONTENTS_PATH;
-import static in.testpress.course.network.TestpressCourseApiClient.COURSE_LIST_PATH;
-import static in.testpress.course.network.TestpressCourseApiClient.LEADERBOARD_PATH;
-import static in.testpress.course.network.TestpressCourseApiClient.RANK_PATH;
-import static in.testpress.course.network.TestpressCourseApiClient.TARGET_PATH;
-import static in.testpress.course.network.TestpressCourseApiClient.THREAD_PATH;
-import static in.testpress.course.network.TestpressCourseApiClient.USER_VIDEOS_PATH;
+import static in.testpress.course.api.TestpressCourseApiClient.ATTEMPTS_PATH;
+import static in.testpress.course.api.TestpressCourseApiClient.CHAPTERS_PATH;
+import static in.testpress.course.api.TestpressCourseApiClient.CONTENTS_PATH;
+import static in.testpress.course.api.TestpressCourseApiClient.COURSE_LIST_PATH;
+import static in.testpress.course.api.TestpressCourseApiClient.LEADERBOARD_PATH;
+import static in.testpress.course.api.TestpressCourseApiClient.RANK_PATH;
+import static in.testpress.course.api.TestpressCourseApiClient.TARGET_PATH;
+import static in.testpress.course.api.TestpressCourseApiClient.THREAD_PATH;
+import static in.testpress.course.api.TestpressCourseApiClient.USER_VIDEOS_PATH;
 
 public interface CourseService {
 

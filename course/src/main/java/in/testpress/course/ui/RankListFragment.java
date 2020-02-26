@@ -10,12 +10,12 @@ import in.testpress.course.R;
 import in.testpress.course.TestpressCourse;
 import in.testpress.course.models.Reputation;
 import in.testpress.course.pagers.LeaderboardPager;
-import in.testpress.course.network.TestpressCourseApiClient;
+import in.testpress.course.api.TestpressCourseApiClient;
 import in.testpress.network.BaseResourcePager;
 import in.testpress.ui.PagedItemFragment;
 import in.testpress.util.SingleTypeAdapter;
 
-import static in.testpress.course.network.TestpressCourseApiClient.COURSE_ID;
+import static in.testpress.course.api.TestpressCourseApiClient.COURSE_ID;
 
 public class RankListFragment extends PagedItemFragment<Reputation> {
 

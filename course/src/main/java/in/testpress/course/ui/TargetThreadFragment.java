@@ -21,7 +21,7 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.course.R;
 import in.testpress.course.models.Reputation;
-import in.testpress.course.network.TestpressCourseApiClient;
+import in.testpress.course.api.TestpressCourseApiClient;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseFragment;

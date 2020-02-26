@@ -2,7 +2,7 @@ package in.testpress.course;
 
 import org.junit.Test;
 
-import in.testpress.course.network.TestpressCourseApiClient;
+import in.testpress.course.api.TestpressCourseApiClient;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

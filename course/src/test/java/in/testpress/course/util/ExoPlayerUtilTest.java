@@ -12,8 +12,8 @@ import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.Video;
 import in.testpress.models.greendao.VideoAttempt;
 
-import static in.testpress.course.network.TestpressCourseApiClient.LAST_POSITION;
-import static in.testpress.course.network.TestpressCourseApiClient.TIME_RANGES;
+import static in.testpress.course.api.TestpressCourseApiClient.LAST_POSITION;
+import static in.testpress.course.api.TestpressCourseApiClient.TIME_RANGES;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;

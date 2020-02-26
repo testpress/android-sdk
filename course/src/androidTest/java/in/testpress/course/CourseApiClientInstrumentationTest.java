@@ -6,7 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import in.testpress.course.network.TestpressCourseApiClient;
+import in.testpress.course.api.TestpressCourseApiClient;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
