@@ -12,15 +12,6 @@ abstract class TestpressDatabase: RoomDatabase() {
 
     companion object {
         private var instance: TestpressDatabase? = null
-        private val LOCK = Any()
-
-        operator fun invoke(context: Context)= instance ?: synchronized(LOCK){
-            instance ?: buildDatabase(context).also { instance = it}
-        }
-
-        private fun buildDatabase(context: Context) = Room.databaseBuilder(context,
-                TestpressDatabase::class.java, "testpress.db")
-                .build()
 
         @JvmStatic fun getDatabase(context: Context): TestpressDatabase? {
             if (instance == null) {
