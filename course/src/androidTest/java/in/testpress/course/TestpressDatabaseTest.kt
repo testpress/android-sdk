@@ -46,7 +46,7 @@ class TestpressDatabaseTest {
     fun readWrite() {
         val content = createContent()
         contentDao.insert(content)
-        val fetchedContent = contentDao.findById(1).getAbsoluteValue()
+        val fetchedContent = contentDao.findById(1)
 
         assertThat(fetchedContent, equalTo(content))
     }
@@ -65,12 +65,12 @@ class TestpressDatabaseTest {
     fun update() {
         val content = createContent()
         contentDao.insert(content)
-        val fetchedContent = contentDao.findById(1).getAbsoluteValue()
+        val fetchedContent = contentDao.findById(1)
         assertThat(fetchedContent.title, equalTo("Content"))
 
         content.title = "Updated Content"
         contentDao.update(content)
-        val updatedContent = contentDao.findById(1).getAbsoluteValue()
+        val updatedContent = contentDao.findById(1)
         assertThat(updatedContent.title, equalTo("Updated Content"))
     }
 }
