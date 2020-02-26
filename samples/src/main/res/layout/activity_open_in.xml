@@ -14,34 +14,34 @@
         android:layout_gravity="center_horizontal"
         android:gravity="center">
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
             android:layout_marginTop="10dp"
             android:text="Simple Course"
             android:id="@+id/simple_course" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
             android:layout_width="wrap_content"
             android:text="Gamified Course"
             android:id="@+id/gamified_course" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
             android:text="Leaderboard"
             android:id="@+id/leaderboard" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
             android:text="Chapter Detail"
             android:id="@+id/chapter_contents" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
             android:text="Content Detail"
             android:id="@+id/content_detail" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
             android:text="Fragment"
             android:id="@+id/fragment_button" />

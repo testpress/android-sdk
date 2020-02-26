@@ -1,12 +1,12 @@
 package in.testpress.ui;
 
 import android.os.Bundle;
-import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.SwipeRefreshLayout;
+import androidx.annotation.StringRes;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -93,7 +93,7 @@ public abstract class BaseGridFragment<E> extends Fragment
             // Show loading progress
             TypedValue typed_value = new TypedValue();
             getActivity().getTheme().resolveAttribute(
-                    android.support.v7.appcompat.R.attr.actionBarSize, typed_value, true);
+                    androidx.appcompat.R.attr.actionBarSize, typed_value, true);
             swipeRefreshLayout.setProgressViewOffset(false, 0, getResources()
                     .getDimensionPixelSize(typed_value.resourceId));
             if (isItemsEmpty()) {

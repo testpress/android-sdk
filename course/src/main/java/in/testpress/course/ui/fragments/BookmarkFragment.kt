@@ -15,8 +15,8 @@ import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.FolderListResponse
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
+import com.google.android.material.snackbar.Snackbar
+import androidx.fragment.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View

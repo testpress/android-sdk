@@ -1,8 +1,8 @@
 package in.testpress.course.ui;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.Loader;
+import androidx.fragment.app.FragmentActivity;
+import androidx.loader.content.Loader;
 
 import org.greenrobot.greendao.AbstractDao;
 

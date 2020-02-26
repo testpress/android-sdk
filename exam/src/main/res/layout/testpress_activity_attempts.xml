@@ -58,7 +58,7 @@
 
             </LinearLayout>
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/attempt_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -96,7 +96,7 @@
             android:layout_height="5dp"
             android:background="@drawable/testpress_gradient_shadow_gray_top" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/start_exam"
             android:background="@drawable/testpress_green_curved_edge_background"
             android:text="@string/testpress_start_exam"

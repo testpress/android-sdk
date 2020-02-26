@@ -1,7 +1,7 @@
 package in.testpress.exam.ui;
 
 import android.os.CountDownTimer;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.widget.Spinner;
 
 import org.junit.Before;
