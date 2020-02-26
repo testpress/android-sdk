@@ -38,6 +38,7 @@ ext {
     supportLib = '27.1.1'
     exoPlayer = '2.8.2'
     powermock = '1.7.4'
+    room_version = "1.1.1"
 
     junit = 'junit:junit:4.12'
     mockito = 'org.mockito:mockito-core:2.8.9'
@@ -64,4 +65,5 @@ ext {
     androidxCore = 'androidx.test:core:1.2.0'
     mockServer = 'com.squareup.okhttp3:mockwebserver:3.10.0'
     shimmer = 'com.facebook.shimmer:shimmer:0.5.0'
+    lifeCycleExtensions = 'android.arch.lifecycle:extensions:1.1.1'
 }
