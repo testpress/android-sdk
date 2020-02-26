@@ -3,7 +3,6 @@ package in.testpress.course.ui;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.Loader;
-import android.util.Log;
 
 import org.greenrobot.greendao.AbstractDao;
 
@@ -13,13 +12,9 @@ import java.util.List;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
-import in.testpress.course.TestpressCourse;
-import in.testpress.course.enums.CourseType;
-import in.testpress.course.util.ManageCourseStates;
-import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
-import in.testpress.course.network.CoursePager;
+import in.testpress.course.pagers.CoursePager;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;

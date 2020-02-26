@@ -22,7 +22,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
-import in.testpress.course.network.ChapterPager;
+import in.testpress.course.pagers.ChapterPager;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.ui.BaseGridFragment;
 import in.testpress.util.ImageUtils;

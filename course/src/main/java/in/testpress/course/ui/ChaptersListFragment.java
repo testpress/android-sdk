@@ -2,25 +2,22 @@ package in.testpress.course.ui;
 
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.View;
 
 import org.greenrobot.greendao.AbstractDao;
-import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.List;
 
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
-import in.testpress.course.network.ChapterPager;
+import in.testpress.course.pagers.ChapterPager;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.network.BaseResourcePager;
-import in.testpress.store.ui.ProductDetailsActivity;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
 

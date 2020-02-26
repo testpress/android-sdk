@@ -4,8 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.Loader;
-import android.util.Log;
-import android.widget.ListView;
 
 import java.util.List;
 
@@ -14,7 +12,7 @@ import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.AvailableCourseListAdapter;
 import in.testpress.course.R;
 import in.testpress.course.enums.CourseType;
-import in.testpress.course.network.CourseProductPager;
+import in.testpress.course.pagers.CourseProductPager;
 import in.testpress.course.util.ManageCourseStates;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;

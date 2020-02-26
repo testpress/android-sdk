@@ -1,8 +1,9 @@
-package in.testpress.course.network;
+package in.testpress.course.pagers;
 
 import java.io.IOException;
 import java.util.List;
 
+import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Content;
 import in.testpress.v2_4.BaseResourcePager;
