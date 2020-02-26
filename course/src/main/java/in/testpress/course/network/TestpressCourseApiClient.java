@@ -5,6 +5,7 @@ import android.content.Context;
 import java.util.Map;
 
 import in.testpress.core.TestpressSdk;
+import in.testpress.course.network_models.NetworkContent;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.HtmlContent;
 import in.testpress.course.models.Reputation;
@@ -92,6 +93,10 @@ public class TestpressCourseApiClient extends TestpressApiClient {
 
     public RetrofitCall<Content> getContent(String contentUrl) {
         return getCourseService().getContent(contentUrl);
+    }
+
+    public RetrofitCall<NetworkContent> getNetworkContent(String contentUrl) {
+        return getCourseService().getNetworkContent(contentUrl);
     }
 
     public RetrofitCall<CourseAttempt> createContentAttempt(long contentId) {

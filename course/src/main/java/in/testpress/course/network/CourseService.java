@@ -2,6 +2,7 @@ package in.testpress.course.network;
 
 import java.util.Map;
 
+import in.testpress.course.network_models.NetworkContent;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.HtmlContent;
 import in.testpress.course.models.Reputation;
@@ -64,6 +65,11 @@ public interface CourseService {
     @GET("{content_url}")
     RetrofitCall<Content> getContent(
             @Path(value = "content_url", encoded = true) String contentUrl);
+
+    @GET("{content_url}")
+    RetrofitCall<NetworkContent> getNetworkContent(
+            @Path(value = "content_url", encoded = true) String contentUrl);
+
 
     @POST(CONTENTS_PATH + "{content_id}" + ATTEMPTS_PATH)
     RetrofitCall<CourseAttempt> createContentAttempt(

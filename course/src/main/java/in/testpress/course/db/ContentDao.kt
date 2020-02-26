@@ -9,5 +9,5 @@ interface ContentDao: BaseDao<Content> {
     fun getAll(): LiveData<List<Content>>
 
     @Query("SELECT * from content where id = :id LIMIT 1")
-    fun findById(id: Long): LiveData<Content>
+    fun findById(id: Long): Content
 }
