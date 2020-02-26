@@ -1,6 +1,6 @@
 package in.testpress.util;
 
-import android.support.test.InstrumentationRegistry;
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -18,14 +18,14 @@ public class ImageUtilsTest {
         if (ImageLoader.getInstance().isInited()) {
             ImageLoader.getInstance().destroy();
         }
-        ImageUtils.initImageLoader(InstrumentationRegistry.getContext());
+        ImageUtils.initImageLoader(ApplicationProvider.getApplicationContext());
         assertEquals("ImageLoader not initialized", true, ImageLoader.getInstance().isInited());
     }
 
     @Test
     public void testInitImageLoader_whenImageLoaderAlreadyInitialized() throws Exception {
         testInitImageLoader_whenImageLoaderNotInitialized();
-        ImageUtils.initImageLoader(InstrumentationRegistry.getContext());
+        ImageUtils.initImageLoader(ApplicationProvider.getApplicationContext());
         assertEquals("ImageLoader not initialized", true, ImageLoader.getInstance().isInited());
     }
 

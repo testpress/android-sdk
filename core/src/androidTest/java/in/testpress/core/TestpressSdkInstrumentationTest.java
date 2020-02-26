@@ -1,7 +1,8 @@
 package in.testpress.core;
 
 import android.graphics.Typeface;
-import android.support.test.InstrumentationRegistry;
+
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Test;
@@ -17,7 +18,7 @@ public class TestpressSdkInstrumentationTest {
     @Test
     public void testGetTypeface_returnFontInDefaultPath() throws Exception {
         try {
-            TestpressSdk.getTypeface(InstrumentationRegistry.getContext(), "dummyPath");
+            TestpressSdk.getTypeface(ApplicationProvider.getApplicationContext(), "dummyPath");
             fail();
         } catch (IllegalStateException e) {
             assertTrue(e.getMessage().contains("Could not get typeface"));
@@ -27,7 +28,7 @@ public class TestpressSdkInstrumentationTest {
     @Test
     public void testGetRubikRegularFont_returnFontInDefaultPath() throws Exception {
         try {
-            Typeface typeface = TestpressSdk.getRubikRegularFont(InstrumentationRegistry.getContext());
+            Typeface typeface = TestpressSdk.getRubikRegularFont(ApplicationProvider.getApplicationContext());
             assertNotNull("Typeface must not be null", typeface);
         } catch (IllegalStateException e) {
             fail(e.getMessage());
@@ -37,7 +38,7 @@ public class TestpressSdkInstrumentationTest {
     @Test
     public void testGetRubikMediumFont_returnFontInDefaultPath() throws Exception {
         try {
-            Typeface typeface = TestpressSdk.getRubikMediumFont(InstrumentationRegistry.getContext());
+            Typeface typeface = TestpressSdk.getRubikMediumFont(ApplicationProvider.getApplicationContext());
             assertNotNull("Typeface must not be null", typeface);
         } catch (IllegalStateException e) {
             fail(e.getMessage());
