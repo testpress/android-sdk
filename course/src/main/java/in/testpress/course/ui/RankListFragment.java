@@ -9,7 +9,7 @@ import in.testpress.core.TestpressException;
 import in.testpress.course.R;
 import in.testpress.course.TestpressCourse;
 import in.testpress.course.models.Reputation;
-import in.testpress.course.network.LeaderboardPager;
+import in.testpress.course.pagers.LeaderboardPager;
 import in.testpress.course.network.TestpressCourseApiClient;
 import in.testpress.network.BaseResourcePager;
 import in.testpress.ui.PagedItemFragment;
