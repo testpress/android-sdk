@@ -1,0 +1,29 @@
+package `in`.testpress.course.network
+
+import `in`.testpress.models.greendao.Video
+
+data class NetworkVideoContent(
+    val id: Long,
+    val title: String = "",
+    val url: String = "",
+    val embedCode: String? = null,
+    val duration: String? = null,
+    val requiredWatchDuration: String = "",
+    val isDomainRestricted: Boolean,
+    val description: String = "",
+    val streams: List<NetworkStream> = arrayListOf<NetworkStream>()
+)
+
+fun NetworkVideoContent.asGreenDaoModel(): Video {
+    return Video(
+        this.title,
+        this.url,
+        this.id,
+        this.embedCode,
+        this.duration,
+        this.isDomainRestricted,
+        null,
+        null,
+        null
+    )
+}
