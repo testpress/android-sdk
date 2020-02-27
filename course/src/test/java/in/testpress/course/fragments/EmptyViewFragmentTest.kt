@@ -8,11 +8,11 @@ import `in`.testpress.models.greendao.Content
 import android.content.Context
 import android.view.View
 import androidx.test.core.app.ApplicationProvider
-import junit.framework.Assert
 import okhttp3.MediaType
 import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.ResponseBody
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,7 +20,6 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.shadows.support.v4.SupportFragmentTestUtil
 import retrofit2.Response
 import java.io.IOException
-
 
 @RunWith(RobolectricTestRunner::class)
 class EmptyViewFragmentTest {
