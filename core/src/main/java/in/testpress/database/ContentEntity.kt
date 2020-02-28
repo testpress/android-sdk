@@ -32,5 +32,6 @@ data class ContentEntity(
     var attachmentId: Long? = null,
     var videoId: Long? = null,
     var htmlId: Long? = null,
-    var start: String? = null
+    var start: String? = null,
+    var hasStarted: Boolean
 )
