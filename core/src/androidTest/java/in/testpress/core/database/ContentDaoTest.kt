@@ -3,9 +3,9 @@ package `in`.testpress.core.database
 import `in`.testpress.database.ContentEntity
 import `in`.testpress.util.getOrAwaitValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import junit.framework.Assert.assertTrue
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -15,7 +15,7 @@ class ContentDaoTest : DbTestMixin() {
         val content = ContentEntity(
                 id = 1, title = "Content", active = true,
                 order = 0, contentType = "exam", isLocked = false,
-                isScheduled = false
+                isScheduled = false, hasStarted = true
         )
         return content
     }
@@ -50,5 +50,15 @@ class ContentDaoTest : DbTestMixin() {
         db.contentDao().update(content)
         val updatedContent = db.contentDao().findById(1).getOrAwaitValue()
         assertThat(updatedContent.title, equalTo("Updated Content"))
+    }
+
+    @Test
+    fun getChapterContents() {
+        val content = createContent()
+        content.chapterId = 1
+        db.contentDao().insert(content)
+        val fetchedContents = db.contentDao().getChapterContents(1).getOrAwaitValue()
+
+        assertEquals(listOf(content), fetchedContents)
     }
 }
