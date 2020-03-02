@@ -20,7 +20,7 @@ class ContentRepository(
 ) {
 
     fun loadContent(
-        contentId: Int,
+        contentId: Long,
         forceRefresh: Boolean = false
     ): LiveData<Resource<DomainContent>> {
         return object : NetworkBoundResource<DomainContent, NetworkContent>() {
@@ -34,7 +34,7 @@ class ContentRepository(
             }
 
             override fun loadFromDb(): LiveData<DomainContent> {
-                return Transformations.map(roomContentDao.findById(contentId.toLong())) {
+                return Transformations.map(roomContentDao.findById(contentId)) {
                     it.asDomainContent()
                 }
             }
