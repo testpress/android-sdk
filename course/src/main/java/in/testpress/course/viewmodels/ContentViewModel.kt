@@ -13,7 +13,7 @@ class ContentViewModel(val repository: ContentRepository) : ViewModel() {
         return repository.loadContent(contentId, forceRefresh)
     }
 
-    fun getChapterContents(chapterId: Long): LiveData<List<DomainContent>>? {
-        return repository.getChapterContentsFromDB(chapterId)
+    fun getContentsForChapter(chapterId: Long): LiveData<List<DomainContent>>? {
+        return repository.getContentsForChapterFromDB(chapterId)
     }
 }

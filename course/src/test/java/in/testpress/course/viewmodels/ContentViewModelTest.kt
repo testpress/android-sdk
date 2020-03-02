@@ -19,7 +19,7 @@ class ContentViewModelTest {
 
     @Test
     fun getChapterContentsCallsRepository() {
-        viewModel.getChapterContents(1)
-        verify(repository, times(1)).getChapterContentsFromDB(1)
+        viewModel.getContentsForChapter(1)
+        verify(repository, times(1)).getContentsForChapterFromDB(1)
     }
 }

@@ -79,7 +79,7 @@ class ContentRepositoryTest {
         val dbData =
             getLiveData(arrayListOf(createContent().asDatabaseModel())) as LiveData<List<ContentEntity>>
         `when`(roomContentDao.getChapterContents(ArgumentMatchers.anyLong())).thenReturn(dbData)
-        val result = repo.getChapterContentsFromDB(1)?.getOrAwaitValue()
+        val result = repo.getContentsForChapterFromDB(1)?.getOrAwaitValue()
 
         assert(result == dbData.value?.asDomainContent())
     }

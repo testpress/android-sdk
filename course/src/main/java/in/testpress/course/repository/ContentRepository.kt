@@ -46,7 +46,7 @@ class ContentRepository(
         }.asLiveData()
     }
 
-    fun getChapterContentsFromDB(chapterId: Long): LiveData<List<DomainContent>>? {
+    fun getContentsForChapterFromDB(chapterId: Long): LiveData<List<DomainContent>>? {
         return Transformations.map(roomContentDao.getChapterContents(chapterId)) {
             it.asDomainContent()
         }
