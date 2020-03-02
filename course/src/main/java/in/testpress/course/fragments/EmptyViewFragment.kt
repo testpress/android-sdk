@@ -1,4 +1,4 @@
-package `in`.testpress.course.ui.fragments
+package `in`.testpress.course.fragments
 
 import `in`.testpress.core.TestpressException
 import `in`.testpress.course.R
