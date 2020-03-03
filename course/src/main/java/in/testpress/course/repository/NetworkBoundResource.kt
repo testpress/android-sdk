@@ -6,6 +6,7 @@ import `in`.testpress.network.RetrofitCall
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -53,17 +54,28 @@ abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
     }
 
     private suspend fun fetchFromNetwork() {
-
         withContext(Dispatchers.IO) {
-            val response = createCall().execute()
-            if (response.isSuccessful) {
-                saveNetworkResponseToDB(processNetworkResponse(response.body()))
-                refreshDBSource()
-                showDBDataIfAvailable()
-            } else {
-                onFetchFailed()
-                result.addSource(dbSource) { newData ->
-                    val exception = TestpressException.httpError(response)
+            try {
+                val response = createCall().execute()
+
+                if (response.isSuccessful) {
+                    saveNetworkResponseToDB(processNetworkResponse(response.body()))
+                    refreshDBSource()
+                    withContext(Dispatchers.Main) {
+                        showDBDataIfAvailable()
+                    }
+                } else {
+                    onFetchFailed()
+                    result.addSource(dbSource) { newData ->
+                        val exception = TestpressException.httpError(response)
+                        setValue(Resource.error(exception, null))
+                    }
+                }
+            } catch (e: Exception) {
+                println("I am here 2")
+                withContext(Dispatchers.Main) {
+                    println("I am here 3")
+                    val exception = TestpressException.unexpectedError(e)
                     setValue(Resource.error(exception, null))
                 }
             }

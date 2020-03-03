@@ -11,8 +11,13 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -34,9 +39,12 @@ class NetworkBoundResourceTest {
     private val dbData = MutableLiveData<Foo>()
     private lateinit var observer: Observer<Resource<Foo>>
     private val exception = TestpressException.networkError(IOException())
+    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(mainThreadSurrogate)
+
         runBlocking {
             networkBoundResource = object : NetworkBoundResource<Foo, Foo>() {
                 override fun saveNetworkResponseToDB(item: Foo) {
@@ -131,6 +139,27 @@ class NetworkBoundResourceTest {
         delay(50)
 
         Assert.assertTrue(isNetworkCallMade)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+        mainThreadSurrogate.close()
+    }
+
+    @Test
+    fun exceptionsShouldBeHandled() = runBlocking {
+        val exception = Exception()
+        shouldFetchHandler = { true }
+        createCallHandler = {
+            throw exception
+        }
+        initObserver()
+        dbData.value = null
+        delay(50)
+        val resource = networkBoundResource.asLiveData().getOrAwaitValue()
+
+        Assert.assertEquals(Status.ERROR, resource.status)
     }
 
     data class Foo(var value: Int)
