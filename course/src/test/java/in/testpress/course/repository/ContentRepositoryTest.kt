@@ -108,6 +108,9 @@ class ContentRepositoryTest {
         val content = Content(1)
         val dbData = listOf(content)
         `when`(contentDao.queryBuilder().list()).thenReturn(dbData)
+        val result = repo.getContentFromDB(1)
+
+        assert(result==content)
     }
 
     @Test
