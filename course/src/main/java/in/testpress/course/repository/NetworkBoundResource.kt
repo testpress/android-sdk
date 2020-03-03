@@ -6,11 +6,11 @@ import `in`.testpress.network.RetrofitCall
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 
 abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
     private val result = MediatorLiveData<Resource<ResultDataType>>()
@@ -57,26 +57,32 @@ abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
         withContext(Dispatchers.IO) {
             try {
                 val response = createCall().execute()
-
-                if (response.isSuccessful) {
-                    saveNetworkResponseToDB(processNetworkResponse(response.body()))
-                    refreshDBSource()
-                    withContext(Dispatchers.Main) {
-                        showDBDataIfAvailable()
-                    }
-                } else {
-                    onFetchFailed()
-                    result.addSource(dbSource) { newData ->
-                        val exception = TestpressException.httpError(response)
-                        setValue(Resource.error(exception, null))
-                    }
-                }
+                handleResponse(response)
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    val exception = TestpressException.unexpectedError(e)
-                    setValue(Resource.error(exception, null))
-                }
+                handleException(e)
             }
+        }
+    }
+
+    private suspend fun handleResponse(response: Response<NetworkDataType>) {
+        if (response.isSuccessful) {
+            saveNetworkResponseToDB(processNetworkResponse(response.body()))
+            refreshDBSource()
+            withContext(Dispatchers.Main) {
+                showDBDataIfAvailable()
+            }
+        } else {
+            onFetchFailed()
+            result.addSource(dbSource) { newData ->
+                val exception = TestpressException.httpError(response)
+                setValue(Resource.error(exception, null))
+            }
+        }
+    }
+
+    private suspend fun handleException(exception: Exception) {
+        withContext(Dispatchers.Main) {
+            setValue(Resource.error(TestpressException.unexpectedError(exception), null))
         }
     }
 
