@@ -1,6 +1,8 @@
 package `in`.testpress.course.domain
 
 import `in`.testpress.database.ContentEntity
+import `in`.testpress.models.greendao.Attachment
+import `in`.testpress.models.greendao.Content
 
 data class DomainContent(
     val id: Long,
@@ -8,24 +10,24 @@ data class DomainContent(
     val description: String? = null,
     val image: String? = null,
     val order: Int? = null,
-    val url: String = "",
+    val url: String? = "",
     val chapterId: Long? = null,
-    val chapterSlug: String = "",
+    val chapterSlug: String? = null,
     val chapterUrl: String? = null,
     val courseId: Long? = null,
     val freePreview: Boolean? = null,
     val modified: String? = null,
-    val contentType: String,
+    val contentType: String? = null,
     val examUrl: String? = null,
     val videoUrl: String? = null,
     val attachmentUrl: String? = null,
     val htmlUrl: String? = null,
-    val isLocked: Boolean,
-    val isScheduled: Boolean,
-    val attemptsCount: Int = 0,
+    val isLocked: Boolean?,
+    val isScheduled: Boolean?,
+    val attemptsCount: Int? = 0,
     val bookmarkId: Long? = null,
     val videoWatchedPercentage: Int? = null,
-    val active: Boolean,
+    val active: Boolean?,
     val examId: Long? = null,
     val attachmentId: Long? = null,
     val videoId: Long? = null,
@@ -35,8 +37,9 @@ data class DomainContent(
     val htmlContentTitle: String? = null,
     val htmlContentUrl: String? = null,
     val attemptsUrl: String? = null,
-    val hasStarted: Boolean,
-    val coverImage: String? = null
+    val hasStarted: Boolean?,
+    val coverImage: String? = null,
+    val attachment: DomainAttachmentContent? = null
 )
 
 fun createDomainContent(contentEntity: ContentEntity): DomainContent {
@@ -73,11 +76,57 @@ fun createDomainContent(contentEntity: ContentEntity): DomainContent {
     )
 }
 
+fun createDomainContent(content: Content): DomainContent {
+    val attachment: Attachment? = content.rawAttachment
+    return DomainContent(
+        id = content.id,
+        title = content.title,
+        description = content.description,
+        image = content.image,
+        order = content.order,
+        url = content.url,
+        chapterId = content.chapterId,
+        chapterSlug = content.chapterSlug,
+        chapterUrl = content.chapterUrl,
+        courseId = content.courseId,
+        freePreview = content.freePreview,
+        modified = content.modified,
+        contentType = content.contentType,
+        examUrl = null,
+        videoUrl = null,
+        attachmentUrl = null,
+        htmlUrl = null,
+        isLocked = content.isLocked,
+        isScheduled = content.isScheduled,
+        attemptsCount = content.attemptsCount,
+        bookmarkId = content.bookmarkId,
+        videoWatchedPercentage = content.videoWatchedPercentage,
+        active = content.active,
+        examId = content.examId,
+        attachmentId = content.attachmentId,
+        videoId = content.videoId,
+        htmlId = content.htmlId,
+        start = content.start,
+        hasStarted = content.hasStarted,
+        attachment = attachment?.asDomainAttachment()
+    )
+}
+
 fun ContentEntity.asDomainContent(): DomainContent {
     return createDomainContent(this)
 }
 
 fun List<ContentEntity>.asDomainContent(): List<DomainContent> {
+    return this.map {
+        createDomainContent(it)
+    }
+}
+
+fun Content.asDomainContent(): DomainContent {
+    return createDomainContent(this)
+}
+
+fun List<Content>.asDomainContents(): List<DomainContent> {
     return this.map {
         createDomainContent(it)
     }
