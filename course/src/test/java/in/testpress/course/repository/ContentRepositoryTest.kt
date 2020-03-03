@@ -4,6 +4,7 @@ import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.asDomainContent
 import `in`.testpress.course.domain.asDomainContents
 import `in`.testpress.course.network.CourseNetwork
+import `in`.testpress.course.network.NetworkAttachmentContent
 import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.course.network.Resource
@@ -23,6 +24,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
@@ -47,11 +49,11 @@ class ContentRepositoryTest {
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
-    fun createContent(): NetworkContent {
+    fun createContent(attachment: NetworkAttachmentContent? = null): NetworkContent {
         return NetworkContent(
             id = 1, title = "Content", active = true,
             order = 0, contentType = "exam", isLocked = false,
-            isScheduled = false, hasStarted = false
+            isScheduled = false, hasStarted = false, attachment = attachment
         )
     }
 
@@ -135,5 +137,19 @@ class ContentRepositoryTest {
 
         verify(courseNetwork).createContentAttempt(1)
         assert(result==apiCall.resource)
+    }
+
+    @Test
+    fun contentAndItsRelatedDataShouldBeStoredInDB() {
+        val attachment = NetworkAttachmentContent(5)
+        val content = createContent(attachment)
+        repo.storeContentAndItsRelationsToDB(content)
+        val contentArgumentCaptor = ArgumentCaptor.forClass(Content::class.java)
+
+        verify(attachmentDao).insertOrReplace(any())
+        verify(contentDao).insertOrReplace(contentArgumentCaptor.capture())
+
+        val storedContent = contentArgumentCaptor.allValues[0]
+        assert(attachment.id==storedContent.attachmentId)
     }
 }
