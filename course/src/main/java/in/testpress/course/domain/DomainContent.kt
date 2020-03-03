@@ -25,7 +25,7 @@ data class DomainContent(
     val isLocked: Boolean?,
     val isScheduled: Boolean?,
     val attemptsCount: Int? = 0,
-    val bookmarkId: Long? = null,
+    var bookmarkId: Long? = null,
     val videoWatchedPercentage: Int? = null,
     val active: Boolean?,
     val examId: Long? = null,
