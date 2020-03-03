@@ -36,9 +36,10 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 class ContentRepositoryTest {
     private val contentDao = mock(ContentDao::class.java)
+    private val attachmentDao = mock(AttachmentDao::class.java)
     private val roomContentDao = mock(`in`.testpress.database.ContentDao::class.java)
     private val courseNetwork = mock(CourseNetwork::class.java)
-    private val repo = ContentRepository(roomContentDao, contentDao, courseNetwork)
+    private val repo = ContentRepository(roomContentDao, contentDao, attachmentDao, courseNetwork)
 
     @Mock
     lateinit var queryBuilder: QueryBuilder<Content>
