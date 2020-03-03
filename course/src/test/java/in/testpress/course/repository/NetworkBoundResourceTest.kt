@@ -148,7 +148,7 @@ class NetworkBoundResourceTest {
     }
 
     @Test
-    fun exceptionShouldBeSetOnLiveDataInCase() = runBlocking {
+    fun onNetworkErrorExceptionIsSetOnResource() = runBlocking {
         val exception = Exception()
         shouldFetchHandler = { true }
         createCallHandler = {
