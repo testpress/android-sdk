@@ -43,10 +43,7 @@ class ContentRepository(
 
             override fun loadFromDb(): LiveData<DomainContent> {
                 val liveData = MutableLiveData<DomainContent>()
-                val contents = contentDao.queryBuilder().where(ContentDao.Properties.Id.eq(contentId)).list()
-                if (contents.isNotEmpty()) {
-                    liveData.value = contents[0].asDomainContent()
-                }
+                liveData.postValue(getContentFromDB(contentId)?.asDomainContent())
                 return liveData
             }
 
