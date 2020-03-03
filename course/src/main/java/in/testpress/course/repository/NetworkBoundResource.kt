@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 
 abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
     private val result = MediatorLiveData<Resource<ResultDataType>>()
@@ -53,20 +54,35 @@ abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
     }
 
     private suspend fun fetchFromNetwork() {
-
         withContext(Dispatchers.IO) {
-            val response = createCall().execute()
-            if (response.isSuccessful) {
-                saveNetworkResponseToDB(processNetworkResponse(response.body()))
-                refreshDBSource()
-                showDBDataIfAvailable()
-            } else {
-                onFetchFailed()
-                result.addSource(dbSource) { newData ->
-                    val exception = TestpressException.httpError(response)
-                    setValue(Resource.error(exception, null))
-                }
+            try {
+                val response = createCall().execute()
+                handleResponse(response)
+            } catch (e: Exception) {
+                handleException(e)
             }
+        }
+    }
+
+    private suspend fun handleResponse(response: Response<NetworkDataType>) {
+        if (response.isSuccessful) {
+            saveNetworkResponseToDB(processNetworkResponse(response.body()))
+            refreshDBSource()
+            withContext(Dispatchers.Main) {
+                showDBDataIfAvailable()
+            }
+        } else {
+            onFetchFailed()
+            result.addSource(dbSource) { newData ->
+                val exception = TestpressException.httpError(response)
+                setValue(Resource.error(exception, null))
+            }
+        }
+    }
+
+    private suspend fun handleException(exception: Exception) {
+        withContext(Dispatchers.Main) {
+            setValue(Resource.error(TestpressException.unexpectedError(exception), null))
         }
     }
 
