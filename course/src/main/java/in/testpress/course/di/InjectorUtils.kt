@@ -10,8 +10,15 @@ object InjectorUtils {
     fun getContentRepository(context: Context): ContentRepository {
         val contentDao = TestpressSDKDatabase.getContentDao(context)
         val attachmentDao = TestpressSDKDatabase.getAttachmentDao(context)
+        val htmlContentDao = TestpressSDKDatabase.getHtmlContentDao(context)
         val roomContentDao = TestpressDatabase(context).contentDao()
-        return ContentRepository(roomContentDao, contentDao, attachmentDao, getCourseNetwork(context))
+        return ContentRepository(
+            roomContentDao,
+            contentDao,
+            attachmentDao,
+            htmlContentDao,
+            getCourseNetwork(context)
+        )
     }
 
     private fun getCourseNetwork(context: Context): CourseNetwork {
