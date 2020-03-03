@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData
 class ContentRepository(
     val roomContentDao: `in`.testpress.database.ContentDao,
     val contentDao: ContentDao,
+    val attachmentDao: AttachmentDao,
     val courseNetwork: CourseNetwork
 ) {
     private var contentAttempt: MutableLiveData<Resource<NetworkContentAttempt>> = MutableLiveData()
@@ -99,6 +100,16 @@ class ContentRepository(
                 }
             })
         return contentAttempt
+    }
+
+    fun storeContentAndItsRelationsToDB(content: NetworkContent) {
+        val greenDaoContent = content.asGreenDaoModel()
+        content.attachment?.let {
+            val attachment = it.asGreenDaoModel()
+            greenDaoContent.attachmentId = attachment.id
+            attachmentDao.insertOrReplace(it.asGreenDaoModel())
+        }
+        contentDao.insertOrReplace(greenDaoContent)
     }
 
     fun storeBookmarkIdToContent(bookmarkId: Long?, contentId: Long) {
