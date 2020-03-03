@@ -145,7 +145,7 @@ class ContentBottomNavigationFragment : Fragment() {
 
     private fun nextShouldOpenNextContentOnClick(position: Int, contents: List<DomainContent>) {
         val nextPosition = position + 1
-        if (!contents[nextPosition].isLocked) {
+        if (!contents[nextPosition].isLocked!!) {
             nextButton.text = getString(R.string.testpress_next_content)
             nextButton.setOnClickListener {
                 startActivity(createIntent(nextPosition, content.chapterId!!, activity as AppCompatActivity, productSlug))
