@@ -45,8 +45,8 @@ class ContentBottomNavigationFragment : Fragment() {
         return inflater.inflate(R.layout.content_bottom_navigation, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ContentViewModel(InjectorUtils.getContentRepository(context!!)) as T
