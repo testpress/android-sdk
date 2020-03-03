@@ -78,7 +78,7 @@ class ContentBottomNavigationFragmentTest {
     }
 
     @Test
-    fun nextButtonInvisibleIfOnlyOneContentPresent() {
+    fun showMenuIfOnlyOneContentPresent() {
         val contents = MutableLiveData<List<DomainContent>>(listOf(content))
         contentFragment.content = content
         `when`(contentFragment.viewModel.getContentsForChapter(anyLong())).thenReturn(contents)
