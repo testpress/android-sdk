@@ -1,26 +1,28 @@
 package `in`.testpress.course.repository
 
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.domain.asDomainContent
+import `in`.testpress.course.domain.asDomainContents
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.Resource
-import `in`.testpress.course.network.asDatabaseModel
 import `in`.testpress.course.util.RetrofitCallMock
 import `in`.testpress.course.util.getOrAwaitValue
 import `in`.testpress.course.util.mock
-import `in`.testpress.database.ContentEntity
+import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import kotlinx.coroutines.runBlocking
+import org.greenrobot.greendao.query.QueryBuilder
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.atLeastOnce
 import org.mockito.Mockito.mock
@@ -35,6 +37,9 @@ class ContentRepositoryTest {
     private val courseNetwork = mock(CourseNetwork::class.java)
     private val repo = ContentRepository(roomContentDao, contentDao, courseNetwork)
 
+    @Mock
+    lateinit var queryBuilder: QueryBuilder<Content>
+
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
@@ -46,11 +51,18 @@ class ContentRepositoryTest {
         )
     }
 
+    @Before
+    fun setUp() {
+        `when`(contentDao.queryBuilder()).thenReturn(queryBuilder)
+        `when`(contentDao.queryBuilder().where(any(), any())).thenReturn(queryBuilder)
+    }
+
+
     @Test
     fun loadUser() {
         repo.loadContent(1)
 
-        verify(roomContentDao, atLeastOnce()).findById(1)
+        verify(contentDao, atLeastOnce()).queryBuilder()
         verify(courseNetwork, never()).getNetworkContent(anyString())
     }
 
@@ -62,8 +74,8 @@ class ContentRepositoryTest {
 
     @Test
     fun fetchFromNetwork() {
-        val dbData = getLiveData(createContent().asDatabaseModel()) as LiveData<ContentEntity>
-        `when`(roomContentDao.findById(ArgumentMatchers.anyLong())).thenReturn(dbData)
+        val dbData = arrayListOf(Content(1))
+        `when`(contentDao.queryBuilder().where(any()).list()).thenReturn(dbData)
         val apiCall = RetrofitCallMock(Resource.success(createContent()))
         `when`(courseNetwork.getNetworkContent(anyString())).thenReturn(apiCall)
         val observer = mock<Observer<Resource<DomainContent>>>()
@@ -76,11 +88,10 @@ class ContentRepositoryTest {
 
     @Test
     fun getChapterContentsFromDB() {
-        val dbData =
-            getLiveData(arrayListOf(createContent().asDatabaseModel())) as LiveData<List<ContentEntity>>
-        `when`(roomContentDao.getChapterContents(ArgumentMatchers.anyLong())).thenReturn(dbData)
+        val dbData = listOf(Content(1))
+        `when`(contentDao.queryBuilder().list()).thenReturn(dbData)
         val result = repo.getContentsForChapterFromDB(1)?.getOrAwaitValue()
 
-        assert(result == dbData.value?.asDomainContent())
+        assert(result == dbData.asDomainContents())
     }
 }

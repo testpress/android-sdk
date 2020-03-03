@@ -3,6 +3,7 @@ package `in`.testpress.course.repository
 import `in`.testpress.course.api.TestpressCourseApiClient.CONTENTS_PATH_v2_4
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.asDomainContent
+import `in`.testpress.course.domain.asDomainContents
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.Resource
@@ -11,7 +12,7 @@ import `in`.testpress.course.network.asGreenDaoModel
 import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.network.RetrofitCall
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.MutableLiveData
 
 class ContentRepository(
     val roomContentDao: `in`.testpress.database.ContentDao,
@@ -30,13 +31,16 @@ class ContentRepository(
             }
 
             override fun shouldFetch(data: DomainContent?): Boolean {
-                return forceRefresh
+                return forceRefresh || loadFromDb().value == null
             }
 
             override fun loadFromDb(): LiveData<DomainContent> {
-                return Transformations.map(roomContentDao.findById(contentId)) {
-                    it.asDomainContent()
+                val liveData = MutableLiveData<DomainContent>()
+                val contents = contentDao.queryBuilder().where(ContentDao.Properties.Id.eq(contentId)).list()
+                if (contents.isNotEmpty()) {
+                    liveData.value = contents[0].asDomainContent()
                 }
+                return liveData
             }
 
             override fun createCall(): RetrofitCall<NetworkContent> {
@@ -46,9 +50,25 @@ class ContentRepository(
         }.asLiveData()
     }
 
+    fun getContent(position: Int, chapterId: Long): DomainContent {
+        val contents = contentDao.queryBuilder()
+            .where(
+                ContentDao.Properties.ChapterId.eq(chapterId),
+                ContentDao.Properties.Active.eq(true)
+            )
+            .orderAsc(ContentDao.Properties.Order)
+            .list()
+        return contents[position].asDomainContent()
+    }
+
     fun getContentsForChapterFromDB(chapterId: Long): LiveData<List<DomainContent>>? {
-        return Transformations.map(roomContentDao.getChapterContents(chapterId)) {
-            it.asDomainContent()
-        }
+        val contentsLiveData = MutableLiveData<List<DomainContent>>()
+        val contents = contentDao.queryBuilder()
+            .where(
+                ContentDao.Properties.ChapterId.eq(chapterId),
+                ContentDao.Properties.Active.eq(true)
+            ).list().asDomainContents()
+        contentsLiveData.value = contents
+        return contentsLiveData
     }
 }
