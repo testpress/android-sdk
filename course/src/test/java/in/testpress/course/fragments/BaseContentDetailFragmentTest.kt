@@ -99,14 +99,13 @@ class BaseContentDetailFragmentTest: GreendaoCleanupMixin() {
     @Test
     fun storeBookmarkIdToContentShouldGetCalledOnBookmarkSuccess() {
         contentFragment.onBookmarkSuccess(2)
-
-        // verify(contentFragment.viewModel).storeBookmarkIdToContent(2, 1)
+        verify(contentFragment.viewModel).storeBookmarkIdToContent(2, 1)
     }
 
     @Test
     fun storeBookmarkIdToContentShouldGetCalledOnBookmarkDeletion() {
         contentFragment.onDeleteBookmarkSuccess()
-        // verify(contentFragment.viewModel).storeBookmarkIdToContent(null, 1)
+        verify(contentFragment.viewModel).storeBookmarkIdToContent(null, 1)
     }
 
     @Test
