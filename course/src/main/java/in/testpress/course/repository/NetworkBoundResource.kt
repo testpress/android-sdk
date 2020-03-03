@@ -72,9 +72,7 @@ abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
                     }
                 }
             } catch (e: Exception) {
-                println("I am here 2")
                 withContext(Dispatchers.Main) {
-                    println("I am here 3")
                     val exception = TestpressException.unexpectedError(e)
                     setValue(Resource.error(exception, null))
                 }
