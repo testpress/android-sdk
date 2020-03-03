@@ -58,7 +58,7 @@ dependencies {
     implementation "androidx.arch.core:core-runtime:2.1.0"
     implementation "androidx.core:core-ktx:$core_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "androidx.room:room-runtime:$room_version"
+    api "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
 }
 
