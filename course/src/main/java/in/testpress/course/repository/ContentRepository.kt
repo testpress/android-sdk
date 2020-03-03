@@ -16,6 +16,7 @@ import `in`.testpress.course.network.asGreenDaoModel
 import `in`.testpress.models.greendao.AttachmentDao
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
+import `in`.testpress.models.greendao.HtmlContentDao
 import `in`.testpress.network.RetrofitCall
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,6 +25,7 @@ class ContentRepository(
     val roomContentDao: `in`.testpress.database.ContentDao,
     val contentDao: ContentDao,
     val attachmentDao: AttachmentDao,
+    val htmlContentDao: HtmlContentDao,
     val courseNetwork: CourseNetwork
 ) {
     private var contentAttempt: MutableLiveData<Resource<NetworkContentAttempt>> = MutableLiveData()
@@ -108,6 +110,11 @@ class ContentRepository(
             val attachment = it.asGreenDaoModel()
             greenDaoContent.attachmentId = attachment.id
             attachmentDao.insertOrReplace(it.asGreenDaoModel())
+        }
+        content.htmlContent ?.let {
+            val htmlContent = it.asGreenDaoModel()
+            greenDaoContent.htmlId = htmlContent.id
+            htmlContentDao.insertOrReplace(htmlContent)
         }
         contentDao.insertOrReplace(greenDaoContent)
     }
