@@ -56,6 +56,7 @@ dependencies {
     androidTestImplementation rootProject.junit
     androidTestImplementation rootProject.testRunner
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
