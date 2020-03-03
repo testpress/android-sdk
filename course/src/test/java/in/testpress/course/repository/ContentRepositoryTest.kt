@@ -1,13 +1,16 @@
 package `in`.testpress.course.repository
 
 import `in`.testpress.course.domain.DomainContent
+import `in`.testpress.course.domain.asDomainContent
 import `in`.testpress.course.domain.asDomainContents
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContent
+import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.course.network.Resource
 import `in`.testpress.course.util.RetrofitCallMock
 import `in`.testpress.course.util.getOrAwaitValue
 import `in`.testpress.course.util.mock
+import `in`.testpress.models.greendao.AttachmentDao
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -51,10 +54,15 @@ class ContentRepositoryTest {
         )
     }
 
+    private fun createContentAttempt(): NetworkContentAttempt {
+        return NetworkContentAttempt(1)
+    }
+
     @Before
     fun setUp() {
         `when`(contentDao.queryBuilder()).thenReturn(queryBuilder)
         `when`(contentDao.queryBuilder().where(any(), any())).thenReturn(queryBuilder)
+        `when`(contentDao.queryBuilder().orderAsc(any())).thenReturn(queryBuilder)
     }
 
 
@@ -93,5 +101,38 @@ class ContentRepositoryTest {
         val result = repo.getContentsForChapterFromDB(1)?.getOrAwaitValue()
 
         assert(result == dbData.asDomainContents())
+    }
+
+    @Test
+    fun contentShouldBeFetchedFromDB() {
+        val content = Content(1)
+        val dbData = listOf(content)
+        `when`(contentDao.queryBuilder().list()).thenReturn(dbData)
+        val result = repo.getContentFromDB(1)
+
+        assert(result==content)
+    }
+
+    @Test
+    fun getContentWithPositionAndChapterIdShouldReturnContent() {
+        val content = Content(1)
+        content.chapterId = 2
+        val content2 = Content(2)
+        content2.chapterId = content.chapterId
+        val dbData = listOf(content, content2)
+        `when`(contentDao.queryBuilder().list()).thenReturn(dbData)
+        val result = repo.getContent(1, content.chapterId)
+
+        assert(result == dbData[1].asDomainContent())
+    }
+
+    @Test
+    fun createAttemptShouldMakeAPICall() {
+        val apiCall = RetrofitCallMock(Resource.success(createContentAttempt()))
+        `when`(courseNetwork.createContentAttempt(1)).thenReturn(apiCall)
+        val result = repo.createContentAttempt(1).getOrAwaitValue()
+
+        verify(courseNetwork).createContentAttempt(1)
+        assert(result==apiCall.resource)
     }
 }
