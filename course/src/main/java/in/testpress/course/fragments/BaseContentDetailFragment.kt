@@ -85,7 +85,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
         if (contentId != -1L) {
             viewModel.getContent(contentId).observe(viewLifecycleOwner, onContentLoad)
         } else {
-            content = viewModel.getContent(position, chapterId)
+            content = viewModel.getContentInChapterForPosition(position, chapterId)
             contentId = content.id
             initBookmarkFragmentIfEnabled()
         }
