@@ -38,12 +38,6 @@ class HtmlContentFragment : BaseContentDetailFragment() {
         webViewUtils = HtmlViewUtils(webView)
         webView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
         ViewUtils.setTypeface(arrayOf(titleView), TestpressSdk.getRubikMediumFont(activity!!))
-
-        viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.SUCCESS -> display()
-            }
-        })
     }
 
     override fun display() {
