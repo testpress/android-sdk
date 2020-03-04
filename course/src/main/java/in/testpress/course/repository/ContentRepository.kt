@@ -54,7 +54,8 @@ class ContentRepository(
         }.asLiveData()
     }
 
-    fun getContentInChapterForPosition(position: Int, chapterId: Long): DomainContent {
+    fun getContentInChapterForPosition(position: Int, chapterId: Long): LiveData<DomainContent> {
+        val liveData = MutableLiveData<DomainContent>()
         val contents = contentDao.queryBuilder()
             .where(
                 ContentDao.Properties.ChapterId.eq(chapterId),
@@ -62,7 +63,8 @@ class ContentRepository(
             )
             .orderAsc(ContentDao.Properties.Order)
             .list()
-        return contents[position].asDomainContent()
+        liveData.postValue(contents[position].asDomainContent())
+        return liveData
     }
 
     fun getContentsForChapterFromDB(chapterId: Long): LiveData<List<DomainContent>>? {

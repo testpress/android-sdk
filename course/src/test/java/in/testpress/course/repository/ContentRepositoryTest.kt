@@ -123,7 +123,7 @@ class ContentRepositoryTest {
         `when`(contentDao.queryBuilder().list()).thenReturn(dbData)
         val result = repo.getContentInChapterForPosition(1, content.chapterId)
 
-        assert(result == dbData[1].asDomainContent())
+        assert(result.value == dbData[1].asDomainContent())
     }
 
     @Test
