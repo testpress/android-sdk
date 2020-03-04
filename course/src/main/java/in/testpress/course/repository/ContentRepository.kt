@@ -35,7 +35,7 @@ class ContentRepository(
         return object : NetworkBoundResource<DomainContent, NetworkContent>() {
             override fun saveNetworkResponseToDB(item: NetworkContent) {
                 roomContentDao.insert(item.asDatabaseModel())
-                contentDao.insertOrReplace(item.asGreenDaoModel())
+                storeContentAndItsRelationsToDB(item)
             }
 
             override fun shouldFetch(data: DomainContent?): Boolean {
