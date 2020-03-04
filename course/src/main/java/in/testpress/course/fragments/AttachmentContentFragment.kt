@@ -2,7 +2,6 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
-import `in`.testpress.course.enums.Status
 import `in`.testpress.util.ViewUtils
 import android.content.Intent
 import android.net.Uri
@@ -13,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.lifecycle.Observer
 
 class AttachmentContentFragment : BaseContentDetailFragment() {
     private lateinit var attachmentContentLayout: LinearLayout
@@ -40,20 +38,9 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
         downloadButton = view.findViewById(R.id.download_attachment)
         ViewUtils.setTypeface(arrayOf(titleView), TestpressSdk.getRubikMediumFont(activity!!))
         ViewUtils.setLeftDrawable(context, downloadButton, R.drawable.ic_file_download_18dp)
-
-        viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.SUCCESS -> display()
-            }
-        })
     }
 
     override fun display() {
-        if (content.attachment == null) {
-            updateContent()
-            return
-        }
-
         titleView.text = content.title
         titleLayout.visibility = View.VISIBLE
 
