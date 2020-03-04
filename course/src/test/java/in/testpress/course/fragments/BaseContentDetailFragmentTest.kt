@@ -121,7 +121,7 @@ class BaseContentDetailFragmentTest: GreendaoCleanupMixin() {
         override var isBookmarkEnabled: Boolean = true
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-            return inflater.inflate(R.layout.attachment_content_detail, container, false)
+            return inflater.inflate(R.layout.base_content_detail, container, false)
         }
 
         override fun display() {

@@ -5,7 +5,6 @@ import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.enums.Status
-import `in`.testpress.course.network.Resource
 import `in`.testpress.course.ui.ContentActivity.CHAPTER_ID
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.ui.ContentActivity.POSITION
@@ -35,6 +34,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
     open var isBookmarkEnabled = true
     private var position: Int = -1
     protected lateinit var content: DomainContent
+    private lateinit var bookmarkFragment: BookmarkFragment
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     open lateinit var viewModel: ContentViewModel
 
@@ -68,28 +68,27 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun loadContentAndInitializeBoomarkFragment() {
-        val onContentLoad = Observer<Resource<DomainContent>> { resource ->
-            when (resource.status) {
-                Status.SUCCESS -> {
-                    content = resource.data!!
-                    contentId = content.id
-                    display()
-                    initializeBookmarkFragment()
-                }
-            }
-        }
-
         if (contentId != -1L) {
-            viewModel.getContent(contentId).observe(viewLifecycleOwner, onContentLoad)
+            viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer { resource ->
+                when (resource.status) {
+                    Status.SUCCESS -> {
+                        setContentAndDisplay(resource.data!!)
+                    }
+                }
+            })
         } else {
-            content = viewModel.getContentInChapterForPosition(position, chapterId)
-            contentId = content.id
-            initBookmarkFragmentIfEnabled()
+            viewModel.getContentInChapterForPosition(position, chapterId).observe(viewLifecycleOwner, Observer{
+                setContentAndDisplay(it)
+            })
         }
     }
 
-    private fun initBookmarkFragmentIfEnabled() {
-        if (isBookmarkEnabled) {
+    private fun setContentAndDisplay(data: DomainContent) {
+        content = data
+        contentId = content.id
+        display()
+
+        if (isBookmarkEnabled && !::bookmarkFragment.isInitialized) {
             initializeBookmarkFragment()
         }
     }
@@ -135,7 +134,8 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun initializeBookmarkFragment() {
-        val bookmarkFragment = BookmarkFragment()
+        arguments?.putLong(CONTENT_ID, contentId)
+        bookmarkFragment = BookmarkFragment()
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.bookmark_fragment_layout, bookmarkFragment)
         transaction.commit()
@@ -150,7 +150,6 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
     }
 
     private fun initBottomNavigationFragment() {
-        arguments?.putLong(CONTENT_ID, content.id)
         val bottomNavigationFragment = ContentBottomNavigationFragment()
         bottomNavigationFragment.arguments = arguments
         val transaction = childFragmentManager.beginTransaction()
