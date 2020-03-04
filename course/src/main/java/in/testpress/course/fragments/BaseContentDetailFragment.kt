@@ -74,10 +74,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
                     content = resource.data!!
                     contentId = content.id
                     display()
-
-                    if (isBookmarkEnabled) {
-                        initializeBookmarkFragment()
-                    }
+                    initializeBookmarkFragment()
                 }
             }
         }
