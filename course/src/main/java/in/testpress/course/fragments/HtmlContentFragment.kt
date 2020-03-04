@@ -47,11 +47,6 @@ class HtmlContentFragment : BaseContentDetailFragment() {
     }
 
     override fun display() {
-        if (content.htmlContent == null) {
-            updateContent()
-            return
-        }
-
         titleView.text = content.title
         titleLayout.visibility = View.VISIBLE
 
