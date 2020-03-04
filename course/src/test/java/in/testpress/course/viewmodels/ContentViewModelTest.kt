@@ -22,4 +22,22 @@ class ContentViewModelTest {
         viewModel.getContentsForChapter(1)
         verify(repository, times(1)).getContentsForChapterFromDB(1)
     }
+
+    @Test
+    fun createContentAttemptShouldCallRepository() {
+        viewModel.createContentAttempt(1)
+        verify(repository).createContentAttempt(1)
+    }
+
+    @Test
+    fun getContentWithPositionAndChapterId() {
+        viewModel.getContent(1, 2)
+        verify(repository).getContent(1, 2)
+    }
+
+    @Test
+    fun storeBookmarkIdToContentCallsRepository() {
+        viewModel.storeBookmarkIdToContent(1, 2)
+        verify(repository).storeBookmarkIdToContent(1, 2)
+    }
 }
