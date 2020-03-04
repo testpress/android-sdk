@@ -14,6 +14,7 @@ import `in`.testpress.course.util.mock
 import `in`.testpress.models.greendao.AttachmentDao
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
+import `in`.testpress.models.greendao.HtmlContentDao
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -41,7 +42,8 @@ class ContentRepositoryTest {
     private val roomContentDao = mock(`in`.testpress.database.ContentDao::class.java)
     private val attachmentDao = mock(AttachmentDao::class.java)
     private val courseNetwork = mock(CourseNetwork::class.java)
-    private val repo = ContentRepository(roomContentDao, contentDao, attachmentDao, courseNetwork)
+    private val htmlContentDao = mock(HtmlContentDao::class.java)
+    private val repo = ContentRepository(roomContentDao, contentDao, attachmentDao, htmlContentDao, courseNetwork)
 
     @Mock
     lateinit var queryBuilder: QueryBuilder<Content>

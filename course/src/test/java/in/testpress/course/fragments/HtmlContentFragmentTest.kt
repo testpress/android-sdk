@@ -80,20 +80,11 @@ class HtmlContentFragmentTest: GreendaoCleanupMixin() {
     }
 
     @Test
-    fun updateContentShouldBeCalledIfAttachmentIsNull() {
+    fun testDisplayCreatesContentAttempt() {
         setUpChapterAndContent()
         initializeContentFragment()
         contentFragment.display()
 
-        Mockito.verify(contentFragment, Mockito.atLeastOnce()).updateContent()
-    }
-
-    @Test
-    fun updateContentShouldNotGetCalledIfAttachmentIsPresent() {
-        setUpChapterAndContent(HtmlContent(1))
-        initializeContentFragment()
-        contentFragment.display()
-
-        verify(contentFragment, never()).updateContent()
+        verify(contentFragment.viewModel).createContentAttempt(1)
     }
 }
