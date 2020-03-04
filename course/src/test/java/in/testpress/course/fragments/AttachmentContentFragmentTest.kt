@@ -52,11 +52,11 @@ class AttachmentContentFragmentTest : GreendaoCleanupMixin() {
         )
     }
 
-    fun setUpChapterAndContent(attachment: Attachment? = null) {
+    fun setUpChapterAndContent() {
         chapter.id = 1
         chapter.name = "Chapter"
         content.title = "New Content"
-        content.attachment = attachment
+        content.attachment = Attachment(1)
         content.id = 1
         content.active = true
         content.chapter = chapter
@@ -76,25 +76,14 @@ class AttachmentContentFragmentTest : GreendaoCleanupMixin() {
         SupportFragmentController.setupFragment(contentFragment)
 
         contentFragment.viewModel = Mockito.mock(ContentViewModel::class.java)
-        val dbData = MutableLiveData(Resource.success(content.asDomainContent()))
-        `when`(contentFragment.viewModel.getContent(1, true)).thenReturn(dbData)
     }
 
     @Test
-    fun updateContentShouldBeCalledIfAttachmentIsNull() {
+    fun testDisplayCreatesContentAttempt() {
         setUpChapterAndContent()
         initializeContentFragment()
         contentFragment.display()
 
-        verify(contentFragment, atLeastOnce()).updateContent()
-    }
-
-    @Test
-    fun updateContentShouldNotGetCalledIfAttachmentIsPresent() {
-        setUpChapterAndContent(Attachment(1))
-        initializeContentFragment()
-        contentFragment.display()
-
-        verify(contentFragment, never()).updateContent()
+        verify(contentFragment.viewModel).createContentAttempt(1)
     }
 }
