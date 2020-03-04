@@ -31,7 +31,7 @@ class ContentViewModelTest {
 
     @Test
     fun getContentWithPositionAndChapterId() {
-        viewModel.getContent(1, 2)
+        viewModel.getContentInChapterForPosition(1, 2)
         verify(repository).getContent(1, 2)
     }
 

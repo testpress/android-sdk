@@ -54,7 +54,7 @@ class ContentRepository(
         }.asLiveData()
     }
 
-    fun getContent(position: Int, chapterId: Long): DomainContent {
+    fun getContentInChapterForPosition(position: Int, chapterId: Long): DomainContent {
         val contents = contentDao.queryBuilder()
             .where(
                 ContentDao.Properties.ChapterId.eq(chapterId),

@@ -14,8 +14,8 @@ class ContentViewModel(val repository: ContentRepository) : ViewModel() {
         return repository.loadContent(contentId, forceRefresh)
     }
 
-    fun getContent(position: Int, chapterId: Long): DomainContent {
-        return repository.getContent(position, chapterId)
+    fun getContentInChapterForPosition(position: Int, chapterId: Long): DomainContent {
+        return repository.getContentInChapterForPosition(position, chapterId)
     }
 
     fun getContentsForChapter(chapterId: Long): LiveData<List<DomainContent>>? {
