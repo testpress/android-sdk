@@ -114,7 +114,7 @@ class BaseContentDetailFragmentTest: GreendaoCleanupMixin() {
         `when`(contentFragment.viewModel.getContent(1, true)).thenReturn(dbData)
         contentFragment.updateContent()
 
-        verify(contentFragment).display()
+        verify(contentFragment, atLeastOnce()).display()
     }
 
     class ConcreteContentFragment: BaseContentDetailFragment() {
