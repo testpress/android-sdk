@@ -40,7 +40,7 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
-import in.testpress.exam.network.BookmarksPager;
+import in.testpress.exam.pager.BookmarksPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.BookmarkDao;

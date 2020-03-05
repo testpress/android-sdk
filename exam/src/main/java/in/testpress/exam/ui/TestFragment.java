@@ -40,7 +40,7 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
-import in.testpress.exam.network.TestQuestionsPager;
+import in.testpress.exam.pager.TestQuestionsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.ui.loaders.AttemptItemsLoader;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;

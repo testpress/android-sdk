@@ -26,7 +26,7 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Subject;
-import in.testpress.exam.network.SubjectPager;
+import in.testpress.exam.pager.SubjectPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;

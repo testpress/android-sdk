@@ -30,7 +30,7 @@ import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.models.greendao.ExamDao;
-import in.testpress.exam.network.AttemptsPager;
+import in.testpress.exam.pager.AttemptsPager;
 import in.testpress.exam.network.TestpressExamApiClient;
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.exam.util.RetakeExamUtil;
