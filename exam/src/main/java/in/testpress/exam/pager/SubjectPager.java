@@ -3,7 +3,7 @@ package in.testpress.exam.pager;
 import java.io.IOException;
 
 import in.testpress.exam.models.Subject;
-import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseResourcePager;
 import retrofit2.Response;

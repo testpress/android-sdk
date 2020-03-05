@@ -35,7 +35,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Comment;
 import in.testpress.exam.pager.CommentsPager;
-import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.ui.CommentsListAdapter;
 import in.testpress.models.FileDetails;
 import in.testpress.models.greendao.ReviewItem;
@@ -50,8 +50,8 @@ import in.testpress.util.ViewUtils;
 import in.testpress.util.WebViewUtils;
 
 import static com.theartofdev.edmodo.cropper.CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE;
-import static in.testpress.exam.network.TestpressExamApiClient.COMMENTS_PATH;
-import static in.testpress.exam.network.TestpressExamApiClient.QUESTIONS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.COMMENTS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.QUESTIONS_PATH;
 
 public class CommentsUtil implements LoaderManager.LoaderCallbacks<List<Comment>> {
 

@@ -4,8 +4,8 @@ import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
-import `in`.testpress.exam.network.TestpressExamApiClient
-import `in`.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH
+import `in`.testpress.exam.api.TestpressExamApiClient
+import `in`.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH
 import `in`.testpress.exam.ui.FolderSpinnerAdapter
 import `in`.testpress.models.greendao.Bookmark
 import `in`.testpress.models.greendao.BookmarkFolder

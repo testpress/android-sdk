@@ -19,7 +19,7 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
-import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Exam;
 import in.testpress.network.RetrofitCall;

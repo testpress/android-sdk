@@ -41,7 +41,7 @@ import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.pager.BookmarksPager;
-import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.BookmarkDao;
 import in.testpress.models.greendao.BookmarkFolder;
@@ -59,7 +59,7 @@ import in.testpress.util.ViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
-import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 import static in.testpress.network.TestpressApiClient.CREATED_SINCE;
 import static in.testpress.network.TestpressApiClient.CREATED_UNTIL;
