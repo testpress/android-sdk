@@ -10,7 +10,7 @@ import androidx.appcompat.app.AlertDialog;
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.exam.R;
-import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.network.RetrofitCall;
 import in.testpress.util.UIUtils;
 

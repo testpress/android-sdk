@@ -1,4 +1,4 @@
-package in.testpress.exam.network;
+package in.testpress.exam.api;
 
 import java.util.Map;
 
@@ -17,8 +17,8 @@ import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 import retrofit2.http.Url;
 
-import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARKS_PATH;
-import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARKS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 
 public interface BookmarkService {
 

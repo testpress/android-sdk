@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import in.testpress.core.TestpressSDKDatabase;
-import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.BookmarkDao;

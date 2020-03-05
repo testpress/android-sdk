@@ -7,7 +7,7 @@ import android.view.View;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.TestpressExam;
-import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.samples.exam.ExamSampleActivity;
 import in.testpress.samples.course.CourseSampleActivity;

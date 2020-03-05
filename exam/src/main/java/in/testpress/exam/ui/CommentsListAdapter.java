@@ -30,7 +30,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Comment;
 import in.testpress.exam.models.Vote;
-import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.models.InstituteSettings;
 import in.testpress.util.FormatDate;
 import in.testpress.util.ImageUtils;

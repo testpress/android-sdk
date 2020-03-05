@@ -37,7 +37,7 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
-import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.util.CommentsUtil;
 import in.testpress.exam.util.ImageUtils;
 import in.testpress.models.InstituteSettings;
@@ -59,7 +59,7 @@ import in.testpress.util.WebViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
-import static in.testpress.exam.network.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 
 public class ReviewQuestionsFragment extends Fragment {

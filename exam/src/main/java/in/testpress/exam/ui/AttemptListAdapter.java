@@ -18,7 +18,7 @@ import in.testpress.core.TestpressSdk;
 
 import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
-import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.util.ViewUtils;

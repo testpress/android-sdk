@@ -17,7 +17,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.pager.CategoryPager;
-import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.ui.BaseGridFragment;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.UIUtils;
