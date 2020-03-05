@@ -40,7 +40,9 @@ data class DomainContent(
     val hasStarted: Boolean?,
     val coverImage: String? = null,
     val attachment: DomainAttachmentContent? = null,
-    val htmlContent: DomainHtmlContent? = null
+    val htmlContent: DomainHtmlContent? = null,
+    val exam: DomainExamContent? = null,
+    val video: DomainVideoContent? = null
 )
 
 fun createDomainContent(contentEntity: ContentEntity): DomainContent {
@@ -110,7 +112,10 @@ fun createDomainContent(content: Content): DomainContent {
         start = content.start,
         hasStarted = content.hasStarted,
         attachment = attachment?.asDomainAttachment(),
-        htmlContent = content.rawHtmlContent?.asDomainAttachment()
+        htmlContent = content.rawHtmlContent?.asDomainAttachment(),
+        exam = content.rawExam?.asDomainAttachment(),
+        video = content.rawVideo?.asDomainVideo(),
+        attemptsUrl = content.attemptsUrl
     )
 }
 
