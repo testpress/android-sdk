@@ -38,7 +38,7 @@ data class NetworkExamContent(
     val studentsAttemptedCount: Int = 0,
     val customRedirectUrl: String = "",
     val overallStudentsAttemptedCount: Int = 0,
-    val restrictRetakeDuration: Boolean? = null,
+    val restrictRetakeDuration: Int? = null,
     val sections: List<NetworkSection> = arrayListOf(),
     val languages: List<String> = arrayListOf()
 )
