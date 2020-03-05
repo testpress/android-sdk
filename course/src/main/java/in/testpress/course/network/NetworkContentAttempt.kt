@@ -10,18 +10,29 @@ data class NetworkContentAttempt(
     val trophies: String? = null,
     val chapterContentId: Long? = null,
     val assessmentId: Long? = null,
-    val userVideoId: Long? = null
+    val userVideoId: Long? = null,
+    val assessment: NetworkAttempt? = null
 )
 
-fun NetworkContentAttempt.asGreenDaoModel(): CourseAttempt {
+fun createContentAttempt(contentAttempt: NetworkContentAttempt): CourseAttempt {
     return CourseAttempt(
-        this.id,
-        this.type,
-        this.objectId,
-        this.objectUrl,
-        this.trophies,
-        this.chapterContentId,
-        this.assessmentId,
-        this.userVideoId
+        contentAttempt.id,
+        contentAttempt.type,
+        contentAttempt.objectId,
+        contentAttempt.objectUrl,
+        contentAttempt.trophies,
+        contentAttempt.chapterContentId,
+        contentAttempt.assessmentId,
+        contentAttempt.userVideoId
     )
+}
+
+fun NetworkContentAttempt.asGreenDaoModel(): CourseAttempt {
+    return createContentAttempt(this)
+}
+
+fun List<NetworkContentAttempt>.asGreenDaoModel(): List<CourseAttempt> {
+    return this.map {
+        createContentAttempt(it)
+    }
 }
