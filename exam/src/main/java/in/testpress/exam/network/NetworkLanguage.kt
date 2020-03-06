@@ -6,14 +6,23 @@ data class NetworkLanguage(
     val id: Long,
     val title: String? = null,
     val code: String? = null,
-    val examId: Long? = null
+    var examId: Long? = null
 )
 
-fun NetworkLanguage.asGreenDaoModel(): Language {
+fun createGreenDaoModel(language: NetworkLanguage): Language {
     return Language(
-        this.id,
-        this.code,
-        this.title,
-        this.examId
+        language.id,
+        language.code,
+        language.title,
+        language.examId
     )
+}
+fun NetworkLanguage.asGreenDaoModel(): Language {
+    return createGreenDaoModel(this)
+}
+
+fun List<NetworkLanguage>.asGreenDaoModels(): List<Language> {
+    return this.map {
+        createGreenDaoModel(it)
+    }
 }
