@@ -47,7 +47,7 @@ class AttachmentContentFragmentTest : GreendaoCleanupMixin() {
         MockitoAnnotations.initMocks(this)
         val instituteSettings = InstituteSettings("http://localhost:9200")
         TestpressSdk.setTestpressSession(
-            ApplicationProvider.getApplicationContext<Context>(),
+            ApplicationProvider.getApplicationContext(),
             TestpressSession(instituteSettings, "USER_TOKEN")
         )
     }
