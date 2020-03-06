@@ -13,12 +13,14 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import java.io.IOException
 
 class HtmlContentFragment : BaseContentDetailFragment() {
     private lateinit var webView: WebView
-    private lateinit var webViewUtils: WebViewUtils
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var webViewUtils: WebViewUtils
     private lateinit var titleView: TextView
     private lateinit var titleLayout: LinearLayout
 
