@@ -8,9 +8,7 @@ import `in`.testpress.course.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.viewmodels.ContentViewModel
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
@@ -48,10 +46,6 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, EmptyVi
                 return ContentViewModel(InjectorUtils.getContentRepository(context!!)) as T
             }
         }).get(ContentViewModel::class.java)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.base_content_detail, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
