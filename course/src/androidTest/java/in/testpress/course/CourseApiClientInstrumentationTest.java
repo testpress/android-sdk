@@ -1,6 +1,6 @@
 package in.testpress.course;
 
-import android.support.test.InstrumentationRegistry;
+import androidx.test.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Test;
