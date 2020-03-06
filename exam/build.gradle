@@ -45,6 +45,7 @@ dependencies {
     androidTestImplementation rootProject.testRunner
     androidTestImplementation rootProject.espressoCore
     androidTestImplementation rootProject.uiautomator
+    androidTestImplementation 'androidx.test:rules:1.2.0'
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

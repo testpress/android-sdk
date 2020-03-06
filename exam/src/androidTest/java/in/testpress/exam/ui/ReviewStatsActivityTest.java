@@ -5,11 +5,11 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.RemoteException;
 import androidx.annotation.RequiresApi;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.InstrumentationRegistry;
 import androidx.test.espresso.Espresso;
 import androidx.test.espresso.IdlingResource;
-import androidx.test.rule.ActivityTestRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.rule.ActivityTestRule;
 import androidx.test.uiautomator.UiDevice;
 import android.view.WindowManager;
 
