@@ -38,10 +38,10 @@ ext {
     buildToolsVersion = '28.0.3'
     supportLib = '27.1.1'
     exoPlayer = '2.8.2'
-    powermock = '1.7.4'
+    powermock = '2.0.5'
 
     junit = 'junit:junit:4.12'
-    mockito = 'org.mockito:mockito-core:2.8.9'
+    mockito = 'org.mockito:mockito-core:2.23.4'
     powermockJunit = 'org.powermock:powermock-module-junit4:' + powermock
     powermockMockio = 'org.powermock:powermock-api-mockito2:' + powermock
     testRunner = 'androidx.test.ext:junit:1.1.1'
