@@ -35,11 +35,13 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.shadows.support.v4.SupportFragmentController
 
 @RunWith(RobolectricTestRunner::class)
-class BaseContentDetailFragmentTest: GreendaoCleanupMixin() {
+class BaseContentDetailFragmentTest : GreendaoCleanupMixin() {
     lateinit var contentFragment: ConcreteContentFragment
     var content = Content()
     private val chapter = Chapter()
-    private val contentDao = TestpressSDKDatabase.getContentDao(ApplicationProvider.getApplicationContext())
+    private val contentDao =
+        TestpressSDKDatabase.getContentDao(ApplicationProvider.getApplicationContext())
+
     @Rule
     @JvmField
     val instantExecutorRule = InstantTaskExecutorRule()
@@ -56,7 +58,7 @@ class BaseContentDetailFragmentTest: GreendaoCleanupMixin() {
         initializeContentFragment()
     }
 
-    fun setUpChapterAndContent() {
+    private fun setUpChapterAndContent() {
         chapter.id = 1
         chapter.name = "Chapter"
         content.title = "New Content"
@@ -69,8 +71,7 @@ class BaseContentDetailFragmentTest: GreendaoCleanupMixin() {
 
     private fun initializeContentFragment() {
         val bundle = Bundle()
-        bundle.putLong(ContentActivity.CHAPTER_ID, 1)
-        bundle.putInt(ContentActivity.POSITION, 0)
+        bundle.putLong(ContentActivity.CONTENT_ID, 1)
 
         contentFragment = ConcreteContentFragment()
         contentFragment = spy(contentFragment)
@@ -117,15 +118,18 @@ class BaseContentDetailFragmentTest: GreendaoCleanupMixin() {
         verify(contentFragment, atLeastOnce()).display()
     }
 
-    class ConcreteContentFragment: BaseContentDetailFragment() {
+    class ConcreteContentFragment : BaseContentDetailFragment() {
         override var isBookmarkEnabled: Boolean = true
 
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View? {
             return inflater.inflate(R.layout.base_content_detail, container, false)
         }
 
         override fun display() {
-
         }
     }
 }

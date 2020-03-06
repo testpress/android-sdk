@@ -5,9 +5,7 @@ import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.enums.Status
-import `in`.testpress.course.ui.ContentActivity.CHAPTER_ID
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
-import `in`.testpress.course.ui.ContentActivity.POSITION
 import `in`.testpress.course.viewmodels.ContentViewModel
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -68,29 +66,18 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun loadContentAndInitializeBoomarkFragment() {
-        if (contentId != -1L) {
-            viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer { resource ->
-                when (resource.status) {
-                    Status.SUCCESS -> {
-                        setContentAndDisplay(resource.data!!)
+        viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer { resource ->
+            when (resource.status) {
+                Status.SUCCESS -> {
+                    content = resource.data!!
+                    display()
+
+                    if (isBookmarkEnabled && !::bookmarkFragment.isInitialized) {
+                        initializeBookmarkFragment()
                     }
                 }
-            })
-        } else {
-            viewModel.getContentInChapterForPosition(position, chapterId).observe(viewLifecycleOwner, Observer{
-                setContentAndDisplay(it)
-            })
-        }
-    }
-
-    private fun setContentAndDisplay(data: DomainContent) {
-        content = data
-        contentId = content.id
-        display()
-
-        if (isBookmarkEnabled && !::bookmarkFragment.isInitialized) {
-            initializeBookmarkFragment()
-        }
+            }
+        })
     }
 
     private fun bindViews() {
@@ -107,14 +94,13 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
     }
 
     private fun parseIntentArguments() {
-        chapterId = arguments!!.getLong(CHAPTER_ID)
         contentId = arguments!!.getLong(CONTENT_ID, -1)
-        position = arguments!!.getInt(POSITION)
         productSlug = arguments!!.getString(PRODUCT_SLUG)
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     fun updateContent() {
+        swipeRefresh.isRefreshing = true
         viewModel.getContent(contentId, forceRefresh = true).observe(viewLifecycleOwner,
             Observer { resource ->
                 swipeRefresh.isRefreshing = false
