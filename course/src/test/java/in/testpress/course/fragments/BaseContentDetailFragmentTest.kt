@@ -27,7 +27,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.atLeastOnce
+import org.mockito.Mockito.doNothing
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.reset
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
@@ -111,11 +113,20 @@ class BaseContentDetailFragmentTest : GreendaoCleanupMixin() {
 
     @Test
     fun updateContentShouldDisplayContentOnSuccess() {
+        reset(contentFragment)
         val dbData = MutableLiveData(Resource.success(content.asDomainContent()))
         `when`(contentFragment.viewModel.getContent(1, true)).thenReturn(dbData)
         contentFragment.updateContent()
 
-        verify(contentFragment, atLeastOnce()).display()
+        verify(contentFragment).display()
+    }
+
+    @Test
+    fun onRetryClickUpdateContentShouldGetCalled() {
+        doNothing().`when`(contentFragment).updateContent()
+        contentFragment.onRetryClick()
+
+        verify(contentFragment).updateContent()
     }
 
     class ConcreteContentFragment : BaseContentDetailFragment() {
@@ -129,7 +140,6 @@ class BaseContentDetailFragmentTest : GreendaoCleanupMixin() {
             return inflater.inflate(R.layout.base_content_detail, container, false)
         }
 
-        override fun display() {
-        }
+        override fun display() {}
     }
 }

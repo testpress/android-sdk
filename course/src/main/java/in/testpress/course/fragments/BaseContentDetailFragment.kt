@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
-abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
+abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, EmptyViewListener {
     protected lateinit var swipeRefresh: SwipeRefreshLayout
     protected lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var toast: Toast
@@ -151,6 +151,10 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener {
     override fun onDeleteBookmarkSuccess() {
         content.bookmarkId = null
         viewModel.storeBookmarkIdToContent(null, contentId)
+    }
+
+    override fun onRetryClick() {
+        updateContent()
     }
 
     abstract fun display()
