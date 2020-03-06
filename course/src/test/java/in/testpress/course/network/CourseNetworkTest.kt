@@ -2,6 +2,7 @@ package `in`.testpress.course.network
 
 import `in`.testpress.network.ErrorHandlingCallAdapterFactory
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.google.common.io.ByteStreams
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -38,6 +39,12 @@ class CourseNetworkTest {
     @After
     fun stopService() {
         mockWebServer.shutdown()
+    }
+
+    fun getContentFromFile(filename: String): String {
+        val inputStream = ClassLoader.getSystemResourceAsStream("content_attempts.json")
+
+        return String(ByteStreams.toByteArray(inputStream))
     }
 
     fun getContentJSON(): String {
@@ -105,6 +112,26 @@ class CourseNetworkTest {
 
             assertTrue(response.isSuccessful)
             assertEquals(3790, response.body().id)
+        }
+    }
+
+    @Test
+    fun getContentAttemptsShouldFetchContentAttempts() {
+        val contentAttemptsJson = getContentFromFile("content_attempts.json")
+        val successResponse = MockResponse().setResponseCode(200).setBody(contentAttemptsJson)
+
+        mockWebServer.enqueue(successResponse)
+
+        runBlocking {
+            val response = service.getContentAttempts("/url").execute()
+            mockWebServer.takeRequest()
+            val contentAttempt = response.body().results[0]
+
+            assertTrue(response.isSuccessful)
+            assertEquals(1, response.body().results.size)
+            assertEquals(null, response.body().next)
+            assertEquals(5345, contentAttempt.id)
+            assertEquals(1228, contentAttempt.assessment!!.id)
         }
     }
 }
