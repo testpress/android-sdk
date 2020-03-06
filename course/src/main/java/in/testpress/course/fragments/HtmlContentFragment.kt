@@ -3,7 +3,6 @@ package `in`.testpress.course.fragments
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
-import `in`.testpress.course.enums.Status
 import `in`.testpress.util.ViewUtils
 import `in`.testpress.util.WebViewUtils
 import android.os.Bundle
@@ -14,7 +13,6 @@ import android.webkit.WebView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.Observer
 import java.io.IOException
 
 class HtmlContentFragment : BaseContentDetailFragment() {
@@ -66,10 +64,6 @@ class HtmlContentFragment : BaseContentDetailFragment() {
             swipeRefresh.isRefreshing = false
             webView.visibility = View.VISIBLE
             viewModel.createContentAttempt(contentId)
-        }
-
-        override fun getHeader(): String {
-            return super.getHeader() + getBookmarkHandlerScript()
         }
 
         override fun onNetworkError() {
