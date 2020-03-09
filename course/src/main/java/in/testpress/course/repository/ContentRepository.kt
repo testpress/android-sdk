@@ -16,7 +16,9 @@ import `in`.testpress.course.network.asGreenDaoModel
 import `in`.testpress.models.greendao.AttachmentDao
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
+import `in`.testpress.models.greendao.ExamDao
 import `in`.testpress.models.greendao.HtmlContentDao
+import `in`.testpress.models.greendao.VideoDao
 import `in`.testpress.network.RetrofitCall
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -26,6 +28,8 @@ class ContentRepository(
     val contentDao: ContentDao,
     val attachmentDao: AttachmentDao,
     val htmlContentDao: HtmlContentDao,
+    val videoContentDao: VideoDao,
+    val examContentDao: ExamDao,
     val courseNetwork: CourseNetwork
 ) {
     private var contentAttempt: MutableLiveData<Resource<NetworkContentAttempt>> = MutableLiveData()
@@ -91,16 +95,18 @@ class ContentRepository(
     }
 
     fun createContentAttempt(contentId: Long): LiveData<Resource<NetworkContentAttempt>> {
-        courseNetwork.createContentAttempt(contentId)
-            .enqueue(object : TestpressCallback<NetworkContentAttempt>() {
-                override fun onSuccess(result: NetworkContentAttempt) {
-                    contentAttempt.value = Resource(Status.SUCCESS, result, null)
-                }
+        if (contentAttempt.value == null || contentAttempt.value!!.status != Status.SUCCESS) {
+            courseNetwork.createContentAttempt(contentId)
+                .enqueue(object : TestpressCallback<NetworkContentAttempt>() {
+                    override fun onSuccess(result: NetworkContentAttempt) {
+                        contentAttempt.value = Resource(Status.SUCCESS, result, null)
+                    }
 
-                override fun onException(exception: TestpressException?) {
-                    contentAttempt.value = Resource(Status.ERROR, null, exception)
-                }
-            })
+                    override fun onException(exception: TestpressException?) {
+                        contentAttempt.value = Resource(Status.ERROR, null, exception)
+                    }
+                })
+        }
         return contentAttempt
     }
 
@@ -115,6 +121,16 @@ class ContentRepository(
             val htmlContent = it.asGreenDaoModel()
             greenDaoContent.htmlId = htmlContent.id
             htmlContentDao.insertOrReplace(htmlContent)
+        }
+        content.video?.let {
+            val video = it.asGreenDaoModel()
+            greenDaoContent.videoId = video.id
+            videoContentDao.insertOrReplace(video)
+        }
+        content.exam?.let {
+            val exam = it.asGreenDaoModel()
+            greenDaoContent.examId = exam.id
+            examContentDao.insertOrReplace(exam)
         }
         contentDao.insertOrReplace(greenDaoContent)
     }
