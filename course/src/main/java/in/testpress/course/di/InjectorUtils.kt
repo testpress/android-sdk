@@ -27,6 +27,23 @@ object InjectorUtils {
         )
     }
 
+    fun getExamRepository(context: Context): ExamContentRepository {
+        val attemptDao = TestpressSDKDatabase.getAttemptDao(context)
+        val contentAttemptDao = TestpressSDKDatabase.getCourseAttemptDao(context)
+        val languageDao = TestpressSDKDatabase.getLanguageDao(context)
+        return ExamContentRepository(
+            getCourseNetwork(context),
+            getExamNetwork(context),
+            contentAttemptDao,
+            attemptDao,
+            languageDao
+        )
+    }
+
+    private fun getExamNetwork(context: Context): ExamNetwork {
+        return ExamNetwork(context)
+    }
+
     private fun getCourseNetwork(context: Context): CourseNetwork {
         return CourseNetwork(context)
     }

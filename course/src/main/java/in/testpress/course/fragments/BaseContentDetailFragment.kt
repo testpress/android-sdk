@@ -43,7 +43,10 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, EmptyVi
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ContentViewModel(InjectorUtils.getContentRepository(context!!)) as T
+                return ContentViewModel(
+                    InjectorUtils.getContentRepository(context!!),
+                    InjectorUtils.getExamRepository(context!!)
+                ) as T
             }
         }).get(ContentViewModel::class.java)
     }
