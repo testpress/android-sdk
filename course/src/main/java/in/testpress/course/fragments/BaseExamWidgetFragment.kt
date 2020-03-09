@@ -1,0 +1,145 @@
+package `in`.testpress.course.fragments
+
+import `in`.testpress.core.TestpressSdk
+import `in`.testpress.course.R
+import `in`.testpress.course.di.InjectorUtils
+import `in`.testpress.course.domain.DomainContent
+import `in`.testpress.course.domain.DomainExamContent
+import `in`.testpress.course.domain.DomainLanguage
+import `in`.testpress.course.domain.asGreenDaoModel
+import `in`.testpress.course.enums.Status
+import `in`.testpress.course.network.NetworkContentAttempt
+import `in`.testpress.course.network.Resource
+import `in`.testpress.course.network.asGreenDaoModel
+import `in`.testpress.course.ui.ContentActivity
+import `in`.testpress.course.viewmodels.ContentViewModel
+import `in`.testpress.exam.TestpressExam
+import `in`.testpress.exam.api.TestpressExamApiClient
+import `in`.testpress.exam.util.MultiLanguagesUtil
+import `in`.testpress.exam.util.RetakeExamUtil
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+
+open class BaseExamWidgetFragment : Fragment() {
+    private lateinit var startButton: Button
+    protected lateinit var viewModel: ContentViewModel
+    protected lateinit var content: DomainContent
+    protected var contentId: Long = -1
+    lateinit var contentAttempts: ArrayList<NetworkContentAttempt>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return ContentViewModel(
+                    InjectorUtils.getContentRepository(context!!),
+                    InjectorUtils.getExamRepository(context!!)
+                ) as T
+            }
+        }).get(ContentViewModel::class.java)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        startButton = view.findViewById(R.id.start_exam)
+        contentId = requireArguments().getLong(ContentActivity.CONTENT_ID)
+
+        viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer {
+            when (it?.status) {
+                Status.SUCCESS -> {
+                    content = it.data!!
+                    loadAttemptsAndUpdateStartButton()
+                }
+            }
+        })
+    }
+
+    private fun loadAttemptsAndUpdateStartButton() {
+        val observer = Observer<Resource<List<DomainLanguage>>> {
+            var exam = content.exam!!
+            exam.languages = it.data!!
+            content.exam = exam
+            updateStartButton(contentAttempts)
+        }
+
+        viewModel.loadAttempts(content.attemptsUrl!!, contentId).observe(viewLifecycleOwner, Observer { resource ->
+            when(resource.status) {
+                Status.SUCCESS -> {
+                    contentAttempts = resource.data!!
+                    val exam = content.exam!!
+                    viewModel.getLanguages(exam.slug!!, exam.id).observe(viewLifecycleOwner, observer)
+                }
+            }
+        })
+    }
+
+    private fun updateStartButton(attempts: ArrayList<NetworkContentAttempt>) {
+        val exam = content.exam!!
+        var pausedAttempt: NetworkContentAttempt? = null
+
+        for (attempt in attempts) {
+            if (attempt.assessment?.state == TestpressExamApiClient.STATE_PAUSED) {
+                pausedAttempt = attempt
+                break
+            }
+        }
+
+        if (pausedAttempt == null && exam.canBeAttempted()) {
+            if (attempts.isEmpty()) {
+                startButton.text = getString(R.string.testpress_start)
+            } else {
+                startButton.text = getString(R.string.testpress_retake)
+            }
+            initStartForFreshExam(exam)
+            startButton.visibility = View.VISIBLE
+        } else if (pausedAttempt != null && !exam.isWebOnly()) {
+            startButton.text = getString(R.string.testpress_resume)
+            initStartForResumeExam(exam, pausedAttempt)
+            startButton.visibility = View.VISIBLE
+        } else {
+            startButton.visibility = View.GONE
+        }
+        startButton.visibility = View.VISIBLE
+    }
+
+    private fun initStartForFreshExam(exam: DomainExamContent) {
+        if (exam.hasMultipleLanguages()) {
+            MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
+                startCourseExam(true, isPartial = false)
+            }
+        } else {
+            startButton.setOnClickListener {
+                RetakeExamUtil.showRetakeOptions(context) { isPartial ->
+                    startCourseExam(false, isPartial)
+                }
+            }
+        }
+    }
+
+    private fun initStartForResumeExam(exam: DomainExamContent, pausedAttempt: NetworkContentAttempt) {
+        if (exam.hasMultipleLanguages()) {
+            MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
+                resumeCourseExam(true, pausedAttempt)
+            }
+        } else {
+            startButton.setOnClickListener { resumeCourseExam(false, pausedAttempt) }
+        }
+    }
+
+    private fun startCourseExam(hasMultipleLanguages: Boolean, isPartial: Boolean) {
+        val greenDaoContent = viewModel.getContentFromDB(content.id)
+        TestpressExam.startCourseExam(requireActivity(), greenDaoContent!!, hasMultipleLanguages, isPartial,
+            TestpressSdk.getTestpressSession(requireActivity())!!)
+    }
+
+    private fun resumeCourseExam(hasMultipleLanguages: Boolean, pausedCourseAttempt: NetworkContentAttempt) {
+        val greenDaoContent = viewModel.getContentFromDB(content.id)
+        TestpressExam.resumeCourseAttempt(requireActivity(), greenDaoContent!!, pausedCourseAttempt.asGreenDaoModel(), hasMultipleLanguages,
+            TestpressSdk.getTestpressSession(requireActivity())!!)
+    }
+}
