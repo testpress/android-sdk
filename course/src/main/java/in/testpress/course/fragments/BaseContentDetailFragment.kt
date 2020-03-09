@@ -24,11 +24,9 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, EmptyVi
     private lateinit var toast: Toast
     private lateinit var contentView: RelativeLayout
 
-    private var chapterId: Long = -1
     protected var contentId: Long = -1
     private var productSlug: String? = null
     open var isBookmarkEnabled = true
-    private var position: Int = -1
     protected lateinit var content: DomainContent
     private lateinit var bookmarkFragment: BookmarkFragment
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
@@ -75,25 +73,25 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, EmptyVi
     }
 
     private fun bindViews() {
-        contentView = view!!.findViewById(R.id.main_content)
+        contentView = requireView().findViewById(R.id.main_content)
         toast = Toast.makeText(activity, R.string.testpress_no_internet_try_again, Toast.LENGTH_SHORT)
-        swipeRefresh = view!!.findViewById(R.id.swipe_container)
+        swipeRefresh = requireView().findViewById(R.id.swipe_container)
         swipeRefresh.setColorSchemeResources(R.color.testpress_color_primary)
     }
 
     private fun initializeListenters() {
         swipeRefresh.setOnRefreshListener {
-            updateContent()
+            forceReloadContent()
         }
     }
 
     private fun parseIntentArguments() {
-        contentId = arguments!!.getLong(CONTENT_ID, -1)
-        productSlug = arguments!!.getString(PRODUCT_SLUG)
+        contentId = requireArguments().getLong(CONTENT_ID, -1)
+        productSlug = requireArguments().getString(PRODUCT_SLUG)
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    fun updateContent() {
+    fun forceReloadContent() {
         swipeRefresh.isRefreshing = true
         viewModel.getContent(contentId, forceRefresh = true).observe(viewLifecycleOwner,
             Observer { resource ->
@@ -148,7 +146,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, EmptyVi
     }
 
     override fun onRetryClick() {
-        updateContent()
+        forceReloadContent()
     }
 
     abstract fun display()

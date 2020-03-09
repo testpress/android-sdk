@@ -116,17 +116,17 @@ class BaseContentDetailFragmentTest : GreendaoCleanupMixin() {
         reset(contentFragment)
         val dbData = MutableLiveData(Resource.success(content.asDomainContent()))
         `when`(contentFragment.viewModel.getContent(1, true)).thenReturn(dbData)
-        contentFragment.updateContent()
+        contentFragment.forceReloadContent()
 
         verify(contentFragment).display()
     }
 
     @Test
     fun onRetryClickUpdateContentShouldGetCalled() {
-        doNothing().`when`(contentFragment).updateContent()
+        doNothing().`when`(contentFragment).forceReloadContent()
         contentFragment.onRetryClick()
 
-        verify(contentFragment).updateContent()
+        verify(contentFragment).forceReloadContent()
     }
 
     class ConcreteContentFragment : BaseContentDetailFragment() {
