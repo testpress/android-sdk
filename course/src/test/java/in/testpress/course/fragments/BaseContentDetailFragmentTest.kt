@@ -84,6 +84,11 @@ class BaseContentDetailFragmentTest : GreendaoCleanupMixin() {
     }
 
     @Test
+    fun initiallyContentShouldStartGettingLoaded() {
+        verify(contentFragment).loadContentAndInitializeBoomarkFragment()
+    }
+
+    @Test
     fun bookmarkFragmentShouldBeInitializedAfterInitializeContent() {
         val dbData = MutableLiveData(Resource.success(content.asDomainContent()))
         `when`(contentFragment.viewModel.getContent(1)).thenReturn(dbData)
