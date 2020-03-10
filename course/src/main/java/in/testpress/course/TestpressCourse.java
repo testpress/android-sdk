@@ -166,7 +166,7 @@ public class TestpressCourse {
 
         init(activity.getApplicationContext(), testpressSession);
         activity.startActivityForResult(
-                ContentActivity.createIntent(contentId, activity),
+                ContentActivity.createIntent(Long.parseLong(contentId), activity),
                 COURSE_CONTENT_DETAIL_REQUEST_CODE
         );
     }
