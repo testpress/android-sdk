@@ -28,6 +28,9 @@ class ExamContentFragment: BaseContentDetailFragment() {
     private lateinit var titleLayout: LinearLayout
     private lateinit var titleView: TextView
     private lateinit var contentAttempts: ArrayList<NetworkContentAttempt>
+    override var isBookmarkEnabled: Boolean
+        get() = false
+        set(value) {}
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,7 +62,7 @@ class ExamContentFragment: BaseContentDetailFragment() {
 
     override fun onResume() {
         super.onResume()
-        if (contentId != -1L) {
+        if (content != null) {
             display()
         }
     }
