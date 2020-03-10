@@ -3,7 +3,6 @@ package in.testpress.course.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -12,17 +11,11 @@ import org.jetbrains.annotations.NotNull;
 
 import in.testpress.course.R;
 import in.testpress.course.domain.DomainContent;
-import in.testpress.course.fragments.AttachmentContentFragment;
 import in.testpress.course.fragments.ContentFragmentChangeListener;
 import in.testpress.course.fragments.ContentFragmentFactory;
 import in.testpress.course.fragments.ContentLoadingFragment;
-import in.testpress.course.fragments.ExamContentFragment;
-import in.testpress.course.fragments.HtmlContentFragment;
-import in.testpress.course.fragments.VideoContentFragment;
 import in.testpress.ui.BaseToolBarActivity;
 
-import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
-import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 
 public class ContentActivity extends BaseToolBarActivity implements ContentFragmentChangeListener {
