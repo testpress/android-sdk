@@ -26,7 +26,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.`when`
-import org.mockito.Mockito.atLeastOnce
 import org.mockito.Mockito.doNothing
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.reset
@@ -84,24 +83,20 @@ class BaseContentDetailFragmentTest : GreendaoCleanupMixin() {
     }
 
     @Test
-    fun initiallyContentShouldStartGettingLoaded() {
-        verify(contentFragment).loadContentAndInitializeBoomarkFragment()
-    }
-
-    @Test
     fun bookmarkFragmentShouldBeInitializedAfterInitializeContent() {
         val dbData = MutableLiveData(Resource.success(content.asDomainContent()))
         `when`(contentFragment.viewModel.getContent(1)).thenReturn(dbData)
+        contentFragment.isBookmarkEnabled = true
         runBlocking {
             contentFragment.loadContentAndInitializeBoomarkFragment()
         }
 
-        verify(contentFragment, atLeastOnce()).initializeBookmarkFragment()
+        assert(contentFragment.bookmarkFragment != null)
     }
 
     @Test
     fun emptyViewFragmentShouldGetInitialized() {
-        verify(contentFragment).initializeEmptyViewFragment()
+        assert(contentFragment.emptyViewFragment != null)
     }
 
     @Test
@@ -135,7 +130,7 @@ class BaseContentDetailFragmentTest : GreendaoCleanupMixin() {
     }
 
     class ConcreteContentFragment : BaseContentDetailFragment() {
-        override var isBookmarkEnabled: Boolean = true
+        override var isBookmarkEnabled: Boolean = false
 
         override fun onCreateView(
             inflater: LayoutInflater,

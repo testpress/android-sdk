@@ -20,7 +20,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, EmptyViewListener {
     protected lateinit var swipeRefresh: SwipeRefreshLayout
-    protected lateinit var emptyViewFragment: EmptyViewFragment
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var toast: Toast
     private lateinit var contentView: RelativeLayout
 
@@ -28,7 +29,8 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, EmptyVi
     private var productSlug: String? = null
     open var isBookmarkEnabled = true
     protected lateinit var content: DomainContent
-    private lateinit var bookmarkFragment: BookmarkFragment
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var bookmarkFragment: BookmarkFragment
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     open lateinit var viewModel: ContentViewModel
 
