@@ -104,7 +104,6 @@ open class BaseExamWidgetFragment : Fragment() {
         } else {
             startButton.visibility = View.GONE
         }
-        startButton.visibility = View.VISIBLE
     }
 
     private fun initStartForFreshExam(exam: DomainExamContent) {
