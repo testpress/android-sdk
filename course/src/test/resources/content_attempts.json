@@ -1,0 +1,46 @@
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "per_page": 20,
+  "results": [
+    {
+      "id": 5345,
+      "type": "assessment",
+      "object_id": 1228,
+      "object_url": "https://sandbox.testpress.in/api/v2.3/attempts/1228/",
+      "trophies": "NA",
+      "coins": "+30",
+      "assessment": {
+        "url": "https://sandbox.testpress.in/api/v2.3/attempts/1228/",
+        "id": 1228,
+        "date": "2020-03-05T07:03:21.659467Z",
+        "total_questions": 20,
+        "score": "0.00",
+        "review_pdf_url": "",
+        "review_url": "https://sandbox.testpress.in/api/v2.3/attempts/1228/review/",
+        "questions_url": "https://sandbox.testpress.in/api/v2.3/attempts/1228/questions/",
+        "percentile": 100.0,
+        "correct_count": 0,
+        "incorrect_count": 3,
+        "last_started_time": "2020-03-05T07:03:28.737759Z",
+        "remaining_time": "23:24:45",
+        "time_taken": "0:00:07",
+        "state": "Completed",
+        "rank": "NA",
+        "max_rank": "NA",
+        "percentage": "0",
+        "unanswered_count": 17,
+        "total_bonus": 0,
+        "rank_enabled": false,
+        "speed": 1547,
+        "accuracy": 0,
+        "institute_attempt_id": null
+      },
+      "video": null,
+      "content": null,
+      "attachment": null,
+      "wiziq": null
+    }
+  ]
+}
