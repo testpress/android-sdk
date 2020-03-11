@@ -1,5 +1,6 @@
 package `in`.testpress.course.network
 
+import `in`.testpress.course.domain.DomainContentAttempt
 import `in`.testpress.models.greendao.CourseAttempt
 
 data class NetworkContentAttempt(
@@ -27,6 +28,19 @@ fun createContentAttempt(contentAttempt: NetworkContentAttempt): CourseAttempt {
     )
 }
 
+fun createDomainContentAttempt(contentAttempt: NetworkContentAttempt): DomainContentAttempt {
+    return DomainContentAttempt(
+        contentAttempt.id,
+        contentAttempt.type,
+        contentAttempt.objectId,
+        contentAttempt.objectUrl,
+        contentAttempt.trophies,
+        contentAttempt.chapterContentId,
+        contentAttempt.assessmentId,
+        contentAttempt.userVideoId
+    )
+}
+
 fun NetworkContentAttempt.asGreenDaoModel(): CourseAttempt {
     return createContentAttempt(this)
 }
@@ -34,5 +48,15 @@ fun NetworkContentAttempt.asGreenDaoModel(): CourseAttempt {
 fun List<NetworkContentAttempt>.asGreenDaoModel(): List<CourseAttempt> {
     return this.map {
         createContentAttempt(it)
+    }
+}
+
+fun NetworkContentAttempt.asDomainContentAttempt(): DomainContentAttempt {
+    return createDomainContentAttempt(this)
+}
+
+fun List<NetworkContentAttempt>.asDomainContentAttempt(): List<DomainContentAttempt> {
+    return this.map {
+        createDomainContentAttempt(it)
     }
 }
