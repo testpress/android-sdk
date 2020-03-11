@@ -1,5 +1,6 @@
 package `in`.testpress.course.network
 
+import `in`.testpress.database.AttemptEntity
 import `in`.testpress.models.greendao.Attempt
 
 data class NetworkAttempt(
@@ -48,6 +49,34 @@ fun createNetworkAttempt(attempt: NetworkAttempt): Attempt {
     )
 }
 
+fun createAttemptEntity(attempt: NetworkAttempt): AttemptEntity {
+    return AttemptEntity(
+        attempt.id,
+        attempt.url,
+        attempt.date,
+        attempt.totalQuestions,
+        attempt.score,
+        attempt.rank,
+        attempt.maxRank,
+        attempt.reviewUrl,
+        attempt.questionsUrl,
+        attempt.correctCount,
+        attempt.incorrectCount,
+        attempt.lastStartedTime,
+        attempt.remainingTime,
+        attempt.timeTaken,
+        attempt.state,
+        attempt.percentile,
+        attempt.speed,
+        attempt.accuracy,
+        attempt.percentage
+    )
+}
+
 fun NetworkAttempt.asGreenDaoModel(): Attempt {
     return createNetworkAttempt(this)
+}
+
+fun NetworkAttempt.asDatabaseModel(): AttemptEntity {
+    return createAttemptEntity(this)
 }

@@ -74,7 +74,8 @@ fun NetworkContent.asDatabaseModel(): ContentEntity {
         videoId = this.videoId,
         htmlId = this.htmlId,
         start = this.start,
-        hasStarted = this.hasStarted
+        hasStarted = this.hasStarted,
+        attemptsUrl = this.attemptsUrl
     )
 }
 

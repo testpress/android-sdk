@@ -1,5 +1,6 @@
 package `in`.testpress.course.domain
 
+import `in`.testpress.database.LanguageEntity
 import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.models.greendao.Language
 
@@ -61,4 +62,23 @@ fun List<DomainLanguage>.toGreenDaoModels(): List<Language> {
     return this.map {
         createGreenDaoModel(it)
     }
+}
+
+fun createDomainLanguage(language: LanguageEntity): DomainLanguage {
+    return DomainLanguage(
+        id = language.id,
+        title = language.title,
+        code = language.code,
+        examId = language.examId
+    )
+}
+
+fun List<LanguageEntity>.fromEntityToDomainLanguages(): List<DomainLanguage> {
+    return this.map {
+        it.asDomainLanguage()
+    }
+}
+
+fun LanguageEntity.asDomainLanguage(): DomainLanguage {
+    return createDomainLanguage(this)
 }

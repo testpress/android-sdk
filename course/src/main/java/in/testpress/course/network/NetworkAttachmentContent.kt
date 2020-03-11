@@ -1,5 +1,6 @@
 package `in`.testpress.course.network
 
+import `in`.testpress.database.AttachmentEntity
 import `in`.testpress.models.greendao.Attachment
 
 data class NetworkAttachmentContent(
@@ -12,5 +13,14 @@ data class NetworkAttachmentContent(
 fun NetworkAttachmentContent.asGreenDaoModel(): Attachment {
     return Attachment(
          this.title, this.attachmentUrl, this.description, this.id
+    )
+}
+
+fun NetworkAttachmentContent.asDatabaseModel(): AttachmentEntity {
+    return AttachmentEntity(
+        id = id,
+        title = title,
+        description = description,
+        attachmentUrl = attachmentUrl
     )
 }

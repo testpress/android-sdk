@@ -1,5 +1,7 @@
 package `in`.testpress.course.domain
 
+import `in`.testpress.database.StreamEntity
+import `in`.testpress.database.VideoContentEntity
 import `in`.testpress.models.greendao.Stream
 import `in`.testpress.models.greendao.Video
 
@@ -45,7 +47,29 @@ fun createDomainVideoContent(video: Video): DomainVideoContent {
     )
 }
 
+fun createDomainVideoContent(video: VideoContentEntity): DomainVideoContent {
+    return DomainVideoContent(
+        id = video.id,
+        title = video.title,
+        url = video.url,
+        embedCode = video.embedCode,
+        duration = video.duration,
+        isDomainRestricted = video.isDomainRestricted,
+        streams = video.streams?.toDomainStreams()
+    )
+}
+
+
 fun createDomainVideoStream(stream: Stream): DomainVideoStream {
+    return DomainVideoStream(
+        id = stream.id,
+        url = stream.url,
+        format = stream.format,
+        videoId = stream.videoId
+    )
+}
+
+fun createDomainVideoStream(stream: StreamEntity): DomainVideoStream {
     return DomainVideoStream(
         id = stream.id,
         url = stream.url,
@@ -58,12 +82,26 @@ fun Stream.asDomainStream(): DomainVideoStream {
     return createDomainVideoStream(this)
 }
 
+fun StreamEntity.asDomainStream(): DomainVideoStream {
+    return createDomainVideoStream(this)
+}
+
 fun List<Stream>.asDomainStreams(): List<DomainVideoStream> {
     return this.map {
         it.asDomainStream()
     }
 }
 
+fun List<StreamEntity>.toDomainStreams(): List<DomainVideoStream> {
+    return this.map {
+        it.asDomainStream()
+    }
+}
+
 fun Video.asDomainVideo(): DomainVideoContent {
+    return createDomainVideoContent(this)
+}
+
+fun VideoContentEntity.asDomainVideo(): DomainVideoContent {
     return createDomainVideoContent(this)
 }

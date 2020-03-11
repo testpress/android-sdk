@@ -1,6 +1,7 @@
 package `in`.testpress.course.domain
 
 import `in`.testpress.database.ContentEntity
+import `in`.testpress.database.ContentWithRelations
 import `in`.testpress.models.greendao.Attachment
 import `in`.testpress.models.greendao.Content
 
@@ -45,37 +46,42 @@ data class DomainContent(
     val video: DomainVideoContent? = null
 )
 
-fun createDomainContent(contentEntity: ContentEntity): DomainContent {
+fun createDomainContent(contentEntity: ContentWithRelations): DomainContent {
     return DomainContent(
-        id = contentEntity.id,
-        title = contentEntity.title,
-        description = contentEntity.description,
-        image = contentEntity.image,
-        order = contentEntity.order,
-        url = contentEntity.url,
-        chapterId = contentEntity.chapterId,
-        chapterSlug = contentEntity.chapterSlug,
-        chapterUrl = contentEntity.chapterUrl,
-        courseId = contentEntity.courseId,
-        freePreview = contentEntity.freePreview,
-        modified = contentEntity.modified,
-        contentType = contentEntity.contentType,
-        examUrl = contentEntity.examUrl,
-        videoUrl = contentEntity.videoUrl,
-        attachmentUrl = contentEntity.attachmentUrl,
-        htmlUrl = contentEntity.htmlUrl,
-        isLocked = contentEntity.isLocked,
-        isScheduled = contentEntity.isScheduled,
-        attemptsCount = contentEntity.attemptsCount,
-        bookmarkId = contentEntity.bookmarkId,
-        videoWatchedPercentage = contentEntity.videoWatchedPercentage,
-        active = contentEntity.active,
-        examId = contentEntity.examId,
-        attachmentId = contentEntity.attachmentId,
-        videoId = contentEntity.videoId,
-        htmlId = contentEntity.htmlId,
-        start = contentEntity.start,
-        hasStarted = contentEntity.hasStarted
+        id = contentEntity.content.id,
+        title = contentEntity.content.title,
+        description = contentEntity.content.description,
+        image = contentEntity.content.image,
+        order = contentEntity.content.order,
+        url = contentEntity.content.url,
+        chapterId = contentEntity.content.chapterId,
+        chapterSlug = contentEntity.content.chapterSlug,
+        chapterUrl = contentEntity.content.chapterUrl,
+        courseId = contentEntity.content.courseId,
+        freePreview = contentEntity.content.freePreview,
+        modified = contentEntity.content.modified,
+        contentType = contentEntity.content.contentType,
+        examUrl = contentEntity.content.examUrl,
+        videoUrl = contentEntity.content.videoUrl,
+        attachmentUrl = contentEntity.content.attachmentUrl,
+        htmlUrl = contentEntity.content.htmlUrl,
+        attemptsUrl = contentEntity.content.attemptsUrl,
+        isLocked = contentEntity.content.isLocked,
+        isScheduled = contentEntity.content.isScheduled,
+        attemptsCount = contentEntity.content.attemptsCount,
+        bookmarkId = contentEntity.content.bookmarkId,
+        videoWatchedPercentage = contentEntity.content.videoWatchedPercentage,
+        active = contentEntity.content.active,
+        examId = contentEntity.content.examId,
+        attachmentId = contentEntity.content.attachmentId,
+        videoId = contentEntity.content.videoId,
+        htmlId = contentEntity.content.htmlId,
+        start = contentEntity.content.start,
+        hasStarted = contentEntity.content.hasStarted,
+        attachment = contentEntity.attachment?.asDomainAttachment(),
+        htmlContent = contentEntity.htmlContent?.asDomainHtmlContent(),
+        video = contentEntity.video?.asDomainVideo(),
+        exam = contentEntity.exam?.asDomainExamContent()
     )
 }
 
@@ -119,11 +125,11 @@ fun createDomainContent(content: Content): DomainContent {
     )
 }
 
-fun ContentEntity.asDomainContent(): DomainContent {
+fun ContentWithRelations.asDomainContent(): DomainContent {
     return createDomainContent(this)
 }
 
-fun List<ContentEntity>.asDomainContent(): List<DomainContent> {
+fun List<ContentWithRelations>.asDomainContent(): List<DomainContent> {
     return this.map {
         createDomainContent(it)
     }
