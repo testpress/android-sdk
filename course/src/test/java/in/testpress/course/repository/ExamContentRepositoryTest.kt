@@ -154,7 +154,7 @@ class ExamContentRepositoryTest {
     }
 
     @Test
-    fun getContentAttemptsFromDB() {
+    fun getContentAttemptsShouldReturnContentAttempts() {
         val contentAttemptList = listOf(createContentAttempt().asGreenDaoModel())
         Mockito.`when`(contentAttemptDao.queryBuilder().list()).thenReturn(contentAttemptList)
         val result = repository.getContentAttempts(1)
