@@ -24,6 +24,11 @@ data class DomainVideoContent(
         }
         return url
     }
+
+    fun hasEmbedCode(): Boolean {
+        return embedCode != null && embedCode.isNotBlank()
+    }
+
 }
 
 data class DomainVideoStream(

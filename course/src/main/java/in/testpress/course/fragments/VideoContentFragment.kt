@@ -43,8 +43,8 @@ class VideoWidgetFragmentFactory {
         fun getWidget(video: DomainVideoContent): Fragment {
             return when {
                 video.isDomainRestricted!! -> DomainRestrictedVideoFragment()
-                video.embedCode.isNullOrEmpty() -> NativeVideoWidgetFragment()
-                else -> WebViewVideoFragment()
+                video.hasEmbedCode() -> WebViewVideoFragment()
+                else -> NativeVideoWidgetFragment()
             }
         }
     }
