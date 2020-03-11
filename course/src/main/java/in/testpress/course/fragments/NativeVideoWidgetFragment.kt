@@ -2,6 +2,7 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
+import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.enums.Status
@@ -33,10 +34,11 @@ class NativeVideoWidgetFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val contentType = requireArguments().getString(TestpressCourse.CONTENT_TYPE)
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ContentViewModel(
-                    InjectorUtils.getContentRepository(context!!),
+                    InjectorUtils.getContentRepository(contentType!!, context!!),
                 ) as T
             }
         }).get(ContentViewModel::class.java)
