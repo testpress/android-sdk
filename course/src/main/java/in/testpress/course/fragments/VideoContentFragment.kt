@@ -30,7 +30,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
 
     override fun display() {
         titleView.text = content.title
-        val videoWidgetFragment = VideoWidgetFactory.getWidget(video)
+        val videoWidgetFragment = VideoWidgetFragmentFactory.getWidget(video)
         videoWidgetFragment.arguments = arguments
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.video_widget_fragment, videoWidgetFragment)
@@ -38,7 +38,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
     }
 }
 
-class VideoWidgetFactory {
+class VideoWidgetFragmentFactory {
     companion object {
         fun getWidget(video: DomainVideoContent): Fragment {
             return when {
