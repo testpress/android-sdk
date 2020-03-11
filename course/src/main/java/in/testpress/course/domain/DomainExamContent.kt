@@ -1,5 +1,6 @@
 package `in`.testpress.course.domain
 
+import `in`.testpress.database.ExamContentEntity
 import `in`.testpress.models.greendao.Exam
 import java.text.DateFormat
 import java.text.ParseException
@@ -34,8 +35,8 @@ data class DomainExamContent(
     val passPercentage: Int? = null,
     val showPercentile: Boolean? = null,
     val showScore: Boolean? = null,
-    val sections: List<DomainSection> = arrayListOf(),
-    var languages: List<DomainLanguage> = arrayListOf()
+    val sections: List<DomainSection>? = arrayListOf(),
+    var languages: List<DomainLanguage>? = arrayListOf()
 ) {
     fun formattedDate(inputString: String): String {
         var date: Date? = null
@@ -88,7 +89,7 @@ data class DomainExamContent(
         } else false
     }
 
-    fun hasMultipleLanguages() = languages.size > 1
+    fun hasMultipleLanguages() = languages!!.size > 1
 }
 
 fun createDomainExamContent(exam: Exam): DomainExamContent {
@@ -160,11 +161,47 @@ fun createGreenDaoExamContent(exam: DomainExamContent): Exam {
         null,
         null
     )
-    greenDaoexam.languages = exam.languages.toGreenDaoModels()
+    greenDaoexam.languages = exam.languages?.toGreenDaoModels()
 
     return greenDaoexam
 }
 
 fun DomainExamContent.asGreenDaoModel(): Exam {
     return createGreenDaoExamContent(this)
+}
+
+fun createDomainExamContent(exam: ExamContentEntity): DomainExamContent {
+    return DomainExamContent(
+        id = exam.id,
+        title = exam.title,
+        duration = exam.duration,
+        description = exam.description,
+        url = exam.url,
+        startDate = exam.startDate,
+        endDate = exam.endDate,
+        numberOfQuestions = exam.numberOfQuestions,
+        negativeMarks = exam.negativeMarks,
+        markPerQuestion = exam.markPerQuestion,
+        templateType = exam.templateType,
+        allowRetake = exam.allowRetake,
+        maxRetakes = exam.maxRetakes,
+        enableRanks = exam.enableRanks,
+        attemptsUrl = exam.attemptsUrl,
+        attemptsCount = exam.attemptsCount,
+        pausedAttemptsCount = exam.pausedAttemptsCount,
+        allowPdf = exam.allowPdf,
+        slug = exam.slug,
+        variableMarkPerQuestion = exam.variableMarkPerQuestion,
+        showAnswers = exam.showAnswers,
+        commentsCount = exam.commentsCount,
+        deviceAccessControl = exam.deviceAccessControl,
+        passPercentage = exam.passPercentage,
+        showPercentile = exam.showPercentile,
+        showScore = exam.showScore,
+        languages = exam.languages?.fromEntityToDomainLanguages()
+    )
+}
+
+fun ExamContentEntity.asDomainExamContent(): DomainExamContent {
+    return createDomainExamContent(this)
 }

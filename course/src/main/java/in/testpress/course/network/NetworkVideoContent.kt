@@ -1,5 +1,6 @@
 package `in`.testpress.course.network
 
+import `in`.testpress.database.VideoContentEntity
 import `in`.testpress.models.greendao.Video
 
 data class NetworkVideoContent(
@@ -25,5 +26,18 @@ fun NetworkVideoContent.asGreenDaoModel(): Video {
         null,
         null,
         null
+    )
+}
+
+fun NetworkVideoContent.asDatabaseModel(): VideoContentEntity {
+    return VideoContentEntity(
+        id = id,
+        url = url,
+        title = title,
+        embedCode = embedCode,
+        duration = duration,
+        description = description,
+        isDomainRestricted = isDomainRestricted,
+        streams = streams.asDatabaseModels()
     )
 }

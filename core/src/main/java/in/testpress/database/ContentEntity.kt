@@ -1,8 +1,10 @@
 package `in`.testpress.database
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 import androidx.room.TypeConverters
 
 @Entity(
@@ -54,6 +56,7 @@ data class ContentEntity(
     var examUrl: String? = null,
     var videoUrl: String? = null,
     var attachmentUrl: String? = null,
+    var attemptsUrl: String? = null,
     var htmlUrl: String? = null,
     var isLocked: Boolean? = null,
     var isScheduled: Boolean? = null,
@@ -71,4 +74,17 @@ data class ContentEntity(
     var exam: ExamContentEntity? = null,
     var htmlContent: HtmlContentEntity? = null,
     var video: VideoContentEntity? = null
+)
+
+
+data class ContentWithRelations(
+    @Embedded var content: ContentEntity,
+    @Relation(parentColumn = "attachmentId", entityColumn = "id")
+    var attachment: AttachmentEntity?,
+    @Relation(parentColumn = "htmlId", entityColumn = "id")
+    var htmlContent: HtmlContentEntity?,
+    @Relation(parentColumn = "videoId", entityColumn = "id")
+    var video: VideoContentEntity?,
+    @Relation(parentColumn = "examId", entityColumn = "id")
+    var exam: ExamContentEntity?
 )

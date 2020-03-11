@@ -7,7 +7,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(version = 5, entities = [
+@Database(version = 2, entities = [
     ContentEntity::class, AttachmentEntity::class, HtmlContentEntity::class,
     VideoContentEntity::class, ExamContentEntity::class, ContentAttemptEntity::class,
     AttemptEntity::class, LanguageEntity::class, StreamEntity::class

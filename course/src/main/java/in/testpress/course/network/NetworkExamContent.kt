@@ -1,5 +1,6 @@
 package `in`.testpress.course.network
 
+import `in`.testpress.database.ExamContentEntity
 import `in`.testpress.models.greendao.Exam
 
 data class NetworkExamContent(
@@ -75,5 +76,46 @@ fun NetworkExamContent.asGreenDaoModel(): Exam {
         this.showPercentile,
         null,
         null
+    )
+}
+
+fun NetworkExamContent.asDatabaseModel(): ExamContentEntity {
+    return ExamContentEntity(
+        id = id,
+        title = title,
+        description = description,
+        duration = duration,
+        url = url,
+        startDate = startDate,
+        endDate = endDate,
+        numberOfQuestions = numberOfQuestions,
+        negativeMarks = negativeMarks,
+        markPerQuestion = markPerQuestion,
+        templateType = templateType,
+        allowRetake = allowRetake,
+        allowPdf = allowPdf,
+        maxRetakes = maxRetakes,
+        enableRanks = enableRanks,
+        rankPublishingDate = rankPublishingDate,
+        allowQuestionsPdf = allowQuestionsPdf,
+        attemptsUrl = attemptsUrl,
+        attemptsCount = attemptsCount,
+        pausedAttemptsCount = pausedAttemptsCount,
+        created = created,
+        slug = slug,
+        variableMarkPerQuestion = variableMarkPerQuestion,
+        showAnswers = showAnswers,
+        commentsCount = commentsCount,
+        allowPreemptiveSectionEnding = allowPreemptiveSectionEnding,
+        immediateFeedback = immediateFeedback,
+        deviceAccessControl = deviceAccessControl,
+        instructions = instructions,
+        passPercentage = passPercentage,
+        showPercentile = showPercentile,
+        showScore = showScore,
+        studentsAttemptedCount = studentsAttemptedCount,
+        customRedirectUrl = customRedirectUrl,
+        overallStudentsAttemptedCount = overallStudentsAttemptedCount,
+        restrictRetakeDuration = restrictRetakeDuration
     )
 }

@@ -1,5 +1,6 @@
 package `in`.testpress.course.domain
 
+import `in`.testpress.database.HtmlContentEntity
 import `in`.testpress.models.greendao.HtmlContent
 
 data class DomainHtmlContent(
@@ -22,4 +23,14 @@ fun createDomainHtmlContent(htmlContent: HtmlContent): DomainHtmlContent {
 
 fun HtmlContent.asDomainAttachment(): DomainHtmlContent {
     return createDomainHtmlContent(this)
+}
+
+fun HtmlContentEntity.asDomainHtmlContent(): DomainHtmlContent {
+    return DomainHtmlContent(
+        id = this.id,
+        title = this.title,
+        textHtml = this.textHtml,
+        sourceUrl = this.sourceUrl,
+        readTime = this.readTime
+    )
 }
