@@ -110,7 +110,7 @@ fun createDomainContent(content: Content): DomainContent {
         start = content.start,
         hasStarted = content.hasStarted,
         attachment = attachment?.asDomainAttachment(),
-        htmlContent = content.rawHtmlContent?.asDomailHtmlContent()
+        htmlContent = content.rawHtmlContent?.asDomainContent()
     )
 }
 

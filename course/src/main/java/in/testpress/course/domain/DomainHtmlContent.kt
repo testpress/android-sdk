@@ -20,6 +20,6 @@ fun createDomainHtmlContent(htmlContent: HtmlContent): DomainHtmlContent {
     )
 }
 
-fun HtmlContent.asDomailHtmlContent(): DomainHtmlContent {
+fun HtmlContent.asDomainContent(): DomainHtmlContent {
     return createDomainHtmlContent(this)
 }
