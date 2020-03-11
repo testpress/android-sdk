@@ -3,20 +3,23 @@ package `in`.testpress.course.repository
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSDKDatabase
+import `in`.testpress.course.domain.DomainContentAttempt
 import `in`.testpress.course.domain.DomainLanguage
+import `in`.testpress.course.domain.asDomainContentAttempts
 import `in`.testpress.course.domain.toDomainLanguages
 import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.course.network.Resource
+import `in`.testpress.course.network.asDomainContentAttempt
 import `in`.testpress.course.network.asGreenDaoModel
 import `in`.testpress.exam.network.ExamNetwork
 import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.exam.network.asGreenDaoModels
 import `in`.testpress.models.TestpressApiResponse
-import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.models.greendao.CourseAttemptDao
 import `in`.testpress.models.greendao.LanguageDao
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
@@ -29,15 +32,16 @@ class ExamContentRepository(
     private val attemptDao = TestpressSDKDatabase.getAttemptDao(context)
     private val contentAttemptDao = TestpressSDKDatabase.getCourseAttemptDao(context)
     private val examNetwork = ExamNetwork(context)
-    private var courseAttempts = arrayListOf<NetworkContentAttempt>()
-    var resourceCourseAttempt: MutableLiveData<Resource<ArrayList<NetworkContentAttempt>>> =
+    private var contentAttempts = arrayListOf<DomainContentAttempt>()
+    private var networkContentAttempts = arrayListOf<NetworkContentAttempt>()
+    var resourceContentAttempt: MutableLiveData<Resource<ArrayList<DomainContentAttempt>>> =
         MutableLiveData()
     private var isLanguagesBeingFetched = false
     private var isAttemptsBeingFetched = false
     private var languages = arrayListOf<NetworkLanguage>()
     var resourceLanguages: MutableLiveData<Resource<List<DomainLanguage>>> = MutableLiveData()
 
-    private fun _loadAttempts(url: String, contentId: Long) {
+    private fun _fetchAttemptFromNetwork(url: String, contentId: Long) {
         courseNetwork.getContentAttempts(url)
             .enqueue(object : TestpressCallback<TestpressApiResponse<NetworkContentAttempt>>() {
                 override fun onSuccess(response: TestpressApiResponse<NetworkContentAttempt>?) {
@@ -46,30 +50,31 @@ class ExamContentRepository(
 
                 override fun onException(exception: TestpressException) {
                     isAttemptsBeingFetched = false
-                    resourceCourseAttempt.value = Resource.error(exception, null)
+                    resourceContentAttempt.value = Resource.error(exception, null)
                 }
             })
     }
 
     private fun handleAttemptsFetchSuccess(response:TestpressApiResponse<NetworkContentAttempt>?, contentId: Long) {
-        courseAttempts.addAll(response?.results ?: listOf())
+        contentAttempts.addAll(response?.results?.asDomainContentAttempt() ?: listOf())
+        networkContentAttempts.addAll(response?.results ?: listOf())
 
         if (response?.next != null) {
-            _loadAttempts(response.next, contentId)
+            _fetchAttemptFromNetwork(response.next, contentId)
         } else {
             isAttemptsBeingFetched = false
             clearContentAttemptsInDB(contentId)
-            saveCourseAttemptInDB(courseAttempts, contentId)
-            resourceCourseAttempt.value = Resource.success(courseAttempts)
+            saveCourseAttemptInDB(networkContentAttempts, contentId)
+            resourceContentAttempt.value = Resource.success(contentAttempts)
         }
     }
 
-    fun loadAttempts(url: String, contentId: Long): LiveData<Resource<ArrayList<NetworkContentAttempt>>> {
+    fun fetchAttemptFromNetwork(url: String, contentId: Long): LiveData<Resource<ArrayList<DomainContentAttempt>>> {
         if (!isAttemptsBeingFetched) {
             isAttemptsBeingFetched = true
-            _loadAttempts(url, contentId)
+            _fetchAttemptFromNetwork(url, contentId)
         }
-        return resourceCourseAttempt
+        return resourceContentAttempt
     }
 
     fun clearContentAttemptsInDB(contentId: Long) {
@@ -79,6 +84,7 @@ class ExamContentRepository(
             .executeDeleteWithoutDetachingEntities()
     }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun saveCourseAttemptInDB(
         courseAttemptList: ArrayList<NetworkContentAttempt>,
         contentId: Long
@@ -93,13 +99,14 @@ class ExamContentRepository(
         }
     }
 
-    fun getContentAttemptsFromDB(contentId: Long): List<CourseAttempt> {
-        return contentAttemptDao.queryBuilder()
+    fun getContentAttemptsFromDB(contentId: Long): List<DomainContentAttempt> {
+        val contentAttempts =  contentAttemptDao.queryBuilder()
             .where(CourseAttemptDao.Properties.ChapterContentId.eq(contentId))
             .list()
+        return contentAttempts.asDomainContentAttempts()
     }
 
-    private fun _fetchLanguages(examSlug: String, examId: Long) {
+    private fun _fetchLanguagesNetwork(examSlug: String, examId: Long) {
         examNetwork.getLanguages(examSlug)
             .enqueue(object : TestpressCallback<TestpressApiResponse<NetworkLanguage>>() {
                 override fun onSuccess(response: TestpressApiResponse<NetworkLanguage>) {
@@ -124,14 +131,15 @@ class ExamContentRepository(
         resourceLanguages.value = Resource.success(languages.toDomainLanguages())
     }
 
-    fun fetchLanguages(examSlug: String, examId: Long): LiveData<Resource<List<DomainLanguage>>> {
+    fun fetchLanguagesNetwork(examSlug: String, examId: Long): LiveData<Resource<List<DomainLanguage>>> {
         if (!isLanguagesBeingFetched) {
             isLanguagesBeingFetched = true
-            _fetchLanguages(examSlug, examId)
+            _fetchLanguagesNetwork(examSlug, examId)
         }
         return resourceLanguages
     }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun storeLanguagesInDB(networkLanguages: ArrayList<NetworkLanguage>, examId: Long) {
         languageDao.queryBuilder()
             .where(LanguageDao.Properties.ExamId.eq(examId))

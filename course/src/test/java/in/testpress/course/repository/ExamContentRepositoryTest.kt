@@ -100,7 +100,7 @@ class ExamContentRepositoryTest {
         val apiCall =
             RetrofitCallMock(Resource.success(TestpressApiResponse<NetworkContentAttempt>()))
         Mockito.`when`(courseNetwork.getContentAttempts(anyString())).thenReturn(apiCall)
-        repository.loadAttempts("attempts_url", 1)
+        repository.fetchAttemptFromNetwork("attempts_url", 1)
 
         verify(courseNetwork).getContentAttempts("attempts_url")
         verify(repository).clearContentAttemptsInDB(1)
@@ -112,7 +112,7 @@ class ExamContentRepositoryTest {
         val contentAttemptApiResponse = createContentAttemptResponse()
         val apiCall = RetrofitCallMock(Resource.success(contentAttemptApiResponse))
         Mockito.`when`(courseNetwork.getContentAttempts(anyString())).thenReturn(apiCall)
-        val result = repository.loadAttempts("attempts_url", 1).getOrAwaitValue()
+        val result = repository.fetchAttemptFromNetwork("attempts_url", 1).getOrAwaitValue()
 
         assert(Status.SUCCESS == result.status)
         assert(contentAttemptApiResponse.results == result.data)
@@ -129,7 +129,7 @@ class ExamContentRepositoryTest {
             )
         )
         Mockito.`when`(courseNetwork.getContentAttempts(anyString())).thenReturn(apiCall)
-        val result = repository.loadAttempts("attempts_url", 1).getOrAwaitValue()
+        val result = repository.fetchAttemptFromNetwork("attempts_url", 1).getOrAwaitValue()
 
         assert(Status.ERROR == result.status)
         assert(apiCall.resource.exception == result.exception)
@@ -167,7 +167,7 @@ class ExamContentRepositoryTest {
         val apiCall =
             RetrofitCallMock(Resource.success(TestpressApiResponse<NetworkLanguage>()))
         Mockito.`when`(examNetwork.getLanguages(anyString())).thenReturn(apiCall)
-        repository.fetchLanguages("slug", 2)
+        repository.fetchLanguagesNetwork("slug", 2)
 
         verify(examNetwork).getLanguages("slug")
     }
@@ -179,7 +179,7 @@ class ExamContentRepositoryTest {
         val apiCall =
             RetrofitCallMock(Resource.success(networkLanguageResponse))
         Mockito.`when`(examNetwork.getLanguages(anyString())).thenReturn(apiCall)
-        val result = repository.fetchLanguages("slug", 1).getOrAwaitValue()
+        val result = repository.fetchLanguagesNetwork("slug", 1).getOrAwaitValue()
 
         assert(Status.SUCCESS==result.status)
         assert(networkLanguageResponse.results[0].asDomainLanguage() == result.data!![0])
@@ -195,7 +195,7 @@ class ExamContentRepositoryTest {
             )
         )
         Mockito.`when`(examNetwork.getLanguages(anyString())).thenReturn(apiCall)
-        val result = repository.fetchLanguages("slug", 1).getOrAwaitValue()
+        val result = repository.fetchLanguagesNetwork("slug", 1).getOrAwaitValue()
 
         assert(Status.ERROR==result.status)
         assert(apiCall.resource.exception==result.exception)

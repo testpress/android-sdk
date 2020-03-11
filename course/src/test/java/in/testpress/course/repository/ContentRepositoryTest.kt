@@ -166,15 +166,4 @@ class ContentRepositoryTest {
         assert(attachment.id == storedContent.attachmentId)
         assert(htmlContent.id == storedContent.htmlId)
     }
-
-    @Test
-    fun createContentAttemptShouldNotMakeAPICallIfAlreadyAttemptIsCreated() {
-        val apiCall = RetrofitCallMock(Resource.success(createContentAttempt()))
-        `when`(courseNetwork.createContentAttempt(1)).thenReturn(apiCall)
-        repo.createContentAttempt(1).getOrAwaitValue()
-        reset(courseNetwork)
-
-        repo.createContentAttempt(1).getOrAwaitValue()
-        verify(courseNetwork, never()).createContentAttempt(1)
-    }
 }

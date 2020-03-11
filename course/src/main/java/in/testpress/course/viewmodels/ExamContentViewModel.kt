@@ -9,7 +9,7 @@ import androidx.lifecycle.LiveData
 
 class ExamContentViewModel(override val repository: ExamContentRepository) : ContentViewModel(repository) {
     fun loadAttempts(url: String, contentId: Long): LiveData<Resource<ArrayList<NetworkContentAttempt>>> {
-        return repository.loadAttempts(url, contentId)
+        return repository.fetchAttemptFromNetwork(url, contentId)
     }
 
     fun getContentAttemptsFromDB(contentId: Long): List<CourseAttempt> {
@@ -17,6 +17,6 @@ class ExamContentViewModel(override val repository: ExamContentRepository) : Con
     }
 
     fun getLanguages(examSlug: String, examId: Long): LiveData<Resource<List<DomainLanguage>>> {
-        return repository.fetchLanguages(examSlug, examId)
+        return repository.fetchLanguagesNetwork(examSlug, examId)
     }
 }
