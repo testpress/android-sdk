@@ -99,13 +99,6 @@ class ExamContentRepository(
         }
     }
 
-    fun getContentAttempts(contentId: Long): List<DomainContentAttempt> {
-        val contentAttempts =  contentAttemptDao.queryBuilder()
-            .where(CourseAttemptDao.Properties.ChapterContentId.eq(contentId))
-            .list()
-        return contentAttempts.asDomainContentAttempts()
-    }
-
     private fun fetchLanguagesNetwork(examSlug: String, examId: Long) {
         examNetwork.getLanguages(examSlug)
             .enqueue(object : TestpressCallback<TestpressApiResponse<NetworkLanguage>>() {
