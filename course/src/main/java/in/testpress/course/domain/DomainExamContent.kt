@@ -1,11 +1,6 @@
 package `in`.testpress.course.domain
 
 import `in`.testpress.models.greendao.Exam
-import java.text.DateFormat
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.TimeZone
 
 data class DomainExamContent(
     val id: Long,
@@ -36,60 +31,7 @@ data class DomainExamContent(
     val showScore: Boolean? = null,
     val sections: List<DomainSection> = arrayListOf(),
     var languages: List<DomainLanguage> = arrayListOf()
-) {
-    fun formattedDate(inputString: String): String {
-        var date: Date? = null
-        val simpleDateFormat =
-            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-        simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
-        try {
-            if (inputString.isNotEmpty()) {
-                date = simpleDateFormat.parse(inputString)
-                val dateformat = DateFormat.getDateInstance()
-                return dateformat.format(date)
-            }
-        } catch (e: ParseException) {
-        }
-        return "forever"
-    }
-
-    fun formattedStartDate() = formattedDate(startDate ?: "")
-
-    fun formattedEndData() = formattedDate(endDate ?: "")
-
-    fun isWebOnly(): Boolean {
-        return deviceAccessControl != null && deviceAccessControl == "web"
-    }
-
-    private fun canRetake(): Boolean {
-        return allowRetake!! &&
-            (attemptsCount!! <= maxRetakes!! || maxRetakes < 0)
-    }
-
-    private fun isEnded(): Boolean {
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-        simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
-        try {
-            if(!endDate.isNullOrEmpty()) {
-                return simpleDateFormat.parse(endDate).before(Date())
-            }
-        } catch (e: ParseException) {
-            e.printStackTrace()
-        }
-        return false
-    }
-
-    fun canBeAttempted(): Boolean {
-        if (isEnded()) {
-            return false
-        }
-        return if (attemptsCount == 0 || canRetake()) {
-            !isWebOnly()
-        } else false
-    }
-
-    fun hasMultipleLanguages() = languages.size > 1
-}
+)
 
 fun createDomainExamContent(exam: Exam): DomainExamContent {
     return DomainExamContent(
