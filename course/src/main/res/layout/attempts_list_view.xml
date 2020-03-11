@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/attempt_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/start_exam"
+        android:layout_width="match_parent"
+        android:layout_height="37dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="80dp"
+        android:background="@drawable/testpress_green_curved_edge_background"
+        android:gravity="center"
+        android:text="@string/testpress_start"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+</LinearLayout>
