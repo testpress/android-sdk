@@ -39,7 +39,8 @@ data class DomainContent(
     val attemptsUrl: String? = null,
     val hasStarted: Boolean?,
     val coverImage: String? = null,
-    val attachment: DomainAttachmentContent? = null
+    val attachment: DomainAttachmentContent? = null,
+    val htmlContent: DomainHtmlContent? = null
 )
 
 fun createDomainContent(contentEntity: ContentEntity): DomainContent {
@@ -108,7 +109,8 @@ fun createDomainContent(content: Content): DomainContent {
         htmlId = content.htmlId,
         start = content.start,
         hasStarted = content.hasStarted,
-        attachment = attachment?.asDomainAttachment()
+        attachment = attachment?.asDomainAttachment(),
+        htmlContent = content.rawHtmlContent?.asDomainContent()
     )
 }
 

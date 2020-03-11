@@ -7,6 +7,7 @@ import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkAttachmentContent
 import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkContentAttempt
+import `in`.testpress.course.network.NetworkHtmlContent
 import `in`.testpress.course.network.Resource
 import `in`.testpress.course.util.RetrofitCallMock
 import `in`.testpress.course.util.getOrAwaitValue
@@ -14,6 +15,7 @@ import `in`.testpress.course.util.mock
 import `in`.testpress.models.greendao.AttachmentDao
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
+import `in`.testpress.models.greendao.HtmlContentDao
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -41,7 +43,9 @@ class ContentRepositoryTest {
     private val roomContentDao = mock(`in`.testpress.database.ContentDao::class.java)
     private val attachmentDao = mock(AttachmentDao::class.java)
     private val courseNetwork = mock(CourseNetwork::class.java)
-    private val repo = ContentRepository(roomContentDao, contentDao, attachmentDao, courseNetwork)
+    private val htmlContentDao = mock(HtmlContentDao::class.java)
+    private val repo =
+        ContentRepository(roomContentDao, contentDao, attachmentDao, htmlContentDao, courseNetwork)
 
     @Mock
     lateinit var queryBuilder: QueryBuilder<Content>
@@ -49,11 +53,15 @@ class ContentRepositoryTest {
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
-    fun createContent(attachment: NetworkAttachmentContent? = null): NetworkContent {
+    fun createContent(
+        attachment: NetworkAttachmentContent? = null,
+        htmlContent: NetworkHtmlContent? = null
+    ): NetworkContent {
         return NetworkContent(
             id = 1, title = "Content", active = true,
             order = 0, contentType = "exam", isLocked = false,
-            isScheduled = false, hasStarted = false, attachment = attachment
+            isScheduled = false, hasStarted = false, attachment = attachment,
+            htmlContent = htmlContent
         )
     }
 
@@ -67,7 +75,6 @@ class ContentRepositoryTest {
         `when`(contentDao.queryBuilder().where(any(), any())).thenReturn(queryBuilder)
         `when`(contentDao.queryBuilder().orderAsc(any())).thenReturn(queryBuilder)
     }
-
 
     @Test
     fun loadUser() {
@@ -113,7 +120,7 @@ class ContentRepositoryTest {
         `when`(contentDao.queryBuilder().list()).thenReturn(dbData)
         val result = repo.getContentFromDB(1)
 
-        assert(result==content)
+        assert(result == content)
     }
 
     @Test
@@ -136,13 +143,14 @@ class ContentRepositoryTest {
         val result = repo.createContentAttempt(1).getOrAwaitValue()
 
         verify(courseNetwork).createContentAttempt(1)
-        assert(result==apiCall.resource)
+        assert(result == apiCall.resource)
     }
 
     @Test
     fun contentAndItsRelatedDataShouldBeStoredInDB() {
         val attachment = NetworkAttachmentContent(5)
-        val content = createContent(attachment)
+        val htmlContent = NetworkHtmlContent(10)
+        val content = createContent(attachment, htmlContent)
         repo.storeContentAndItsRelationsToDB(content)
         val contentArgumentCaptor = ArgumentCaptor.forClass(Content::class.java)
 
@@ -150,6 +158,7 @@ class ContentRepositoryTest {
         verify(contentDao).insertOrReplace(contentArgumentCaptor.capture())
 
         val storedContent = contentArgumentCaptor.allValues[0]
-        assert(attachment.id==storedContent.attachmentId)
+        assert(attachment.id == storedContent.attachmentId)
+        assert(htmlContent.id == storedContent.htmlId)
     }
 }
