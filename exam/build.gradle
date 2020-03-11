@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -37,6 +39,9 @@ dependencies {
     testImplementation rootProject.roboelectric
     testImplementation rootProject.androidxCore
     testImplementation rootProject.powermockJunit
+    testImplementation rootProject.mockServer
+    testImplementation "androidx.arch.core:core-testing:2.1.0"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.3"
     testImplementation (rootProject.powermockMockio) {
         exclude group: 'org.mockito'
     }
@@ -46,6 +51,11 @@ dependencies {
     androidTestImplementation rootProject.espressoCore
     androidTestImplementation rootProject.uiautomator
     androidTestImplementation 'androidx.test:rules:1.2.0'
+    implementation "androidx.core:core-ktx:1.2.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+repositories {
+    mavenCentral()
+}

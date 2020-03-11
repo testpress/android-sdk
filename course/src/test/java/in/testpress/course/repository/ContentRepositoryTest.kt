@@ -15,7 +15,9 @@ import `in`.testpress.course.util.mock
 import `in`.testpress.models.greendao.AttachmentDao
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
+import `in`.testpress.models.greendao.ExamDao
 import `in`.testpress.models.greendao.HtmlContentDao
+import `in`.testpress.models.greendao.VideoDao
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -34,6 +36,7 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.atLeastOnce
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
+import org.mockito.Mockito.reset
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 
@@ -42,10 +45,12 @@ class ContentRepositoryTest {
     private val contentDao = mock(ContentDao::class.java)
     private val roomContentDao = mock(`in`.testpress.database.ContentDao::class.java)
     private val attachmentDao = mock(AttachmentDao::class.java)
-    private val courseNetwork = mock(CourseNetwork::class.java)
     private val htmlContentDao = mock(HtmlContentDao::class.java)
+    private val videoDao = mock(VideoDao::class.java)
+    private val examDao = mock(ExamDao::class.java)
+    private val courseNetwork = mock(CourseNetwork::class.java)
     private val repo =
-        ContentRepository(roomContentDao, contentDao, attachmentDao, htmlContentDao, courseNetwork)
+        ContentRepository(roomContentDao, contentDao, attachmentDao, htmlContentDao, videoDao, examDao, courseNetwork)
 
     @Mock
     lateinit var queryBuilder: QueryBuilder<Content>
@@ -160,5 +165,16 @@ class ContentRepositoryTest {
         val storedContent = contentArgumentCaptor.allValues[0]
         assert(attachment.id == storedContent.attachmentId)
         assert(htmlContent.id == storedContent.htmlId)
+    }
+
+    @Test
+    fun createContentAttemptShouldNotMakeAPICallIfAlreadyAttemptIsCreated() {
+        val apiCall = RetrofitCallMock(Resource.success(createContentAttempt()))
+        `when`(courseNetwork.createContentAttempt(1)).thenReturn(apiCall)
+        repo.createContentAttempt(1).getOrAwaitValue()
+        reset(courseNetwork)
+
+        repo.createContentAttempt(1).getOrAwaitValue()
+        verify(courseNetwork, never()).createContentAttempt(1)
     }
 }

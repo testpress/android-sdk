@@ -1,0 +1,16 @@
+{
+  "count": 2,
+  "next": null,
+  "previous": null,
+  "per_page": 20,
+  "results": [
+    {
+      "code": "hi",
+      "title": "Hindi"
+    },
+    {
+      "code": "en",
+      "title": "English"
+    }
+  ]
+}
