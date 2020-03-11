@@ -13,7 +13,7 @@ class ExamContentViewModel(override val repository: ExamContentRepository) : Con
     }
 
     fun getContentAttemptsFromDB(contentId: Long): List<CourseAttempt> {
-        return repository.getContentAttemptsFromDB(contentId)
+        return repository.getContentAttempts(contentId)
     }
 
     fun getLanguages(examSlug: String, examId: Long): LiveData<Resource<List<DomainLanguage>>> {

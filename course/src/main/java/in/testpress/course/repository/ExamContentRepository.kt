@@ -99,7 +99,7 @@ class ExamContentRepository(
         }
     }
 
-    fun getContentAttemptsFromDB(contentId: Long): List<DomainContentAttempt> {
+    fun getContentAttempts(contentId: Long): List<DomainContentAttempt> {
         val contentAttempts =  contentAttemptDao.queryBuilder()
             .where(CourseAttemptDao.Properties.ChapterContentId.eq(contentId))
             .list()
