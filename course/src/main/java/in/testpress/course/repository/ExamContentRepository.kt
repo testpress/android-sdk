@@ -41,7 +41,7 @@ class ExamContentRepository(
     private var languages = arrayListOf<NetworkLanguage>()
     var resourceLanguages: MutableLiveData<Resource<List<DomainLanguage>>> = MutableLiveData()
 
-    private fun _fetchAttemptFromNetwork(url: String, contentId: Long) {
+    private fun fetchAttemptFromNetwork(url: String, contentId: Long) {
         courseNetwork.getContentAttempts(url)
             .enqueue(object : TestpressCallback<TestpressApiResponse<NetworkContentAttempt>>() {
                 override fun onSuccess(response: TestpressApiResponse<NetworkContentAttempt>?) {
@@ -60,7 +60,7 @@ class ExamContentRepository(
         networkContentAttempts.addAll(response?.results ?: listOf())
 
         if (response?.next != null) {
-            _fetchAttemptFromNetwork(response.next, contentId)
+            fetchAttemptFromNetwork(response.next, contentId)
         } else {
             isAttemptsBeingFetched = false
             clearContentAttemptsInDB(contentId)
@@ -72,7 +72,7 @@ class ExamContentRepository(
     fun loadAttempts(url: String, contentId: Long): LiveData<Resource<ArrayList<DomainContentAttempt>>> {
         if (!isAttemptsBeingFetched) {
             isAttemptsBeingFetched = true
-            _fetchAttemptFromNetwork(url, contentId)
+            fetchAttemptFromNetwork(url, contentId)
         }
         return resourceContentAttempt
     }
@@ -106,7 +106,7 @@ class ExamContentRepository(
         return contentAttempts.asDomainContentAttempts()
     }
 
-    private fun _fetchLanguagesNetwork(examSlug: String, examId: Long) {
+    private fun fetchLanguagesNetwork(examSlug: String, examId: Long) {
         examNetwork.getLanguages(examSlug)
             .enqueue(object : TestpressCallback<TestpressApiResponse<NetworkLanguage>>() {
                 override fun onSuccess(response: TestpressApiResponse<NetworkLanguage>) {
@@ -134,7 +134,7 @@ class ExamContentRepository(
     fun loadLanguages(examSlug: String, examId: Long): LiveData<Resource<List<DomainLanguage>>> {
         if (!isLanguagesBeingFetched) {
             isLanguagesBeingFetched = true
-            _fetchLanguagesNetwork(examSlug, examId)
+            fetchLanguagesNetwork(examSlug, examId)
         }
         return resourceLanguages
     }
