@@ -30,8 +30,8 @@ import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.models.greendao.ExamDao;
-import in.testpress.exam.network.AttemptsPager;
-import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.pager.AttemptsPager;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.exam.util.RetakeExamUtil;
 import in.testpress.models.TestpressApiResponse;
@@ -45,7 +45,7 @@ import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 
 import static in.testpress.exam.TestpressExam.PARAM_EXAM_SLUG;
-import static in.testpress.exam.network.TestpressExamApiClient.STATE_PAUSED;
+import static in.testpress.exam.api.TestpressExamApiClient.STATE_PAUSED;
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 import static in.testpress.exam.ui.TestActivity.PARAM_EXAM;
 

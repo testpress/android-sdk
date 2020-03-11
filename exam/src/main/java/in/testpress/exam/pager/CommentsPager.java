@@ -1,8 +1,9 @@
-package in.testpress.exam.network;
+package in.testpress.exam.pager;
 
 import java.io.IOException;
 
 import in.testpress.exam.models.Comment;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.BaseResourcePager;
 import retrofit2.Response;

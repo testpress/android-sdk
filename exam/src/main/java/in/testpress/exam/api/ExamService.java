@@ -1,4 +1,4 @@
-package in.testpress.exam.network;
+package in.testpress.exam.api;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,12 +27,12 @@ import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 import retrofit2.http.Url;
 
-import static in.testpress.exam.network.TestpressExamApiClient.ACCESS_CODES_PATH;
-import static in.testpress.exam.network.TestpressExamApiClient.CONTENTS_PATH;
-import static in.testpress.exam.network.TestpressExamApiClient.EXAMS_LIST_v2_3_PATH;
-import static in.testpress.exam.network.TestpressExamApiClient.EXAMS_PATH;
-import static in.testpress.exam.network.TestpressExamApiClient.LANGUAGES_PATH;
-import static in.testpress.exam.network.TestpressExamApiClient.PERMISSIONS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.ACCESS_CODES_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.CONTENTS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.EXAMS_LIST_v2_3_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.EXAMS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.LANGUAGES_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.PERMISSIONS_PATH;
 
 public interface ExamService {
 

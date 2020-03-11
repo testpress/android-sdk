@@ -20,7 +20,7 @@ import in.testpress.course.R;
 import in.testpress.exam.TestpressExam;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.CourseAttempt;
-import in.testpress.exam.network.TestpressExamApiClient;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.models.greendao.Content;
 import in.testpress.util.ViewUtils;
 
