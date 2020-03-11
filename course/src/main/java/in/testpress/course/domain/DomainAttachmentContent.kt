@@ -19,6 +19,6 @@ fun createDomainAttachmentContent(attachment: Attachment): DomainAttachmentConte
     )
 }
 
-fun Attachment.asDomainAttachment(): DomainAttachmentContent {
+fun Attachment.asDomainContent(): DomainAttachmentContent {
     return createDomainAttachmentContent(this)
 }

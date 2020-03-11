@@ -255,6 +255,13 @@ public class Video implements android.os.Parcelable {
             return new Video[size];
         }
     };
+
+    public List<Stream> getRawStreams() {
+        if (myDao == null || streams != null) {
+            return streams;
+        }
+        return getStreams();
+    }
     // KEEP METHODS END
 
 }
