@@ -13,6 +13,10 @@ import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.course.network.Resource
 import `in`.testpress.course.network.asDatabaseModel
 import `in`.testpress.course.network.asGreenDaoModel
+import `in`.testpress.database.AttachmentContentDao
+import `in`.testpress.database.ContentEntity
+import `in`.testpress.database.ExamContentDao
+import `in`.testpress.database.VideoContentDao
 import `in`.testpress.models.greendao.AttachmentDao
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
@@ -22,6 +26,11 @@ import `in`.testpress.models.greendao.VideoDao
 import `in`.testpress.network.RetrofitCall
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ContentRepository(
     val roomContentDao: `in`.testpress.database.ContentDao,
@@ -30,7 +39,11 @@ class ContentRepository(
     val htmlContentDao: HtmlContentDao,
     val videoContentDao: VideoDao,
     val examContentDao: ExamDao,
-    val courseNetwork: CourseNetwork
+    val courseNetwork: CourseNetwork,
+    val roomAttachmentDao: AttachmentContentDao,
+    val roomHtmlContentDao: `in`.testpress.database.HtmlContentDao,
+    val roomVideoDao: VideoContentDao,
+    val roomExamDao: ExamContentDao
 ) {
     private var contentAttempt: MutableLiveData<Resource<NetworkContentAttempt>> = MutableLiveData()
 
@@ -45,13 +58,13 @@ class ContentRepository(
             }
 
             override fun shouldFetch(data: DomainContent?): Boolean {
-                return forceRefresh || getContentFromDB(contentId) == null
+                return forceRefresh || data == null
             }
 
             override fun loadFromDb(): LiveData<DomainContent> {
-                val liveData = MutableLiveData<DomainContent>()
-                liveData.postValue(getContentFromDB(contentId)?.asDomainContent())
-                return liveData
+                return Transformations.map(roomContentDao.findById(contentId)){
+                    it?.asDomainContent()
+                }
             }
 
             override fun createCall(): RetrofitCall<NetworkContent> {
@@ -111,33 +124,85 @@ class ContentRepository(
     }
 
     fun storeContentAndItsRelationsToDB(content: NetworkContent) {
-        val greenDaoContent = content.asGreenDaoModel()
+        storeAttachmentContent(content)
+        storeHtmlContent(content)
+        storeVideoContent(content)
+        storeExamContent(content)
+    }
+
+    fun storeAttachmentContent(content: NetworkContent) {
         content.attachment?.let {
+            val greenDaoContent = content.asGreenDaoModel()
+            val roomContent = content.asDatabaseModel()
             val attachment = it.asGreenDaoModel()
             greenDaoContent.attachmentId = attachment.id
             attachmentDao.insertOrReplace(it.asGreenDaoModel())
+            roomContent.attachmentId = attachment.id
+            roomAttachmentDao.insert(it.asDatabaseModel())
+            storeContent(greenDaoContent, roomContent)
         }
+    }
+
+    fun storeHtmlContent(content: NetworkContent) {
         content.htmlContent ?.let {
+            val greenDaoContent = content.asGreenDaoModel()
             val htmlContent = it.asGreenDaoModel()
             greenDaoContent.htmlId = htmlContent.id
             htmlContentDao.insertOrReplace(htmlContent)
+
+            val roomContent = content.asDatabaseModel()
+            roomContent.htmlId = it.id
+            roomHtmlContentDao.insert(it.asDatabaseModel())
+            storeContent(greenDaoContent, roomContent)
         }
+    }
+
+    fun storeVideoContent(content: NetworkContent) {
         content.video?.let {
+            val greenDaoContent = content.asGreenDaoModel()
             val video = it.asGreenDaoModel()
             greenDaoContent.videoId = video.id
             videoContentDao.insertOrReplace(video)
+
+            val roomContent = content.asDatabaseModel()
+            roomContent.videoId = it.id
+            roomVideoDao.insert(it.asDatabaseModel())
+            storeContent(greenDaoContent, roomContent)
         }
+    }
+
+    fun storeExamContent(content: NetworkContent) {
         content.exam?.let {
+            val greenDaoContent = content.asGreenDaoModel()
             val exam = it.asGreenDaoModel()
             greenDaoContent.examId = exam.id
             examContentDao.insertOrReplace(exam)
+
+            val roomContent = content.asDatabaseModel()
+            roomContent.examId = exam.id
+            roomExamDao.insert(it.asDatabaseModel())
+            storeContent(greenDaoContent, roomContent)
         }
+    }
+
+    fun storeContent(greenDaoContent: Content, roomContent: ContentEntity) {
         contentDao.insertOrReplace(greenDaoContent)
+        roomContentDao.insert(roomContent)
     }
 
     fun storeBookmarkIdToContent(bookmarkId: Long?, contentId: Long) {
         val content = getContentFromDB(contentId)
         content?.bookmarkId = bookmarkId
         contentDao.updateInTx(content)
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                val roomContent = roomContentDao.findById(contentId)
+                Transformations.map(roomContent) {
+                    val content = it.content
+                    content.bookmarkId = bookmarkId
+                    roomContentDao.insert(content)
+                }
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package `in`.testpress.course.domain
 
+import `in`.testpress.database.ContentAttemptEntity
 import `in`.testpress.models.greendao.CourseAttempt
 
 data class DomainContentAttempt(
@@ -13,7 +14,7 @@ data class DomainContentAttempt(
     val userVideoId: Long? = null
 )
 
-fun createDomainContentAttempt(contentAttempt: CourseAttempt): DomainContentAttempt {
+fun createDomainContentAttempt(contentAttempt: ContentAttemptEntity): DomainContentAttempt {
     return DomainContentAttempt(
         id = contentAttempt.id,
         type = contentAttempt.type,
@@ -26,11 +27,11 @@ fun createDomainContentAttempt(contentAttempt: CourseAttempt): DomainContentAtte
     )
 }
 
-fun CourseAttempt.asDomainContentAttempt(): DomainContentAttempt {
+fun ContentAttemptEntity.asDomainContentAttempt(): DomainContentAttempt {
     return createDomainContentAttempt(this)
 }
 
-fun List<CourseAttempt>.asDomainContentAttempts(): List<DomainContentAttempt> {
+fun List<ContentAttemptEntity>.asDomainContentAttempts(): List<DomainContentAttempt> {
     return this.map {
         createDomainContentAttempt(it)
     }

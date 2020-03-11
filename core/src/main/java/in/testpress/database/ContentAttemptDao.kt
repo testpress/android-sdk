@@ -11,4 +11,7 @@ interface ContentAttemptDao: BaseDao<ContentAttemptEntity> {
 
     @Query("SELECT * from contentattemptentity where id = :id LIMIT 1")
     fun findById(id: Long): LiveData<ContentAttemptEntity>
+
+    @Query("SELECT * FROM ContentAttemptEntity WHERE chapterContentId = :id")
+    fun getForContentId(id: Long): LiveData<List<ContentAttemptEntity>>
 }

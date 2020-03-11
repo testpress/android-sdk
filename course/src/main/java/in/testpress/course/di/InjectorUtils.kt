@@ -16,6 +16,10 @@ object InjectorUtils {
         val videoContentDao = TestpressSDKDatabase.getVideoDao(context)
         val examDao = TestpressSDKDatabase.getExamDao(context)
         val roomContentDao = TestpressDatabase(context).contentDao()
+        val roomAttachmentDao = TestpressDatabase(context).attachmentDao()
+        val roomExamDao = TestpressDatabase(context).examDao()
+        val roomHtmlDao = TestpressDatabase(context).htmlDao()
+        val roomVideoDao = TestpressDatabase(context).videoDao()
         return ContentRepository(
             roomContentDao,
             contentDao,
@@ -23,20 +27,31 @@ object InjectorUtils {
             htmlContentDao,
             videoContentDao,
             examDao,
-            getCourseNetwork(context)
-        )
+            getCourseNetwork(context),
+            roomAttachmentDao,
+            roomHtmlDao,
+            roomVideoDao,
+            roomExamDao
+            )
     }
 
     fun getExamRepository(context: Context): ExamContentRepository {
         val attemptDao = TestpressSDKDatabase.getAttemptDao(context)
         val contentAttemptDao = TestpressSDKDatabase.getCourseAttemptDao(context)
         val languageDao = TestpressSDKDatabase.getLanguageDao(context)
+        val roomAttemptDao = TestpressDatabase(context).attemptDao()
+        val roomContentAttemptDao = TestpressDatabase(context).contentAttemptDao()
+        val roomLanguageDao = TestpressDatabase(context).languageDao()
+
         return ExamContentRepository(
             getCourseNetwork(context),
             getExamNetwork(context),
             contentAttemptDao,
             attemptDao,
-            languageDao
+            languageDao,
+            roomContentAttemptDao,
+            roomAttemptDao,
+            roomLanguageDao
         )
     }
 

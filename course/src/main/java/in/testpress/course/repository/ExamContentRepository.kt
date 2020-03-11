@@ -9,9 +9,12 @@ import `in`.testpress.course.domain.toDomainLanguages
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.course.network.Resource
+import `in`.testpress.course.network.asDatabaseModel
 import `in`.testpress.course.network.asGreenDaoModel
+import `in`.testpress.database.ContentAttemptDao
 import `in`.testpress.exam.network.ExamNetwork
 import `in`.testpress.exam.network.NetworkLanguage
+import `in`.testpress.exam.network.asDatabaseModels
 import `in`.testpress.exam.network.asGreenDaoModels
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.AttemptDao
@@ -20,15 +23,22 @@ import `in`.testpress.models.greendao.CourseAttemptDao
 import `in`.testpress.models.greendao.LanguageDao
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.Transformations
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ExamContentRepository(
     val courseNetwork: CourseNetwork,
     val examNetwork: ExamNetwork,
     val contentAttemptDao: CourseAttemptDao,
     val attemptDao: AttemptDao,
-    val languageDao: LanguageDao
-) : ViewModel() {
+    val languageDao: LanguageDao,
+    val roomContentAttemptDao: ContentAttemptDao,
+    val roomAttemptDao: `in`.testpress.database.AttemptDao,
+    val roomLanguageDao: `in`.testpress.database.LanguageDao
+) {
 
     private var courseAttempts = arrayListOf<NetworkContentAttempt>()
     var resourceCourseAttempt: MutableLiveData<Resource<ArrayList<NetworkContentAttempt>>> =
@@ -86,23 +96,31 @@ class ExamContentRepository(
         courseAttemptList: ArrayList<NetworkContentAttempt>,
         contentId: Long
     ) {
-        for (networkContentAttempt in courseAttemptList) {
-            val contentAttempt = networkContentAttempt.asGreenDaoModel()
-            val attempt = networkContentAttempt.assessment!!
-            attemptDao.insertOrReplace(attempt.asGreenDaoModel())
-            contentAttempt.assessmentId = attempt.id
-            contentAttempt.chapterContentId = contentId
-            contentAttemptDao.insertOrReplace(contentAttempt)
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                for (networkContentAttempt in courseAttemptList) {
+                    val contentAttempt = networkContentAttempt.asGreenDaoModel()
+                    val attempt = networkContentAttempt.assessment!!
+                    attemptDao.insertOrReplace(attempt.asGreenDaoModel())
+                    contentAttempt.assessmentId = attempt.id
+                    contentAttempt.chapterContentId = contentId
+                    contentAttemptDao.insertOrReplace(contentAttempt)
+
+                    val roomContentAttempt = networkContentAttempt.asDatabaseModel()
+                    val roomAttempt = networkContentAttempt.assessment.asDatabaseModel()
+                    roomAttemptDao.insert(roomAttempt)
+                    roomContentAttempt.assessmentId = roomAttempt.id
+                    roomContentAttempt.chapterContentId = contentId
+                    roomContentAttemptDao.insert(roomContentAttempt)
+                }
+            }
         }
     }
 
     fun getContentAttempts(contentId: Long): LiveData<List<DomainContentAttempt>> {
-        val liveData = MutableLiveData<List<DomainContentAttempt>>()
-        val contentAttempts = contentAttemptDao.queryBuilder()
-            .where(CourseAttemptDao.Properties.ChapterContentId.eq(contentId))
-            .list().asDomainContentAttempts()
-        liveData.postValue(contentAttempts)
-        return liveData
+        return Transformations.map(roomContentAttemptDao.getForContentId(contentId)) {
+            it?.asDomainContentAttempts()
+        }
     }
 
     fun getContentAttemptsFromDB(contentId: Long): List<CourseAttempt> {
@@ -149,7 +167,17 @@ class ExamContentRepository(
         for (language in languages) {
             language.examId = examId
         }
-        println(languages)
         languageDao.insertOrReplaceInTx(languages)
+
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                roomLanguageDao.deleteForExam(examId)
+                val roomlanguages = networkLanguages.asDatabaseModels()
+                for (language in roomlanguages) {
+                    language.examId = examId
+                }
+                roomLanguageDao.insertAll(roomlanguages)
+            }
+        }
     }
 }
