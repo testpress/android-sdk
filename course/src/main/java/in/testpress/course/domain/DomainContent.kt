@@ -1,8 +1,11 @@
 package `in`.testpress.course.domain
 
+import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.database.ContentEntity
 import `in`.testpress.models.greendao.Attachment
 import `in`.testpress.models.greendao.Content
+import `in`.testpress.models.greendao.ContentDao
+import android.content.Context
 
 data class DomainContent(
     val id: Long,
@@ -137,4 +140,14 @@ fun List<Content>.asDomainContents(): List<DomainContent> {
     return this.map {
         createDomainContent(it)
     }
+}
+
+fun DomainContent.getGreenDaoContent(context: Context): Content? {
+    val contentDao = TestpressSDKDatabase.getContentDao(context)
+    val contents =  contentDao.queryBuilder().where(ContentDao.Properties.Id.eq(this.id)).list()
+    if (contents.isNotEmpty()) {
+        return contents[0]
+    }
+
+    return null
 }

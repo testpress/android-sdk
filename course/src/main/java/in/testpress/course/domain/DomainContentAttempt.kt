@@ -1,6 +1,10 @@
 package `in`.testpress.course.domain
 
+import `in`.testpress.core.TestpressSDKDatabase
+import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.models.greendao.CourseAttempt
+import `in`.testpress.models.greendao.CourseAttemptDao
+import android.content.Context
 
 data class DomainContentAttempt(
     val id: Long,
@@ -34,4 +38,14 @@ fun List<CourseAttempt>.asDomainContentAttempts(): List<DomainContentAttempt> {
     return this.map {
         createDomainContentAttempt(it)
     }
+}
+
+fun DomainContentAttempt.getGreenDaoContentAttempt(context: Context): CourseAttempt? {
+    val courseAttemptDao = TestpressSDKDatabase.getCourseAttemptDao(context)
+    val courseAttempts =  courseAttemptDao.queryBuilder().where(CourseAttemptDao.Properties.Id.eq(this.id)).list()
+    if (courseAttempts.isNotEmpty()) {
+        return courseAttempts[0]
+    }
+
+    return null
 }

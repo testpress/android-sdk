@@ -2,17 +2,18 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
-import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.domain.DomainContent
+import `in`.testpress.course.domain.DomainContentAttempt
 import `in`.testpress.course.domain.DomainExamContent
 import `in`.testpress.course.domain.DomainLanguage
 import `in`.testpress.course.domain.asGreenDaoModel
+import `in`.testpress.course.domain.getGreenDaoContent
+import `in`.testpress.course.domain.getGreenDaoContentAttempt
 import `in`.testpress.course.enums.Status
-import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.course.network.Resource
-import `in`.testpress.course.network.asGreenDaoModel
+import `in`.testpress.course.repository.ExamContentRepository
 import `in`.testpress.course.ui.ContentActivity
-import `in`.testpress.course.viewmodels.ContentViewModel
+import `in`.testpress.course.viewmodels.ExamContentViewModel
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.util.MultiLanguagesUtil
@@ -27,21 +28,20 @@ import androidx.lifecycle.ViewModelProvider
 
 open class BaseExamWidgetFragment : Fragment() {
     private lateinit var startButton: Button
-    protected lateinit var viewModel: ContentViewModel
+    protected lateinit var viewModel: ExamContentViewModel
     protected lateinit var content: DomainContent
     protected var contentId: Long = -1
-    lateinit var contentAttempts: ArrayList<NetworkContentAttempt>
+    lateinit var contentAttempts: ArrayList<DomainContentAttempt>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ContentViewModel(
-                    InjectorUtils.getContentRepository(context!!),
-                    InjectorUtils.getExamRepository(context!!)
+                return ExamContentViewModel(
+                    ExamContentRepository(context!!)
                 ) as T
             }
-        }).get(ContentViewModel::class.java)
+        }).get(ExamContentViewModel::class.java)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -67,30 +67,33 @@ open class BaseExamWidgetFragment : Fragment() {
             updateStartButton(contentAttempts)
         }
 
-        viewModel.loadAttempts(content.attemptsUrl!!, contentId).observe(viewLifecycleOwner, Observer { resource ->
-            when(resource.status) {
-                Status.SUCCESS -> {
-                    contentAttempts = resource.data!!
-                    val exam = content.exam!!
-                    viewModel.getLanguages(exam.slug!!, exam.id).observe(viewLifecycleOwner, observer)
+        viewModel.loadContentAttempts(content.attemptsUrl!!, contentId)
+            .observe(viewLifecycleOwner, Observer { resource ->
+                when (resource.status) {
+                    Status.SUCCESS -> {
+                        contentAttempts = resource.data!!
+                        val exam = content.exam!!
+                        viewModel.getLanguages(exam.slug!!, exam.id)
+                            .observe(viewLifecycleOwner, observer)
+                    }
                 }
-            }
-        })
+            })
     }
 
-    private fun updateStartButton(attempts: ArrayList<NetworkContentAttempt>) {
+    private fun updateStartButton(contentAttempts: ArrayList<DomainContentAttempt>) {
         val exam = content.exam!!
-        var pausedAttempt: NetworkContentAttempt? = null
+        var pausedAttempt: DomainContentAttempt? = null
 
-        for (attempt in attempts) {
-            if (attempt.assessment?.state == TestpressExamApiClient.STATE_PAUSED) {
+        for (attempt in contentAttempts) {
+            val greendaoContentAttempt = attempt.getGreenDaoContentAttempt(requireContext())
+            if (greendaoContentAttempt?.assessment?.state == TestpressExamApiClient.STATE_PAUSED) {
                 pausedAttempt = attempt
                 break
             }
         }
 
         if (pausedAttempt == null && exam.canBeAttempted()) {
-            if (attempts.isEmpty()) {
+            if (contentAttempts.isEmpty()) {
                 startButton.text = getString(R.string.testpress_start)
             } else {
                 startButton.text = getString(R.string.testpress_retake)
@@ -120,7 +123,10 @@ open class BaseExamWidgetFragment : Fragment() {
         }
     }
 
-    private fun initStartForResumeExam(exam: DomainExamContent, pausedAttempt: NetworkContentAttempt) {
+    private fun initStartForResumeExam(
+        exam: DomainExamContent,
+        pausedAttempt: DomainContentAttempt
+    ) {
         if (exam.hasMultipleLanguages()) {
             MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
                 resumeCourseExam(true, pausedAttempt)
@@ -131,14 +137,24 @@ open class BaseExamWidgetFragment : Fragment() {
     }
 
     private fun startCourseExam(hasMultipleLanguages: Boolean, isPartial: Boolean) {
-        val greenDaoContent = viewModel.getContentFromDB(content.id)
-        TestpressExam.startCourseExam(requireActivity(), greenDaoContent!!, hasMultipleLanguages, isPartial,
-            TestpressSdk.getTestpressSession(requireActivity())!!)
+        val greenDaoContent = content.getGreenDaoContent(requireContext())
+        TestpressExam.startCourseExam(
+            requireActivity(), greenDaoContent!!, hasMultipleLanguages, isPartial,
+            TestpressSdk.getTestpressSession(requireActivity())!!
+        )
     }
 
-    private fun resumeCourseExam(hasMultipleLanguages: Boolean, pausedCourseAttempt: NetworkContentAttempt) {
-        val greenDaoContent = viewModel.getContentFromDB(content.id)
-        TestpressExam.resumeCourseAttempt(requireActivity(), greenDaoContent!!, pausedCourseAttempt.asGreenDaoModel(), hasMultipleLanguages,
-            TestpressSdk.getTestpressSession(requireActivity())!!)
+    private fun resumeCourseExam(
+        hasMultipleLanguages: Boolean,
+        pausedCourseAttempt: DomainContentAttempt
+    ) {
+        val greenDaoContent = content.getGreenDaoContent(requireContext())
+        TestpressExam.resumeCourseAttempt(
+            requireActivity(),
+            greenDaoContent!!,
+            pausedCourseAttempt.getGreenDaoContentAttempt(requireContext())!!,
+            hasMultipleLanguages,
+            TestpressSdk.getTestpressSession(requireActivity())!!
+        )
     }
 }

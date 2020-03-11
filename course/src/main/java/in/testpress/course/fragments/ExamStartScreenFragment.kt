@@ -3,6 +3,7 @@ package `in`.testpress.course.fragments
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainExamContent
+import `in`.testpress.course.domain.getGreenDaoContentAttempt
 import `in`.testpress.course.enums.Status
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.exam.api.TestpressExamApiClient.STATE_PAUSED
@@ -69,7 +70,7 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
                 markPerQuestion,
                 negativeMarks,
                 date
-            ), TestpressSdk.getRubikMediumFont(activity!!)
+            ), TestpressSdk.getRubikMediumFont(requireActivity())
         )
         ViewUtils.setTypeface(
             arrayOf(
@@ -111,14 +112,20 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
     }
 
     private fun showExamDuration(exam: DomainExamContent) {
-        val attempts = viewModel.getContentAttemptsFromDB(contentId)
-
-        if (attempts.size == 1 && attempts[0].assessment.state == STATE_PAUSED) {
-            val pausedAttempt = attempts[0]
-            examDuration.text = exam.duration
-            examDuration.text = pausedAttempt.assessment.remainingTime
-        } else {
-            examDuration.text = exam.duration
-        }
+        viewModel.loadContentAttempts(content.attemptsUrl!!, contentId)
+            .observe(viewLifecycleOwner, Observer {resource ->
+                when (resource.status) {
+                    Status.SUCCESS -> {
+                        contentAttempts = resource.data!!
+                        val greendaoContentAttempt = contentAttempts[0].getGreenDaoContentAttempt(requireContext())
+                        if (contentAttempts.size == 1 && greendaoContentAttempt?.assessment?.state == STATE_PAUSED) {
+                            examDuration.text = exam.duration
+                            examDuration.text = greendaoContentAttempt?.assessment.remainingTime
+                        } else {
+                            examDuration.text = exam.duration
+                        }
+                    }
+                }
+            })
     }
 }
