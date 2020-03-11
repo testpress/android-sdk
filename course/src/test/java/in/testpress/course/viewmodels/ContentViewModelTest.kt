@@ -66,6 +66,6 @@ class ContentViewModelTest {
     @Test
     fun getLanguages() {
         viewModel.getLanguages("slug", 1)
-        verify(examRepository).fetchLanguages("slug", 1)
+        verify(examRepository).loadLanguages("slug", 1)
     }
 }

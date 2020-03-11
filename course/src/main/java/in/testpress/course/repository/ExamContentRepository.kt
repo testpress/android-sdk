@@ -69,7 +69,7 @@ class ExamContentRepository(
         }
     }
 
-    fun fetchAttemptFromNetwork(url: String, contentId: Long): LiveData<Resource<ArrayList<DomainContentAttempt>>> {
+    fun loadAttempts(url: String, contentId: Long): LiveData<Resource<ArrayList<DomainContentAttempt>>> {
         if (!isAttemptsBeingFetched) {
             isAttemptsBeingFetched = true
             _fetchAttemptFromNetwork(url, contentId)
@@ -131,7 +131,7 @@ class ExamContentRepository(
         resourceLanguages.value = Resource.success(languages.toDomainLanguages())
     }
 
-    fun fetchLanguagesNetwork(examSlug: String, examId: Long): LiveData<Resource<List<DomainLanguage>>> {
+    fun loadLanguages(examSlug: String, examId: Long): LiveData<Resource<List<DomainLanguage>>> {
         if (!isLanguagesBeingFetched) {
             isLanguagesBeingFetched = true
             _fetchLanguagesNetwork(examSlug, examId)
