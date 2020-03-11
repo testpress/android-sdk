@@ -1,0 +1,156 @@
+package `in`.testpress.course.repository
+
+import `in`.testpress.core.TestpressCallback
+import `in`.testpress.core.TestpressException
+import `in`.testpress.core.TestpressSDKDatabase
+import `in`.testpress.course.domain.DomainLanguage
+import `in`.testpress.course.domain.toDomainLanguages
+import `in`.testpress.course.network.NetworkContent
+import `in`.testpress.course.network.NetworkContentAttempt
+import `in`.testpress.course.network.Resource
+import `in`.testpress.course.network.asGreenDaoModel
+import `in`.testpress.exam.network.ExamNetwork
+import `in`.testpress.exam.network.NetworkLanguage
+import `in`.testpress.exam.network.asGreenDaoModels
+import `in`.testpress.models.TestpressApiResponse
+import `in`.testpress.models.greendao.CourseAttempt
+import `in`.testpress.models.greendao.CourseAttemptDao
+import `in`.testpress.models.greendao.LanguageDao
+import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+
+class ExamContentRepository(
+    context: Context
+) : ContentRepository(context) {
+
+    private val examContentDao = TestpressSDKDatabase.getExamDao(context)
+    private val languageDao = TestpressSDKDatabase.getLanguageDao(context)
+    private val attemptDao = TestpressSDKDatabase.getAttemptDao(context)
+    private val contentAttemptDao = TestpressSDKDatabase.getCourseAttemptDao(context)
+    private val examNetwork = ExamNetwork(context)
+    private var courseAttempts = arrayListOf<NetworkContentAttempt>()
+    var resourceCourseAttempt: MutableLiveData<Resource<ArrayList<NetworkContentAttempt>>> =
+        MutableLiveData()
+    private var isLanguagesBeingFetched = false
+    private var isAttemptsBeingFetched = false
+    private var languages = arrayListOf<NetworkLanguage>()
+    var resourceLanguages: MutableLiveData<Resource<List<DomainLanguage>>> = MutableLiveData()
+
+    private fun _loadAttempts(url: String, contentId: Long) {
+        courseNetwork.getContentAttempts(url)
+            .enqueue(object : TestpressCallback<TestpressApiResponse<NetworkContentAttempt>>() {
+                override fun onSuccess(response: TestpressApiResponse<NetworkContentAttempt>?) {
+                    handleAttemptsFetchSuccess(response, contentId)
+                }
+
+                override fun onException(exception: TestpressException) {
+                    isAttemptsBeingFetched = false
+                    resourceCourseAttempt.value = Resource.error(exception, null)
+                }
+            })
+    }
+
+    private fun handleAttemptsFetchSuccess(response:TestpressApiResponse<NetworkContentAttempt>?, contentId: Long) {
+        courseAttempts.addAll(response?.results ?: listOf())
+
+        if (response?.next != null) {
+            _loadAttempts(response.next, contentId)
+        } else {
+            isAttemptsBeingFetched = false
+            clearContentAttemptsInDB(contentId)
+            saveCourseAttemptInDB(courseAttempts, contentId)
+            resourceCourseAttempt.value = Resource.success(courseAttempts)
+        }
+    }
+
+    fun loadAttempts(url: String, contentId: Long): LiveData<Resource<ArrayList<NetworkContentAttempt>>> {
+        if (!isAttemptsBeingFetched) {
+            isAttemptsBeingFetched = true
+            _loadAttempts(url, contentId)
+        }
+        return resourceCourseAttempt
+    }
+
+    fun clearContentAttemptsInDB(contentId: Long) {
+        contentAttemptDao.queryBuilder()
+            .where(CourseAttemptDao.Properties.ChapterContentId.eq(contentId))
+            .buildDelete()
+            .executeDeleteWithoutDetachingEntities()
+    }
+
+    fun saveCourseAttemptInDB(
+        courseAttemptList: ArrayList<NetworkContentAttempt>,
+        contentId: Long
+    ) {
+        for (networkContentAttempt in courseAttemptList) {
+            val contentAttempt = networkContentAttempt.asGreenDaoModel()
+            val attempt = networkContentAttempt.assessment!!
+            attemptDao.insertOrReplace(attempt.asGreenDaoModel())
+            contentAttempt.assessmentId = attempt.id
+            contentAttempt.chapterContentId = contentId
+            contentAttemptDao.insertOrReplace(contentAttempt)
+        }
+    }
+
+    fun getContentAttemptsFromDB(contentId: Long): List<CourseAttempt> {
+        return contentAttemptDao.queryBuilder()
+            .where(CourseAttemptDao.Properties.ChapterContentId.eq(contentId))
+            .list()
+    }
+
+    private fun _fetchLanguages(examSlug: String, examId: Long) {
+        examNetwork.getLanguages(examSlug)
+            .enqueue(object : TestpressCallback<TestpressApiResponse<NetworkLanguage>>() {
+                override fun onSuccess(response: TestpressApiResponse<NetworkLanguage>) {
+                    handleLanguagesFetchSuccess(response, examId)
+                }
+
+                override fun onException(exception: TestpressException) {
+                    isLanguagesBeingFetched = false
+                    resourceLanguages.value = Resource.error(exception, null)
+                }
+            })
+    }
+
+    private fun handleLanguagesFetchSuccess(response: TestpressApiResponse<NetworkLanguage>, examId: Long) {
+        val fetchedLanguages = response.results
+        for (language in fetchedLanguages) {
+            language.examId = examId
+        }
+        languages.addAll(fetchedLanguages)
+        isLanguagesBeingFetched = false
+        storeLanguagesInDB(languages, examId)
+        resourceLanguages.value = Resource.success(languages.toDomainLanguages())
+    }
+
+    fun fetchLanguages(examSlug: String, examId: Long): LiveData<Resource<List<DomainLanguage>>> {
+        if (!isLanguagesBeingFetched) {
+            isLanguagesBeingFetched = true
+            _fetchLanguages(examSlug, examId)
+        }
+        return resourceLanguages
+    }
+
+    fun storeLanguagesInDB(networkLanguages: ArrayList<NetworkLanguage>, examId: Long) {
+        languageDao.queryBuilder()
+            .where(LanguageDao.Properties.ExamId.eq(examId))
+            .buildDelete()
+            .executeDeleteWithoutDetachingEntities()
+        val languages = networkLanguages.asGreenDaoModels()
+        for (language in languages) {
+            language.examId = examId
+        }
+        languageDao.insertOrReplaceInTx(languages)
+    }
+
+    override fun storeContentAndItsRelationsToDB(content: NetworkContent) {
+        val greenDaoContent = content.asGreenDaoModel()
+        content.exam?.let {
+            val exam = it.asGreenDaoModel()
+            greenDaoContent.examId = exam.id
+            examContentDao.insertOrReplace(exam)
+        }
+        contentDao.insertOrReplace(greenDaoContent)
+    }
+}

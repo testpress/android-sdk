@@ -1,14 +1,17 @@
 package `in`.testpress.course.viewmodels
 
 import `in`.testpress.course.domain.DomainContent
+import `in`.testpress.course.domain.DomainLanguage
 import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.course.network.Resource
 import `in`.testpress.course.repository.ContentRepository
+import `in`.testpress.models.greendao.Content
+import `in`.testpress.models.greendao.CourseAttempt
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 
 
-class ContentViewModel(val repository: ContentRepository) : ViewModel() {
+open class ContentViewModel(open val repository: ContentRepository) : ViewModel() {
     fun getContent(contentId: Long,
                  forceRefresh: Boolean = false): LiveData<Resource<DomainContent>> {
         return repository.loadContent(contentId, forceRefresh)
@@ -28,5 +31,9 @@ class ContentViewModel(val repository: ContentRepository) : ViewModel() {
 
     fun storeBookmarkIdToContent(bookmarkId: Long?, contentId: Long) {
         return repository.storeBookmarkIdToContent(bookmarkId, contentId)
+    }
+
+    fun getContentFromDB(contentId: Long): Content? {
+        return repository.getContentFromDB(contentId)
     }
 }

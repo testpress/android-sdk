@@ -1,15 +1,19 @@
 package `in`.testpress.course.viewmodels
 
 import `in`.testpress.course.repository.ContentRepository
+import `in`.testpress.course.repository.ExamContentRepository
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 class ContentViewModelTest {
     private val repository = mock(ContentRepository::class.java)
-    private val viewModel = ContentViewModel(repository)
+    private val examRepository = mock(ExamContentRepository::class.java)
+    private val viewModel = ContentViewModel(repository, examRepository)
 
     @Test
     fun getContentsCallsRepository() {
@@ -39,5 +43,29 @@ class ContentViewModelTest {
     fun storeBookmarkIdToContentCallsRepository() {
         viewModel.storeBookmarkIdToContent(1, 2)
         verify(repository).storeBookmarkIdToContent(1, 2)
+    }
+
+    @Test
+    fun getContentFromDBShouldCallRepositoryMethod() {
+        viewModel.getContentFromDB(1)
+        verify(repository).getContentFromDB(1)
+    }
+
+    @Test
+    fun loadAttemptsShouldCallExamRepositoryMethod() {
+        viewModel.loadAttempts("url", 1)
+        verify(examRepository).loadAttempts("url", 1)
+    }
+
+    @Test
+    fun getContentAttemptsFromDBShouldCallExamRepositoryMethod() {
+        viewModel.getContentAttemptsFromDB(1)
+        verify(examRepository).getContentAttemptsFromDB(1)
+    }
+
+    @Test
+    fun getLanguages() {
+        viewModel.getLanguages("slug", 1)
+        verify(examRepository).fetchLanguages("slug", 1)
     }
 }

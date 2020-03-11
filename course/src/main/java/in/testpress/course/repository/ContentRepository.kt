@@ -122,6 +122,8 @@ class ContentRepositoryFactory {
                 "Html" -> HtmlContentRepository(context) as ContentRepository
                 "Notes" -> HtmlContentRepository(context) as ContentRepository
                 "Video" -> VideoContentRepository(context) as ContentRepository
+                "Exam" -> ExamContentRepository(context) as ContentRepository
+                "Quiz" -> ExamContentRepository(context) as ContentRepository
                 else -> ContentRepository(context)
             }
     }
