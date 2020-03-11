@@ -32,8 +32,4 @@ open class ContentViewModel(open val repository: ContentRepository) : ViewModel(
     fun storeBookmarkIdToContent(bookmarkId: Long?, contentId: Long) {
         return repository.storeBookmarkIdToContent(bookmarkId, contentId)
     }
-
-    fun getContentFromDB(contentId: Long): Content? {
-        return repository.getContentFromDB(contentId)
-    }
 }

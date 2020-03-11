@@ -46,21 +46,9 @@ class ContentViewModelTest {
     }
 
     @Test
-    fun getContentFromDBShouldCallRepositoryMethod() {
-        viewModel.getContentFromDB(1)
-        verify(repository).getContentFromDB(1)
-    }
-
-    @Test
     fun loadAttemptsShouldCallExamRepositoryMethod() {
         viewModel.loadAttempts("url", 1)
         verify(examRepository).loadAttempts("url", 1)
-    }
-
-    @Test
-    fun getContentAttemptsFromDBShouldCallExamRepositoryMethod() {
-        viewModel.getContentAttemptsFromDB(1)
-        verify(examRepository).getContentAttemptsFromDB(1)
     }
 
     @Test
