@@ -30,18 +30,6 @@ class VideoContentFragment : BaseContentDetailFragment() {
 
     override fun display() {
         titleView.text = content.title
-        val video = content.video
-
-        if (video == null) {
-            swipeRefresh.isRefreshing = true
-            updateContent()
-            return
-        }
-
-        initVideoWidget(video)
-    }
-
-    private fun initVideoWidget(video: DomainVideoContent) {
         val videoWidgetFragment = VideoWidgetFactory.getWidget(video)
         videoWidgetFragment.arguments = arguments
         val transaction = childFragmentManager.beginTransaction()

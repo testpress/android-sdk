@@ -37,7 +37,6 @@ class NativeVideoWidgetFragment : Fragment() {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ContentViewModel(
                     InjectorUtils.getContentRepository(context!!),
-                    InjectorUtils.getExamRepository(context!!)
                 ) as T
             }
         }).get(ContentViewModel::class.java)
