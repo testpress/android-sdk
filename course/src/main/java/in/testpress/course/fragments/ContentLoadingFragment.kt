@@ -2,9 +2,9 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
-import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.enums.Status
+import `in`.testpress.course.repository.ContentRepository
 import `in`.testpress.course.ui.ContentActivity.CHAPTER_ID
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.ui.ContentActivity.POSITION
@@ -33,8 +33,7 @@ class ContentLoadingFragment : Fragment(), EmptyViewListener {
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ContentViewModel(
-                    InjectorUtils.getContentRepository(context!!),
-                    InjectorUtils.getExamRepository(context!!)
+                    ContentRepository(requireContext())
                 ) as T
             }
         }).get(ContentViewModel::class.java)
@@ -43,9 +42,9 @@ class ContentLoadingFragment : Fragment(), EmptyViewListener {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (parentFragment != null) {
-            fragmentChangeListener = parentFragment as ContentFragmentChangeListener;
+            fragmentChangeListener = parentFragment as ContentFragmentChangeListener
         } else {
-            fragmentChangeListener = context as ContentFragmentChangeListener;
+            fragmentChangeListener = context as ContentFragmentChangeListener
         }
     }
 
@@ -74,10 +73,10 @@ class ContentLoadingFragment : Fragment(), EmptyViewListener {
     fun initContent() {
         if (contentId != -1L) {
             viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer { resource ->
-                when(resource.status) {
+                when (resource.status) {
                     Status.SUCCESS -> {
                         if (!isContentLoaded(resource.data!!)) {
-                            loadContent(resource.data)
+                            refetchContent(resource.data.id)
                         } else {
                             changeFragment(resource.data)
                         }
@@ -86,13 +85,15 @@ class ContentLoadingFragment : Fragment(), EmptyViewListener {
                 }
             })
         } else {
-            viewModel.getContentInChapterForPosition(position, chapterId).observe(viewLifecycleOwner, Observer { content ->
-                if (!isContentLoaded(content)) {
-                    loadContent(content)
-                } else {
-                    changeFragment(content)
-                }
-            })
+            viewModel.getContentInChapterForPosition(position, chapterId)
+                .observe(viewLifecycleOwner, Observer { content ->
+                    contentId = content.id
+                    if (!isContentLoaded(content)) {
+                        refetchContent(content.id)
+                    } else {
+                        changeFragment(content)
+                    }
+                })
         }
     }
 
@@ -103,14 +104,15 @@ class ContentLoadingFragment : Fragment(), EmptyViewListener {
         return false
     }
 
-    private fun loadContent(content: DomainContent) {
-        viewModel.getContent(content.id, forceRefresh = true).observe(viewLifecycleOwner, Observer { resource ->
-            when(resource.status) {
-                Status.SUCCESS -> {
-                    changeFragment(resource.data!!)
+    private fun refetchContent(id: Long) {
+        viewModel.getContent(id, forceRefresh = true)
+            .observe(viewLifecycleOwner, Observer { resource ->
+                when (resource.status) {
+                    Status.SUCCESS -> {
+                        changeFragment(resource.data!!)
+                    }
                 }
-            }
-        })
+            })
     }
 
     fun initializeEmptyViewFragment() {
@@ -125,7 +127,7 @@ class ContentLoadingFragment : Fragment(), EmptyViewListener {
     }
 
     override fun onRetryClick() {
-
+        refetchContent(contentId)
     }
 }
 
@@ -136,7 +138,7 @@ interface ContentFragmentChangeListener {
 class ContentFragmentFactory {
     companion object {
         fun getFragment(content: DomainContent): Fragment {
-            return when(content.contentType) {
+            return when (content.contentType) {
                 "Exam" -> ExamContentFragment()
                 "Quiz" -> ExamContentFragment()
                 "Video" -> VideoContentFragment()
