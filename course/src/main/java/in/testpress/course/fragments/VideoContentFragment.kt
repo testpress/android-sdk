@@ -30,7 +30,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
 
     override fun display() {
         titleView.text = content.title
-        val videoWidgetFragment = VideoWidgetFragmentFactory.getWidget(video)
+        val videoWidgetFragment = VideoWidgetFragmentFactory.getWidget(content.video!!)
         videoWidgetFragment.arguments = arguments
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.video_widget_fragment, videoWidgetFragment)
