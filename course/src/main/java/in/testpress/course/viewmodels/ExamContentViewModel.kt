@@ -1,5 +1,6 @@
 package `in`.testpress.course.viewmodels
 
+import `in`.testpress.course.domain.DomainContentAttempt
 import `in`.testpress.course.domain.DomainLanguage
 import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.course.network.Resource
@@ -8,11 +9,11 @@ import `in`.testpress.models.greendao.CourseAttempt
 import androidx.lifecycle.LiveData
 
 class ExamContentViewModel(override val repository: ExamContentRepository) : ContentViewModel(repository) {
-    fun loadAttempts(url: String, contentId: Long): LiveData<Resource<ArrayList<NetworkContentAttempt>>> {
+    fun loadAttempts(url: String, contentId: Long): LiveData<Resource<ArrayList<DomainContentAttempt>>> {
         return repository.loadAttempts(url, contentId)
     }
 
-    fun getContentAttemptsFromDB(contentId: Long): List<CourseAttempt> {
+    fun getContentAttempts(contentId: Long): List<DomainContentAttempt> {
         return repository.getContentAttempts(contentId)
     }
 
