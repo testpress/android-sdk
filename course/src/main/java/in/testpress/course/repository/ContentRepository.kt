@@ -21,7 +21,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
-class ContentRepository(
+open class ContentRepository(
     val context: Context
 ) {
     val roomContentDao = TestpressDatabase(context).contentDao()
