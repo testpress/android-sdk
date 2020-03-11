@@ -123,7 +123,7 @@ fun createDomainExamContent(exam: Exam): DomainExamContent {
     )
 }
 
-fun Exam.asDomainAttachment(): DomainExamContent {
+fun Exam.asDomainContent(): DomainExamContent {
     return createDomainExamContent(this)
 }
 

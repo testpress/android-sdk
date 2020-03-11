@@ -64,6 +64,6 @@ fun List<Stream>.asDomainStreams(): List<DomainVideoStream> {
     }
 }
 
-fun Video.asDomainVideo(): DomainVideoContent {
+fun Video.asDomainContent(): DomainVideoContent {
     return createDomainVideoContent(this)
 }

@@ -111,10 +111,10 @@ fun createDomainContent(content: Content): DomainContent {
         htmlId = content.htmlId,
         start = content.start,
         hasStarted = content.hasStarted,
-        attachment = attachment?.asDomainAttachment(),
+        attachment = attachment?.asDomainContent(),
         htmlContent = content.rawHtmlContent?.asDomainContent(),
-        exam = content.rawExam?.asDomainAttachment(),
-        video = content.rawVideo?.asDomainVideo(),
+        exam = content.rawExam?.asDomainContent(),
+        video = content.rawVideo?.asDomainContent(),
         attemptsUrl = content.attemptsUrl
     )
 }
