@@ -2,6 +2,7 @@ package `in`.testpress.course.repository
 
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
+import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.course.api.TestpressCourseApiClient.CONTENTS_PATH_v2_4
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.asDomainContent
@@ -12,22 +13,21 @@ import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.course.network.Resource
 import `in`.testpress.course.network.asDatabaseModel
-import `in`.testpress.course.network.asGreenDaoModel
-import `in`.testpress.models.greendao.AttachmentDao
+import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
-import `in`.testpress.models.greendao.HtmlContentDao
 import `in`.testpress.network.RetrofitCall
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
 class ContentRepository(
-    val roomContentDao: `in`.testpress.database.ContentDao,
-    val contentDao: ContentDao,
-    val attachmentDao: AttachmentDao,
-    val htmlContentDao: HtmlContentDao,
-    val courseNetwork: CourseNetwork
+    val context: Context
 ) {
+    val roomContentDao = TestpressDatabase(context).contentDao()
+    val contentDao = TestpressSDKDatabase.getContentDao(context)
+    val courseNetwork = CourseNetwork(context)
+
     private var contentAttempt: MutableLiveData<Resource<NetworkContentAttempt>> = MutableLiveData()
 
     fun loadContent(
@@ -82,7 +82,8 @@ class ContentRepository(
     }
 
     fun getContentFromDB(contentId: Long): Content? {
-        val contents = contentDao.queryBuilder().where(ContentDao.Properties.Id.eq(contentId)).list()
+        val contents =
+            contentDao.queryBuilder().where(ContentDao.Properties.Id.eq(contentId)).list()
 
         if (contents.isEmpty()) {
             return null
@@ -104,24 +105,24 @@ class ContentRepository(
         return contentAttempt
     }
 
-    fun storeContentAndItsRelationsToDB(content: NetworkContent) {
-        val greenDaoContent = content.asGreenDaoModel()
-        content.attachment?.let {
-            val attachment = it.asGreenDaoModel()
-            greenDaoContent.attachmentId = attachment.id
-            attachmentDao.insertOrReplace(it.asGreenDaoModel())
-        }
-        content.htmlContent ?.let {
-            val htmlContent = it.asGreenDaoModel()
-            greenDaoContent.htmlId = htmlContent.id
-            htmlContentDao.insertOrReplace(htmlContent)
-        }
-        contentDao.insertOrReplace(greenDaoContent)
-    }
-
     fun storeBookmarkIdToContent(bookmarkId: Long?, contentId: Long) {
         val content = getContentFromDB(contentId)
         content?.bookmarkId = bookmarkId
         contentDao.updateInTx(content)
+    }
+
+    open fun storeContentAndItsRelationsToDB(content: NetworkContent) {}
+}
+
+class ContentRepositoryFactory {
+    companion object {
+        fun getRepository(contentType: String, context: Context): ContentRepository =
+            when (contentType) {
+                "Attachment" -> AttachmentContentRepository(context) as ContentRepository
+                "Html" -> HtmlContentRepository(context) as ContentRepository
+                "Notes" -> HtmlContentRepository(context) as ContentRepository
+                "Video" -> VideoContentRepository(context) as ContentRepository
+                else -> ContentRepository(context)
+            }
     }
 }

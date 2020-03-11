@@ -1,6 +1,7 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
+import `in`.testpress.course.TestpressCourse.CONTENT_TYPE
 import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.domain.DomainContent
@@ -41,9 +42,10 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, EmptyVi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val contentType = requireArguments().getString(CONTENT_TYPE)
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ContentViewModel(InjectorUtils.getContentRepository(context!!)) as T
+                return ContentViewModel(InjectorUtils.getContentRepository(contentType!!, context!!)) as T
             }
         }).get(ContentViewModel::class.java)
     }
