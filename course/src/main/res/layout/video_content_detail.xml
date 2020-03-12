@@ -13,64 +13,71 @@
         android:layout_above="@+id/button_layout"
         android:layout_below="@+id/appbar">
 
-        <androidx.core.widget.NestedScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#ffffff"
-            android:fillViewport="true">
+            android:orientation="vertical"
+            tools:ignore="ScrollViewSize">
+
+            <FrameLayout
+                android:id="@+id/video_widget_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
 
             <LinearLayout
+                android:id="@+id/header_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingTop="20dp"
-                tools:ignore="ScrollViewSize">
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="20dp">
 
                 <LinearLayout
-                    android:id="@+id/title_layout"
+                    android:id="@id/title_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp">
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:gravity="center"
+                        android:drawableRight="@drawable/ic_down_chevron"
+                        android:gravity="left"
                         android:lineSpacingExtra="6dp"
                         android:textColor="@color/testpress_black"
                         android:textSize="24sp"
                         android:textStyle="bold" />
 
-                    <FrameLayout
-                        android:id="@+id/bookmark_fragment_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                    <View
-                        android:id="@+id/title_separator"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_marginBottom="5dp"
-                        android:background="#e6e6e6" />
-
                 </LinearLayout>
 
-                <FrameLayout
-                    android:id="@+id/video_widget_fragment"
+                <androidx.core.widget.NestedScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:fillViewport="true">
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="20dp">
+
+                        <TextView
+                            android:id="@+id/description"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:scrollbars="vertical"
+                            android:textColor="@color/testpress_text_gray"
+                            android:textColorHighlight="#00FFFFFF" />
+                    </LinearLayout>
+                </androidx.core.widget.NestedScrollView>
             </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
 
+        </LinearLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <FrameLayout

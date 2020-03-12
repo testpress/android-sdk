@@ -15,15 +15,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 
 class NativeVideoWidgetFragment : Fragment() {
-    private lateinit var exoPlayerMainFrame: FrameLayout
+    private lateinit var exoPlayerMainFrame: AspectRatioFrameLayout
     private var exoPlayerUtil: ExoPlayerUtil? = null
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -69,6 +69,7 @@ class NativeVideoWidgetFragment : Fragment() {
     fun bindViews(view: View) {
         exoPlayerMainFrame = view.findViewById(R.id.exo_player_main_frame)
         exoPlayerMainFrame.visibility = View.VISIBLE
+        exoPlayerMainFrame.setAspectRatio(16f/9f)
         exoplayerFullscreenHelper.initializeOrientationListener()
     }
 
@@ -83,6 +84,10 @@ class NativeVideoWidgetFragment : Fragment() {
                 exoPlayerUtil?.initializePlayer()
                 exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil)
             })
+    }
+
+    fun seekTo(milliSeconds: Long?) {
+        exoPlayerUtil?.seekTo(milliSeconds)
     }
 
     override fun onPause() {

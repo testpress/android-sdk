@@ -230,6 +230,10 @@ public class ExoPlayerUtil {
         });
     }
 
+    public void seekTo(Long milliSeconds) {
+        player.seekTo(milliSeconds);
+    }
+
     private void initResolutionSelector() {
         FrameLayout resolutionButton = playerView.findViewById(R.id.exo_resolution_button);
         resolutionButton.setOnClickListener(new View.OnClickListener() {
