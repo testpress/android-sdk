@@ -1,6 +1,8 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
+import `in`.testpress.course.domain.getGreenDaoContent
+import `in`.testpress.course.domain.getGreenDaoContentAttempts
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.ContentAttemptListAdapter
 import android.os.Bundle
@@ -24,13 +26,11 @@ class AttemptsListFragment : BaseExamWidgetFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         attemptList = view.findViewById(R.id.attempt_list)
-        display()
     }
 
-    fun display() {
-        val contentId = requireArguments().getLong(ContentActivity.CONTENT_ID)
-        val greenDaoContent = viewModel.getContentFromDB(contentId)
-        val attempts = viewModel.getContentAttemptsFromDB(contentId)
+    override fun display() {
+        val greenDaoContent = content.getGreenDaoContent(requireContext())
+        val attempts = content.getGreenDaoContentAttempts(requireContext())
         attemptList.isNestedScrollingEnabled = false
         attemptList.setHasFixedSize(true)
         attemptList.layoutManager = LinearLayoutManager(activity)

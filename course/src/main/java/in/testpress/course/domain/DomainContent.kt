@@ -5,6 +5,8 @@ import `in`.testpress.database.ContentEntity
 import `in`.testpress.models.greendao.Attachment
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
+import `in`.testpress.models.greendao.CourseAttempt
+import `in`.testpress.models.greendao.CourseAttemptDao
 import android.content.Context
 
 data class DomainContent(
@@ -150,4 +152,9 @@ fun DomainContent.getGreenDaoContent(context: Context): Content? {
     }
 
     return null
+}
+
+fun DomainContent.getGreenDaoContentAttempts(context: Context): List<CourseAttempt> {
+    val courseAttemptDao = TestpressSDKDatabase.getCourseAttemptDao(context)
+    return courseAttemptDao.queryBuilder().where(CourseAttemptDao.Properties.ChapterContentId.eq(this.id)).list()
 }
