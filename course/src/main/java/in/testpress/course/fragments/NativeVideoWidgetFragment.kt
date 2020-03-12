@@ -5,6 +5,7 @@ import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.domain.DomainContent
+import `in`.testpress.course.domain.getGreenDaoContent
 import `in`.testpress.course.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.util.ExoPlayerUtil
@@ -27,7 +28,7 @@ class NativeVideoWidgetFragment : Fragment() {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var viewModel: ContentViewModel
-    private val session by lazy { TestpressSdk.getTestpressSession(activity!!) }
+    private val session by lazy { TestpressSdk.getTestpressSession(requireActivity()) }
     private val exoplayerFullscreenHelper: ExoplayerFullscreenHelper by lazy {
         ExoplayerFullscreenHelper(activity)
     }
@@ -38,7 +39,7 @@ class NativeVideoWidgetFragment : Fragment() {
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ContentViewModel(
-                    InjectorUtils.getContentRepository(contentType!!, context!!),
+                    InjectorUtils.getContentRepository(contentType!!, context!!)
                 ) as T
             }
         }).get(ContentViewModel::class.java)
@@ -72,7 +73,7 @@ class NativeVideoWidgetFragment : Fragment() {
     }
 
     private fun createAttemptAndInitializeExoplayer(content: DomainContent) {
-        val greenDaoContent = viewModel.getContentFromDB(content.id)
+        val greenDaoContent = content.getGreenDaoContent(requireContext())
         val video = content.video
         viewModel.createContentAttempt(content.id)
             .observe(viewLifecycleOwner, Observer { resource ->
