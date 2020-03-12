@@ -109,13 +109,14 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
             .observe(viewLifecycleOwner, Observer {resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
+                        examDuration.text = exam.duration
                         contentAttempts = resource.data!!
-                        val greendaoContentAttempt = contentAttempts[0].getGreenDaoContentAttempt(requireContext())
-                        if (contentAttempts.size == 1 && greendaoContentAttempt?.assessment?.state == STATE_PAUSED) {
-                            examDuration.text = exam.duration
-                            examDuration.text = greendaoContentAttempt?.assessment.remainingTime
-                        } else {
-                            examDuration.text = exam.duration
+                        if (contentAttempts.size == 1) {
+                            val greendaoContentAttempt = contentAttempts[0].getGreenDaoContentAttempt(requireContext())
+                            if (greendaoContentAttempt?.assessment?.state == STATE_PAUSED) {
+                                examDuration.text = exam.duration
+                                examDuration.text = greendaoContentAttempt.assessment.remainingTime
+                            }
                         }
                     }
                 }
