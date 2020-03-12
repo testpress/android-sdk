@@ -72,6 +72,7 @@ open class BaseExamWidgetFragment : Fragment() {
                 when (resource.status) {
                     Status.SUCCESS -> {
                         contentAttempts = resource.data!!
+                        display()
                         val exam = content.exam!!
                         viewModel.getLanguages(exam.slug!!, exam.id)
                             .observe(viewLifecycleOwner, observer)
@@ -157,4 +158,6 @@ open class BaseExamWidgetFragment : Fragment() {
             TestpressSdk.getTestpressSession(requireActivity())!!
         )
     }
+
+    open fun display() {}
 }

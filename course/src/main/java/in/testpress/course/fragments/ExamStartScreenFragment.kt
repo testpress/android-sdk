@@ -44,7 +44,6 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         super.onViewCreated(view, savedInstanceState)
         contentId = requireArguments().getLong(ContentActivity.CONTENT_ID)
         bindViews(view)
-        display()
     }
 
     private fun bindViews(view: View) {
@@ -86,20 +85,14 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         )
     }
 
-    fun display() {
-        viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer { resource ->
-            when (resource.status) {
-                Status.SUCCESS -> {
-                    val exam = resource.data?.exam!!
-                    markPerQuestion.text = exam.markPerQuestion
-                    negativeMarks.text = exam.negativeMarks
-                    numberOfQuestions.text = exam.numberOfQuestions.toString()
-                    descriptionContent.text = exam.description
-                    showOrHideExamDate(exam)
-                    showExamDuration(exam)
-                }
-            }
-        })
+    override fun display() {
+        val exam = content.exam!!
+        markPerQuestion.text = exam.markPerQuestion
+        negativeMarks.text = exam.negativeMarks
+        numberOfQuestions.text = exam.numberOfQuestions.toString()
+        descriptionContent.text = exam.description
+        showOrHideExamDate(exam)
+        showExamDuration(exam)
     }
 
     private fun showOrHideExamDate(exam: DomainExamContent) {
