@@ -25,7 +25,11 @@ abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
     private fun showDBDataIfAvailable(nonce: Boolean = false, callback: ()->Unit = {}) {
         result.addSource(dbSource) { data ->
             if (nonce) result.removeSource(dbSource)
-            data?.let { setValue(Resource.success(data)) }
+            if (nonce && shouldFetch(data)) {
+                data?.let { setValue(Resource.loading(data)) }
+            } else {
+                data?.let { setValue(Resource.success(data)) }
+            }
             callback()
         }
     }
@@ -65,10 +69,12 @@ abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
     }
 
     private suspend fun handleResponse(response: Response<NetworkDataType>) {
+        println("Handle Response : ${response.isSuccessful}")
         if (response.isSuccessful) {
             saveNetworkResponseToDB(processNetworkResponse(response.body()))
             refreshDBSource()
             withContext(Dispatchers.Main) {
+                println("NBT : ")
                 showDBDataIfAvailable()
             }
         } else {
