@@ -23,7 +23,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
     private lateinit var titleView: TextView
     private lateinit var description: TextView
     private lateinit var titleLayout: LinearLayout
-    private lateinit var videoWidgetFragment: Fragment
+    private lateinit var videoWidgetFragment: BaseVideoWidgetFragment
 
     override var isBookmarkEnabled: Boolean
         get() = false
@@ -91,9 +91,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
                         dateFormat.timeZone = TimeZone.getTimeZone("UTC")
                         try {
                             val date: Date = dateFormat.parse(text)
-                            if (videoWidgetFragment is NativeVideoWidgetFragment) {
-                                (videoWidgetFragment as NativeVideoWidgetFragment).seekTo(date.time)
-                            }
+                            videoWidgetFragment.seekTo(date.time)
                         } catch (ignore: ParseException) {
                         }
                     }
@@ -105,7 +103,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
 
 class VideoWidgetFragmentFactory {
     companion object {
-        fun getWidget(video: DomainVideoContent): Fragment {
+        fun getWidget(video: DomainVideoContent): BaseVideoWidgetFragment {
             return when {
                 video.isDomainRestricted!! -> DomainRestrictedVideoFragment()
                 video.hasEmbedCode() -> WebViewVideoFragment()

@@ -2,47 +2,26 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
-import `in`.testpress.course.TestpressCourse
-import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.getGreenDaoContent
 import `in`.testpress.course.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
-import `in`.testpress.course.viewmodels.ContentViewModel
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.VisibleForTesting
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 
-class NativeVideoWidgetFragment : Fragment() {
+class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
     private lateinit var exoPlayerMainFrame: AspectRatioFrameLayout
     private var exoPlayerUtil: ExoPlayerUtil? = null
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    lateinit var viewModel: ContentViewModel
     private val session by lazy { TestpressSdk.getTestpressSession(requireActivity()) }
     private val exoplayerFullscreenHelper: ExoplayerFullscreenHelper by lazy {
         ExoplayerFullscreenHelper(activity)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val contentType = requireArguments().getString(TestpressCourse.CONTENT_TYPE)
-        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ContentViewModel(
-                    InjectorUtils.getContentRepository(contentType!!, context!!)
-                ) as T
-            }
-        }).get(ContentViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -86,7 +65,7 @@ class NativeVideoWidgetFragment : Fragment() {
             })
     }
 
-    fun seekTo(milliSeconds: Long?) {
+    override fun seekTo(milliSeconds: Long?) {
         exoPlayerUtil?.seekTo(milliSeconds)
     }
 

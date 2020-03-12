@@ -1,13 +1,10 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
-import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.api.TestpressCourseApiClient
-import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.enums.Status
 import `in`.testpress.course.ui.ContentActivity
-import `in`.testpress.course.viewmodels.ContentViewModel
 import `in`.testpress.util.FullScreenChromeClient
 import `in`.testpress.util.WebViewUtils
 import android.app.Activity
@@ -16,29 +13,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 
-open class WebViewVideoFragment : Fragment() {
+open class WebViewVideoFragment : BaseVideoWidgetFragment() {
     protected lateinit var webView: WebView
     protected lateinit var webViewUtils: WebViewUtils
-    private lateinit var viewModel: ContentViewModel
     protected lateinit var fullScreenChromeClient: FullScreenChromeClient
     private var contentId: Long = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         fullScreenChromeClient = FullScreenChromeClient(activity)
-        val contentType = requireArguments().getString(TestpressCourse.CONTENT_TYPE)
-        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ContentViewModel(
-                    InjectorUtils.getContentRepository(contentType!!, context!!)
-                ) as T
-            }
-        }).get(ContentViewModel::class.java)
     }
 
     override fun onCreateView(
