@@ -98,10 +98,13 @@ class ContentLoadingFragment : Fragment(), EmptyViewListener {
     }
 
     private fun isContentLoaded(content: DomainContent): Boolean {
-        if ((content.exam != null && content.attemptsUrl != null) || content.video != null || content.htmlContent != null || content.attachment != null) {
-            return true
+        return when(content.contentType) {
+            "Exam", "Quiz" -> (content.exam != null) && (content.attemptsUrl != null)
+            "Video" -> content.video != null
+            "Attachment" -> content.attachment != null
+            "Html", "Notes" -> content.htmlContent != null
+            else -> true
         }
-        return false
     }
 
     private fun refetchContent(id: Long) {
