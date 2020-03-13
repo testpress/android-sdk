@@ -75,7 +75,7 @@ class ShareToUnLockActivity : BaseToolBarActivity(), OnShareAppListener {
 
     override fun onResume() {
         super.onResume()
-        if (prefs.getInt(NO_OF_TIMES_SHARED, 2) >= 2) {
+        if (prefs.getInt(NO_OF_TIMES_SHARED, 0) >= 2) {
             setResult(Activity.RESULT_OK)
             finish()
         }
@@ -104,7 +104,8 @@ class ShareToUnLockActivity : BaseToolBarActivity(), OnShareAppListener {
         intent.component = name
         startActivity(intent)
         val previousShareTimes = prefs.getInt(NO_OF_TIMES_SHARED, 0)
-        prefs.edit().putInt(NO_OF_TIMES_SHARED, previousShareTimes + 1).apply()    }
+        prefs.edit().putInt(NO_OF_TIMES_SHARED, previousShareTimes + 1).apply()
+    }
 }
 
 interface OnShareAppListener {
