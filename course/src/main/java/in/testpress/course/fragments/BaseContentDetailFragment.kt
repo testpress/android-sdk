@@ -43,7 +43,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, EmptyVi
     open lateinit var viewModel: ContentViewModel
 
     override val bookmarkId: Long?
-        get() = content.bookmarkId
+        get() = if (!::content.isInitialized) null else content.bookmarkId
     override val bookmarkContentId: Long?
         get() = content.id
 
