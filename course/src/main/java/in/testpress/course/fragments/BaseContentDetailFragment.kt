@@ -1,6 +1,8 @@
 package `in`.testpress.course.fragments
 
+import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
+import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.TestpressCourse.CONTENT_TYPE
 import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.di.InjectorUtils
@@ -8,7 +10,12 @@ import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.viewmodels.ContentViewModel
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.Toast
@@ -48,6 +55,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, EmptyVi
                 return ContentViewModel(InjectorUtils.getContentRepository(contentType!!, context!!)) as T
             }
         }).get(ContentViewModel::class.java)
+        setHasOptionsMenu(true)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -59,6 +67,19 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, EmptyVi
         loadContentAndInitializeBoomarkFragment()
         initBottomNavigationFragment()
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val intent = Intent()
+        intent.putExtra(TestpressSdk.ACTION_PRESSED_HOME, true)
+
+        if (::content.isInitialized) {
+            intent.putExtra(TestpressCourse.CHAPTER_URL, content.chapterUrl)
+        }
+        requireActivity().setResult(Activity.RESULT_CANCELED, intent)
+        requireActivity().finish()
+        return false
+    }
+
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun loadContentAndInitializeBoomarkFragment() {
