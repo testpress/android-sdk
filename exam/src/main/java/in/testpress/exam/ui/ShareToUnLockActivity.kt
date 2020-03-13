@@ -46,7 +46,6 @@ class ShareToUnLockActivity : BaseToolBarActivity(), OnShareAppListener {
     private fun initSharedPreference() {
         val sharedPreferenceKey = intent.getStringExtra(SHARE_TO_UNLOCK)
         prefs = getSharedPreferences(sharedPreferenceKey, Context.MODE_PRIVATE)
-        prefs.edit().clear().apply()
     }
 
     private fun getColumnCount(): Int = when (resources.configuration.orientation) {
