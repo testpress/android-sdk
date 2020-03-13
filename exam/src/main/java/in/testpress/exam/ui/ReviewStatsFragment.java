@@ -180,6 +180,7 @@ public class ReviewStatsFragment extends BaseFragment {
                 },
                 TestpressSdk.getRubikRegularFont(getContext()));
 
+        showOrRemoveLockIconOnSolutionsButton();
         return view;
     }
 
@@ -243,9 +244,7 @@ public class ReviewStatsFragment extends BaseFragment {
             reviewQuestionsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    getActivity().startActivity(
-                            ReviewQuestionsActivity.createIntent(getActivity(), exam, attempt)
-                    );
+                    openShareFragmentOrSolutionsFragment();
                 }
             });
             reviewQuestionsButton.setVisibility(View.VISIBLE);
@@ -308,6 +307,41 @@ public class ReviewStatsFragment extends BaseFragment {
         }
         reviewStatLayout.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
+    }
+
+    private boolean isAppNotSharedAlready() {
+        String sharedPreferenceKey = exam.getShareToUnlockSharedPreferenceKey();
+        SharedPreferences preferences = requireContext().getSharedPreferences(sharedPreferenceKey, Context.MODE_PRIVATE);
+        return preferences.getInt(NO_OF_TIMES_SHARED, 0) < 2;
+    }
+
+    private void openShareFragmentOrSolutionsFragment() {
+        if (exam.isGrowthHackEnabled() && isAppNotSharedAlready()) {
+            Intent intent = new Intent(getActivity(), ShareToUnLockActivity.class);
+            intent.putExtra(SHARE_TO_UNLOCK_SHARED_PREFERENCE_KEY, exam.getShareToUnlockSharedPreferenceKey());
+            String messageToShare = exam.getShareTextForSolutionUnlock() != null ? exam.getShareTextForSolutionUnlock() : "";
+            intent.putExtra(MESSAGE_TO_SHARE, messageToShare);
+            requireActivity().startActivityForResult(intent, SHARE_APP);
+        } else {
+            requireActivity().startActivity(
+                    ReviewQuestionsActivity.createIntent(getActivity(), exam, attempt)
+            );
+        }
+    }
+
+    private void showOrRemoveLockIconOnSolutionsButton() {
+        if (exam.isGrowthHackEnabled()  && isAppNotSharedAlready()) {
+            reviewQuestionsButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock, 0, 0, 0);
+        } else {
+            reviewQuestionsButton.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+        }
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        showOrRemoveLockIconOnSolutionsButton();
     }
 
     private void loadAttempt() {
