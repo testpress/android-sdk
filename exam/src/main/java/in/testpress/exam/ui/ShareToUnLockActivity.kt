@@ -3,7 +3,7 @@ package `in`.testpress.exam.ui
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.exam.R
 import `in`.testpress.exam.ui.ReviewStatsFragment.MESSAGE_TO_SHARE
-import `in`.testpress.exam.ui.ReviewStatsFragment.SHARE_TO_UNLOCK
+import `in`.testpress.exam.ui.ReviewStatsFragment.WAS_APP_SHARED
 import `in`.testpress.exam.ui.ReviewStatsFragment.SHARE_TO_UNLOCK_SHARED_PREFERENCE_KEY
 import `in`.testpress.exam.ui.adapters.ShareToUnlockAdapter
 import `in`.testpress.ui.BaseToolBarActivity
@@ -44,7 +44,7 @@ class ShareToUnLockActivity : BaseToolBarActivity(), OnShareAppListener {
     }
 
     private fun initSharedPreference() {
-        val sharedPreferenceKey = intent.getStringExtra(SHARE_TO_UNLOCK)
+        val sharedPreferenceKey = intent.getStringExtra(SHARE_TO_UNLOCK_SHARED_PREFERENCE_KEY)
         prefs = getSharedPreferences(sharedPreferenceKey, Context.MODE_PRIVATE)
     }
 
@@ -75,7 +75,7 @@ class ShareToUnLockActivity : BaseToolBarActivity(), OnShareAppListener {
 
     override fun onResume() {
         super.onResume()
-        if (prefs.getBoolean(SHARE_TO_UNLOCK_SHARED_PREFERENCE_KEY, false)) {
+        if (prefs.getBoolean(WAS_APP_SHARED, false)) {
             setResult(Activity.RESULT_OK)
             finish()
         }
@@ -103,7 +103,7 @@ class ShareToUnLockActivity : BaseToolBarActivity(), OnShareAppListener {
         val intent = getShareIntent()
         intent.component = name
         startActivity(intent)
-        prefs.edit().putBoolean(SHARE_TO_UNLOCK_SHARED_PREFERENCE_KEY, true).apply()
+        prefs.edit().putBoolean(WAS_APP_SHARED, true).apply()
     }
 }
 

@@ -26,7 +26,7 @@ class ShareToUnlockActivityTest {
     @Before
     fun setUp() {
         val intent = Intent()
-        intent.putExtra(ReviewStatsFragment.SHARE_TO_UNLOCK, "sharetounlock")
+        intent.putExtra(ReviewStatsFragment.WAS_APP_SHARED, "sharetounlock")
         intent.putExtra(MESSAGE_TO_SHARE, messageToShare)
 
         val instituteSettings = InstituteSettings("http://sandbox.testpress.in")
