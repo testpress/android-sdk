@@ -2,7 +2,9 @@ package in.testpress.exam.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
@@ -44,6 +46,10 @@ import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_PREVIOUS_ACTIVITY;
 public class ReviewStatsFragment extends BaseFragment {
 
     static final String PARAM_SHOW_RETAKE_BUTTON = "showRetakeButton";
+    static final String SHARE_TO_UNLOCK_SHARED_PREFERENCE_KEY = "shareToUnlockconstant";
+    static final Integer SHARE_APP = 1000;
+    static final String NO_OF_TIMES_SHARED = "NO_OF_TIMES_SHARED";
+    static final String MESSAGE_TO_SHARE = "MESSAGE_TO_SHARE";
 
     private TextView examTitle;
     private TextView attemptDate;
