@@ -59,8 +59,7 @@ class ShareToUnLockActivity : BaseToolBarActivity(), OnShareAppListener {
         intent.type = "text/plain"
         var appsList: List<ResolveInfo> =
             this.packageManager?.queryIntentActivities(intent, 0) as List<ResolveInfo>
-        appsList = sortAppsList(appsList.toMutableList())
-        return appsList
+        return sortAppsList(appsList.toMutableList())
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
