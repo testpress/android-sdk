@@ -71,30 +71,18 @@ class ContentLoadingFragment : Fragment(), EmptyViewListener {
     }
 
     fun initContent() {
-        if (contentId != -1L) {
-            viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer { resource ->
-                when (resource.status) {
-                    Status.SUCCESS -> {
-                        if (!isContentLoaded(resource.data!!)) {
-                            refetchContent(resource.data.id)
-                        } else {
-                            changeFragment(resource.data)
-                        }
-                    }
-                    Status.ERROR -> emptyViewFragment.displayError(resource.exception!!)
-                }
-            })
-        } else {
-            viewModel.getContentInChapterForPosition(position, chapterId)
-                .observe(viewLifecycleOwner, Observer { content ->
-                    contentId = content.id
-                    if (!isContentLoaded(content)) {
-                        refetchContent(content.id)
+        viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer { resource ->
+            when (resource.status) {
+                Status.SUCCESS -> {
+                    if (!isContentLoaded(resource.data!!)) {
+                        refetchContent(resource.data.id)
                     } else {
-                        changeFragment(content)
+                        changeFragment(resource.data)
                     }
-                })
-        }
+                }
+                Status.ERROR -> emptyViewFragment.displayError(resource.exception!!)
+            }
+        })
     }
 
     private fun isContentLoaded(content: DomainContent): Boolean {

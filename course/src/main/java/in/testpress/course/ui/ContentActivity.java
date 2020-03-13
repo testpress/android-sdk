@@ -30,18 +30,10 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
     public static final String CHAPTER_ID = "chapterId";
     public static final String POSITION = "position";
 
-    public static Intent createIntent(int position, long chapterId, AppCompatActivity activity, String productSlug) {
-        Intent intent = new Intent(activity, ContentActivity.class);
-        intent.putExtra(POSITION, position);
-        intent.putExtra(ACTIONBAR_TITLE, activity.getSupportActionBar().getTitle());
-        intent.putExtra(CHAPTER_ID, chapterId);
-        intent.putExtra(PRODUCT_SLUG, productSlug);
-        return intent;
-    }
-
-    public static Intent createIntent(Long contentId, Context context) {
+    public static Intent createIntent(Long contentId, Context context, String productSlug) {
         Intent intent = new Intent(context, ContentActivity.class);
         intent.putExtra(CONTENT_ID, contentId);
+        intent.putExtra(PRODUCT_SLUG, productSlug);
         return intent;
     }
 

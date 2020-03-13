@@ -25,7 +25,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ShareCompat.getCallingActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -115,9 +114,8 @@ class ContentBottomNavigationFragment : Fragment() {
         if (position < 1)
             return
 
-        val previousContentPosition = position - 1
         previousButton.setOnClickListener {
-            startActivity(createIntent(previousContentPosition, content.chapterId!!, activity as AppCompatActivity, productSlug))
+            startActivity(createIntent(content.id, activity, productSlug))
             finishActivity()
         }
         previousButton.visibility = View.VISIBLE
@@ -157,7 +155,7 @@ class ContentBottomNavigationFragment : Fragment() {
         if (!contents[nextPosition].isLocked!!) {
             nextButton.text = getString(R.string.testpress_next_content)
             nextButton.setOnClickListener {
-                startActivity(createIntent(nextPosition, content.chapterId!!, activity as AppCompatActivity, productSlug))
+                startActivity(createIntent(content.id, activity, productSlug))
                 finishActivity()
             }
             nextButton.visibility = View.VISIBLE

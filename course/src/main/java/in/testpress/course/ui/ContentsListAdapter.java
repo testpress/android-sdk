@@ -133,9 +133,8 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
                 @Override
                 public void onClick(View v) {
                     mActivity.startActivity(ContentActivity.createIntent(
-                            position,
-                            chapterId,
-                            (AppCompatActivity) mActivity,
+                            content.getId(),
+                            mActivity,
                             productSlug)
                     );
                 }
