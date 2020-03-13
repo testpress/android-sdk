@@ -55,6 +55,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         public final static Property ShowPercentile = new Property(27, Boolean.class, "showPercentile", false, "SHOW_PERCENTILE");
         public final static Property Categories = new Property(28, String.class, "categories", false, "CATEGORIES");
         public final static Property IsDetailsFetched = new Property(29, Boolean.class, "isDetailsFetched", false, "IS_DETAILS_FETCHED");
+        public final static Property IsGrowthHackEnabled = new Property(30, Boolean.class, "isGrowthHackEnabled", false, "IS_GROWTH_HACK_ENABLED");
+        public final static Property ShareTextForSolutionUnlock = new Property(31, String.class, "shareTextForSolutionUnlock", false, "SHARE_TEXT_FOR_SOLUTION_UNLOCK");
     }
 
     private DaoSession daoSession;
@@ -103,7 +105,9 @@ public class ExamDao extends AbstractDao<Exam, Long> {
                 "\"SHOW_SCORE\" INTEGER," + // 26: showScore
                 "\"SHOW_PERCENTILE\" INTEGER," + // 27: showPercentile
                 "\"CATEGORIES\" TEXT," + // 28: categories
-                "\"IS_DETAILS_FETCHED\" INTEGER);"); // 29: isDetailsFetched
+                "\"IS_DETAILS_FETCHED\" INTEGER," + // 29: isDetailsFetched
+                "\"IS_GROWTH_HACK_ENABLED\" INTEGER," + // 30: isGrowthHackEnabled
+                "\"SHARE_TEXT_FOR_SOLUTION_UNLOCK\" TEXT);"); // 31: shareTextForSolutionUnlock
     }
 
     /** Drops the underlying database table. */
@@ -265,6 +269,16 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (isDetailsFetched != null) {
             stmt.bindLong(30, isDetailsFetched ? 1L: 0L);
         }
+ 
+        Boolean isGrowthHackEnabled = entity.getIsGrowthHackEnabled();
+        if (isGrowthHackEnabled != null) {
+            stmt.bindLong(31, isGrowthHackEnabled ? 1L: 0L);
+        }
+ 
+        String shareTextForSolutionUnlock = entity.getShareTextForSolutionUnlock();
+        if (shareTextForSolutionUnlock != null) {
+            stmt.bindString(32, shareTextForSolutionUnlock);
+        }
     }
 
     @Override
@@ -420,6 +434,16 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (isDetailsFetched != null) {
             stmt.bindLong(30, isDetailsFetched ? 1L: 0L);
         }
+ 
+        Boolean isGrowthHackEnabled = entity.getIsGrowthHackEnabled();
+        if (isGrowthHackEnabled != null) {
+            stmt.bindLong(31, isGrowthHackEnabled ? 1L: 0L);
+        }
+ 
+        String shareTextForSolutionUnlock = entity.getShareTextForSolutionUnlock();
+        if (shareTextForSolutionUnlock != null) {
+            stmt.bindString(32, shareTextForSolutionUnlock);
+        }
     }
 
     @Override
@@ -465,7 +489,9 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             cursor.isNull(offset + 26) ? null : cursor.getShort(offset + 26) != 0, // showScore
             cursor.isNull(offset + 27) ? null : cursor.getShort(offset + 27) != 0, // showPercentile
             cursor.isNull(offset + 28) ? null : categoriesConverter.convertToEntityProperty(cursor.getString(offset + 28)), // categories
-            cursor.isNull(offset + 29) ? null : cursor.getShort(offset + 29) != 0 // isDetailsFetched
+            cursor.isNull(offset + 29) ? null : cursor.getShort(offset + 29) != 0, // isDetailsFetched
+            cursor.isNull(offset + 30) ? null : cursor.getShort(offset + 30) != 0, // isGrowthHackEnabled
+            cursor.isNull(offset + 31) ? null : cursor.getString(offset + 31) // shareTextForSolutionUnlock
         );
         return entity;
     }
@@ -502,6 +528,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         entity.setShowPercentile(cursor.isNull(offset + 27) ? null : cursor.getShort(offset + 27) != 0);
         entity.setCategories(cursor.isNull(offset + 28) ? null : categoriesConverter.convertToEntityProperty(cursor.getString(offset + 28)));
         entity.setIsDetailsFetched(cursor.isNull(offset + 29) ? null : cursor.getShort(offset + 29) != 0);
+        entity.setIsGrowthHackEnabled(cursor.isNull(offset + 30) ? null : cursor.getShort(offset + 30) != 0);
+        entity.setShareTextForSolutionUnlock(cursor.isNull(offset + 31) ? null : cursor.getString(offset + 31));
      }
     
     @Override

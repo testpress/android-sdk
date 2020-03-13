@@ -64,6 +64,8 @@ public class Exam implements android.os.Parcelable {
     @Convert(converter = in.testpress.util.StringListConverter.class, columnType = String.class)
     private StringList categories;
     private Boolean isDetailsFetched;
+    private Boolean isGrowthHackEnabled;
+    private String shareTextForSolutionUnlock;
 
     /** Used to resolve relations */
     @Generated
@@ -90,7 +92,7 @@ public class Exam implements android.os.Parcelable {
     }
 
     @Generated
-    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched) {
+    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock) {
         this.totalMarks = totalMarks;
         this.url = url;
         this.id = id;
@@ -121,6 +123,8 @@ public class Exam implements android.os.Parcelable {
         this.showPercentile = showPercentile;
         this.categories = categories;
         this.isDetailsFetched = isDetailsFetched;
+        this.isGrowthHackEnabled = isGrowthHackEnabled;
+        this.shareTextForSolutionUnlock = shareTextForSolutionUnlock;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -368,6 +372,22 @@ public class Exam implements android.os.Parcelable {
 
     public void setIsDetailsFetched(Boolean isDetailsFetched) {
         this.isDetailsFetched = isDetailsFetched;
+    }
+
+    public Boolean getIsGrowthHackEnabled() {
+        return isGrowthHackEnabled;
+    }
+
+    public void setIsGrowthHackEnabled(Boolean isGrowthHackEnabled) {
+        this.isGrowthHackEnabled = isGrowthHackEnabled;
+    }
+
+    public String getShareTextForSolutionUnlock() {
+        return shareTextForSolutionUnlock;
+    }
+
+    public void setShareTextForSolutionUnlock(String shareTextForSolutionUnlock) {
+        this.shareTextForSolutionUnlock = shareTextForSolutionUnlock;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
