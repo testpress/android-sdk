@@ -3,7 +3,7 @@ package `in`.testpress.exam.ui
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.exam.R
 import `in`.testpress.exam.ui.ReviewStatsFragment.MESSAGE_TO_SHARE
-import `in`.testpress.exam.ui.ReviewStatsFragment.WAS_APP_SHARED
+import `in`.testpress.exam.ui.ReviewStatsFragment.NO_OF_TIMES_SHARED
 import `in`.testpress.exam.ui.ReviewStatsFragment.SHARE_TO_UNLOCK_SHARED_PREFERENCE_KEY
 import `in`.testpress.exam.ui.adapters.ShareToUnlockAdapter
 import `in`.testpress.ui.BaseToolBarActivity
@@ -75,7 +75,7 @@ class ShareToUnLockActivity : BaseToolBarActivity(), OnShareAppListener {
 
     override fun onResume() {
         super.onResume()
-        if (prefs.getBoolean(WAS_APP_SHARED, false)) {
+        if (prefs.getInt(NO_OF_TIMES_SHARED, 2) >= 2) {
             setResult(Activity.RESULT_OK)
             finish()
         }
@@ -103,8 +103,8 @@ class ShareToUnLockActivity : BaseToolBarActivity(), OnShareAppListener {
         val intent = getShareIntent()
         intent.component = name
         startActivity(intent)
-        prefs.edit().putBoolean(WAS_APP_SHARED, true).apply()
-    }
+        val previousShareTimes = prefs.getInt(NO_OF_TIMES_SHARED, 0)
+        prefs.edit().putInt(NO_OF_TIMES_SHARED, previousShareTimes + 1).apply()    }
 }
 
 interface OnShareAppListener {
