@@ -727,6 +727,13 @@ public class Exam implements android.os.Parcelable {
     public String getShareToUnlockSharedPreferenceKey() {
         return this.id.toString() + SHARE_TO_UNLOCK;
     }
+
+    public boolean isGrowthHackEnabled() {
+        if (isGrowthHackEnabled != null) {
+            return isGrowthHackEnabled;
+        }
+        return false;
+    }
     // KEEP METHODS END
 
 }

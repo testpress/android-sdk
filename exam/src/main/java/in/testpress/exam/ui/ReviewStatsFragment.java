@@ -316,7 +316,7 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void openShareFragmentOrSolutionsFragment() {
-        if (exam.getIsGrowthHackEnabled() && isAppNotSharedAlready()) {
+        if (exam.isGrowthHackEnabled() && isAppNotSharedAlready()) {
             Intent intent = new Intent(getActivity(), ShareToUnLockActivity.class);
             intent.putExtra(SHARE_TO_UNLOCK_SHARED_PREFERENCE_KEY, exam.getShareToUnlockSharedPreferenceKey());
             String messageToShare = exam.getShareTextForSolutionUnlock() != null ? exam.getShareTextForSolutionUnlock() : "";
@@ -330,7 +330,7 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void showOrRemoveLockIconOnSolutionsButton() {
-        if (exam.getIsGrowthHackEnabled() && isAppNotSharedAlready()) {
+        if (exam.isGrowthHackEnabled()  && isAppNotSharedAlready()) {
             reviewQuestionsButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock, 0, 0, 0);
         } else {
             reviewQuestionsButton.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
