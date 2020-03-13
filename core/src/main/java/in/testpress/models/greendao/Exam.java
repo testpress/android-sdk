@@ -81,6 +81,7 @@ public class Exam implements android.os.Parcelable {
     private List<Language> languages;
 
     // KEEP FIELDS - put your custom fields here
+    private static final String SHARE_TO_UNLOCK = "_SHARE_TO_UNLOCK";
     // KEEP FIELDS END
 
     @Generated
@@ -721,6 +722,10 @@ public class Exam implements android.os.Parcelable {
 
     public boolean hasMultipleLanguages() {
         return getRawLanguages().size() > 1;
+    }
+
+    public String getShareToUnlockSharedPreferenceKey() {
+        return this.id.toString() + SHARE_TO_UNLOCK;
     }
     // KEEP METHODS END
 

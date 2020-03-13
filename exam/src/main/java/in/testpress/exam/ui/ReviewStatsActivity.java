@@ -15,6 +15,7 @@ import in.testpress.models.greendao.Exam;
 import in.testpress.ui.BaseToolBarActivity;
 
 import static in.testpress.exam.ui.ReviewStatsFragment.PARAM_SHOW_RETAKE_BUTTON;
+import static in.testpress.exam.ui.ReviewStatsFragment.SHARE_APP;
 
 public class ReviewStatsActivity extends BaseToolBarActivity {
 
@@ -76,6 +77,12 @@ public class ReviewStatsActivity extends BaseToolBarActivity {
         if ((requestCode == CarouselFragment.TEST_TAKEN_REQUEST_CODE)) {
             setResult(RESULT_OK);
             finish();
+        } else if ((requestCode == SHARE_APP) && (resultCode == RESULT_OK)) {
+            Exam exam = getIntent().getParcelableExtra(PARAM_EXAM);
+            CourseAttempt courseAttempt = getIntent().getParcelableExtra(PARAM_COURSE_ATTEMPT);
+            startActivity(
+                    ReviewQuestionsActivity.createIntent(this, exam, courseAttempt.getRawAssessment())
+            );
         }
     }
 
