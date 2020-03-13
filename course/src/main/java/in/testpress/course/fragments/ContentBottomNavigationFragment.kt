@@ -1,7 +1,9 @@
 package `in`.testpress.course.fragments
 
+import `in`.testpress.core.TestpressSdk.ACTION_PRESSED_HOME
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse
+import `in`.testpress.course.TestpressCourse.CHAPTER_URL
 import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.domain.DomainContent
@@ -11,7 +13,9 @@ import `in`.testpress.course.ui.ContentActivity.GO_TO_MENU
 import `in`.testpress.course.ui.ContentActivity.TESTPRESS_CONTENT_SHARED_PREFS
 import `in`.testpress.course.ui.ContentActivity.createIntent
 import `in`.testpress.course.viewmodels.ContentViewModel
+import android.app.Activity.RESULT_CANCELED
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +25,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ShareCompat.getCallingActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -162,6 +167,14 @@ class ContentBottomNavigationFragment : Fragment() {
     private fun finishActivity() {
         activity?.let {
             if (it is AppCompatActivity) {
+                if (it.getCallingActivity() != null) {
+                    val intent = Intent()
+                    intent.putExtra(ACTION_PRESSED_HOME, true)
+                    intent.putExtra(CHAPTER_URL, content.chapterUrl)
+                    it.setResult(RESULT_CANCELED, intent)
+                    it.finish()
+                    return
+                }
                 it.finish()
             }
         }
