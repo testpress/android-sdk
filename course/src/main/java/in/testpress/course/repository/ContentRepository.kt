@@ -13,6 +13,7 @@ import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.course.network.Resource
 import `in`.testpress.course.network.asDatabaseModel
+import `in`.testpress.course.network.asGreenDaoModel
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
@@ -111,7 +112,35 @@ open class ContentRepository(
         contentDao.updateInTx(content)
     }
 
-    open fun storeContentAndItsRelationsToDB(content: NetworkContent) {}
+
+    open fun storeContentAndItsRelationsToDB(content: NetworkContent) {
+        val greenDaoContent = content.asGreenDaoModel()
+        content.exam?.let {
+            val examDao = TestpressSDKDatabase.getExamDao(context)
+            val exam = it.asGreenDaoModel()
+            greenDaoContent.examId = exam.id
+            examDao.insertOrReplace(exam)
+        }
+        content.htmlContent ?.let {
+            val htmlContentDao = TestpressSDKDatabase.getHtmlContentDao(context)
+            val htmlContent = it.asGreenDaoModel()
+            greenDaoContent.htmlId = htmlContent.id
+            htmlContentDao.insertOrReplace(htmlContent)
+        }
+        content.video?.let {
+            val videoDao = TestpressSDKDatabase.getVideoDao(context)
+            val video = it.asGreenDaoModel()
+            greenDaoContent.videoId = video.id
+            videoDao.insertOrReplace(it.asGreenDaoModel())
+        }
+        content.attachment?.let {
+            val attachmentDao = TestpressSDKDatabase.getAttachmentDao(context)
+            val attachment = it.asGreenDaoModel()
+            greenDaoContent.attachmentId = attachment.id
+            attachmentDao.insertOrReplace(it.asGreenDaoModel())
+        }
+        contentDao.insertOrReplace(greenDaoContent)
+    }
 }
 
 class ContentRepositoryFactory {
