@@ -63,7 +63,9 @@ public class ZoomableImageActivity extends Activity {
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                         super.onLoadingComplete(imageUri, view, loadedImage);
                         progressBar.setVisibility(View.GONE);
-                        ((TouchImageView) findViewById(R.id.image)).setImageBitmap(loadedImage);
+                        TouchImageView imageView = (TouchImageView) findViewById(R.id.image);
+                        imageView.setImageBitmap(loadedImage);
+                        imageView.setZoom(0.99f);
                     }
                 });
     }
