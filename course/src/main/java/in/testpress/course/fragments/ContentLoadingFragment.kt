@@ -5,27 +5,26 @@ import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.enums.Status
 import `in`.testpress.course.repository.ContentRepository
-import `in`.testpress.course.ui.ContentActivity.CHAPTER_ID
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
-import `in`.testpress.course.ui.ContentActivity.POSITION
 import `in`.testpress.course.viewmodels.ContentViewModel
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
 class ContentLoadingFragment : Fragment(), EmptyViewListener {
-    private var position: Int = -1
-    private var chapterId: Long = -1
     private var contentId: Long = -1
     lateinit var viewModel: ContentViewModel
     lateinit var fragmentChangeListener: ContentFragmentChangeListener
     private var productSlug: String? = null
+    private lateinit var loadingLayout: LinearLayout
     private lateinit var emptyViewFragment: EmptyViewFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,14 +57,13 @@ class ContentLoadingFragment : Fragment(), EmptyViewListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        loadingLayout = view.findViewById(R.id.loading_layout)
         parseArguments()
         initializeEmptyViewFragment()
         initContent()
     }
 
     private fun parseArguments() {
-        position = requireArguments().getInt(POSITION)
-        chapterId = requireArguments().getLong(CHAPTER_ID)
         contentId = requireArguments().getLong(CONTENT_ID, -1)
         productSlug = requireArguments().getString(PRODUCT_SLUG)
     }
@@ -80,7 +78,10 @@ class ContentLoadingFragment : Fragment(), EmptyViewListener {
                         changeFragment(resource.data)
                     }
                 }
-                Status.ERROR -> emptyViewFragment.displayError(resource.exception!!)
+                Status.ERROR -> {
+                    loadingLayout.visibility = View.GONE
+                    emptyViewFragment.displayError(resource.exception!!)
+                }
             }
         })
     }
@@ -102,6 +103,10 @@ class ContentLoadingFragment : Fragment(), EmptyViewListener {
                     Status.SUCCESS -> {
                         changeFragment(resource.data!!)
                     }
+                    Status.ERROR -> {
+                        loadingLayout.visibility = View.GONE
+                        emptyViewFragment.displayError(resource.exception!!)
+                    }
                 }
             })
     }
@@ -118,6 +123,7 @@ class ContentLoadingFragment : Fragment(), EmptyViewListener {
     }
 
     override fun onRetryClick() {
+        loadingLayout.visibility = View.VISIBLE
         refetchContent(contentId)
     }
 }
