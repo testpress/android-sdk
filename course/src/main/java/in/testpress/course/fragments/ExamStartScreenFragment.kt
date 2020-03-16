@@ -105,21 +105,13 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
     }
 
     private fun showExamDuration(exam: DomainExamContent) {
-        viewModel.loadContentAttempts(content.attemptsUrl!!, contentId)
-            .observe(viewLifecycleOwner, Observer {resource ->
-                when (resource.status) {
-                    Status.SUCCESS -> {
-                        examDuration.text = exam.duration
-                        contentAttempts = resource.data!!
-                        if (contentAttempts.size == 1) {
-                            val greendaoContentAttempt = contentAttempts[0].getGreenDaoContentAttempt(requireContext())
-                            if (greendaoContentAttempt?.assessment?.state == STATE_PAUSED) {
-                                examDuration.text = exam.duration
-                                examDuration.text = greendaoContentAttempt.assessment.remainingTime
-                            }
-                        }
-                    }
-                }
-            })
+        examDuration.text = exam.duration
+        if (contentAttempts.size == 1) {
+            val greendaoContentAttempt = contentAttempts[0].getGreenDaoContentAttempt(requireContext())
+            if (greendaoContentAttempt?.assessment?.state == STATE_PAUSED) {
+                examDuration.text = exam.duration
+                examDuration.text = greendaoContentAttempt.assessment.remainingTime
+            }
+        }
     }
 }
