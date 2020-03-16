@@ -11,7 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 
-class ExamContentFragment: BaseContentDetailFragment() {
+class ExamContentFragment: BaseContentDetailFragment(), ExamRefreshListener {
     private lateinit var titleLayout: LinearLayout
     private lateinit var titleView: TextView
     private lateinit var contentAttempts: ArrayList<NetworkContentAttempt>
@@ -53,6 +53,14 @@ class ExamContentFragment: BaseContentDetailFragment() {
         transaction.replace(R.id.exam_widget_fragment, examWidgetFragment)
         transaction.commit()
     }
+
+    override fun showOrHideRefresh(isRefreshing: Boolean) {
+        swipeRefresh.isRefreshing = isRefreshing
+    }
+}
+
+interface ExamRefreshListener {
+    fun showOrHideRefresh(isRefreshing: Boolean)
 }
 
 class ExamWidgetFactory {

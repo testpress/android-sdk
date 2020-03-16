@@ -18,6 +18,7 @@ import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.util.MultiLanguagesUtil
 import `in`.testpress.exam.util.RetakeExamUtil
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -32,6 +33,7 @@ open class BaseExamWidgetFragment : Fragment() {
     protected lateinit var content: DomainContent
     protected var contentId: Long = -1
     lateinit var contentAttempts: ArrayList<DomainContentAttempt>
+    protected lateinit var examRefreshListener: ExamRefreshListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +44,15 @@ open class BaseExamWidgetFragment : Fragment() {
                 ) as T
             }
         }).get(ExamContentViewModel::class.java)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (parentFragment != null) {
+            examRefreshListener = parentFragment as ExamRefreshListener
+        } else {
+            examRefreshListener = context as ExamRefreshListener
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -60,20 +71,28 @@ open class BaseExamWidgetFragment : Fragment() {
     }
 
     private fun loadAttemptsAndUpdateStartButton() {
-        val observer = Observer<Resource<List<DomainLanguage>>> {
-            var exam = content.exam!!
-            exam.languages = it.data!!
-            content.exam = exam
-            updateStartButton(contentAttempts)
+        val observer = Observer<Resource<List<DomainLanguage>>> { resource ->
+            examRefreshListener.showOrHideRefresh(false)
+            when(resource.status) {
+                Status.SUCCESS -> {
+                    var exam = content.exam!!
+                    exam.languages = resource.data!!
+                    content.exam = exam
+                    updateStartButton(contentAttempts)
+                }
+            }
         }
 
+        examRefreshListener.showOrHideRefresh(true)
         viewModel.loadContentAttempts(content.attemptsUrl!!, contentId)
             .observe(viewLifecycleOwner, Observer { resource ->
+                examRefreshListener.showOrHideRefresh(false)
                 when (resource.status) {
                     Status.SUCCESS -> {
                         contentAttempts = resource.data!!
                         display()
                         val exam = content.exam!!
+                        examRefreshListener.showOrHideRefresh(true)
                         viewModel.getLanguages(exam.slug!!, exam.id)
                             .observe(viewLifecycleOwner, observer)
                     }
