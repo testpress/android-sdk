@@ -47,6 +47,8 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, EmptyVi
     override val bookmarkContentId: Long?
         get() = content.id
 
+    protected fun isContentInitialized() = ::content.isInitialized
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val contentType = requireArguments().getString(CONTENT_TYPE)

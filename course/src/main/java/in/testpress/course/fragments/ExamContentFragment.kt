@@ -39,6 +39,13 @@ class ExamContentFragment: BaseContentDetailFragment() {
         initExamWidget(content)
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (isContentInitialized()) {
+            display()
+        }
+    }
+
     private fun initExamWidget(content: DomainContent) {
         val examWidgetFragment = ExamWidgetFactory.getWidget(content)
         examWidgetFragment.arguments = arguments
