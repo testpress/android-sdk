@@ -375,6 +375,8 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         TextView date = findViewById(R.id.date);
         LinearLayout dateLayout = findViewById(R.id.date_layout);
         LinearLayout description = findViewById(R.id.description);
+        LinearLayout marksPerQuestionLayout = findViewById(R.id.mark_per_question_layout);
+        LinearLayout negativeMarksLayout = findViewById(R.id.negative_marks_layout);
         TextView descriptionContent = findViewById(R.id.descriptionContent);
         TextView questionsLabel = findViewById(R.id.questions_label);
         TextView durationLabel = findViewById(R.id.duration_label);
@@ -427,6 +429,11 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         }
         progressBar.setVisibility(View.GONE);
         examDetailsContainer.setVisibility(View.VISIBLE);
+
+        if (exam.getVariableMarkPerQuestion()) {
+            marksPerQuestionLayout.setVisibility(View.GONE);
+            negativeMarksLayout.setVisibility(View.GONE);
+        }
     }
 
     private void endExam() {
