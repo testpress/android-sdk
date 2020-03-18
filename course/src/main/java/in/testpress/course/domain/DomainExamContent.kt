@@ -121,7 +121,9 @@ fun createDomainExamContent(exam: Exam): DomainExamContent {
         passPercentage = exam.passPercentage,
         showPercentile = exam.showPercentile,
         showScore = exam.showScore,
-        languages = exam.rawLanguages.asDomainLanguages()
+        languages = exam.rawLanguages.asDomainLanguages(),
+        isGrowthHackEnabled = exam.getIsGrowthHackEnabled(),
+        shareTextForSolutionUnlock = exam.shareTextForSolutionUnlock
     )
 }
 
@@ -166,6 +168,7 @@ fun createGreenDaoExamContent(exam: DomainExamContent): Exam {
     )
     greenDaoexam.languages = exam.languages.toGreenDaoModels()
 
+    println("GreenDao Exam : ${greenDaoexam.getIsGrowthHackEnabled()}")
     return greenDaoexam
 }
 
