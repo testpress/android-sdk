@@ -522,6 +522,9 @@ public class Exam implements android.os.Parcelable {
         byte tmpShowPercentile = in.readByte();
         showPercentile = tmpShowPercentile == 0 ? null : tmpShowPercentile == 1;
         languages = in.createTypedArrayList(Language.CREATOR);
+        byte tmpIsGrowthHackEnabled = in.readByte();
+        isGrowthHackEnabled = tmpIsGrowthHackEnabled == 0 ? null : tmpIsGrowthHackEnabled == 1;
+        shareTextForSolutionUnlock = in.readString();
     }
 
     @Override
@@ -597,6 +600,8 @@ public class Exam implements android.os.Parcelable {
         dest.writeByte((byte) (showScore == null ? 0 : showScore ? 1 : 2));
         dest.writeByte((byte) (showPercentile == null ? 0 : showPercentile ? 1 : 2));
         dest.writeTypedList(getRawLanguages());
+        dest.writeByte((byte) (isGrowthHackEnabled == null ? 0 : isGrowthHackEnabled ? 1 : 2));
+        dest.writeString(shareTextForSolutionUnlock);
     }
 
     @Override
