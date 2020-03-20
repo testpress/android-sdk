@@ -130,7 +130,7 @@ open class BaseExamWidgetFragment : Fragment() {
     }
 
     private fun initStartForFreshExam(exam: DomainExamContent) {
-        if (exam.hasMultipleLanguages()) {
+        if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
                 startCourseExam(true, isPartial = false)
             }
@@ -147,7 +147,7 @@ open class BaseExamWidgetFragment : Fragment() {
         exam: DomainExamContent,
         pausedAttempt: DomainContentAttempt
     ) {
-        if (exam.hasMultipleLanguages()) {
+        if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
                 resumeCourseExam(true, pausedAttempt)
             }
