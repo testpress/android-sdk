@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fillViewport="true">
 
     <ProgressBar
         android:layout_width="45dp"
@@ -570,52 +571,78 @@
 
     </ScrollView>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:layout_above="@+id/button_layout"
-        android:background="@drawable/testpress_gradient_shadow_gray_top" />
 
     <LinearLayout
-        android:id="@+id/button_layout"
-        android:orientation="horizontal"
+        android:id="@+id/share_button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="15dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
+        android:layout_marginTop="15dp"
+        android:visibility="visible"
+        android:layout_above="@+id/button_layout">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/share_to_unlock"
+            android:text="Solutions"
+            android:textSize="16sp"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
+            android:gravity="center"
+            app:icon="@drawable/ic_lock_white_21dp"
+            app:iconGravity="textStart"
+            android:background="@color/testpress_green_light"
+            android:textColor="@color/testpress_white"
+            android:ellipsize="end"
+            app:iconPadding="15dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/bottom_row">
+        android:layout_above="@+id/bottom_row"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="15dp"
+        android:orientation="horizontal">
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/analytics"
-            android:background="@drawable/testpress_green_stroke"
-            android:text="@string/testpress_analytics"
-            android:gravity="center"
-            android:textSize="16sp"
-            android:textColor="@color/testpress_green_light"
-            android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="37dp"
             android:layout_marginLeft="10dp"
+            android:layout_marginTop="15dp"
             android:layout_marginRight="10dp"
-            android:layout_marginTop="15dp" />
+            android:layout_weight="1"
+            android:background="@drawable/testpress_green_stroke"
+            android:gravity="center"
+            android:text="@string/testpress_analytics"
+            android:textColor="@color/testpress_green_light"
+            android:textSize="16sp" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/review"
-            android:background="@drawable/testpress_green_stroke"
-            android:text="@string/testpress_solutions"
-            android:gravity="center"
-            android:textSize="16sp"
-            android:textColor="@color/testpress_green_light"
-            android:layout_weight="1"
-            android:drawablePadding="0dp"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp"
             android:layout_width="0dp"
             android:layout_height="37dp"
             android:layout_marginLeft="10dp"
+            android:layout_marginTop="15dp"
             android:layout_marginRight="10dp"
-            android:layout_marginTop="15dp" />
+            android:layout_weight="1"
+            android:background="@drawable/testpress_green_stroke"
+            android:drawablePadding="0dp"
+            android:gravity="center"
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp"
+            android:text="@string/testpress_solutions"
+            android:textColor="@color/testpress_green_light"
+            android:textSize="16sp" />
 
     </LinearLayout>
 
