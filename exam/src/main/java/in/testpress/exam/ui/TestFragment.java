@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -1020,8 +1021,11 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             String[] types = {"All", "Answered", "Unanswered", "Marked for review"};
             ExploreSpinnerAdapter typeSpinnerAdapter = new ExploreSpinnerAdapter(
                     getLayoutInflater(), getResources(), false);
+            typeSpinnerAdapter.addItem(0, types[0], types[0], true, 0);
+            typeSpinnerAdapter.addItem(1, types[1], types[1], true, Color.parseColor("#08AE9E"));
+            typeSpinnerAdapter.addItem(2, types[2], types[2], true, Color.parseColor("#808080"));
+            typeSpinnerAdapter.addItem(3, types[3], types[3], true, Color.parseColor("#ffa31a"));
 
-            typeSpinnerAdapter.addItems(Arrays.asList(types));
             questionsFilter.setAdapter(typeSpinnerAdapter);
             questionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
