@@ -70,7 +70,7 @@ class HtmlContentFragmentTest: GreendaoCleanupMixin() {
         contentFragment = HtmlContentFragment()
         contentFragment = Mockito.spy(HtmlContentFragment::class.java)
         contentFragment.arguments = bundle
-        doNothing().`when`(contentFragment).updateContent()
+        doNothing().`when`(contentFragment).forceReloadContent()
         SupportFragmentController.setupFragment(contentFragment)
 
         contentFragment.viewModel = Mockito.mock(ContentViewModel::class.java)

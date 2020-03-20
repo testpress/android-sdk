@@ -72,7 +72,7 @@ class AttachmentContentFragmentTest : GreendaoCleanupMixin() {
         contentFragment = AttachmentContentFragment()
         contentFragment = Mockito.spy(contentFragment)
         contentFragment.arguments = bundle
-        doNothing().`when`(contentFragment).updateContent()
+        doNothing().`when`(contentFragment).forceReloadContent()
         SupportFragmentController.setupFragment(contentFragment)
 
         contentFragment.viewModel = Mockito.mock(ContentViewModel::class.java)

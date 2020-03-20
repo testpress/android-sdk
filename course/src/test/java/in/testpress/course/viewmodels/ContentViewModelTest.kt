@@ -13,7 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner
 class ContentViewModelTest {
     private val repository = mock(ContentRepository::class.java)
     private val examRepository = mock(ExamContentRepository::class.java)
-    private val viewModel = ContentViewModel(repository, examRepository)
+    private val viewModel = ExamContentViewModel(examRepository)
 
     @Test
     fun getContentsCallsRepository() {
@@ -47,7 +47,7 @@ class ContentViewModelTest {
 
     @Test
     fun loadAttemptsShouldCallExamRepositoryMethod() {
-        viewModel.loadAttempts("url", 1)
+        viewModel.loadContentAttempts("url", 1)
         verify(examRepository).loadAttempts("url", 1)
     }
 
