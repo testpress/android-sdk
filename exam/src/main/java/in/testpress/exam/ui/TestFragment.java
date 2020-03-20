@@ -19,6 +19,8 @@ import androidx.loader.content.Loader;
 import androidx.viewpager.widget.ViewPager;
 import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 import androidx.appcompat.app.AlertDialog;
+
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,7 +66,7 @@ import static in.testpress.exam.ui.TestActivity.PARAM_COURSE_CONTENT;
 import static in.testpress.models.greendao.Attempt.COMPLETED;
 import static in.testpress.models.greendao.Attempt.NOT_STARTED;
 
-public class TestFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>> {
+public class TestFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>>, PlainSpinnerItemAdapter.SectionInfoClickListener {
 
     private static final int APP_BACKGROUND_DELAY = 60000; // 1m
 
@@ -91,6 +93,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     private AlertDialog heartBeatAlertDialog;
     private AlertDialog saveAnswerAlertDialog;
     private AlertDialog networkErrorAlertDialog;
+    private AlertDialog sectionInfoAlertDialog;
     private View questionsListProgressBar;
 
     Attempt attempt;
@@ -296,12 +299,15 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             sectionsFilterContainer.setVisibility(View.VISIBLE);
         } else if (exam.getTemplateType() == 2 || attempt.hasNoSectionalLock()) {
             plainSpinnerAdapter = new PlainSpinnerItemAdapter(getActivity());
+            plainSpinnerAdapter.setSectionInfoClickListener(this);
+            showSectionInstructionsButton();
             sectionsFilter.setAdapter(plainSpinnerAdapter);
             sectionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> spinner, View view, int position,
                                            long itemId) {
 
+                    showSectionInstructionsButton();
                     if (!fistTimeCallback) {
                         fistTimeCallback = true;
                         return;
@@ -321,6 +327,13 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                 public void onNothingSelected(AdapterView<?> adapterView) {
                 }
             });
+        }
+    }
+
+    private void showSectionInstructionsButton() {
+        AttemptSection section = sections.get(attempt.getCurrentSectionPosition());
+        if (section.getInstructions() != null) {
+            plainSpinnerAdapter.showSectionInfoButton(true);
         }
     }
 
@@ -1308,7 +1321,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             stopTimer();
         }
         CommonUtils.dismissDialogs(new Dialog[] {
-                heartBeatAlertDialog, saveAnswerAlertDialog, networkErrorAlertDialog
+                heartBeatAlertDialog, saveAnswerAlertDialog, networkErrorAlertDialog,
+                sectionInfoAlertDialog
         });
         showResumeExamDialog();
     }
@@ -1362,5 +1376,16 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         stopTimer();
         removeAppBackgroundHandler();
         super.onDestroy();
+    }
+
+
+    @Override
+    public void showInfo() {
+        AttemptSection section = sections.get(attempt.getCurrentSectionPosition());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+                R.style.TestpressAppCompatAlertDialogStyle);
+        builder.setTitle("Instructions");
+        builder.setMessage(Html.fromHtml(section.getInstructions()));
+        builder.show();
     }
 }
