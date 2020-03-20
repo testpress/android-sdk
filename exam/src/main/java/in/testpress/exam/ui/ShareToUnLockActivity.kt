@@ -34,7 +34,6 @@ class ShareToUnLockActivity : BaseToolBarActivity(), OnShareAppListener {
         shareInfo = findViewById(R.id.share_info)
         shareInfo.typeface = TestpressSdk.getRubikMediumFont(this)
         shareInfo.text = getString(R.string.share_app_message)
-        prefs.edit().clear().apply()
     }
 
     private fun initRecyclerView() {
