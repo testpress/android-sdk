@@ -66,6 +66,7 @@ public class Exam implements android.os.Parcelable {
     private Boolean isDetailsFetched;
     private Boolean isGrowthHackEnabled;
     private String shareTextForSolutionUnlock;
+    private Boolean showAnalytics;
 
     /** Used to resolve relations */
     @Generated
@@ -93,7 +94,7 @@ public class Exam implements android.os.Parcelable {
     }
 
     @Generated
-    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock) {
+    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock, Boolean showAnalytics) {
         this.totalMarks = totalMarks;
         this.url = url;
         this.id = id;
@@ -126,6 +127,7 @@ public class Exam implements android.os.Parcelable {
         this.isDetailsFetched = isDetailsFetched;
         this.isGrowthHackEnabled = isGrowthHackEnabled;
         this.shareTextForSolutionUnlock = shareTextForSolutionUnlock;
+        this.showAnalytics = showAnalytics;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -391,6 +393,14 @@ public class Exam implements android.os.Parcelable {
         this.shareTextForSolutionUnlock = shareTextForSolutionUnlock;
     }
 
+    public Boolean getShowAnalytics() {
+        return showAnalytics;
+    }
+
+    public void setShowAnalytics(Boolean showAnalytics) {
+        this.showAnalytics = showAnalytics;
+    }
+
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
     @Generated
     public List<Language> getLanguages() {
@@ -525,6 +535,8 @@ public class Exam implements android.os.Parcelable {
         byte tmpIsGrowthHackEnabled = in.readByte();
         isGrowthHackEnabled = tmpIsGrowthHackEnabled == 0 ? null : tmpIsGrowthHackEnabled == 1;
         shareTextForSolutionUnlock = in.readString();
+        byte tmpshowAnalytics = in.readByte();
+        showAnalytics = tmpshowAnalytics == 0 ? null : tmpshowAnalytics == 1;
     }
 
     @Override
@@ -602,6 +614,7 @@ public class Exam implements android.os.Parcelable {
         dest.writeTypedList(getRawLanguages());
         dest.writeByte((byte) (isGrowthHackEnabled == null ? 0 : isGrowthHackEnabled ? 1 : 2));
         dest.writeString(shareTextForSolutionUnlock);
+        dest.writeByte((byte) (showAnalytics == null ? 0 : showAnalytics ? 1 : 2));
     }
 
     @Override
@@ -738,6 +751,10 @@ public class Exam implements android.os.Parcelable {
             return isGrowthHackEnabled;
         }
         return false;
+    }
+
+    public boolean showAnalytics() {
+        return showAnalytics != null && showAnalytics == true;
     }
     // KEEP METHODS END
 

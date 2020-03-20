@@ -362,6 +362,7 @@ public class TestpressSDKDaoGenerator {
         exam.addBooleanProperty("isDetailsFetched");
         exam.addBooleanProperty("isGrowthHackEnabled");
         exam.addStringProperty("shareTextForSolutionUnlock");
+        exam.addBooleanProperty("showAnalytics");
         exam.implementsInterface("android.os.Parcelable");
         return exam;
     }
