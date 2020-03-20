@@ -85,7 +85,7 @@ open class BaseExamWidgetFragment : Fragment() {
         }
 
         examRefreshListener.showOrHideRefresh(true)
-        viewModel.loadContentAttempts(content.attemptsUrl!!, contentId, firstTime)
+        viewModel.loadContentAttempts(content.attemptsUrl!!, contentId, forceRefresh = firstTime)
             .observe(viewLifecycleOwner, Observer { resource ->
                 examRefreshListener.showOrHideRefresh(false)
                 when (resource.status) {
