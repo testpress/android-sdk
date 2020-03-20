@@ -43,7 +43,7 @@ abstract class BaseNetworkBoundResource<ResultDataType, NetworkDataType> {
         }
     }
 
-    protected fun refreshDBSource() {
+    protected fun reloadFromDB() {
         dbSource = loadFromDb()
     }
 

@@ -38,7 +38,7 @@ abstract class MultiPageNetworkBoundResource<ResultDataType, NetworkDataType> :
             } else {
                 if (shouldClearDB()) clearFromDB()
                 saveNetworkResponseToDB(apiResults)
-                refreshDBSource()
+                reloadFromDB()
                 withContext(Dispatchers.Main) {
                     showDBDataIfAvailable()
                 }
@@ -55,8 +55,6 @@ abstract class MultiPageNetworkBoundResource<ResultDataType, NetworkDataType> :
 
 
     protected abstract fun saveNetworkResponseToDB(item: List<NetworkDataType>)
-
-    abstract override fun shouldFetch(data: ResultDataType?): Boolean
 
     protected abstract fun createCall(url: String? = null): RetrofitCall<TestpressApiResponse<NetworkDataType>>
 

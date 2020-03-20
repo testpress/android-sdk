@@ -24,7 +24,7 @@ abstract class NetworkBoundResource<ResultDataType, NetworkDataType>:
     protected suspend fun handleResponse(response: Response<NetworkDataType>) {
         if (response.isSuccessful) {
             saveNetworkResponseToDB(processNetworkResponse(response.body()))
-            refreshDBSource()
+            reloadFromDB()
             withContext(Dispatchers.Main) {
                 showDBDataIfAvailable()
             }
