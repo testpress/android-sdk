@@ -25,6 +25,7 @@
         android:textColor="@color/testpress_color_primary"
         android:textSize="12sp"
         android:visibility="gone"
+        android:layout_marginTop="4dp"
         android:paddingLeft="0dp"
         android:id="@+id/info_button"
         android:layout_alignParentRight="true"
