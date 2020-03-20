@@ -29,6 +29,7 @@ public class AttemptSection implements android.os.Parcelable {
     private String name;
     private String duration;
     private Integer order;
+    private String instructions;
     private Long attemptId;
 
     // KEEP FIELDS - put your custom fields here
@@ -43,7 +44,7 @@ public class AttemptSection implements android.os.Parcelable {
     }
 
     @Generated
-    public AttemptSection(Long id, String state, String questionsUrl, String startUrl, String endUrl, String remainingTime, String name, String duration, Integer order, Long attemptId) {
+    public AttemptSection(Long id, String state, String questionsUrl, String startUrl, String endUrl, String remainingTime, String name, String duration, Integer order, String instructions, Long attemptId) {
         this.id = id;
         this.state = state;
         this.questionsUrl = questionsUrl;
@@ -53,6 +54,7 @@ public class AttemptSection implements android.os.Parcelable {
         this.name = name;
         this.duration = duration;
         this.order = order;
+        this.instructions = instructions;
         this.attemptId = attemptId;
     }
 
@@ -128,6 +130,14 @@ public class AttemptSection implements android.os.Parcelable {
         this.order = order;
     }
 
+    public String getInstructions() {
+        return instructions;
+    }
+
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
+    }
+
     public Long getAttemptId() {
         return attemptId;
     }
@@ -160,6 +170,7 @@ public class AttemptSection implements android.os.Parcelable {
         } else {
             attemptId = in.readLong();
         }
+        instructions = in.readString();
     }
 
     @Override
@@ -189,6 +200,7 @@ public class AttemptSection implements android.os.Parcelable {
             dest.writeByte((byte) 1);
             dest.writeLong(attemptId);
         }
+        dest.writeString(instructions);
     }
 
     @Override
