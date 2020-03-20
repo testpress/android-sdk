@@ -187,6 +187,7 @@ public class ReviewStatsFragment extends BaseFragment {
                 TestpressSdk.getRubikRegularFont(getContext()));
 
         showOrHideShareButton();
+        addClickListeners();
         return view;
     }
 
