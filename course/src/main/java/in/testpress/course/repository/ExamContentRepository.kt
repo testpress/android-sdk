@@ -10,14 +10,15 @@ import `in`.testpress.course.domain.toDomainLanguages
 import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.course.network.Resource
-import `in`.testpress.course.network.asDomainContentAttempt
 import `in`.testpress.course.network.asGreenDaoModel
 import `in`.testpress.exam.network.ExamNetwork
 import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.exam.network.asGreenDaoModels
 import `in`.testpress.models.TestpressApiResponse
+import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.models.greendao.CourseAttemptDao
 import `in`.testpress.models.greendao.LanguageDao
+import `in`.testpress.network.RetrofitCall
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
@@ -32,49 +33,48 @@ class ExamContentRepository(
     private val attemptDao = TestpressSDKDatabase.getAttemptDao(context)
     private val contentAttemptDao = TestpressSDKDatabase.getCourseAttemptDao(context)
     private val examNetwork = ExamNetwork(context)
-    private var contentAttempts = arrayListOf<DomainContentAttempt>()
-    private var networkContentAttempts = arrayListOf<NetworkContentAttempt>()
-    var resourceContentAttempt: MutableLiveData<Resource<ArrayList<DomainContentAttempt>>> =
-        MutableLiveData()
     private var isLanguagesBeingFetched = false
-    private var isAttemptsBeingFetched = false
     private var languages = arrayListOf<NetworkLanguage>()
     var resourceLanguages: MutableLiveData<Resource<List<DomainLanguage>>> = MutableLiveData()
 
-    private fun fetchAttemptFromNetwork(url: String, contentId: Long) {
-        courseNetwork.getContentAttempts(url)
-            .enqueue(object : TestpressCallback<TestpressApiResponse<NetworkContentAttempt>>() {
-                override fun onSuccess(response: TestpressApiResponse<NetworkContentAttempt>?) {
-                    handleAttemptsFetchSuccess(response, contentId)
-                }
+    fun loadAttempts(attemptsUrl: String, contentId: Long, forceRefresh: Boolean = false): LiveData<Resource<ArrayList<DomainContentAttempt>>> {
+        return object : MultiPageNetworkBoundResource<ArrayList<DomainContentAttempt>, NetworkContentAttempt>() {
+            override fun saveNetworkResponseToDB(item: List<NetworkContentAttempt>) {
+                saveCourseAttemptInDB(ArrayList(item), contentId)
+            }
 
-                override fun onException(exception: TestpressException) {
-                    isAttemptsBeingFetched = false
-                    resourceContentAttempt.value = Resource.error(exception, null)
-                }
-            })
+            override fun shouldFetch(data: ArrayList<DomainContentAttempt>?): Boolean {
+                return forceRefresh || getContentAttemptsFromDB(contentId).isEmpty()
+            }
+
+            override fun loadFromDb(): LiveData<ArrayList<DomainContentAttempt>> {
+                val liveData = MutableLiveData<ArrayList<DomainContentAttempt>>()
+                val contentAttempts = contentAttemptDao.queryBuilder()
+                    .where(CourseAttemptDao.Properties.ChapterContentId.eq(contentId))
+                    .list()
+                liveData.postValue(ArrayList(contentAttempts.asDomainContentAttempts()))
+                return liveData
+            }
+
+            override fun shouldClearDB()  = true
+
+            override fun clearFromDB() {
+                clearContentAttemptsInDB(contentId)
+            }
+
+            override fun createCall(
+                url: String?
+            ): RetrofitCall<TestpressApiResponse<NetworkContentAttempt>> {
+                if (url != null) return courseNetwork.getContentAttempts(url)
+                return courseNetwork.getContentAttempts(attemptsUrl)
+            }
+        }.asLiveData()
     }
 
-    private fun handleAttemptsFetchSuccess(response:TestpressApiResponse<NetworkContentAttempt>?, contentId: Long) {
-        contentAttempts.addAll(response?.results?.asDomainContentAttempt() ?: listOf())
-        networkContentAttempts.addAll(response?.results ?: listOf())
-
-        if (response?.next != null) {
-            fetchAttemptFromNetwork(response.next, contentId)
-        } else {
-            isAttemptsBeingFetched = false
-            clearContentAttemptsInDB(contentId)
-            saveCourseAttemptInDB(networkContentAttempts, contentId)
-            resourceContentAttempt.value = Resource.success(contentAttempts)
-        }
-    }
-
-    fun loadAttempts(url: String, contentId: Long): LiveData<Resource<ArrayList<DomainContentAttempt>>> {
-        if (!isAttemptsBeingFetched) {
-            isAttemptsBeingFetched = true
-            fetchAttemptFromNetwork(url, contentId)
-        }
-        return resourceContentAttempt
+    fun getContentAttemptsFromDB(contentId: Long): MutableList<CourseAttempt> {
+        return contentAttemptDao.queryBuilder()
+            .where(CourseAttemptDao.Properties.ChapterContentId.eq(contentId))
+            .list()
     }
 
     fun clearContentAttemptsInDB(contentId: Long) {

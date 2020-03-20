@@ -9,8 +9,12 @@ import `in`.testpress.models.greendao.CourseAttempt
 import androidx.lifecycle.LiveData
 
 class ExamContentViewModel(override val repository: ExamContentRepository) : ContentViewModel(repository) {
-    fun loadContentAttempts(url: String, contentId: Long): LiveData<Resource<ArrayList<DomainContentAttempt>>> {
-        return repository.loadAttempts(url, contentId)
+    fun loadContentAttempts(
+        url: String,
+        contentId: Long,
+        forceRefresh: Boolean = false
+    ): LiveData<Resource<ArrayList<DomainContentAttempt>>> {
+        return repository.loadAttempts(url, contentId, forceRefresh)
     }
 
     fun getLanguages(examSlug: String, examId: Long): LiveData<Resource<List<DomainLanguage>>> {
