@@ -57,6 +57,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         public final static Property IsDetailsFetched = new Property(29, Boolean.class, "isDetailsFetched", false, "IS_DETAILS_FETCHED");
         public final static Property IsGrowthHackEnabled = new Property(30, Boolean.class, "isGrowthHackEnabled", false, "IS_GROWTH_HACK_ENABLED");
         public final static Property ShareTextForSolutionUnlock = new Property(31, String.class, "shareTextForSolutionUnlock", false, "SHARE_TEXT_FOR_SOLUTION_UNLOCK");
+        public final static Property ShowAnalytics = new Property(32, Boolean.class, "showAnalytics", false, "SHOW_ANALYTICS");
     }
 
     private DaoSession daoSession;
@@ -107,7 +108,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
                 "\"CATEGORIES\" TEXT," + // 28: categories
                 "\"IS_DETAILS_FETCHED\" INTEGER," + // 29: isDetailsFetched
                 "\"IS_GROWTH_HACK_ENABLED\" INTEGER," + // 30: isGrowthHackEnabled
-                "\"SHARE_TEXT_FOR_SOLUTION_UNLOCK\" TEXT);"); // 31: shareTextForSolutionUnlock
+                "\"SHARE_TEXT_FOR_SOLUTION_UNLOCK\" TEXT," + // 31: shareTextForSolutionUnlock
+                "\"SHOW_ANALYTICS\" INTEGER);"); // 32: showAnalytics
     }
 
     /** Drops the underlying database table. */
@@ -279,6 +281,11 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (shareTextForSolutionUnlock != null) {
             stmt.bindString(32, shareTextForSolutionUnlock);
         }
+ 
+        Boolean showAnalytics = entity.getShowAnalytics();
+        if (showAnalytics != null) {
+            stmt.bindLong(33, showAnalytics ? 1L: 0L);
+        }
     }
 
     @Override
@@ -444,6 +451,11 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (shareTextForSolutionUnlock != null) {
             stmt.bindString(32, shareTextForSolutionUnlock);
         }
+ 
+        Boolean showAnalytics = entity.getShowAnalytics();
+        if (showAnalytics != null) {
+            stmt.bindLong(33, showAnalytics ? 1L: 0L);
+        }
     }
 
     @Override
@@ -491,7 +503,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             cursor.isNull(offset + 28) ? null : categoriesConverter.convertToEntityProperty(cursor.getString(offset + 28)), // categories
             cursor.isNull(offset + 29) ? null : cursor.getShort(offset + 29) != 0, // isDetailsFetched
             cursor.isNull(offset + 30) ? null : cursor.getShort(offset + 30) != 0, // isGrowthHackEnabled
-            cursor.isNull(offset + 31) ? null : cursor.getString(offset + 31) // shareTextForSolutionUnlock
+            cursor.isNull(offset + 31) ? null : cursor.getString(offset + 31), // shareTextForSolutionUnlock
+            cursor.isNull(offset + 32) ? null : cursor.getShort(offset + 32) != 0 // showAnalytics
         );
         return entity;
     }
@@ -530,6 +543,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         entity.setIsDetailsFetched(cursor.isNull(offset + 29) ? null : cursor.getShort(offset + 29) != 0);
         entity.setIsGrowthHackEnabled(cursor.isNull(offset + 30) ? null : cursor.getShort(offset + 30) != 0);
         entity.setShareTextForSolutionUnlock(cursor.isNull(offset + 31) ? null : cursor.getString(offset + 31));
+        entity.setShowAnalytics(cursor.isNull(offset + 32) ? null : cursor.getShort(offset + 32) != 0);
      }
     
     @Override

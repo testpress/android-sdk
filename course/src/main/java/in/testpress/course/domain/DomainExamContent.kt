@@ -37,7 +37,8 @@ data class DomainExamContent(
     val sections: List<DomainSection> = arrayListOf(),
     var languages: List<DomainLanguage> = arrayListOf(),
     val isGrowthHackEnabled: Boolean? = null,
-    val shareTextForSolutionUnlock: String? = null
+    val shareTextForSolutionUnlock: String? = null,
+    val showAnalytics: Boolean? = null
 ) {
     fun formattedDate(inputString: String): String {
         var date: Date? = null
@@ -164,7 +165,8 @@ fun createGreenDaoExamContent(exam: DomainExamContent): Exam {
         null,
         null,
         exam.isGrowthHackEnabled,
-        exam.shareTextForSolutionUnlock
+        exam.shareTextForSolutionUnlock,
+        exam.showAnalytics
     )
     greenDaoexam.languages = exam.languages.toGreenDaoModels()
 
