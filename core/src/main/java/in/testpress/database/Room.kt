@@ -17,7 +17,8 @@ abstract class TestpressDatabase: RoomDatabase() {
             synchronized(TestpressDatabase::class.java) {
                 if (!::INSTANCE.isInitialized) {
                     INSTANCE = Room.databaseBuilder(context.applicationContext,
-                            TestpressDatabase::class.java, "testpress-db").build()
+                            TestpressDatabase::class.java, "testpress-db")
+                        .fallbackToDestructiveMigration().build()
                 }
             }
             return INSTANCE
