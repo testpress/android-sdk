@@ -81,6 +81,9 @@ public class ReviewStatsFragment extends BaseFragment {
     private TextView retakeButton;
     private LinearLayout retakeButtonLayout;
     private LinearLayout timeAnalyticsButtonLayout;
+    private LinearLayout shareButtonLayout;
+    private LinearLayout statsButtonLayout;
+    private Button shareButton;
     private TextView reviewQuestionsButton;
     private TextView emailPdfButton;
     private LinearLayout emailPdfButtonLayout;
@@ -158,6 +161,9 @@ public class ReviewStatsFragment extends BaseFragment {
         emailPdfButtonLayout = (LinearLayout) view.findViewById(R.id.email_mcqs_layout);
         reviewQuestionsButton = (TextView) view.findViewById(R.id.review);
         timeAnalyticsButton = (Button) view.findViewById(R.id.time_analytics);
+        shareButton = view.findViewById(R.id.share_to_unlock);
+        shareButtonLayout = view.findViewById(R.id.share_button_layout);
+        statsButtonLayout = view.findViewById(R.id.button_layout);
         ViewUtils.setTypeface(
                 new TextView[] {
                         score, rank, correct, incorrect, timeTaken, accuracy, reviewQuestionsButton,
@@ -180,8 +186,17 @@ public class ReviewStatsFragment extends BaseFragment {
                 },
                 TestpressSdk.getRubikRegularFont(getContext()));
 
-        showOrRemoveLockIconOnSolutionsButton();
+        showOrHideShareButton();
         return view;
+    }
+
+    private void addClickListeners() {
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openShareFragment();
+            }
+        });
     }
 
     @Override
@@ -244,7 +259,9 @@ public class ReviewStatsFragment extends BaseFragment {
             reviewQuestionsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    openShareFragmentOrSolutionsFragment();
+                    requireActivity().startActivity(
+                            ReviewQuestionsActivity.createIntent(getActivity(), exam, attempt)
+                    );
                 }
             });
             reviewQuestionsButton.setVisibility(View.VISIBLE);
@@ -315,33 +332,28 @@ public class ReviewStatsFragment extends BaseFragment {
         return preferences.getInt(NO_OF_TIMES_SHARED, 0) < 2;
     }
 
-    private void openShareFragmentOrSolutionsFragment() {
-        if (exam.isGrowthHackEnabled() && isAppNotSharedAlready()) {
-            Intent intent = new Intent(getActivity(), ShareToUnLockActivity.class);
-            intent.putExtra(SHARE_TO_UNLOCK_SHARED_PREFERENCE_KEY, exam.getShareToUnlockSharedPreferenceKey());
-            String messageToShare = exam.getShareTextForSolutionUnlock() != null ? exam.getShareTextForSolutionUnlock() : "";
-            intent.putExtra(MESSAGE_TO_SHARE, messageToShare);
-            requireActivity().startActivityForResult(intent, SHARE_APP);
-        } else {
-            requireActivity().startActivity(
-                    ReviewQuestionsActivity.createIntent(getActivity(), exam, attempt)
-            );
-        }
+    private void openShareFragment() {
+        Intent intent = new Intent(getActivity(), ShareToUnLockActivity.class);
+        intent.putExtra(SHARE_TO_UNLOCK_SHARED_PREFERENCE_KEY, exam.getShareToUnlockSharedPreferenceKey());
+        String messageToShare = exam.getShareTextForSolutionUnlock() != null ? exam.getShareTextForSolutionUnlock() : "";
+        intent.putExtra(MESSAGE_TO_SHARE, messageToShare);
+        requireActivity().startActivityForResult(intent, SHARE_APP);
     }
 
-    private void showOrRemoveLockIconOnSolutionsButton() {
+    private void showOrHideShareButton() {
         if (exam.isGrowthHackEnabled()  && isAppNotSharedAlready()) {
-            reviewQuestionsButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock, 0, 0, 0);
+            shareButtonLayout.setVisibility(View.VISIBLE);
+            statsButtonLayout.setVisibility(View.GONE);
         } else {
-            reviewQuestionsButton.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+            statsButtonLayout.setVisibility(View.VISIBLE);
+            shareButtonLayout.setVisibility(View.GONE);
         }
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        showOrRemoveLockIconOnSolutionsButton();
+        showOrHideShareButton();
     }
 
     private void loadAttempt() {
