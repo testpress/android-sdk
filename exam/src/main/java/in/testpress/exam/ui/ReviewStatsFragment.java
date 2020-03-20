@@ -273,7 +273,9 @@ public class ReviewStatsFragment extends BaseFragment {
             timeAnalyticsButtonLayout.setVisibility(View.GONE);
         }
 
-        if (instituteSettings.getDisableStudentAnalytics()) {
+        if (exam.showAnalytics()) {
+            analyticsButton.setVisibility(View.VISIBLE);
+        } else {
             analyticsButton.setVisibility(View.GONE);
         }
 
