@@ -34,7 +34,8 @@ public class AttemptSectionDao extends AbstractDao<AttemptSection, Long> {
         public final static Property Name = new Property(6, String.class, "name", false, "NAME");
         public final static Property Duration = new Property(7, String.class, "duration", false, "DURATION");
         public final static Property Order = new Property(8, Integer.class, "order", false, "ORDER");
-        public final static Property AttemptId = new Property(9, Long.class, "attemptId", false, "ATTEMPT_ID");
+        public final static Property Instructions = new Property(9, String.class, "instructions", false, "INSTRUCTIONS");
+        public final static Property AttemptId = new Property(10, Long.class, "attemptId", false, "ATTEMPT_ID");
     }
 
     private Query<AttemptSection> attempt_SectionsQuery;
@@ -60,7 +61,8 @@ public class AttemptSectionDao extends AbstractDao<AttemptSection, Long> {
                 "\"NAME\" TEXT," + // 6: name
                 "\"DURATION\" TEXT," + // 7: duration
                 "\"ORDER\" INTEGER," + // 8: order
-                "\"ATTEMPT_ID\" INTEGER);"); // 9: attemptId
+                "\"INSTRUCTIONS\" TEXT," + // 9: instructions
+                "\"ATTEMPT_ID\" INTEGER);"); // 10: attemptId
     }
 
     /** Drops the underlying database table. */
@@ -118,9 +120,14 @@ public class AttemptSectionDao extends AbstractDao<AttemptSection, Long> {
             stmt.bindLong(9, order);
         }
  
+        String instructions = entity.getInstructions();
+        if (instructions != null) {
+            stmt.bindString(10, instructions);
+        }
+ 
         Long attemptId = entity.getAttemptId();
         if (attemptId != null) {
-            stmt.bindLong(10, attemptId);
+            stmt.bindLong(11, attemptId);
         }
     }
 
@@ -173,9 +180,14 @@ public class AttemptSectionDao extends AbstractDao<AttemptSection, Long> {
             stmt.bindLong(9, order);
         }
  
+        String instructions = entity.getInstructions();
+        if (instructions != null) {
+            stmt.bindString(10, instructions);
+        }
+ 
         Long attemptId = entity.getAttemptId();
         if (attemptId != null) {
-            stmt.bindLong(10, attemptId);
+            stmt.bindLong(11, attemptId);
         }
     }
 
@@ -196,7 +208,8 @@ public class AttemptSectionDao extends AbstractDao<AttemptSection, Long> {
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // name
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // duration
             cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8), // order
-            cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9) // attemptId
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // instructions
+            cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10) // attemptId
         );
         return entity;
     }
@@ -212,7 +225,8 @@ public class AttemptSectionDao extends AbstractDao<AttemptSection, Long> {
         entity.setName(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setDuration(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setOrder(cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8));
-        entity.setAttemptId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
+        entity.setInstructions(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setAttemptId(cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10));
      }
     
     @Override
