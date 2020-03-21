@@ -34,6 +34,7 @@ open class BaseExamWidgetFragment : Fragment() {
     protected var contentId: Long = -1
     lateinit var contentAttempts: ArrayList<DomainContentAttempt>
     protected lateinit var examRefreshListener: ExamRefreshListener
+    private var `firstTime`: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,11 +85,12 @@ open class BaseExamWidgetFragment : Fragment() {
         }
 
         examRefreshListener.showOrHideRefresh(true)
-        viewModel.loadContentAttempts(content.attemptsUrl!!, contentId)
+        viewModel.loadContentAttempts(content.attemptsUrl!!, contentId, forceRefresh = firstTime)
             .observe(viewLifecycleOwner, Observer { resource ->
                 examRefreshListener.showOrHideRefresh(false)
                 when (resource.status) {
                     Status.SUCCESS -> {
+                        firstTime = false
                         contentAttempts = resource.data!!
                         display()
                         val exam = content.exam!!
