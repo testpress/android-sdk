@@ -6,6 +6,7 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import in.testpress.R;
 import in.testpress.core.TestpressSdk;
@@ -24,6 +25,7 @@ import static in.testpress.core.TestpressSdk.ACTION_PRESSED_HOME;
 public abstract class BaseToolBarActivity extends AppCompatActivity {
 
     public static final String ACTIONBAR_TITLE = "title";
+    protected ImageView logo;
 
     @Override
     public void setContentView(final int layoutResId) {
@@ -33,6 +35,7 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
         }
         super.setContentView(layoutResId);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        logo = findViewById(R.id.toolbar_logo);
         setSupportActionBar(toolbar);
         //noinspection ConstantConditions
         getSupportActionBar().setHomeButtonEnabled(true);
