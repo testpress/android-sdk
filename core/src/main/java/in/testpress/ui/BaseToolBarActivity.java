@@ -31,6 +31,7 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
     public static final String ACTIONBAR_TITLE = "title";
     protected ImageView logo;
     private TestpressSession session;
+    protected Toolbar toolbar;
 
     @Override
     public void setContentView(final int layoutResId) {
@@ -39,7 +40,7 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
             getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
         }
         super.setContentView(layoutResId);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         logo = findViewById(R.id.toolbar_logo);
         setSupportActionBar(toolbar);
         //noinspection ConstantConditions
@@ -63,6 +64,7 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
             return;
         }
         String url = session.getInstituteSettings().getAppToolbarLogo();
+        url = "https://media.testpress.in/i/6d8c6fd3f703490fb66fe8419e5d3380.png";
         ImageLoader imageLoader = ImageUtils.initImageLoader(this);
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
