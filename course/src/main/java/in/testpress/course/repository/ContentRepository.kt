@@ -77,7 +77,7 @@ open class ContentRepository(
             .where(
                 ContentDao.Properties.ChapterId.eq(chapterId),
                 ContentDao.Properties.Active.eq(true)
-            ).list().asDomainContents()
+            ).orderAsc(ContentDao.Properties.Order).list().asDomainContents()
         contentsLiveData.value = contents
         return contentsLiveData
     }

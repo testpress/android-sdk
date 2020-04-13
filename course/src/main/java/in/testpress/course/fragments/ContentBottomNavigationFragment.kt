@@ -94,7 +94,7 @@ class ContentBottomNavigationFragment : Fragment() {
         val contentsFromChapterObserver = Observer<List<DomainContent>> { contents ->
             val position = contents.indexOf(content)
             initNextButton(position)
-            initPrevButton(position)
+            initPrevButton(position, contents)
             pageNumber.text = String.format("%d/%d", position + 1, contents.size)
         }
 
@@ -110,12 +110,12 @@ class ContentBottomNavigationFragment : Fragment() {
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun initPrevButton(position: Int) {
+    fun initPrevButton(position: Int, contents: List<DomainContent>) {
         if (position < 1)
             return
 
         previousButton.setOnClickListener {
-            startActivity(createIntent(content.id, activity, productSlug))
+            startActivity(createIntent(contents[position-1].id, activity, productSlug))
             finishActivity()
         }
         previousButton.visibility = View.VISIBLE
@@ -155,7 +155,7 @@ class ContentBottomNavigationFragment : Fragment() {
         if (!contents[nextPosition].isLocked!!) {
             nextButton.text = getString(R.string.testpress_next_content)
             nextButton.setOnClickListener {
-                startActivity(createIntent(content.id, activity, productSlug))
+                startActivity(createIntent(contents[nextPosition].id, activity, productSlug))
                 finishActivity()
             }
             nextButton.visibility = View.VISIBLE
