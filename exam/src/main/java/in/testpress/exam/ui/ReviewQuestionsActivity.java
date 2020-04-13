@@ -240,7 +240,10 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         if (position != -1) {
             goToQuestion(position);
         }
+        customiseToolbar();
+    }
 
+    private void customiseToolbar() {
         toolbar.setBackgroundColor(Color.WHITE);
         toolbar.setTitleTextColor(getResources().getColor(R.color.testpress_color_primary));
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
