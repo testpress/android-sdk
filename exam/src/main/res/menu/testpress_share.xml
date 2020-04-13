@@ -3,6 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/whatsapp"
+        android:icon="@drawable/whatsapp"
+        app:showAsAction="always"
+        android:visible="false"
+        app:iconTint="@color/testpress_color_primary"
+        android:title="@string/testpress_share" >
+    </item>
+
+    <item
+        android:id="@+id/telegram"
+        android:icon="@drawable/telegram"
+        app:showAsAction="always"
+        android:visible="false"
+        app:iconTint="@color/testpress_color_primary"
+        android:title="@string/testpress_share" >
+    </item>
+
+    <item
         android:id="@+id/share"
         android:icon="@drawable/ic_share_white_24dp"
         app:showAsAction="always"

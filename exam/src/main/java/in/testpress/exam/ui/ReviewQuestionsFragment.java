@@ -61,6 +61,7 @@ import in.testpress.v2_4.models.FolderListResponse;
 
 import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
+import static in.testpress.util.CommonUtils.isAppInstalled;
 
 public class ReviewQuestionsFragment extends Fragment {
 
@@ -225,6 +226,15 @@ public class ReviewQuestionsFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.testpress_share, menu);
+        if (isAppInstalled("com.whatsapp", getContext())) {
+            MenuItem whatsapp = menu.findItem(R.id.whatsapp);
+            whatsapp.setVisible(true);
+        }
+
+        if (isAppInstalled("org.telegram.messenger", getContext())) {
+            MenuItem telegram = menu.findItem(R.id.telegram);
+            telegram.setVisible(true);
+        }
     }
 
     private void setDifficulty(View view) {
@@ -587,20 +597,28 @@ public class ReviewQuestionsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.share) {
-            webViewUtils.hideBookmarkButton();
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Bitmap bitmap = ImageUtils.getBitmapFromView(webView);
-                    webViewUtils.displayBookmarkButton();
-                    ImageUtils.shareBitmap(bitmap, webView.getContext());
-                }
-            }, 100);
+            shareQuestionAsImage(null);
             return true;
+        } else if (item.getItemId() == R.id.telegram) {
+            shareQuestionAsImage("org.telegram.messenger");
+        } else if (item.getItemId() == R.id.whatsapp) {
+            shareQuestionAsImage("com.whatsapp");
         } else if (item.getItemId() == R.id.close) {
             getActivity().finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void shareQuestionAsImage(final String package_name) {
+        webViewUtils.hideBookmarkButton();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap bitmap = ImageUtils.getBitmapFromView(webView);
+                webViewUtils.displayBookmarkButton();
+                ImageUtils.shareBitmap(bitmap, webView.getContext(), package_name);
+            }
+        }, 100);
     }
 
     void handleException(TestpressException exception) {

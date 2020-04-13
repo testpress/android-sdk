@@ -124,7 +124,7 @@ public class ImageUtils {
         return bitmap;
     }
 
-    public static void shareBitmap(Bitmap bitmap, Context context) {
+    public static void shareBitmap(Bitmap bitmap, Context context, String package_name) {
         File image = new File(context.getCacheDir() , "screenshot.png");
         FileOutputStream outputStream;
         try {
@@ -132,7 +132,7 @@ public class ImageUtils {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
             outputStream.flush();
             outputStream.close();
-            shareImage(image, context);
+            shareImage(image, context, package_name);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -140,7 +140,7 @@ public class ImageUtils {
         }
     }
 
-    public static void shareImage(File file, Context context) {
+    public static void shareImage(File file, Context context, String package_name) {
         Uri uri = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
@@ -154,6 +154,11 @@ public class ImageUtils {
         intent.putExtra(android.content.Intent.EXTRA_TEXT, shareMessage);
         intent.putExtra(Intent.EXTRA_STREAM, uri);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        if (package_name != null) {
+            intent.setPackage(package_name);
+        }
+
         try {
             context.startActivity(Intent.createChooser(intent,
                     context.getString(R.string.testpress_share_screenshot)));
