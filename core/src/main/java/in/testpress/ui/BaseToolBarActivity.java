@@ -57,7 +57,7 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(title);
     }
 
-    public void setLogo() {
+    public void showLogoInToolbar() {
         getSupportActionBar().setTitle("");
         if (session == null || session.getInstituteSettings() == null) {
             return;
