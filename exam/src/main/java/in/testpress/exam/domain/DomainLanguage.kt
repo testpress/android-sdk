@@ -4,7 +4,7 @@ import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.models.greendao.Language
 
 data class DomainLanguage(
-    val id: Long,
+    val id: Long?,
     val title: String? = null,
     val code: String? = null,
     val examId: Long? = null
