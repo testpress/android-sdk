@@ -64,7 +64,6 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
             return;
         }
         String url = session.getInstituteSettings().getAppToolbarLogo();
-        url = "https://media.testpress.in/i/6d8c6fd3f703490fb66fe8419e5d3380.png";
         ImageLoader imageLoader = ImageUtils.initImageLoader(this);
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
