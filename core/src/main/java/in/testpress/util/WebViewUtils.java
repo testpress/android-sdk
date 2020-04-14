@@ -179,8 +179,8 @@ public class WebViewUtils {
         evaluateJavascript("displayBookmarkButton();");
     }
 
-    public void showLogo() {
-        evaluateJavascript("showLogo();");
+    public void showLogo(String logoUrl) {
+        evaluateJavascript("showLogo('"+logoUrl+"');");
     }
 
     public void hideLogo() {
