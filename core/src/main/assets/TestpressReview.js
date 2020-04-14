@@ -29,3 +29,13 @@ function hideBookmarkButton() {
 function getElement(className) {
     return document.getElementsByClassName(className)[0];
 }
+
+function showLogo() {
+    var logo = getElement("logo");
+    logo.style.display = "block";
+}
+
+function hideLogo() {
+    var logo = getElement("logo");
+    logo.style.display = "none";
+}

@@ -179,6 +179,14 @@ public class WebViewUtils {
         evaluateJavascript("displayBookmarkButton();");
     }
 
+    public void showLogo() {
+        evaluateJavascript("showLogo();");
+    }
+
+    public void hideLogo() {
+        evaluateJavascript("hideLogo();");
+    }
+
     protected static String getTestEngineHeader() {
         return "<script src='TestpressTestEngine.js'></script>";
     }

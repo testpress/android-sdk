@@ -302,6 +302,12 @@ public class ReviewQuestionsFragment extends Fragment {
 
         String html = "<div style='padding-left: 2px; padding-right: 4px;'>";
 
+
+        String imageTag = WebViewUtils.appendImageTags(instituteSettings.getAppToolbarLogo());
+        String imageContainer =
+                "<div class='logo' id='logo' style='max-width:150px;padding: 20px;display:none;'> "+ imageTag +"</div>";
+        html += imageContainer;
+
         // Add index
         html += "<div>" +
                 "<div class='review-question-index'>" +
@@ -611,11 +617,13 @@ public class ReviewQuestionsFragment extends Fragment {
 
     private void shareQuestionAsImage(final String package_name) {
         webViewUtils.hideBookmarkButton();
+        webViewUtils.showLogo();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 Bitmap bitmap = ImageUtils.getBitmapFromView(webView);
                 webViewUtils.displayBookmarkButton();
+                webViewUtils.hideLogo();
                 ImageUtils.shareBitmap(bitmap, webView.getContext(), package_name);
             }
         }, 100);
