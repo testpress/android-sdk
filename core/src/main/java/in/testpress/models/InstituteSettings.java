@@ -19,6 +19,7 @@ public class InstituteSettings {
     private Integer lockoutLimit;
     private String cooloffTime;
     private String storeLabel;
+    private String appToolbarLogo;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -156,6 +157,15 @@ public class InstituteSettings {
 
     public InstituteSettings setStoreLabel(String storeLabel) {
         this.storeLabel = storeLabel;
+        return this;
+    }
+
+    public String getAppToolbarLogo() {
+        return appToolbarLogo;
+    }
+
+    public InstituteSettings setAppToolbarLogo(String appToolbarLogo) {
+        this.appToolbarLogo = appToolbarLogo;
         return this;
     }
 }
