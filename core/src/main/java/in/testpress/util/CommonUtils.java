@@ -4,6 +4,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+
 import androidx.annotation.NonNull;
 
 import java.io.IOException;
@@ -11,6 +13,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import in.testpress.models.greendao.Content;
 import in.testpress.network.RetrofitCall;
 
 public class CommonUtils {
@@ -85,4 +88,13 @@ public class CommonUtils {
                 intent.getExtras().getBoolean("connected");
     }
 
+    public static boolean isAppInstalled(String uri, Context context) {
+        PackageManager pm = context.getPackageManager();
+        try {
+            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+            return true;
+        }
+        catch (PackageManager.NameNotFoundException ignore) {}
+        return false;
+    }
 }
