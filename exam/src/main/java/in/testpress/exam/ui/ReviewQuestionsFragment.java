@@ -611,11 +611,13 @@ public class ReviewQuestionsFragment extends Fragment {
 
     private void shareQuestionAsImage(final String package_name) {
         webViewUtils.hideBookmarkButton();
+        webViewUtils.showLogo(instituteSettings.getAppToolbarLogo());
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 Bitmap bitmap = ImageUtils.getBitmapFromView(webView);
                 webViewUtils.displayBookmarkButton();
+                webViewUtils.hideLogo();
                 ImageUtils.shareBitmap(bitmap, webView.getContext(), package_name);
             }
         }, 100);
