@@ -597,6 +597,8 @@ public class ReviewQuestionsFragment extends Fragment {
                 }
             }, 100);
             return true;
+        } else if (item.getItemId() == R.id.close) {
+            getActivity().finish();
         }
         return super.onOptionsItemSelected(item);
     }

@@ -31,6 +31,7 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
     public static final String ACTIONBAR_TITLE = "title";
     protected ImageView logo;
     private TestpressSession session;
+    protected Toolbar toolbar;
 
     @Override
     public void setContentView(final int layoutResId) {
@@ -39,7 +40,7 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
             getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
         }
         super.setContentView(layoutResId);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         logo = findViewById(R.id.toolbar_logo);
         setSupportActionBar(toolbar);
         //noinspection ConstantConditions
