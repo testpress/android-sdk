@@ -1,5 +1,7 @@
 package in.testpress.models;
 
+import android.content.Context;
+
 import in.testpress.util.Assert;
 
 public class InstituteSettings {
@@ -20,6 +22,7 @@ public class InstituteSettings {
     private String cooloffTime;
     private String storeLabel;
     private String appToolbarLogo;
+    private String appShareLink;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -166,6 +169,18 @@ public class InstituteSettings {
 
     public InstituteSettings setAppToolbarLogo(String appToolbarLogo) {
         this.appToolbarLogo = appToolbarLogo;
+        return this;
+    }
+
+    public String getAppShareLink(Context context) {
+        if (appShareLink == null) {
+            return "https://play.google.com/store/apps/details?id=" + context.getPackageName();
+        }
+        return appShareLink;
+    }
+
+    public InstituteSettings setAppShareLink(String appShareLink) {
+        this.appShareLink = appShareLink;
         return this;
     }
 }

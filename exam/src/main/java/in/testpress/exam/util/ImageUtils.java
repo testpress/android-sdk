@@ -21,6 +21,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import in.testpress.core.TestpressSdk;
+import in.testpress.core.TestpressSession;
 import in.testpress.exam.R;
 import in.testpress.util.PermissionsUtils;
 import in.testpress.util.ViewUtils;
@@ -146,10 +148,16 @@ public class ImageUtils {
         intent.setAction(Intent.ACTION_SEND);
         intent.setType("image/*");
         intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "");
+        String appShareLink = "https://play.google.com/store/apps/details?id=" + context.getPackageName();
+        if (TestpressSdk.hasActiveSession(context)) {
+            TestpressSession session = TestpressSdk.getTestpressSession(context);
+            appShareLink = session.getInstituteSettings().getAppShareLink(context);
+        }
+
         String shareMessage = String.format(
                 context.getString(R.string.testpress_share_screenshot_text),
                 context.getApplicationInfo().loadLabel(context.getPackageManager()),
-                context.getPackageName()
+                appShareLink
         );
         intent.putExtra(android.content.Intent.EXTRA_TEXT, shareMessage);
         intent.putExtra(Intent.EXTRA_STREAM, uri);
