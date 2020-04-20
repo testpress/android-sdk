@@ -207,6 +207,7 @@ public class ReviewQuestionsFragment extends Fragment {
                     commentsUtil.displayComments();
                 }
                 animationView.bringToFront();
+                webViewUtils.addLogo(instituteSettings.getAppToolbarLogo());
                 setHasOptionsMenu(true);
             }
 
@@ -294,6 +295,7 @@ public class ReviewQuestionsFragment extends Fragment {
             htmlContent = getHtml(reviewQuestion.getDirection(), reviewQuestion.getQuestionHtml(),
                     reviewQuestion.getAnswers(), reviewQuestion.getExplanationHtml(), reviewQuestion.getSubject());
         }
+
         return htmlContent;
     }
 
@@ -611,7 +613,7 @@ public class ReviewQuestionsFragment extends Fragment {
 
     private void shareQuestionAsImage(final String package_name) {
         webViewUtils.hideBookmarkButton();
-        webViewUtils.showLogo(instituteSettings.getAppToolbarLogo());
+        webViewUtils.showLogo();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
