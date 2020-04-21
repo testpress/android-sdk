@@ -34,9 +34,11 @@ import java.util.Map;
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
+import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
+import in.testpress.models.InstituteSettings;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.Exam;
@@ -240,7 +242,11 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         if (position != -1) {
             goToQuestion(position);
         }
-        customiseToolbar();
+
+        InstituteSettings instituteSettings = TestpressSdk.getTestpressSession(this).getInstituteSettings();
+        if (instituteSettings.isGrowthHackEnabled()) {
+            customiseToolbar();
+        }
     }
 
     private void customiseToolbar() {

@@ -227,14 +227,18 @@ public class ReviewQuestionsFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.testpress_share, menu);
-        if (isAppInstalled("com.whatsapp", getContext())) {
-            MenuItem whatsapp = menu.findItem(R.id.whatsapp);
-            whatsapp.setVisible(true);
-        }
+        if (instituteSettings.isGrowthHackEnabled()) {
+            menu.findItem(R.id.share).setVisible(true);
 
-        if (isAppInstalled("org.telegram.messenger", getContext())) {
-            MenuItem telegram = menu.findItem(R.id.telegram);
-            telegram.setVisible(true);
+            if (isAppInstalled("com.whatsapp", getContext())) {
+                MenuItem whatsapp = menu.findItem(R.id.whatsapp);
+                whatsapp.setVisible(true);
+            }
+
+            if (isAppInstalled("org.telegram.messenger", getContext())) {
+                MenuItem telegram = menu.findItem(R.id.telegram);
+                telegram.setVisible(true);
+            }
         }
     }
 
@@ -613,7 +617,9 @@ public class ReviewQuestionsFragment extends Fragment {
 
     private void shareQuestionAsImage(final String package_name) {
         webViewUtils.hideBookmarkButton();
-        webViewUtils.showLogo();
+        if (instituteSettings.isGrowthHackEnabled()) {
+            webViewUtils.showLogo();
+        }
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
