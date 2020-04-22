@@ -179,12 +179,16 @@ public class WebViewUtils {
         evaluateJavascript("displayBookmarkButton();");
     }
 
-    public void showLogo(String logoUrl) {
-        evaluateJavascript("showLogo('"+logoUrl+"');");
+    public void addLogo(String logoUrl) {
+        evaluateJavascript("addLogo('"+logoUrl+"');");
     }
 
     public void hideLogo() {
         evaluateJavascript("hideLogo();");
+    }
+
+    public void showLogo() {
+        evaluateJavascript("showLogo();");
     }
 
     protected static String getTestEngineHeader() {
