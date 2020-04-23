@@ -12,24 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize" >
 
-        <ImageButton
-            android:id="@+id/exit_button"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:padding="10dp"
-            android:background="?android:selectableItemBackground"
-            android:src="@drawable/ic_close_black_24dp"
-            android:tint="@color/testpress_actionbar_text"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/toolbar_logo"
             android:layout_centerVertical="true"
             android:visibility="gone"
-            android:layout_toRightOf="@+id/exit_button"/>
+            android:paddingLeft="10dp"
+            android:layout_alignParentLeft="true" />
 
         <TextView
             android:id="@+id/timer"
@@ -37,14 +27,13 @@
             android:layout_height="wrap_content"
             android:background="?android:selectableItemBackground"
             android:text="00:00:00"
-            android:layout_alignParentRight="true"
+            android:layout_toLeftOf="@+id/language_spinner"
             android:layout_centerVertical="true"
             android:textStyle="bold"
             android:textColor="@color/testpress_actionbar_text"
             android:gravity="center"
             android:drawableLeft="@drawable/ic_round_pause_circle_outline_black_24"
             android:drawablePadding="5dp"
-            android:layout_marginRight="10dp"
             android:padding="10dp"
             />
 
@@ -53,11 +42,22 @@
             android:layout_height="?attr/actionBarSize"
             android:visibility="gone"
             android:id="@+id/language_spinner"
-            android:layout_alignParentRight="true"
+            android:layout_toLeftOf="@+id/exit_button"
             style="@style/Widget.Testpress.HeaderBar.Spinner.Base"
             android:background="@drawable/testpress_translate_action_bar"
             />
 
+        <ImageButton
+            android:id="@+id/exit_button"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:padding="10dp"
+            android:layout_alignParentRight="true"
+            android:background="?android:selectableItemBackground"
+            android:src="@drawable/ic_close_black_24dp"
+            android:tint="@color/testpress_actionbar_text"
+            android:layout_centerVertical="true"
+            />
     </RelativeLayout>
 
     <RelativeLayout
