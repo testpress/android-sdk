@@ -1,6 +1,7 @@
 package in.testpress.models;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import in.testpress.util.Assert;
 
@@ -191,5 +192,19 @@ public class InstituteSettings {
 
     public void setGrowthHackEnabled(boolean growthHackEnabled) {
         isGrowthHackEnabled = growthHackEnabled;
+    }
+
+    public boolean isAppSharedOneTime(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences("APP_SHARING", Context.MODE_PRIVATE);
+        return preferences.getBoolean("IS_APP_SHARED_ONCE1", false);
+    }
+
+    public void setAppSharedOneTime(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences("APP_SHARING", Context.MODE_PRIVATE);
+        preferences.edit().putBoolean("IS_APP_SHARED_ONCE1", true).apply();
+    }
+
+    public String getShareText(Context context) {
+        return "Do checkout our app at " + getAppShareLink(context);
     }
 }
