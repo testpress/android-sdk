@@ -196,12 +196,12 @@ public class InstituteSettings {
 
     public boolean isAppSharedOneTime(Context context) {
         SharedPreferences preferences = context.getSharedPreferences("APP_SHARING", Context.MODE_PRIVATE);
-        return preferences.getBoolean("IS_APP_SHARED_ONCE1", false);
+        return preferences.getBoolean("IS_APP_SHARED_ONCE", false);
     }
 
     public void setAppSharedOneTime(Context context) {
         SharedPreferences preferences = context.getSharedPreferences("APP_SHARING", Context.MODE_PRIVATE);
-        preferences.edit().putBoolean("IS_APP_SHARED_ONCE1", true).apply();
+        preferences.edit().putBoolean("IS_APP_SHARED_ONCE", true).apply();
     }
 
     public String getShareText(Context context) {
