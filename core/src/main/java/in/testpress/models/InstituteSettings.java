@@ -25,6 +25,7 @@ public class InstituteSettings {
     private String appToolbarLogo;
     private String appShareLink;
     private boolean isGrowthHackEnabled;
+    private String appShareText;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -204,7 +205,11 @@ public class InstituteSettings {
         preferences.edit().putBoolean("IS_APP_SHARED_ONCE", true).apply();
     }
 
-    public String getShareText(Context context) {
-        return "Do checkout our app at " + getAppShareLink(context);
+    public String getAppShareText() {
+        return appShareText;
+    }
+
+    public void setAppShareText(String appShareText) {
+        this.appShareText = appShareText;
     }
 }
