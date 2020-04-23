@@ -247,6 +247,16 @@ public class ViewUtils {
         Snackbar.make(rootLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 
+    public static void setTextViewDrawableColor(TextView textView, @ColorRes int color, Context context) {
+        for (Drawable drawable : textView.getCompoundDrawables()) {
+            if (drawable != null) {
+        drawable.setColorFilter(
+            new PorterDuffColorFilter(
+                ContextCompat.getColor(context, color), PorterDuff.Mode.SRC_IN));
+            }
+        }
+    }
+
     private ViewUtils() {
     }
 }

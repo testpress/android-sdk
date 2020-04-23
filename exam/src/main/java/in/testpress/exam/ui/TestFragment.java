@@ -7,16 +7,11 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 
-import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -39,10 +34,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toolbar;
-
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -54,14 +45,12 @@ import java.util.TimeZone;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
-import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.pager.TestQuestionsPager;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.ui.loaders.AttemptItemsLoader;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
-import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.AttemptSection;
 import in.testpress.models.greendao.Content;
@@ -72,7 +61,6 @@ import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseFragment;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
-import in.testpress.util.ImageUtils;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
@@ -376,35 +364,29 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         customiseToolbar();
     }
 
-    private void customiseToolbar() {
-        RelativeLayout toolbar = getView().findViewById(R.id.toolbar);
-        toolbar.setBackgroundColor(getContext().getColor(R.color.testpress_white));
+    private void showLogoInToolbar() {
         ImageView logo = getView().findViewById(R.id.toolbar_logo);
-        ImageButton exitButton = getView().findViewById(R.id.exit_button);
-        exitButton.setColorFilter(getContext().getColor(R.color.testpress_color_primary));
         logo.setVisibility(View.VISIBLE);
-        InstituteSettings instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
-        String url = instituteSettings.getAppToolbarLogo();
-        ImageLoader imageLoader = ImageUtils.initImageLoader(getContext());
-        DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .build();
-        imageLoader.displayImage(url, logo, options);
-        timer.setTextColor(getContext().getColor(R.color.testpress_color_primary));
+        UIUtils.loadLogoInView(logo, getContext());
+    }
+
+    private void customiseToolbar() {
+        showLogoInToolbar();
+        RelativeLayout toolbar = getView().findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.testpress_white));
+
+        // Change exit button color
+        ImageButton exitButton = getView().findViewById(R.id.exit_button);
+        exitButton.setColorFilter(ContextCompat.getColor(getContext(), R.color.testpress_color_primary));
+
+        // Change timer and pause icon color
+        timer.setTextColor(ContextCompat.getColor(getContext(), R.color.testpress_color_primary));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             timer.setCompoundDrawableTintList(ContextCompat.getColorStateList(getContext(), R.color.testpress_blue));
         }
-        setTextViewDrawableColor(timer, R.color.testpress_color_primary);
+        ViewUtils.setTextViewDrawableColor(timer, R.color.testpress_color_primary, getContext());
     }
 
-    private void setTextViewDrawableColor(TextView textView,@ColorRes int color) {
-        for (Drawable drawable : textView.getCompoundDrawables()) {
-            if (drawable != null) {
-                drawable.setColorFilter(new PorterDuffColorFilter(getContext().getColor(color), PorterDuff.Mode.SRC_IN));
-            }
-        }
-    }
 
     private void initializeProgressDialog() {
         progressDialog = new ProgressDialog(getActivity());
