@@ -7,9 +7,11 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -26,6 +28,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -357,7 +361,32 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         slidingPaneLayout = view.findViewById(R.id.sliding_layout);
         questionsListProgressBar = (View) LayoutInflater.from(getActivity()).inflate(R.layout.progress_bar, null);
         questionsListView.addFooterView(questionsListProgressBar);
+        customiseToolbar();
     }
+
+    private void showLogoInToolbar() {
+        ImageView logo = getView().findViewById(R.id.toolbar_logo);
+        logo.setVisibility(View.VISIBLE);
+        UIUtils.loadLogoInView(logo, getContext());
+    }
+
+    private void customiseToolbar() {
+        showLogoInToolbar();
+        RelativeLayout toolbar = getView().findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.testpress_white));
+
+        // Change exit button color
+        ImageButton exitButton = getView().findViewById(R.id.exit_button);
+        exitButton.setColorFilter(ContextCompat.getColor(getContext(), R.color.testpress_color_primary));
+
+        // Change timer and pause icon color
+        timer.setTextColor(ContextCompat.getColor(getContext(), R.color.testpress_color_primary));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            timer.setCompoundDrawableTintList(ContextCompat.getColorStateList(getContext(), R.color.testpress_blue));
+        }
+        ViewUtils.setTextViewDrawableColor(timer, R.color.testpress_color_primary, getContext());
+    }
+
 
     private void initializeProgressDialog() {
         progressDialog = new ProgressDialog(getActivity());

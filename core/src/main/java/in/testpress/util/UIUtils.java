@@ -6,15 +6,21 @@ import android.content.Context;
 
 import androidx.annotation.StringRes;
 import com.google.android.material.snackbar.Snackbar;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import in.testpress.R;
+import in.testpress.core.TestpressSdk;
+import in.testpress.models.InstituteSettings;
 
 public class UIUtils {
 
@@ -92,5 +98,16 @@ public class UIUtils {
         builder.setMessage(message);
         builder.setPositiveButton(R.string.testpress_ok, null);
         builder.show();
+    }
+
+    public static void loadLogoInView(ImageView logoView, Context context) {
+        InstituteSettings instituteSettings = TestpressSdk.getTestpressSession(context).getInstituteSettings();
+        String url = instituteSettings.getAppToolbarLogo();
+        ImageLoader imageLoader = ImageUtils.initImageLoader(context);
+        DisplayImageOptions options = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .build();
+        imageLoader.displayImage(url, logoView, options);
     }
 }

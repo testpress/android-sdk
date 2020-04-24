@@ -8,6 +8,7 @@
     <RelativeLayout
         android:background="@color/testpress_color_primary"
         android:orientation="horizontal"
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize" >
 
@@ -22,6 +23,13 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
             />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/toolbar_logo"
+            android:layout_centerVertical="true"
+            android:visibility="gone"
+            android:layout_toRightOf="@+id/exit_button"/>
 
         <TextView
             android:id="@+id/timer"
@@ -126,12 +134,6 @@
             </RelativeLayout>
 
         </in.testpress.exam.ui.view.SlidingPaneLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:layout_alignParentTop="true"
-            android:background="@drawable/testpress_gradient_shadow_gray_bottom" />
 
         <View
             android:layout_width="fill_parent"
