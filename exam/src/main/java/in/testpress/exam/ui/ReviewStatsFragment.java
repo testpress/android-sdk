@@ -344,8 +344,13 @@ public class ReviewStatsFragment extends BaseFragment {
         requireActivity().startActivityForResult(intent, SHARE_APP);
     }
 
+    private boolean shouldShowShareButton() {
+        return (exam.isGrowthHackEnabled() && isAppNotSharedAlready()) ||
+                (instituteSettings.isGrowthHackEnabled() && !instituteSettings.isAppSharedAlready(requireContext()));
+    }
+
     private void showOrHideShareButton() {
-        if ((exam.isGrowthHackEnabled()  && isAppNotSharedAlready()) || !instituteSettings.isAppSharedAlready(requireContext())) {
+        if (shouldShowShareButton()) {
             shareButtonLayout.setVisibility(View.VISIBLE);
             statsButtonLayout.setVisibility(View.GONE);
         } else {
