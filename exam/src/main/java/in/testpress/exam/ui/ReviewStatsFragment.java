@@ -34,6 +34,7 @@ import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseFragment;
+import in.testpress.util.StringUtils;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 
@@ -338,7 +339,7 @@ public class ReviewStatsFragment extends BaseFragment {
     private void openShareFragment() {
         Intent intent = new Intent(getActivity(), ShareToUnLockActivity.class);
         intent.putExtra(SHARE_TO_UNLOCK_SHARED_PREFERENCE_KEY, exam.getShareToUnlockSharedPreferenceKey());
-        String messageToShare = exam.getShareTextForSolutionUnlock() != null ?
+        String messageToShare = StringUtils.isNullOrEmpty(exam.getShareTextForSolutionUnlock()) ?
                 exam.getShareTextForSolutionUnlock() : instituteSettings.getAppShareText();
         intent.putExtra(MESSAGE_TO_SHARE, messageToShare);
         requireActivity().startActivityForResult(intent, SHARE_APP);
