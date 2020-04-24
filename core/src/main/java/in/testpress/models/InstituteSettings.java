@@ -195,9 +195,13 @@ public class InstituteSettings {
         isGrowthHackEnabled = growthHackEnabled;
     }
 
-    public boolean isAppSharedAlready(Context context) {
+    private boolean isAppSharedAlready(Context context) {
         SharedPreferences preferences = context.getSharedPreferences("APP_SHARING", Context.MODE_PRIVATE);
         return preferences.getInt("NO_OF_TIMES_SHARED", 0) >= 2;
+    }
+
+    public boolean isAppNotSharedAlready(Context context) {
+        return !isAppSharedAlready(context);
     }
 
     public void updateAppSharedStatus(Context context) {

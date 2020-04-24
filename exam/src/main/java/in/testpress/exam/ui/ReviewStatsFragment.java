@@ -346,7 +346,7 @@ public class ReviewStatsFragment extends BaseFragment {
 
     private boolean shouldShowShareButton() {
         return (exam.isGrowthHackEnabled() && isAppNotSharedAlready()) ||
-                (instituteSettings.isGrowthHackEnabled() && !instituteSettings.isAppSharedAlready(requireContext()));
+                (instituteSettings.isGrowthHackEnabled() && instituteSettings.isAppNotSharedAlready(requireContext()));
     }
 
     private void showOrHideShareButton() {
