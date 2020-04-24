@@ -6,6 +6,7 @@ import `in`.testpress.exam.ui.ReviewStatsFragment.MESSAGE_TO_SHARE
 import `in`.testpress.exam.ui.ReviewStatsFragment.NO_OF_TIMES_SHARED
 import `in`.testpress.exam.ui.ReviewStatsFragment.SHARE_TO_UNLOCK_SHARED_PREFERENCE_KEY
 import `in`.testpress.exam.ui.adapters.ShareToUnlockAdapter
+import `in`.testpress.models.InstituteSettings
 import `in`.testpress.ui.BaseToolBarActivity
 import android.app.Activity
 import android.content.ComponentName
@@ -25,6 +26,7 @@ class ShareToUnLockActivity : BaseToolBarActivity(), OnShareAppListener {
     private lateinit var prefs: SharedPreferences
     private lateinit var recyclerView: RecyclerView
     private lateinit var shareInfo: TextView
+    private lateinit var instituteSettings: InstituteSettings
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +36,7 @@ class ShareToUnLockActivity : BaseToolBarActivity(), OnShareAppListener {
         shareInfo = findViewById(R.id.share_info)
         shareInfo.typeface = TestpressSdk.getRubikMediumFont(this)
         shareInfo.text = getString(R.string.share_app_message)
+        instituteSettings = TestpressSdk.getTestpressSession(applicationContext)!!.getInstituteSettings();
     }
 
     private fun initRecyclerView() {
@@ -105,6 +108,7 @@ class ShareToUnLockActivity : BaseToolBarActivity(), OnShareAppListener {
         startActivity(Intent.createChooser(intent, null))
         val previousShareTimes = prefs.getInt(NO_OF_TIMES_SHARED, 0)
         prefs.edit().putInt(NO_OF_TIMES_SHARED, previousShareTimes + 1).apply()
+        instituteSettings.updateAppSharedStatus(applicationContext);
     }
 }
 

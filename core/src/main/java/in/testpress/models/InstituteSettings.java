@@ -1,6 +1,7 @@
 package in.testpress.models;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import in.testpress.util.Assert;
 
@@ -24,6 +25,7 @@ public class InstituteSettings {
     private String appToolbarLogo;
     private String appShareLink;
     private boolean isGrowthHackEnabled;
+    private String appShareText;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -191,5 +193,28 @@ public class InstituteSettings {
 
     public void setGrowthHackEnabled(boolean growthHackEnabled) {
         isGrowthHackEnabled = growthHackEnabled;
+    }
+
+    private boolean isAppSharedAlready(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences("APP_SHARING", Context.MODE_PRIVATE);
+        return preferences.getInt("NO_OF_TIMES_SHARED", 0) >= 2;
+    }
+
+    public boolean isAppNotSharedAlready(Context context) {
+        return !isAppSharedAlready(context);
+    }
+
+    public void updateAppSharedStatus(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences("APP_SHARING", Context.MODE_PRIVATE);
+        int noOfTimesShared = preferences.getInt("NO_OF_TIMES_SHARED", 0);
+        preferences.edit().putInt("NO_OF_TIMES_SHARED", noOfTimesShared + 1).apply();
+    }
+
+    public String getAppShareText() {
+        return appShareText;
+    }
+
+    public void setAppShareText(String appShareText) {
+        this.appShareText = appShareText;
     }
 }
