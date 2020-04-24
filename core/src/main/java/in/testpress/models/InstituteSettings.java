@@ -195,14 +195,15 @@ public class InstituteSettings {
         isGrowthHackEnabled = growthHackEnabled;
     }
 
-    public boolean isAppSharedOneTime(Context context) {
+    public boolean isAppSharedAlready(Context context) {
         SharedPreferences preferences = context.getSharedPreferences("APP_SHARING", Context.MODE_PRIVATE);
-        return preferences.getBoolean("IS_APP_SHARED_ONCE", false);
+        return preferences.getInt("NO_OF_TIMES_SHARED", 0) >= 2;
     }
 
-    public void setAppSharedOneTime(Context context) {
+    public void updateAppSharedStatus(Context context) {
         SharedPreferences preferences = context.getSharedPreferences("APP_SHARING", Context.MODE_PRIVATE);
-        preferences.edit().putBoolean("IS_APP_SHARED_ONCE", true).apply();
+        int noOfTimesShared = preferences.getInt("NO_OF_TIMES_SHARED", 0);
+        preferences.edit().putInt("NO_OF_TIMES_SHARED", noOfTimesShared + 1).apply();
     }
 
     public String getAppShareText() {

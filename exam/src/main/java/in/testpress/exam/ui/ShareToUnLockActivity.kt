@@ -108,7 +108,7 @@ class ShareToUnLockActivity : BaseToolBarActivity(), OnShareAppListener {
         startActivity(Intent.createChooser(intent, null))
         val previousShareTimes = prefs.getInt(NO_OF_TIMES_SHARED, 0)
         prefs.edit().putInt(NO_OF_TIMES_SHARED, previousShareTimes + 1).apply()
-        instituteSettings.setAppSharedOneTime(applicationContext);
+        instituteSettings.updateAppSharedStatus(applicationContext);
     }
 }
 

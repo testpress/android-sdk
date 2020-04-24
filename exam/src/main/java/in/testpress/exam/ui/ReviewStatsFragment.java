@@ -339,13 +339,13 @@ public class ReviewStatsFragment extends BaseFragment {
         Intent intent = new Intent(getActivity(), ShareToUnLockActivity.class);
         intent.putExtra(SHARE_TO_UNLOCK_SHARED_PREFERENCE_KEY, exam.getShareToUnlockSharedPreferenceKey());
         String messageToShare = exam.getShareTextForSolutionUnlock() != null ?
-                exam.getShareTextForSolutionUnlock() : instituteSettings.getShareText(requireContext());
+                exam.getShareTextForSolutionUnlock() : instituteSettings.getAppShareText();
         intent.putExtra(MESSAGE_TO_SHARE, messageToShare);
         requireActivity().startActivityForResult(intent, SHARE_APP);
     }
 
     private void showOrHideShareButton() {
-        if ((exam.isGrowthHackEnabled()  && isAppNotSharedAlready()) || !instituteSettings.isAppSharedOneTime(requireContext())) {
+        if ((exam.isGrowthHackEnabled()  && isAppNotSharedAlready()) || !instituteSettings.isAppSharedAlready(requireContext())) {
             shareButtonLayout.setVisibility(View.VISIBLE);
             statsButtonLayout.setVisibility(View.GONE);
         } else {
