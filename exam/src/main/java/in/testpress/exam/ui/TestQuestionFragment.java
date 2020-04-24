@@ -12,11 +12,13 @@ import android.webkit.JavascriptInterface;
 import java.util.ArrayList;
 import java.util.List;
 
+import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptAnswer;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.AttemptQuestion;
 import in.testpress.exam.ui.view.WebView;
+import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Language;
 import in.testpress.util.WebViewUtils;
 
@@ -32,6 +34,7 @@ public class TestQuestionFragment extends Fragment {
     private WebView questionsView;
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
+    private InstituteSettings instituteSettings;
 
     static TestQuestionFragment getInstance(AttemptItem attemptItem, int questionIndex,
                                             Language selectedLanguage) {
@@ -52,6 +55,7 @@ public class TestQuestionFragment extends Fragment {
         index = getArguments().getInt(PARAM_QUESTION_INDEX);
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
         selectedOptions = new ArrayList<>(attemptItem.getSelectedAnswers());
+        instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
     }
 
     @SuppressLint({"SetTextI18n", "AddJavascriptInterface"})
@@ -85,6 +89,12 @@ public class TestQuestionFragment extends Fragment {
                         }
                     }
                     return javascript;
+                }
+
+                @Override
+                protected void onLoadFinished() {
+                    super.onLoadFinished();
+                    webViewUtils.addWatermark(instituteSettings.getAppToolbarLogo());
                 }
             };
             webViewUtils.initWebView(getQuestionItemHtml(), getActivity());

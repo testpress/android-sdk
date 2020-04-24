@@ -192,11 +192,15 @@ public class WebViewUtils {
     }
 
     protected static String getTestEngineHeader() {
-        return "<script src='TestpressTestEngine.js'></script>";
+        return "<script src='TestpressTestEngine.js'></script><script src='pseudo_style_selector.js'></script>";
     }
 
     protected static String getBookmarkHandlerScript() {
         return "<script src='TestpressReview.js'></script>";
+    }
+
+    public void addWatermark(String logoUrl) {
+        evaluateJavascript("addWatermark('"+ logoUrl +"');");
     }
 
     protected static String getRadioButtonInitializer(int selectedOption) {
