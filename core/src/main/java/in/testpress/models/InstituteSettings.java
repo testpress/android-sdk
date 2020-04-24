@@ -23,6 +23,7 @@ public class InstituteSettings {
     private String storeLabel;
     private String appToolbarLogo;
     private String appShareLink;
+    private boolean isGrowthHackEnabled;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -182,5 +183,13 @@ public class InstituteSettings {
     public InstituteSettings setAppShareLink(String appShareLink) {
         this.appShareLink = appShareLink;
         return this;
+    }
+
+    public boolean isGrowthHackEnabled() {
+        return isGrowthHackEnabled;
+    }
+
+    public void setGrowthHackEnabled(boolean growthHackEnabled) {
+        isGrowthHackEnabled = growthHackEnabled;
     }
 }
