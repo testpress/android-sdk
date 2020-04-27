@@ -250,7 +250,8 @@ public class WebViewUtils {
     public String getQuestionsHeader() {
         return getBaseHeader() +
                 "<link rel='stylesheet' type='text/css' href='testpress_questions_typebase.css' />" +
-                "<link rel='stylesheet' type='text/css' href='icomoon/style.css' />";
+                "<link rel='stylesheet' type='text/css' href='icomoon/style.css' />" +
+                "<script src='pseudo_style_selector.js'></script>";
     }
 
     public static String getHeadingTags(String headingText) {

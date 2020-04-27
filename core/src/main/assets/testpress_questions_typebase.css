@@ -407,5 +407,20 @@ body.watermark::before {
     transform: translateY(60%) rotate(45deg);
     background-repeat: no-repeat;
     background-size: contain;
-    overflow: inherit;
+    overflow: hidden;
+}
+
+body.review-watermark::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 400px;
+    opacity: 0.1;
+    left: -30%;
+    z-index: 999;
+    transform: translateY(30%) rotate(45deg);
+    background-repeat: no-repeat;
+    background-size: contain;
+    overflow: hidden;
+    display: block;
 }

@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -208,6 +210,10 @@ public class ReviewQuestionsFragment extends Fragment {
                 }
                 animationView.bringToFront();
                 webViewUtils.addLogo(instituteSettings.getAppToolbarLogo());
+
+                if (instituteSettings.isGrowthHackEnabled()) {
+                    webViewUtils.addWatermark(instituteSettings.getAppToolbarLogo());
+                }
                 setHasOptionsMenu(true);
             }
 

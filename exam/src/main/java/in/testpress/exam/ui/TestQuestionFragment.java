@@ -94,7 +94,9 @@ public class TestQuestionFragment extends Fragment {
                 @Override
                 protected void onLoadFinished() {
                     super.onLoadFinished();
-                    webViewUtils.addWatermark(instituteSettings.getAppToolbarLogo());
+                    if (instituteSettings.isGrowthHackEnabled()) {
+                        webViewUtils.addWatermark(instituteSettings.getAppToolbarLogo());
+                    }
                 }
             };
             webViewUtils.initWebView(getQuestionItemHtml(), getActivity());
