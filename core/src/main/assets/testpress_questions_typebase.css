@@ -85,8 +85,7 @@ p {
 }
 
 .review-option-item {
-    padding-top: 10px;
-    padding-bottom: 20px;
+    padding-bottom: 5px;
     padding-right: 10px;
     padding-left: 10px;
     display: flex;
@@ -153,10 +152,23 @@ p {
     color: #666;
     text-align: justify;
     font-family: 'PT-Serif-Regular', serif;
-    margin-top: 10px;
-    margin-bottom: 5px;
+    margin-top: 5px;
     margin-left: 10px;
     margin-right: 10px;
+}
+
+.review-question-container .question {
+    font-size: 16px;
+    line-height: 0 !important;
+}
+
+.review-question-container .question p {
+    line-height: 1.5em;
+}
+
+.correct-answer {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .mark-button {
