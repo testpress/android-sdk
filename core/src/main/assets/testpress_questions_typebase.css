@@ -90,6 +90,7 @@ p {
     padding-left: 10px;
     display: flex;
     flex-flow: row;
+    font-size: 15px;
     color: #444;
     font-family: 'PT-Serif-Regular', serif;
 }
@@ -102,7 +103,7 @@ p {
     margin-bottom: auto;
     margin-left: 10px;
     margin-right: 5px;
-    font-size: 1rem;
+    font-size: 15px;
     font-family: 'Rubik-Medium', sans-serif;
 }
 
@@ -155,10 +156,11 @@ p {
     margin-top: 5px;
     margin-left: 10px;
     margin-right: 10px;
+    font-size: 15px;
 }
 
 .review-question-container .question {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 0 !important;
 }
 
