@@ -309,7 +309,9 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         } else if (exam.getTemplateType() == 2 || attempt.hasNoSectionalLock()) {
             plainSpinnerAdapter = new PlainSpinnerItemAdapter(getActivity());
             plainSpinnerAdapter.setSectionInfoClickListener(this);
-            showSectionInstructionsButton();
+            if (!sections.isEmpty()) {
+                showSectionInstructionsButton();
+            }
             sectionsFilter.setAdapter(plainSpinnerAdapter);
             sectionsFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
