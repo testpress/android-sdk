@@ -15,6 +15,7 @@ import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.core.view.ViewCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.core.content.ContextCompat;
 import androidx.loader.content.Loader;
@@ -45,12 +46,14 @@ import java.util.TimeZone;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
+import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.pager.TestQuestionsPager;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.ui.loaders.AttemptItemsLoader;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
+import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.AttemptSection;
 import in.testpress.models.greendao.Content;
@@ -136,12 +139,14 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     };
     public int totalQuestions = 0;
     private boolean isNextPageQuestionsBeingFetched = false;
+    private InstituteSettings instituteSettings;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initializeAttemptAndExamVariables(savedInstanceState);
         initializeResourcePager();
+        instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
     }
 
     private void initializeAttemptAndExamVariables(Bundle savedInstanceState) {
@@ -361,7 +366,9 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         slidingPaneLayout = view.findViewById(R.id.sliding_layout);
         questionsListProgressBar = (View) LayoutInflater.from(getActivity()).inflate(R.layout.progress_bar, null);
         questionsListView.addFooterView(questionsListProgressBar);
-        customiseToolbar();
+        if (instituteSettings.isGrowthHackEnabled()) {
+            customiseToolbar();
+        }
     }
 
     private void showLogoInToolbar() {
@@ -379,10 +386,21 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         ImageButton exitButton = getView().findViewById(R.id.exit_button);
         exitButton.setColorFilter(ContextCompat.getColor(getContext(), R.color.testpress_color_primary));
 
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) exitButton.getLayoutParams();
+        params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+        exitButton.setLayoutParams(params);
+
+        Spinner languagesFilter = getView().findViewById(R.id.language_spinner);
+        RelativeLayout.LayoutParams languagesFilterParams = (RelativeLayout.LayoutParams) languagesFilter.getLayoutParams();
+        languagesFilterParams.addRule(RelativeLayout.LEFT_OF, R.id.exit_button);
+        languagesFilterParams.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        languagesFilter.setLayoutParams(languagesFilterParams);
+        languagesFilter.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.testpress_color_primary));
+
         // Change timer and pause icon color
         timer.setTextColor(ContextCompat.getColor(getContext(), R.color.testpress_color_primary));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            timer.setCompoundDrawableTintList(ContextCompat.getColorStateList(getContext(), R.color.testpress_blue));
+            timer.setCompoundDrawableTintList(ContextCompat.getColorStateList(getContext(), R.color.testpress_color_primary));
         }
         ViewUtils.setTextViewDrawableColor(timer, R.color.testpress_color_primary, getContext());
     }
