@@ -1,6 +1,5 @@
 package in.testpress.course.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import androidx.loader.content.Loader;
 
@@ -18,13 +17,12 @@ import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
 import in.testpress.course.pagers.ChapterPager;
 import in.testpress.course.api.TestpressCourseApiClient;
-import in.testpress.course.util.ProductUtils;
+import in.testpress.course.util.UIUtils;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.network.BaseResourcePager;
-import in.testpress.store.ui.ProductDetailsActivity;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -86,21 +84,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
     private void displayBuyNowButton() {
         Button buyButton = requireView().findViewById(R.id.buy_button);
-        buyButton.setVisibility(View.VISIBLE);
-        if (ProductUtils.getPriceForProduct(productSlug, requireContext()) > 0.0) {
-            buyButton.setText(R.string.buy_now);
-        } else {
-            buyButton.setText(R.string.get_it_for_free);
-        }
-
-        buyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(requireContext(), ProductDetailsActivity.class);
-                intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, productSlug);
-                requireActivity().startActivity(intent);
-            }
-        });
+        UIUtils.displayBuyNowButton(buyButton, productSlug, requireContext());
     }
 
     @Override
