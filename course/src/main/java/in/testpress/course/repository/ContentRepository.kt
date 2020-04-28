@@ -132,6 +132,9 @@ open class ContentRepository(
             val video = it.asGreenDaoModel()
             greenDaoContent.videoId = video.id
             videoDao.insertOrReplace(it.asGreenDaoModel())
+            val streamDao = TestpressSDKDatabase.getStreamDao(context)
+            val streams = it.streams.asGreenDaoModel()
+            streamDao.insertOrReplaceInTx(streams)
         }
         content.attachment?.let {
             val attachmentDao = TestpressSDKDatabase.getAttachmentDao(context)
