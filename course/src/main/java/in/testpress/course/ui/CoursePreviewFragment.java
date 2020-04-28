@@ -18,9 +18,9 @@ import java.util.List;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
+import in.testpress.course.util.ProductUtils;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
-import in.testpress.models.greendao.Product;
 import in.testpress.models.greendao.ProductDao;
 import in.testpress.store.ui.ProductDetailsActivity;
 import in.testpress.ui.BaseListViewFragment;
@@ -32,7 +32,6 @@ import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 
 public class CoursePreviewFragment extends BaseListViewFragment<Course> {
     private CourseDao courseDao;
-    private ProductDao productDao;
     private List<Course> courses = new ArrayList<Course>();
     private ArrayList<Integer> courseIds;
     private String productSlug;
@@ -42,7 +41,6 @@ public class CoursePreviewFragment extends BaseListViewFragment<Course> {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
-        productDao = TestpressSDKDatabase.getProductDao(getContext());
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             courseIds = bundle.getIntegerArrayList(COURSE_IDS);
@@ -66,16 +64,11 @@ public class CoursePreviewFragment extends BaseListViewFragment<Course> {
     private void displayBuyNowButton() {
         Button buyButton = requireView().findViewById(R.id.buy_button);
         buyButton.setVisibility(View.VISIBLE);
-        List<Product> products = productDao.queryBuilder().where(ProductDao.Properties.Slug.eq(productSlug)).list();
-        if (!products.isEmpty()) {
-            Product product = products.get(0);
-            float price = Float.parseFloat(product.getCurrentPrice());
 
-            if (price > 0.0) {
-                buyButton.setText(R.string.buy_now);
-            } else {
-                buyButton.setText(R.string.get_it_for_free);
-            }
+        if (ProductUtils.getPriceForProduct(productSlug, requireContext()) > 0.0) {
+            buyButton.setText(R.string.buy_now);
+        } else {
+            buyButton.setText(R.string.get_it_for_free);
         }
 
         buyButton.setOnClickListener(new View.OnClickListener() {
