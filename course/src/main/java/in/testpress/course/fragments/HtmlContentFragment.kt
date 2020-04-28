@@ -46,7 +46,7 @@ class HtmlContentFragment : BaseContentDetailFragment() {
 
         val htmlContent = content.htmlContent
         val html = """
-            <div style='padding-left: 20px; padding-right: 20px; padding-bottom:70px'>
+            <div style='padding-left: 20px; padding-right: 20px;'>
                 ${htmlContent?.textHtml}
             </div>
         """.trimIndent()
