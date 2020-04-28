@@ -12,7 +12,8 @@ data class NetworkContentAttempt(
     val chapterContentId: Long? = null,
     val assessmentId: Long? = null,
     val userVideoId: Long? = null,
-    val assessment: NetworkAttempt? = null
+    val assessment: NetworkAttempt? = null,
+    val video: NetworkVideoAttempt? = null
 )
 
 fun createContentAttempt(contentAttempt: NetworkContentAttempt): CourseAttempt {
