@@ -474,6 +474,7 @@ public class ExoPlayerUtil {
     }
 
     private void startOverlayMarquee() {
+        if (emailIdLayout == null) return;
         Animation marquee = AnimationUtils.loadAnimation(activity, R.anim.testpress_marquee);
         emailIdLayout.startAnimation(marquee);
     }
