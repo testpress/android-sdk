@@ -192,11 +192,15 @@ public class WebViewUtils {
     }
 
     protected static String getTestEngineHeader() {
-        return "<script src='TestpressTestEngine.js'></script>";
+        return "<script src='TestpressTestEngine.js'></script><script src='pseudo_style_selector.js'></script>";
     }
 
     protected static String getBookmarkHandlerScript() {
         return "<script src='TestpressReview.js'></script>";
+    }
+
+    public void addWatermark(String logoUrl) {
+        evaluateJavascript("addWatermark('"+ logoUrl +"');");
     }
 
     protected static String getRadioButtonInitializer(int selectedOption) {
@@ -246,7 +250,8 @@ public class WebViewUtils {
     public String getQuestionsHeader() {
         return getBaseHeader() +
                 "<link rel='stylesheet' type='text/css' href='testpress_questions_typebase.css' />" +
-                "<link rel='stylesheet' type='text/css' href='icomoon/style.css' />";
+                "<link rel='stylesheet' type='text/css' href='icomoon/style.css' />" +
+                "<script src='pseudo_style_selector.js'></script>";
     }
 
     public static String getHeadingTags(String headingText) {

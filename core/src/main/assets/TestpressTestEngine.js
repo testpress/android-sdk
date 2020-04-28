@@ -112,3 +112,8 @@ function setSelectedOptionBackground(layout) {
 function removeBackground(layout) {
     layout.className = layout.className.replace( /(?:^|\s)option-item-selected(?!\S)/g , '' );
 }
+
+function addWatermark(logoUrl) {
+    document.body.pseudoStyle("before", "background-image", `url(${logoUrl})`);
+    document.body.classList.add("watermark");
+}

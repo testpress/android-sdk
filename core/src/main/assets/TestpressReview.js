@@ -46,3 +46,8 @@ function hideLogo() {
     var logo = getElement("logo");
     logo.style.display = "none";
 }
+
+function addWatermark(logoUrl) {
+    document.body.pseudoStyle("before", "background-image", `url(${logoUrl})`);
+    document.body.classList.add("review-watermark");
+}
