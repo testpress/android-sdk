@@ -59,7 +59,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
             .observe(viewLifecycleOwner, Observer { resource ->
                 val videoAttempt = resource.data!!
                 exoPlayerUtil = ExoPlayerUtil(activity, exoPlayerMainFrame, video?.hlsUrl(), 0F)
-                exoPlayerUtil?.setVideoAttemptParameters(videoAttempt.id, greenDaoContent!!)
+                exoPlayerUtil?.setVideoAttemptParameters(videoAttempt.objectId!!.toLong(), greenDaoContent!!)
                 exoPlayerUtil?.initializePlayer()
                 exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil)
             })
