@@ -1,8 +1,13 @@
 package in.testpress.course.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.loader.content.Loader;
+
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 
 import org.greenrobot.greendao.AbstractDao;
 
@@ -17,13 +22,17 @@ import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
+import in.testpress.models.greendao.Product;
+import in.testpress.models.greendao.ProductDao;
 import in.testpress.network.BaseResourcePager;
+import in.testpress.store.ui.ProductDetailsActivity;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
 
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
+import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 
 public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
@@ -41,6 +50,12 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         apiClient = new TestpressCourseApiClient(getActivity());
         chapterDao = TestpressSDKDatabase.getChapterDao(getActivity());
         courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
+    }
+
+    @Override
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+                             final Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.course_preview_layout, container, false);
     }
 
     private void storeArgs() {
@@ -62,9 +77,39 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         super.onViewCreated(view, savedInstanceState);
         swipeRefreshLayout.setEnabled(false);
 
+        if (productSlug != null) {
+            displayBuyNowButton();
+        }
+
         if (isItemsEmpty()) {
             showLoadingPlaceholder();
         }
+    }
+
+    private void displayBuyNowButton() {
+        ProductDao productDao = TestpressSDKDatabase.getProductDao(getContext());
+        Button buyButton = requireView().findViewById(R.id.buy_button);
+        buyButton.setVisibility(View.VISIBLE);
+        List<Product> products = productDao.queryBuilder().where(ProductDao.Properties.Slug.eq(productSlug)).list();
+        if (!products.isEmpty()) {
+            Product product = products.get(0);
+            float price = Float.parseFloat(product.getCurrentPrice());
+
+            if (price > 0.0) {
+                buyButton.setText(R.string.buy_now);
+            } else {
+                buyButton.setText(R.string.get_it_for_free);
+            }
+        }
+
+        buyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(requireContext(), ProductDetailsActivity.class);
+                intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, productSlug);
+                requireActivity().startActivity(intent);
+            }
+        });
     }
 
     @Override
