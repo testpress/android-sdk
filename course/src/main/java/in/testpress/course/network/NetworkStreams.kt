@@ -12,3 +12,9 @@ data class NetworkStream(
 fun NetworkStream.asGreenDaoModel(): Stream {
     return Stream(this.id, this.format, this.url, this.videoId)
 }
+
+fun List<NetworkStream>.asGreenDaoModel(): List<Stream> {
+    return this.map {
+        it.asGreenDaoModel()
+    }
+}
