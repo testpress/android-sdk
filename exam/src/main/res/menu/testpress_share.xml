@@ -41,7 +41,6 @@
         android:id="@+id/close"
         android:visible="false"
         android:icon="@drawable/ic_close_black_24dp"
-        android:visible="false"
         app:showAsAction="always"
         app:iconTint="@color/testpress_color_primary"
         android:title="@string/testpress_share" >
