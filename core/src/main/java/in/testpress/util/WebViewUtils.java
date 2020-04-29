@@ -17,6 +17,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 import java.util.List;
 
 import in.testpress.models.greendao.ReviewAnswer;
@@ -284,9 +287,9 @@ public class WebViewUtils {
         } else {
             optionCircleHtml += ((char) (65 + index));
         }
-
+        Document answerHtmlNode = Jsoup.parse(answer.getTextHtml());
         return html + optionCircleHtml + "</div>" +
-                "    <span>" + answer.getTextHtml() + "</span>" +
+                "    <span class='review-option-text'>" + answerHtmlNode.body().text() + "</span>" +
                 "</div>";
     }
 

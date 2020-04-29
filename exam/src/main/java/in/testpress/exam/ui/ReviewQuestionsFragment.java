@@ -445,7 +445,6 @@ public class ReviewQuestionsFragment extends Fragment {
 
         // Add explanation
         if (explanationHtml != null && !explanationHtml.isEmpty()) {
-            html += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation));
             html += "<div class='review-explanation'>" +
                         explanationHtml +
                     "</div>";
