@@ -2,6 +2,11 @@ package in.testpress.course.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.Loader;
@@ -12,6 +17,7 @@ import java.util.List;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
+import in.testpress.course.util.UIUtils;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.ui.BaseListViewFragment;
@@ -38,6 +44,23 @@ public class CoursePreviewFragment extends BaseListViewFragment<Course> {
             productSlug = bundle.getString(PRODUCT_SLUG);
         }
 
+    }
+
+    @Override
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+                             final Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.course_preview_layout, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        displayBuyNowButton();
+    }
+
+    private void displayBuyNowButton() {
+        Button buyButton = requireView().findViewById(R.id.buy_button);
+        UIUtils.displayBuyNowButton(buyButton, productSlug, requireContext());
     }
 
     @Override

@@ -2,7 +2,11 @@ package in.testpress.course.ui;
 
 import android.os.Bundle;
 import androidx.loader.content.Loader;
+
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 
 import org.greenrobot.greendao.AbstractDao;
 
@@ -13,6 +17,7 @@ import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
 import in.testpress.course.pagers.ChapterPager;
 import in.testpress.course.api.TestpressCourseApiClient;
+import in.testpress.course.util.UIUtils;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Course;
@@ -43,6 +48,12 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
     }
 
+    @Override
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+                             final Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.course_preview_layout, container, false);
+    }
+
     private void storeArgs() {
         courseId = getArguments().getString(COURSE_ID);
         productSlug = getArguments().getString(PRODUCT_SLUG);
@@ -62,9 +73,18 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         super.onViewCreated(view, savedInstanceState);
         swipeRefreshLayout.setEnabled(false);
 
+        if (productSlug != null) {
+            displayBuyNowButton();
+        }
+
         if (isItemsEmpty()) {
             showLoadingPlaceholder();
         }
+    }
+
+    private void displayBuyNowButton() {
+        Button buyButton = requireView().findViewById(R.id.buy_button);
+        UIUtils.displayBuyNowButton(buyButton, productSlug, requireContext());
     }
 
     @Override
