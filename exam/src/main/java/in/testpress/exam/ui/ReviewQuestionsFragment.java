@@ -394,8 +394,6 @@ public class ReviewQuestionsFragment extends Fragment {
                     } else {
                         optionColor = R.color.testpress_red;
                     }
-                } else if (attemptAnswer.getIsCorrect()) {
-                    optionColor = R.color.testpress_green;
                 } else {
                     optionColor = android.R.color.white;
                 }
