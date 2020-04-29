@@ -63,7 +63,7 @@ p {
     border-radius: 50%;
     color: #aaa;
     background: #fff;
-    margin-right: 10px;
+    margin-right: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -85,14 +85,18 @@ p {
 }
 
 .review-option-item {
-    padding-top: 10px;
-    padding-bottom: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     padding-right: 10px;
     padding-left: 10px;
     display: flex;
     flex-flow: row;
     color: #444;
     font-family: 'PT-Serif-Regular', serif;
+}
+
+.review-option-text {
+    padding-top: 3px;
 }
 
 .review-heading {
@@ -423,4 +427,11 @@ body.review-watermark::before {
     background-size: contain;
     overflow: hidden;
     display: block;
+}
+
+.correct-tick {
+    color: #18be99;
+    padding-top: 3px;
+    font-weight: bold;
+    margin-left: 5px;
 }

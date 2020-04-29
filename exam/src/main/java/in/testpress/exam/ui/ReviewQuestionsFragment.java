@@ -397,7 +397,7 @@ public class ReviewQuestionsFragment extends Fragment {
                 } else {
                     optionColor = android.R.color.white;
                 }
-                html += "\n" + WebViewUtils.getOptionWithTags(attemptAnswer.getTextHtml(), j,
+                html += "\n" + WebViewUtils.getOptionWithTags(attemptAnswer, j,
                         optionColor, getContext());
 
                 if (attemptAnswer.getIsCorrect()) {
@@ -426,7 +426,7 @@ public class ReviewQuestionsFragment extends Fragment {
                     "</div>";
         }
 
-        if (isSingleMCQType || isMultipleMCQType || isNumericalType) {
+        if (isNumericalType) {
             // Add correct answer
             html += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
                     WebViewUtils.getHeadingTags(getString(R.string.testpress_correct_answer)) +
@@ -443,7 +443,6 @@ public class ReviewQuestionsFragment extends Fragment {
 
         // Add explanation
         if (explanationHtml != null && !explanationHtml.isEmpty()) {
-            html += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation));
             html += "<div class='review-explanation'>" +
                         explanationHtml +
                     "</div>";

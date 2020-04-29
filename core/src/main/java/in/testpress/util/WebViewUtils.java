@@ -17,8 +17,12 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 import java.util.List;
 
+import in.testpress.models.greendao.ReviewAnswer;
 import in.testpress.ui.ZoomableImageActivity;
 
 public class WebViewUtils {
@@ -269,7 +273,7 @@ public class WebViewUtils {
                 "</div>";
     }
 
-    public static String getOptionWithTags(String optionText, int index, int colorRes, Context context) {
+    public static String getOptionWithTags(ReviewAnswer answer, int index, int colorRes, Context context) {
         String html = "\n<div class='review-option-item wrapper'>";
         if (colorRes == android.R.color.white) {
             html += "<div class='alphabetical-option-ring-general'>";
@@ -277,8 +281,15 @@ public class WebViewUtils {
             html += "<div class='alphabetical-option-ring-attempted' style='background-color:" +
                     getColor(context, colorRes) + ";'>";
         }
+        String correctAnswerTick = "";
+        if (answer.getIsCorrect()) {
+            correctAnswerTick += "<span class='correct-tick'> &check; </span>";
+        }
+
+        Document answerHtmlNode = Jsoup.parse(answer.getTextHtml());
         return html + ((char) (65 + index)) + "</div>" +
-                "    <span>" + optionText + "</span>" +
+                "    <span class='review-option-text'>" + answerHtmlNode.body().text() + "</span>" +
+                correctAnswerTick +
                 "</div>";
     }
 
