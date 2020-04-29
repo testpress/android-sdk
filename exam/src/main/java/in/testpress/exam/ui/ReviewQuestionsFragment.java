@@ -235,6 +235,7 @@ public class ReviewQuestionsFragment extends Fragment {
         inflater.inflate(R.menu.testpress_share, menu);
         if (instituteSettings.isGrowthHackEnabled()) {
             menu.findItem(R.id.share).setVisible(true);
+            menu.findItem(R.id.close).setVisible(true);
 
             if (isAppInstalled("com.whatsapp", getContext())) {
                 MenuItem whatsapp = menu.findItem(R.id.whatsapp);
