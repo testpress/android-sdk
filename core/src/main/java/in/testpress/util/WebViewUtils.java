@@ -281,15 +281,15 @@ public class WebViewUtils {
             html += "<div class='alphabetical-option-ring-attempted' style='background-color:" +
                     getColor(context, colorRes) + ";'>";
         }
-        String optionCircleHtml = "";
+        String correctAnswerTick = "";
         if (answer.getIsCorrect()) {
-            optionCircleHtml += "&check;";
-        } else {
-            optionCircleHtml += ((char) (65 + index));
+            correctAnswerTick += "<span class='correct-tick'> &check; </span>";
         }
+
         Document answerHtmlNode = Jsoup.parse(answer.getTextHtml());
-        return html + optionCircleHtml + "</div>" +
+        return html + ((char) (65 + index)) + "</div>" +
                 "    <span class='review-option-text'>" + answerHtmlNode.body().text() + "</span>" +
+                correctAnswerTick +
                 "</div>";
     }
 

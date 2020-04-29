@@ -428,3 +428,10 @@ body.review-watermark::before {
     overflow: hidden;
     display: block;
 }
+
+.correct-tick {
+    color: #18be99;
+    padding-top: 3px;
+    font-weight: bold;
+    margin-left: 5px;
+}
