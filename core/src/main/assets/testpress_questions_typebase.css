@@ -112,10 +112,9 @@ p {
     min-width: 10px;
     margin-top: 15px;
     margin-left: 10px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    padding-right: 13px;
-    padding-left: 13px;
+    float: left;
+    padding-right: 8px;
+    padding-left: 8px;
     border: 1px solid #ccc;
     border-radius: 15px;
     font-size: 0.9rem;
