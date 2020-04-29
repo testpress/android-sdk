@@ -98,6 +98,7 @@ public class ReviewQuestionsFragment extends Fragment {
     private Language selectedLanguage;
     private InstituteSettings instituteSettings;
     private boolean loadComments = false;
+    private MenuItem bookmarkIcon;
 
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
     private RetrofitCall<Bookmark> bookmarkAPIRequest;
@@ -233,7 +234,12 @@ public class ReviewQuestionsFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.testpress_share, menu);
+        bookmarkIcon = menu.findItem(R.id.bookmark);
+        initalizeBookmarkButtonListener();
+
         if (instituteSettings.isGrowthHackEnabled()) {
+            menu.findItem(R.id.bookmark).setIconTintList(ContextCompat.getColorStateList(
+                    getActivity(), R.color.testpress_actionbar_text));
             menu.findItem(R.id.share).setVisible(true);
             menu.findItem(R.id.close).setVisible(true);
 
@@ -246,6 +252,29 @@ public class ReviewQuestionsFragment extends Fragment {
                 MenuItem telegram = menu.findItem(R.id.telegram);
                 telegram.setVisible(true);
             }
+        }
+    }
+
+    private void initalizeBookmarkButtonListener() {
+        bookmarkIcon.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if (reviewItem.getBookmarkId() != null) {
+                    deleteBookmark(reviewItem.getBookmarkId());
+                } else {
+                    bookmarkFolders.clear();
+                    loadBookmarkFolders(instituteSettings.getBaseUrl() + BOOKMARK_FOLDERS_PATH);
+                }
+                return false;
+            }
+        });
+    }
+
+    private void updateBookmarkIcon() {
+        if (reviewItem.getBookmarkId() != null) {
+            bookmarkIcon.setIcon(R.drawable.ic_remove_bookmark);
+        } else {
+            bookmarkIcon.setIcon(R.drawable.ic_bookmark_border_black_24dp);
         }
     }
 
@@ -321,9 +350,6 @@ public class ReviewQuestionsFragment extends Fragment {
                 reviewItem.getIndex() +
                 "</div>";
 
-        if (instituteSettings.isBookmarksEnabled()) {
-            html += WebViewUtils.getBookmarkButtonWithTags(reviewItem.getBookmarkId() != null);
-        }
 
         // Add direction/passage
         if (directionHtml != null && !directionHtml.isEmpty()) {
@@ -488,7 +514,7 @@ public class ReviewQuestionsFragment extends Fragment {
                     public void onSuccess(Bookmark bookmark) {
                         reviewItem.setBookmarkId(bookmark.getId());
                         reviewItemDao.updateInTx(reviewItem);
-                        webViewUtils.updateBookmarkButtonState(true);
+                        updateBookmarkIcon();
                         setBookmarkProgress(false);
                     }
 
@@ -508,7 +534,7 @@ public class ReviewQuestionsFragment extends Fragment {
                         reviewItem.setBookmarkId(null);
                         reviewItemDao.updateInTx(reviewItem);
                         bookmarkFolderSpinner.setSelection(0);
-                        webViewUtils.updateBookmarkButtonState(false);
+                        updateBookmarkIcon();
                         setBookmarkProgress(false);
                     }
 
@@ -521,11 +547,11 @@ public class ReviewQuestionsFragment extends Fragment {
 
     void setBookmarkProgress(boolean show) {
         if (show) {
-            webViewUtils.hideBookmarkButton();
+            bookmarkIcon.setVisible(false);
             animationView.setVisibility(View.VISIBLE);
         } else {
+            bookmarkIcon.setVisible(true);
             animationView.setVisibility(View.GONE);
-            webViewUtils.displayBookmarkButton();
         }
     }
 
@@ -631,7 +657,6 @@ public class ReviewQuestionsFragment extends Fragment {
             @Override
             public void run() {
                 Bitmap bitmap = ImageUtils.getBitmapFromView(webView);
-                webViewUtils.displayBookmarkButton();
                 webViewUtils.hideLogo();
                 ImageUtils.shareBitmap(bitmap, webView.getContext(), package_name);
             }
