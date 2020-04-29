@@ -19,6 +19,7 @@ import android.webkit.WebViewClient;
 
 import java.util.List;
 
+import in.testpress.models.greendao.ReviewAnswer;
 import in.testpress.ui.ZoomableImageActivity;
 
 public class WebViewUtils {
@@ -269,7 +270,7 @@ public class WebViewUtils {
                 "</div>";
     }
 
-    public static String getOptionWithTags(String optionText, int index, int colorRes, Context context) {
+    public static String getOptionWithTags(ReviewAnswer answer, int index, int colorRes, Context context) {
         String html = "\n<div class='review-option-item wrapper'>";
         if (colorRes == android.R.color.white) {
             html += "<div class='alphabetical-option-ring-general'>";
@@ -277,8 +278,15 @@ public class WebViewUtils {
             html += "<div class='alphabetical-option-ring-attempted' style='background-color:" +
                     getColor(context, colorRes) + ";'>";
         }
-        return html + ((char) (65 + index)) + "</div>" +
-                "    <span>" + optionText + "</span>" +
+        String optionCircleHtml = "";
+        if (answer.getIsCorrect()) {
+            optionCircleHtml += "&check;";
+        } else {
+            optionCircleHtml += ((char) (65 + index));
+        }
+
+        return html + optionCircleHtml + "</div>" +
+                "    <span>" + answer.getTextHtml() + "</span>" +
                 "</div>";
     }
 

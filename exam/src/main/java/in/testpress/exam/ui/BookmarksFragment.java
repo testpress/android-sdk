@@ -426,7 +426,7 @@ public class BookmarksFragment extends BaseFragment {
                 } else {
                     optionColor = android.R.color.white;
                 }
-                html += "\n" + WebViewUtils.getOptionWithTags(attemptAnswer.getTextHtml(), j,
+                html += "\n" + WebViewUtils.getOptionWithTags(attemptAnswer, j,
                         optionColor, getContext());
 
                 if (attemptAnswer.getIsCorrect()) {
