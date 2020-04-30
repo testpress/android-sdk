@@ -49,5 +49,5 @@ function hideLogo() {
 
 function addWatermark(logoUrl) {
     document.body.pseudoStyle("before", "background-image", `url(${logoUrl})`);
-    document.body.classList.add("review-watermark");
+    document.body.classList.add("watermark");
 }
