@@ -6,7 +6,7 @@ import `in`.testpress.course.domain.asDomainContents
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkAttachmentContent
 import `in`.testpress.course.network.NetworkContent
-import `in`.testpress.course.network.NetworkContentAttempt
+import `in`.testpress.exam.network.NetworkContentAttempt
 import `in`.testpress.course.network.NetworkHtmlContent
 import `in`.testpress.course.network.Resource
 import `in`.testpress.course.util.RetrofitCallMock

@@ -14,6 +14,7 @@ import `in`.testpress.course.network.asDomainContentAttempt
 import `in`.testpress.course.network.asGreenDaoModel
 import `in`.testpress.exam.network.ExamNetwork
 import `in`.testpress.exam.network.NetworkLanguage
+import `in`.testpress.exam.network.asGreenDaoModel
 import `in`.testpress.exam.network.asGreenDaoModels
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.CourseAttemptDao

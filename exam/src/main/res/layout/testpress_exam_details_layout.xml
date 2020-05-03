@@ -40,6 +40,7 @@
         <LinearLayout
             style="@style/TestpressExamInfoRow"
             android:layout_marginBottom="5dp"
+            android:id="@+id/duration_layout"
             android:layout_gravity="center">
             <ImageView
                 android:layout_height="match_parent"

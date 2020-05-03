@@ -6,12 +6,15 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import android.view.MenuItem;
 
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.CourseAttempt;
+import in.testpress.models.greendao.CourseAttemptDao;
 import in.testpress.models.greendao.Exam;
+import in.testpress.models.greendao.ExamDao;
 import in.testpress.ui.BaseToolBarActivity;
 
 import static in.testpress.exam.ui.ReviewStatsFragment.PARAM_SHOW_RETAKE_BUTTON;
@@ -32,6 +35,21 @@ public class ReviewStatsActivity extends BaseToolBarActivity {
         intent.putExtra(PARAM_EXAM, exam);
         intent.putExtra(PARAM_ATTEMPT, attempt);
         intent.putExtra(PARAM_SHOW_RETAKE_BUTTON, true);
+        return intent;
+    }
+
+    public static Intent createIntent(Activity activity, Long examId, Long contentAttemptId) {
+        ExamDao examDao = TestpressSDKDatabase.getExamDao(activity);
+        Exam exam = examDao.queryBuilder().where(ExamDao.Properties.Id.eq(examId)).build().list().get(0);
+        CourseAttemptDao courseAttemptDao = TestpressSDKDatabase.getCourseAttemptDao(activity);
+        CourseAttempt courseAttempt = courseAttemptDao.queryBuilder()
+                .where(CourseAttemptDao.Properties.Id.eq(contentAttemptId)).list().get(0);
+
+        Intent intent = new Intent(activity, ReviewStatsActivity.class);
+        intent.putExtra(PARAM_PREVIOUS_ACTIVITY, activity.getClass().getName());
+        intent.putExtra(PARAM_EXAM, exam);
+        intent.putExtra(PARAM_COURSE_ATTEMPT, courseAttempt);
+        intent.putExtra(PARAM_SHOW_RETAKE_BUTTON, false);
         return intent;
     }
 

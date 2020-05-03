@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 30;
+    private static final int VERSION = 31;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -26,6 +26,17 @@ public class TestpressSDKDaoGenerator {
         addReviewQuestionToAnswers(reviewQuestion, reviewAnswer);
         addTranslationsToReviewQuestion(reviewQuestion, reviewQuestionTranslation);
         addAnswersToReviewTranslations(reviewQuestionTranslation, reviewAnswerTranslation);
+
+        Entity direction = addDirection(schema);
+        Entity examQuestion = addExamQuestion(schema);
+        Entity question = addQuestion(schema);
+        Entity answer = addAnswer(schema);
+        addQuestionToExamQuestion(examQuestion, question);
+        addQuestionToAnswers(question, answer);
+        addDirectionToQuestion(direction, question);
+
+        Entity userSelectedAnswer = addUserSelectedAnswer(schema);
+        addQuestionToUserSelectedAnswer(question, userSelectedAnswer);
 
         Entity course = addCourse(schema);
 
@@ -69,7 +80,6 @@ public class TestpressSDKDaoGenerator {
         Entity answerTranslation = addAnswerTranslation(schema);
         addAnswersTranslationToReviewTranslations(reviewQuestionTranslation, answerTranslation);
         addSubject(schema);
-        addDirection(schema);
         addDirectionTranslation(schema);
 
         Entity product = addProduct(schema);
@@ -118,6 +128,81 @@ public class TestpressSDKDaoGenerator {
                 "in.testpress.util.IntegerListConverter"
         ).codeBeforeField("@SerializedName(\"courses\")");
         return product;
+    }
+
+    private static Entity addUserSelectedAnswer(Schema schema) {
+        Entity userSelectedAnswer = schema.addEntity("UserSelectedAnswer");
+        userSelectedAnswer.addLongProperty("id").primaryKey();
+        userSelectedAnswer.addIntProperty("order");
+        userSelectedAnswer.addBooleanProperty("review");
+        userSelectedAnswer.addLongProperty("examId");
+        userSelectedAnswer.addStringProperty("explanationHtml");
+        userSelectedAnswer.addStringProperty("shortText");
+        userSelectedAnswer.addStringProperty("selectedAnswers").customType(
+                "in.testpress.util.IntegerList",
+                "in.testpress.util.IntegerListConverter"
+        );
+        userSelectedAnswer.addStringProperty("correctAnswers").customType(
+                "in.testpress.util.IntegerList",
+                "in.testpress.util.IntegerListConverter"
+        );
+        userSelectedAnswer.addStringProperty("url");
+        return userSelectedAnswer;
+    }
+
+    private static void addQuestionToUserSelectedAnswer(Entity question, Entity userSelectedAnswer) {
+        Property questionId = userSelectedAnswer.addLongProperty("questionId").getProperty();
+        userSelectedAnswer.addToOne(question, questionId, "question");
+    }
+
+    private static Entity addExamQuestion(Schema schema) {
+        Entity examQuestion = schema.addEntity("ExamQuestion");
+        examQuestion.addLongProperty("id").primaryKey();
+        examQuestion.addIntProperty("order");
+        examQuestion.addLongProperty("examId");
+        return examQuestion;
+    }
+
+    private static void addQuestionToExamQuestion(Entity examQuestion, Entity question) {
+        Property questionId = examQuestion.addLongProperty("questionId").getProperty();
+        examQuestion.addToOne(question, questionId, "question");
+    }
+
+    private static Entity addQuestion(Schema schema) {
+        Entity question = schema.addEntity("Question");
+        question.addLongProperty("id").primaryKey();
+        question.addStringProperty("questionHtml");
+        question.addStringProperty("directionHtml");
+        question.addLongProperty("parentId");
+        question.addStringProperty("type");
+        question.addStringProperty("language");
+        question.addStringProperty("explanation");
+        question.addStringProperty("commentsUrl");
+        question.addStringProperty("answerIds").customType(
+                "in.testpress.util.IntegerList",
+                "in.testpress.util.IntegerListConverter"
+        );
+        return question;
+    }
+
+    private static void addDirectionToQuestion(Entity direction, Entity question) {
+        Property directionId = question.addLongProperty("directionId").getProperty();
+        question.addToOne(direction, directionId, "direction");
+    }
+
+    private static Entity addAnswer(Schema schema) {
+        Entity answer = schema.addEntity("Answer");
+        answer.addLongProperty("id").primaryKey();
+        answer.addStringProperty("textHtml");
+        answer.addBooleanProperty("isCorrect");
+        answer.addStringProperty("marks");
+        return answer;
+    }
+
+    private static void addQuestionToAnswers(Entity question, Entity answer) {
+        Property questionId = answer.addLongProperty("questionId").getProperty();
+        ToMany questionToAnswers = question.addToMany(answer, questionId);
+        questionToAnswers.setName("answers");
     }
 
     private static Entity addAttempt(Schema schema) {
@@ -659,10 +744,11 @@ public class TestpressSDKDaoGenerator {
         subject.addStringProperty("name");
     }
 
-    private static void addDirection(Schema schema) {
+    private static Entity addDirection(Schema schema) {
         Entity direction = schema.addEntity("Direction");
         direction.addLongProperty("id").primaryKey();
         direction.addStringProperty("html");
+        return direction;
     }
 
     private static void addDirectionTranslation(Schema schema) {

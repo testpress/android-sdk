@@ -12,15 +12,15 @@ function initRadioGroup(selectedRadioOptionId) {
 
 function onRadioOptionClick(clickedOption) {
     if (selectedRadioOption == clickedOption) {
-        OptionsSelectionListener.onCheckedChange(clickedOption.id, false, true);
         setRadioButtonState(clickedOption, false);
         selectedRadioOption = null;
+        OptionsSelectionListener.onCheckedChange(clickedOption.id, false, true);
     } else {
         if (selectedRadioOption) {
             setRadioButtonState(selectedRadioOption, false);
         }
-        OptionsSelectionListener.onCheckedChange(clickedOption.id, true, true);
         setRadioButtonState(clickedOption, true);
+        OptionsSelectionListener.onCheckedChange(clickedOption.id, true, true);
     }
 }
 
@@ -55,11 +55,11 @@ function initCheckBoxGroup(selectedCheckBoxOptionIds) {
 
 function onCheckBoxOptionClick(option) {
     if (isCheckedOption(option)) {
-        OptionsSelectionListener.onCheckedChange(option.id, false, false);
         setCheckboxState(option, false);
+        OptionsSelectionListener.onCheckedChange(option.id, false, false);
     } else {
-        OptionsSelectionListener.onCheckedChange(option.id, true, false);
         setCheckboxState(option, true);
+        OptionsSelectionListener.onCheckedChange(option.id, true, false);
     }
 }
 

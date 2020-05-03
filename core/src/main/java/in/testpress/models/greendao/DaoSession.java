@@ -15,6 +15,11 @@ import in.testpress.models.greendao.ReviewAnswer;
 import in.testpress.models.greendao.ReviewQuestionTranslation;
 import in.testpress.models.greendao.ReviewAnswerTranslation;
 import in.testpress.models.greendao.SelectedAnswer;
+import in.testpress.models.greendao.Direction;
+import in.testpress.models.greendao.ExamQuestion;
+import in.testpress.models.greendao.Question;
+import in.testpress.models.greendao.Answer;
+import in.testpress.models.greendao.UserSelectedAnswer;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.Content;
@@ -33,7 +38,6 @@ import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.ContentType;
 import in.testpress.models.greendao.AnswerTranslation;
 import in.testpress.models.greendao.Subject;
-import in.testpress.models.greendao.Direction;
 import in.testpress.models.greendao.DirectionTranslation;
 import in.testpress.models.greendao.Product;
 import in.testpress.models.greendao.Price;
@@ -45,6 +49,11 @@ import in.testpress.models.greendao.ReviewAnswerDao;
 import in.testpress.models.greendao.ReviewQuestionTranslationDao;
 import in.testpress.models.greendao.ReviewAnswerTranslationDao;
 import in.testpress.models.greendao.SelectedAnswerDao;
+import in.testpress.models.greendao.DirectionDao;
+import in.testpress.models.greendao.ExamQuestionDao;
+import in.testpress.models.greendao.QuestionDao;
+import in.testpress.models.greendao.AnswerDao;
+import in.testpress.models.greendao.UserSelectedAnswerDao;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.ContentDao;
@@ -63,7 +72,6 @@ import in.testpress.models.greendao.BookmarkDao;
 import in.testpress.models.greendao.ContentTypeDao;
 import in.testpress.models.greendao.AnswerTranslationDao;
 import in.testpress.models.greendao.SubjectDao;
-import in.testpress.models.greendao.DirectionDao;
 import in.testpress.models.greendao.DirectionTranslationDao;
 import in.testpress.models.greendao.ProductDao;
 import in.testpress.models.greendao.PriceDao;
@@ -84,6 +92,11 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig reviewQuestionTranslationDaoConfig;
     private final DaoConfig reviewAnswerTranslationDaoConfig;
     private final DaoConfig selectedAnswerDaoConfig;
+    private final DaoConfig directionDaoConfig;
+    private final DaoConfig examQuestionDaoConfig;
+    private final DaoConfig questionDaoConfig;
+    private final DaoConfig answerDaoConfig;
+    private final DaoConfig userSelectedAnswerDaoConfig;
     private final DaoConfig courseDaoConfig;
     private final DaoConfig chapterDaoConfig;
     private final DaoConfig contentDaoConfig;
@@ -102,7 +115,6 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig contentTypeDaoConfig;
     private final DaoConfig answerTranslationDaoConfig;
     private final DaoConfig subjectDaoConfig;
-    private final DaoConfig directionDaoConfig;
     private final DaoConfig directionTranslationDaoConfig;
     private final DaoConfig productDaoConfig;
     private final DaoConfig priceDaoConfig;
@@ -114,6 +126,11 @@ public class DaoSession extends AbstractDaoSession {
     private final ReviewQuestionTranslationDao reviewQuestionTranslationDao;
     private final ReviewAnswerTranslationDao reviewAnswerTranslationDao;
     private final SelectedAnswerDao selectedAnswerDao;
+    private final DirectionDao directionDao;
+    private final ExamQuestionDao examQuestionDao;
+    private final QuestionDao questionDao;
+    private final AnswerDao answerDao;
+    private final UserSelectedAnswerDao userSelectedAnswerDao;
     private final CourseDao courseDao;
     private final ChapterDao chapterDao;
     private final ContentDao contentDao;
@@ -132,7 +149,6 @@ public class DaoSession extends AbstractDaoSession {
     private final ContentTypeDao contentTypeDao;
     private final AnswerTranslationDao answerTranslationDao;
     private final SubjectDao subjectDao;
-    private final DirectionDao directionDao;
     private final DirectionTranslationDao directionTranslationDao;
     private final ProductDao productDao;
     private final PriceDao priceDao;
@@ -161,6 +177,21 @@ public class DaoSession extends AbstractDaoSession {
 
         selectedAnswerDaoConfig = daoConfigMap.get(SelectedAnswerDao.class).clone();
         selectedAnswerDaoConfig.initIdentityScope(type);
+
+        directionDaoConfig = daoConfigMap.get(DirectionDao.class).clone();
+        directionDaoConfig.initIdentityScope(type);
+
+        examQuestionDaoConfig = daoConfigMap.get(ExamQuestionDao.class).clone();
+        examQuestionDaoConfig.initIdentityScope(type);
+
+        questionDaoConfig = daoConfigMap.get(QuestionDao.class).clone();
+        questionDaoConfig.initIdentityScope(type);
+
+        answerDaoConfig = daoConfigMap.get(AnswerDao.class).clone();
+        answerDaoConfig.initIdentityScope(type);
+
+        userSelectedAnswerDaoConfig = daoConfigMap.get(UserSelectedAnswerDao.class).clone();
+        userSelectedAnswerDaoConfig.initIdentityScope(type);
 
         courseDaoConfig = daoConfigMap.get(CourseDao.class).clone();
         courseDaoConfig.initIdentityScope(type);
@@ -216,9 +247,6 @@ public class DaoSession extends AbstractDaoSession {
         subjectDaoConfig = daoConfigMap.get(SubjectDao.class).clone();
         subjectDaoConfig.initIdentityScope(type);
 
-        directionDaoConfig = daoConfigMap.get(DirectionDao.class).clone();
-        directionDaoConfig.initIdentityScope(type);
-
         directionTranslationDaoConfig = daoConfigMap.get(DirectionTranslationDao.class).clone();
         directionTranslationDaoConfig.initIdentityScope(type);
 
@@ -235,6 +263,11 @@ public class DaoSession extends AbstractDaoSession {
         reviewQuestionTranslationDao = new ReviewQuestionTranslationDao(reviewQuestionTranslationDaoConfig, this);
         reviewAnswerTranslationDao = new ReviewAnswerTranslationDao(reviewAnswerTranslationDaoConfig, this);
         selectedAnswerDao = new SelectedAnswerDao(selectedAnswerDaoConfig, this);
+        directionDao = new DirectionDao(directionDaoConfig, this);
+        examQuestionDao = new ExamQuestionDao(examQuestionDaoConfig, this);
+        questionDao = new QuestionDao(questionDaoConfig, this);
+        answerDao = new AnswerDao(answerDaoConfig, this);
+        userSelectedAnswerDao = new UserSelectedAnswerDao(userSelectedAnswerDaoConfig, this);
         courseDao = new CourseDao(courseDaoConfig, this);
         chapterDao = new ChapterDao(chapterDaoConfig, this);
         contentDao = new ContentDao(contentDaoConfig, this);
@@ -253,7 +286,6 @@ public class DaoSession extends AbstractDaoSession {
         contentTypeDao = new ContentTypeDao(contentTypeDaoConfig, this);
         answerTranslationDao = new AnswerTranslationDao(answerTranslationDaoConfig, this);
         subjectDao = new SubjectDao(subjectDaoConfig, this);
-        directionDao = new DirectionDao(directionDaoConfig, this);
         directionTranslationDao = new DirectionTranslationDao(directionTranslationDaoConfig, this);
         productDao = new ProductDao(productDaoConfig, this);
         priceDao = new PriceDao(priceDaoConfig, this);
@@ -265,6 +297,11 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(ReviewQuestionTranslation.class, reviewQuestionTranslationDao);
         registerDao(ReviewAnswerTranslation.class, reviewAnswerTranslationDao);
         registerDao(SelectedAnswer.class, selectedAnswerDao);
+        registerDao(Direction.class, directionDao);
+        registerDao(ExamQuestion.class, examQuestionDao);
+        registerDao(Question.class, questionDao);
+        registerDao(Answer.class, answerDao);
+        registerDao(UserSelectedAnswer.class, userSelectedAnswerDao);
         registerDao(Course.class, courseDao);
         registerDao(Chapter.class, chapterDao);
         registerDao(Content.class, contentDao);
@@ -283,7 +320,6 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(ContentType.class, contentTypeDao);
         registerDao(AnswerTranslation.class, answerTranslationDao);
         registerDao(Subject.class, subjectDao);
-        registerDao(Direction.class, directionDao);
         registerDao(DirectionTranslation.class, directionTranslationDao);
         registerDao(Product.class, productDao);
         registerDao(Price.class, priceDao);
@@ -297,6 +333,11 @@ public class DaoSession extends AbstractDaoSession {
         reviewQuestionTranslationDaoConfig.clearIdentityScope();
         reviewAnswerTranslationDaoConfig.clearIdentityScope();
         selectedAnswerDaoConfig.clearIdentityScope();
+        directionDaoConfig.clearIdentityScope();
+        examQuestionDaoConfig.clearIdentityScope();
+        questionDaoConfig.clearIdentityScope();
+        answerDaoConfig.clearIdentityScope();
+        userSelectedAnswerDaoConfig.clearIdentityScope();
         courseDaoConfig.clearIdentityScope();
         chapterDaoConfig.clearIdentityScope();
         contentDaoConfig.clearIdentityScope();
@@ -315,7 +356,6 @@ public class DaoSession extends AbstractDaoSession {
         contentTypeDaoConfig.clearIdentityScope();
         answerTranslationDaoConfig.clearIdentityScope();
         subjectDaoConfig.clearIdentityScope();
-        directionDaoConfig.clearIdentityScope();
         directionTranslationDaoConfig.clearIdentityScope();
         productDaoConfig.clearIdentityScope();
         priceDaoConfig.clearIdentityScope();
@@ -347,6 +387,26 @@ public class DaoSession extends AbstractDaoSession {
 
     public SelectedAnswerDao getSelectedAnswerDao() {
         return selectedAnswerDao;
+    }
+
+    public DirectionDao getDirectionDao() {
+        return directionDao;
+    }
+
+    public ExamQuestionDao getExamQuestionDao() {
+        return examQuestionDao;
+    }
+
+    public QuestionDao getQuestionDao() {
+        return questionDao;
+    }
+
+    public AnswerDao getAnswerDao() {
+        return answerDao;
+    }
+
+    public UserSelectedAnswerDao getUserSelectedAnswerDao() {
+        return userSelectedAnswerDao;
     }
 
     public CourseDao getCourseDao() {
@@ -419,10 +479,6 @@ public class DaoSession extends AbstractDaoSession {
 
     public SubjectDao getSubjectDao() {
         return subjectDao;
-    }
-
-    public DirectionDao getDirectionDao() {
-        return directionDao;
     }
 
     public DirectionTranslationDao getDirectionTranslationDao() {

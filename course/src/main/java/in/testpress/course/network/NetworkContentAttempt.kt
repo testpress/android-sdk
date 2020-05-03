@@ -1,6 +1,7 @@
 package `in`.testpress.course.network
 
 import `in`.testpress.course.domain.DomainContentAttempt
+import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.models.greendao.CourseAttempt
 
 data class NetworkContentAttempt(
@@ -10,7 +11,7 @@ data class NetworkContentAttempt(
     val objectUrl: String? = null,
     val trophies: String? = null,
     val chapterContentId: Long? = null,
-    val assessmentId: Long? = null,
+    var assessmentId: Long? = null,
     val userVideoId: Long? = null,
     val assessment: NetworkAttempt? = null,
     val video: NetworkVideoAttempt? = null
