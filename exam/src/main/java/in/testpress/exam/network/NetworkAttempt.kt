@@ -1,4 +1,4 @@
-package `in`.testpress.course.network
+package `in`.testpress.exam.network
 
 import `in`.testpress.models.greendao.Attempt
 

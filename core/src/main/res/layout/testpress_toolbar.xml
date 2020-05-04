@@ -25,6 +25,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left|start"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/close"
+            android:layout_gravity="right|end"
+            android:background="@drawable/testpress_transparent"
+            android:tint="@color/testpress_color_primary"
+            android:paddingRight="10dp"
+            android:visibility="gone"
+            android:src="@drawable/ic_close_black_24dp"/>
     </androidx.appcompat.widget.Toolbar>
 
 </com.google.android.material.appbar.AppBarLayout>

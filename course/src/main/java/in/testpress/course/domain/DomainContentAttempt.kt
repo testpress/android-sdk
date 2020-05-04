@@ -14,7 +14,8 @@ data class DomainContentAttempt(
     val trophies: String? = null,
     val chapterContentId: Long? = null,
     val assessmentId: Long? = null,
-    val userVideoId: Long? = null
+    val userVideoId: Long? = null,
+    val assessment: DomainAttempt? = null
 )
 
 fun createDomainContentAttempt(contentAttempt: CourseAttempt): DomainContentAttempt {
@@ -26,7 +27,8 @@ fun createDomainContentAttempt(contentAttempt: CourseAttempt): DomainContentAtte
         trophies = contentAttempt.trophies,
         chapterContentId = contentAttempt.chapterContentId,
         assessmentId = contentAttempt.assessmentId,
-        userVideoId = contentAttempt.userVideoId
+        userVideoId = contentAttempt.userVideoId,
+        assessment = contentAttempt.assessment?.asDomainModel()
     )
 }
 

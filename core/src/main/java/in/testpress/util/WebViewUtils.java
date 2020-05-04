@@ -269,7 +269,7 @@ public class WebViewUtils {
                 "</div>";
     }
 
-    public static String getOptionWithTags(String optionText, int index, int colorRes, Context context) {
+    public static String getOptionWithTags(String optionText, int index, int colorRes, Context context, boolean isCorrect) {
         String html = "\n<div class='review-option-item wrapper'>";
         if (colorRes == android.R.color.white) {
             html += "<div class='alphabetical-option-ring-general'>";
@@ -277,8 +277,14 @@ public class WebViewUtils {
             html += "<div class='alphabetical-option-ring-attempted' style='background-color:" +
                     getColor(context, colorRes) + ";'>";
         }
+        String optionHtml = "";
+        if (isCorrect) {
+            optionHtml += "<span class='correct'>" + optionText + "</span>";
+        } else {
+            optionHtml += "<span>" + optionText + "</span>";
+        }
         return html + ((char) (65 + index)) + "</div>" +
-                "    <span>" + optionText + "</span>" +
+                optionHtml +
                 "</div>";
     }
 

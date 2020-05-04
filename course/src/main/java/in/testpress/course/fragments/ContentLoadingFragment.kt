@@ -9,7 +9,6 @@ import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.viewmodels.ContentViewModel
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -137,7 +136,7 @@ class ContentFragmentFactory {
         fun getFragment(content: DomainContent): Fragment {
             return when (content.contentType) {
                 "Exam" -> ExamContentFragment()
-                "Quiz" -> ExamContentFragment()
+                "Quiz" -> StartQuizFragment()
                 "Video" -> VideoContentFragment()
                 "Attachment" -> AttachmentContentFragment()
                 "Html" -> HtmlContentFragment()

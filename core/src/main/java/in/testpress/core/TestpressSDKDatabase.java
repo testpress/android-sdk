@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 
 import org.greenrobot.greendao.database.Database;
 
+import in.testpress.models.greendao.AnswerDao;
 import in.testpress.models.greendao.AnswerTranslationDao;
 import in.testpress.models.greendao.AttachmentDao;
 import in.testpress.models.greendao.AttemptDao;
@@ -20,9 +21,11 @@ import in.testpress.models.greendao.DaoSession;
 import in.testpress.models.greendao.DirectionDao;
 import in.testpress.models.greendao.DirectionTranslationDao;
 import in.testpress.models.greendao.ExamDao;
+import in.testpress.models.greendao.ExamQuestionDao;
 import in.testpress.models.greendao.HtmlContentDao;
 import in.testpress.models.greendao.LanguageDao;
 import in.testpress.models.greendao.ProductDao;
+import in.testpress.models.greendao.QuestionDao;
 import in.testpress.models.greendao.ReviewAnswerDao;
 import in.testpress.models.greendao.ReviewAnswerTranslationDao;
 import in.testpress.models.greendao.ReviewAttemptDao;
@@ -32,6 +35,7 @@ import in.testpress.models.greendao.ReviewQuestionTranslationDao;
 import in.testpress.models.greendao.SelectedAnswerDao;
 import in.testpress.models.greendao.StreamDao;
 import in.testpress.models.greendao.SubjectDao;
+import in.testpress.models.greendao.UserSelectedAnswerDao;
 import in.testpress.models.greendao.VideoDao;
 
 public class TestpressSDKDatabase {
@@ -165,6 +169,22 @@ public class TestpressSDKDatabase {
 
     public static ContentTypeDao getContentTypeDao(Context context) {
         return getDaoSession(context).getContentTypeDao();
+    }
+
+    public static QuestionDao getQuestionDao(Context context) {
+        return getDaoSession(context).getQuestionDao();
+    }
+
+    public static AnswerDao getAnswerDao(Context context) {
+        return getDaoSession(context).getAnswerDao();
+    }
+
+    public static ExamQuestionDao getExamQuestionDao(Context context) {
+        return getDaoSession(context).getExamQuestionDao();
+    }
+
+    public static UserSelectedAnswerDao getUserSelectedAnswerDao(Context context) {
+        return getDaoSession(context).getUserSelectedAnswerDao();
     }
 
 }

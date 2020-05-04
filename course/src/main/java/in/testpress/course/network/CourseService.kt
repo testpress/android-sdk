@@ -2,12 +2,14 @@ package `in`.testpress.course.network
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.api.TestpressCourseApiClient
+import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.network.RetrofitCall
 import `in`.testpress.network.TestpressApiClient
 import android.content.Context
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Url
 
@@ -24,6 +26,11 @@ interface CourseService {
 
     @GET
     fun getContentAttempts(@Url attemptsUrl: String): RetrofitCall<TestpressApiResponse<NetworkContentAttempt>>
+
+    @PUT("{end_exam_url}")
+    fun endContentAttempt(
+        @Path(value = "end_exam_url", encoded = true) endExamUrlFrag: String?
+    ): RetrofitCall<NetworkAttempt>
 }
 
 
@@ -40,5 +47,9 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     fun getContentAttempts(url: String): RetrofitCall<TestpressApiResponse<NetworkContentAttempt>> {
         return getCourseService().getContentAttempts(url)
+    }
+
+    fun endContentAttempt(url: String):  RetrofitCall<NetworkAttempt> {
+        return getCourseService().endContentAttempt(url)
     }
 }

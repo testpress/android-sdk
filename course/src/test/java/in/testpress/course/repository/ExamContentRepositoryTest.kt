@@ -4,10 +4,9 @@ import `in`.testpress.core.TestpressException
 import `in`.testpress.course.domain.asDomainLanguage
 import `in`.testpress.course.enums.Status
 import `in`.testpress.course.network.CourseNetwork
-import `in`.testpress.course.network.NetworkAttempt
-import `in`.testpress.course.network.NetworkContentAttempt
+import `in`.testpress.exam.network.NetworkAttempt
+import `in`.testpress.exam.network.NetworkContentAttempt
 import `in`.testpress.course.network.Resource
-import `in`.testpress.course.network.asGreenDaoModel
 import `in`.testpress.course.util.RetrofitCallMock
 import `in`.testpress.course.util.getOrAwaitValue
 import `in`.testpress.exam.network.ExamNetwork
@@ -84,7 +83,10 @@ class ExamContentRepositoryTest {
 
     fun createContentAttempt(): NetworkContentAttempt {
         val assessment = NetworkAttempt(2)
-        return NetworkContentAttempt(1, assessment = assessment)
+        return NetworkContentAttempt(
+            1,
+            assessment = assessment
+        )
     }
 
     fun createContentAttemptResponse(): TestpressApiResponse<NetworkContentAttempt> {
