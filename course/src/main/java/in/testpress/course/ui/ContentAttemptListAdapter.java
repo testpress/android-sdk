@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.Context;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +25,8 @@ import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.models.greendao.Content;
 import in.testpress.util.ViewUtils;
+
+import static in.testpress.course.ui.ContentActivity.CONTENT_ID;
 
 public class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
 
@@ -136,6 +140,14 @@ public class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView
                     @Override
                     public void onClick(View v) {
                         //noinspection ConstantConditions
+                        if (mContent.getContentType().equals("Quiz")) {
+                            Intent intent = new Intent(mActivity, QuizActivity.class);
+                            intent.putExtra(CONTENT_ID, mContent.getId());
+                            intent.putExtra("CONTENT_ID", mContent.getExamId());
+                            intent.putExtra("ATTEMPT_URL", mContent.getExam().getAttemptsUrl());
+                            mActivity.startActivity(intent);
+                            return;
+                        }
                         TestpressExam.resumeCourseAttempt(mActivity, mContent, courseAttempt, false,
                                 TestpressSdk.getTestpressSession(mActivity));
                     }

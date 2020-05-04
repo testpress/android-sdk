@@ -14,7 +14,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 
-class StartQuizFragment: BaseContentDetailFragment() {
+class StartQuizFragment: BaseExamWidgetFragment() {
     private lateinit var numberOfQuestions: TextView
     private lateinit var description: LinearLayout
     private lateinit var marksPerQuestionLayout: LinearLayout
@@ -24,12 +24,6 @@ class StartQuizFragment: BaseContentDetailFragment() {
     private lateinit var questionsLabel: TextView
     private lateinit var dateLabel: TextView
     private lateinit var startButton: Button
-    private lateinit var titleLayout: LinearLayout
-    private lateinit var titleView: TextView
-
-    override var isBookmarkEnabled: Boolean
-        get() = false
-        set(value) {}
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,8 +39,6 @@ class StartQuizFragment: BaseContentDetailFragment() {
     }
 
     private fun bindViews(view: View) {
-        titleView = view.findViewById(R.id.title)
-        titleLayout = view.findViewById(R.id.title_layout)
         numberOfQuestions = view.findViewById(R.id.number_of_questions)
         description = view.findViewById(R.id.description)
         durationLayout = view.findViewById(R.id.duration_layout)
@@ -81,8 +73,6 @@ class StartQuizFragment: BaseContentDetailFragment() {
 
     private fun bindData() {
         val exam = content.exam!!
-        titleView.text = content.title
-        titleLayout.visibility = View.VISIBLE
         numberOfQuestions.text = exam.numberOfQuestions.toString()
         descriptionContent.text = exam.description
     }

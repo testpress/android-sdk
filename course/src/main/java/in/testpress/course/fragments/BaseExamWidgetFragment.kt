@@ -13,12 +13,15 @@ import `in`.testpress.course.enums.Status
 import `in`.testpress.course.network.Resource
 import `in`.testpress.course.repository.ExamContentRepository
 import `in`.testpress.course.ui.ContentActivity
+import `in`.testpress.course.ui.QuizActivity
+import `in`.testpress.course.ui.StartQuizActivity
 import `in`.testpress.course.viewmodels.ExamContentViewModel
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.util.MultiLanguagesUtil
 import `in`.testpress.exam.util.RetakeExamUtil
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -126,6 +129,17 @@ open class BaseExamWidgetFragment : Fragment() {
             startButton.visibility = View.VISIBLE
         } else {
             startButton.visibility = View.GONE
+        }
+
+        if (content.contentType.equals("Quiz", ignoreCase = true)) {
+            startButton.setOnClickListener {
+                val intent = Intent(requireContext(), QuizActivity::class.java).apply {
+                    putExtra(ContentActivity.CONTENT_ID, content.id)
+                    putExtra("EXAM_ID", exam.id)
+                    putExtra("ATTEMPT_URL", exam.attemptsUrl)
+                }
+                requireActivity().startActivity(intent)
+            }
         }
     }
 

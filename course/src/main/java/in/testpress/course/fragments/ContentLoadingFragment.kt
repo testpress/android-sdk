@@ -136,7 +136,7 @@ class ContentFragmentFactory {
         fun getFragment(content: DomainContent): Fragment {
             return when (content.contentType) {
                 "Exam" -> ExamContentFragment()
-                "Quiz" -> StartQuizFragment()
+                "Quiz" -> QuizContentFragment()
                 "Video" -> VideoContentFragment()
                 "Attachment" -> AttachmentContentFragment()
                 "Html" -> HtmlContentFragment()
