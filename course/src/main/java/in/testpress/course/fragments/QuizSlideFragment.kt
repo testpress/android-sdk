@@ -13,6 +13,7 @@ import androidx.viewpager2.widget.ViewPager2
 class QuizSlideFragment: Fragment(), NextQuizHandler {
     private lateinit var viewPager: ViewPager2
     var examId: Long = -1
+    var attemptId: Long = -1
     var totalNoOfQuestions: Int = 1
     lateinit var endHanlder: ExamEndHanlder
 
@@ -34,6 +35,7 @@ class QuizSlideFragment: Fragment(), NextQuizHandler {
 
     private fun parseArguments() {
         examId = requireArguments().getLong("EXAM_ID", -1)
+        attemptId = requireArguments().getLong("ATTEMPT_ID", -1)
         totalNoOfQuestions = requireArguments().getInt("NO_OF_QUESTIONS", 1)
     }
 
@@ -55,6 +57,7 @@ class QuizSlideFragment: Fragment(), NextQuizHandler {
             val bundle = Bundle().apply {
                 putInt("POSITION", position)
                 putLong("EXAM_ID", fragment.examId)
+                putLong("ATTEMPT_ID", fragment.attemptId)
             }
             questionFragment.arguments = bundle
             return questionFragment

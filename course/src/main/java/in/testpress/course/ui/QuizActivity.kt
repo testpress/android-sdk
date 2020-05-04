@@ -130,6 +130,7 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder {
             val examId = intent.getLongExtra("EXAM_ID", -1)
             val bundle = Bundle().apply {
                 putLong("EXAM_ID", examId)
+                putLong("ATTEMPT_ID", it.data.assessment!!.id)
                 putInt("NO_OF_QUESTIONS", totalNoOfQuestions)
             }
             val quizSlideFragment = QuizSlideFragment().apply { arguments=bundle }

@@ -32,12 +32,13 @@ public class UserSelectedAnswerDao extends AbstractDao<UserSelectedAnswer, Long>
         public final static Property Order = new Property(1, Integer.class, "order", false, "ORDER");
         public final static Property Review = new Property(2, Boolean.class, "review", false, "REVIEW");
         public final static Property ExamId = new Property(3, Long.class, "examId", false, "EXAM_ID");
-        public final static Property ExplanationHtml = new Property(4, String.class, "explanationHtml", false, "EXPLANATION_HTML");
-        public final static Property ShortText = new Property(5, String.class, "shortText", false, "SHORT_TEXT");
-        public final static Property SelectedAnswers = new Property(6, String.class, "selectedAnswers", false, "SELECTED_ANSWERS");
-        public final static Property CorrectAnswers = new Property(7, String.class, "correctAnswers", false, "CORRECT_ANSWERS");
-        public final static Property Url = new Property(8, String.class, "url", false, "URL");
-        public final static Property QuestionId = new Property(9, Long.class, "questionId", false, "QUESTION_ID");
+        public final static Property AttemptId = new Property(4, Long.class, "attemptId", false, "ATTEMPT_ID");
+        public final static Property ExplanationHtml = new Property(5, String.class, "explanationHtml", false, "EXPLANATION_HTML");
+        public final static Property ShortText = new Property(6, String.class, "shortText", false, "SHORT_TEXT");
+        public final static Property SelectedAnswers = new Property(7, String.class, "selectedAnswers", false, "SELECTED_ANSWERS");
+        public final static Property CorrectAnswers = new Property(8, String.class, "correctAnswers", false, "CORRECT_ANSWERS");
+        public final static Property Url = new Property(9, String.class, "url", false, "URL");
+        public final static Property QuestionId = new Property(10, Long.class, "questionId", false, "QUESTION_ID");
     }
 
     private DaoSession daoSession;
@@ -62,12 +63,13 @@ public class UserSelectedAnswerDao extends AbstractDao<UserSelectedAnswer, Long>
                 "\"ORDER\" INTEGER," + // 1: order
                 "\"REVIEW\" INTEGER," + // 2: review
                 "\"EXAM_ID\" INTEGER," + // 3: examId
-                "\"EXPLANATION_HTML\" TEXT," + // 4: explanationHtml
-                "\"SHORT_TEXT\" TEXT," + // 5: shortText
-                "\"SELECTED_ANSWERS\" TEXT," + // 6: selectedAnswers
-                "\"CORRECT_ANSWERS\" TEXT," + // 7: correctAnswers
-                "\"URL\" TEXT," + // 8: url
-                "\"QUESTION_ID\" INTEGER);"); // 9: questionId
+                "\"ATTEMPT_ID\" INTEGER," + // 4: attemptId
+                "\"EXPLANATION_HTML\" TEXT," + // 5: explanationHtml
+                "\"SHORT_TEXT\" TEXT," + // 6: shortText
+                "\"SELECTED_ANSWERS\" TEXT," + // 7: selectedAnswers
+                "\"CORRECT_ANSWERS\" TEXT," + // 8: correctAnswers
+                "\"URL\" TEXT," + // 9: url
+                "\"QUESTION_ID\" INTEGER);"); // 10: questionId
     }
 
     /** Drops the underlying database table. */
@@ -100,34 +102,39 @@ public class UserSelectedAnswerDao extends AbstractDao<UserSelectedAnswer, Long>
             stmt.bindLong(4, examId);
         }
  
+        Long attemptId = entity.getAttemptId();
+        if (attemptId != null) {
+            stmt.bindLong(5, attemptId);
+        }
+ 
         String explanationHtml = entity.getExplanationHtml();
         if (explanationHtml != null) {
-            stmt.bindString(5, explanationHtml);
+            stmt.bindString(6, explanationHtml);
         }
  
         String shortText = entity.getShortText();
         if (shortText != null) {
-            stmt.bindString(6, shortText);
+            stmt.bindString(7, shortText);
         }
  
         IntegerList selectedAnswers = entity.getSelectedAnswers();
         if (selectedAnswers != null) {
-            stmt.bindString(7, selectedAnswersConverter.convertToDatabaseValue(selectedAnswers));
+            stmt.bindString(8, selectedAnswersConverter.convertToDatabaseValue(selectedAnswers));
         }
  
         IntegerList correctAnswers = entity.getCorrectAnswers();
         if (correctAnswers != null) {
-            stmt.bindString(8, correctAnswersConverter.convertToDatabaseValue(correctAnswers));
+            stmt.bindString(9, correctAnswersConverter.convertToDatabaseValue(correctAnswers));
         }
  
         String url = entity.getUrl();
         if (url != null) {
-            stmt.bindString(9, url);
+            stmt.bindString(10, url);
         }
  
         Long questionId = entity.getQuestionId();
         if (questionId != null) {
-            stmt.bindLong(10, questionId);
+            stmt.bindLong(11, questionId);
         }
     }
 
@@ -155,34 +162,39 @@ public class UserSelectedAnswerDao extends AbstractDao<UserSelectedAnswer, Long>
             stmt.bindLong(4, examId);
         }
  
+        Long attemptId = entity.getAttemptId();
+        if (attemptId != null) {
+            stmt.bindLong(5, attemptId);
+        }
+ 
         String explanationHtml = entity.getExplanationHtml();
         if (explanationHtml != null) {
-            stmt.bindString(5, explanationHtml);
+            stmt.bindString(6, explanationHtml);
         }
  
         String shortText = entity.getShortText();
         if (shortText != null) {
-            stmt.bindString(6, shortText);
+            stmt.bindString(7, shortText);
         }
  
         IntegerList selectedAnswers = entity.getSelectedAnswers();
         if (selectedAnswers != null) {
-            stmt.bindString(7, selectedAnswersConverter.convertToDatabaseValue(selectedAnswers));
+            stmt.bindString(8, selectedAnswersConverter.convertToDatabaseValue(selectedAnswers));
         }
  
         IntegerList correctAnswers = entity.getCorrectAnswers();
         if (correctAnswers != null) {
-            stmt.bindString(8, correctAnswersConverter.convertToDatabaseValue(correctAnswers));
+            stmt.bindString(9, correctAnswersConverter.convertToDatabaseValue(correctAnswers));
         }
  
         String url = entity.getUrl();
         if (url != null) {
-            stmt.bindString(9, url);
+            stmt.bindString(10, url);
         }
  
         Long questionId = entity.getQuestionId();
         if (questionId != null) {
-            stmt.bindLong(10, questionId);
+            stmt.bindLong(11, questionId);
         }
     }
 
@@ -204,12 +216,13 @@ public class UserSelectedAnswerDao extends AbstractDao<UserSelectedAnswer, Long>
             cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // order
             cursor.isNull(offset + 2) ? null : cursor.getShort(offset + 2) != 0, // review
             cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // examId
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // explanationHtml
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // shortText
-            cursor.isNull(offset + 6) ? null : selectedAnswersConverter.convertToEntityProperty(cursor.getString(offset + 6)), // selectedAnswers
-            cursor.isNull(offset + 7) ? null : correctAnswersConverter.convertToEntityProperty(cursor.getString(offset + 7)), // correctAnswers
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // url
-            cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9) // questionId
+            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4), // attemptId
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // explanationHtml
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // shortText
+            cursor.isNull(offset + 7) ? null : selectedAnswersConverter.convertToEntityProperty(cursor.getString(offset + 7)), // selectedAnswers
+            cursor.isNull(offset + 8) ? null : correctAnswersConverter.convertToEntityProperty(cursor.getString(offset + 8)), // correctAnswers
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // url
+            cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10) // questionId
         );
         return entity;
     }
@@ -220,12 +233,13 @@ public class UserSelectedAnswerDao extends AbstractDao<UserSelectedAnswer, Long>
         entity.setOrder(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
         entity.setReview(cursor.isNull(offset + 2) ? null : cursor.getShort(offset + 2) != 0);
         entity.setExamId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
-        entity.setExplanationHtml(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setShortText(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setSelectedAnswers(cursor.isNull(offset + 6) ? null : selectedAnswersConverter.convertToEntityProperty(cursor.getString(offset + 6)));
-        entity.setCorrectAnswers(cursor.isNull(offset + 7) ? null : correctAnswersConverter.convertToEntityProperty(cursor.getString(offset + 7)));
-        entity.setUrl(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setQuestionId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
+        entity.setAttemptId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
+        entity.setExplanationHtml(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setShortText(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setSelectedAnswers(cursor.isNull(offset + 7) ? null : selectedAnswersConverter.convertToEntityProperty(cursor.getString(offset + 7)));
+        entity.setCorrectAnswers(cursor.isNull(offset + 8) ? null : correctAnswersConverter.convertToEntityProperty(cursor.getString(offset + 8)));
+        entity.setUrl(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setQuestionId(cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10));
      }
     
     @Override

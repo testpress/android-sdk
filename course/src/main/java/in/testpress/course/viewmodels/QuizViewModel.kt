@@ -20,12 +20,12 @@ class QuizViewModel(val repository: UserSelectedAnswersRepository): ViewModel() 
         return repository.createAttempt(contentId)
     }
 
-    fun loadUserSelectedAnswers(examId: Long, url: String): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
-        return repository.loadUserSelectedAnswers(examId, url)
+    fun loadUserSelectedAnswers(attemptId: Long, url: String): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
+        return repository.loadUserSelectedAnswers(attemptId, url)
     }
 
-    fun getUserSelectedAnswers(examId: Long): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
-        return repository.getUserSelectedAnswers(examId)
+    fun getUserSelectedAnswers(attemptId: Long): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
+        return repository.getUserSelectedAnswers(attemptId)
     }
 
     fun setAnswer(id: Long, selectedOptions: ArrayList<Int>) {

@@ -32,6 +32,7 @@ class QuizReviewFragment: Fragment() {
     lateinit var nextQuizHandler: NextQuizHandler
 
     private var examId: Long = -1
+    private var attemptId: Long = -1
     private var position: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,11 +66,12 @@ class QuizReviewFragment: Fragment() {
 
     private fun parseArguments() {
         examId = requireArguments().getLong("EXAM_ID", -1)
+        attemptId = requireArguments().getLong("ATTEMPT_ID", -1)
         position = requireArguments().getInt("POSITION", 0)
     }
 
     private fun initializeListeners() {
-        viewModel.getUserSelectedAnswers(examId).observe(viewLifecycleOwner, Observer {
+        viewModel.getUserSelectedAnswers(attemptId).observe(viewLifecycleOwner, Observer {
             when(it.status) {
                 Status.SUCCESS -> {
                     userSelectedAnswer = it.data?.get(position)!!

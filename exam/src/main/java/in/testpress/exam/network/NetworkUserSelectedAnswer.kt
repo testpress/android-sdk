@@ -14,6 +14,7 @@ data class NetworkUserSelectedAnswer(
     val explanationHtml: String? = null,
     val url: String? = null,
     var examId: Long? = null,
+    var attemptId: Long? = null,
     var questionId: Long? = null
 )
 
@@ -24,7 +25,7 @@ fun NetworkUserSelectedAnswer.asGreenDaoModel(): UserSelectedAnswer {
     correctAnswersIds.addAll(correctAnswers?.map {it.id.toInt()} ?: listOf())
 
     return UserSelectedAnswer(
-        id, order, review, examId, explanationHtml, shortText, selectedAnswersIntegerList,
+        id, order, review, examId, attemptId, explanationHtml, shortText, selectedAnswersIntegerList,
         correctAnswersIds, url, questionId
     )
 }

@@ -28,11 +28,11 @@ class UserSelectedAnswersRepository(context: Context): QuizExamRepository(contex
         get() = _resourceUserSelectedAnswers
     val answerResource: MutableLiveData<Resource<NetworkUserSelectedAnswer>> = MutableLiveData()
 
-    private fun fetchUserSelectedAnswers(url: String, examId: Long) {
+    private fun fetchUserSelectedAnswers(url: String, attemptId: Long) {
         examNetwork.getUserSelectedAnswers(url)
             .enqueue(object: TestpressCallback<TestpressApiResponse<NetworkUserSelectedAnswer>>() {
                 override fun onSuccess(result: TestpressApiResponse<NetworkUserSelectedAnswer>?) {
-                    handleUserSelectedAnswersFetchSuccess(result!!, examId)
+                    handleUserSelectedAnswersFetchSuccess(result!!, attemptId)
                 }
 
                 override fun onException(exception: TestpressException?) {
@@ -41,16 +41,16 @@ class UserSelectedAnswersRepository(context: Context): QuizExamRepository(contex
             })
     }
 
-    private fun handleUserSelectedAnswersFetchSuccess(response: TestpressApiResponse<NetworkUserSelectedAnswer>, examId: Long) {
+    private fun handleUserSelectedAnswersFetchSuccess(response: TestpressApiResponse<NetworkUserSelectedAnswer>, attemptId: Long) {
         if(response.next != null) {
-            fetchUserSelectedAnswers(response.next, examId)
+            fetchUserSelectedAnswers(response.next, attemptId)
         } else {
-            saveAttemptItemsToDB(response.results, examId)
-            getUserSelectedAnswers(examId)
+            saveAttemptItemsToDB(response.results, attemptId)
+            getUserSelectedAnswers(attemptId)
         }
     }
 
-    fun saveAttemptItemsToDB(userSelectedAnswers: List<NetworkUserSelectedAnswer>, examId: Long) {
+    fun saveAttemptItemsToDB(userSelectedAnswers: List<NetworkUserSelectedAnswer>, attemptId: Long) {
         val questionDao = TestpressSDKDatabase.getQuestionDao(context)
         val answerDao = TestpressSDKDatabase.getAnswerDao(context)
         val answers = mutableListOf<NetworkAnswer>()
@@ -58,7 +58,7 @@ class UserSelectedAnswersRepository(context: Context): QuizExamRepository(contex
         for (userSelectedAnswer in userSelectedAnswers) {
             // TODO: Remove the below assigning of question id after exposing id in API
             userSelectedAnswer.question?.id = (3000..9999).random().toLong()
-            userSelectedAnswer.examId = examId
+            userSelectedAnswer.attemptId = attemptId
             userSelectedAnswer.questionId = userSelectedAnswer.question?.id
             questionDao.insertOrReplaceInTx(userSelectedAnswer.question?.asGreenDaoModel())
             userSelectedAnswerDao.insertOrReplaceInTx(userSelectedAnswer.asGreenDaoModel())
@@ -71,31 +71,31 @@ class UserSelectedAnswersRepository(context: Context): QuizExamRepository(contex
         }
     }
 
-    fun clearUserSelectedAnswersFromDB(examId: Long) {
+    fun clearUserSelectedAnswersFromDB(attemptId: Long) {
         userSelectedAnswerDao.queryBuilder()
-            .where(UserSelectedAnswerDao.Properties.ExamId.eq(examId))
+            .where(UserSelectedAnswerDao.Properties.AttemptId.eq(attemptId))
             .buildDelete().executeDeleteWithoutDetachingEntities()
     }
 
-    fun getUserSelectedAnswersFromDB(examId: Long): List<UserSelectedAnswer>? {
-        return userSelectedAnswerDao.queryBuilder().where(UserSelectedAnswerDao.Properties.ExamId.eq(examId)).list()
+    fun getUserSelectedAnswersFromDB(attemptId: Long): List<UserSelectedAnswer>? {
+        return userSelectedAnswerDao.queryBuilder().where(UserSelectedAnswerDao.Properties.AttemptId.eq(attemptId)).list()
     }
 
-    fun loadUserSelectedAnswers(examId: Long, url: String): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
-        clearUserSelectedAnswersFromDB(examId)
-        fetchUserSelectedAnswers(url, examId)
+    fun loadUserSelectedAnswers(attemptId: Long, url: String): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
+        clearUserSelectedAnswersFromDB(attemptId)
+        fetchUserSelectedAnswers(url, attemptId)
         return resourceUserSelectedAnswers
     }
 
-    fun getUserSelectedAnswers(examId: Long): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
-        val userSelectedAnswers = getUserSelectedAnswersFromDB(examId)
+    fun getUserSelectedAnswers(attemptId: Long): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
+        val userSelectedAnswers = getUserSelectedAnswersFromDB(attemptId)
         if (userSelectedAnswers?.isNotEmpty() == true) {
             _resourceUserSelectedAnswers.postValue(Resource.success(userSelectedAnswers?.asDomainModels()))
         }
         return resourceUserSelectedAnswers
     }
 
-    fun getUserSelectedAnswer(id: Long): UserSelectedAnswer? {
+    private fun getUserSelectedAnswer(id: Long): UserSelectedAnswer? {
         return userSelectedAnswerDao.queryBuilder().where(UserSelectedAnswerDao.Properties.Id.eq(id)).list().get(0)
     }
 
@@ -118,7 +118,7 @@ class UserSelectedAnswersRepository(context: Context): QuizExamRepository(contex
                 override fun onSuccess(result: NetworkUserSelectedAnswer?) {
                     var usa = result?.asGreenDaoModel()
                     usa?.questionId = userSelectedAnswer.questionId
-                    usa?.examId = userSelectedAnswer.examId
+                    usa?.attemptId = userSelectedAnswer.attemptId
                     userSelectedAnswerDao.insertOrReplaceInTx(usa)
                     answerResource.postValue(Resource.success(result))
                 }

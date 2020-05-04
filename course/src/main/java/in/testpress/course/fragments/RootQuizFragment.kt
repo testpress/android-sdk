@@ -12,6 +12,7 @@ class RootQuizFragment: Fragment(), QuizFragmentHandler {
     lateinit var nextQuizHandler: NextQuizHandler
     private var position: Int = 0
     private var examId: Long = -1
+    private var attemptId: Long = -1
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.quiz_layout, container, false)
@@ -25,6 +26,7 @@ class RootQuizFragment: Fragment(), QuizFragmentHandler {
 
     private fun parseArguments() {
         examId = requireArguments().getLong("EXAM_ID", -1)
+        attemptId = requireArguments().getLong("ATTEMPT_ID", -1)
         position = requireArguments().getInt("POSITION", 0)
     }
 

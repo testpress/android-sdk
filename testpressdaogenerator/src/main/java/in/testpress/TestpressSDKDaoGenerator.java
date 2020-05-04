@@ -136,6 +136,7 @@ public class TestpressSDKDaoGenerator {
         userSelectedAnswer.addIntProperty("order");
         userSelectedAnswer.addBooleanProperty("review");
         userSelectedAnswer.addLongProperty("examId");
+        userSelectedAnswer.addLongProperty("attemptId");
         userSelectedAnswer.addStringProperty("explanationHtml");
         userSelectedAnswer.addStringProperty("shortText");
         userSelectedAnswer.addStringProperty("selectedAnswers").customType(

@@ -31,6 +31,7 @@ class QuizQuestionFragment : Fragment() {
     lateinit var quizFragmentHandler: QuizFragmentHandler
 
     private var examId: Long = -1
+    private var attemptId: Long = -1
     private var position: Int = 0
     private var selectedOptions: ArrayList<Int> = arrayListOf()
 
@@ -64,6 +65,7 @@ class QuizQuestionFragment : Fragment() {
 
     private fun parseArguments() {
         examId = requireArguments().getLong("EXAM_ID", -1)
+        attemptId = requireArguments().getLong("ATTEMPT_ID", -1)
         position = requireArguments().getInt("POSITION", 0)
     }
 
@@ -87,7 +89,7 @@ class QuizQuestionFragment : Fragment() {
             })
         }
 
-        viewModel.getUserSelectedAnswers(examId).observe(viewLifecycleOwner, Observer {
+        viewModel.getUserSelectedAnswers(attemptId).observe(viewLifecycleOwner, Observer {
             when(it.status) {
                 Status.SUCCESS -> {
                     userSelectedAnswer = it.data?.get(position)!!

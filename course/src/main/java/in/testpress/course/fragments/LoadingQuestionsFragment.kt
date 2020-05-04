@@ -79,7 +79,7 @@ class LoadingQuestionsFragment : Fragment(), EmptyViewListener {
 
     private fun initUserSelectedAnswers() {
         val attempt = contentAttempt.assessment!!
-        viewModel.loadUserSelectedAnswers(examId, attempt.questionsUrl!!).observe(viewLifecycleOwner, Observer { resource ->
+        viewModel.loadUserSelectedAnswers(attempt.id, attempt.questionsUrl!!).observe(viewLifecycleOwner, Observer { resource ->
             when(resource?.status) {
                 Status.SUCCESS -> {
                     fragmentChangeListener.showQuiz(contentAttempt.id, resource.data!!.size)

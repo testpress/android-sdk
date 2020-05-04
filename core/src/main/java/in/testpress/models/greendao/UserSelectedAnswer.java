@@ -23,6 +23,7 @@ public class UserSelectedAnswer {
     private Integer order;
     private Boolean review;
     private Long examId;
+    private Long attemptId;
     private String explanationHtml;
     private String shortText;
 
@@ -60,11 +61,12 @@ public class UserSelectedAnswer {
     }
 
     @Generated
-    public UserSelectedAnswer(Long id, Integer order, Boolean review, Long examId, String explanationHtml, String shortText, IntegerList selectedAnswers, IntegerList correctAnswers, String url, Long questionId) {
+    public UserSelectedAnswer(Long id, Integer order, Boolean review, Long examId, Long attemptId, String explanationHtml, String shortText, IntegerList selectedAnswers, IntegerList correctAnswers, String url, Long questionId) {
         this.id = id;
         this.order = order;
         this.review = review;
         this.examId = examId;
+        this.attemptId = attemptId;
         this.explanationHtml = explanationHtml;
         this.shortText = shortText;
         this.selectedAnswers = selectedAnswers;
@@ -110,6 +112,14 @@ public class UserSelectedAnswer {
 
     public void setExamId(Long examId) {
         this.examId = examId;
+    }
+
+    public Long getAttemptId() {
+        return attemptId;
+    }
+
+    public void setAttemptId(Long attemptId) {
+        this.attemptId = attemptId;
     }
 
     public String getExplanationHtml() {
