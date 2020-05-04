@@ -123,7 +123,7 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder {
         alertDialog = alertDialogBuilder.show()
     }
 
-    override fun showQuiz(attemptId: Long, totalNoOfQuestions:Int) {
+    override fun showQuiz(attemptId: Long, totalNoOfQuestions:Int, index: Int) {
         viewModel.loadAttempt(attemptId).observe(this, Observer {
             contentAttemptId = it?.data!!.id
             examEndUrl = it?.data?.assessment?.endUrl
@@ -132,6 +132,7 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder {
                 putLong("EXAM_ID", examId)
                 putLong("ATTEMPT_ID", it.data.assessment!!.id)
                 putInt("NO_OF_QUESTIONS", totalNoOfQuestions)
+                putInt("START_INDEX", index)
             }
             val quizSlideFragment = QuizSlideFragment().apply { arguments=bundle }
             quizSlideFragment.endHanlder = this

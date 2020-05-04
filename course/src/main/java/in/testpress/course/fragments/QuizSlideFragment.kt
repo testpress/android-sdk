@@ -14,6 +14,7 @@ class QuizSlideFragment: Fragment(), NextQuizHandler {
     private lateinit var viewPager: ViewPager2
     var examId: Long = -1
     var attemptId: Long = -1
+    var startIndex: Int = 0
     var totalNoOfQuestions: Int = 1
     lateinit var endHanlder: ExamEndHanlder
 
@@ -31,11 +32,13 @@ class QuizSlideFragment: Fragment(), NextQuizHandler {
         viewPager = view.findViewById(R.id.pager)
         viewPager.adapter = QuizSlideAdapter(this)
         viewPager.isUserInputEnabled = false
+        viewPager.post { viewPager.setCurrentItem(startIndex, true) }
     }
 
     private fun parseArguments() {
         examId = requireArguments().getLong("EXAM_ID", -1)
         attemptId = requireArguments().getLong("ATTEMPT_ID", -1)
+        startIndex = requireArguments().getInt("START_INDEX", 0)
         totalNoOfQuestions = requireArguments().getInt("NO_OF_QUESTIONS", 1)
     }
 

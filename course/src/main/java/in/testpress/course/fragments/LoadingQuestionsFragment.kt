@@ -82,7 +82,10 @@ class LoadingQuestionsFragment : Fragment(), EmptyViewListener {
         viewModel.loadUserSelectedAnswers(attempt.id, attempt.questionsUrl!!).observe(viewLifecycleOwner, Observer { resource ->
             when(resource?.status) {
                 Status.SUCCESS -> {
-                    fragmentChangeListener.showQuiz(contentAttempt.id, resource.data!!.size)
+                    val index = resource.data!!.indexOfFirst{
+                        it.duration == null
+                    }
+                    fragmentChangeListener.showQuiz(contentAttempt.id, resource.data.size, index)
                 }
                 Status.ERROR -> {
                     loadingLayout.visibility = View.GONE
@@ -118,5 +121,5 @@ class LoadingQuestionsFragment : Fragment(), EmptyViewListener {
 }
 
 interface ShowQuizHandler {
-    fun showQuiz(attemptId: Long, totalNoOfQuestions: Int)
+    fun showQuiz(attemptId: Long, totalNoOfQuestions: Int, index: Int)
 }
