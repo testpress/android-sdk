@@ -12,6 +12,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.QueryMap
 import java.util.HashMap
 
 @JvmSuppressWildcards
@@ -28,7 +29,8 @@ interface ExamService {
 
     @GET("{questions_url}")
     fun getUserSelectedAnswers(
-        @Path(value="questions_url", encoded = true) questionsUrl: String?
+        @Path(value="questions_url", encoded = true) questionsUrl: String?,
+        @QueryMap options: Map<String, Any>
     ): RetrofitCall<TestpressApiResponse<NetworkUserSelectedAnswer>>
 
     @PUT("{url}")
@@ -49,8 +51,8 @@ class ExamNetwork(context: Context): TestpressApiClient(context, TestpressSdk.ge
         return getService().getQuestions(url)
     }
 
-    fun getUserSelectedAnswers(url: String): RetrofitCall<TestpressApiResponse<NetworkUserSelectedAnswer>> {
-        return getService().getUserSelectedAnswers(url)
+    fun getUserSelectedAnswers(url: String, queryParams: Map<String, Any>): RetrofitCall<TestpressApiResponse<NetworkUserSelectedAnswer>> {
+        return getService().getUserSelectedAnswers(url, queryParams)
     }
 
     fun saveUserSelectedAnswer(url: String, arguments: HashMap<String, Any>): RetrofitCall<NetworkUserSelectedAnswer> {

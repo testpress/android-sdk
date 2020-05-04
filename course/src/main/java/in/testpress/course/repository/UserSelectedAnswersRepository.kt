@@ -23,16 +23,19 @@ class UserSelectedAnswersRepository(context: Context): QuizExamRepository(contex
     private val examNetwork = ExamNetwork(context)
     val userSelectedAnswerDao = TestpressSDKDatabase.getUserSelectedAnswerDao(context)
 
+    var page = 1
     var _resourceUserSelectedAnswers: MutableLiveData<Resource<List<DomainUserSelectedAnswer>>> = MutableLiveData()
     val resourceUserSelectedAnswers: LiveData<Resource<List<DomainUserSelectedAnswer>>>
         get() = _resourceUserSelectedAnswers
     val answerResource: MutableLiveData<Resource<NetworkUserSelectedAnswer>> = MutableLiveData()
 
-    private fun fetchUserSelectedAnswers(url: String, attemptId: Long) {
-        examNetwork.getUserSelectedAnswers(url)
+    private fun fetchUserSelectedAnswers(url: String, attemptId: Long, page: Int = 1) {
+        val queryParams: HashMap<String, Any> = hashMapOf()
+        queryParams["page"] = page
+        examNetwork.getUserSelectedAnswers(url, queryParams)
             .enqueue(object: TestpressCallback<TestpressApiResponse<NetworkUserSelectedAnswer>>() {
                 override fun onSuccess(result: TestpressApiResponse<NetworkUserSelectedAnswer>?) {
-                    handleUserSelectedAnswersFetchSuccess(result!!, attemptId)
+                    handleUserSelectedAnswersFetchSuccess(result!!, attemptId, url)
                 }
 
                 override fun onException(exception: TestpressException?) {
@@ -41,9 +44,12 @@ class UserSelectedAnswersRepository(context: Context): QuizExamRepository(contex
             })
     }
 
-    private fun handleUserSelectedAnswersFetchSuccess(response: TestpressApiResponse<NetworkUserSelectedAnswer>, attemptId: Long) {
+    private fun handleUserSelectedAnswersFetchSuccess(
+        response: TestpressApiResponse<NetworkUserSelectedAnswer>, attemptId: Long, url: String) {
         if(response.next != null) {
-            fetchUserSelectedAnswers(response.next, attemptId)
+            page += 1
+            fetchUserSelectedAnswers(url, attemptId, page)
+            saveAttemptItemsToDB(response.results, attemptId)
         } else {
             saveAttemptItemsToDB(response.results, attemptId)
             getUserSelectedAnswers(attemptId)
