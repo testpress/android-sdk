@@ -13,7 +13,8 @@ data class DomainUserSelectedAnswer(
     val explanationHtml: String? = null,
     val url: String? = null,
     var examId: Long? = null,
-    var questionId: Long? = null
+    var questionId: Long? = null,
+    val duration: String? = null
 )
 
 fun UserSelectedAnswer.asDomainModel(): DomainUserSelectedAnswer {
@@ -27,7 +28,8 @@ fun UserSelectedAnswer.asDomainModel(): DomainUserSelectedAnswer {
         correctAnswers = correctAnswers,
         explanationHtml = explanationHtml,
         url = url,
-        questionId = questionId
+        questionId = questionId,
+        duration = duration
     )
 }
 

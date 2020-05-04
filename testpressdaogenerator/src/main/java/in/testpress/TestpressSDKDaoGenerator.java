@@ -139,6 +139,7 @@ public class TestpressSDKDaoGenerator {
         userSelectedAnswer.addLongProperty("attemptId");
         userSelectedAnswer.addStringProperty("explanationHtml");
         userSelectedAnswer.addStringProperty("shortText");
+        userSelectedAnswer.addStringProperty("duration");
         userSelectedAnswer.addStringProperty("selectedAnswers").customType(
                 "in.testpress.util.IntegerList",
                 "in.testpress.util.IntegerListConverter"

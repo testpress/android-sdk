@@ -26,6 +26,7 @@ public class UserSelectedAnswer {
     private Long attemptId;
     private String explanationHtml;
     private String shortText;
+    private String duration;
 
     @Convert(converter = in.testpress.util.IntegerListConverter.class, columnType = String.class)
     private IntegerList selectedAnswers;
@@ -61,7 +62,7 @@ public class UserSelectedAnswer {
     }
 
     @Generated
-    public UserSelectedAnswer(Long id, Integer order, Boolean review, Long examId, Long attemptId, String explanationHtml, String shortText, IntegerList selectedAnswers, IntegerList correctAnswers, String url, Long questionId) {
+    public UserSelectedAnswer(Long id, Integer order, Boolean review, Long examId, Long attemptId, String explanationHtml, String shortText, String duration, IntegerList selectedAnswers, IntegerList correctAnswers, String url, Long questionId) {
         this.id = id;
         this.order = order;
         this.review = review;
@@ -69,6 +70,7 @@ public class UserSelectedAnswer {
         this.attemptId = attemptId;
         this.explanationHtml = explanationHtml;
         this.shortText = shortText;
+        this.duration = duration;
         this.selectedAnswers = selectedAnswers;
         this.correctAnswers = correctAnswers;
         this.url = url;
@@ -136,6 +138,14 @@ public class UserSelectedAnswer {
 
     public void setShortText(String shortText) {
         this.shortText = shortText;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 
     public IntegerList getSelectedAnswers() {
