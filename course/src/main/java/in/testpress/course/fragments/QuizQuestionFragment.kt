@@ -2,6 +2,7 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
 import `in`.testpress.course.enums.Status
+import `in`.testpress.course.repository.QuizQuestionsRepository
 import `in`.testpress.course.repository.UserSelectedAnswersRepository
 import `in`.testpress.course.viewmodels.QuizViewModel
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
@@ -40,7 +41,7 @@ class QuizQuestionFragment : Fragment() {
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return QuizViewModel(
-                    UserSelectedAnswersRepository(requireContext())
+                    QuizQuestionsRepository(requireContext())
                 ) as T
             }
         }).get(QuizViewModel::class.java)
@@ -75,18 +76,8 @@ class QuizQuestionFragment : Fragment() {
             submitButton.background.setColorFilter(resources.getColor(R.color.testpress_text_gray_medium), PorterDuff.Mode.SRC_ATOP)
             submitButton.text = "Checking"
 
-            viewModel.submitAnswer(userSelectedAnswer.id!!).observe(viewLifecycleOwner, Observer {
-                submitButton.isEnabled = true
-                when(it?.status) {
-                    Status.SUCCESS -> quizFragmentHandler.changeFragment()
-                    else -> {
-                        Toast.makeText(requireContext(), "Failed to save answer. Please try again", Toast.LENGTH_SHORT).show()
-                        submitButton.isEnabled = true
-                        submitButton.text = "Check"
-                        submitButton.background.setColorFilter(resources.getColor(R.color.testpress_color_primary), PorterDuff.Mode.SRC_ATOP)
-                    }
-                }
-            })
+            viewModel.submitAnswer(userSelectedAnswer.id!!)
+            quizFragmentHandler.changeFragment()
         }
 
         viewModel.getUserSelectedAnswers(attemptId).observe(viewLifecycleOwner, Observer {

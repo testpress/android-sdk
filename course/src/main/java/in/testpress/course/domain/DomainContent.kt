@@ -156,5 +156,6 @@ fun DomainContent.getGreenDaoContent(context: Context): Content? {
 
 fun DomainContent.getGreenDaoContentAttempts(context: Context): List<CourseAttempt> {
     val courseAttemptDao = TestpressSDKDatabase.getCourseAttemptDao(context)
-    return courseAttemptDao.queryBuilder().where(CourseAttemptDao.Properties.ChapterContentId.eq(this.id)).list()
+    return courseAttemptDao.queryBuilder()
+        .where(CourseAttemptDao.Properties.ChapterContentId.eq(this.id), CourseAttemptDao.Properties.ObjectUrl.isNotNull).list()
 }

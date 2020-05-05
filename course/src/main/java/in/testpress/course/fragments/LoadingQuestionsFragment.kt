@@ -3,7 +3,7 @@ package `in`.testpress.course.fragments
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainContentAttempt
 import `in`.testpress.course.enums.Status
-import `in`.testpress.course.repository.UserSelectedAnswersRepository
+import `in`.testpress.course.repository.QuizQuestionsRepository
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.viewmodels.QuizViewModel
 import android.content.Context
@@ -33,7 +33,7 @@ class LoadingQuestionsFragment : Fragment(), EmptyViewListener {
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return QuizViewModel(
-                    UserSelectedAnswersRepository(requireContext())
+                    QuizQuestionsRepository(requireContext())
                 ) as T
             }
         }).get(QuizViewModel::class.java)
@@ -79,7 +79,8 @@ class LoadingQuestionsFragment : Fragment(), EmptyViewListener {
 
     private fun initUserSelectedAnswers() {
         val attempt = contentAttempt.assessment!!
-        viewModel.loadUserSelectedAnswers(attempt.id, attempt.questionsUrl!!).observe(viewLifecycleOwner, Observer { resource ->
+        val questionsUrl = "/api/v2.4/exams/${examId}/questions/"
+        viewModel.loadUserSelectedAnswers(examId, attempt.id, questionsUrl).observe(viewLifecycleOwner, Observer { resource ->
             when(resource?.status) {
                 Status.SUCCESS -> {
                     val index = resource.data!!.indexOfFirst{

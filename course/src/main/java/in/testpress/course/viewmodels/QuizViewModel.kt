@@ -15,13 +15,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class QuizViewModel(val repository: UserSelectedAnswersRepository): ViewModel() {
+class QuizViewModel(val repository: QuizQuestionsRepository): ViewModel() {
     fun loadAttempt(contentId: Long): LiveData<Resource<DomainContentAttempt>> {
         return repository.createAttempt(contentId)
     }
 
-    fun loadUserSelectedAnswers(attemptId: Long, url: String): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
-        return repository.loadUserSelectedAnswers(attemptId, url)
+    fun loadUserSelectedAnswers(examID: Long, attemptId: Long, url: String): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
+        return repository.getQuestions(examID, attemptId, url)
     }
 
     fun getUserSelectedAnswers(attemptId: Long): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
@@ -32,7 +32,7 @@ class QuizViewModel(val repository: UserSelectedAnswersRepository): ViewModel() 
         repository.setAnswer(id, selectedOptions)
     }
 
-    fun submitAnswer(id: Long): MutableLiveData<Resource<NetworkUserSelectedAnswer>> {
+    fun submitAnswer(id: Long): MutableLiveData<Resource<DomainUserSelectedAnswer>> {
         return repository.submitAnswer(id)
     }
 }

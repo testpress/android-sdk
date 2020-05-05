@@ -2,6 +2,7 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
 import `in`.testpress.course.enums.Status
+import `in`.testpress.course.repository.QuizQuestionsRepository
 import `in`.testpress.course.repository.UserSelectedAnswersRepository
 import `in`.testpress.course.viewmodels.QuizViewModel
 import `in`.testpress.exam.domain.DomainQuestion
@@ -40,7 +41,7 @@ class QuizReviewFragment: Fragment() {
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return QuizViewModel(
-                    UserSelectedAnswersRepository(requireContext())
+                    QuizQuestionsRepository(requireContext())
                 ) as T
             }
         }).get(QuizViewModel::class.java)

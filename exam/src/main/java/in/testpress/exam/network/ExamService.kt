@@ -10,6 +10,7 @@ import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.QueryMap
@@ -33,7 +34,7 @@ interface ExamService {
         @QueryMap options: Map<String, Any>
     ): RetrofitCall<TestpressApiResponse<NetworkUserSelectedAnswer>>
 
-    @PUT("{url}")
+    @POST("{url}")
     fun saveUserSelectedAnswer(
         @Path(value="url", encoded = true) url: String?,
         @Body arguments: HashMap<String, Any>
