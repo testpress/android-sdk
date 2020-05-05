@@ -120,6 +120,39 @@ open class BaseExamWidgetFragment : Fragment() {
             }
         }
 
+        updateStartButtonTextAndVisibility(exam, pausedAttempt)
+        updateStartButtonListener(exam, pausedAttempt)
+    }
+
+    private fun updateStartButtonTextAndVisibility(exam: DomainExamContent, pausedAttempt: DomainContentAttempt?) {
+        if (pausedAttempt == null && exam.canBeAttempted()) {
+            if (contentAttempts.isEmpty()) {
+                startButton.text = getString(R.string.testpress_start)
+            } else {
+                startButton.text = getString(R.string.testpress_retake)
+            }
+            startButton.visibility = View.VISIBLE
+        } else if (pausedAttempt != null && !exam.isWebOnly()) {
+            startButton.text = getString(R.string.testpress_resume)
+            startButton.visibility = View.VISIBLE
+        } else {
+            startButton.visibility = View.GONE
+        }
+    }
+
+    private fun updateStartButtonListener(exam: DomainExamContent, pausedAttempt: DomainContentAttempt?) {
+        if (content.contentType.equals("Quiz", ignoreCase = true)) {
+            startButton.setOnClickListener {
+                val intent = Intent(requireContext(), QuizActivity::class.java).apply {
+                    putExtra(ContentActivity.CONTENT_ID, content.id)
+                    putExtra("EXAM_ID", exam.id)
+                    putExtra("ATTEMPT_URL", exam.attemptsUrl)
+                }
+                requireActivity().startActivity(intent)
+            }
+            return
+        }
+
         if (pausedAttempt == null && exam.canBeAttempted()) {
             if (contentAttempts.isEmpty()) {
                 startButton.text = getString(R.string.testpress_start)
@@ -134,17 +167,6 @@ open class BaseExamWidgetFragment : Fragment() {
             startButton.visibility = View.VISIBLE
         } else {
             startButton.visibility = View.GONE
-        }
-
-        if (content.contentType.equals("Quiz", ignoreCase = true)) {
-            startButton.setOnClickListener {
-                val intent = Intent(requireContext(), QuizActivity::class.java).apply {
-                    putExtra(ContentActivity.CONTENT_ID, content.id)
-                    putExtra("EXAM_ID", exam.id)
-                    putExtra("ATTEMPT_URL", exam.attemptsUrl)
-                }
-                requireActivity().startActivity(intent)
-            }
         }
     }
 
