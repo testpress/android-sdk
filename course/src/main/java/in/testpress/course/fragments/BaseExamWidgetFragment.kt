@@ -83,6 +83,11 @@ open class BaseExamWidgetFragment : Fragment() {
                     content.exam = exam
                     updateStartButton(contentAttempts)
                 }
+                else -> {
+                    var exam = content.exam!!
+                    content.exam = exam
+                    updateStartButton(contentAttempts)
+                }
             }
         }
 
