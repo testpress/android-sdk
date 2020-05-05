@@ -13,7 +13,7 @@ class QuizExamViewModel(val repository: QuizExamRepository): ViewModel() {
         return repository.loadAttempt(id)
     }
 
-    fun endExam(url: String) {
-        repository.endExam(url)
+    fun endExam(url: String, attemptId: Long) {
+        repository.endExam(url, attemptId)
     }
 }

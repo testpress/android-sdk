@@ -12,6 +12,7 @@ import `in`.testpress.course.util.ProgressDialog
 import `in`.testpress.course.viewmodels.QuizExamViewModel
 import `in`.testpress.exam.ui.ReviewStatsActivity
 import `in`.testpress.ui.BaseToolBarActivity
+import `in`.testpress.util.InternetConnectivityChecker
 import android.app.Dialog
 import android.graphics.Color
 import android.os.Bundle
@@ -26,6 +27,7 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder {
     lateinit var viewModel: QuizExamViewModel
     private var examEndUrl: String? = null
     private var contentAttemptId: Long = -1
+    private var attemptId: Long = -1
     private var examId: Long = -1
     private var alertDialog: AlertDialog? = null
     private lateinit var dialog: Dialog
@@ -81,9 +83,12 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder {
             dialog.hide()
             when(it.status) {
                 Status.SUCCESS -> {
-                    val intent = ReviewStatsActivity.createIntent(this, examId, contentAttemptId)
+                    if (InternetConnectivityChecker.isConnected(this)) {
+                        val intent = ReviewStatsActivity.createIntent(this, examId, contentAttemptId)
+                        finish()
+                        startActivity(intent)
+                    }
                     finish()
-                    startActivity(intent)
                 }
                 Status.ERROR -> {
                     handleExamEndError(it.exception!!)
@@ -126,6 +131,7 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder {
     override fun showQuiz(attemptId: Long, totalNoOfQuestions:Int, index: Int) {
         viewModel.loadAttempt(attemptId).observe(this, Observer {
             contentAttemptId = it?.data!!.id
+            this.attemptId = it.data.assessment?.id!!
             examEndUrl = it?.data?.assessment?.endUrl
             val examId = intent.getLongExtra("EXAM_ID", -1)
             val bundle = Bundle().apply {
@@ -147,7 +153,7 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder {
             dialog.hide()
             finish()
         } else {
-            viewModel.endExam(examEndUrl!!)
+            viewModel.endExam(examEndUrl!!, attemptId)
         }
     }
 }
