@@ -7,6 +7,7 @@ import `in`.testpress.course.enums.Status
 import `in`.testpress.course.repository.ContentRepository
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.viewmodels.ContentViewModel
+import `in`.testpress.util.InternetConnectivityChecker
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -87,10 +88,16 @@ class ContentLoadingFragment : Fragment(), EmptyViewListener {
 
     private fun isContentLoaded(content: DomainContent): Boolean {
         return when(content.contentType) {
-            "Exam", "Quiz" -> (content.exam != null) && (content.attemptsUrl != null)
+            "Exam" -> (content.exam != null) && (content.attemptsUrl != null)
             "Video" -> content.video != null
             "Attachment" -> content.attachment != null
             "Html", "Notes" -> content.htmlContent != null
+            "Quiz" -> {
+                if (InternetConnectivityChecker.isConnected(activity)) {
+                    return (content.exam != null) && (content.attemptsUrl != null)
+                }
+                return (content.exam != null)
+            }
             else -> true
         }
     }

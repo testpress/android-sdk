@@ -70,8 +70,12 @@ class ExamContentRepository(
         }
     }
 
-    fun loadAttempts(url: String, contentId: Long): LiveData<Resource<ArrayList<DomainContentAttempt>>> {
-        if (!isAttemptsBeingFetched) {
+    fun loadAttempts(url: String?, contentId: Long): LiveData<Resource<ArrayList<DomainContentAttempt>>> {
+        if (url == null) {
+            val contentAttempts = contentAttemptDao.queryBuilder().where(CourseAttemptDao.Properties.ChapterContentId.eq(contentId)).list()
+            val domainContentAttempts = ArrayList(contentAttempts.asDomainContentAttempts())
+            resourceContentAttempt.postValue(Resource.success(domainContentAttempts))
+        } else if (!isAttemptsBeingFetched) {
             isAttemptsBeingFetched = true
             fetchAttemptFromNetwork(url, contentId)
         }
