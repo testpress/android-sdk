@@ -2,6 +2,8 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainContent
+import `in`.testpress.util.InternetConnectivityChecker
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -39,7 +41,7 @@ class QuizContentFragment: BaseContentDetailFragment(), ExamRefreshListener {
     }
 
     private fun initQuizWidget(content: DomainContent) {
-        val quizWidgetFragment = QuizWidgetFactory.getWidget(content)
+        val quizWidgetFragment = QuizWidgetFactory.getWidget(content, requireContext())
         quizWidgetFragment.arguments = arguments
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.exam_widget_fragment, quizWidgetFragment)
@@ -53,8 +55,8 @@ class QuizContentFragment: BaseContentDetailFragment(), ExamRefreshListener {
 
 class QuizWidgetFactory {
     companion object {
-        fun getWidget(content: DomainContent): Fragment {
-            if (content.attemptsCount!! > 0){
+        fun getWidget(content: DomainContent, context: Context): Fragment {
+            if (content.attemptsCount!! > 0 && InternetConnectivityChecker.isConnected(context)){
                 return AttemptsListFragment()
             }
             return StartQuizFragment()
