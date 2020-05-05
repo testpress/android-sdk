@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 31;
+    private static final int VERSION = 33;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -37,6 +37,7 @@ public class TestpressSDKDaoGenerator {
 
         Entity userSelectedAnswer = addUserSelectedAnswer(schema);
         addQuestionToUserSelectedAnswer(question, userSelectedAnswer);
+        addExamQuestionToUserSelectedAnswer(examQuestion, userSelectedAnswer);
 
         Entity course = addCourse(schema);
 
@@ -155,6 +156,11 @@ public class TestpressSDKDaoGenerator {
     private static void addQuestionToUserSelectedAnswer(Entity question, Entity userSelectedAnswer) {
         Property questionId = userSelectedAnswer.addLongProperty("questionId").getProperty();
         userSelectedAnswer.addToOne(question, questionId, "question");
+    }
+
+    private static void addExamQuestionToUserSelectedAnswer(Entity examQuestion, Entity userSelectedAnswer) {
+        Property examQuestionId = userSelectedAnswer.addLongProperty("examQuestionId").getProperty();
+        userSelectedAnswer.addToOne(examQuestion, examQuestionId, "examQuestion");
     }
 
     private static Entity addExamQuestion(Schema schema) {

@@ -35,6 +35,7 @@ public class UserSelectedAnswer {
     private IntegerList correctAnswers;
     private String url;
     private Long questionId;
+    private Long examQuestionId;
 
     /** Used to resolve relations */
     @Generated
@@ -50,6 +51,12 @@ public class UserSelectedAnswer {
     @Generated
     private transient Long question__resolvedKey;
 
+    @ToOne(joinProperty = "examQuestionId")
+    private ExamQuestion examQuestion;
+
+    @Generated
+    private transient Long examQuestion__resolvedKey;
+
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
 
@@ -62,7 +69,7 @@ public class UserSelectedAnswer {
     }
 
     @Generated
-    public UserSelectedAnswer(Long id, Integer order, Boolean review, Long examId, Long attemptId, String explanationHtml, String shortText, String duration, IntegerList selectedAnswers, IntegerList correctAnswers, String url, Long questionId) {
+    public UserSelectedAnswer(Long id, Integer order, Boolean review, Long examId, Long attemptId, String explanationHtml, String shortText, String duration, IntegerList selectedAnswers, IntegerList correctAnswers, String url, Long questionId, Long examQuestionId) {
         this.id = id;
         this.order = order;
         this.review = review;
@@ -75,6 +82,7 @@ public class UserSelectedAnswer {
         this.correctAnswers = correctAnswers;
         this.url = url;
         this.questionId = questionId;
+        this.examQuestionId = examQuestionId;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -180,6 +188,14 @@ public class UserSelectedAnswer {
         this.questionId = questionId;
     }
 
+    public Long getExamQuestionId() {
+        return examQuestionId;
+    }
+
+    public void setExamQuestionId(Long examQuestionId) {
+        this.examQuestionId = examQuestionId;
+    }
+
     /** To-one relationship, resolved on first access. */
     @Generated
     public Question getQuestion() {
@@ -202,6 +218,31 @@ public class UserSelectedAnswer {
             this.question = question;
             questionId = question == null ? null : question.getId();
             question__resolvedKey = questionId;
+        }
+    }
+
+    /** To-one relationship, resolved on first access. */
+    @Generated
+    public ExamQuestion getExamQuestion() {
+        Long __key = this.examQuestionId;
+        if (examQuestion__resolvedKey == null || !examQuestion__resolvedKey.equals(__key)) {
+            __throwIfDetached();
+            ExamQuestionDao targetDao = daoSession.getExamQuestionDao();
+            ExamQuestion examQuestionNew = targetDao.load(__key);
+            synchronized (this) {
+                examQuestion = examQuestionNew;
+            	examQuestion__resolvedKey = __key;
+            }
+        }
+        return examQuestion;
+    }
+
+    @Generated
+    public void setExamQuestion(ExamQuestion examQuestion) {
+        synchronized (this) {
+            this.examQuestion = examQuestion;
+            examQuestionId = examQuestion == null ? null : examQuestion.getId();
+            examQuestion__resolvedKey = examQuestionId;
         }
     }
 

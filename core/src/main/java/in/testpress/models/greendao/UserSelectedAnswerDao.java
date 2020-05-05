@@ -40,6 +40,7 @@ public class UserSelectedAnswerDao extends AbstractDao<UserSelectedAnswer, Long>
         public final static Property CorrectAnswers = new Property(9, String.class, "correctAnswers", false, "CORRECT_ANSWERS");
         public final static Property Url = new Property(10, String.class, "url", false, "URL");
         public final static Property QuestionId = new Property(11, Long.class, "questionId", false, "QUESTION_ID");
+        public final static Property ExamQuestionId = new Property(12, Long.class, "examQuestionId", false, "EXAM_QUESTION_ID");
     }
 
     private DaoSession daoSession;
@@ -71,7 +72,8 @@ public class UserSelectedAnswerDao extends AbstractDao<UserSelectedAnswer, Long>
                 "\"SELECTED_ANSWERS\" TEXT," + // 8: selectedAnswers
                 "\"CORRECT_ANSWERS\" TEXT," + // 9: correctAnswers
                 "\"URL\" TEXT," + // 10: url
-                "\"QUESTION_ID\" INTEGER);"); // 11: questionId
+                "\"QUESTION_ID\" INTEGER," + // 11: questionId
+                "\"EXAM_QUESTION_ID\" INTEGER);"); // 12: examQuestionId
     }
 
     /** Drops the underlying database table. */
@@ -143,6 +145,11 @@ public class UserSelectedAnswerDao extends AbstractDao<UserSelectedAnswer, Long>
         if (questionId != null) {
             stmt.bindLong(12, questionId);
         }
+ 
+        Long examQuestionId = entity.getExamQuestionId();
+        if (examQuestionId != null) {
+            stmt.bindLong(13, examQuestionId);
+        }
     }
 
     @Override
@@ -208,6 +215,11 @@ public class UserSelectedAnswerDao extends AbstractDao<UserSelectedAnswer, Long>
         if (questionId != null) {
             stmt.bindLong(12, questionId);
         }
+ 
+        Long examQuestionId = entity.getExamQuestionId();
+        if (examQuestionId != null) {
+            stmt.bindLong(13, examQuestionId);
+        }
     }
 
     @Override
@@ -235,7 +247,8 @@ public class UserSelectedAnswerDao extends AbstractDao<UserSelectedAnswer, Long>
             cursor.isNull(offset + 8) ? null : selectedAnswersConverter.convertToEntityProperty(cursor.getString(offset + 8)), // selectedAnswers
             cursor.isNull(offset + 9) ? null : correctAnswersConverter.convertToEntityProperty(cursor.getString(offset + 9)), // correctAnswers
             cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // url
-            cursor.isNull(offset + 11) ? null : cursor.getLong(offset + 11) // questionId
+            cursor.isNull(offset + 11) ? null : cursor.getLong(offset + 11), // questionId
+            cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12) // examQuestionId
         );
         return entity;
     }
@@ -254,6 +267,7 @@ public class UserSelectedAnswerDao extends AbstractDao<UserSelectedAnswer, Long>
         entity.setCorrectAnswers(cursor.isNull(offset + 9) ? null : correctAnswersConverter.convertToEntityProperty(cursor.getString(offset + 9)));
         entity.setUrl(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
         entity.setQuestionId(cursor.isNull(offset + 11) ? null : cursor.getLong(offset + 11));
+        entity.setExamQuestionId(cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12));
      }
     
     @Override
@@ -289,8 +303,11 @@ public class UserSelectedAnswerDao extends AbstractDao<UserSelectedAnswer, Long>
             SqlUtils.appendColumns(builder, "T", getAllColumns());
             builder.append(',');
             SqlUtils.appendColumns(builder, "T0", daoSession.getQuestionDao().getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T1", daoSession.getExamQuestionDao().getAllColumns());
             builder.append(" FROM USER_SELECTED_ANSWER T");
             builder.append(" LEFT JOIN QUESTION T0 ON T.\"QUESTION_ID\"=T0.\"ID\"");
+            builder.append(" LEFT JOIN EXAM_QUESTION T1 ON T.\"EXAM_QUESTION_ID\"=T1.\"ID\"");
             builder.append(' ');
             selectDeep = builder.toString();
         }
@@ -303,6 +320,10 @@ public class UserSelectedAnswerDao extends AbstractDao<UserSelectedAnswer, Long>
 
         Question question = loadCurrentOther(daoSession.getQuestionDao(), cursor, offset);
         entity.setQuestion(question);
+        offset += daoSession.getQuestionDao().getAllColumns().length;
+
+        ExamQuestion examQuestion = loadCurrentOther(daoSession.getExamQuestionDao(), cursor, offset);
+        entity.setExamQuestion(examQuestion);
 
         return entity;    
     }
