@@ -25,7 +25,8 @@ interface ExamService {
 
     @GET("{questions_url}")
     fun getQuestions(
-        @Path(value="questions_url", encoded = true) questionsUrl: String?
+        @Path(value="questions_url", encoded = true) questionsUrl: String?,
+        @QueryMap queryParams: Map<String, Any>
     ): RetrofitCall<ApiResponse<NetworkExamQuestionResult>>
 
     @GET("{questions_url}")
@@ -48,8 +49,8 @@ class ExamNetwork(context: Context): TestpressApiClient(context, TestpressSdk.ge
         return getService().getLanguages(slug)
     }
 
-    fun getQuestions(url: String): RetrofitCall<ApiResponse<NetworkExamQuestionResult>> {
-        return getService().getQuestions(url)
+    fun getQuestions(url: String, queryParams: Map<String, Any>): RetrofitCall<ApiResponse<NetworkExamQuestionResult>> {
+        return getService().getQuestions(url, queryParams)
     }
 
     fun getUserSelectedAnswers(url: String, queryParams: Map<String, Any>): RetrofitCall<TestpressApiResponse<NetworkUserSelectedAnswer>> {
