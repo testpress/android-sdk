@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
@@ -251,6 +252,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
 
     private void customiseToolbar() {
         toolbar.setBackgroundColor(Color.WHITE);
+        toolbar.getOverflowIcon().setColorFilter(getResources().getColor(R.color.testpress_color_primary), PorterDuff.Mode.SRC_ATOP);
         toolbar.setTitleTextColor(getResources().getColor(R.color.testpress_color_primary));
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         showLogoInToolbar();
