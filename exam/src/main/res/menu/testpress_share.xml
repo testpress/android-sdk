@@ -8,7 +8,7 @@
         app:showAsAction="always"
         android:visible="false"
         app:iconTint="@color/testpress_color_primary"
-        android:title="@string/testpress_share" >
+        android:title="Whatsapp Share" >
     </item>
 
     <item
@@ -17,13 +17,13 @@
         app:showAsAction="always"
         android:visible="false"
         app:iconTint="@color/testpress_color_primary"
-        android:title="@string/testpress_share" >
+        android:title="Telegram Share" >
     </item>
 
     <item
         android:id="@+id/share"
         android:icon="@drawable/ic_share_white_24dp"
-        app:showAsAction="always"
+        app:showAsAction="withText"
         android:visible="false"
         app:iconTint="@color/testpress_color_primary"
         android:title="@string/testpress_share" >
@@ -32,9 +32,9 @@
     <item
         android:id="@+id/bookmark"
         android:icon="@drawable/ic_bookmark_border_black_24dp"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         app:iconTint="@color/testpress_white"
-        android:title="@string/testpress_share" >
+        android:title="Bookmark" >
     </item>
 
     <item
@@ -43,7 +43,7 @@
         android:icon="@drawable/ic_close_black_24dp"
         app:showAsAction="always"
         app:iconTint="@color/testpress_color_primary"
-        android:title="@string/testpress_share" >
+        android:title="Close" >
     </item>
 
 </menu>
