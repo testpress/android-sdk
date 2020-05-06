@@ -403,12 +403,15 @@ public class ReviewQuestionsFragment extends Fragment {
                 } else {
                     optionColor = android.R.color.white;
                 }
+
+                if (attemptAnswer.getIsCorrect()) {
+                    optionColor = R.color.testpress_green;
+                    correctAnswerHtml += "\n" + WebViewUtils.getCorrectAnswerIndexWithTags(j);
+                }
+
                 html += "\n" + WebViewUtils.getOptionWithTags(attemptAnswer.getTextHtml(), j,
                         optionColor, getContext(), attemptAnswer.getIsCorrect());
 
-                if (attemptAnswer.getIsCorrect()) {
-                    correctAnswerHtml += "\n" + WebViewUtils.getCorrectAnswerIndexWithTags(j);
-                }
             } else if (isNumericalType) {
                 correctAnswerHtml = attemptAnswer.getTextHtml();
             } else {
