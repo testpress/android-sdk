@@ -30,16 +30,20 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     val examQuestionDao = TestpressSDKDatabase.getExamQuestionDao(context)
     private val userSelectedAnswerDao = TestpressSDKDatabase.getUserSelectedAnswerDao(context)
 
+    var page = 1
+
     var _resourceUserSelectedAnswers: MutableLiveData<Resource<List<DomainUserSelectedAnswer>>> = MutableLiveData()
     val resourceUserSelectedAnswers: LiveData<Resource<List<DomainUserSelectedAnswer>>>
         get() = _resourceUserSelectedAnswers
     val answerResource: MutableLiveData<Resource<DomainUserSelectedAnswer>> = MutableLiveData()
 
     private fun fetchQuestions(url: String, examId: Long, attemptId: Long) {
-        examNetwork.getQuestions(url)
+        val queryParams: HashMap<String, Any> = hashMapOf()
+        queryParams["page"] = page
+        examNetwork.getQuestions(url, queryParams)
             .enqueue(object: TestpressCallback<ApiResponse<NetworkExamQuestionResult>>(){
                 override fun onSuccess(result: ApiResponse<NetworkExamQuestionResult>?) {
-                    handleQuestionsFetchSuccess(result, examId, attemptId)
+                    handleQuestionsFetchSuccess(result, examId, attemptId, url)
                 }
 
                 override fun onException(exception: TestpressException?) {
@@ -48,11 +52,13 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
             })
     }
 
-    private fun handleQuestionsFetchSuccess(response: ApiResponse<NetworkExamQuestionResult>?, examId: Long, attemptId: Long) {
+    private fun handleQuestionsFetchSuccess(response: ApiResponse<NetworkExamQuestionResult>?, examId: Long, attemptId: Long, url: String) {
         if (response?.next != null) {
-            fetchQuestions(response.next, examId, attemptId)
+            page += 1
+            fetchQuestions(url, examId, attemptId)
+            saveQuestionsToDB(response?.results, examId)
         } else {
-            cleanQuestionInDB(examId)
+            page = 1
             saveQuestionsToDB(response?.results, examId)
             val questions = getQuestionsFromDB(examId)
             createUserSelectedAnswers(questions!!, attemptId)
@@ -102,6 +108,7 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
                 _resourceUserSelectedAnswers.postValue(Resource.success(userSelectedAnswers.asDomainModels()))
             }
         } else {
+            cleanQuestionInDB(examId)
             fetchQuestions(url, examId, attemptId)
         }
         return resourceUserSelectedAnswers
