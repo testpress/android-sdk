@@ -92,12 +92,7 @@ class ContentLoadingFragment : Fragment(), EmptyViewListener {
             "Video" -> content.video != null
             "Attachment" -> content.attachment != null
             "Html", "Notes" -> content.htmlContent != null
-            "Quiz" -> {
-                if (InternetConnectivityChecker.isConnected(activity)) {
-                    return (content.exam != null) && (content.attemptsUrl != null)
-                }
-                return (content.exam != null)
-            }
+            "Quiz" -> content.exam != null
             else -> true
         }
     }
