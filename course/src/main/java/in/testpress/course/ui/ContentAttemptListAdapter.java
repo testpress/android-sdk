@@ -143,7 +143,7 @@ public class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView
                         if (mContent.getContentType().equals("Quiz")) {
                             Intent intent = new Intent(mActivity, QuizActivity.class);
                             intent.putExtra(CONTENT_ID, mContent.getId());
-                            intent.putExtra("CONTENT_ID", mContent.getExamId());
+                            intent.putExtra("EXAM_ID", mContent.getExamId());
                             intent.putExtra("ATTEMPT_URL", mContent.getExam().getAttemptsUrl());
                             mActivity.startActivity(intent);
                             return;
