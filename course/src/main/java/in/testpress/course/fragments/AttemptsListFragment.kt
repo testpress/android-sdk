@@ -11,8 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 
-class AttemptsListFragment : BaseExamWidgetFragment() {
+open class AttemptsListFragment : BaseExamWidgetFragment() {
     private lateinit var attemptList: RecyclerView
 
     override fun onCreateView(
@@ -34,7 +35,7 @@ class AttemptsListFragment : BaseExamWidgetFragment() {
         attemptList.isNestedScrollingEnabled = false
         attemptList.setHasFixedSize(true)
         attemptList.layoutManager = LinearLayoutManager(activity)
-        attemptList.adapter = ContentAttemptListAdapter(activity, greenDaoContent, attempts)
+        attemptList.adapter = ContentAttemptListAdapter(activity, greenDaoContent, attempts.reversed())
         attemptList.visibility = View.VISIBLE
     }
 }

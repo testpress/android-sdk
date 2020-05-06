@@ -31,7 +31,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
 open class BaseExamWidgetFragment : Fragment() {
-    private lateinit var startButton: Button
+    lateinit var startButton: Button
     protected lateinit var viewModel: ExamContentViewModel
     protected lateinit var content: DomainContent
     protected var contentId: Long = -1
@@ -73,7 +73,7 @@ open class BaseExamWidgetFragment : Fragment() {
         })
     }
 
-    private fun loadAttemptsAndUpdateStartButton() {
+    fun loadAttemptsAndUpdateStartButton() {
         val observer = Observer<Resource<List<DomainLanguage>>> { resource ->
             examRefreshListener.showOrHideRefresh(false)
             when(resource.status) {
@@ -92,7 +92,8 @@ open class BaseExamWidgetFragment : Fragment() {
         }
 
         examRefreshListener.showOrHideRefresh(true)
-        viewModel.loadContentAttempts(content.attemptsUrl, contentId)
+        var url = content.attemptsUrl ?: "/api/v2.3/contents/${content.id}/attempts/"
+        viewModel.loadContentAttempts(url, contentId)
             .observe(viewLifecycleOwner, Observer { resource ->
                 examRefreshListener.showOrHideRefresh(false)
                 when (resource.status) {
@@ -108,7 +109,7 @@ open class BaseExamWidgetFragment : Fragment() {
             })
     }
 
-    private fun updateStartButton(contentAttempts: ArrayList<DomainContentAttempt>) {
+    open fun updateStartButton(contentAttempts: ArrayList<DomainContentAttempt>) {
         val exam = content.exam!!
         var pausedAttempt: DomainContentAttempt? = null
 

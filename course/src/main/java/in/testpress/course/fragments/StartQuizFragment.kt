@@ -2,6 +2,8 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
+import `in`.testpress.course.enums.Status
+import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.ui.QuizActivity
 import `in`.testpress.util.ViewUtils
@@ -13,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.lifecycle.Observer
 
 class StartQuizFragment: BaseExamWidgetFragment() {
     private lateinit var numberOfQuestions: TextView
@@ -23,19 +26,29 @@ class StartQuizFragment: BaseExamWidgetFragment() {
     private lateinit var descriptionContent: TextView
     private lateinit var questionsLabel: TextView
     private lateinit var dateLabel: TextView
-    private lateinit var startButton: Button
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.quiz_content_detail, container, false)
+        return inflater.inflate(R.layout.quiz_start_screen, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        startButton = view.findViewById(R.id.start_exam)
+        contentId = requireArguments().getLong(ContentActivity.CONTENT_ID)
         bindViews(view)
+
+        viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer {
+            when (it?.status) {
+                Status.SUCCESS -> {
+                    content = it.data!!
+                    display()
+                    loadAttemptsAndUpdateStartButton()
+                }
+            }
+        })
     }
 
     private fun bindViews(view: View) {
@@ -47,7 +60,6 @@ class StartQuizFragment: BaseExamWidgetFragment() {
         descriptionContent = view.findViewById(R.id.descriptionContent)
         questionsLabel = view.findViewById(R.id.questions_label)
         dateLabel = view.findViewById(R.id.date_label)
-        startButton = view.findViewById(R.id.start_exam)
         startButton.visibility = View.VISIBLE
         marksPerQuestionLayout.visibility = View.GONE
         negativeMarksLayout.visibility = View.GONE

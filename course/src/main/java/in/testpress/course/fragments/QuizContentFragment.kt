@@ -25,7 +25,7 @@ class QuizContentFragment: BaseContentDetailFragment(), ExamRefreshListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.exam_content_detail, container, false)
+        return inflater.inflate(R.layout.quiz_content_detail, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -41,25 +41,33 @@ class QuizContentFragment: BaseContentDetailFragment(), ExamRefreshListener {
     }
 
     private fun initQuizWidget(content: DomainContent) {
+        val startQuizFragment = StartQuizFragment()
+        startQuizFragment.arguments = arguments
+        val fragmentTransaction = childFragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.start_exam_fragment, startQuizFragment)
+        fragmentTransaction.commit()
+
         val quizWidgetFragment = QuizWidgetFactory.getWidget(content, requireContext())
-        quizWidgetFragment.arguments = arguments
-        val transaction = childFragmentManager.beginTransaction()
-        transaction.replace(R.id.exam_widget_fragment, quizWidgetFragment)
-        transaction.commit()
+        quizWidgetFragment?.let {
+            it.arguments = arguments
+            val transaction = childFragmentManager.beginTransaction()
+            transaction.replace(R.id.exam_widget_fragment, it)
+            transaction.commit()
+        }
     }
 
     override fun showOrHideRefresh(isRefreshing: Boolean) {
-        swipeRefresh.isRefreshing = isRefreshing
+        // swipeRefresh.isRefreshing = isRefreshing
     }
 }
 
 class QuizWidgetFactory {
     companion object {
-        fun getWidget(content: DomainContent, context: Context): Fragment {
+        fun getWidget(content: DomainContent, context: Context): Fragment? {
             if (content.attemptsCount!! > 0 && InternetConnectivityChecker.isConnected(context)){
-                return AttemptsListFragment()
+                return QuizAttemptsList()
             }
-            return StartQuizFragment()
+            return null
         }
     }
 }

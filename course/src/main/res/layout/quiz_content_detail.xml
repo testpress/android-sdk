@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/button_layout"
+        android:layout_below="@+id/appbar">
+
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -19,41 +26,84 @@
                 android:paddingTop="20dp"
                 tools:ignore="ScrollViewSize">
 
-                <include
-                    android:id="@+id/exam_details_layout"
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    layout="@layout/testpress_exam_details_layout" />
-
                 <LinearLayout
+                    android:id="@+id/title_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom">
+                    android:orientation="vertical"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:visibility="gone">
 
-                    <androidx.appcompat.widget.AppCompatButton
-                        android:id="@+id/start_exam"
+                    <TextView
+                        android:id="@+id/title"
                         android:layout_width="match_parent"
-                        android:layout_height="37dp"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginRight="20dp"
-                        android:layout_marginBottom="30dp"
-                        android:background="@drawable/testpress_green_curved_edge_background"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
                         android:gravity="center"
-                        android:visibility="gone"
-                        android:text="@string/testpress_start"
-                        android:textColor="@android:color/white"
-                        android:textSize="16sp" />
+                        android:lineSpacingExtra="6dp"
+                        android:text="Lorem ipsum dolor sit amet, consectetur"
+                        android:textColor="@color/testpress_black"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <FrameLayout
+                        android:id="@+id/bookmark_fragment_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <View
+                        android:id="@+id/title_separator"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="5dp"
+                        android:background="#e6e6e6" />
+
                 </LinearLayout>
 
-                <!-- Empty layout to keep the navigation button in bottom -->
-                <View
+                <LinearLayout
+                    android:id="@+id/exam_content_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp">
+
+                    <FrameLayout
+                        android:id="@+id/start_exam_fragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <FrameLayout
+                        android:id="@+id/exam_widget_fragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/attempt_web_only_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="15dp"
+                        android:layout_marginBottom="20dp"
+                        android:gravity="center"
+                        android:lineSpacingExtra="5dp"
+                        android:text="@string/testpress_web_only_exam_description"
+                        android:textColor="@color/testpress_black"
+                        android:visibility="gone" />
+
+                </LinearLayout>
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <FrameLayout
         android:id="@+id/empty_view_fragment"
@@ -64,6 +114,6 @@
         android:id="@+id/bottom_navigation_fragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>
