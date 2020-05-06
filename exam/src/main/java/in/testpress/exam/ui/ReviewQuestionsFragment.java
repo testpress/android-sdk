@@ -3,6 +3,7 @@ package in.testpress.exam.ui;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -238,7 +239,8 @@ public class ReviewQuestionsFragment extends Fragment {
         initalizeBookmarkButtonListener();
 
         if (instituteSettings.isGrowthHackEnabled()) {
-            menu.findItem(R.id.bookmark).setIconTintList(ContextCompat.getColorStateList(
+            bookmarkIcon.getIcon().setColorFilter(getResources().getColor(R.color.testpress_color_primary), PorterDuff.Mode.SRC_ATOP);
+            bookmarkIcon.setIconTintList(ContextCompat.getColorStateList(
                     getActivity(), R.color.testpress_actionbar_text));
             menu.findItem(R.id.share).setVisible(true);
             menu.findItem(R.id.close).setVisible(true);
@@ -275,6 +277,10 @@ public class ReviewQuestionsFragment extends Fragment {
             bookmarkIcon.setIcon(R.drawable.ic_remove_bookmark);
         } else {
             bookmarkIcon.setIcon(R.drawable.ic_bookmark_border_black_24dp);
+        }
+
+        if (instituteSettings.isGrowthHackEnabled()) {
+            bookmarkIcon.getIcon().setColorFilter(getResources().getColor(R.color.testpress_color_primary), PorterDuff.Mode.SRC_ATOP);
         }
     }
 
@@ -547,10 +553,8 @@ public class ReviewQuestionsFragment extends Fragment {
 
     void setBookmarkProgress(boolean show) {
         if (show) {
-            bookmarkIcon.setVisible(false);
             animationView.setVisibility(View.VISIBLE);
         } else {
-            bookmarkIcon.setVisible(true);
             animationView.setVisibility(View.GONE);
         }
     }
