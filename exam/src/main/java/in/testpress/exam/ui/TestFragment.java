@@ -342,6 +342,9 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     private void showSectionInstructionsButton() {
+        if (sections.isEmpty()) {
+            return;
+        }
         AttemptSection section = sections.get(attempt.getCurrentSectionPosition());
         if (section.getInstructions() != null) {
             plainSpinnerAdapter.showSectionInfoButton(true);
