@@ -1,12 +1,13 @@
 package `in`.testpress.course.fragments
 
+import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.enums.Status
 import `in`.testpress.course.repository.QuizQuestionsRepository
-import `in`.testpress.course.repository.UserSelectedAnswersRepository
 import `in`.testpress.course.viewmodels.QuizViewModel
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
 import `in`.testpress.exam.ui.view.WebView
+import `in`.testpress.models.InstituteSettings
 import `in`.testpress.util.WebViewUtils
 import android.graphics.PorterDuff
 import android.os.Bundle
@@ -14,22 +15,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
-import android.widget.Toast
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.button.MaterialButton
 import java.util.ArrayList
+import java.util.Timer
+import kotlin.concurrent.schedule
 
 class QuizQuestionFragment : Fragment() {
     private lateinit var questionsView: WebView
-    private lateinit var submitButton: MaterialButton
 
     private lateinit var webViewUtils: WebViewUtils
     lateinit var viewModel: QuizViewModel
     private lateinit var userSelectedAnswer: DomainUserSelectedAnswer
     lateinit var quizFragmentHandler: QuizFragmentHandler
+    private lateinit var instituteSettings: InstituteSettings
 
     private var examId: Long = -1
     private var attemptId: Long = -1
@@ -56,12 +61,12 @@ class QuizQuestionFragment : Fragment() {
         bindViews(view)
         parseArguments()
         initializeListeners()
+        instituteSettings = TestpressSdk.getTestpressSession(requireContext())!!.instituteSettings;
     }
 
     private fun bindViews(view: View) {
         questionsView = view.findViewById(R.id.question)
         questionsView.addJavascriptInterface(OptionsSelectionListener(), "OptionsSelectionListener")
-        submitButton = view.findViewById(R.id.submit_button)
     }
 
     private fun parseArguments() {
@@ -71,15 +76,6 @@ class QuizQuestionFragment : Fragment() {
     }
 
     private fun initializeListeners() {
-        submitButton.setOnClickListener {
-            submitButton.isEnabled = false
-            submitButton.background.setColorFilter(resources.getColor(R.color.testpress_text_gray_medium), PorterDuff.Mode.SRC_ATOP)
-            submitButton.text = "Checking"
-
-            viewModel.submitAnswer(userSelectedAnswer.id!!)
-            quizFragmentHandler.changeFragment()
-        }
-
         viewModel.getUserSelectedAnswers(attemptId).observe(viewLifecycleOwner, Observer {
             when(it.status) {
                 Status.SUCCESS -> {
@@ -90,6 +86,10 @@ class QuizQuestionFragment : Fragment() {
         })
     }
 
+    fun submitAnswer() {
+        viewModel.submitAnswer(userSelectedAnswer.id!!)
+    }
+
     private fun initWebview() {
         webViewUtils = object : WebViewUtils(questionsView) {
             override fun getHeader(): String {
@@ -98,9 +98,10 @@ class QuizQuestionFragment : Fragment() {
 
             override fun onLoadFinished() {
                 super.onLoadFinished()
-                submitButton.visibility = View.VISIBLE
+                if (instituteSettings.isGrowthHackEnabled) {
+                    webViewUtils.addWatermark(instituteSettings.appToolbarLogo)
+                }
             }
-
         }
         webViewUtils.initWebView(getHtml(), requireActivity())
     }
@@ -156,6 +157,7 @@ class QuizQuestionFragment : Fragment() {
             } else {
                 selectedOptions.remove(id.toInt())
             }
+            userSelectedAnswer.selectedAnswers = selectedOptions
             viewModel.setAnswer(userSelectedAnswer.id!!, selectedOptions)
         }
     }

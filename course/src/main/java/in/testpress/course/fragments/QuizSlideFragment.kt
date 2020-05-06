@@ -8,9 +8,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-
+import com.google.android.material.button.MaterialButton
 
 class QuizSlideFragment: Fragment(), NextQuizHandler {
+    private lateinit var submitButton: MaterialButton
+
     private lateinit var viewPager: ViewPager2
     var examId: Long = -1
     var attemptId: Long = -1
@@ -26,6 +28,20 @@ class QuizSlideFragment: Fragment(), NextQuizHandler {
         super.onViewCreated(view, savedInstanceState)
         parseArguments()
         initializeViewPager(view)
+        submitButton = view.findViewById(R.id.submit_button)
+        submitButton.visibility = View.VISIBLE
+
+        submitButton.setOnClickListener {
+            val fragment = childFragmentManager.findFragmentByTag("f" + viewPager.currentItem) as RootQuizFragment
+            if (fragment.isQuestionFragment) {
+                fragment.submitAnswer()
+                fragment.changeFragment()
+                submitButton.text = "Continue"
+            } else {
+                submitButton.text = "Check"
+                showNext()
+            }
+        }
     }
 
     private fun initializeViewPager(view: View) {

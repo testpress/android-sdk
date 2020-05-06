@@ -1,36 +1,48 @@
 package `in`.testpress.course.fragments
 
+import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.enums.Status
 import `in`.testpress.course.repository.QuizQuestionsRepository
-import `in`.testpress.course.repository.UserSelectedAnswersRepository
 import `in`.testpress.course.viewmodels.QuizViewModel
 import `in`.testpress.exam.domain.DomainQuestion
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
 import `in`.testpress.exam.ui.view.WebView
+import `in`.testpress.models.InstituteSettings
+import `in`.testpress.util.ViewUtils
 import `in`.testpress.util.WebViewUtils
-import android.graphics.PorterDuff
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.button.MaterialButton
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
 
 class QuizReviewFragment: Fragment() {
     private lateinit var questionsView: WebView
-    private lateinit var nextButton: MaterialButton
+    lateinit var difficultyTitle: TextView
+    lateinit var difficultyPercentageText: TextView
+    lateinit var usersAnsweredRight: TextView
+    lateinit var imageView1: ImageView
+    lateinit var imageView2: ImageView
+    lateinit var imageView3: ImageView
+    lateinit var imageView4: ImageView
+    lateinit var imageView5: ImageView
+    var percentageCorrect = 0
 
     private lateinit var webViewUtils: WebViewUtils
     lateinit var viewModel: QuizViewModel
     private lateinit var userSelectedAnswer: DomainUserSelectedAnswer
     lateinit var nextQuizHandler: NextQuizHandler
+    private lateinit var instituteSettings: InstituteSettings
 
     private var examId: Long = -1
     private var attemptId: Long = -1
@@ -56,13 +68,28 @@ class QuizReviewFragment: Fragment() {
         bindViews(view)
         parseArguments()
         initializeListeners()
+        instituteSettings = TestpressSdk.getTestpressSession(requireContext())!!.instituteSettings;
     }
 
     private fun bindViews(view: View) {
         questionsView = view.findViewById(R.id.question)
-        nextButton = view.findViewById(R.id.submit_button)
-        nextButton.background.setColorFilter(ContextCompat.getColor(requireContext(),  R.color.testpress_color_primary), PorterDuff.Mode.SRC_ATOP)
-        nextButton.text = "Continue"
+
+        difficultyTitle = view.findViewById(R.id.difficulty_title)
+        difficultyPercentageText = view.findViewById(R.id.difficulty_percentage)
+        usersAnsweredRight = view.findViewById(R.id.users_answered_right)
+        imageView1 = view.findViewById(R.id.difficulty1)
+        imageView2 = view.findViewById(R.id.difficulty2)
+        imageView3 = view.findViewById(R.id.difficulty3)
+        imageView4 = view.findViewById(R.id.difficulty4)
+        imageView5 = view.findViewById(R.id.difficulty5)
+        percentageCorrect = 50
+        difficultyPercentageText.text = "$percentageCorrect%"
+
+
+        ViewUtils.setTypeface(
+            arrayOf(difficultyTitle, difficultyPercentageText),
+            TestpressSdk.getRubikMediumFont(context!!)
+        )
     }
 
     private fun parseArguments() {
@@ -80,24 +107,68 @@ class QuizReviewFragment: Fragment() {
                 }
             }
         })
-
-        nextButton.setOnClickListener{
-            nextQuizHandler.showNext()
-        }
     }
 
     private fun initWebview() {
         webViewUtils = object : WebViewUtils(questionsView) {
-            override fun onLoadFinished() {
-                super.onLoadFinished()
-                nextButton.visibility = View.VISIBLE
+            override fun getHeader(): String? {
+                return questionsHeader + getBookmarkHandlerScript()
             }
 
-            override fun getHeader(): String? {
-                return questionsHeader
+            override fun onLoadFinished() {
+                super.onLoadFinished()
+                setDifficulty(view!!)
+                view!!.findViewById<View>(R.id.difficulty_layout).visibility = View.VISIBLE
+
+                if (instituteSettings.isGrowthHackEnabled) {
+                    webViewUtils.addWatermark(instituteSettings.appToolbarLogo)
+                }
             }
         }
         webViewUtils.initWebView(getHtml(), requireActivity())
+    }
+
+    private fun setDifficulty(view: View) {
+        if (percentageCorrect >= 0) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                imageView1.background =
+                    resources.getDrawable(R.drawable.testpress_difficulty_left_on)
+            } else {
+                imageView1.setBackgroundColor(resources.getColor(R.color.testpress_difficulty_level_1))
+            }
+        }
+        if (percentageCorrect > 20) {
+            imageView2.setBackgroundColor(
+                ContextCompat.getColor(
+                    context!!,
+                    R.color.testpress_difficulty_level_2
+                )
+            )
+        }
+        if (percentageCorrect > 40) {
+            imageView3.setBackgroundColor(
+                ContextCompat.getColor(
+                    context!!,
+                    R.color.testpress_difficulty_level_3
+                )
+            )
+        }
+        if (percentageCorrect > 60) {
+            imageView4.setBackgroundColor(
+                ContextCompat.getColor(
+                    context!!,
+                    R.color.testpress_difficulty_level_4
+                )
+            )
+        }
+        if (percentageCorrect > 80) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                imageView5.background =
+                    resources.getDrawable(R.drawable.testpress_difficulty_right_on)
+            } else {
+                imageView5.setBackgroundColor(resources.getColor(R.color.testpress_difficulty_level_5))
+            }
+        }
     }
 
     private fun getHtml(): String {

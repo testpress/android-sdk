@@ -7,12 +7,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.google.android.material.button.MaterialButton
 
 class RootQuizFragment: Fragment(), QuizFragmentHandler {
+    private lateinit var questionFragment: QuizQuestionFragment
+    private lateinit var reviewFragment: QuizReviewFragment
+
     lateinit var nextQuizHandler: NextQuizHandler
     private var position: Int = 0
     private var examId: Long = -1
     private var attemptId: Long = -1
+    var isQuestionFragment: Boolean = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.quiz_layout, container, false)
@@ -30,8 +35,13 @@ class RootQuizFragment: Fragment(), QuizFragmentHandler {
         position = requireArguments().getInt("POSITION", 0)
     }
 
+    fun submitAnswer() {
+     questionFragment.submitAnswer()
+    }
+
     private fun showQuestion() {
-        val questionFragment = QuizQuestionFragment()
+        isQuestionFragment = true
+        questionFragment = QuizQuestionFragment()
         questionFragment.arguments = arguments
         questionFragment.quizFragmentHandler = this
 
@@ -41,7 +51,8 @@ class RootQuizFragment: Fragment(), QuizFragmentHandler {
     }
 
     private fun showReviewFragment() {
-        val reviewFragment = QuizReviewFragment()
+        isQuestionFragment = false
+        reviewFragment = QuizReviewFragment()
         reviewFragment.arguments = arguments
         reviewFragment.arguments?.apply {
             putInt("POSITION", position)
