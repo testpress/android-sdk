@@ -149,14 +149,23 @@ p {
     padding: 10px;
 }
 
+.question p{
+  text-align: left;
+  text-align-last: left;
+}
+
 .review-explanation {
     color: #666;
-    text-align: left;
+    text-align: left !important;
     font-family: 'PT-Serif-Regular', serif;
     margin-top: 10px;
     margin-bottom: 5px;
     margin-left: 10px;
     margin-right: 10px;
+}
+
+.review-explanation p{
+    text-align: left !important;
 }
 
 .mark-button {
