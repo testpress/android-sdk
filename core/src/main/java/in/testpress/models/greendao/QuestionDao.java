@@ -34,7 +34,7 @@ public class QuestionDao extends AbstractDao<Question, Long> {
         public final static Property ParentId = new Property(3, Long.class, "parentId", false, "PARENT_ID");
         public final static Property Type = new Property(4, String.class, "type", false, "TYPE");
         public final static Property Language = new Property(5, String.class, "language", false, "LANGUAGE");
-        public final static Property Explanation = new Property(6, String.class, "explanation", false, "EXPLANATION");
+        public final static Property ExplanationHtml = new Property(6, String.class, "explanationHtml", false, "EXPLANATION_HTML");
         public final static Property CommentsUrl = new Property(7, String.class, "commentsUrl", false, "COMMENTS_URL");
         public final static Property AnswerIds = new Property(8, String.class, "answerIds", false, "ANSWER_IDS");
         public final static Property DirectionId = new Property(9, Long.class, "directionId", false, "DIRECTION_ID");
@@ -63,7 +63,7 @@ public class QuestionDao extends AbstractDao<Question, Long> {
                 "\"PARENT_ID\" INTEGER," + // 3: parentId
                 "\"TYPE\" TEXT," + // 4: type
                 "\"LANGUAGE\" TEXT," + // 5: language
-                "\"EXPLANATION\" TEXT," + // 6: explanation
+                "\"EXPLANATION_HTML\" TEXT," + // 6: explanationHtml
                 "\"COMMENTS_URL\" TEXT," + // 7: commentsUrl
                 "\"ANSWER_IDS\" TEXT," + // 8: answerIds
                 "\"DIRECTION_ID\" INTEGER);"); // 9: directionId
@@ -109,9 +109,9 @@ public class QuestionDao extends AbstractDao<Question, Long> {
             stmt.bindString(6, language);
         }
  
-        String explanation = entity.getExplanation();
-        if (explanation != null) {
-            stmt.bindString(7, explanation);
+        String explanationHtml = entity.getExplanationHtml();
+        if (explanationHtml != null) {
+            stmt.bindString(7, explanationHtml);
         }
  
         String commentsUrl = entity.getCommentsUrl();
@@ -164,9 +164,9 @@ public class QuestionDao extends AbstractDao<Question, Long> {
             stmt.bindString(6, language);
         }
  
-        String explanation = entity.getExplanation();
-        if (explanation != null) {
-            stmt.bindString(7, explanation);
+        String explanationHtml = entity.getExplanationHtml();
+        if (explanationHtml != null) {
+            stmt.bindString(7, explanationHtml);
         }
  
         String commentsUrl = entity.getCommentsUrl();
@@ -205,7 +205,7 @@ public class QuestionDao extends AbstractDao<Question, Long> {
             cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // parentId
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // type
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // language
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // explanation
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // explanationHtml
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // commentsUrl
             cursor.isNull(offset + 8) ? null : answerIdsConverter.convertToEntityProperty(cursor.getString(offset + 8)), // answerIds
             cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9) // directionId
@@ -221,7 +221,7 @@ public class QuestionDao extends AbstractDao<Question, Long> {
         entity.setParentId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
         entity.setType(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setLanguage(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setExplanation(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setExplanationHtml(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setCommentsUrl(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setAnswerIds(cursor.isNull(offset + 8) ? null : answerIdsConverter.convertToEntityProperty(cursor.getString(offset + 8)));
         entity.setDirectionId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));

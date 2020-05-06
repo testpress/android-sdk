@@ -127,7 +127,7 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
             val url = "/api/v2.4/attempts/${attemptId}/questions/${examQuestion.id}/"
             val userSelectedAnswer = UserSelectedAnswer(
                 id + index, index, false, null, attemptId,
-                examQuestion.question.explanation, null, null, null,
+                question.explanationHtml, null, null, null,
                 correctAnswersIds, url, question.id, examQuestion.id
             )
             userSelectedAnswerDao.insertOrReplaceInTx(userSelectedAnswer)
@@ -187,7 +187,10 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
                     var usa = result?.asGreenDaoModel()
                     usa?.questionId = userSelectedAnswer.questionId
                     usa?.attemptId = userSelectedAnswer.attemptId
+                    usa?.explanationHtml = userSelectedAnswer.explanationHtml
+                    usa?.correctAnswers = userSelectedAnswer.correctAnswers
                     usa?.duration = "00:00:01"
+                    userSelectedAnswerDao.delete(userSelectedAnswer)
                     userSelectedAnswerDao.insertOrReplaceInTx(usa)
                     val userSelectedAnswer = getUserSelectedAnswer(usa?.id!!)
                     answerResource.postValue(Resource.success(userSelectedAnswer?.asDomainModel()))

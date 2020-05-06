@@ -31,7 +31,7 @@ fun Question.asDomainModel(): DomainQuestion {
         subjectId = null,
         parentId = parentId,
         type = type,
-        explanation = explanation,
+        explanation = explanationHtml,
         directionHtml = directionHtml
     )
 }

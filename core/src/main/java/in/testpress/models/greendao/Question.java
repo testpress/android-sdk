@@ -26,7 +26,7 @@ public class Question {
     private Long parentId;
     private String type;
     private String language;
-    private String explanation;
+    private String explanationHtml;
     private String commentsUrl;
 
     @Convert(converter = in.testpress.util.IntegerListConverter.class, columnType = String.class)
@@ -64,14 +64,14 @@ public class Question {
     }
 
     @Generated
-    public Question(Long id, String questionHtml, String directionHtml, Long parentId, String type, String language, String explanation, String commentsUrl, IntegerList answerIds, Long directionId) {
+    public Question(Long id, String questionHtml, String directionHtml, Long parentId, String type, String language, String explanationHtml, String commentsUrl, IntegerList answerIds, Long directionId) {
         this.id = id;
         this.questionHtml = questionHtml;
         this.directionHtml = directionHtml;
         this.parentId = parentId;
         this.type = type;
         this.language = language;
-        this.explanation = explanation;
+        this.explanationHtml = explanationHtml;
         this.commentsUrl = commentsUrl;
         this.answerIds = answerIds;
         this.directionId = directionId;
@@ -132,12 +132,12 @@ public class Question {
         this.language = language;
     }
 
-    public String getExplanation() {
-        return explanation;
+    public String getExplanationHtml() {
+        return explanationHtml;
     }
 
-    public void setExplanation(String explanation) {
-        this.explanation = explanation;
+    public void setExplanationHtml(String explanationHtml) {
+        this.explanationHtml = explanationHtml;
     }
 
     public String getCommentsUrl() {
