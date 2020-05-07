@@ -157,7 +157,6 @@ class QuizQuestionFragment : Fragment() {
             } else {
                 selectedOptions.remove(id.toInt())
             }
-            userSelectedAnswer.selectedAnswers = selectedOptions
             viewModel.setAnswer(userSelectedAnswer.id!!, selectedOptions)
         }
     }
