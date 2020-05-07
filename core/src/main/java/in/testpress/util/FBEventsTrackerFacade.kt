@@ -10,9 +10,8 @@ import com.facebook.appevents.AppEventsLogger
 class FBEventsTrackerFacade(val context: Context) {
     private val logger: AppEventsLogger = AppEventsLogger.newLogger(context)
 
-
     companion object {
-        fun initFacebook(applicationId: String, application: Application) {
+        fun init(applicationId: String, application: Application) {
             FacebookSdk.setApplicationId(applicationId);
             AppEventsLogger.activateApp(application);
         }
