@@ -3,6 +3,7 @@ package `in`.testpress.course.fragments
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
+import `in`.testpress.util.EventsTrackerFacade
 import `in`.testpress.util.ViewUtils
 import `in`.testpress.util.WebViewUtils
 import android.os.Bundle
@@ -14,6 +15,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import java.io.IOException
+import java.util.Timer
+import kotlin.concurrent.schedule
 
 class HtmlContentFragment : BaseContentDetailFragment() {
     private lateinit var webView: WebView
@@ -64,6 +67,13 @@ class HtmlContentFragment : BaseContentDetailFragment() {
             swipeRefresh.isRefreshing = false
             webView.visibility = View.VISIBLE
             viewModel.createContentAttempt(contentId)
+
+            Timer().schedule(5000) {
+                activity?.applicationContext?.let {
+                    val params = hashMapOf<String, Any>("name" to content.title!!, "id" to contentId)
+                    EventsTrackerFacade(it).logEvent(EventsTrackerFacade.VIEWED_NOTES_EVENT, params)
+                }
+            }
         }
 
         override fun onNetworkError() {

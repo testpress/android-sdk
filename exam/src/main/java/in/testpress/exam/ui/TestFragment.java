@@ -64,6 +64,7 @@ import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseFragment;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
+import in.testpress.util.EventsTrackerFacade;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
@@ -140,6 +141,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     public int totalQuestions = 0;
     private boolean isNextPageQuestionsBeingFetched = false;
     private InstituteSettings instituteSettings;
+    private EventsTrackerFacade eventsTrackerFacade;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -147,6 +149,15 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         initializeAttemptAndExamVariables(savedInstanceState);
         initializeResourcePager();
         instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
+        eventsTrackerFacade = new EventsTrackerFacade(getContext());
+        logEvent(EventsTrackerFacade.STARTED_EXAM);
+    }
+
+    private void logEvent(String name) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("exam_name", exam.getTitle());
+        params.put("id", exam.getId());
+        eventsTrackerFacade.logEvent(name, params);
     }
 
     private void initializeAttemptAndExamVariables(Bundle savedInstanceState) {
@@ -1001,6 +1012,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             if (getActivity() == null) {
                                 return;
                             }
+                            logEvent(EventsTrackerFacade.ENDED_EXAM);
                             if (progressDialog.isShowing()) {
                                 progressDialog.dismiss();
                             }

@@ -40,6 +40,7 @@ dependencies {
     api rootProject.greendao
     api rootProject.shimmer
     api rootProject.junit
+    api 'com.facebook.android:facebook-android-sdk:5.15.3'
     api 'org.jsoup:jsoup:1.13.1'
     testImplementation rootProject.junit
     testImplementation rootProject.mockito

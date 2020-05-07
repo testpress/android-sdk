@@ -1,12 +1,17 @@
 package in.testpress.core;
 
 import android.annotation.SuppressLint;
+import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.facebook.FacebookSdk;
+import com.facebook.LoggingBehavior;
+import com.facebook.appevents.AppEventsLogger;
 
 import java.util.HashMap;
 
@@ -317,6 +322,12 @@ public final class TestpressSdk {
                         }
                     }
                 });
+    }
+
+
+    public static void initFacebookSDk(String applicationId, Application application) {
+        FacebookSdk.setApplicationId(applicationId);
+        AppEventsLogger.activateApp(application);
     }
 
     private static void validateContext(Context context) {

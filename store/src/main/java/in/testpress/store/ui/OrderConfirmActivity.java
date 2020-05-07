@@ -22,6 +22,7 @@ import com.payu.india.Model.PayuHashes;
 import com.payu.india.Payu.PayuConstants;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import in.testpress.core.TestpressCallback;
@@ -35,6 +36,8 @@ import in.testpress.store.models.Product;
 import in.testpress.store.network.TestpressStoreApiClient;
 import in.testpress.store.payu.PaymentModeActivity;
 import in.testpress.ui.BaseToolBarActivity;
+import in.testpress.util.EventsTrackerFacade;
+import in.testpress.util.FBEventsTrackerFacade;
 import in.testpress.util.TextWatcherAdapter;
 import in.testpress.util.UIUtils;
 
@@ -65,6 +68,8 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
     private Order order;
     private OrderItem orderItem = new OrderItem();
     private TestpressStoreApiClient apiClient;
+    private FBEventsTrackerFacade fbEventsLogger;
+    private EventsTrackerFacade eventsTrackerFacade;
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -98,6 +103,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
         orderItems = new ArrayList<>();
         orderItems.add(orderItem);
         apiClient = new TestpressStoreApiClient(this);
+        eventsTrackerFacade = new EventsTrackerFacade(getApplicationContext());
         order();
     }
 
@@ -230,6 +236,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
 
                     @Override
                     public void onException(TestpressException exception) {
+                        logEvent(EventsTrackerFacade.PAYMENT_FAILURE);
                         if (exception.isNetworkError()) {
                             setEmptyText(R.string.testpress_network_error,
                                     R.string.testpress_no_internet_try_again,
@@ -272,6 +279,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
     }
 
     void showPaymentStatus() {
+        logEvent(EventsTrackerFacade.PAYMENT_SUCCESS);
         Intent intent = new Intent(this, PaymentSuccessActivity.class);
         intent.putExtra(ORDER, order);
         //noinspection ConstantConditions
@@ -309,6 +317,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
                 .setPositiveButton(R.string.testpress_yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        logEvent(EventsTrackerFacade.CANCELLED_PAYMENT);
                         Intent intent = new Intent();
                         setResult(RESULT_CANCELED, intent);
                         finish();
@@ -316,6 +325,15 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
                 })
                 .setNegativeButton(R.string.testpress_no, null)
                 .show();
+    }
+
+    private void logEvent(String eventName) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("product_name", product.getTitle());
+        params.put("product_id", product.getId());
+        params.put("order_id", order.getOrderId());
+        params.put("email", order.getEmail());
+        eventsTrackerFacade.logEvent(eventName, params);
     }
 
     protected void setEmptyText(final int title, final int description, final int left) {
