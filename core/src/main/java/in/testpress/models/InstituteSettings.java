@@ -27,6 +27,7 @@ public class InstituteSettings {
     private boolean isGrowthHackEnabled;
     private String appShareText;
     private boolean isFacebookEventTrackingEnabled;
+    private String facebookAppId;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -225,6 +226,15 @@ public class InstituteSettings {
 
     public InstituteSettings setIsFacebookEventTrackingEnabled(boolean isFacebookEventTrackingEnabled) {
         this.isFacebookEventTrackingEnabled = isFacebookEventTrackingEnabled;
+        return this;
+    }
+
+    public String getFacebookAppId() {
+        return facebookAppId;
+    }
+
+    public InstituteSettings setFacebookAppId(String facebookAppId) {
+        this.facebookAppId = facebookAppId;
         return this;
     }
 }
