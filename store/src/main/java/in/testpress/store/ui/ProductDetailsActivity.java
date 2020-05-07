@@ -18,6 +18,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
@@ -29,6 +30,8 @@ import in.testpress.store.R;
 import in.testpress.store.models.Product;
 import in.testpress.store.network.TestpressStoreApiClient;
 import in.testpress.ui.BaseToolBarActivity;
+import in.testpress.util.EventsTrackerFacade;
+import in.testpress.util.FBEventsTrackerFacade;
 import in.testpress.util.FormatDate;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.UILImageGetter;
@@ -50,6 +53,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     private ProgressBar progressBar;
     private Product product;
     private String productSlug;
+    private EventsTrackerFacade eventsTrackerFacade;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -73,6 +77,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
                 loadProductDetails();
             }
         });
+        eventsTrackerFacade = new EventsTrackerFacade(getApplicationContext());
 
         loadProductDetails();
     }
@@ -225,6 +230,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
             ViewUtils.setListViewHeightBasedOnChildren(notesListView);
         }
 
+        logEvent(EventsTrackerFacade.VIEWED_PRODUCT_EVENT);
         ProductDetailsActivity.this.product = product;
     }
 
@@ -232,6 +238,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         if (product == null) {
             return;
         }
+        logEvent(EventsTrackerFacade.CLICKED_BUY_NOW);
         if (this.product.getPaymentLink().isEmpty()) {
             Intent intent = new Intent(ProductDetailsActivity.this, OrderConfirmActivity.class);
             intent.putExtra(PRODUCT, product);
@@ -241,6 +248,14 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
         }
+    }
+
+    private void logEvent(String eventName) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("name", this.product.getTitle());
+        params.put("slug", this.product.getSlug());
+        params.put("id", this.product.getId());
+        eventsTrackerFacade.logEvent(eventName, params);
     }
 
     @Override
