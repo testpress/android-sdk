@@ -340,7 +340,7 @@ public class ReviewStatsFragment extends BaseFragment {
         Intent intent = new Intent(getActivity(), ShareToUnLockActivity.class);
         intent.putExtra(SHARE_TO_UNLOCK_SHARED_PREFERENCE_KEY, exam.getShareToUnlockSharedPreferenceKey());
         String messageToShare = StringUtils.isNullOrEmpty(exam.getShareTextForSolutionUnlock()) ?
-                exam.getShareTextForSolutionUnlock() : instituteSettings.getAppShareText();
+                instituteSettings.getAppShareText(): exam.getShareTextForSolutionUnlock();
         intent.putExtra(MESSAGE_TO_SHARE, messageToShare);
         requireActivity().startActivityForResult(intent, SHARE_APP);
     }
