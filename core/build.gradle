@@ -41,6 +41,7 @@ dependencies {
     api rootProject.shimmer
     api rootProject.junit
     api 'com.facebook.android:facebook-android-sdk:5.15.3'
+    api 'com.google.firebase:firebase-analytics:17.4.0'
     api 'org.jsoup:jsoup:1.13.1'
     testImplementation rootProject.junit
     testImplementation rootProject.mockito

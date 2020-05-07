@@ -10,6 +10,7 @@ import com.facebook.appevents.AppEventsLogger
 class EventsTrackerFacade(val context: Context) {
     val instituteSettings: InstituteSettings = TestpressSdk.getTestpressSession(context)!!.instituteSettings;
     private val fbEventsTrackerFacade = FBEventsTrackerFacade(context)
+    private val firebaseEventsTrackerFacade = FirebaseEventsTrackerFacade(context)
 
     companion object {
         const val ACCOUNT_REGISTERED = "Account Registered"
@@ -36,6 +37,10 @@ class EventsTrackerFacade(val context: Context) {
     fun logEvent(name: String, params: HashMap<String, Any>) {
         if(instituteSettings.isFacebookEventTrackingEnabled) {
             fbEventsTrackerFacade.logEvent(name, params)
+        }
+
+        if (instituteSettings.isFirebaseEventTrackingEnabled) {
+            firebaseEventsTrackerFacade.logEvent(name, params)
         }
     }
 }
