@@ -28,6 +28,7 @@ class EventsTrackerFacade(val context: Context) {
 
             if(instituteSettings.isFacebookEventTrackingEnabled) {
                 FacebookSdk.setApplicationId(instituteSettings.facebookAppId)
+                FacebookSdk.fullyInitialize()
                 AppEventsLogger.activateApp(application)
             }
         }
