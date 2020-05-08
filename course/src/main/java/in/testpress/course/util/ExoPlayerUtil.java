@@ -145,6 +145,8 @@ public class ExoPlayerUtil {
         this.exoPlayerMainFrame = exoPlayerMainFrame;
         this.url = url;
         this.startPosition = startPosition;
+
+        initializeViews();
         exoPlayerLayout = exoPlayerMainFrame.findViewById(R.id.exo_player_layout);
         playerView = exoPlayerMainFrame.findViewById(R.id.exo_player_view);
         fullscreenIcon = exoPlayerMainFrame.findViewById(R.id.exo_fullscreen_icon);
@@ -206,6 +208,12 @@ public class ExoPlayerUtil {
         this(activity, exoPlayerMainFrame, url, startPosition);
         this.playWhenReady = playWhenReady;
         setSpeedRate(speedRate);
+    }
+
+
+    private void initializeViews() {
+        emailIdTextView = exoPlayerMainFrame.findViewById(R.id.email_id);
+        emailIdLayout = exoPlayerMainFrame.findViewById(R.id.email_id_layout);
     }
 
     private void initFullscreenDialog() {
@@ -466,9 +474,7 @@ public class ExoPlayerUtil {
         } else {
             overlayText = profileDetails.getUsername();
         }
-        emailIdTextView = exoPlayerMainFrame.findViewById(R.id.email_id);
         emailIdTextView.setText(overlayText);
-        emailIdLayout = exoPlayerMainFrame.findViewById(R.id.email_id_layout);
         overlayPositionHandler = new Handler();
         startOverlayMarquee();
     }
