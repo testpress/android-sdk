@@ -2,7 +2,6 @@ package `in`.testpress.util
 
 import android.content.Context
 import android.os.Bundle
-import androidx.core.os.bundleOf
 import com.facebook.appevents.AppEventsLogger
 
 class FBEventsTrackerFacade(val context: Context) {
@@ -14,11 +13,22 @@ class FBEventsTrackerFacade(val context: Context) {
     }
 
     private fun generateBundle(params: HashMap<String, Any>): Bundle {
-        val paramsList = mutableListOf<Pair<String, Any>>()
+        val bundle = Bundle()
         for ((key, value) in params) {
-            paramsList.add(Pair(key, value))
+            bundle.apply {
+                when(value) {
+                    is Boolean -> putBoolean(key, value)
+                    is Byte -> putByte(key, value)
+                    is Char -> putChar(key, value)
+                    is Double -> putDouble(key, value)
+                    is Float -> putFloat(key, value)
+                    is Int -> putInt(key, value)
+                    is Long -> putLong(key, value)
+                    is Short -> putShort(key, value)
+                    else -> putString(key, value.toString())
+                }
+            }
         }
-        paramsList.toTypedArray()
-        return bundleOf(*paramsList.toTypedArray())
+        return bundle
     }
 }
