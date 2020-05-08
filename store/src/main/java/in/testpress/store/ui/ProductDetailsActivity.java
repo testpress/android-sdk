@@ -230,8 +230,8 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
             ViewUtils.setListViewHeightBasedOnChildren(notesListView);
         }
 
-        logEvent(EventsTrackerFacade.VIEWED_PRODUCT_EVENT);
         ProductDetailsActivity.this.product = product;
+        logEvent(EventsTrackerFacade.VIEWED_PRODUCT_EVENT);
     }
 
     public void order() {
