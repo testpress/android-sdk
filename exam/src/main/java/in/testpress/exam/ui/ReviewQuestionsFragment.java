@@ -240,8 +240,6 @@ public class ReviewQuestionsFragment extends Fragment {
 
         if (instituteSettings.isGrowthHackEnabled()) {
             bookmarkIcon.getIcon().setColorFilter(getResources().getColor(R.color.testpress_color_primary), PorterDuff.Mode.SRC_ATOP);
-            bookmarkIcon.setIconTintList(ContextCompat.getColorStateList(
-                    getActivity(), R.color.testpress_actionbar_text));
             menu.findItem(R.id.share).setVisible(true);
             menu.findItem(R.id.close).setVisible(true);
 
