@@ -29,6 +29,7 @@ public class InstituteSettings {
     private boolean isFacebookEventTrackingEnabled;
     private String facebookAppId;
     private boolean isFirebaseEventTrackingEnabled;
+    private boolean isBranchEventTrackingEnabled;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -246,5 +247,13 @@ public class InstituteSettings {
     public InstituteSettings setFirebaseEventTrackingEnabled(boolean firebaseEventTrackingEnabled) {
         isFirebaseEventTrackingEnabled = firebaseEventTrackingEnabled;
         return this;
+    }
+
+    public boolean isBranchEventTrackingEnabled() {
+        return isBranchEventTrackingEnabled;
+    }
+
+    public void setBranchEventTrackingEnabled(boolean branchEventTrackingEnabled) {
+        isBranchEventTrackingEnabled = branchEventTrackingEnabled;
     }
 }
