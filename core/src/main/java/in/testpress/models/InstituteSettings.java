@@ -28,6 +28,7 @@ public class InstituteSettings {
     private String appShareText;
     private boolean isFacebookEventTrackingEnabled;
     private String facebookAppId;
+    private boolean isFirebaseEventTrackingEnabled;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -235,6 +236,15 @@ public class InstituteSettings {
 
     public InstituteSettings setFacebookAppId(String facebookAppId) {
         this.facebookAppId = facebookAppId;
+        return this;
+    }
+
+    public boolean isFirebaseEventTrackingEnabled() {
+        return isFirebaseEventTrackingEnabled;
+    }
+
+    public InstituteSettings setFirebaseEventTrackingEnabled(boolean firebaseEventTrackingEnabled) {
+        isFirebaseEventTrackingEnabled = firebaseEventTrackingEnabled;
         return this;
     }
 }
