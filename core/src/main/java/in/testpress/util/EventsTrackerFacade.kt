@@ -6,10 +6,12 @@ import android.app.Application
 import android.content.Context
 import com.facebook.FacebookSdk
 import com.facebook.appevents.AppEventsLogger
+import io.branch.referral.Branch
 
 class EventsTrackerFacade(val context: Context) {
     val instituteSettings: InstituteSettings = TestpressSdk.getTestpressSession(context)!!.instituteSettings;
     private val fbEventsTrackerFacade = FBEventsTrackerFacade(context)
+    private val branchEventsTrackerFacade = BranchEventTrackerFacade(context)
     private val firebaseEventsTrackerFacade = FirebaseEventsTrackerFacade(context)
 
     companion object {
@@ -32,6 +34,8 @@ class EventsTrackerFacade(val context: Context) {
                 FacebookSdk.fullyInitialize()
                 AppEventsLogger.activateApp(application)
             }
+
+            Branch.getInstance(application)
         }
     }
 
@@ -42,6 +46,10 @@ class EventsTrackerFacade(val context: Context) {
 
         if (instituteSettings.isFirebaseEventTrackingEnabled) {
             firebaseEventsTrackerFacade.logEvent(name, params)
+        }
+
+        if (instituteSettings.isBranchEventTrackingEnabled) {
+            branchEventsTrackerFacade.logEvent(name, params)
         }
     }
 }
