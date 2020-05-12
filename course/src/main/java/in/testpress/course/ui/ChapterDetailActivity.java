@@ -137,6 +137,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     }
 
     void loadChapter(final String chapterUrl) {
+        TestpressSDKDatabase.getChapterDao(this).detachAll();
         List<Chapter> chapters = TestpressSDKDatabase.getChapterDao(this).queryBuilder()
                 .where(ChapterDao.Properties.Url.eq(chapterUrl)).list();
 
