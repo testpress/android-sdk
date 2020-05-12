@@ -9,7 +9,7 @@ import com.facebook.appevents.AppEventsLogger
 import io.branch.referral.Branch
 
 class EventsTrackerFacade(val context: Context) {
-    val instituteSettings: InstituteSettings = TestpressSdk.getTestpressSession(context)!!.instituteSettings;
+    val instituteSettings: InstituteSettings? = TestpressSdk.getTestpressSession(context)?.instituteSettings;
     private val fbEventsTrackerFacade = FBEventsTrackerFacade(context)
     private val branchEventsTrackerFacade = BranchEventTrackerFacade(context)
     private val firebaseEventsTrackerFacade = FirebaseEventsTrackerFacade(context)
@@ -40,16 +40,29 @@ class EventsTrackerFacade(val context: Context) {
     }
 
     fun logEvent(name: String, params: HashMap<String, Any>) {
-        if(instituteSettings.isFacebookEventTrackingEnabled) {
-            fbEventsTrackerFacade.logEvent(name, params)
+        if(instituteSettings?.isFacebookEventTrackingEnabled == true) {
+            logEvent(name, params, EventTracker.FB_EVENTS_TRACKER)
         }
 
-        if (instituteSettings.isFirebaseEventTrackingEnabled) {
-            firebaseEventsTrackerFacade.logEvent(name, params)
+        if (instituteSettings?.isFirebaseEventTrackingEnabled == true) {
+            logEvent(name, params, EventTracker.FIREBASE_EVENTS_TRACKER)
         }
 
-        if (instituteSettings.isBranchEventTrackingEnabled) {
-            branchEventsTrackerFacade.logEvent(name, params)
+        if (instituteSettings?.isBranchEventTrackingEnabled == true) {
+            logEvent(name, params, EventTracker.BRANCH_EVENTS_TRACKER)
+        }
+    }
+
+    fun logEvent(name: String, params: HashMap<String, Any>, tracker: EventTracker) {
+        logProvider(tracker).logEvent(name, params)
+    }
+
+    fun logProvider(tracker: EventTracker): BaseEventTrackerFacade {
+        return when (tracker) {
+            EventTracker.FB_EVENTS_TRACKER -> this.fbEventsTrackerFacade
+            EventTracker.BRANCH_EVENTS_TRACKER -> this.branchEventsTrackerFacade
+            EventTracker.FIREBASE_EVENTS_TRACKER -> this.firebaseEventsTrackerFacade
+            else -> this.fbEventsTrackerFacade
         }
     }
 }

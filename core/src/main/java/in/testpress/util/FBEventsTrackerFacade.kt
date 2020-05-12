@@ -4,10 +4,10 @@ import android.content.Context
 import android.os.Bundle
 import com.facebook.appevents.AppEventsLogger
 
-class FBEventsTrackerFacade(val context: Context) {
+class FBEventsTrackerFacade(val context: Context): BaseEventTrackerFacade() {
     private val logger: AppEventsLogger = AppEventsLogger.newLogger(context)
 
-    fun logEvent(name: String, params: HashMap<String, Any>) {
+    override fun logEvent(name: String, params: HashMap<String, Any>) {
         val bundle = generateBundle(params)
         logger.logEvent(name, bundle)
     }

@@ -5,10 +5,10 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import com.google.firebase.analytics.FirebaseAnalytics
 
-class FirebaseEventsTrackerFacade(val context: Context) {
+class FirebaseEventsTrackerFacade(val context: Context): BaseEventTrackerFacade() {
     private var firebaseAnalytics: FirebaseAnalytics = FirebaseAnalytics.getInstance(context)
 
-    fun logEvent(name: String, params: HashMap<String, Any>) {
+    override fun logEvent(name: String, params: HashMap<String, Any>) {
         val bundle = generateBundle(params)
         val eventName = name.replace(" ", "_")
         firebaseAnalytics.logEvent(eventName, bundle)
