@@ -59,9 +59,9 @@ public class ContentsListFragment extends BaseListViewFragment<Content> {
         pager = new ContentPager(contentsUrlFrag, mApiClient);
     }
 
-    private void deleteContents(long courseId) {
+    private void deleteContents(long chapterId) {
         contentDao.queryBuilder().where(
-                ContentDao.Properties.CourseId.eq(courseId),
+                ContentDao.Properties.ChapterId.eq(chapterId),
                 ContentDao.Properties.Active.eq(true)
         ).buildDelete().executeDeleteWithoutDetachingEntities();
         contentDao.detachAll();
@@ -145,8 +145,7 @@ public class ContentsListFragment extends BaseListViewFragment<Content> {
 
         this.exception = null;
         this.items = contents;
-        Chapter chapter = Chapter.get(getContext(), chapterId.toString());
-        deleteContents(chapter.getCourseId());
+        deleteContents(chapterId);
         contentDao.insertOrReplaceInTx(contents);
         getListAdapter().notifyDataSetChanged();
         showList();
