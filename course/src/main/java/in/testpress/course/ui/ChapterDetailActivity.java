@@ -256,7 +256,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             getIntent().putExtra(PRODUCT_SLUG, productSlug);
             loadChildChapters();
         } else if (chapter.hasContents()) {
-            getIntent().putExtra(CONTENTS_URL_FRAG, chapter.getContentUrl());
+            getIntent().putExtra(CONTENTS_URL_FRAG, chapter.getChapterContentsUrl());
             getIntent().putExtra(CHAPTER_ID, chapter.getId());
             getIntent().putExtra(PRODUCT_SLUG, productSlug);
             loadContents();

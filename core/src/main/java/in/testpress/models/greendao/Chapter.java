@@ -415,6 +415,10 @@ public class Chapter {
 
         return chapters.get(0);
     }
+
+    public String getChapterContentsUrl() {
+        return url + "contents/";
+    }
     // KEEP METHODS END
 
 }
