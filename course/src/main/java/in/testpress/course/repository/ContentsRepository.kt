@@ -44,7 +44,7 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
         courseNetwork.getContents(url, queryParams)
             .enqueue(object : TestpressCallback<ApiResponse<ContentsListResponse>>(){
                 override fun onSuccess(result: ApiResponse<ContentsListResponse>) {
-                    handleContentsListResponse(result)
+                    handleFetchSuccess(result)
                 }
 
                 override fun onException(exception: TestpressException?) {
@@ -53,15 +53,27 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
             })
     }
 
-    private fun handleContentsListResponse(response: ApiResponse<ContentsListResponse>) {
-        val contents = storeContent(response.results)
+    private fun handleFetchSuccess(response: ApiResponse<ContentsListResponse>) {
+        if (page == 1) {
+            deleteExistingContents()
+        }
+
+        storeContent(response.results)
         _resourceContents.postValue(Resource.success(response.results.contents))
+
         if (response.next != null) {
             page += 1
             loadItems(page)
         } else {
             page = 1
         }
+    }
+
+    private fun deleteExistingContents() {
+        contentDao.queryBuilder()
+            .where(ContentDao.Properties.ChapterId.eq(chapterId))
+            .buildDelete()
+            .executeDeleteWithoutDetachingEntities()
     }
 
     private fun storeContent(response: ContentsListResponse): List<DomainContent> {

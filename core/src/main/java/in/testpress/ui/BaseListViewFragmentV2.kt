@@ -31,14 +31,11 @@ abstract class BaseListViewFragmentV2<E>: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindViews(view)
+        initializeEmptyViewFragment()
+        listView.adapter = createAdapter()
         swipeRefreshLayout.setOnRefreshListener {
             refreshWithProgress()
         }
-        listView.adapter = createAdapter()
-        if (isItemsEmpty()) {
-            swipeRefreshLayout.isRefreshing = true
-        }
-        initializeEmptyViewFragment()
     }
 
     fun bindViews(view: View) {
@@ -50,11 +47,7 @@ abstract class BaseListViewFragmentV2<E>: Fragment() {
 
 
     protected fun createAdapter(): HeaderFooterListAdapter<SingleTypeAdapter<E>> {
-        val wrapped: SingleTypeAdapter<E> = createAdapter(items)
-        return HeaderFooterListAdapter<SingleTypeAdapter<E>>(
-            listView,
-            wrapped
-        )
+        return HeaderFooterListAdapter<SingleTypeAdapter<E>>(listView, createAdapter(items))
     }
 
     fun initializeEmptyViewFragment() {

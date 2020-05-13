@@ -37,13 +37,8 @@ class ContentListFragment: BaseListViewFragmentV2<Content>(), EmptyViewListener 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         parseArguments()
-        apiClient = TestpressCourseApiClient(activity)
-        contentDao = TestpressSDKDatabase.getContentDao(requireContext())
-        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ContentsListViewModel(ContentsRepository(requireContext(), chapterId)) as T
-            }
-        }).get(ContentsListViewModel::class.java)
+        initializeApiClientAndDao()
+        initializeViewModel()
     }
 
     private fun parseArguments() {
@@ -52,8 +47,30 @@ class ContentListFragment: BaseListViewFragmentV2<Content>(), EmptyViewListener 
         productSlug = arguments!!.getString(TestpressCourse.PRODUCT_SLUG)
     }
 
+    private fun initializeApiClientAndDao() {
+        apiClient = TestpressCourseApiClient(activity)
+        contentDao = TestpressSDKDatabase.getContentDao(requireContext())
+    }
+
+    private fun initializeViewModel() {
+        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return ContentsListViewModel(ContentsRepository(requireContext(), chapterId)) as T
+            }
+        }).get(ContentsListViewModel::class.java)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initalizeObservers()
+        viewModel.loadContents()
+    }
+
+    private fun initalizeObservers() {
+        if (isItemsEmpty()) {
+            swipeRefreshLayout.isRefreshing = true
+        }
+
         viewModel.items.observe(viewLifecycleOwner, Observer { resource ->
             when(resource?.status) {
                 Status.SUCCESS -> {
@@ -69,10 +86,9 @@ class ContentListFragment: BaseListViewFragmentV2<Content>(), EmptyViewListener 
                 }
             }
         })
-        viewModel.loadContents()
     }
 
-    protected fun getErrorMessage(exception: TestpressException?): Int {
+    private fun getErrorMessage(exception: TestpressException?): Int {
         if (exception?.isUnauthenticated == true) {
             return R.string.testpress_authentication_failed
         } else if (exception?.isNetworkError == true) {
