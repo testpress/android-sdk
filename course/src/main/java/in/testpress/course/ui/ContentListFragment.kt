@@ -5,6 +5,7 @@ import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.api.TestpressCourseApiClient
+import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.enums.Status
 import `in`.testpress.course.repository.ContentsRepository
 import `in`.testpress.course.viewmodels.ContentsListViewModel
@@ -20,7 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 
-class ContentListFragment : BaseListViewFragmentV2<Content>(), EmptyViewListener {
+class ContentListFragment : BaseListViewFragmentV2<DomainContent>(), EmptyViewListener {
     companion object {
         const val CONTENTS_URL_FRAG = "contentsUrlFrag"
         const val CHAPTER_ID = "chapterId"
@@ -74,9 +75,9 @@ class ContentListFragment : BaseListViewFragmentV2<Content>(), EmptyViewListener
             when (resource?.status) {
                 Status.SUCCESS -> {
                     swipeRefreshLayout.isRefreshing = false
-                    items = resource.data!! as List<Content>
-                    getListAdapter().notifyDataSetChanged()
+                    items = resource.data!! as List<DomainContent>
                     showEmptyList(isItemsEmpty())
+                    getListAdapter().wrappedAdapter.setItems(items)
                 }
                 Status.ERROR -> {
                     swipeRefreshLayout.isRefreshing = false
@@ -112,8 +113,8 @@ class ContentListFragment : BaseListViewFragmentV2<Content>(), EmptyViewListener
             .list().isEmpty()
     }
 
-    override fun createAdapter(items: List<Content>): SingleTypeAdapter<Content> {
-        return ContentsListAdapter(activity, chapterId, productSlug)
+    override fun createAdapter(items: List<DomainContent>): SingleTypeAdapter<DomainContent> {
+        return ContentListAdapter(requireActivity(), chapterId, productSlug)
     }
 
     override fun refreshWithProgress() {
