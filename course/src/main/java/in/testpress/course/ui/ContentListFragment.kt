@@ -20,8 +20,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 
-class ContentListFragment: BaseListViewFragmentV2<Content>(), EmptyViewListener {
-    companion object{
+class ContentListFragment : BaseListViewFragmentV2<Content>(), EmptyViewListener {
+    companion object {
         const val CONTENTS_URL_FRAG = "contentsUrlFrag"
         const val CHAPTER_ID = "chapterId"
     }
@@ -32,7 +32,6 @@ class ContentListFragment: BaseListViewFragmentV2<Content>(), EmptyViewListener 
     private var productSlug: String? = null
     private lateinit var contentDao: ContentDao
     private lateinit var viewModel: ContentsListViewModel
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,7 +71,7 @@ class ContentListFragment: BaseListViewFragmentV2<Content>(), EmptyViewListener 
         }
 
         viewModel.items.observe(viewLifecycleOwner, Observer { resource ->
-            when(resource?.status) {
+            when (resource?.status) {
                 Status.SUCCESS -> {
                     swipeRefreshLayout.isRefreshing = false
                     items = resource.data!! as List<Content>
@@ -89,7 +88,7 @@ class ContentListFragment: BaseListViewFragmentV2<Content>(), EmptyViewListener 
     }
 
     private fun getErrorMessage(exception: TestpressException?): Int {
-        when(exception != null) {
+        when (exception != null) {
             exception!!.isUnauthenticated -> R.string.testpress_authentication_failed
             exception!!.isNetworkError -> R.string.testpress_no_internet_try_again
             else -> R.string.testpress_some_thing_went_wrong_try_again

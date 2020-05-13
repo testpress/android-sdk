@@ -12,12 +12,11 @@ import androidx.fragment.app.Fragment
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.facebook.shimmer.ShimmerFrameLayout
 
-abstract class BaseListViewFragmentV2<E>: Fragment() {
+abstract class BaseListViewFragmentV2<E> : Fragment() {
     protected lateinit var listView: ListView
     protected lateinit var swipeRefreshLayout: SwipeRefreshLayout
     lateinit var emptyViewFragment: EmptyViewFragment
     protected var items: List<E> = emptyList()
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,7 +41,6 @@ abstract class BaseListViewFragmentV2<E>: Fragment() {
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
         swipeRefreshLayout.setColorSchemeResources(R.color.testpress_color_primary)
     }
-
 
     protected fun createAdapter(): HeaderFooterListAdapter<SingleTypeAdapter<E>> {
         return HeaderFooterListAdapter<SingleTypeAdapter<E>>(listView, createAdapter(items))
