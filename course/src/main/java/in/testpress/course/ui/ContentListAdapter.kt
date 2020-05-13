@@ -59,7 +59,7 @@ class ContentListAdapter(val activity: Activity, val chapterId: Long, val produc
     override fun update(position: Int, content: DomainContent) {
         setTypeface(intArrayOf(0, 7, 8, 13), TestpressSdk.getRubikMediumFont(activity))
         this.content = content
-        hideViews()
+        hideViews() // Initially hide un common views, so that when reusing view it won't appear
         setTitle()
         setImage()
         showOrHideLockIcon()
@@ -132,6 +132,20 @@ class ContentListAdapter(val activity: Activity, val chapterId: Long, val produc
     }
 
     private fun showVideoDetails() {
+        showWatchPercentage()
+        showDuration()
+    }
+
+    private fun showDuration() {
+        val video = content.video
+        setGone(14, true)
+        video?.duration.let { duration ->
+            setGone(14, false)
+            setText(15, duration)
+        }
+    }
+
+    private fun showWatchPercentage() {
         if (content.video?.isNativeVideo == true) {
             when (content.videoWatchedPercentage) {
                 0 -> {
@@ -151,13 +165,6 @@ class ContentListAdapter(val activity: Activity, val chapterId: Long, val produc
                     setGone(10, false)
                 }
             }
-        }
-
-        val video = content.video
-        setGone(14, true)
-        video?.duration.let { duration ->
-            setGone(14, false)
-            setText(15, duration)
         }
     }
 
@@ -220,6 +227,7 @@ class ContentListAdapter(val activity: Activity, val chapterId: Long, val produc
             false
         } else productSlug != null && (content.freePreview == null || !content.freePreview)
     }
+
     private fun showExamDetails() {
         val exam = content.exam
         setGone(5, true)
