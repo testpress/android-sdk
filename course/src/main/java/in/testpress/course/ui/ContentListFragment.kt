@@ -89,10 +89,10 @@ class ContentListFragment: BaseListViewFragmentV2<Content>(), EmptyViewListener 
     }
 
     private fun getErrorMessage(exception: TestpressException?): Int {
-        if (exception?.isUnauthenticated == true) {
-            return R.string.testpress_authentication_failed
-        } else if (exception?.isNetworkError == true) {
-            return R.string.testpress_no_internet_try_again
+        when(exception != null) {
+            exception!!.isUnauthenticated -> R.string.testpress_authentication_failed
+            exception!!.isNetworkError -> R.string.testpress_no_internet_try_again
+            else -> R.string.testpress_some_thing_went_wrong_try_again
         }
         return R.string.testpress_some_thing_went_wrong_try_again
     }

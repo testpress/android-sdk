@@ -14,7 +14,6 @@ import com.facebook.shimmer.ShimmerFrameLayout
 
 abstract class BaseListViewFragmentV2<E>: Fragment() {
     protected lateinit var listView: ListView
-    protected lateinit var loadingPlaceholder: ShimmerFrameLayout
     protected lateinit var swipeRefreshLayout: SwipeRefreshLayout
     lateinit var emptyViewFragment: EmptyViewFragment
     protected var items: List<E> = emptyList()
@@ -39,9 +38,8 @@ abstract class BaseListViewFragmentV2<E>: Fragment() {
     }
 
     fun bindViews(view: View) {
-        listView = view.findViewById(android.R.id.list)
-        loadingPlaceholder = view.findViewById(R.id.shimmer_view_container)
-        swipeRefreshLayout = view.findViewById(R.id.swipe_container)
+        listView = view.findViewById(R.id.listView)
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
         swipeRefreshLayout.setColorSchemeResources(R.color.testpress_color_primary)
     }
 
