@@ -148,6 +148,10 @@ public class ContentsListFragment extends BaseListViewFragment<Content> {
         deleteContents(chapterId);
         contentDao.insertOrReplaceInTx(contents);
         getListAdapter().notifyDataSetChanged();
+
+        if (isItemsEmpty()) {
+            setEmptyText();
+        }
         showList();
     }
 

@@ -141,13 +141,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         List<Chapter> chapters = TestpressSDKDatabase.getChapterDao(this).queryBuilder()
                 .where(ChapterDao.Properties.Url.eq(chapterUrl)).list();
 
-        if (chapters.isEmpty() ||
-                (!chapters.get(0).hasChildren() && !chapters.get(0).hasContents())) {
-
-            if (!chapters.isEmpty()) {
-                //noinspection ConstantConditions
-                getSupportActionBar().setTitle(chapters.get(0).getName());
-            }
+        if (chapters.isEmpty()) {
             loadChapterFromServer(chapterUrl);
         } else {
             onChapterLoaded(chapters.get(0));
@@ -256,14 +250,11 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             getIntent().putExtra(PARENT_ID, chapter.getId().toString());
             getIntent().putExtra(PRODUCT_SLUG, productSlug);
             loadChildChapters();
-        } else if (chapter.hasContents()) {
+        } else  {
             getIntent().putExtra(CONTENTS_URL_FRAG, chapter.getChapterContentsUrl());
             getIntent().putExtra(CHAPTER_ID, chapter.getId());
             getIntent().putExtra(PRODUCT_SLUG, productSlug);
             loadContents();
-        } else {
-            setEmptyText(R.string.testpress_no_content,
-                    R.string.testpress_no_content_description);
         }
     }
 
