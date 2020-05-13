@@ -6,12 +6,16 @@ import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.network.RetrofitCall
 import `in`.testpress.network.TestpressApiClient
+import `in`.testpress.v2_4.models.ApiResponse
+import `in`.testpress.v2_4.models.ContentsListResponse
 import android.content.Context
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.QueryMap
 import retrofit2.http.Url
+import java.util.HashMap
 
 interface CourseService {
     @GET("{content_url}")
@@ -31,6 +35,12 @@ interface CourseService {
     fun endContentAttempt(
         @Path(value = "end_exam_url", encoded = true) endExamUrlFrag: String?
     ): RetrofitCall<NetworkAttempt>
+
+    @GET("{contents_url}")
+    fun getContents(
+        @Path(value = "contents_url", encoded = true) contentUrl: String,
+        @QueryMap queryParams: HashMap<String, Any>
+    ): RetrofitCall<ApiResponse<ContentsListResponse>>
 }
 
 
@@ -51,5 +61,9 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     fun endContentAttempt(url: String):  RetrofitCall<NetworkAttempt> {
         return getCourseService().endContentAttempt(url)
+    }
+
+    fun getContents(url: String, arguments: HashMap<String, Any>): RetrofitCall<ApiResponse<ContentsListResponse>> {
+        return getCourseService().getContents(url, arguments)
     }
 }
