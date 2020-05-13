@@ -55,6 +55,7 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
 
     private fun handleFetchSuccess(response: ApiResponse<ContentsListResponse>) {
         if (page == 1) {
+            // Delete all contents of chapter once first page is fetched
             deleteExistingContents()
         }
 
