@@ -1,7 +1,7 @@
-package `in`.testpress.course.fragments
+package `in`.testpress.fragments
 
+import `in`.testpress.R
 import `in`.testpress.core.TestpressException
-import `in`.testpress.course.R
 import android.content.Context
 import android.os.Bundle
 import androidx.annotation.VisibleForTesting
@@ -27,7 +27,7 @@ class EmptyViewFragment : Fragment() {
     private var emptyViewListener: EmptyViewListener? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.testpress_empty_view, container, false);
+        return inflater.inflate(R.layout.testpress_empty_view, container, false)
     }
 
     override fun onAttach(context: Context) {
@@ -62,7 +62,8 @@ class EmptyViewFragment : Fragment() {
     }
 
     private fun handleForbidden() {
-        setEmptyText(R.string.permission_denied,
+        setEmptyText(
+            R.string.permission_denied,
                 R.string.testpress_no_permission,
                 R.drawable.ic_error_outline_black_18dp)
         retryButton.visibility = View.GONE

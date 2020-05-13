@@ -10,11 +10,11 @@ import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.viewmodels.ContentViewModel
+import `in`.testpress.fragments.EmptyViewFragment
+import `in`.testpress.fragments.EmptyViewListener
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.RelativeLayout
@@ -26,7 +26,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
-abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, EmptyViewListener {
+abstract class BaseContentDetailFragment : Fragment(), BookmarkListener,
+    EmptyViewListener {
     protected lateinit var swipeRefresh: SwipeRefreshLayout
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     lateinit var emptyViewFragment: EmptyViewFragment

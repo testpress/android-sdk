@@ -7,7 +7,8 @@ import `in`.testpress.course.enums.Status
 import `in`.testpress.course.repository.ContentRepository
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.viewmodels.ContentViewModel
-import `in`.testpress.util.InternetConnectivityChecker
+import `in`.testpress.fragments.EmptyViewFragment
+import `in`.testpress.fragments.EmptyViewListener
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,7 +20,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-class ContentLoadingFragment : Fragment(), EmptyViewListener {
+class ContentLoadingFragment : Fragment(),
+    EmptyViewListener {
     private var contentId: Long = -1
     lateinit var viewModel: ContentViewModel
     lateinit var fragmentChangeListener: ContentFragmentChangeListener

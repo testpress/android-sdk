@@ -6,6 +6,8 @@ import `in`.testpress.course.enums.Status
 import `in`.testpress.course.repository.QuizQuestionsRepository
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.viewmodels.QuizViewModel
+import `in`.testpress.fragments.EmptyViewFragment
+import `in`.testpress.fragments.EmptyViewListener
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,7 +19,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-class LoadingQuestionsFragment : Fragment(), EmptyViewListener {
+class LoadingQuestionsFragment : Fragment(),
+    EmptyViewListener {
     private lateinit var attemptUrl: String
     private var examId = -1L
     private var contentId = -1L

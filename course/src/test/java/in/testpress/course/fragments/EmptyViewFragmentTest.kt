@@ -2,6 +2,7 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.core.TestpressException
 import `in`.testpress.course.R
+import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Content
 import android.content.Context
