@@ -1,7 +1,6 @@
 package `in`.testpress.course.ui
 
 import `in`.testpress.core.TestpressException
-import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.api.TestpressCourseApiClient
@@ -10,8 +9,6 @@ import `in`.testpress.course.enums.Status
 import `in`.testpress.course.repository.ContentsRepository
 import `in`.testpress.course.viewmodels.ContentsListViewModel
 import `in`.testpress.fragments.EmptyViewListener
-import `in`.testpress.models.greendao.Content
-import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.ui.BaseListViewFragmentV2
 import `in`.testpress.util.SingleTypeAdapter
 import android.os.Bundle
@@ -31,7 +28,6 @@ class ContentListFragment : BaseListViewFragmentV2<DomainContent>(), EmptyViewLi
     private lateinit var contentsURL: String
     private var chapterId: Long = -1
     private var productSlug: String? = null
-    private lateinit var contentDao: ContentDao
     private lateinit var viewModel: ContentsListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +45,6 @@ class ContentListFragment : BaseListViewFragmentV2<DomainContent>(), EmptyViewLi
 
     private fun initializeApiClientAndDao() {
         apiClient = TestpressCourseApiClient(activity)
-        contentDao = TestpressSDKDatabase.getContentDao(requireContext())
     }
 
     private fun initializeViewModel() {
@@ -108,9 +103,7 @@ class ContentListFragment : BaseListViewFragmentV2<DomainContent>(), EmptyViewLi
     }
 
     override fun isItemsEmpty(): Boolean {
-        return contentDao.queryBuilder()
-            .where(ContentDao.Properties.ChapterId.eq(chapterId))
-            .list().isEmpty()
+        return items.isEmpty()
     }
 
     override fun createAdapter(items: List<DomainContent>): SingleTypeAdapter<DomainContent> {
