@@ -266,7 +266,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     }
 
     private void loadContents() {
-        ContentsListFragment fragment = new ContentsListFragment();
+        ContentListFragment fragment = new ContentListFragment();
         fragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                 .commitAllowingStateLoss();
