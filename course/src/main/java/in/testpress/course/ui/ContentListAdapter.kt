@@ -139,9 +139,10 @@ class ContentListAdapter(val activity: Activity, val chapterId: Long, val produc
     private fun showDuration() {
         val video = content.video
         setGone(14, true)
-        video?.duration.let { duration ->
+
+        if (!video?.duration.isNullOrBlank()) {
             setGone(14, false)
-            setText(15, duration)
+            setText(15, video?.duration)
         }
     }
 
