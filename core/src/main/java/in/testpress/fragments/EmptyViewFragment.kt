@@ -91,7 +91,7 @@ class EmptyViewFragment : Fragment() {
                 R.drawable.ic_error_outline_black_18dp)
     }
 
-    private fun setEmptyText(title: Int, description: Int, left: Int) {
+    fun setEmptyText(title: Int, description: Int, left: Int) {
         emptyContainer.visibility = View.VISIBLE
         emptyTitleView.setText(title)
         emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0)

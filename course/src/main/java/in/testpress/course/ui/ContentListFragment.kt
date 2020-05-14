@@ -76,6 +76,7 @@ class ContentListFragment : BaseListViewFragmentV2<Content>(), EmptyViewListener
                     swipeRefreshLayout.isRefreshing = false
                     items = resource.data!! as List<Content>
                     getListAdapter().notifyDataSetChanged()
+                    showEmptyList(isItemsEmpty())
                 }
                 Status.ERROR -> {
                     swipeRefreshLayout.isRefreshing = false
@@ -85,6 +86,15 @@ class ContentListFragment : BaseListViewFragmentV2<Content>(), EmptyViewListener
                 }
             }
         })
+    }
+
+    private fun showEmptyList(show: Boolean) {
+        if (show) {
+            emptyViewFragment.setEmptyText(R.string.testpress_no_content,
+                R.string.testpress_no_content_description,
+                R.drawable.ic_error_outline_black_18dp
+            )
+        }
     }
 
     private fun getErrorMessage(exception: TestpressException?): Int {
