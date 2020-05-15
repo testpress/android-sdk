@@ -14,6 +14,9 @@ data class DomainVideoContent(
     val description: String? = null,
     val streams: List<DomainVideoStream>? = arrayListOf<DomainVideoStream>()
 ) {
+    val isNativeVideo: Boolean
+        get() = !hasEmbedCode()
+
     fun hlsUrl(): String? {
         if (streams != null) {
             for (stream in streams) {

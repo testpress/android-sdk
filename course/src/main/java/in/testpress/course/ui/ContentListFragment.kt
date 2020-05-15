@@ -1,16 +1,14 @@
 package `in`.testpress.course.ui
 
 import `in`.testpress.core.TestpressException
-import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.api.TestpressCourseApiClient
+import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.enums.Status
 import `in`.testpress.course.repository.ContentsRepository
 import `in`.testpress.course.viewmodels.ContentsListViewModel
 import `in`.testpress.fragments.EmptyViewListener
-import `in`.testpress.models.greendao.Content
-import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.ui.BaseListViewFragmentV2
 import `in`.testpress.util.SingleTypeAdapter
 import android.os.Bundle
@@ -20,7 +18,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 
-class ContentListFragment : BaseListViewFragmentV2<Content>(), EmptyViewListener {
+class ContentListFragment : BaseListViewFragmentV2<DomainContent>(), EmptyViewListener {
     companion object {
         const val CONTENTS_URL_FRAG = "contentsUrlFrag"
         const val CHAPTER_ID = "chapterId"
@@ -30,7 +28,6 @@ class ContentListFragment : BaseListViewFragmentV2<Content>(), EmptyViewListener
     private lateinit var contentsURL: String
     private var chapterId: Long = -1
     private var productSlug: String? = null
-    private lateinit var contentDao: ContentDao
     private lateinit var viewModel: ContentsListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +45,6 @@ class ContentListFragment : BaseListViewFragmentV2<Content>(), EmptyViewListener
 
     private fun initializeApiClientAndDao() {
         apiClient = TestpressCourseApiClient(activity)
-        contentDao = TestpressSDKDatabase.getContentDao(requireContext())
     }
 
     private fun initializeViewModel() {
@@ -74,9 +70,9 @@ class ContentListFragment : BaseListViewFragmentV2<Content>(), EmptyViewListener
             when (resource?.status) {
                 Status.SUCCESS -> {
                     swipeRefreshLayout.isRefreshing = false
-                    items = resource.data!! as List<Content>
-                    getListAdapter().notifyDataSetChanged()
+                    items = resource.data!! as List<DomainContent>
                     showEmptyList(isItemsEmpty())
+                    getListAdapter().wrappedAdapter.setItems(items)
                 }
                 Status.ERROR -> {
                     swipeRefreshLayout.isRefreshing = false
@@ -107,13 +103,11 @@ class ContentListFragment : BaseListViewFragmentV2<Content>(), EmptyViewListener
     }
 
     override fun isItemsEmpty(): Boolean {
-        return contentDao.queryBuilder()
-            .where(ContentDao.Properties.ChapterId.eq(chapterId))
-            .list().isEmpty()
+        return items.isEmpty()
     }
 
-    override fun createAdapter(items: List<Content>): SingleTypeAdapter<Content> {
-        return ContentsListAdapter(activity, chapterId, productSlug)
+    override fun createAdapter(items: List<DomainContent>): SingleTypeAdapter<DomainContent> {
+        return ContentListAdapter(requireActivity(), chapterId, productSlug)
     }
 
     override fun refreshWithProgress() {
