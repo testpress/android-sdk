@@ -98,7 +98,7 @@ public class ReviewQuestionsFragment extends Fragment {
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
     private InstituteSettings instituteSettings;
-    private boolean loadComments = false;
+    private boolean loadComments = true;
     private MenuItem bookmarkIcon;
 
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
