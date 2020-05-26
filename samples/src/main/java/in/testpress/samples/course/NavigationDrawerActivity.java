@@ -41,7 +41,7 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                     .setBookmarksEnabled(false)
                     .setCommentsVotingEnabled(false)
                     .setCoursesFrontend(false)
-                    .setScreenshotDisabled(true)
+                    .setScreenshotDisabled(false)
                     .setDisplayUserEmailOnVideo(false)
                     .setCoursesGamificationEnabled(false);
             TestpressSdk.setTestpressSession(this, session);

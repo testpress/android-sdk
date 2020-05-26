@@ -46,6 +46,11 @@
         <ImageButton android:id="@id/exo_ffwd"
             style="@style/ExoMediaButton.FastForward"/>
 
+        <ImageButton android:id="@+id/pip_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_picture_in_picture_black_24dp"/>
+
     </LinearLayout>
 
     <LinearLayout

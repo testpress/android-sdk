@@ -8,6 +8,9 @@ import `in`.testpress.course.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
+import android.app.PictureInPictureParams
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -50,6 +53,36 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         exoPlayerMainFrame.visibility = View.VISIBLE
         exoPlayerMainFrame.setAspectRatio(16f/9f)
         exoplayerFullscreenHelper.initializeOrientationListener()
+    }
+
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode)
+        if (isInPictureInPictureMode) {
+            exoPlayerUtil?.showOrhideControls(false)
+        } else {
+            exoPlayerUtil?.showOrhideControls(true)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    fun enterPIPMode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+            && activity?.packageManager
+                ?.hasSystemFeature(
+                    PackageManager.FEATURE_PICTURE_IN_PICTURE
+                ) == true
+        ) {
+            exoPlayerUtil?.let {
+                var videoPosition = it.currentPosition
+                it.setUseController(true)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val params = PictureInPictureParams.Builder()
+                    activity?.enterPictureInPictureMode(params.build())
+                } else {
+                    activity?.enterPictureInPictureMode()
+                }
+            }
+        }
     }
 
     private fun createAttemptAndInitializeExoplayer(content: DomainContent) {

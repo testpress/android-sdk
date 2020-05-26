@@ -3,6 +3,7 @@ package in.testpress.course.util;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PictureInPictureParams;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import androidx.mediarouter.media.MediaRouteSelector;
 import androidx.mediarouter.media.MediaRouter;
 import androidx.mediarouter.media.MediaRouter.RouteInfo;
 import android.util.Pair;
+import android.util.Rational;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -28,6 +30,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -91,6 +94,7 @@ public class ExoPlayerUtil {
     private FrameLayout exoPlayerMainFrame;
     private View exoPlayerLayout;
     private PlayerView playerView;
+    private ImageButton pipButton;
     private LottieAnimationView progressBar;
     private TextView errorMessageTextView;
     private LinearLayout emailIdLayout;
@@ -149,6 +153,7 @@ public class ExoPlayerUtil {
         initializeViews();
         exoPlayerLayout = exoPlayerMainFrame.findViewById(R.id.exo_player_layout);
         playerView = exoPlayerMainFrame.findViewById(R.id.exo_player_view);
+        initializePip();
         fullscreenIcon = exoPlayerMainFrame.findViewById(R.id.exo_fullscreen_icon);
         progressBar = exoPlayerMainFrame.findViewById(R.id.exo_player_progress);
         errorMessageTextView = exoPlayerMainFrame.findViewById(R.id.error_message);
@@ -214,6 +219,24 @@ public class ExoPlayerUtil {
     private void initializeViews() {
         emailIdTextView = exoPlayerMainFrame.findViewById(R.id.email_id);
         emailIdLayout = exoPlayerMainFrame.findViewById(R.id.email_id_layout);
+    }
+
+    public void showOrhideControls(boolean show) {
+        playerView.setUseController(show);
+    }
+
+    private void initializePip() {
+        pipButton = playerView.findViewById(R.id.pip_mode);
+        pipButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    PictureInPictureParams params = new PictureInPictureParams.Builder()
+                            .setAspectRatio(new Rational(16, 9)).build();
+                    activity.enterPictureInPictureMode(params);
+                }
+            }
+        });
     }
 
     private void initFullscreenDialog() {
@@ -290,6 +313,10 @@ public class ExoPlayerUtil {
                 }
             }
         };
+    }
+
+    public void setUseController(boolean useController) {
+        playerView.setUseController(useController);
     }
 
     public void initializePlayer() {

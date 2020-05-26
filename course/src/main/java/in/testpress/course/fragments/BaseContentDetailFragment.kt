@@ -17,6 +17,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
@@ -33,6 +34,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener,
     lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var toast: Toast
     private lateinit var contentView: RelativeLayout
+    private lateinit var bottomNavView: FrameLayout
 
     protected var contentId: Long = -1
     private var productSlug: String? = null
@@ -105,6 +107,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener,
         toast = Toast.makeText(activity, R.string.testpress_no_internet_try_again, Toast.LENGTH_SHORT)
         swipeRefresh = requireView().findViewById(R.id.swipe_container)
         swipeRefresh.setColorSchemeResources(R.color.testpress_color_primary)
+        bottomNavView = requireView().findViewById(R.id.bottom_navigation_fragment)
     }
 
     private fun initializeListenters() {
@@ -145,6 +148,14 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener,
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.bookmark_fragment_layout, bookmarkFragment)
         transaction.commit()
+    }
+
+    fun showOrhideBottomNav(show: Boolean) {
+        if (show) {
+            bottomNavView.visibility = View.VISIBLE
+        } else {
+            bottomNavView.visibility = View.GONE
+        }
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)

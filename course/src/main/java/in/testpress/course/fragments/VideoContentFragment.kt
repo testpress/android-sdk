@@ -4,12 +4,15 @@ import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainVideoContent
 import `in`.testpress.course.util.PatternEditableBuilder
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import java.text.DateFormat
@@ -23,6 +26,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
     private lateinit var titleView: TextView
     private lateinit var description: TextView
     private lateinit var titleLayout: LinearLayout
+    private lateinit var descriptionLayout: LinearLayout
     private lateinit var videoWidgetFragment: BaseVideoWidgetFragment
 
     override var isBookmarkEnabled: Boolean
@@ -42,6 +46,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
         titleView = view.findViewById(R.id.title)
         description = view.findViewById(R.id.description)
         titleLayout = view.findViewById(R.id.title_layout)
+        descriptionLayout = view.findViewById(R.id.description_layout)
         initializeListeners()
     }
 
@@ -51,6 +56,27 @@ class VideoContentFragment : BaseContentDetailFragment() {
             toggleDescription(!isDescriptionVisible)
         }
     }
+
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode)
+        if(isInPictureInPictureMode) {
+            showOrhideBottomNav(false)
+            titleLayout.visibility = View.GONE
+            descriptionLayout.visibility = View.GONE
+        } else {
+            showOrhideBottomNav(true)
+            titleLayout.visibility = View.VISIBLE
+            descriptionLayout.visibility = View.VISIBLE
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            activity?.finishAndRemoveTask()
+        }
+    }
+
     private fun toggleDescription(show: Boolean) {
         if (show) {
             description.visibility = View.VISIBLE
