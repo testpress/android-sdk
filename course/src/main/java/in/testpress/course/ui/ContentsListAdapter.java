@@ -204,7 +204,6 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
         }
     }
 
-
     private boolean shouldOpenPaymentPage(Course course, Content content) {
         if (course.getIsMyCourse() != null && course.getIsMyCourse()) {
             return false;

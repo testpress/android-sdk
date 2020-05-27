@@ -7,7 +7,9 @@ import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.models.greendao.CourseAttemptDao
+import `in`.testpress.util.FormatDate
 import android.content.Context
+import android.text.format.DateUtils
 
 data class DomainContent(
     val id: Long,
@@ -48,7 +50,25 @@ data class DomainContent(
     val htmlContent: DomainHtmlContent? = null,
     var exam: DomainExamContent? = null,
     val video: DomainVideoContent? = null
-)
+) {
+    val contentTypeEnum: ContentType
+        get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
+
+    fun getFormattedStart(): String? {
+        start?.let {
+            val dateInMillis: Long = FormatDate.getDate(
+                start,
+                "yyyy-MM-dd'T'HH:mm:ss", "UTC"
+            ).time
+            return DateUtils.getRelativeTimeSpanString(dateInMillis).toString()
+        }
+        return null
+    }
+
+    fun hasAttempted(): Boolean {
+        return (attemptsCount ?: 0) > 0
+    }
+}
 
 fun createDomainContent(contentEntity: ContentEntity): DomainContent {
     return DomainContent(
@@ -159,3 +179,10 @@ fun DomainContent.getGreenDaoContentAttempts(context: Context): List<CourseAttem
     return courseAttemptDao.queryBuilder()
         .where(CourseAttemptDao.Properties.ChapterContentId.eq(this.id), CourseAttemptDao.Properties.ObjectUrl.isNotNull).list()
 }
+
+enum class ContentType {
+    Exam, Quiz, Video, Attachment, Notes, Unknown
+}
+
+inline fun <reified T : Enum<T>> String.asEnumOrDefault(defaultValue: T? = null): T? =
+        enumValues<T>().firstOrNull { it.name.equals(this, ignoreCase = true) } ?: defaultValue
