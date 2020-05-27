@@ -3,13 +3,16 @@ package `in`.testpress.course.fragments
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainVideoContent
 import `in`.testpress.course.util.PatternEditableBuilder
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import java.text.DateFormat
@@ -97,6 +100,21 @@ class VideoContentFragment : BaseContentDetailFragment() {
                     }
                 }).into(description)
             toggleDescription(true)
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            hideBottomNavigationBar()
+            (activity as AppCompatActivity).supportActionBar?.hide()
+            swipeRefresh.isEnabled = false
+            requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        } else {
+            (activity as AppCompatActivity).supportActionBar?.show()
+            showBottomNavigationBar()
+            swipeRefresh.isEnabled = true
+            requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         }
     }
 }
