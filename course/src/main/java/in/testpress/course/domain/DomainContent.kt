@@ -64,6 +64,10 @@ data class DomainContent(
         }
         return null
     }
+
+    fun hasAttempted(): Boolean {
+        return (attemptsCount ?: 0) > 0
+    }
 }
 
 fun createDomainContent(contentEntity: ContentEntity): DomainContent {
