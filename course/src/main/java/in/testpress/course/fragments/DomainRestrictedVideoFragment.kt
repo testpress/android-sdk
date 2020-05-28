@@ -13,5 +13,6 @@ class DomainRestrictedVideoFragment: WebViewVideoFragment() {
         jsonObject.addProperty(TestpressCourseApiClient.EMBED_CODE, content.video!!.embedCode)
         val url = "${session!!.instituteSettings.baseUrl}/${TestpressCourseApiClient.EMBED_DOMAIN_RESTRICTED_VIDEO_PATH}"
         webViewUtils.initWebViewAndPostUrl(url, jsonObject.toString(), activity)
+        webView.webChromeClient = fullScreenChromeClient
     }
 }

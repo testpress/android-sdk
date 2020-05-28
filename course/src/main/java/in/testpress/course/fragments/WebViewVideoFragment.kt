@@ -51,7 +51,6 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
         webView = view.findViewById(R.id.web_view)
         webViewUtils = HtmlViewUtils(webView)
         webView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
-        webView.webChromeClient = fullScreenChromeClient
     }
 
     open fun loadVideo(content: DomainContent) {
@@ -60,6 +59,7 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
             "class='videoWrapper'>" + video?.embedCode + "</div>"
 
         webViewUtils.initWebView(html, activity)
+        webView.webChromeClient = fullScreenChromeClient
     }
 
     override fun onResume() {
