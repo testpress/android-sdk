@@ -44,6 +44,7 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
@@ -56,7 +57,7 @@ import com.google.android.exoplayer2.ui.TrackSelectionView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
 import java.util.HashMap;
@@ -76,6 +77,7 @@ import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
 import in.testpress.util.UserAgentProvider;
+import okhttp3.OkHttpClient;
 
 import static android.content.Context.AUDIO_SERVICE;
 import static androidx.mediarouter.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
@@ -375,10 +377,18 @@ public class ExoPlayerUtil {
                 .build();
     }
 
-    private MediaSource buildMediaSource(Uri uri) {
+    private DataSource.Factory getDataSourceFactory() {
         String userAgent = UserAgentProvider.get(activity);
-        DataSource.Factory dataSourceFactory =
-                new DefaultHttpDataSourceFactory(userAgent);
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new VideoPlayerInterceptor(activity))
+                .build();
+        OkHttpDataSourceFactory okHttpDataSourceFactory = new OkHttpDataSourceFactory(okHttpClient, userAgent, bandwidthMeter);
+        return new DefaultDataSourceFactory(activity, bandwidthMeter, okHttpDataSourceFactory);
+    }
+
+    private MediaSource buildMediaSource(Uri uri) {
+        DataSource.Factory dataSourceFactory = getDataSourceFactory();
         int type = Util.inferContentType(uri);
         switch (type) {
             case C.TYPE_HLS:
