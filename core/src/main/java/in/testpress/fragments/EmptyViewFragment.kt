@@ -50,6 +50,10 @@ class EmptyViewFragment : Fragment() {
         emptyTitleView = view.findViewById(R.id.empty_title)
         emptyDescView = view.findViewById(R.id.empty_description)
         retryButton = view.findViewById(R.id.retry_button)
+        retryButton.setOnClickListener {
+            emptyContainer.visibility = View.GONE
+            emptyViewListener?.onRetryClick()
+        }
     }
 
     fun displayError(exception: TestpressException) {
@@ -73,10 +77,6 @@ class EmptyViewFragment : Fragment() {
         setEmptyText(R.string.testpress_network_error,
                 R.string.testpress_no_internet_try_again,
                 R.drawable.ic_error_outline_black_18dp)
-        retryButton.setOnClickListener {
-            emptyContainer.visibility = View.GONE
-            emptyViewListener?.onRetryClick()
-        }
     }
 
     private fun handleIsPageNotFound() {
