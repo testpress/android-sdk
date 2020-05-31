@@ -34,6 +34,8 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
             .list()
         if (contents.isNotEmpty()) {
             _resourceContents.postValue(Resource.success(contents))
+        } else {
+            _resourceContents.value = Resource.loading(null)
         }
         chapter = chapterDao.queryBuilder().where(ChapterDao.Properties.Id.eq(chapterId)).list()[0]
     }
