@@ -91,59 +91,14 @@
             android:textColor="@color/testpress_black"
             android:textSize="16sp" />
 
+
         <LinearLayout
             android:id="@+id/content_details_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginTop="10dp"
-            android:orientation="horizontal">
-
-
-            <LinearLayout
-                android:id="@+id/duration_container"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginRight="25dp"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="15dp"
-                    android:layout_marginRight="5dp"
-                    android:src="@drawable/testpress_clock" />
-
-                <TextView
-                    android:id="@+id/duration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:lineSpacingExtra="4dp"
-                    android:maxLines="1"
-                    android:text="3:00:00"
-                    android:textColor="@color/testpress_text_gray_medium"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_marginRight="5dp"
-                android:src="@drawable/testpress_question_tag" />
-
-            <TextView
-                android:id="@+id/number_of_questions"
-                android:layout_width="40dp"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:lineSpacingExtra="4dp"
-                android:maxLines="1"
-                android:text="50 Qs"
-                android:textColor="@color/testpress_text_gray_medium"
-                android:textSize="12sp" />
-
-
-        </LinearLayout>
+            android:orientation="horizontal"></LinearLayout>
 
         <LinearLayout
             android:id="@+id/scheduled_info_container"

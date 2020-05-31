@@ -53,6 +53,24 @@
 
         </LinearLayout>
 
+
+        <LinearLayout
+            android:id="@+id/video_completion_progress_container"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/testpress_circle_white_background"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <com.github.testpress.mikephil.charting.charts.PieChart
+                android:id="@+id/video_completion_progress_chart"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+        </LinearLayout>
+
         <LinearLayout
             android:id="@+id/attempted_tick_container"
             android:layout_width="30dp"
@@ -124,25 +142,6 @@
                     android:textColor="@color/testpress_text_gray_medium"
                     android:textSize="12sp" />
             </LinearLayout>
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_marginRight="5dp"
-                android:src="@drawable/testpress_question_tag" />
-
-            <TextView
-                android:id="@+id/number_of_questions"
-                android:layout_width="40dp"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:lineSpacingExtra="4dp"
-                android:maxLines="1"
-                android:text="50 Qs"
-                android:textColor="@color/testpress_text_gray_medium"
-                android:textSize="12sp" />
-
-
         </LinearLayout>
 
         <LinearLayout

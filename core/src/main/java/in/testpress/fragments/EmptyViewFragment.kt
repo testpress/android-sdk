@@ -4,6 +4,7 @@ import `in`.testpress.R
 import `in`.testpress.core.TestpressException
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -37,6 +38,7 @@ class EmptyViewFragment : Fragment() {
 
     private fun initializeListeners() {
         emptyViewListener = if (parentFragment != null) {
+            Log.d("EmptyViewFragment", "Setting parent as listener")
             parentFragment as? EmptyViewListener
         } else {
             context as? EmptyViewListener
@@ -50,6 +52,10 @@ class EmptyViewFragment : Fragment() {
         emptyTitleView = view.findViewById(R.id.empty_title)
         emptyDescView = view.findViewById(R.id.empty_description)
         retryButton = view.findViewById(R.id.retry_button)
+        retryButton.setOnClickListener {
+            emptyContainer.visibility = View.GONE
+            emptyViewListener?.onRetryClick()
+        }
     }
 
     fun displayError(exception: TestpressException) {
@@ -73,10 +79,6 @@ class EmptyViewFragment : Fragment() {
         setEmptyText(R.string.testpress_network_error,
                 R.string.testpress_no_internet_try_again,
                 R.drawable.ic_error_outline_black_18dp)
-        retryButton.setOnClickListener {
-            emptyContainer.visibility = View.GONE
-            emptyViewListener?.onRetryClick()
-        }
     }
 
     private fun handleIsPageNotFound() {
@@ -92,6 +94,7 @@ class EmptyViewFragment : Fragment() {
     }
 
     fun setEmptyText(title: Int, description: Int, left: Int) {
+        Log.d("EmptyFragment", "Making empty container visible")
         emptyContainer.visibility = View.VISIBLE
         emptyTitleView.setText(title)
         emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0)

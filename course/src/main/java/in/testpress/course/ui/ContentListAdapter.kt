@@ -4,7 +4,9 @@ import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.course.domain.ContentType
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.ui.viewholders.BaseContentListItemViewHolder
+import `in`.testpress.course.ui.viewholders.ContentListItemViewHolder
 import `in`.testpress.course.ui.viewholders.ExamContentListItemViewHolder
+import `in`.testpress.course.ui.viewholders.VideoContentListItemViewHolder
 import `in`.testpress.models.greendao.ChapterDao
 import `in`.testpress.models.greendao.CourseDao
 import `in`.testpress.store.TestpressStore
@@ -15,7 +17,6 @@ import android.content.Intent
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 
 
 class ContentListAdapter(val chapterId: Long,
@@ -26,7 +27,11 @@ class ContentListAdapter(val chapterId: Long,
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseContentListItemViewHolder {
         return when (viewType) {
             ContentType.Exam.ordinal -> ExamContentListItemViewHolder.create(parent)
-            else -> ExamContentListItemViewHolder.create(parent)
+            ContentType.Quiz.ordinal -> ExamContentListItemViewHolder.create(parent)
+            ContentType.Video.ordinal -> VideoContentListItemViewHolder.create(parent)
+            ContentType.Notes.ordinal -> ContentListItemViewHolder.create(parent)
+            ContentType.Attachment.ordinal -> ContentListItemViewHolder.create(parent)
+            else -> ContentListItemViewHolder.create(parent)
         }
     }
 

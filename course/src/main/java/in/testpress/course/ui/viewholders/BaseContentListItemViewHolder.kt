@@ -6,22 +6,29 @@ import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.models.greendao.ChapterDao
 import `in`.testpress.models.greendao.CourseDao
+import `in`.testpress.util.ImageUtils
 import android.content.Context
+import android.opengl.Visibility
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.nostra13.universalimageloader.core.DisplayImageOptions
+import com.nostra13.universalimageloader.core.ImageLoader
 
 abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     private val title: TextView = view.findViewById(R.id.title)
+    private val thumbnail: ImageView = view.findViewById(R.id.thumbnail)
     private val scheduledInfo: TextView = view.findViewById(R.id.scheduled_info)
     private val whiteForeground: View = view.findViewById(R.id.white_foreground)
     private val lockContainer: LinearLayout = view.findViewById(R.id.lock_container)
-    private val attemptedTickContainer: LinearLayout = view.findViewById(R.id.attempted_tick_container)
+    val attemptedTickContainer: LinearLayout = view.findViewById(R.id.attempted_tick_container)
     private val lockImage: ImageView = view.findViewById(R.id.lock_image)
     private val scheduledInfoContainer: LinearLayout = view.findViewById(R.id.scheduled_info_container)
     private val contentDetailsContainer: LinearLayout = view.findViewById(R.id.content_details_container)
+    private var imageLoader: ImageLoader = ImageUtils.initImageLoader(view.context)
+    private var imageOptions: DisplayImageOptions = ImageUtils.getPlaceholdersOption()
 
     init {
         title.typeface = TestpressSdk.getRubikMediumFont(view.context)
@@ -30,10 +37,20 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
 
     fun bind(content: DomainContent, isPremium: Boolean, clickListener: (DomainContent) -> Unit) {
         title.text = content.title
+        updateThumbnail(content)
         handleLockedAndScheduledContent(content)
         if (isPremium) showCrownIcon()
         bindContentDetails(content)
         itemView.setOnClickListener { clickListener(content)}
+    }
+
+    private fun updateThumbnail(content: DomainContent) {
+        if (content.image.isNullOrEmpty()) {
+            thumbnail.visibility = View.GONE
+        } else {
+            thumbnail.visibility = View.VISIBLE
+            imageLoader.displayImage(content.image, thumbnail, imageOptions)
+        }
     }
 
     private fun showScheduledInfo(content: DomainContent) {
@@ -85,5 +102,5 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
         }
     }
 
-    abstract fun bindContentDetails(content: DomainContent)
+    open fun bindContentDetails(content: DomainContent) {}
 }

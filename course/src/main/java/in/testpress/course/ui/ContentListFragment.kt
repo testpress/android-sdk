@@ -1,6 +1,5 @@
 package `in`.testpress.course.ui
 
-import `in`.testpress.core.TestpressException
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.domain.DomainContent
@@ -10,16 +9,19 @@ import `in`.testpress.course.viewmodels.ContentsListViewModel
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.base_list_layout.*
+import androidx.recyclerview.widget.RecyclerView
+import com.facebook.shimmer.ShimmerFrameLayout
 
 class ContentListFragment : Fragment(), EmptyViewListener {
     companion object {
@@ -32,6 +34,9 @@ class ContentListFragment : Fragment(), EmptyViewListener {
     private var productSlug: String? = null
     private lateinit var viewModel: ContentsListViewModel
     private lateinit var mAdapter: ContentListAdapter
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var emptyViewFragment: EmptyViewFragment
+    private lateinit var loadingPlaceholder: ShimmerFrameLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,42 +68,77 @@ class ContentListFragment : Fragment(), EmptyViewListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        bindViews()
         mAdapter = ContentListAdapter(chapterId, productSlug)
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = mAdapter
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
         initalizeObservers()
         viewModel.loadContents()
+    }
+
+    private fun bindViews() {
+        recyclerView = view!!.findViewById(R.id.recycler_view)
+        loadingPlaceholder = view!!.findViewById(R.id.shimmer_view_container)
+        loadingPlaceholder.visibility = View.GONE
+        initializeEmptyViewFragment()
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun initializeEmptyViewFragment() {
+        emptyViewFragment = EmptyViewFragment()
+        val transaction = childFragmentManager.beginTransaction()
+        transaction.replace(R.id.empty_view_fragment, emptyViewFragment)
+        transaction.commit()
     }
 
     private fun initalizeObservers() {
 
         viewModel.items.observe(viewLifecycleOwner, Observer { resource ->
             when (resource?.status) {
+                Status.LOADING -> {
+                    Log.d("ContentListFragment", "Got status LOADING")
+                    showLoadingPlaceholder()
+                }
                 Status.SUCCESS -> {
+                    Log.d("ContentListFragment", "Got status SUCCESS")
+                    hideLoadingPlaceholder()
                     val items = resource.data!! as List<DomainContent>
-                    showEmptyList(items.isEmpty())
+                    Log.d("Items", "" + items.isEmpty())
+                    if (items.isEmpty()) showEmptyList()
                     mAdapter.contents = items
                     mAdapter.notifyDataSetChanged()
                 }
                 Status.ERROR -> {
-                    (emptyViewFragment as EmptyViewFragment).displayError(resource.exception!!)
+                    Log.d("ContentListFragment", "Got status ERROR")
+                    hideLoadingPlaceholder()
+                    emptyViewFragment.displayError(resource.exception!!)
                 }
             }
         })
     }
 
-    private fun showEmptyList(show: Boolean) {
-        if (show) {
-            (emptyViewFragment as EmptyViewFragment).setEmptyText(R.string.testpress_no_content,
+    private fun showEmptyList() {
+        emptyViewFragment.setEmptyText(R.string.testpress_no_content,
                 R.string.testpress_no_content_description,
                 R.drawable.ic_error_outline_black_18dp
-            )
-        }
+        )
     }
 
     override fun onRetryClick() {
+        Log.d("onRetryClick", "viewModel load contents")
         viewModel.loadContents()
+    }
+
+    fun showLoadingPlaceholder() {
+        loadingPlaceholder.visibility = View.VISIBLE
+        loadingPlaceholder.startShimmer()
+    }
+
+    fun hideLoadingPlaceholder() {
+        loadingPlaceholder.stopShimmer()
+        loadingPlaceholder.visibility = View.GONE
     }
 }
