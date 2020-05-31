@@ -38,7 +38,6 @@ class EmptyViewFragment : Fragment() {
 
     private fun initializeListeners() {
         emptyViewListener = if (parentFragment != null) {
-            Log.d("EmptyViewFragment", "Setting parent as listener")
             parentFragment as? EmptyViewListener
         } else {
             context as? EmptyViewListener
@@ -94,7 +93,6 @@ class EmptyViewFragment : Fragment() {
     }
 
     fun setEmptyText(title: Int, description: Int, left: Int) {
-        Log.d("EmptyFragment", "Making empty container visible")
         emptyContainer.visibility = View.VISIBLE
         emptyTitleView.setText(title)
         emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0)
