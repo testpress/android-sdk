@@ -45,6 +45,7 @@
     <string name="testpress_disconnect_live_video">Stop screen sharing!. Your device is casted to projector/monitor, Please stop it &amp; retry to play videos.</string>
     <string name="my_course_title">My Courses</string>
     <string name="available_courses_title">Available Courses</string>
+    <string name="select_track">Select Track</string>
     <string name="no_products_available">No Products Available</string>
     <string name="check_again_later">Please check again later</string>
     <string name="buy_now">Buy Now</string>
