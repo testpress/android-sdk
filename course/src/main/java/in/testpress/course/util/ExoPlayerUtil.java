@@ -298,7 +298,7 @@ public class ExoPlayerUtil {
         errorMessageTextView.setVisibility(View.GONE);
         if (player == null) {
             progressBar.setVisibility(View.VISIBLE);
-            player = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(activity),
+            player = ExoPlayerFactory.newSimpleInstance(activity, new DefaultRenderersFactory(activity),
                     trackSelector, new DefaultLoadControl());
 
             player.addListener(new PlayerEventListener());
