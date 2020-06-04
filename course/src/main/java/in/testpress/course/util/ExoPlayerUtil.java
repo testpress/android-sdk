@@ -35,6 +35,7 @@ import com.google.android.exoplayer2.DefaultControlDispatcher;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.PlaybackPreparer;
@@ -275,9 +276,8 @@ public class ExoPlayerUtil {
         errorMessageTextView.setVisibility(View.GONE);
         if (player == null) {
             progressBar.setVisibility(View.VISIBLE);
-            player = ExoPlayerFactory.newSimpleInstance(activity, new DefaultRenderersFactory(activity),
-                    trackSelector, new DefaultLoadControl());
-
+            player = new SimpleExoPlayer.Builder(activity, new DefaultRenderersFactory(activity))
+                    .setTrackSelector(trackSelector).build();
             player.addListener(new PlayerEventListener());
             playerView.setPlayer(player);
             player.setPlayWhenReady(playWhenReady);
