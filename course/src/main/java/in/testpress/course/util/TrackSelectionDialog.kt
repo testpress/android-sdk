@@ -209,7 +209,7 @@ class TrackSelectionDialog: DialogFragment() {
             trackSelectionView.setAllowMultipleOverrides(allowMultipleOverrides)
             trackSelectionView.setAllowAdaptiveSelections(allowAdaptiveSelections)
             trackSelectionView.init(
-                mappedTrackInfo, rendererIndex, isDisabled, overrides,  /* listener= */this
+                mappedTrackInfo!!, rendererIndex, isDisabled, overrides,  /* listener= */this
             )
             return rootView
         }
