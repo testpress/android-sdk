@@ -117,7 +117,7 @@ class QuizReviewFragment: Fragment() {
 
             override fun onLoadFinished() {
                 super.onLoadFinished()
-                setDifficulty(view!!)
+                setDifficulty()
                 view!!.findViewById<View>(R.id.difficulty_layout).visibility = View.VISIBLE
 
                 if (instituteSettings.isGrowthHackEnabled) {
@@ -128,7 +128,7 @@ class QuizReviewFragment: Fragment() {
         webViewUtils.initWebView(getHtml(), requireActivity())
     }
 
-    private fun setDifficulty(view: View) {
+    private fun setDifficulty() {
         if (percentageCorrect >= 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 imageView1.background =
