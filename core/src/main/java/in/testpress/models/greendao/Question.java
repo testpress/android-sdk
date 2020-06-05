@@ -28,6 +28,7 @@ public class Question {
     private String language;
     private String explanationHtml;
     private String commentsUrl;
+    private String percentageGotCorrect;
 
     @Convert(converter = in.testpress.util.IntegerListConverter.class, columnType = String.class)
     private IntegerList answerIds;
@@ -64,7 +65,7 @@ public class Question {
     }
 
     @Generated
-    public Question(Long id, String questionHtml, String directionHtml, Long parentId, String type, String language, String explanationHtml, String commentsUrl, IntegerList answerIds, Long directionId) {
+    public Question(Long id, String questionHtml, String directionHtml, Long parentId, String type, String language, String explanationHtml, String commentsUrl, String percentageGotCorrect, IntegerList answerIds, Long directionId) {
         this.id = id;
         this.questionHtml = questionHtml;
         this.directionHtml = directionHtml;
@@ -73,6 +74,7 @@ public class Question {
         this.language = language;
         this.explanationHtml = explanationHtml;
         this.commentsUrl = commentsUrl;
+        this.percentageGotCorrect = percentageGotCorrect;
         this.answerIds = answerIds;
         this.directionId = directionId;
     }
@@ -146,6 +148,14 @@ public class Question {
 
     public void setCommentsUrl(String commentsUrl) {
         this.commentsUrl = commentsUrl;
+    }
+
+    public String getPercentageGotCorrect() {
+        return percentageGotCorrect;
+    }
+
+    public void setPercentageGotCorrect(String percentageGotCorrect) {
+        this.percentageGotCorrect = percentageGotCorrect;
     }
 
     public IntegerList getAnswerIds() {

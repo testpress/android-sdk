@@ -12,11 +12,24 @@ data class NetworkQuestion(
     val parentId: Long? = null,
     val type: String? = null,
     val explanationHtml: String? = null,
-    val direction: String? = null
+    val direction: String? = null,
+    val percentageGotCorrect: String? = null
 )
 
 fun NetworkQuestion.asGreenDaoModel(): Question {
-    return Question(id, questionHtml, direction, parentId, type, language, explanationHtml, null, null, directionId)
+    return Question(
+        id,
+        questionHtml,
+        direction,
+        parentId,
+        type,
+        language,
+        explanationHtml,
+        null,
+        percentageGotCorrect,
+        null,
+        directionId
+    )
 }
 
 fun List<NetworkQuestion>.asGreenDaoModels(): List<Question> {

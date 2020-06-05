@@ -36,8 +36,9 @@ public class QuestionDao extends AbstractDao<Question, Long> {
         public final static Property Language = new Property(5, String.class, "language", false, "LANGUAGE");
         public final static Property ExplanationHtml = new Property(6, String.class, "explanationHtml", false, "EXPLANATION_HTML");
         public final static Property CommentsUrl = new Property(7, String.class, "commentsUrl", false, "COMMENTS_URL");
-        public final static Property AnswerIds = new Property(8, String.class, "answerIds", false, "ANSWER_IDS");
-        public final static Property DirectionId = new Property(9, Long.class, "directionId", false, "DIRECTION_ID");
+        public final static Property PercentageGotCorrect = new Property(8, String.class, "percentageGotCorrect", false, "PERCENTAGE_GOT_CORRECT");
+        public final static Property AnswerIds = new Property(9, String.class, "answerIds", false, "ANSWER_IDS");
+        public final static Property DirectionId = new Property(10, Long.class, "directionId", false, "DIRECTION_ID");
     }
 
     private DaoSession daoSession;
@@ -65,8 +66,9 @@ public class QuestionDao extends AbstractDao<Question, Long> {
                 "\"LANGUAGE\" TEXT," + // 5: language
                 "\"EXPLANATION_HTML\" TEXT," + // 6: explanationHtml
                 "\"COMMENTS_URL\" TEXT," + // 7: commentsUrl
-                "\"ANSWER_IDS\" TEXT," + // 8: answerIds
-                "\"DIRECTION_ID\" INTEGER);"); // 9: directionId
+                "\"PERCENTAGE_GOT_CORRECT\" TEXT," + // 8: percentageGotCorrect
+                "\"ANSWER_IDS\" TEXT," + // 9: answerIds
+                "\"DIRECTION_ID\" INTEGER);"); // 10: directionId
     }
 
     /** Drops the underlying database table. */
@@ -119,14 +121,19 @@ public class QuestionDao extends AbstractDao<Question, Long> {
             stmt.bindString(8, commentsUrl);
         }
  
+        String percentageGotCorrect = entity.getPercentageGotCorrect();
+        if (percentageGotCorrect != null) {
+            stmt.bindString(9, percentageGotCorrect);
+        }
+ 
         IntegerList answerIds = entity.getAnswerIds();
         if (answerIds != null) {
-            stmt.bindString(9, answerIdsConverter.convertToDatabaseValue(answerIds));
+            stmt.bindString(10, answerIdsConverter.convertToDatabaseValue(answerIds));
         }
  
         Long directionId = entity.getDirectionId();
         if (directionId != null) {
-            stmt.bindLong(10, directionId);
+            stmt.bindLong(11, directionId);
         }
     }
 
@@ -174,14 +181,19 @@ public class QuestionDao extends AbstractDao<Question, Long> {
             stmt.bindString(8, commentsUrl);
         }
  
+        String percentageGotCorrect = entity.getPercentageGotCorrect();
+        if (percentageGotCorrect != null) {
+            stmt.bindString(9, percentageGotCorrect);
+        }
+ 
         IntegerList answerIds = entity.getAnswerIds();
         if (answerIds != null) {
-            stmt.bindString(9, answerIdsConverter.convertToDatabaseValue(answerIds));
+            stmt.bindString(10, answerIdsConverter.convertToDatabaseValue(answerIds));
         }
  
         Long directionId = entity.getDirectionId();
         if (directionId != null) {
-            stmt.bindLong(10, directionId);
+            stmt.bindLong(11, directionId);
         }
     }
 
@@ -207,8 +219,9 @@ public class QuestionDao extends AbstractDao<Question, Long> {
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // language
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // explanationHtml
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // commentsUrl
-            cursor.isNull(offset + 8) ? null : answerIdsConverter.convertToEntityProperty(cursor.getString(offset + 8)), // answerIds
-            cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9) // directionId
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // percentageGotCorrect
+            cursor.isNull(offset + 9) ? null : answerIdsConverter.convertToEntityProperty(cursor.getString(offset + 9)), // answerIds
+            cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10) // directionId
         );
         return entity;
     }
@@ -223,8 +236,9 @@ public class QuestionDao extends AbstractDao<Question, Long> {
         entity.setLanguage(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setExplanationHtml(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setCommentsUrl(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setAnswerIds(cursor.isNull(offset + 8) ? null : answerIdsConverter.convertToEntityProperty(cursor.getString(offset + 8)));
-        entity.setDirectionId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
+        entity.setPercentageGotCorrect(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setAnswerIds(cursor.isNull(offset + 9) ? null : answerIdsConverter.convertToEntityProperty(cursor.getString(offset + 9)));
+        entity.setDirectionId(cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10));
      }
     
     @Override

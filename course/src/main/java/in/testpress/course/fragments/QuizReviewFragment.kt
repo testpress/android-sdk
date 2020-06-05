@@ -82,7 +82,7 @@ class QuizReviewFragment: Fragment() {
         imageView3 = view.findViewById(R.id.difficulty3)
         imageView4 = view.findViewById(R.id.difficulty4)
         imageView5 = view.findViewById(R.id.difficulty5)
-        percentageCorrect = 50
+        percentageCorrect = 0
         difficultyPercentageText.text = "$percentageCorrect%"
 
 
@@ -103,10 +103,19 @@ class QuizReviewFragment: Fragment() {
             when(it.status) {
                 Status.SUCCESS -> {
                     userSelectedAnswer = it.data?.get(position)!!
+                    updateDifficultyLevel()
                     initWebview()
                 }
             }
         })
+    }
+
+    private fun updateDifficultyLevel() {
+        val percentageGotCorrectString = userSelectedAnswer.question?.percentageGotCorrect
+        if(percentageGotCorrectString != null && percentageGotCorrectString.toIntOrNull() != null) {
+            percentageCorrect = percentageGotCorrectString.toInt()
+            difficultyPercentageText.text = "$percentageCorrect%"
+        }
     }
 
     private fun initWebview() {
