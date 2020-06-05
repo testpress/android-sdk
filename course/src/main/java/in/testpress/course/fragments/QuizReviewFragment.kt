@@ -112,7 +112,7 @@ class QuizReviewFragment: Fragment() {
 
     private fun updateDifficultyLevel() {
         val percentageGotCorrectString = userSelectedAnswer.question?.percentageGotCorrect
-        if(percentageGotCorrectString != null && percentageGotCorrectString.toIntOrNull() != null) {
+        percentageGotCorrectString?.toIntOrNull()?.let {
             percentageCorrect = percentageGotCorrectString.toInt()
             difficultyPercentageText.text = "$percentageCorrect%"
         }
