@@ -36,7 +36,6 @@ class QuizReviewFragment: Fragment() {
     lateinit var imageView3: ImageView
     lateinit var imageView4: ImageView
     lateinit var imageView5: ImageView
-    var percentageCorrect = 0
 
     private lateinit var webViewUtils: WebViewUtils
     lateinit var viewModel: QuizViewModel
@@ -82,9 +81,6 @@ class QuizReviewFragment: Fragment() {
         imageView3 = view.findViewById(R.id.difficulty3)
         imageView4 = view.findViewById(R.id.difficulty4)
         imageView5 = view.findViewById(R.id.difficulty5)
-        percentageCorrect = 0
-        difficultyPercentageText.text = "$percentageCorrect%"
-
 
         ViewUtils.setTypeface(
             arrayOf(difficultyTitle, difficultyPercentageText),
@@ -103,19 +99,10 @@ class QuizReviewFragment: Fragment() {
             when(it.status) {
                 Status.SUCCESS -> {
                     userSelectedAnswer = it.data?.get(position)!!
-                    updateDifficultyLevel()
                     initWebview()
                 }
             }
         })
-    }
-
-    private fun updateDifficultyLevel() {
-        val percentageGotCorrectString = userSelectedAnswer.question?.percentageGotCorrect
-        percentageGotCorrectString?.toIntOrNull()?.let {
-            percentageCorrect = percentageGotCorrectString.toInt()
-            difficultyPercentageText.text = "$percentageCorrect%"
-        }
     }
 
     private fun initWebview() {
@@ -138,6 +125,9 @@ class QuizReviewFragment: Fragment() {
     }
 
     private fun setDifficulty() {
+        val percentageCorrect = getPercentageGotCorrect() ?: return
+        difficultyPercentageText.text = "$percentageCorrect%"
+
         if (percentageCorrect >= 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 imageView1.background =
@@ -178,6 +168,15 @@ class QuizReviewFragment: Fragment() {
                 imageView5.setBackgroundColor(resources.getColor(R.color.testpress_difficulty_level_5))
             }
         }
+    }
+
+    private fun getPercentageGotCorrect(): Int? {
+        var percentageCorrect: Int? = null
+        val percentageGotCorrectString = userSelectedAnswer.question?.percentageGotCorrect
+        percentageGotCorrectString?.toIntOrNull()?.let {
+            percentageCorrect = percentageGotCorrectString.toInt()
+        }
+        return percentageCorrect
     }
 
     private fun getHtml(): String {
