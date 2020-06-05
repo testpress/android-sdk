@@ -39,6 +39,7 @@ import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory;
+import com.google.android.exoplayer2.offline.StreamKey;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
@@ -54,6 +55,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -62,6 +64,7 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.core.TestpressUserDetails;
+import in.testpress.course.CourseApplication;
 import in.testpress.course.R;
 import in.testpress.course.api.TestpressCourseApiClient;
 import in.testpress.models.ProfileDetails;
@@ -361,12 +364,22 @@ public class ExoPlayerUtil {
         return new DefaultDataSourceFactory(activity, bandwidthMeter, okHttpDataSourceFactory);
     }
 
+    private List<StreamKey> getOfflineStreamKeys(Uri uri) {
+        return ((CourseApplication) activity.getApplication()).getDownloadTracker().getOfflineStreamKeys(uri);
+    }
+
+    private DataSource.Factory buildDataSourceFactory() {
+        return ((CourseApplication) activity.getApplication()).buildDataSourceFactory();
+    }
+
+
     private MediaSource buildMediaSource(Uri uri) {
-        DataSource.Factory dataSourceFactory = getDataSourceFactory();
+        DataSource.Factory dataSourceFactory = buildDataSourceFactory();
+        List<StreamKey> offlineStreamKeys = getOfflineStreamKeys(uri);
         int type = Util.inferContentType(uri);
         switch (type) {
             case C.TYPE_HLS:
-                return new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+                return new HlsMediaSource.Factory(dataSourceFactory).setStreamKeys(offlineStreamKeys).createMediaSource(uri);
             case C.TYPE_OTHER:
                 return new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
             default:

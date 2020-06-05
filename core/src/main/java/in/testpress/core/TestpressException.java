@@ -108,6 +108,10 @@ public class TestpressException extends RuntimeException {
         return statusCode == 403;
     }
 
+    public boolean isUnauthorized() {
+        return statusCode == 401;
+    }
+
     public boolean isClientError() {
         return statusCode >= 400 && statusCode < 500 && statusCode != 403;
     }

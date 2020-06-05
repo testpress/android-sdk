@@ -46,6 +46,9 @@
     <string name="my_course_title">My Courses</string>
     <string name="available_courses_title">Available Courses</string>
     <string name="select_track">Select Track</string>
+    <string name="download">Download</string>
+    <string name="download_description"></string>
+    <string name="download_start_error">Failed to start download</string>
     <string name="no_products_available">No Products Available</string>
     <string name="check_again_later">Please check again later</string>
     <string name="buy_now">Buy Now</string>

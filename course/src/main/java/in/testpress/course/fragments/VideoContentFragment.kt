@@ -1,17 +1,24 @@
 package `in`.testpress.course.fragments
 
+import `in`.testpress.course.CourseApplication
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainVideoContent
 import `in`.testpress.course.util.PatternEditableBuilder
+import `in`.testpress.course.util.VideoDownloadService
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
-import androidx.fragment.app.Fragment
+import com.google.android.exoplayer2.DefaultRenderersFactory
+import com.google.android.exoplayer2.offline.DownloadService
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -28,6 +35,20 @@ class VideoContentFragment : BaseContentDetailFragment() {
     override var isBookmarkEnabled: Boolean
         get() = false
         set(value) {}
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Start the download service if it should be running but it's not currently.
+        // Starting the service in the foreground causes notification flicker if there is no scheduled
+        // action. Starting it in the background throws an exception if the app is in the background too
+        // (e.g. if device screen is locked).
+        try {
+            DownloadService.start(context!!, VideoDownloadService::class.java)
+        } catch (e: IllegalStateException) {
+            DownloadService.startForeground(context!!, VideoDownloadService::class.java)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,6 +72,33 @@ class VideoContentFragment : BaseContentDetailFragment() {
             toggleDescription(!isDescriptionVisible)
         }
     }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.content_detail_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.download) {
+            downloadVideo()
+            return false
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    fun downloadVideo() {
+        val url = Uri.parse(content.video!!.hlsUrl()!!)
+        val courseApplication = activity?.application as CourseApplication
+        val downloadTracker = courseApplication.getDownloadTracker()
+        downloadTracker.toggleDownload(
+            childFragmentManager,
+            content.title!!,
+            url,
+            "m3u8",
+            DefaultRenderersFactory(context!!)
+        )
+    }
+
     private fun toggleDescription(show: Boolean) {
         if (show) {
             description.visibility = View.VISIBLE

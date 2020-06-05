@@ -17,6 +17,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.offline.DownloadHelper
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector.SelectionOverride
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector.MappedTrackInfo
@@ -55,6 +56,45 @@ class TrackSelectionDialog: DialogFragment() {
                 })
             return trackSelectionDialog
         }
+
+        fun createForDownload(mappedTrackInfo: MappedTrackInfo, onClickListener: DialogInterface.OnClickListener): TrackSelectionDialog {
+            val trackSelectionDialog = TrackSelectionDialog()
+            trackSelectionDialog.titleId = R.string.download
+            trackSelectionDialog.init(
+                mappedTrackInfo,
+                DownloadHelper.DEFAULT_TRACK_SELECTOR_PARAMETERS_WITHOUT_CONTEXT,
+                onClickListener
+            )
+            return trackSelectionDialog
+        }
+
+        fun hasTracks(mappedTrackInfo: MappedTrackInfo): Boolean {
+            for (rendererIndex in 0 until mappedTrackInfo.rendererCount) {
+                if (showTabForRenderer(mappedTrackInfo, rendererIndex)) {
+                    return true
+                }
+            }
+            return false
+        }
+
+        fun showTabForRenderer(
+            mappedTrackInfo: MappedTrackInfo,
+            rendererIndex: Int
+        ): Boolean {
+            val trackGroupArray = mappedTrackInfo.getTrackGroups(rendererIndex)
+            if (trackGroupArray.length == 0) {
+                return false
+            }
+            val trackType = mappedTrackInfo.getRendererType(rendererIndex)
+            return isSupportedTrackType(trackType)
+        }
+
+        private fun isSupportedTrackType(trackType: Int): Boolean {
+            return when (trackType) {
+                C.TRACK_TYPE_VIDEO -> true
+                else -> false
+            }
+        }
     }
 
     fun getIsDisabled(rendererIndex: Int): Boolean {
@@ -88,25 +128,6 @@ class TrackSelectionDialog: DialogFragment() {
                 tabFragments.put(rendererIndex, tabFragment)
                 tabTrackTypes.add(trackType)
             }
-        }
-    }
-
-    private fun showTabForRenderer(
-        mappedTrackInfo: MappedTrackInfo,
-        rendererIndex: Int
-    ): Boolean {
-        val trackGroupArray = mappedTrackInfo.getTrackGroups(rendererIndex)
-        if (trackGroupArray.length == 0) {
-            return false
-        }
-        val trackType = mappedTrackInfo.getRendererType(rendererIndex)
-        return isSupportedTrackType(trackType)
-    }
-
-    private fun isSupportedTrackType(trackType: Int): Boolean {
-        return when (trackType) {
-            C.TRACK_TYPE_VIDEO -> true
-            else -> false
         }
     }
 
