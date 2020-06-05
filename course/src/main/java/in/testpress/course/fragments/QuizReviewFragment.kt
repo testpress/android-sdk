@@ -171,12 +171,7 @@ class QuizReviewFragment: Fragment() {
     }
 
     private fun getPercentageGotCorrect(): Int? {
-        var percentageCorrect: Int? = null
-        val percentageGotCorrectString = userSelectedAnswer.question?.percentageGotCorrect
-        percentageGotCorrectString?.toIntOrNull()?.let {
-            percentageCorrect = percentageGotCorrectString.toInt()
-        }
-        return percentageCorrect
+        return userSelectedAnswer.question?.percentageGotCorrect?.toIntOrNull()
     }
 
     private fun getHtml(): String {
