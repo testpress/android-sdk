@@ -12,7 +12,8 @@ data class DomainQuestion(
     val parentId: Long? = null,
     val type: String? = null,
     val explanation: String? = null,
-    val directionHtml: String? = null
+    val directionHtml: String? = null,
+    val percentageGotCorrect: String? = null
 ) {
     val isSingleMCQType: Boolean = type == "R"
     val isMultipleMCQType: Boolean = type == "C"
@@ -32,6 +33,7 @@ fun Question.asDomainModel(): DomainQuestion {
         parentId = parentId,
         type = type,
         explanation = explanationHtml,
-        directionHtml = directionHtml
+        directionHtml = directionHtml,
+        percentageGotCorrect = percentageGotCorrect
     )
 }
