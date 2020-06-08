@@ -47,7 +47,7 @@ open class QuizExamRepository(val context: Context) {
                     if (exception?.isNetworkError == true) {
                         loadAttemptFromDB(contentId)
                     } else {
-                        _resourceContentAttempt.postValue(Resource.error(exception, null))
+                        _resourceContentAttempt.postValue(Resource.error(exception!!, null))
                     }
                 }
             })
