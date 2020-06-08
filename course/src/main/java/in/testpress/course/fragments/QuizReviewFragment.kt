@@ -25,6 +25,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
+import kotlin.math.roundToInt
 
 class QuizReviewFragment: Fragment() {
     private lateinit var questionsView: WebView
@@ -126,7 +127,7 @@ class QuizReviewFragment: Fragment() {
 
     private fun setDifficulty() {
         val percentageCorrect = getPercentageGotCorrect() ?: return
-        difficultyPercentageText.text = "$percentageCorrect%"
+        difficultyPercentageText.text = "${percentageCorrect.roundToInt()}%"
 
         if (percentageCorrect >= 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -170,8 +171,8 @@ class QuizReviewFragment: Fragment() {
         }
     }
 
-    private fun getPercentageGotCorrect(): Int? {
-        return userSelectedAnswer.question?.percentageGotCorrect?.toIntOrNull()
+    private fun getPercentageGotCorrect(): Float? {
+        return userSelectedAnswer.question?.percentageGotCorrect?.toFloatOrNull()
     }
 
     private fun getHtml(): String {
