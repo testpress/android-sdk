@@ -67,6 +67,7 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
         Bundle bundle = new Bundle();
         bundle.putLong(CONTENT_ID, content.getId());
         bundle.putString(CONTENT_TYPE, content.getContentType());
+        bundle.putString(PRODUCT_SLUG, getIntent().getStringExtra(PRODUCT_SLUG));
         fragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, fragment).commitAllowingStateLoss();
