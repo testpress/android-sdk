@@ -40,9 +40,6 @@ data class DomainExamContent(
     val shareTextForSolutionUnlock: String? = null,
     val showAnalytics: Boolean? = null
 ) {
-    val isPaused: Boolean
-        get() = attemptsCount == 0 && pausedAttemptsCount == 1
-
     fun formattedDate(inputString: String): String {
         var date: Date? = null
         val simpleDateFormat =

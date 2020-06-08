@@ -24,8 +24,8 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
     var page = 1
     val chapter: Chapter
 
-    var _resourceContents: MutableLiveData<Resource<List<DomainContent>>> = MutableLiveData()
-    val resourceContents: LiveData<Resource<List<DomainContent>>>
+    var _resourceContents: MutableLiveData<Resource<List<Content>>> = MutableLiveData()
+    val resourceContents: LiveData<Resource<List<Content>>>
         get() = _resourceContents
 
     init {
@@ -33,7 +33,7 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
             .where(ContentDao.Properties.ChapterId.eq(chapterId))
             .list()
         if (contents.isNotEmpty()) {
-            _resourceContents.postValue(Resource.success(contents.asDomainContents()))
+            _resourceContents.postValue(Resource.success(contents))
         } else {
             _resourceContents.value = Resource.loading(null)
         }
@@ -62,10 +62,7 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
         }
 
         storeContent(response.results)
-        val contents = contentDao.queryBuilder()
-            .where(ContentDao.Properties.ChapterId.eq(chapterId))
-            .list()
-        _resourceContents.postValue(Resource.success(contents.asDomainContents()))
+        _resourceContents.postValue(Resource.success(response.results.contents))
 
         if (response.next != null) {
             page += 1
