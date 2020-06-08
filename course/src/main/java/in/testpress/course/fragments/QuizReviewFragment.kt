@@ -17,6 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -31,6 +32,7 @@ class QuizReviewFragment: Fragment() {
     private lateinit var questionsView: WebView
     lateinit var difficultyTitle: TextView
     lateinit var difficultyPercentageText: TextView
+    lateinit var difficultyLevelContainer: LinearLayout
     lateinit var usersAnsweredRight: TextView
     lateinit var imageView1: ImageView
     lateinit var imageView2: ImageView
@@ -73,7 +75,7 @@ class QuizReviewFragment: Fragment() {
 
     private fun bindViews(view: View) {
         questionsView = view.findViewById(R.id.question)
-
+        difficultyLevelContainer = view.findViewById(R.id.difficulty_layout)
         difficultyTitle = view.findViewById(R.id.difficulty_title)
         difficultyPercentageText = view.findViewById(R.id.difficulty_percentage)
         usersAnsweredRight = view.findViewById(R.id.users_answered_right)
@@ -115,7 +117,6 @@ class QuizReviewFragment: Fragment() {
             override fun onLoadFinished() {
                 super.onLoadFinished()
                 setDifficulty()
-                view!!.findViewById<View>(R.id.difficulty_layout).visibility = View.VISIBLE
 
                 if (instituteSettings.isGrowthHackEnabled) {
                     webViewUtils.addWatermark(instituteSettings.appToolbarLogo)
@@ -128,6 +129,7 @@ class QuizReviewFragment: Fragment() {
     private fun setDifficulty() {
         val percentageCorrect = getPercentageGotCorrect() ?: return
         difficultyPercentageText.text = "${percentageCorrect.roundToInt()}%"
+        difficultyLevelContainer.visibility = View.VISIBLE
 
         if (percentageCorrect >= 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
