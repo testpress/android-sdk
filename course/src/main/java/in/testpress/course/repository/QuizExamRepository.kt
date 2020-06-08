@@ -44,25 +44,30 @@ open class QuizExamRepository(val context: Context) {
                 }
 
                 override fun onException(exception: TestpressException?) {
-                    val contentAttempts = courseAttemptDao.queryBuilder()
-                        .where(CourseAttemptDao.Properties.ChapterContentId.eq(contentId)).list()
-                    val attemptIds = mutableListOf<Int>()
-                    attemptIds.addAll(contentAttempts.map {it.assessmentId.toInt()})
-
-                    val attemptsQuery = attemptDao.queryBuilder().where(AttemptDao.Properties.State.eq("Running"), AttemptDao.Properties.Id.`in`(attemptIds))
-                    val attempts = attemptsQuery.orderDesc(AttemptDao.Properties.Id).list()
-                    lateinit var contentAttempt: CourseAttempt
-
-                    if (attempts.isNotEmpty()) {
-                        contentAttempt = courseAttemptDao.queryBuilder()
-                            .where(CourseAttemptDao.Properties.AssessmentId.eq(attempts[0].id)).list()[0]
-                    } else {
-                        contentAttempt = createLocalContentAttempt(contentId)
-                    }
+                    val contentAttempt = loadAttemptFromDB(contentId)
                     _resourceContentAttempt.postValue(Resource.success(contentAttempt.asDomainContentAttempt()))
                 }
             })
         return resourceContentAttempt
+    }
+
+    fun loadAttemptFromDB(contentId: Long): CourseAttempt {
+        return getRunningAttemptFromDB(contentId) ?: createLocalContentAttempt(contentId)
+    }
+
+    private fun getRunningAttemptFromDB(contentId: Long): CourseAttempt? {
+        val contentAttempts = courseAttemptDao.queryBuilder()
+            .where(CourseAttemptDao.Properties.ChapterContentId.eq(contentId)).list()
+        val attemptIds = contentAttempts.map {it.assessmentId.toInt()}.toIntArray()
+        val attempts = attemptDao.queryBuilder()
+            .where(AttemptDao.Properties.State.eq("Running"), AttemptDao.Properties.Id.`in`(attemptIds))
+            .orderDesc(AttemptDao.Properties.Id).list()
+
+        if (attempts.isNotEmpty()) {
+            return courseAttemptDao.queryBuilder()
+                .where(CourseAttemptDao.Properties.AssessmentId.eq(attempts[0].id)).list()[0]
+        }
+        return null
     }
 
     fun createLocalContentAttempt(contentId: Long): CourseAttempt {
