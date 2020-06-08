@@ -44,10 +44,10 @@ open class QuizExamRepository(val context: Context) {
                 }
 
                 override fun onException(exception: TestpressException?) {
-                    if (exception?.isForbidden == true) {
-                        _resourceContentAttempt.postValue(Resource.error(exception, null))
-                    } else {
+                    if (exception?.isNetworkError == true) {
                         loadAttemptFromDB(contentId)
+                    } else {
+                        _resourceContentAttempt.postValue(Resource.error(exception, null))
                     }
                 }
             })
