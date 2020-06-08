@@ -107,6 +107,7 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
             } else {
                 _resourceUserSelectedAnswers.postValue(Resource.success(userSelectedAnswers.asDomainModels()))
             }
+            fetchQuestions(url, examId, attemptId)
         } else {
             cleanQuestionInDB(examId)
             fetchQuestions(url, examId, attemptId)
