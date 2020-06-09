@@ -142,6 +142,7 @@ public class ReviewStatsFragment extends BaseFragment {
         bindViews(view);
         showOrHideShareButton();
         addClickListeners();
+        hideViewsForQuiz();
     }
 
     private void bindViews(View view) {
@@ -347,7 +348,6 @@ public class ReviewStatsFragment extends BaseFragment {
         }
         reviewStatLayout.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
-        hideViewsForQuiz();
     }
 
     private void hideViewsForQuiz() {
