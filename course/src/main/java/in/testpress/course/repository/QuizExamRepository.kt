@@ -58,7 +58,7 @@ open class QuizExamRepository(val context: Context) {
     private fun getRunningAttemptFromDB(contentId: Long): CourseAttempt? {
         val contentAttempts = courseAttemptDao.queryBuilder()
             .where(CourseAttemptDao.Properties.ChapterContentId.eq(contentId)).list()
-        val attemptIds = contentAttempts.map {it.assessmentId.toInt()}.toIntArray()
+        val attemptIds = contentAttempts.map {it.assessmentId.toInt()}
         val attempts = attemptDao.queryBuilder()
             .where(AttemptDao.Properties.State.eq("Running"), AttemptDao.Properties.Id.`in`(attemptIds))
             .orderDesc(AttemptDao.Properties.Id).list()
