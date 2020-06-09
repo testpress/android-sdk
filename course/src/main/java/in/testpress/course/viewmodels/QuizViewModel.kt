@@ -1,16 +1,9 @@
 package `in`.testpress.course.viewmodels
 
 import `in`.testpress.course.domain.DomainContentAttempt
-import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.course.network.Resource
 import `in`.testpress.course.repository.QuizQuestionsRepository
-import `in`.testpress.course.repository.UserSelectedAnswersRepository
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
-import `in`.testpress.exam.models.AttemptItem
-import `in`.testpress.exam.network.NetworkAttempt
-import `in`.testpress.exam.network.NetworkUserSelectedAnswer
-import `in`.testpress.models.greendao.ExamQuestion
-import `in`.testpress.models.greendao.UserSelectedAnswer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
