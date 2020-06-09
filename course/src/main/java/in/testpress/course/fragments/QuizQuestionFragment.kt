@@ -110,10 +110,6 @@ class QuizQuestionFragment : Fragment() {
         val question = userSelectedAnswer.question!!
         var htmlContent = "<div class='quiz_question_container'>"
 
-        // Add index
-        htmlContent += "<div style='padding-right:10px; padding-left:10px;'>" +
-            "<div class='question-index'>${position + 1}</div>"
-
         question.directionHtml?.let {
             htmlContent += "<div class='question' style='padding-bottom: 0px;'>${it}</div>"
         }

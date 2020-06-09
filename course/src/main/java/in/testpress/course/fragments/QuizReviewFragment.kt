@@ -189,7 +189,6 @@ class QuizReviewFragment: Fragment() {
 
     private fun getQuestionHtml(question: DomainQuestion): String {
         var htmlContent = ""
-        htmlContent += "<div><div class='review-question-index'>${position + 1}</div>"
 
         question.directionHtml?.let {
             htmlContent += "<div class='question' style='padding-bottom: 0px;'>${it}</div>"
