@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 import android.view.LayoutInflater;
@@ -124,8 +126,18 @@ public class ReviewStatsFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.testpress_fragment_review_stats, container, false);
+    }
 
-        final View view = inflater.inflate(R.layout.testpress_fragment_review_stats, container, false);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        bindViews(view);
+        showOrHideShareButton();
+        addClickListeners();
+    }
+
+    private void bindViews(View view) {
         progressBar = (ProgressBar) view.findViewById(R.id.pb_loading);
         UIUtils.setIndeterminateDrawable(getActivity(), progressBar, 4);
         emptyView = view.findViewById(R.id.empty_container);
@@ -187,9 +199,6 @@ public class ReviewStatsFragment extends BaseFragment {
                 },
                 TestpressSdk.getRubikRegularFont(getContext()));
 
-        showOrHideShareButton();
-        addClickListeners();
-        return view;
     }
 
     private void addClickListeners() {
