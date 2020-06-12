@@ -32,6 +32,7 @@ import in.testpress.exam.util.RetakeExamUtil;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
+import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.network.RetrofitCall;
@@ -86,6 +87,9 @@ public class ReviewStatsFragment extends BaseFragment {
     private LinearLayout timeAnalyticsButtonLayout;
     private LinearLayout shareButtonLayout;
     private LinearLayout statsButtonLayout;
+    private LinearLayout totalTimeLayout;
+    private LinearLayout cutoffLayout;
+    private LinearLayout totalMarksLayout;
     private Button shareButton;
     private TextView reviewQuestionsButton;
     private TextView emailPdfButton;
@@ -95,6 +99,7 @@ public class ReviewStatsFragment extends BaseFragment {
     private Exam exam;
     private InstituteSettings instituteSettings;
     private RetrofitCall<TestpressApiResponse<Attempt>> attemptsApiRequest;
+    private boolean isQuiz = false;
 
     public static void showReviewStatsFragment(FragmentActivity activity, Exam exam, Attempt attempt,
                                                boolean showRetakeButton) {
@@ -120,6 +125,8 @@ public class ReviewStatsFragment extends BaseFragment {
         CourseAttempt courseAttempt = getArguments().getParcelable(PARAM_COURSE_ATTEMPT);
         if (courseAttempt != null) {
             attempt = courseAttempt.getRawAssessment();
+            Content content = courseAttempt.getChapterContent();
+            isQuiz = (content != null) && (content.getContentType().equals("Quiz"));
         }
     }
 
@@ -135,6 +142,9 @@ public class ReviewStatsFragment extends BaseFragment {
         bindViews(view);
         showOrHideShareButton();
         addClickListeners();
+        if (isQuiz) {
+            hideViewsForQuiz();
+        }
     }
 
     private void bindViews(View view) {
@@ -177,6 +187,9 @@ public class ReviewStatsFragment extends BaseFragment {
         shareButton = view.findViewById(R.id.share_to_unlock);
         shareButtonLayout = view.findViewById(R.id.share_button_layout);
         statsButtonLayout = view.findViewById(R.id.button_layout);
+        totalMarksLayout = view.findViewById(R.id.total_marks_layout);
+        totalTimeLayout = view.findViewById(R.id.total_time_layout);
+        cutoffLayout = view.findViewById(R.id.cutoff_layout);
         ViewUtils.setTypeface(
                 new TextView[] {
                         score, rank, correct, incorrect, timeTaken, accuracy, reviewQuestionsButton,
@@ -337,6 +350,14 @@ public class ReviewStatsFragment extends BaseFragment {
         }
         reviewStatLayout.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
+    }
+
+    private void hideViewsForQuiz() {
+        totalMarksLayout.setVisibility(View.GONE);
+        totalTimeLayout.setVisibility(View.GONE);
+        cutoffLayout.setVisibility(View.GONE);
+        scoreLayout.setVisibility(View.GONE);
+        percentageLayout.setVisibility(View.GONE);
     }
 
     private boolean isAppNotSharedAlready() {
