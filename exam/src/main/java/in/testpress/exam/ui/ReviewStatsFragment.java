@@ -142,7 +142,9 @@ public class ReviewStatsFragment extends BaseFragment {
         bindViews(view);
         showOrHideShareButton();
         addClickListeners();
-        hideViewsForQuiz();
+        if (isQuiz) {
+            hideViewsForQuiz();
+        }
     }
 
     private void bindViews(View view) {
@@ -351,13 +353,11 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void hideViewsForQuiz() {
-        if (isQuiz) {
-            totalMarksLayout.setVisibility(View.GONE);
-            totalTimeLayout.setVisibility(View.GONE);
-            cutoffLayout.setVisibility(View.GONE);
-            scoreLayout.setVisibility(View.GONE);
-            percentageLayout.setVisibility(View.GONE);
-        }
+        totalMarksLayout.setVisibility(View.GONE);
+        totalTimeLayout.setVisibility(View.GONE);
+        cutoffLayout.setVisibility(View.GONE);
+        scoreLayout.setVisibility(View.GONE);
+        percentageLayout.setVisibility(View.GONE);
     }
 
     private boolean isAppNotSharedAlready() {
