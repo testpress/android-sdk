@@ -19,6 +19,7 @@ class QuizSlideFragment: Fragment(), NextQuizHandler {
     var startIndex: Int = 0
     var totalNoOfQuestions: Int = 1
     lateinit var endHanlder: ExamEndHanlder
+    var questionNumberHandler: QuestionNumberHandler? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.quiz_slide_layout, container, false)
@@ -49,6 +50,7 @@ class QuizSlideFragment: Fragment(), NextQuizHandler {
         viewPager.adapter = QuizSlideAdapter(this)
         viewPager.isUserInputEnabled = false
         viewPager.post { viewPager.setCurrentItem(startIndex, true) }
+        questionNumberHandler?.changeQuestionNumber(startIndex + 1, totalNoOfQuestions)
     }
 
     private fun parseArguments() {
@@ -63,6 +65,7 @@ class QuizSlideFragment: Fragment(), NextQuizHandler {
             endHanlder.endExam()
             return
         }
+        questionNumberHandler?.changeQuestionNumber(viewPager.currentItem + 2, totalNoOfQuestions)
         viewPager.setCurrentItem(viewPager.currentItem + 1, true)
     }
 
@@ -86,4 +89,8 @@ class QuizSlideFragment: Fragment(), NextQuizHandler {
 
 interface ExamEndHanlder {
     fun endExam()
+}
+
+interface QuestionNumberHandler {
+    fun changeQuestionNumber(number: Int, total: Int)
 }

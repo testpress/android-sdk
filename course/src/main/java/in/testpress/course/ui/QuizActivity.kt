@@ -1,10 +1,12 @@
 package `in`.testpress.course.ui
 
 import `in`.testpress.core.TestpressException
+import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.enums.Status
 import `in`.testpress.course.fragments.ExamEndHanlder
 import `in`.testpress.course.fragments.LoadingQuestionsFragment
+import `in`.testpress.course.fragments.QuestionNumberHandler
 import `in`.testpress.course.fragments.QuizSlideFragment
 import `in`.testpress.course.fragments.ShowQuizHandler
 import `in`.testpress.course.repository.QuizExamRepository
@@ -18,12 +20,13 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder {
+class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, QuestionNumberHandler {
     lateinit var viewModel: QuizExamViewModel
     private var examEndUrl: String? = null
     private var contentAttemptId: Long = -1
@@ -31,16 +34,23 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder {
     private var examId: Long = -1
     private var alertDialog: AlertDialog? = null
     private lateinit var dialog: Dialog
+    private lateinit var questionNumberView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.testpress_container_layout)
+        setContentView(R.layout.quiz_container_layout)
         examId = intent.getLongExtra("EXAM_ID", -1)
         dialog = ProgressDialog.progressDialog(this, "Ending Exam")
+        bindViews()
         initializeViewModel()
         initializeListeners()
         loadQuestions()
         customiseToolbar()
+    }
+
+    private fun bindViews() {
+        questionNumberView = findViewById(R.id.question_number)
+        questionNumberView.typeface = TestpressSdk.getRubikMediumFont(this)
     }
 
     private fun customiseToolbar() {
@@ -142,6 +152,7 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder {
             }
             val quizSlideFragment = QuizSlideFragment().apply { arguments=bundle }
             quizSlideFragment.endHanlder = this
+            quizSlideFragment.questionNumberHandler = this
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, quizSlideFragment).commitAllowingStateLoss()
         })
@@ -155,5 +166,10 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder {
         } else {
             viewModel.endExam(examEndUrl!!, attemptId)
         }
+    }
+
+    override fun changeQuestionNumber(number: Int, total: Int) {
+        questionNumberView.visibility = View.VISIBLE
+        questionNumberView.text = "$number of $total"
     }
 }
