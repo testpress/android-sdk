@@ -44,15 +44,19 @@ open class QuizExamRepository(val context: Context) {
                 }
 
                 override fun onException(exception: TestpressException?) {
-                    val contentAttempt = loadAttemptFromDB(contentId)
-                    _resourceContentAttempt.postValue(Resource.success(contentAttempt.asDomainContentAttempt()))
+                    if (exception?.isNetworkError == true) {
+                        loadAttemptFromDB(contentId)
+                    } else {
+                        _resourceContentAttempt.postValue(Resource.error(exception!!, null))
+                    }
                 }
             })
         return resourceContentAttempt
     }
 
-    fun loadAttemptFromDB(contentId: Long): CourseAttempt {
-        return getRunningAttemptFromDB(contentId) ?: createLocalContentAttempt(contentId)
+    fun loadAttemptFromDB(contentId: Long) {
+        val contentAttempt = getRunningAttemptFromDB(contentId) ?: createLocalContentAttempt(contentId)
+        _resourceContentAttempt.postValue(Resource.success(contentAttempt.asDomainContentAttempt()))
     }
 
     private fun getRunningAttemptFromDB(contentId: Long): CourseAttempt? {
