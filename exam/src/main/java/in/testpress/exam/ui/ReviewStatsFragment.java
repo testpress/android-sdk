@@ -357,7 +357,6 @@ public class ReviewStatsFragment extends BaseFragment {
             cutoffLayout.setVisibility(View.GONE);
             scoreLayout.setVisibility(View.GONE);
             percentageLayout.setVisibility(View.GONE);
-            percentileLayout.setVisibility(View.GONE);
         }
     }
 
