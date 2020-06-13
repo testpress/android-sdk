@@ -10,15 +10,16 @@ data class NetworkContentAttempt(
     val objectId: Int? = null,
     val objectUrl: String? = null,
     val trophies: String? = null,
-    val chapterContentId: Long? = null,
+    var chapterContentId: Long? = null,
     var assessmentId: Long? = null,
     val userVideoId: Long? = null,
     val assessment: NetworkAttempt? = null,
-    val video: NetworkVideoAttempt? = null
+    val video: NetworkVideoAttempt? = null,
+    val chapterContent: NetworkContent? = null
 )
 
 fun createContentAttempt(contentAttempt: NetworkContentAttempt): CourseAttempt {
-    return CourseAttempt(
+    val courseAttempt = CourseAttempt(
         contentAttempt.id,
         contentAttempt.type,
         contentAttempt.objectId,
@@ -28,6 +29,8 @@ fun createContentAttempt(contentAttempt: NetworkContentAttempt): CourseAttempt {
         contentAttempt.assessmentId,
         contentAttempt.userVideoId
     )
+    courseAttempt.chapterContent = contentAttempt.chapterContent?.asGreenDaoModel()
+    return courseAttempt
 }
 
 fun createDomainContentAttempt(contentAttempt: NetworkContentAttempt): DomainContentAttempt {

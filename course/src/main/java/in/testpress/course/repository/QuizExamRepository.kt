@@ -87,6 +87,7 @@ open class QuizExamRepository(val context: Context) {
 
     fun saveContentAttempt(contentAttempt: NetworkContentAttempt?) {
         contentAttempt?.assessmentId = contentAttempt?.assessment?.id
+        contentAttempt?.chapterContentId = contentAttempt?.chapterContent?.id
         attemptDao.insertOrReplaceInTx(contentAttempt?.assessment?.asGreenDaoModel())
         courseAttemptDao.insertOrReplaceInTx(contentAttempt?.asGreenDaoModel())
     }
