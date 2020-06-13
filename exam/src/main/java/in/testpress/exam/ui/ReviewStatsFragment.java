@@ -125,7 +125,7 @@ public class ReviewStatsFragment extends BaseFragment {
         CourseAttempt courseAttempt = getArguments().getParcelable(PARAM_COURSE_ATTEMPT);
         if (courseAttempt != null) {
             attempt = courseAttempt.getRawAssessment();
-            Content content = courseAttempt.getChapterContent();
+            Content content = courseAttempt.getRawChapterContent();
             isQuiz = (content != null) && (content.getContentType().equals("Quiz"));
         }
     }
