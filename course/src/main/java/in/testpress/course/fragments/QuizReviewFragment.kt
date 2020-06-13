@@ -116,6 +116,8 @@ class QuizReviewFragment: Fragment() {
 
             override fun onLoadFinished() {
                 super.onLoadFinished()
+                if (context == null) return
+
                 setDifficulty()
 
                 if (instituteSettings.isGrowthHackEnabled) {
