@@ -35,6 +35,10 @@ public class ApiResponse<T> {
         return next;
     }
 
+    public boolean hasNextPage() {
+        return next != null;
+    }
+
     /**
      *
      * @param next
