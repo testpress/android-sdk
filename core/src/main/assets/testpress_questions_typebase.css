@@ -85,12 +85,12 @@ p {
 }
 
 .review-option-item {
-    padding-top: 10px;
-    padding-bottom: 20px;
+    padding-bottom: 5px;
     padding-right: 10px;
     padding-left: 10px;
     display: flex;
     flex-flow: row;
+    font-size: 15px;
     color: #444;
     font-family: 'PT-Serif-Regular', serif;
 }
@@ -103,7 +103,7 @@ p {
     margin-bottom: auto;
     margin-left: 10px;
     margin-right: 5px;
-    font-size: 1rem;
+    font-size: 15px;
     font-family: 'Rubik-Medium', sans-serif;
 }
 
@@ -158,10 +158,24 @@ p {
     color: #666;
     text-align: left !important;
     font-family: 'PT-Serif-Regular', serif;
-    margin-top: 10px;
-    margin-bottom: 5px;
+    margin-top: 5px;
     margin-left: 10px;
     margin-right: 10px;
+    font-size: 15px;
+}
+
+.review-question-container .question {
+    font-size: 15px;
+    line-height: 0 !important;
+}
+
+.review-question-container .question p {
+    line-height: 1.5em;
+}
+
+.correct-answer {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .review-explanation p{

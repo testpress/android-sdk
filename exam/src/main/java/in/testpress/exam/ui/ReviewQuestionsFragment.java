@@ -346,7 +346,7 @@ public class ReviewQuestionsFragment extends Fragment {
     private String getHtml(String directionHtml, String questionHtml,
                            Object answers, String explanationHtml, String subject) {
 
-        String html = "<div style='padding-left: 2px; padding-right: 4px;'>";
+        String html = "<div class='review-question-container' style='padding-left: 2px; padding-right: 4px;'>";
 
         // Add index
         html += "<div>" +
@@ -435,7 +435,7 @@ public class ReviewQuestionsFragment extends Fragment {
 
         if (isSingleMCQType || isMultipleMCQType || isNumericalType) {
             // Add correct answer
-            html += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
+            html += "<div class='correct-answer' style='display:box; display:-webkit-box;'>" +
                     WebViewUtils.getHeadingTags(getString(R.string.testpress_correct_answer)) +
                     correctAnswerHtml +
                     "</div>";
