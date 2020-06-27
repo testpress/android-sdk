@@ -125,6 +125,7 @@ public class ReviewQuestionsFragment extends Fragment {
         imageUtils = new ImageUtils(rootLayout, this);
         //noinspection ConstantConditions
         instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
+        loadComments = instituteSettings.getBaseUrl().contains("elixir") || instituteSettings.getBaseUrl().contains("medpgbasics");
 
         List<ReviewItem> reviewItems = reviewItemDao.queryBuilder()
                 .where(ReviewItemDao.Properties.Id.eq(reviewItemId)).list();
