@@ -81,7 +81,7 @@ class ContentListAdapter(val chapterId: Long,
         if (course.isMyCourse == true) {
             return false
         }
-        return productSlug != null && content.freePreview != true
+        return content.freePreview != true
     }
 
     companion object {
