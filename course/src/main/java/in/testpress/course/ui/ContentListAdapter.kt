@@ -60,9 +60,14 @@ class ContentListAdapter(val chapterId: Long,
 
     private fun onItemClick(content: DomainContent, context: Context) {
         if (shouldPurchase(content, context)) {
-            val intent = Intent(context, ProductDetailsActivity::class.java)
-            intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, productSlug)
-             (context as Activity).startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE)
+            if (productSlug != null) {
+                val intent = Intent(context, ProductDetailsActivity::class.java)
+                intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, productSlug)
+                (context as Activity).startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE)
+            } else {
+                val intent = Intent(context, AvailableCoursesListActivity::class.java)
+                (context as Activity).startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE)
+            }
         } else if (content.isLocked != true && content.isScheduled != true) {
             context.startActivity(ContentActivity.createIntent(
                     content.id,
