@@ -33,6 +33,11 @@
 
         <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
+            android:text="Course Detail"
+            android:id="@+id/course_contents" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/Button"
             android:text="Chapter Detail"
             android:id="@+id/chapter_contents" />
 

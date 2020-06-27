@@ -50,6 +50,19 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                 showSDK(R.id.leaderboard);
             }
         });
+        findViewById(R.id.course_contents).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ViewUtils.showInputDialogBox(CourseSampleActivity.this, "Enter Course ID",
+                        new ViewUtils.OnInputCompletedListener() {
+                            @Override
+                            public void onInputComplete(String inputText) {
+                                text = inputText;
+                                showSDK(R.id.course_contents);
+                            }
+                        });
+            }
+        });
         findViewById(R.id.chapter_contents).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,6 +113,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                     break;
                 case R.id.gamified_course:
                 case R.id.leaderboard:
+                case R.id.course_contents:
                 case R.id.chapter_contents:
                 case R.id.content_detail:
                     session.getInstituteSettings()
@@ -123,6 +137,10 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                     break;
                 case R.id.leaderboard:
                     TestpressCourse.showLeaderboard(this, session);
+                    break;
+                case R.id.course_contents:
+                    TestpressCourse.showChapters(this, "Course Detail",
+                            Integer.parseInt(text), session);
                     break;
                 case R.id.chapter_contents:
                     String url = session.getInstituteSettings().getBaseUrl() +
