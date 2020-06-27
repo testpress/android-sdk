@@ -2,7 +2,6 @@ package in.testpress.course;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -13,18 +12,14 @@ import java.util.List;
 
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
-import in.testpress.course.ui.ChapterDetailActivity;
-import in.testpress.course.ui.CoursePreviewActivity;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.Product;
 import in.testpress.models.greendao.ProductDao;
+import in.testpress.store.TestpressStore;
 import in.testpress.store.ui.ProductDetailsActivity;
 import in.testpress.util.ImageUtils;
-import in.testpress.util.IntegerList;
 import in.testpress.util.SingleTypeAdapter;
-
-import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 
 
 public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
@@ -106,34 +101,15 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
         view(5).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openCoursesOrChapters(product);
+                showProductDetail(product);
             }
         });
     }
 
-    private void openCoursesOrChapters(Product product) {
-        if (product.getCourseIds().size() > 1) {
-            openCoursesList(product.getCourseIds(), product.getSlug());
-        } else if (product.getCourseIds().size() == 1) {
-            openChapters(product.getCourseIds().get(0), product.getSlug());
-        } else {
-            Intent intent = new Intent(activity, ProductDetailsActivity.class);
-            intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.getSlug());
-            activity.startActivityForResult(intent, STORE_REQUEST_CODE);
-        }
-    }
-
-    private void openCoursesList(IntegerList courseIds, String productSlug) {
-        activity.startActivity(CoursePreviewActivity.createIntent(courseIds, activity, productSlug));
-    }
-
-    private void openChapters(Integer courseId, String productSlug) {
-        List<Course> courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.in(courseId)).list();
-        Course course = courses.get(0);
-        activity.startActivity(ChapterDetailActivity.createIntent(
-                course.getTitle(),
-                course.getId().toString(),
-                activity, productSlug));
+    private void showProductDetail(Product product) {
+        Intent intent = new Intent(activity, ProductDetailsActivity.class);
+        intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.getSlug());
+        activity.startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE);
     }
 
 }
