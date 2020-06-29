@@ -120,7 +120,7 @@ class QuizReviewFragment: Fragment() {
 
                 setDifficulty()
 
-                if (instituteSettings.isGrowthHackEnabled) {
+                if (instituteSettings.isGrowthHackEnabled || instituteSettings.baseUrl.contains("edzorb")) {
                     webViewUtils.addWatermark(instituteSettings.appToolbarLogo)
                 }
             }

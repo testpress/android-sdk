@@ -98,7 +98,7 @@ class QuizQuestionFragment : Fragment() {
 
             override fun onLoadFinished() {
                 super.onLoadFinished()
-                if (instituteSettings.isGrowthHackEnabled) {
+                if (instituteSettings.isGrowthHackEnabled || instituteSettings.baseUrl.contains("edzorb")) {
                     webViewUtils.addWatermark(instituteSettings.appToolbarLogo)
                 }
             }

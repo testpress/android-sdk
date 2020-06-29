@@ -214,7 +214,7 @@ public class ReviewQuestionsFragment extends Fragment {
                 animationView.bringToFront();
                 webViewUtils.addLogo(instituteSettings.getAppToolbarLogo());
 
-                if (instituteSettings.isGrowthHackEnabled()) {
+                if (instituteSettings.isGrowthHackEnabled() || instituteSettings.getBaseUrl().contains("edzorb")) {
                     webViewUtils.addWatermark(instituteSettings.getAppToolbarLogo());
                 }
                 setHasOptionsMenu(true);

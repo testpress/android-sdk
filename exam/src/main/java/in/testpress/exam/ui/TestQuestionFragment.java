@@ -94,7 +94,7 @@ public class TestQuestionFragment extends Fragment {
                 @Override
                 protected void onLoadFinished() {
                     super.onLoadFinished();
-                    if (instituteSettings.isGrowthHackEnabled()) {
+                    if (instituteSettings.isGrowthHackEnabled() || instituteSettings.getBaseUrl().contains("edzorb")) {
                         webViewUtils.addWatermark(instituteSettings.getAppToolbarLogo());
                     }
                 }
