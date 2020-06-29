@@ -17,9 +17,13 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import in.testpress.R;
+import in.testpress.core.TestpressSdk;
+import in.testpress.core.TestpressSession;
 import in.testpress.ui.view.TouchImageView;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.UIUtils;
+
+import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 
 public class ZoomableImageActivity extends Activity {
 
@@ -30,6 +34,15 @@ public class ZoomableImageActivity extends Activity {
         Intent intent = new Intent(context, ZoomableImageActivity.class);
         intent.putExtra(IMAGE_URL, imageUrl);
         return intent;
+    }
+
+    @Override
+    public void setContentView(final int layoutResId) {
+        TestpressSession session = TestpressSdk.getTestpressSession(this);
+        if (session != null && session.getInstituteSettings().isScreenshotDisabled()) {
+            getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
+        }
+        super.setContentView(layoutResId);
     }
 
     @Override
