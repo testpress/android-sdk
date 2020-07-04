@@ -56,6 +56,7 @@ public class Content implements android.os.Parcelable {
     private String coverImage;
     private Long courseId;
     private Long chapterId;
+    private Long videoConferenceId;
     private Long htmlId;
     private Long videoId;
     private Long attachmentId;
@@ -74,6 +75,12 @@ public class Content implements android.os.Parcelable {
 
     @Generated
     private transient Long chapter__resolvedKey;
+
+    @ToOne(joinProperty = "videoConferenceId")
+    private VideoConference videoConference;
+
+    @Generated
+    private transient Long videoConference__resolvedKey;
 
     @ToOne(joinProperty = "htmlId")
     private HtmlContent htmlContent;
@@ -117,7 +124,7 @@ public class Content implements android.os.Parcelable {
     }
 
     @Generated
-    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, String coverImage, Long courseId, Long chapterId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
+    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, String coverImage, Long courseId, Long chapterId, Long videoConferenceId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
         this.order = order;
         this.htmlContentTitle = htmlContentTitle;
         this.htmlContentUrl = htmlContentUrl;
@@ -145,6 +152,7 @@ public class Content implements android.os.Parcelable {
         this.coverImage = coverImage;
         this.courseId = courseId;
         this.chapterId = chapterId;
+        this.videoConferenceId = videoConferenceId;
         this.htmlId = htmlId;
         this.videoId = videoId;
         this.attachmentId = attachmentId;
@@ -374,6 +382,14 @@ public class Content implements android.os.Parcelable {
         this.chapterId = chapterId;
     }
 
+    public Long getVideoConferenceId() {
+        return videoConferenceId;
+    }
+
+    public void setVideoConferenceId(Long videoConferenceId) {
+        this.videoConferenceId = videoConferenceId;
+    }
+
     public Long getHtmlId() {
         return htmlId;
     }
@@ -428,6 +444,31 @@ public class Content implements android.os.Parcelable {
             this.chapter = chapter;
             chapterId = chapter == null ? null : chapter.getId();
             chapter__resolvedKey = chapterId;
+        }
+    }
+
+    /** To-one relationship, resolved on first access. */
+    @Generated
+    public VideoConference getVideoConference() {
+        Long __key = this.videoConferenceId;
+        if (videoConference__resolvedKey == null || !videoConference__resolvedKey.equals(__key)) {
+            __throwIfDetached();
+            VideoConferenceDao targetDao = daoSession.getVideoConferenceDao();
+            VideoConference videoConferenceNew = targetDao.load(__key);
+            synchronized (this) {
+                videoConference = videoConferenceNew;
+            	videoConference__resolvedKey = __key;
+            }
+        }
+        return videoConference;
+    }
+
+    @Generated
+    public void setVideoConference(VideoConference videoConference) {
+        synchronized (this) {
+            this.videoConference = videoConference;
+            videoConferenceId = videoConference == null ? null : videoConference.getId();
+            videoConference__resolvedKey = videoConferenceId;
         }
     }
 
@@ -712,6 +753,13 @@ public class Content implements android.os.Parcelable {
             return attachment;
         }
         return getAttachment();
+    }
+
+    public VideoConference getRawVideoConference() {
+        if (myDao == null || videoConference != null) {
+            return videoConference;
+        }
+        return getVideoConference();
     }
 
     public Exam getRawExam() {

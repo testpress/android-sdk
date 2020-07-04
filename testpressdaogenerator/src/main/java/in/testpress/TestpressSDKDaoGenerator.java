@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 35;
+    private static final int VERSION = 36;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -55,7 +55,9 @@ public class TestpressSDKDaoGenerator {
         Entity stream = addStream(schema);
         Entity attachment = addAttachment(schema);
         Entity exam = addExam(schema);
+        Entity videoConference = addVideoConference(schema);
         addLanguage(schema, exam);
+        addVideoConferenceToContent(content, videoConference);
         addHTMLToContent(content, html);
         addVideoToContent(content, video);
         addStreamToVideo(stream, video);
@@ -276,6 +278,11 @@ public class TestpressSDKDaoGenerator {
         content.addToOne(exam, examId, "exam");
     }
 
+    private static void addVideoConferenceToContent(Entity content, Entity videoConference) {
+        Property htmlId = content.addLongProperty("videoConferenceId").getProperty();
+        content.addToOne(videoConference, htmlId, "videoConference");
+    }
+
     private static void addHTMLToContent(Entity content, Entity html) {
         Property htmlId = content.addLongProperty("htmlId").getProperty();
         content.addToOne(html, htmlId, "htmlContent");
@@ -372,6 +379,18 @@ public class TestpressSDKDaoGenerator {
         attachment.addLongProperty("id").primaryKey();
         attachment.implementsInterface("android.os.Parcelable");
         return attachment;
+    }
+
+    private static Entity addVideoConference(Schema schema) {
+        Entity video = schema.addEntity("VideoConference");
+        video.addStringProperty("title");
+        video.addStringProperty("joinUrl");
+        video.addLongProperty("id").primaryKey();
+        video.addStringProperty("start");
+        video.addIntProperty("duration");
+        video.addStringProperty("provider");
+        video.addStringProperty("conferenceId");
+        return video;
     }
 
     private static Entity addVideo(Schema schema) {
