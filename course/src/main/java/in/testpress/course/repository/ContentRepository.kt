@@ -142,6 +142,12 @@ open class ContentRepository(
             greenDaoContent.attachmentId = attachment.id
             attachmentDao.insertOrReplace(it.asGreenDaoModel())
         }
+        content.videoConference?.let {
+            val videoConferenceDao = TestpressSDKDatabase.getVideoConferenceDao(context)
+            val videoConference = it.asGreenDaoModel()
+            greenDaoContent.videoConferenceId = videoConference.id
+            videoConferenceDao.insertOrReplace(it.asGreenDaoModel())
+        }
         contentDao.insertOrReplace(greenDaoContent)
     }
 }

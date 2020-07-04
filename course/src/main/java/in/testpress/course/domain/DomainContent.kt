@@ -49,7 +49,8 @@ data class DomainContent(
     val attachment: DomainAttachmentContent? = null,
     val htmlContent: DomainHtmlContent? = null,
     var exam: DomainExamContent? = null,
-    val video: DomainVideoContent? = null
+    val video: DomainVideoContent? = null,
+    val videoConference: DomainVideoConferenceContent? = null
 ) {
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
@@ -140,7 +141,8 @@ fun createDomainContent(content: Content): DomainContent {
         htmlContent = content.rawHtmlContent?.asDomainContent(),
         exam = content.rawExam?.asDomainContent(),
         video = content.rawVideo?.asDomainContent(),
-        attemptsUrl = content.attemptsUrl
+        attemptsUrl = content.attemptsUrl,
+        videoConference = content.rawVideoConference?.asDomainContent()
     )
 }
 

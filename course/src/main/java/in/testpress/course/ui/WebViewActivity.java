@@ -32,6 +32,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+
 import in.testpress.course.R;
 import in.testpress.ui.BaseToolBarActivity;
 
@@ -112,6 +114,7 @@ public class WebViewActivity extends BaseToolBarActivity {
             ActivityCompat.requestPermissions(WebViewActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
         }
 
+
         webView = (WebView) findViewById(R.id.course_webview);
         assert webView != null;
 
@@ -135,7 +138,7 @@ public class WebViewActivity extends BaseToolBarActivity {
                 return false;
             }
         });
-        webView.loadUrl(url);
+        webView.loadUrl(url, getHttpHeaders());
         webView.setWebChromeClient(new WebChromeClient() {
 
             //For Android 3.0+
@@ -219,6 +222,15 @@ public class WebViewActivity extends BaseToolBarActivity {
                 return true;
             }
         });
+    }
+
+    private HashMap getHttpHeaders() {
+        HashMap hashMap = new HashMap();
+
+        if (getIntent().hasExtra("JWT_TOKEN")) {
+            hashMap.put("Authorization", "JWT " + getIntent().getStringExtra("JWT_TOKEN"));
+        }
+        return hashMap;
     }
 
     public void setUrl(String url) {
