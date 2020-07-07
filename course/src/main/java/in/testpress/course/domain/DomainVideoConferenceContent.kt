@@ -19,7 +19,7 @@ data class DomainVideoConferenceContent(
     private fun formattedDate(inputString: String): String {
         var date: Date? = null
         val simpleDateFormat =
-            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ")
         simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
         try {
             if (inputString.isNotEmpty()) {

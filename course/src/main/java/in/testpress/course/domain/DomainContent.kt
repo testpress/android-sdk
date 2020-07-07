@@ -38,6 +38,7 @@ data class DomainContent(
     val examId: Long? = null,
     val attachmentId: Long? = null,
     val videoId: Long? = null,
+    val videoConferenceID: Long? = null,
     val htmlId: Long? = null,
     val start: String? = null,
     val end: String? = null,
@@ -142,6 +143,7 @@ fun createDomainContent(content: Content): DomainContent {
         exam = content.rawExam?.asDomainContent(),
         video = content.rawVideo?.asDomainContent(),
         attemptsUrl = content.attemptsUrl,
+        videoConferenceID = content.videoConferenceId,
         videoConference = content.rawVideoConference?.asDomainContent()
     )
 }

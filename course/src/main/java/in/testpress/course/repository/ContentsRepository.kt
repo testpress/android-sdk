@@ -98,6 +98,9 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
         val videoDao = TestpressSDKDatabase.getVideoDao(context)
         videoDao.insertOrReplaceInTx(response.videos)
 
+        val videoConferenceDao = TestpressSDKDatabase.getVideoConferenceDao(context)
+        videoConferenceDao.insertOrReplaceInTx(response.videoConferences)
+
         val contentDao = TestpressSDKDatabase.getContentDao(context)
         contentDao.insertOrReplaceInTx(response.contents)
 
