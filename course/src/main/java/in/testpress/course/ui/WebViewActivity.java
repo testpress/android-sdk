@@ -21,6 +21,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -117,13 +118,9 @@ public class WebViewActivity extends BaseToolBarActivity {
 
         webView = (WebView) findViewById(R.id.course_webview);
         assert webView != null;
-
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setAllowFileAccess(true);
+        setUpWebViewDefaults();
 
         if (Build.VERSION.SDK_INT >= 21) {
-            webSettings.setMixedContentMode(0);
             webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         } else if (Build.VERSION.SDK_INT >= 19) {
             webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
@@ -138,8 +135,14 @@ public class WebViewActivity extends BaseToolBarActivity {
                 return false;
             }
         });
-        webView.loadUrl(url, getHttpHeaders());
         webView.setWebChromeClient(new WebChromeClient() {
+
+            @Override
+            public void onPermissionRequest(PermissionRequest request) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    request.grant(request.getResources());
+                }
+            }
 
             //For Android 3.0+
             public void openFileChooser(ValueCallback<Uri> uploadMsg) {
@@ -222,6 +225,29 @@ public class WebViewActivity extends BaseToolBarActivity {
                 return true;
             }
         });
+        webView.loadUrl(url, getHttpHeaders());
+    }
+
+    private void setUpWebViewDefaults() {
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setAllowFileAccess(true);
+        // Enable pinch to zoom without the zoom buttons
+        webSettings.setBuiltInZoomControls(true);
+        webSettings.setUseWideViewPort(true);
+        webSettings.setLoadWithOverviewMode(true);
+
+        // Allow use of Local Storage
+        webSettings.setDomStorageEnabled(true);
+
+        // Hide the zoom controls for HONEYCOMB+
+        webSettings.setDisplayZoomControls(false);
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            webSettings.setMixedContentMode(0);
+            CookieManager cookieManager = CookieManager.getInstance();
+            cookieManager.setAcceptThirdPartyCookies(webView, true);
+        }
     }
 
     private HashMap getHttpHeaders() {
