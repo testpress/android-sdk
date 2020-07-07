@@ -21,6 +21,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -32,6 +33,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+
 import in.testpress.course.R;
 import in.testpress.ui.BaseToolBarActivity;
 
@@ -112,15 +115,12 @@ public class WebViewActivity extends BaseToolBarActivity {
             ActivityCompat.requestPermissions(WebViewActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
         }
 
+
         webView = (WebView) findViewById(R.id.course_webview);
         assert webView != null;
-
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setAllowFileAccess(true);
+        setUpWebViewDefaults();
 
         if (Build.VERSION.SDK_INT >= 21) {
-            webSettings.setMixedContentMode(0);
             webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         } else if (Build.VERSION.SDK_INT >= 19) {
             webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
@@ -135,8 +135,14 @@ public class WebViewActivity extends BaseToolBarActivity {
                 return false;
             }
         });
-        webView.loadUrl(url);
         webView.setWebChromeClient(new WebChromeClient() {
+
+            @Override
+            public void onPermissionRequest(PermissionRequest request) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    request.grant(request.getResources());
+                }
+            }
 
             //For Android 3.0+
             public void openFileChooser(ValueCallback<Uri> uploadMsg) {
@@ -219,6 +225,38 @@ public class WebViewActivity extends BaseToolBarActivity {
                 return true;
             }
         });
+        webView.loadUrl(url, getHttpHeaders());
+    }
+
+    private void setUpWebViewDefaults() {
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setAllowFileAccess(true);
+        // Enable pinch to zoom without the zoom buttons
+        webSettings.setBuiltInZoomControls(true);
+        webSettings.setUseWideViewPort(true);
+        webSettings.setLoadWithOverviewMode(true);
+
+        // Allow use of Local Storage
+        webSettings.setDomStorageEnabled(true);
+
+        // Hide the zoom controls for HONEYCOMB+
+        webSettings.setDisplayZoomControls(false);
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            webSettings.setMixedContentMode(0);
+            CookieManager cookieManager = CookieManager.getInstance();
+            cookieManager.setAcceptThirdPartyCookies(webView, true);
+        }
+    }
+
+    private HashMap getHttpHeaders() {
+        HashMap hashMap = new HashMap();
+
+        if (getIntent().hasExtra("JWT_TOKEN")) {
+            hashMap.put("Authorization", "JWT " + getIntent().getStringExtra("JWT_TOKEN"));
+        }
+        return hashMap;
     }
 
     public void setUrl(String url) {

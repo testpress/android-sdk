@@ -145,6 +145,7 @@ class ContentFragmentFactory {
                 "Attachment" -> AttachmentContentFragment()
                 "Html" -> HtmlContentFragment()
                 "Notes" -> HtmlContentFragment()
+                "VideoConference" -> VideoConferenceFragment()
                 else -> ContentLoadingFragment()
             }
         }
