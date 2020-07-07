@@ -31,6 +31,10 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        bindViews(view)
+    }
+
+    private fun bindViews(view: View) {
         titleView = view.findViewById(R.id.title)
         titleLayout = view.findViewById(R.id.title_layout)
         startButton = view.findViewById(R.id.start_button)
@@ -65,7 +69,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         val token = session?.token
         intent.putExtra("URL", videoConference?.joinUrl)
         intent.putExtra("JWT_TOKEN", token)
-        intent.putExtra("TITLE", "Zoom Meet")
+        intent.putExtra("TITLE", videoConference?.title)
         activity!!.startActivity(intent)
     }
 }
