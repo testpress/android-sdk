@@ -36,6 +36,7 @@ import in.testpress.models.greendao.SelectedAnswerDao;
 import in.testpress.models.greendao.StreamDao;
 import in.testpress.models.greendao.SubjectDao;
 import in.testpress.models.greendao.UserSelectedAnswerDao;
+import in.testpress.models.greendao.VideoConferenceDao;
 import in.testpress.models.greendao.VideoDao;
 
 public class TestpressSDKDatabase {
@@ -85,6 +86,10 @@ public class TestpressSDKDatabase {
 
     public static AttachmentDao getAttachmentDao(Context context) {
         return getDaoSession(context).getAttachmentDao();
+    }
+
+    public static VideoConferenceDao getVideoConferenceDao(Context context) {
+        return getDaoSession(context).getVideoConferenceDao();
     }
 
     public static HtmlContentDao getHtmlContentDao(Context context) {
