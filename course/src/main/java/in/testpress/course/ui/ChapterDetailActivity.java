@@ -8,8 +8,6 @@ import androidx.annotation.Nullable;
 import com.google.android.material.tabs.TabLayout;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
-
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -37,7 +35,6 @@ import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
-import static in.testpress.course.TestpressCourse.show;
 import static in.testpress.course.ui.ContentActivity.FORCE_REFRESH;
 import static in.testpress.course.ui.ContentActivity.GO_TO_MENU;
 import static in.testpress.course.ui.ContentActivity.TESTPRESS_CONTENT_SHARED_PREFS;
@@ -87,7 +84,12 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         productSlug = getIntent().getStringExtra(PRODUCT_SLUG);
         final String chapterUrl = getIntent().getStringExtra(CHAPTER_URL);
         if (chapterUrl != null) {
-            bindViews();
+            emptyView = (LinearLayout) findViewById(R.id.empty_container);
+            emptyTitleView = (TextView) findViewById(R.id.empty_title);
+            emptyDescView = (TextView) findViewById(R.id.empty_description);
+            retryButton = (Button) findViewById(R.id.retry_button);
+            progressBar = (ProgressBar) findViewById(R.id.pb_loading);
+            UIUtils.setIndeterminateDrawable(this, progressBar, 4);
             retryButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -112,74 +114,25 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                     getSupportActionBar().setTitle(courses.get(0).getTitle());
                 }
             }
+            //noinspection ConstantConditions
+            InstituteSettings instituteSettings =
+                    TestpressSdk.getTestpressSession(this).getInstituteSettings();
 
-            final String courseId = getIntent().getStringExtra(COURSE_ID);
-            final CourseDao courseDao = TestpressSDKDatabase.getCourseDao(this);
-            List<Course> courses = courseDao.queryBuilder()
-                    .where(CourseDao.Properties.Id.eq(courseId)).list();
-            if (!courses.isEmpty()) {
-                showChapters();
+            if (instituteSettings.isCoursesFrontend() &&
+                    instituteSettings.isCoursesGamificationEnabled() && productSlug == null) {
+
+                findViewById(R.id.fragment_carousel).setVisibility(View.VISIBLE);
+                findViewById(R.id.fragment_container).setVisibility(View.GONE);
+                CourseDetailsTabAdapter adapter = new CourseDetailsTabAdapter(getResources(),
+                        getSupportFragmentManager(), getIntent().getExtras());
+
+                ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+                viewPager.setAdapter(adapter);
+                TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+                tabLayout.setupWithViewPager(viewPager);
             } else {
-                bindViews();
-                retryButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        emptyView.setVisibility(View.GONE);
-                        fetchCourseAndShowChapters(courseId);
-                    }
-                });
-                fetchCourseAndShowChapters(courseId);
+                loadChildChapters();
             }
-        }
-    }
-
-    private void bindViews() {
-        emptyView = (LinearLayout) findViewById(R.id.empty_container);
-        emptyTitleView = (TextView) findViewById(R.id.empty_title);
-        emptyDescView = (TextView) findViewById(R.id.empty_description);
-        retryButton = (Button) findViewById(R.id.retry_button);
-        progressBar = (ProgressBar) findViewById(R.id.pb_loading);
-        UIUtils.setIndeterminateDrawable(this, progressBar, 4);
-    }
-
-    private void fetchCourseAndShowChapters(String courseId) {
-        progressBar.setVisibility(View.VISIBLE);
-        courseApiRequest = new TestpressCourseApiClient(this).getCourse(courseId)
-            .enqueue(new TestpressCallback<Course>() {
-                @Override
-                public void onSuccess(Course course) {
-                    progressBar.setVisibility(View.GONE);
-                    course.setIsMyCourse(true);
-                    courseDao.insertOrReplace(course);
-                    showChapters();
-                }
-
-                @Override
-                public void onException(TestpressException exception) {
-                    handleException(exception);
-                }
-            });
-    }
-
-    private void showChapters() {
-        //noinspection ConstantConditions
-        InstituteSettings instituteSettings =
-                TestpressSdk.getTestpressSession(this).getInstituteSettings();
-
-        if (instituteSettings.isCoursesFrontend() &&
-                instituteSettings.isCoursesGamificationEnabled() && productSlug == null) {
-
-            findViewById(R.id.fragment_carousel).setVisibility(View.VISIBLE);
-            findViewById(R.id.fragment_container).setVisibility(View.GONE);
-            CourseDetailsTabAdapter adapter = new CourseDetailsTabAdapter(getResources(),
-                    getSupportFragmentManager(), getIntent().getExtras());
-
-            ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-            viewPager.setAdapter(adapter);
-            TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-            tabLayout.setupWithViewPager(viewPager);
-        } else {
-            loadChildChapters();
         }
     }
 
