@@ -1,11 +1,13 @@
 package in.testpress.course.ui;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import in.testpress.core.TestpressSdk;
@@ -33,6 +35,7 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
         this.options = ImageUtils.getPlaceholdersOption();
         this.course = course;
         this.productSlug = productSlug;
+        this.chapters = new ArrayList<>();
     }
 
     private void loadChapters() {
@@ -40,7 +43,7 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
             Chapter parentChapter = Chapter.get(activity, parentId);
             parentChapter.resetChildren();
             this.chapters = parentChapter.getChildren();
-        } else {
+        } else if (course != null) {
             this.chapters = course.getRootChapters();
         }
     }

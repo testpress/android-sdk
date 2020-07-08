@@ -3,6 +3,7 @@ package in.testpress.course.ui;
 import android.os.Bundle;
 import androidx.loader.content.Loader;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import org.greenrobot.greendao.AbstractDao;
 
 import java.util.List;
 
+import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
@@ -23,6 +25,7 @@ import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.network.BaseResourcePager;
+import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -38,6 +41,8 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     private ChapterDao chapterDao;
     private CourseDao courseDao;
     private String productSlug;
+    private Course course;
+    private RetrofitCall<Course> courseApiRequest;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,10 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         apiClient = new TestpressCourseApiClient(getActivity());
         chapterDao = TestpressSDKDatabase.getChapterDao(getActivity());
         courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
+        List<Course> courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.eq(courseId)).list();
+        if (!courses.isEmpty()) {
+            course = courses.get(0);
+        }
     }
 
     @Override
@@ -77,9 +86,34 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
             displayBuyNowButton();
         }
 
-        if (isItemsEmpty()) {
+        if(getCourse() == null) {
+            getLoaderManager().destroyLoader(0);
+            showLoadingPlaceholder();
+            fetchCourseAndShowChapters(courseId);
+        }
+
+        if (getCourse() != null && isItemsEmpty()) {
             showLoadingPlaceholder();
         }
+    }
+
+    private void fetchCourseAndShowChapters(String courseId) {
+        courseApiRequest = new TestpressCourseApiClient(getContext()).getCourse(courseId)
+                .enqueue(new TestpressCallback<Course>() {
+                    @Override
+                    public void onSuccess(Course fetchedCourse) {
+                        course = fetchedCourse;
+                        course.setIsMyCourse(true);
+                        courseDao.insertOrReplace(course);
+                        configureList(getActivity(), getListView());
+                        refreshWithProgress();
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        getErrorMessage(exception);
+                    }
+                });
     }
 
     private void displayBuyNowButton() {
@@ -117,7 +151,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     }
 
     private Course getCourse() {
-        return courseDao.queryBuilder().where(CourseDao.Properties.Id.eq(courseId)).list().get(0);
+        return course;
     }
 
 
@@ -131,6 +165,9 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
     @Override
     protected boolean isItemsEmpty() {
+        if (getCourse() == null) {
+            return true;
+        }
         return getCourse().getRootChapters().isEmpty();
     }
 
