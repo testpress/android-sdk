@@ -21,6 +21,8 @@ public class VideoConference {
     private Integer duration;
     private String provider;
     private String conferenceId;
+    private String accessToken;
+    private String password;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -34,7 +36,7 @@ public class VideoConference {
     }
 
     @Generated
-    public VideoConference(String title, String joinUrl, Long id, String start, Integer duration, String provider, String conferenceId) {
+    public VideoConference(String title, String joinUrl, Long id, String start, Integer duration, String provider, String conferenceId, String accessToken, String password) {
         this.title = title;
         this.joinUrl = joinUrl;
         this.id = id;
@@ -42,6 +44,8 @@ public class VideoConference {
         this.duration = duration;
         this.provider = provider;
         this.conferenceId = conferenceId;
+        this.accessToken = accessToken;
+        this.password = password;
     }
 
     public String getTitle() {
@@ -98,6 +102,22 @@ public class VideoConference {
 
     public void setConferenceId(String conferenceId) {
         this.conferenceId = conferenceId;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     // KEEP METHODS - put your custom methods here
