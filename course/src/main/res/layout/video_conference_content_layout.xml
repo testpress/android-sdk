@@ -165,7 +165,7 @@
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:layout_marginRight="5dp"
-                            android:src="@drawable/testpress_stopwatch_flat_icon"/>
+                            android:src="@drawable/ic_video_lecture"/>
 
                         <LinearLayout
                             android:orientation="vertical"
