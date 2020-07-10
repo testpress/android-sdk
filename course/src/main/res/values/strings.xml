@@ -71,4 +71,9 @@
         <item quantity="other">%d Chapters</item>
     </plurals>
 
+    <style name="ZMEditText" parent="android:Widget.EditText">
+        <item name="android:textColorHint">@color/testpress_gray_light</item>
+        <item name="android:textColor">@color/testpress_black</item>
+        <item name="android:background">@drawable/zm_edit_text</item>
+    </style>
 </resources>
