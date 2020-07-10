@@ -12,7 +12,6 @@ import us.zoom.sdk.InMeetingServiceListener
 import us.zoom.sdk.JoinMeetingOptions
 import us.zoom.sdk.JoinMeetingParams
 import us.zoom.sdk.MeetingError
-import us.zoom.sdk.MeetingService
 import us.zoom.sdk.MeetingServiceListener
 import us.zoom.sdk.MeetingStatus
 import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_MEETING_ID
@@ -29,9 +28,10 @@ class ZoomMeetHandler(
 ) : MeetingServiceListener,
     ZoomSDKInitializeListener, InMeetingServiceListener {
 
+    private lateinit var zoomSDK: ZoomSDK
 
     fun init() {
-        val zoomSDK = ZoomSDK.getInstance()
+        zoomSDK = ZoomSDK.getInstance()
         zoomSDK.initialize(context, this, getInitializationParams())
 
         if (zoomSDK.isInitialized) {
@@ -49,7 +49,6 @@ class ZoomMeetHandler(
     }
 
     fun goToMeet() {
-        val zoomSDK = ZoomSDK.getInstance()
         if (!zoomSDK.isInitialized) {
             val errorMessage =
                 "Zoom Meet has not been initialized yet. Please click start class button after a minute"
@@ -57,16 +56,16 @@ class ZoomMeetHandler(
             return
         }
 
-        val meetingService: MeetingService = zoomSDK.meetingService ?: return
-        if (meetingService.meetingStatus == MeetingStatus.MEETING_STATUS_IDLE) {
-            startMeeting()
-        } else {
-            meetingService.returnToMeeting(context)
+        zoomSDK.meetingService?.let { meetingService ->
+            if (meetingService.meetingStatus == MeetingStatus.MEETING_STATUS_IDLE) {
+                startMeeting()
+            } else {
+                meetingService.returnToMeeting(context)
+            }
         }
     }
 
     private fun registerMeetingServiceListener() {
-        val zoomSDK = ZoomSDK.getInstance()
         val meetingService = zoomSDK.meetingService
         meetingService?.addListener(this)
         zoomSDK.inMeetingService.addListener(this)
@@ -112,7 +111,6 @@ class ZoomMeetHandler(
     }
 
     fun removeListeners() {
-        val zoomSDK = ZoomSDK.getInstance()
         if (zoomSDK.isInitialized) {
             val meetingService = zoomSDK.meetingService
             meetingService.removeListener(this)
@@ -120,7 +118,6 @@ class ZoomMeetHandler(
     }
 
     fun startMeeting() {
-        val zoomSDK = ZoomSDK.getInstance()
         val meetingService = zoomSDK.meetingService
         val ret = meetingService.joinMeetingWithParams(
             context,
