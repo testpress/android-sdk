@@ -23,7 +23,6 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     private lateinit var startButton: Button
     private lateinit var duration: TextView
     private lateinit var startTime: TextView
-    private lateinit var provider: TextView
     private var videoConferenceHandler: VideoConferenceHandler? = null
     private var profileDetails: ProfileDetails? = null
 
@@ -54,9 +53,8 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         startButton = view.findViewById(R.id.start_button)
         duration = view.findViewById(R.id.duration)
         startTime = view.findViewById(R.id.start_time)
-        provider = view.findViewById(R.id.provider)
         ViewUtils.setTypeface(
-            arrayOf(titleView, provider, startTime, duration),
+            arrayOf(titleView, startTime, duration),
             TestpressSdk.getRubikMediumFont(activity!!)
         )
     }
@@ -69,7 +67,6 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         titleLayout.visibility = View.VISIBLE
         videoConference?.let {
             duration.text = it.duration.toString()
-            provider.text = it.provider?.toUpperCase()
             startTime.text = it.formattedStartDate()
         }
         startButton.setOnClickListener {
