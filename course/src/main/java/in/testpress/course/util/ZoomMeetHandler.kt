@@ -120,7 +120,6 @@ class ZoomMeetHandler(
     }
 
     fun startMeeting() {
-        // showChangeLangDialog()
         val zoomSDK = ZoomSDK.getInstance()
         val meetingService = zoomSDK.meetingService
         val ret = meetingService.joinMeetingWithParams(
