@@ -59,6 +59,12 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="Web View" />
 
+        <activity
+            android:name=".ui.ZoomMeetActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="Zoom Meet"
+            android:theme="@style/TestpressTheme"/>
+
     </application>
 
 </manifest>
