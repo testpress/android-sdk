@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Handler;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.mediarouter.media.MediaControlIntent;
 import androidx.mediarouter.media.MediaRouteSelector;
@@ -45,8 +46,8 @@ import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
@@ -260,18 +261,8 @@ public class ExoPlayerUtil {
                                     && mappedTrackInfo.getTypeSupport(C.TRACK_TYPE_VIDEO)
                                     == MappingTrackSelector.MappedTrackInfo.RENDERER_SUPPORT_NO_TRACKS);
 
-                    Pair<AlertDialog, TrackSelectionView> dialogPair =
-                            TrackSelectionView.getDialog(activity, "Quality", trackSelector, rendererIndex);
-                    Window window = dialogPair.first.getWindow();
-
-                    if (window != null) {
-                        window.setBackgroundDrawable(new ColorDrawable(Color.DKGRAY));
-                        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    }
-
-                    dialogPair.second.setShowDisableOption(false);
-                    dialogPair.second.setAllowAdaptiveSelections(allowAdaptiveSelections);
-                    dialogPair.first.show();
+                    TrackSelectionDialog trackSelectionDialog = new TrackSelectionDialog(trackSelector);
+                    trackSelectionDialog.show(((AppCompatActivity)activity).getSupportFragmentManager(), null);
                 }
             }
         });
@@ -394,7 +385,7 @@ public class ExoPlayerUtil {
             case C.TYPE_HLS:
                 return new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
             case C.TYPE_OTHER:
-                return new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+                return new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
             default:
                 throw new IllegalStateException("Unsupported type: " + type);
         }
