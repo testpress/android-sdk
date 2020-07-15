@@ -50,15 +50,6 @@ class TrackSelectionDialog(private val trackSelector: DefaultTrackSelector) : Di
         return dialog
     }
 
-    override fun onTrackSelectionChanged(
-        isDisabled: Boolean,
-        overrides: List<DefaultTrackSelector.SelectionOverride>?
-    ) {
-        overrides?.let {
-            this.overrides = it
-        }
-    }
-
     private fun initializeTrackSelectionView(view: View) {
         trackSelectionView = view.findViewById(R.id.exo_track_selection_view)
         trackSelectionView.setShowDisableOption(false)
@@ -100,5 +91,14 @@ class TrackSelectionDialog(private val trackSelector: DefaultTrackSelector) : Di
 
     fun setAllowAdaptiveSelections(allow: Boolean) {
         allowAdaptiveSelections = allow
+    }
+
+    override fun onTrackSelectionChanged(
+        isDisabled: Boolean,
+        overrides: MutableList<DefaultTrackSelector.SelectionOverride>
+    ) {
+        overrides.let {
+            this.overrides = it
+        }
     }
 }
