@@ -192,12 +192,9 @@ public class ExoPlayerUtil {
                 initializePlayer();
             }
         });
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
 
-        TrackSelection.Factory videoTrackSelectionFactory =
-                new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        trackSelector =
-                new DefaultTrackSelector(videoTrackSelectionFactory);
+        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory();
+        trackSelector =  new DefaultTrackSelector(activity, videoTrackSelectionFactory);
         initFullscreenDialog();
         initResolutionSelector();
 
@@ -289,8 +286,8 @@ public class ExoPlayerUtil {
         errorMessageTextView.setVisibility(View.GONE);
         if (player == null) {
             progressBar.setVisibility(View.VISIBLE);
-            player = ExoPlayerFactory.newSimpleInstance(activity, new DefaultRenderersFactory(activity),
-                    trackSelector, new DefaultLoadControl());
+            player = new SimpleExoPlayer.Builder(activity, new DefaultRenderersFactory(activity))
+                    .setTrackSelector(trackSelector).build();
 
             player.addListener(new PlayerEventListener());
             playerView.setPlayer(player);
