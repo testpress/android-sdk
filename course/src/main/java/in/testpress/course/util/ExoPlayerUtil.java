@@ -104,7 +104,7 @@ public class ExoPlayerUtil {
 
 
     private Activity activity;
-    private long videoAttemptId;
+    private long videoAttemptId = -1;
     private Content content;
     private String url;
     private boolean isopenFullscreenDialogCalled;
@@ -543,6 +543,10 @@ public class ExoPlayerUtil {
     }
 
     public void updateVideoAttempt() {
+        if (videoAttemptId == -1) {
+            return;
+        }
+
         Map<String, Object> parameters = getVideoAttemptParameters();
         new TestpressCourseApiClient(activity).updateVideoAttempt(videoAttemptId, parameters)
                 .enqueue(new TestpressCallback<VideoAttempt>() {
