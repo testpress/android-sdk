@@ -124,6 +124,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         TextView priceText = (TextView) findViewById(R.id.price);
         View descriptionContainer = findViewById(R.id.description_container);
         TextView descriptionText = (TextView) findViewById(R.id.description);
+        View descriptionContainerLine = (View) findViewById(R.id.description_line);
         View examsListContainer = findViewById(R.id.exams_list_container);
         ListView examsListView = (ListView) findViewById(R.id.exams_list);
         View notesListContainer = findViewById(R.id.notes_list_container);
@@ -193,8 +194,10 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         // Update product description
         if(product.getDescription().isEmpty()) {
             descriptionContainer.setVisibility(View.GONE);
+            descriptionContainerLine.setVisibility(View.GONE);
         } else {
             descriptionContainer.setVisibility(View.VISIBLE);
+            descriptionContainerLine.setVisibility(View.VISIBLE);
             Spanned html = Html.fromHtml(product.getDescription(),
                     new UILImageGetter(descriptionText, ProductDetailsActivity.this), null);
 
