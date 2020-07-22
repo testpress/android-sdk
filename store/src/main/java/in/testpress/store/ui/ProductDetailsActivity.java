@@ -13,13 +13,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-
-import java.util.Arrays;
 import java.util.HashMap;
-
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
@@ -31,7 +27,6 @@ import in.testpress.store.models.Product;
 import in.testpress.store.network.TestpressStoreApiClient;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.EventsTrackerFacade;
-import in.testpress.util.FBEventsTrackerFacade;
 import in.testpress.util.FormatDate;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.UILImageGetter;
@@ -119,8 +114,6 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         TextView totalExams = (TextView) findViewById(R.id.total_exams);
         View totalNotesContainer = findViewById(R.id.total_notes_container);
         TextView totalNotes = (TextView) findViewById(R.id.total_notes);
-        TextView dateText = (TextView) findViewById(R.id.date);
-        TextView categoriesText = (TextView) findViewById(R.id.categories);
         TextView priceText = (TextView) findViewById(R.id.price);
         View descriptionContainer = findViewById(R.id.description_container);
         TextView descriptionText = (TextView) findViewById(R.id.description);
@@ -180,12 +173,6 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
             totalNotesContainer.setVisibility(View.VISIBLE);
         } else {
             totalNotesContainer.setVisibility(View.GONE);
-        }
-
-        String date = FormatDate.getDate(product.getStartDate(), product.getEndDate());
-        if(date != null) {
-            dateText.setVisibility(View.VISIBLE);
-            dateText.setText(date);
         }
 
         // Price
