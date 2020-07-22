@@ -187,9 +187,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
             dateText.setText(date);
         }
 
-        // Price & Categories
-        String categories = Arrays.toString(product.getCategories().toArray());
-        categoriesText.setText(categories.substring(1, categories.length() - 1));
+        // Price
         priceText.setText(product.getPrice());
 
         // Update product description
