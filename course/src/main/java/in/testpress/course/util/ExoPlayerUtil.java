@@ -40,7 +40,6 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory;
 import com.google.android.exoplayer2.offline.DownloadHelper;
 import com.google.android.exoplayer2.offline.DownloadRequest;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -66,7 +65,6 @@ import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
 import in.testpress.course.api.TestpressCourseApiClient;
 import in.testpress.course.helpers.DownloadTask;
-import in.testpress.course.helpers.VideoDownloadManager;
 import in.testpress.models.ProfileDetails;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.VideoAttempt;
@@ -331,10 +329,10 @@ public class ExoPlayerUtil {
     private MediaSource getMediaSource() {
         DownloadTask downloadTask = new DownloadTask(url, activity);
         DownloadRequest downloadRequest = downloadTask.getDownloadRequest();
-        if (downloadRequest != null) {
+        if (downloadTask.isDownloaded()) {
             return DownloadHelper.createMediaSource(downloadRequest, buildDataSourceFactory());
         } else {
-            return buildMediaSource(Uri.parse(url));
+            return buildNetworkMediaSource(Uri.parse(url));
         }
     }
 
@@ -394,7 +392,7 @@ public class ExoPlayerUtil {
                 .build();
     }
 
-    private MediaSource buildMediaSource(Uri uri) {
+    private MediaSource buildNetworkMediaSource(Uri uri) {
         DataSource.Factory dataSourceFactory = buildDataSourceFactory();
 
         int type = Util.inferContentType(uri);

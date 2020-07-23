@@ -68,6 +68,11 @@ class DownloadTask(val url: String, val context: Context) {
         return -1
     }
 
+    fun isDownloaded(): Boolean {
+        val download = downloadIndex.getDownload(url)
+        return download != null && download.state != Download.STATE_COMPLETED
+    }
+
     fun getDownloadRequest(): DownloadRequest? {
         val download = downloadIndex.getDownload(url)
         return if (download != null && download.state != Download.STATE_FAILED) download.request else null

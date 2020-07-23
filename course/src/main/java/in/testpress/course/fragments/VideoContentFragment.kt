@@ -62,13 +62,13 @@ class VideoContentFragment : BaseContentDetailFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.download) {
-            downloadVideo()
+            showDownloadDialog()
             return true
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun downloadVideo() {
+    private fun showDownloadDialog() {
         val videoDownloadQualitySelector = VideoDownloadQualitySelector(
             childFragmentManager,
             requireContext(),
