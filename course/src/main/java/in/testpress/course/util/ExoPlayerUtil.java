@@ -661,4 +661,14 @@ public class ExoPlayerUtil {
         }
     }
 
+    public static int getRendererIndex(int trackType, MappingTrackSelector.MappedTrackInfo mappedTrackInfo) {
+        for (int i=0; i < mappedTrackInfo.getRendererCount(); i++) {
+            if (mappedTrackInfo.getRendererType(i) == trackType) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
 }
