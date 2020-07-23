@@ -133,7 +133,6 @@ public class ExoPlayerUtil {
     };
     AudioManager audioManager;
     AudioManager.OnAudioFocusChangeListener audioFocusChangeListener;
-    private DialogInterface.OnClickListener dialogOnClickListener;
     private DefaultTrackSelector trackSelector;
     private DialogInterface.OnClickListener dialogOnClickListener;
 
@@ -204,23 +203,6 @@ public class ExoPlayerUtil {
         this(activity, exoPlayerMainFrame, url, startPosition);
         this.playWhenReady = playWhenReady;
         setSpeedRate(speedRate);
-    }
-
-    private DialogInterface.OnClickListener trackSelectionListener() {
-        if (dialogOnClickListener == null) {
-            dialogOnClickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
-                    int rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo);
-                    DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
-                    parametersBuilder.clearSelectionOverrides(rendererIndex)
-                            .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), trackSelectionDialog.getOverrides().get(0));
-                }
-            };
-        }
-
-        return dialogOnClickListener;
     }
 
     private void initializeViews() {
