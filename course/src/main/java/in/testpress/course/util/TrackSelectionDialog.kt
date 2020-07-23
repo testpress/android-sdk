@@ -13,7 +13,6 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector
 import com.google.android.exoplayer2.ui.TrackSelectionView
-import com.google.android.exoplayer2.util.Assertions
 import kotlinx.android.synthetic.main.track_selection_dialog.*
 
 class TrackSelectionDialog(
@@ -24,7 +23,7 @@ class TrackSelectionDialog(
 
     private lateinit var trackSelectionView: TrackSelectionView
     private var allowAdaptiveSelections = false
-    private val rendererIndex = ExoPlayerUtil.getRendererIndex(C.TRACK_TYPE_VIDEO)
+    private val rendererIndex = ExoPlayerUtil.getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
     private val trackGroup = mappedTrackInfo.getTrackGroups(rendererIndex)
     var overrides: List<DefaultTrackSelector.SelectionOverride>
     var onClickListener: DialogInterface.OnClickListener? = null
