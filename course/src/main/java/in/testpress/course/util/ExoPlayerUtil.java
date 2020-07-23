@@ -358,7 +358,7 @@ public class ExoPlayerUtil {
 
 
     private DataSource.Factory buildDataSourceFactory() {
-        return VideoDownloadManager.invoke(activity).buildDataSourceFactory();
+        return new ExoPlayerDataSourceFactory(activity).build();
     }
 
 

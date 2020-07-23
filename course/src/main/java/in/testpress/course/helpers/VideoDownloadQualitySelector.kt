@@ -1,6 +1,7 @@
 package `in`.testpress.course.helpers
 
 import `in`.testpress.course.domain.DomainContent
+import `in`.testpress.course.util.ExoPlayerDataSourceFactory
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.TrackSelectionDialog
 import android.content.Context
@@ -35,7 +36,7 @@ class VideoDownloadQualitySelector(
     }
 
     private fun getDownloadHelper(uri: Uri): DownloadHelper {
-        val dataSourceFactory = VideoDownloadManager(context).buildDataSourceFactory()
+        val dataSourceFactory = ExoPlayerDataSourceFactory(context).build()
         val renderersFactory = DefaultRenderersFactory(context)
         return when (val type = Util.inferContentType(uri)) {
             C.TYPE_HLS -> DownloadHelper.forHls(context, uri, dataSourceFactory, renderersFactory)
