@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
@@ -93,6 +94,7 @@ public class ExoPlayerUtil {
     private SimpleExoPlayer player;
     private ImageView fullscreenIcon;
     private Dialog fullscreenDialog;
+    private TrackSelectionDialog trackSelectionDialog;
 
 
     private Activity activity;
@@ -132,6 +134,7 @@ public class ExoPlayerUtil {
     AudioManager audioManager;
     AudioManager.OnAudioFocusChangeListener audioFocusChangeListener;
     private DefaultTrackSelector trackSelector;
+    private DialogInterface.OnClickListener dialogOnClickListener;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition) {
@@ -250,7 +253,8 @@ public class ExoPlayerUtil {
                                     && mappedTrackInfo.getTypeSupport(C.TRACK_TYPE_VIDEO)
                                     == MappingTrackSelector.MappedTrackInfo.RENDERER_SUPPORT_NO_TRACKS);
 
-                    TrackSelectionDialog trackSelectionDialog = new TrackSelectionDialog(trackSelector);
+                    trackSelectionDialog = new TrackSelectionDialog(trackSelector);
+                    trackSelectionDialog.setOnClickListener(trackSelectionListener());
                     trackSelectionDialog.show(((AppCompatActivity)activity).getSupportFragmentManager(), null);
                 }
             }
@@ -305,6 +309,23 @@ public class ExoPlayerUtil {
         }
 
         addPlayPauseOnClickListener();
+    }
+
+    private DialogInterface.OnClickListener trackSelectionListener() {
+        if (dialogOnClickListener == null) {
+            dialogOnClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
+                    int rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo);
+                    DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
+                    parametersBuilder.clearSelectionOverrides(rendererIndex)
+                            .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), trackSelectionDialog.getOverrides().get(0));
+                }
+            };
+        }
+
+        return dialogOnClickListener;
     }
 
     private void addPlayPauseOnClickListener() {
