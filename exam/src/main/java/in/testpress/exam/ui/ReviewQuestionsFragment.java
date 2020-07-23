@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -42,6 +41,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.util.CommentsUtil;
+import in.testpress.exam.util.GetUsernameEmailUtil;
 import in.testpress.exam.util.ImageUtils;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Bookmark;
@@ -348,6 +348,7 @@ public class ReviewQuestionsFragment extends Fragment {
                            Object answers, String explanationHtml, String subject) {
 
         String html = "<div style='padding-left: 2px; padding-right: 4px;'>";
+        String watermarkText = GetUsernameEmailUtil.getEmailOrUsername(getActivity());
 
         // Add index
         html += "<div>" +
@@ -449,9 +450,12 @@ public class ReviewQuestionsFragment extends Fragment {
                     "</div>";
         }
 
-        // Add explanation
+        // Add explanation with watermark
         if (explanationHtml != null && !explanationHtml.isEmpty()) {
             html += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation));
+            html += "<div class ='emailWaterMark'>" +
+                    "© "+ getString(R.string.testpress_app_name) +" "+ watermarkText +
+                    "\n" + "</div>";
             html += "<div class='review-explanation'>" +
                         explanationHtml +
                     "</div>";

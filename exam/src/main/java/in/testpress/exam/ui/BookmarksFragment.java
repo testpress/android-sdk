@@ -34,6 +34,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.util.CommentsUtil;
+import in.testpress.exam.util.GetUsernameEmailUtil;
 import in.testpress.exam.util.ImageUtils;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.Bookmark;
@@ -378,6 +379,7 @@ public class BookmarksFragment extends BaseFragment {
     private String getHtml(String directionHtml, String questionHtml,
                            Object answers, String explanationHtml, String subject) {
 
+        String watermarkText = GetUsernameEmailUtil.getEmailOrUsername(getActivity());
         String html = "<div style='padding-left: 12px; padding-right: 12px;'>";
 
         // Add direction/passage
@@ -470,9 +472,12 @@ public class BookmarksFragment extends BaseFragment {
                     "</div>";
         }
 
-        // Add explanation
+        // Add explanation with watermark
         if (explanationHtml != null && !explanationHtml.isEmpty()) {
             html += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation));
+            html += "<div class ='emailWaterMark'>" +
+                    "© "+ getString(R.string.testpress_app_name) +" "+ watermarkText +
+                    "\n" + "</div>";
             html += "<div class='review-explanation'>" +
                         explanationHtml +
                     "</div>";
