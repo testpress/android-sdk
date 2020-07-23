@@ -2,6 +2,7 @@ package `in`.testpress.course.util
 
 import `in`.testpress.course.R
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,20 +11,27 @@ import androidx.appcompat.app.AppCompatDialog
 import androidx.fragment.app.DialogFragment
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.trackselection.MappingTrackSelector
 import com.google.android.exoplayer2.ui.TrackSelectionView
-import com.google.android.exoplayer2.util.Assertions
 import kotlinx.android.synthetic.main.track_selection_dialog.*
 
-class TrackSelectionDialog(private val trackSelector: DefaultTrackSelector) : DialogFragment(),
+class TrackSelectionDialog(
+    private val parameters: DefaultTrackSelector.Parameters,
+    val mappedTrackInfo: MappingTrackSelector.MappedTrackInfo
+) : DialogFragment(),
     TrackSelectionView.TrackSelectionListener {
 
     private lateinit var trackSelectionView: TrackSelectionView
     private var allowAdaptiveSelections = false
-    private val parameters = trackSelector.parameters
-    private val mappedTrackInfo = Assertions.checkNotNull(trackSelector.currentMappedTrackInfo)
-    private val rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO)
+    private val rendererIndex = ExoPlayerUtil.getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
     private val trackGroup = mappedTrackInfo.getTrackGroups(rendererIndex)
-    private var overrides: List<DefaultTrackSelector.SelectionOverride>
+    var overrides: List<DefaultTrackSelector.SelectionOverride>
+    var onClickListener: DialogInterface.OnClickListener? = null
+
+    constructor(trackSelector: DefaultTrackSelector) : this(
+        trackSelector.parameters,
+        trackSelector.currentMappedTrackInfo!!
+    )
 
     init {
         val selectionOverrides = parameters.getSelectionOverride(rendererIndex, trackGroup)
@@ -58,35 +66,13 @@ class TrackSelectionDialog(private val trackSelector: DefaultTrackSelector) : Di
         trackSelectionView.init(mappedTrackInfo, rendererIndex, false, overrides, this)
     }
 
-    private fun getRendererIndex(trackType: Int): Int {
-        for (rendererIndex in 0 until mappedTrackInfo.rendererCount) {
-            if (mappedTrackInfo.getRendererType(rendererIndex) == trackType) {
-                return rendererIndex
-            }
-        }
-
-        return -1
-    }
-
     private fun setOnClickListeners() {
         okButton.setOnClickListener {
-            changeSelectedTrack()
+            onClickListener?.onClick(dialog, DialogInterface.BUTTON_POSITIVE)
             dismiss()
         }
 
         cancelButton.setOnClickListener { dismiss() }
-    }
-
-    private fun changeSelectedTrack() {
-        val parametersBuilder = parameters.buildUpon()
-        parametersBuilder
-            .clearSelectionOverrides(rendererIndex)
-            .setSelectionOverride(
-                rendererIndex,
-                mappedTrackInfo.getTrackGroups(rendererIndex),
-                overrides[0]
-            )
-        trackSelector.setParameters(parametersBuilder)
     }
 
     fun setAllowAdaptiveSelections(allow: Boolean) {
