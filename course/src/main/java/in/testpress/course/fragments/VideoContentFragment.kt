@@ -2,16 +2,21 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainVideoContent
+import `in`.testpress.course.helpers.DownloadTask
+import `in`.testpress.course.helpers.VideoDownloadQualitySelector
+import `in`.testpress.course.services.VideoDownloadService
 import `in`.testpress.course.util.PatternEditableBuilder
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
-import androidx.fragment.app.Fragment
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -29,6 +34,11 @@ class VideoContentFragment : BaseContentDetailFragment() {
         get() = false
         set(value) {}
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        VideoDownloadService.start(requireContext())
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -45,12 +55,37 @@ class VideoContentFragment : BaseContentDetailFragment() {
         initializeListeners()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.video_content_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.download) {
+            downloadVideo()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun downloadVideo() {
+        val videoDownloadQualitySelector = VideoDownloadQualitySelector(
+            childFragmentManager,
+            requireContext(),
+            content
+        )
+        videoDownloadQualitySelector.setOnSubmitListener { downloadRequest ->
+            DownloadTask(downloadRequest.uri.toString(), requireContext()).start(downloadRequest)
+        }
+    }
+
     private fun initializeListeners() {
         titleLayout.setOnClickListener {
             val isDescriptionVisible = description.visibility == View.VISIBLE
             toggleDescription(!isDescriptionVisible)
         }
     }
+
     private fun toggleDescription(show: Boolean) {
         if (show) {
             description.visibility = View.VISIBLE

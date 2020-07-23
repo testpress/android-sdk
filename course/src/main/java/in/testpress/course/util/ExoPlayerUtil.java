@@ -41,6 +41,8 @@ import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory;
+import com.google.android.exoplayer2.offline.DownloadHelper;
+import com.google.android.exoplayer2.offline.DownloadRequest;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
@@ -50,8 +52,6 @@ import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
 import java.util.HashMap;
@@ -65,13 +65,13 @@ import in.testpress.core.TestpressSession;
 import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
 import in.testpress.course.api.TestpressCourseApiClient;
+import in.testpress.course.helpers.DownloadTask;
+import in.testpress.course.helpers.VideoDownloadManager;
 import in.testpress.models.ProfileDetails;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
-import in.testpress.util.UserAgentProvider;
-import okhttp3.OkHttpClient;
 
 import static android.content.Context.AUDIO_SERVICE;
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
@@ -133,6 +133,7 @@ public class ExoPlayerUtil {
     };
     AudioManager audioManager;
     AudioManager.OnAudioFocusChangeListener audioFocusChangeListener;
+    private DialogInterface.OnClickListener dialogOnClickListener;
     private DefaultTrackSelector trackSelector;
     private DialogInterface.OnClickListener dialogOnClickListener;
 
@@ -205,6 +206,22 @@ public class ExoPlayerUtil {
         setSpeedRate(speedRate);
     }
 
+    private DialogInterface.OnClickListener trackSelectionListener() {
+        if (dialogOnClickListener == null) {
+            dialogOnClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
+                    int rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo);
+                    DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
+                    parametersBuilder.clearSelectionOverrides(rendererIndex)
+                            .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), trackSelectionDialog.getOverrides().get(0));
+                }
+            };
+        }
+
+        return dialogOnClickListener;
+    }
 
     private void initializeViews() {
         emailIdTextView = exoPlayerMainFrame.findViewById(R.id.email_id);
@@ -295,7 +312,8 @@ public class ExoPlayerUtil {
             player.seekTo((long) (startPosition * 1000));
             player.setPlaybackParameters(new PlaybackParameters(speedRate));
         }
-        MediaSource mediaSource = buildMediaSource(Uri.parse(url));
+
+        MediaSource mediaSource = getMediaSource();
         player.prepare(mediaSource, false, false);
         if (overlayPositionHandler != null) {
             overlayPositionHandler
@@ -327,6 +345,22 @@ public class ExoPlayerUtil {
 
         return dialogOnClickListener;
     }
+
+    private MediaSource getMediaSource() {
+        DownloadTask downloadTask = new DownloadTask(url, activity);
+        DownloadRequest downloadRequest = downloadTask.getDownloadRequest();
+        if (downloadRequest != null) {
+            return DownloadHelper.createMediaSource(downloadRequest, buildDataSourceFactory());
+        } else {
+            return buildMediaSource(Uri.parse(url));
+        }
+    }
+
+
+    private DataSource.Factory buildDataSourceFactory() {
+        return VideoDownloadManager.invoke(activity).buildDataSourceFactory();
+    }
+
 
     private void addPlayPauseOnClickListener() {
         playerView.setControlDispatcher(new DefaultControlDispatcher() {
@@ -378,18 +412,9 @@ public class ExoPlayerUtil {
                 .build();
     }
 
-    private DataSource.Factory getDataSourceFactory() {
-        String userAgent = UserAgentProvider.get(activity);
-        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new VideoPlayerInterceptor(activity))
-                .build();
-        OkHttpDataSourceFactory okHttpDataSourceFactory = new OkHttpDataSourceFactory(okHttpClient, userAgent, bandwidthMeter);
-        return new DefaultDataSourceFactory(activity, bandwidthMeter, okHttpDataSourceFactory);
-    }
-
     private MediaSource buildMediaSource(Uri uri) {
-        DataSource.Factory dataSourceFactory = getDataSourceFactory();
+        DataSource.Factory dataSourceFactory = buildDataSourceFactory();
+
         int type = Util.inferContentType(uri);
         switch (type) {
             case C.TYPE_HLS:
