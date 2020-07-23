@@ -41,7 +41,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.util.CommentsUtil;
-import in.testpress.exam.util.GetUsernameEmailUtil;
+import in.testpress.exam.util.GetEmailOrUsernameUtil;
 import in.testpress.exam.util.ImageUtils;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Bookmark;
@@ -348,7 +348,7 @@ public class ReviewQuestionsFragment extends Fragment {
                            Object answers, String explanationHtml, String subject) {
 
         String html = "<div style='padding-left: 2px; padding-right: 4px;'>";
-        String watermarkText = GetUsernameEmailUtil.getEmailOrUsername(getActivity());
+        String watermarkText = GetEmailOrUsernameUtil.getEmailOrUsername(getActivity());
 
         // Add index
         html += "<div>" +

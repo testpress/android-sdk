@@ -6,17 +6,17 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressUserDetails;
 import in.testpress.models.ProfileDetails;
 
-public class GetUsernameEmailUtil {
-    static String watermarkText;
+public class GetEmailOrUsernameUtil {
+    static String emailOrUsernameText;
     public static String getEmailOrUsername(FragmentActivity activity) {
         ProfileDetails profileDetails = TestpressUserDetails.getInstance().getProfileDetails();
         if (profileDetails != null) {
-            watermarkText = getEmailOrUsername(profileDetails);
+            emailOrUsernameText = getEmailOrUsername(profileDetails);
         } else {
             TestpressUserDetails.getInstance().load(activity, new TestpressCallback<ProfileDetails>() {
                 @Override
                 public void onSuccess(ProfileDetails userDetails) {
-                    watermarkText = getEmailOrUsername(userDetails);
+                    emailOrUsernameText = getEmailOrUsername(userDetails);
                 }
 
                 @Override
@@ -24,20 +24,18 @@ public class GetUsernameEmailUtil {
                 }
             });
         }
-        if (watermarkText != null) {
-            return watermarkText;
+        if (emailOrUsernameText != null) {
+            return emailOrUsernameText;
         } else {
             return "";
         }
     }
 
     public static String getEmailOrUsername(ProfileDetails profileDetails) {
-        String watermark;
         if (profileDetails.getEmail() != null && !profileDetails.getEmail().isEmpty()) {
-            watermark = profileDetails.getEmail();
+            return profileDetails.getEmail();
         } else {
-            watermark = profileDetails.getUsername();
+            return profileDetails.getUsername();
         }
-        return watermark;
     }
 }
