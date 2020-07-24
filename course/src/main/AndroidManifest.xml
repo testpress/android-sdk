@@ -3,12 +3,14 @@
     package="in.testpress.course">
     <uses-permission android:name="android.permission.MICROPHONE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-sdk tools:overrideLibrary="us.zoom.androidlib,us.zoom.videomeetings"/>
 
     <application
         android:allowBackup="true"
+        android:name=".util.CourseApplication"
         android:supportsRtl="true" >
 
         <activity android:name=".ui.CourseListActivity"
@@ -65,6 +67,15 @@
             android:label="Zoom Meet"
             android:theme="@style/TestpressTheme"/>
 
+        <service android:name=".services.VideoDownloadService" android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.exoplayer.downloadService.action.RESTART" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+        
+        <service android:name="com.google.android.exoplayer2.scheduler.PlatformScheduler$PlatformSchedulerService" android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>

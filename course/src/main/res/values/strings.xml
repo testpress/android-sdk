@@ -50,6 +50,9 @@
     <string name="check_again_later">Please check again later</string>
     <string name="buy_now">Buy Now</string>
     <string name="get_it_for_free">Get it for free</string>
+    <string name="download">Download</string>
+    <string name="download_description">Download Descrition</string>
+    <string name="download_start_error">Failed to start download</string>
 
     <string-array name="exo_speed_values">
         <item>0.5</item>
