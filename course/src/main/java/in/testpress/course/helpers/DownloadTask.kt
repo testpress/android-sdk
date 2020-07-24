@@ -73,7 +73,14 @@ class DownloadTask(val url: String, val context: Context) {
         return download != null && download.state != Download.STATE_COMPLETED
     }
 
-    fun getDownloadRequest(): DownloadRequest? {
+
+}
+
+object VideoDownload {
+    @JvmStatic
+    fun getDownloadRequest(url: String, context: Context): DownloadRequest? {
+        val downloadManager = VideoDownloadManager(context).get()
+        val downloadIndex = downloadManager.downloadIndex
         val download = downloadIndex.getDownload(url)
         return if (download != null && download.state != Download.STATE_FAILED) download.request else null
     }

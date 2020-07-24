@@ -65,6 +65,7 @@ import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
 import in.testpress.course.api.TestpressCourseApiClient;
 import in.testpress.course.helpers.DownloadTask;
+import in.testpress.course.helpers.VideoDownload;
 import in.testpress.models.ProfileDetails;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.VideoAttempt;
@@ -328,7 +329,7 @@ public class ExoPlayerUtil {
 
     private MediaSource getMediaSource() {
         DownloadTask downloadTask = new DownloadTask(url, activity);
-        DownloadRequest downloadRequest = downloadTask.getDownloadRequest();
+        DownloadRequest downloadRequest = VideoDownload.getDownloadRequest(url, activity);
         if (downloadTask.isDownloaded()) {
             return DownloadHelper.createMediaSource(downloadRequest, buildDataSourceFactory());
         } else {
