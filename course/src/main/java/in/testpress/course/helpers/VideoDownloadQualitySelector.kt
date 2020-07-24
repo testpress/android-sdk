@@ -8,11 +8,14 @@ import android.content.Context
 import android.content.DialogInterface
 import android.net.Uri
 import android.widget.Toast
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.offline.DownloadHelper
 import com.google.android.exoplayer2.offline.DownloadRequest
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.trackselection.MappingTrackSelector
 import com.google.android.exoplayer2.util.Util
 import java.io.IOException
 
@@ -86,5 +89,25 @@ class VideoDownloadQualitySelector(
 
     private fun buildDownloadRequest(): DownloadRequest {
         return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(content.title!!))
+    }
+}
+
+class VideoQualityChooserDialog(uri: String): DialogFragment() {
+    private val downloadHelper: DownloadHelper
+
+    init {
+        val uri = Uri.parse(uri)
+        downloadHelper = getDownloadHelper(uri)
+        downloadHelper.prepare(this)
+    }
+
+    private fun getDownloadHelper(uri: Uri): DownloadHelper {
+        val dataSourceFactory = ExoPlayerDataSourceFactory(context).build()
+        val renderersFactory = DefaultRenderersFactory(context)
+        return when (val type = Util.inferContentType(uri)) {
+            C.TYPE_HLS -> DownloadHelper.forHls(context, uri, dataSourceFactory, renderersFactory)
+            C.TYPE_OTHER -> DownloadHelper.forProgressive(context, uri)
+            else -> throw IllegalStateException("Video type not supported for download $type")
+        }
     }
 }

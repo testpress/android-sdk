@@ -6,6 +6,7 @@ import `in`.testpress.course.helpers.DownloadTask
 import `in`.testpress.course.helpers.VideoDownloadQualitySelector
 import `in`.testpress.course.services.VideoDownloadService
 import `in`.testpress.course.util.PatternEditableBuilder
+import `in`.testpress.course.util.TrackSelectionDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -69,6 +70,11 @@ class VideoContentFragment : BaseContentDetailFragment() {
     }
 
     private fun showDownloadDialog() {
+        trackSelectionDialog =
+            TrackSelectionDialog(trackSelectionParameters, downloadHelper.getMappedTrackInfo(0))
+        trackSelectionDialog.onClickListener = this
+        trackSelectionDialog.show(childFragmentManager, null)
+
         val videoDownloadQualitySelector = VideoDownloadQualitySelector(
             childFragmentManager,
             requireContext(),

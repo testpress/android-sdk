@@ -15,9 +15,9 @@ import com.google.android.exoplayer2.trackselection.MappingTrackSelector
 import com.google.android.exoplayer2.ui.TrackSelectionView
 import kotlinx.android.synthetic.main.track_selection_dialog.*
 
-class TrackSelectionDialog(
+open class TrackSelectionDialog(
     private val parameters: DefaultTrackSelector.Parameters,
-    val mappedTrackInfo: MappingTrackSelector.MappedTrackInfo
+    open val mappedTrackInfo: MappingTrackSelector.MappedTrackInfo
 ) : DialogFragment(),
     TrackSelectionView.TrackSelectionListener {
 
