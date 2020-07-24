@@ -36,25 +36,6 @@ class VideoDownloadRequestCreationHandler(val context: Context, val url: String,
         }
     }
 
-    fun buildDownloadRequest(overrides: List<DefaultTrackSelector.SelectionOverride>): DownloadRequest {
-        setSelectedTracks(overrides)
-        return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name))
-    }
-
-    private fun setSelectedTracks(overrides: List<DefaultTrackSelector.SelectionOverride>) {
-        val mappedTrackInfo = downloadHelper.getMappedTrackInfo(0)
-        for (index in 0 until downloadHelper.periodCount) {
-            downloadHelper.clearTrackSelections(index)
-            val rendererIndex = ExoPlayerUtil.getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
-            downloadHelper.addTrackSelectionForSingleRenderer(
-                index,
-                rendererIndex,
-                DownloadHelper.DEFAULT_TRACK_SELECTOR_PARAMETERS_WITHOUT_CONTEXT,
-                overrides
-            )
-        }
-    }
-
     override fun onPrepared(helper: DownloadHelper) {
         listener?.onDownloadRequestHandlerPrepared(
             getMappedTrackInfo(),
@@ -80,6 +61,25 @@ class VideoDownloadRequestCreationHandler(val context: Context, val url: String,
 
     override fun onPrepareError(helper: DownloadHelper, e: IOException) {
         listener?.onDownloadRequestHandlerPrepareError(helper, e)
+    }
+
+    fun buildDownloadRequest(overrides: List<DefaultTrackSelector.SelectionOverride>): DownloadRequest {
+        setSelectedTracks(overrides)
+        return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name))
+    }
+
+    private fun setSelectedTracks(overrides: List<DefaultTrackSelector.SelectionOverride>) {
+        val mappedTrackInfo = downloadHelper.getMappedTrackInfo(0)
+        for (index in 0 until downloadHelper.periodCount) {
+            downloadHelper.clearTrackSelections(index)
+            val rendererIndex = ExoPlayerUtil.getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
+            downloadHelper.addTrackSelectionForSingleRenderer(
+                index,
+                rendererIndex,
+                DownloadHelper.DEFAULT_TRACK_SELECTOR_PARAMETERS_WITHOUT_CONTEXT,
+                overrides
+            )
+        }
     }
 
     interface Listener {

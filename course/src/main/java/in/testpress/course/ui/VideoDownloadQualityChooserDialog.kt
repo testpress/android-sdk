@@ -53,6 +53,28 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
         initializeTrackSelectionView(view)
         showLoading()
     }
+    
+    private fun initializeTrackSelectionView(view: View) {
+        trackSelectionView = view.findViewById(R.id.exo_track_selection_view)
+        trackSelectionView.setShowDisableOption(false)
+        trackSelectionView.setAllowAdaptiveSelections(true)
+        trackSelectionView.setAllowMultipleOverrides(false)
+        trackSelectionView.visibility = View.GONE
+    }
+
+    private fun setOnClickListeners() {
+        okButton.setOnClickListener {
+            val downloadRequest = videoDownloadRequestCreateHandler.buildDownloadRequest(overrides)
+            onSubmitListener?.invoke(downloadRequest)
+            dismiss()
+        }
+
+        cancelButton.setOnClickListener { dismiss() }
+    }
+
+    private fun showLoading() {
+        loadingProgress.visibility = View.VISIBLE
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = AppCompatDialog(activity, R.style.TestpressAppCompatAlertDialogStyle)
@@ -82,6 +104,10 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
         Log.d("VideoDownload", "onDownloadRequestHandlerPrepareError: ${e.localizedMessage}")
     }
 
+    private fun hideLoading() {
+        loadingProgress.visibility = View.GONE
+    }
+
     override fun onTrackSelectionChanged(
         isDisabled: Boolean,
         selectedOverrides: MutableList<DefaultTrackSelector.SelectionOverride>
@@ -91,31 +117,5 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
 
     fun setOnSubmitListener(listener: OnSubmitListener) {
         onSubmitListener = listener
-    }
-
-    private fun showLoading() {
-        loadingProgress.visibility = View.VISIBLE
-    }
-
-    private fun hideLoading() {
-        loadingProgress.visibility = View.GONE
-    }
-
-    private fun initializeTrackSelectionView(view: View) {
-        trackSelectionView = view.findViewById(R.id.exo_track_selection_view)
-        trackSelectionView.setShowDisableOption(false)
-        trackSelectionView.setAllowAdaptiveSelections(true)
-        trackSelectionView.setAllowMultipleOverrides(false)
-        trackSelectionView.visibility = View.GONE
-    }
-
-    private fun setOnClickListeners() {
-        okButton.setOnClickListener {
-            val downloadRequest = videoDownloadRequestCreateHandler.buildDownloadRequest(overrides)
-            onSubmitListener?.invoke(downloadRequest)
-            dismiss()
-        }
-
-        cancelButton.setOnClickListener { dismiss() }
     }
 }

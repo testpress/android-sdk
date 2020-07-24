@@ -25,18 +25,6 @@ class VideoDownloadManager {
         databaseProvider = ExoDatabaseProvider(context)
     }
 
-    @Synchronized
-    fun getDownloadCache(): Cache {
-        if (!::downloadCache.isInitialized) {
-            val courseApplication = context.applicationContext as CourseApplication
-            val downloadContentDirectory =
-                File(courseApplication.getDownloadDirectory(), DOWNLOAD_CONTENT_DIRECTORY)
-            downloadCache =
-                SimpleCache(downloadContentDirectory, NoOpCacheEvictor(), databaseProvider)
-        }
-        return downloadCache
-    }
-
     fun get(): DownloadManager {
         if (downloadManger == null) {
             initializeDownloadManger()
@@ -55,6 +43,18 @@ class VideoDownloadManager {
             downloadIndex,
             DefaultDownloaderFactory(downloaderConstructorHelper)
         )
+    }
+
+    @Synchronized
+    fun getDownloadCache(): Cache {
+        if (!::downloadCache.isInitialized) {
+            val courseApplication = context.applicationContext as CourseApplication
+            val downloadContentDirectory =
+                File(courseApplication.getDownloadDirectory(), DOWNLOAD_CONTENT_DIRECTORY)
+            downloadCache =
+                SimpleCache(downloadContentDirectory, NoOpCacheEvictor(), databaseProvider)
+        }
+        return downloadCache
     }
 
     private fun buildHttpDataSourceFactory(): HttpDataSource.Factory {
