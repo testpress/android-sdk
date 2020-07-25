@@ -117,7 +117,7 @@ class VideoDownloadService : DownloadService(
         launch {
             withContext(Dispatchers.IO) {
                 while (downloadManager.currentDownloads.isNotEmpty()) {
-                    offlineVideoRepository.updateOfflineVideoDownloadStatus()
+                    offlineVideoRepository.refreshCurrentDownloadsProgress()
                     delay(1000)
                 }
                 downloadProgressUpdateHandler.removeCallbacks(runnable)

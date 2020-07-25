@@ -10,7 +10,7 @@ class OfflineVideoRepository(val context: Context) {
     val offlineVideos = offlineVideoDao.getAll()
     private val downloadManager = VideoDownloadManager(context).get()
 
-    fun updateOfflineVideoDownloadStatus() {
+    fun refreshCurrentDownloadsProgress() {
         for (download in downloadManager.currentDownloads) {
             updateOfflineVideoDownloadStatus(download)
         }
