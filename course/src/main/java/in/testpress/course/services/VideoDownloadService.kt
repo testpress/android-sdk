@@ -2,6 +2,8 @@ package `in`.testpress.course.services
 
 import `in`.testpress.course.R
 import `in`.testpress.course.helpers.VideoDownloadManager
+import `in`.testpress.course.helpers.VideoDownloadMonitor
+import `in`.testpress.course.repository.OfflineVideoRepository
 import android.app.Notification
 import android.content.Context
 import com.google.android.exoplayer2.offline.Download
@@ -12,6 +14,9 @@ import com.google.android.exoplayer2.scheduler.Scheduler
 import com.google.android.exoplayer2.ui.DownloadNotificationHelper
 import com.google.android.exoplayer2.util.NotificationUtil
 import com.google.android.exoplayer2.util.Util
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 class VideoDownloadService : DownloadService(
     FOREGROUND_NOTIFICATION_ID,
@@ -19,13 +24,23 @@ class VideoDownloadService : DownloadService(
     CHANNEL_ID,
     R.string.download,
     R.string.download_description
-), DownloadManager.Listener {
+), DownloadManager.Listener, VideoDownloadMonitor.Callback {
+
+    private lateinit var offlineVideoRepository: OfflineVideoRepository
 
     private lateinit var notificationHelper: DownloadNotificationHelper
+    lateinit var downloadMonitor: VideoDownloadMonitor
 
     override fun onCreate() {
         super.onCreate()
+        offlineVideoRepository = OfflineVideoRepository(this)
         notificationHelper = DownloadNotificationHelper(this, CHANNEL_ID)
+        initializeDownloadMonitor()
+    }
+
+    private fun initializeDownloadMonitor() {
+        downloadMonitor = VideoDownloadMonitor()
+        downloadMonitor.callback = this
     }
 
     override fun getDownloadManager(): DownloadManager {
@@ -53,25 +68,38 @@ class VideoDownloadService : DownloadService(
 
     override fun onDownloadChanged(downloadManager: DownloadManager, download: Download) {
         var notification: Notification? = null
+
+        if (!downloadMonitor.isRunning()) {
+            downloadMonitor.start()
+        }
+
         when (download.state) {
             Download.STATE_COMPLETED -> {
-                val message = "Download is completed"
-                notification = notificationHelper.buildDownloadCompletedNotification(
-                    R.drawable.ic_download_done,
-                    null,
-                    message
-                )
+                downloadMonitor.updateVideoProgress(download)
+                notification = getCompletedNotification()
             }
-            Download.STATE_FAILED -> {
-                val message = "Download is failed. Please try again"
-                notification = notificationHelper.buildDownloadFailedNotification(
-                    R.drawable.ic_download_done,
-                    null,
-                    message
-                )
-            }
+            Download.STATE_FAILED -> notification = getFailedNotification()
+            Download.STATE_REMOVING -> downloadMonitor.deleteVideo(download)
         }
         NotificationUtil.setNotification(this, nextNotificationId, notification)
+    }
+
+    private fun getFailedNotification(): Notification {
+        val message = "Download is failed. Please try again"
+        return notificationHelper.buildDownloadFailedNotification(
+            R.drawable.ic_download_done,
+            null,
+            message
+        )
+    }
+
+    private fun getCompletedNotification(): Notification {
+        val message = "Download is completed"
+        return notificationHelper.buildDownloadCompletedNotification(
+            R.drawable.ic_download_done,
+            null,
+            message
+        )
     }
 
     companion object {
@@ -86,6 +114,28 @@ class VideoDownloadService : DownloadService(
             } catch (e: IllegalStateException) {
                 startForeground(context, VideoDownloadService::class.java)
             }
+        }
+    }
+
+    override suspend fun onCurrentDownloadsUpdate() {
+        withContext(Dispatchers.IO) {
+            while (downloadManager.currentDownloads.isNotEmpty()) {
+                offlineVideoRepository.refreshCurrentDownloadsProgress()
+                delay(1000)
+            }
+            downloadMonitor.stop()
+        }
+    }
+
+    override suspend fun onUpdate(download: Download) {
+        withContext(Dispatchers.IO) {
+            offlineVideoRepository.updateOfflineVideoDownloadStatus(download)
+        }
+    }
+
+    override suspend fun onDelete(download: Download) {
+        withContext(Dispatchers.IO) {
+            offlineVideoRepository.deleteOfflineVideo(download)
         }
     }
 }

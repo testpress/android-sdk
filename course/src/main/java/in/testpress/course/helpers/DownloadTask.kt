@@ -1,22 +1,47 @@
 package `in`.testpress.course.helpers
 
+import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.services.VideoDownloadService
+import `in`.testpress.database.OfflineVideo
+import `in`.testpress.database.TestpressDatabase
 import android.content.Context
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadRequest
 import com.google.android.exoplayer2.offline.DownloadService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DownloadTask(val url: String, val context: Context) {
     private val downloadManager = VideoDownloadManager(context).get()
     private val downloadIndex = downloadManager.downloadIndex
 
-    fun start(downloadRequest: DownloadRequest) {
+    fun start(downloadRequest: DownloadRequest, content: DomainContent) {
+        storeDownloadInfo(content)
         DownloadService.sendAddDownload(
             context,
             VideoDownloadService::class.java,
             downloadRequest,
             false
         )
+    }
+
+    private fun storeDownloadInfo(content: DomainContent) {
+        val offlineVideo = OfflineVideo(
+            title = content.title,
+            description = content.description,
+            duration = content.video!!.duration!!,
+            url = content.video.hlsUrl(),
+            contentId = content.id
+        )
+        val offlineVideoDao = TestpressDatabase(context).offlineVideoDao()
+
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                offlineVideoDao.insert(offlineVideo)
+            }
+        }
     }
 
     fun pause() {
