@@ -73,7 +73,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
             VideoDownloadQualityChooserDialog(content)
         videoQualityChooserDialog.show(childFragmentManager, null)
         videoQualityChooserDialog.setOnSubmitListener {downloadRequest ->
-            DownloadTask(downloadRequest.uri.toString(), requireContext()).start(downloadRequest)
+            DownloadTask(downloadRequest.uri.toString(), requireContext()).start(downloadRequest, content)
         }
     }
 
