@@ -2,10 +2,10 @@ package `in`.testpress.course.services
 
 import `in`.testpress.course.R
 import `in`.testpress.course.helpers.VideoDownloadManager
+import `in`.testpress.course.helpers.VideoDownloadMonitor
 import `in`.testpress.course.repository.OfflineVideoRepository
 import android.app.Notification
 import android.content.Context
-import android.os.Handler
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
 import com.google.android.exoplayer2.offline.DownloadService
@@ -14,12 +14,9 @@ import com.google.android.exoplayer2.scheduler.Scheduler
 import com.google.android.exoplayer2.ui.DownloadNotificationHelper
 import com.google.android.exoplayer2.util.NotificationUtil
 import com.google.android.exoplayer2.util.Util
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.CoroutineContext
 
 class VideoDownloadService : DownloadService(
     FOREGROUND_NOTIFICATION_ID,
@@ -27,23 +24,23 @@ class VideoDownloadService : DownloadService(
     CHANNEL_ID,
     R.string.download,
     R.string.download_description
-), DownloadManager.Listener, CoroutineScope {
+), DownloadManager.Listener, VideoDownloadMonitor.Callback {
 
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.IO
-    var downloadProgressUpdateHandler = Handler()
-    lateinit var runnable: Runnable
     private lateinit var offlineVideoRepository: OfflineVideoRepository
 
     private lateinit var notificationHelper: DownloadNotificationHelper
+    lateinit var downloadMonitor: VideoDownloadMonitor
 
     override fun onCreate() {
         super.onCreate()
         offlineVideoRepository = OfflineVideoRepository(this)
         notificationHelper = DownloadNotificationHelper(this, CHANNEL_ID)
-        runnable = Runnable {
-            updateDownloadProgressInDB()
-        }
+        initializeDownloadMonitor()
+    }
+
+    private fun initializeDownloadMonitor() {
+        downloadMonitor = VideoDownloadMonitor()
+        downloadMonitor.callback = this
     }
 
     override fun getDownloadManager(): DownloadManager {
@@ -72,21 +69,17 @@ class VideoDownloadService : DownloadService(
     override fun onDownloadChanged(downloadManager: DownloadManager, download: Download) {
         var notification: Notification? = null
 
-        if (isDownloadProgressNotBeingUpdated()) {
-            refreshCurrentDownloadsProgress()
+        if (!downloadMonitor.isRunning()) {
+            downloadMonitor.start()
         }
 
         when (download.state) {
             Download.STATE_COMPLETED -> {
-                updateDownloadProgress(download)
+                downloadMonitor.updateVideoProgress(download)
                 notification = getCompletedNotification()
             }
             Download.STATE_FAILED -> notification = getFailedNotification()
-            Download.STATE_REMOVING -> {
-                launch {
-                    offlineVideoRepository.deleteOfflineVideo(download)
-                }
-            }
+            Download.STATE_REMOVING -> downloadMonitor.deleteVideo(download)
         }
         NotificationUtil.setNotification(this, nextNotificationId, notification)
     }
@@ -109,35 +102,6 @@ class VideoDownloadService : DownloadService(
         )
     }
 
-    private fun refreshCurrentDownloadsProgress() {
-        downloadProgressUpdateHandler.postDelayed(runnable, 1000)
-    }
-
-    private fun updateDownloadProgressInDB() {
-        launch {
-            withContext(Dispatchers.IO) {
-                while (downloadManager.currentDownloads.isNotEmpty()) {
-                    offlineVideoRepository.refreshCurrentDownloadsProgress()
-                    delay(1000)
-                }
-                downloadProgressUpdateHandler.removeCallbacks(runnable)
-                downloadProgressUpdateHandler.removeCallbacksAndMessages(null)
-            }
-        }
-    }
-
-    private fun isDownloadProgressNotBeingUpdated(): Boolean {
-        return !downloadProgressUpdateHandler.hasCallbacks(runnable)
-    }
-
-    private fun updateDownloadProgress(download: Download) {
-        launch {
-            withContext(Dispatchers.IO) {
-                offlineVideoRepository.updateOfflineVideoDownloadStatus(download)
-            }
-        }
-    }
-
     companion object {
         private const val CHANNEL_ID = "download_channel"
         private const val JOB_ID = 1
@@ -150,6 +114,28 @@ class VideoDownloadService : DownloadService(
             } catch (e: IllegalStateException) {
                 startForeground(context, VideoDownloadService::class.java)
             }
+        }
+    }
+
+    override suspend fun onCurrentDownloadsUpdate() {
+        withContext(Dispatchers.IO) {
+            while (downloadManager.currentDownloads.isNotEmpty()) {
+                offlineVideoRepository.refreshCurrentDownloadsProgress()
+                delay(1000)
+            }
+            downloadMonitor.stop()
+        }
+    }
+
+    override suspend fun onUpdate(download: Download) {
+        withContext(Dispatchers.IO) {
+            offlineVideoRepository.updateOfflineVideoDownloadStatus(download)
+        }
+    }
+
+    override suspend fun onDelete(download: Download) {
+        withContext(Dispatchers.IO) {
+            offlineVideoRepository.deleteOfflineVideo(download)
         }
     }
 }
