@@ -18,7 +18,7 @@ class VideoDownloadMonitor() : CoroutineScope {
 
     init {
         runnable = Runnable {
-            update()
+            run()
         }
     }
 
@@ -43,7 +43,7 @@ class VideoDownloadMonitor() : CoroutineScope {
         }
     }
 
-    private fun update() {
+    private fun run() {
         launch {
             withContext(Dispatchers.IO) {
                 callback?.onCurrentDownloadsUpdate()
