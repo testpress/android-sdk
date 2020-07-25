@@ -8,9 +8,10 @@ class ExoPlayerTrackNameProvider : TrackNameProvider {
         return when {
             format.width <= 240 -> "Very Low"
             format.width <= 360 -> "Low"
-            format.width <= 480 -> "Medium"
-            format.width <= 720 -> "High"
-            format.width <= 1080 -> "Very High"
+            format.width <= 480 -> "High"
+            format.width <= 540 -> "High"
+            format.width <= 720 -> "HD"
+            format.width <= 1080 -> "HD1080"
             else -> "${format.width}p"
         }
     }
