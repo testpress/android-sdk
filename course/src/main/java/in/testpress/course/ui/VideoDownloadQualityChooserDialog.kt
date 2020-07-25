@@ -3,6 +3,7 @@ package `in`.testpress.course.ui
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.helpers.VideoDownloadRequestCreationHandler
+import `in`.testpress.course.util.ExoPlayerTrackNameProvider
 import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
@@ -60,6 +61,7 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
         trackSelectionView.setAllowAdaptiveSelections(true)
         trackSelectionView.setAllowMultipleOverrides(false)
         trackSelectionView.visibility = View.GONE
+        trackSelectionView.setTrackNameProvider(ExoPlayerTrackNameProvider())
     }
 
     private fun setOnClickListeners() {
