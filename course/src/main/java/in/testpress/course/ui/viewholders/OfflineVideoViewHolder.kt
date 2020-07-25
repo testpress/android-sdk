@@ -39,6 +39,8 @@ class OfflineVideoViewHolder(val view: View) : RecyclerView.ViewHolder(view),
 
     init {
         title.typeface = TestpressSdk.getRubikMediumFont(view.context)
+        size.typeface = TestpressSdk.getRubikRegularFont(view.context)
+        duration.typeface = TestpressSdk.getRubikRegularFont(view.context)
     }
 
     fun bind(offlineVideo: DomainOfflineVideo, clickListener: DownloadedVideoClickListener) {

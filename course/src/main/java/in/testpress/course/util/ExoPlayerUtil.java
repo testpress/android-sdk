@@ -232,11 +232,12 @@ public class ExoPlayerUtil {
     }
 
     public void openOnlyInFullScreen() {
-        initFullscreenDialog();
+        openFullscreenDialog();
         fullscreenDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
                 fullscreenDialog.dismiss();
+                activity.finish();
             }
         });
     }
