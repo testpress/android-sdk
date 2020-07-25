@@ -231,6 +231,17 @@ public class ExoPlayerUtil {
         });
     }
 
+    public void openOnlyInFullScreen() {
+        openFullscreenDialog();
+        fullscreenDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                fullscreenDialog.dismiss();
+                activity.finish();
+            }
+        });
+    }
+
     public void seekTo(Long milliSeconds) {
         player.seekTo(milliSeconds);
     }
