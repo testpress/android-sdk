@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainOfflineVideo
 import `in`.testpress.course.ui.DownloadedVideoClickListener
+import `in`.testpress.util.ImageUtils
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -36,6 +37,8 @@ class OfflineVideoViewHolder(val view: View) : RecyclerView.ViewHolder(view),
     private val cancelButton: MaterialButton = view.findViewById(R.id.cancel_button)
     private var eventListener: DownloadedVideoClickListener? = null
     private lateinit var offlineVideo: DomainOfflineVideo
+    private val imageOptions = ImageUtils.getPlaceholdersOption()
+    private val imageLoader = ImageUtils.initImageLoader(view.context)
 
     init {
         title.typeface = TestpressSdk.getRubikMediumFont(view.context)
@@ -53,6 +56,7 @@ class OfflineVideoViewHolder(val view: View) : RecyclerView.ViewHolder(view),
     private fun bindViews() {
         title.text = offlineVideo.title
         duration.text = offlineVideo.duration
+        imageLoader.displayImage(offlineVideo.remoteThumbnail, image, imageOptions)
         showVideoSize()
 
         if (offlineVideo.isDownloadCompleted) {

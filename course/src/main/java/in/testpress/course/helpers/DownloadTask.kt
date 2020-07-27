@@ -33,7 +33,8 @@ class DownloadTask(val url: String, val context: Context) {
             description = content.description,
             duration = content.video!!.duration!!,
             url = content.video.hlsUrl(),
-            contentId = content.id
+            contentId = content.id,
+            remoteThumbnail = content.video.thumbnailMedium
         )
         val offlineVideoDao = TestpressDatabase(context).offlineVideoDao()
 
