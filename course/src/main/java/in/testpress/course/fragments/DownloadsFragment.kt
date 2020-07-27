@@ -2,6 +2,7 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
 import `in`.testpress.course.repository.OfflineVideoRepository
+import `in`.testpress.course.services.VideoDownloadService
 import `in`.testpress.course.ui.OfflineVideoListAdapter
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import `in`.testpress.fragments.EmptyViewFragment
@@ -32,6 +33,11 @@ class DownloadsFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var loadingPlaceholder: ShimmerFrameLayout
     private lateinit var adapter: OfflineVideoListAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        VideoDownloadService.start(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
