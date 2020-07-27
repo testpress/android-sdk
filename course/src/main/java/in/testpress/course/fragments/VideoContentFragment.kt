@@ -11,6 +11,7 @@ import `in`.testpress.course.util.PatternEditableBuilder
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -162,7 +163,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
             } else if(it != null && it.isDownloadCompleted){
                 showDownloadedIcon()
             } else {
-                showDownloadedIcon()
+                showDownloadIcon()
             }
         })
     }
