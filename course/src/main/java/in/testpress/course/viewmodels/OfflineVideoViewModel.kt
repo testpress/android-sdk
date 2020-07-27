@@ -12,8 +12,8 @@ class OfflineVideoViewModel(private val offlineVideoRepository: OfflineVideoRepo
         it.asDomainModel()
     }
 
-    fun getOfflineVideo(url: String): LiveData<DomainOfflineVideo?> {
-        return Transformations.map(offlineVideoRepository.getOfflineVideo(url)) {
+    fun get(url: String): LiveData<DomainOfflineVideo?> {
+        return Transformations.map(offlineVideoRepository.get(url)) {
             it?.asDomainModel()
         }
     }

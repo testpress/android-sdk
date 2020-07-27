@@ -12,13 +12,13 @@ class OfflineVideoRepository(val context: Context) {
     val offlineVideos = offlineVideoDao.getAll()
     private val downloadManager = VideoDownloadManager(context).get()
 
-    fun refreshCurrentDownloadsProgress() {
+    fun refreshCurrentDownloadsStatus() {
         for (download in downloadManager.currentDownloads) {
-            updateOfflineVideoDownloadStatus(download)
+            updateDownloadStatus(download)
         }
     }
 
-    fun updateOfflineVideoDownloadStatus(download: Download) {
+    fun updateDownloadStatus(download: Download) {
         val offlineVideo = offlineVideoDao.getByUrl(download.request.uri.toString())
         offlineVideo?.let {
             offlineVideo.percentageDownloaded = download.percentDownloaded.toInt()
@@ -28,11 +28,11 @@ class OfflineVideoRepository(val context: Context) {
         }
     }
 
-    fun deleteOfflineVideo(download: Download) {
+    fun delete(download: Download) {
         offlineVideoDao.deleteByUrl(download.request.uri.toString())
     }
 
-    fun getOfflineVideo(url: String): LiveData<OfflineVideo?> {
+    fun get(url: String): LiveData<OfflineVideo?> {
         return offlineVideoDao.get(url)
     }
 }

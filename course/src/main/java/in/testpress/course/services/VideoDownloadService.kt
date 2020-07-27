@@ -120,7 +120,7 @@ class VideoDownloadService : DownloadService(
     override suspend fun onCurrentDownloadsUpdate() {
         withContext(Dispatchers.IO) {
             while (downloadManager.currentDownloads.isNotEmpty()) {
-                offlineVideoRepository.refreshCurrentDownloadsProgress()
+                offlineVideoRepository.refreshCurrentDownloadsStatus()
                 delay(1000)
             }
             downloadMonitor.stop()
@@ -129,13 +129,13 @@ class VideoDownloadService : DownloadService(
 
     override suspend fun onUpdate(download: Download) {
         withContext(Dispatchers.IO) {
-            offlineVideoRepository.updateOfflineVideoDownloadStatus(download)
+            offlineVideoRepository.updateDownloadStatus(download)
         }
     }
 
     override suspend fun onDelete(download: Download) {
         withContext(Dispatchers.IO) {
-            offlineVideoRepository.deleteOfflineVideo(download)
+            offlineVideoRepository.delete(download)
         }
     }
 }
