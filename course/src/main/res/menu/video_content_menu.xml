@@ -3,9 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/download_progress"
+        android:icon="@drawable/ic_downloads"
+        android:title="Download"
+        android:visible="false"
+        app:contentInsetEnd="10dp"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/download"
         android:icon="@drawable/ic_downloads"
-        app:showAsAction="always"
+        android:title="Download"
         android:visible="true"
-        android:title="Download" />
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/downloaded"
+        android:icon="@drawable/ic_offline_available"
+        android:title="Offline"
+        android:visible="false"
+        app:showAsAction="always" />
 </menu>

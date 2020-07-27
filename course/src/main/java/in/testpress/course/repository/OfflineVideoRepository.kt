@@ -1,8 +1,10 @@
 package `in`.testpress.course.repository
 
 import `in`.testpress.course.helpers.VideoDownloadManager
+import `in`.testpress.database.OfflineVideo
 import `in`.testpress.database.TestpressDatabase
 import android.content.Context
+import androidx.lifecycle.LiveData
 import com.google.android.exoplayer2.offline.Download
 
 class OfflineVideoRepository(val context: Context) {
@@ -28,5 +30,9 @@ class OfflineVideoRepository(val context: Context) {
 
     fun deleteOfflineVideo(download: Download) {
         offlineVideoDao.deleteByUrl(download.request.uri.toString())
+    }
+
+    fun getOfflineVideo(url: String): LiveData<OfflineVideo?> {
+        return offlineVideoDao.get(url)
     }
 }

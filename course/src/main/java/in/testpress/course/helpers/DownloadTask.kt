@@ -99,6 +99,10 @@ class DownloadTask(val url: String, val context: Context) {
         return download != null && download.state == Download.STATE_COMPLETED
     }
 
+    fun isBeingDownloaded(): Boolean {
+        val download = downloadIndex.getDownload(url)
+        return download != null && download.state == Download.STATE_DOWNLOADING
+    }
 
 }
 
