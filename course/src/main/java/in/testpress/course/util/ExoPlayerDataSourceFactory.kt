@@ -14,7 +14,7 @@ class ExoPlayerDataSourceFactory(val context: Context) {
     private val bandwidthMeter = DefaultBandwidthMeter.Builder(context).build()
     private val userAgent: String = UserAgentProvider.get(context)
 
-    private fun getHttpDataSourceFactory(): OkHttpDataSourceFactory {
+    fun getHttpDataSourceFactory(): OkHttpDataSourceFactory {
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(VideoPlayerInterceptor(context))
             .build()

@@ -1,6 +1,7 @@
 package `in`.testpress.course.helpers
 
 import `in`.testpress.course.util.CourseApplication
+import `in`.testpress.course.util.ExoPlayerDataSourceFactory
 import android.content.Context
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
 import com.google.android.exoplayer2.offline.DefaultDownloadIndex
@@ -37,7 +38,10 @@ class VideoDownloadManager {
     private fun initializeDownloadManger() {
         val downloadIndex = DefaultDownloadIndex(databaseProvider)
         val downloaderConstructorHelper =
-            DownloaderConstructorHelper(getDownloadCache(), buildHttpDataSourceFactory())
+            DownloaderConstructorHelper(
+                getDownloadCache(),
+                ExoPlayerDataSourceFactory(context).getHttpDataSourceFactory()
+            )
         downloadManger = DownloadManager(
             context,
             downloadIndex,
@@ -55,11 +59,6 @@ class VideoDownloadManager {
                 SimpleCache(downloadContentDirectory, NoOpCacheEvictor(), databaseProvider)
         }
         return downloadCache
-    }
-
-    private fun buildHttpDataSourceFactory(): HttpDataSource.Factory {
-        val userAgent = Util.getUserAgent(context, context.packageName)
-        return DefaultHttpDataSourceFactory(userAgent)
     }
 
     companion object {
