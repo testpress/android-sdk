@@ -117,3 +117,17 @@ function addWatermark(logoUrl) {
     document.body.pseudoStyle("before", "background-image", `url(${logoUrl})`);
     document.body.classList.add("watermark");
 }
+function showImage() {
+    var image = document.getElementsByTagName("img");
+    var button = document.getElementById("show-hide-button");
+         for (i = 0; i < image.length; i++) {
+             if(image[i].style.display == 'none') {
+                  image[i].style.display = 'block';
+                  button.innerHTML = 'Hide Image';
+             }
+             else {
+                  image[i].style.display = 'none';
+                  button.innerHTML = 'Show Image';
+             }
+         }
+}

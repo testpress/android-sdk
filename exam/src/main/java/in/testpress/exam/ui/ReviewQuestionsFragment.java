@@ -7,12 +7,6 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +20,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -361,6 +360,10 @@ public class ReviewQuestionsFragment extends Fragment {
             html += "<div class='question' style='padding-bottom: 0px;'>" +
                         directionHtml +
                     "</div>";
+            boolean isImageAvailable = directionHtml.contains("<img");
+            if (isImageAvailable) {
+                html += "\n" + WebViewUtils.getButtonToShowOrHideImage();
+            }
         }
 
         // Add question

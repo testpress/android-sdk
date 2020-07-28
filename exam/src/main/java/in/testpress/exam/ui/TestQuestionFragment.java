@@ -3,15 +3,13 @@ package in.testpress.exam.ui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
-
+import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 import java.util.List;
-
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptAnswer;
@@ -129,6 +127,10 @@ public class TestQuestionFragment extends Fragment {
                     "<div class='question' style='padding-bottom: 0px;'>" +
                         attemptQuestion.getDirection() +
                     "</div>";
+            boolean isImageAvailable = attemptQuestion.getDirection().contains("<img");
+            if (isImageAvailable){
+                htmlContent +=  WebViewUtils.getButtonToShowOrHideImage();
+            }
         }
         // Add question
         htmlContent += "" +

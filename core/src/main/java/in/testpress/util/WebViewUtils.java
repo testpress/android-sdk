@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
-import androidx.core.content.ContextCompat;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -16,9 +15,8 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
+import androidx.core.content.ContextCompat;
 import java.util.List;
-
 import in.testpress.ui.ZoomableImageActivity;
 
 public class WebViewUtils {
@@ -211,6 +209,10 @@ public class WebViewUtils {
         return "initCheckBoxGroup(" + selectedOptions + ");";
     }
 
+    protected static String getButtonClick() {
+        return "showImage()";
+    }
+
     protected static String getBookmarkButtonUpdater(boolean bookmarked) {
         return "updateBookmarkButtonState(" + bookmarked + ");";
     }
@@ -286,6 +288,10 @@ public class WebViewUtils {
         return html + ((char) (65 + index)) + "</div>" +
                 optionHtml +
                 "</div>";
+    }
+
+    public static String getButtonToShowOrHideImage() {
+        return "\n<button onclick='showImage()' id='show-hide-button' class= 'hide-or-show-text'>Hide Image</button>";
     }
 
     public static String getRadioButtonOptionWithTags(String optionText, int id) {
