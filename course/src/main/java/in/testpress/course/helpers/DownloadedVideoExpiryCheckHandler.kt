@@ -15,6 +15,10 @@ class DownloadedVideoExpiryCheckHandler(val context: Context) {
         urls: HashMap<String, List<String>>,
         handleSuccess: (NetworkDownloadedVideosAccessChecker) -> Unit
     ) {
+        if (urls.values.isEmpty()) {
+            return
+        }
+        
         courseNetwork.checkDownloadedVideosExpiry(urls)
             .enqueue(object : TestpressCallback<NetworkDownloadedVideosAccessChecker>() {
                 override fun onSuccess(result: NetworkDownloadedVideosAccessChecker?) {
