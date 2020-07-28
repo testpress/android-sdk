@@ -2,6 +2,7 @@ package `in`.testpress.course.helpers
 
 import `in`.testpress.course.util.CourseApplication
 import `in`.testpress.course.util.ExoPlayerDataSourceFactory
+import `in`.testpress.util.DateUtils
 import android.content.Context
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
 import com.google.android.exoplayer2.offline.DefaultDownloadIndex
@@ -12,6 +13,7 @@ import com.google.android.exoplayer2.upstream.cache.Cache
 import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import java.io.File
+import java.util.Date
 
 class VideoDownloadManager {
     private lateinit var downloadCache: Cache
@@ -58,8 +60,27 @@ class VideoDownloadManager {
         return downloadCache
     }
 
+
+    fun isVideosRefreshed(): Boolean {
+        val sharedPreferences = context.getSharedPreferences(DOWNLOADS_SHARED_PREFERENCE, Context.MODE_PRIVATE)
+        if (sharedPreferences.getLong(LAST_REFRESH_DATE, -1) != -1L) {
+            val lastRefreshedDate = Date(sharedPreferences.getLong(LAST_REFRESH_DATE, 0))
+            val today = Date()
+            return DateUtils.difference(lastRefreshedDate, today) <= 15
+        }
+        return false
+    }
+
+    fun updateRefreshDate() {
+        val today = Date()
+        val sharedPreferences = context.getSharedPreferences(DOWNLOADS_SHARED_PREFERENCE, Context.MODE_PRIVATE)
+        sharedPreferences.edit().putLong(LAST_REFRESH_DATE, today.time).apply();
+    }
+
     companion object {
         const val DOWNLOAD_CONTENT_DIRECTORY = "downloads"
+        const val DOWNLOADS_SHARED_PREFERENCE = "downloadsSharedPreference"
+        const val LAST_REFRESH_DATE = "lastRefreshDate"
         private lateinit var INSTANCE: VideoDownloadManager
 
         @JvmStatic

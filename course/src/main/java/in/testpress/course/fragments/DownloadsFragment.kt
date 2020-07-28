@@ -1,11 +1,14 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
+import `in`.testpress.course.helpers.DownloadedVideoExpiryCheckHandler
+import `in`.testpress.course.helpers.VideoDownloadManager
 import `in`.testpress.course.repository.OfflineVideoRepository
 import `in`.testpress.course.services.VideoDownloadService
 import `in`.testpress.course.ui.OfflineVideoListAdapter
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import `in`.testpress.fragments.EmptyViewFragment
+import `in`.testpress.fragments.EmptyViewListener
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,7 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
 
-class DownloadsFragment : Fragment() {
+class DownloadsFragment : Fragment(), EmptyViewListener {
     private val TAG = "DownloadsFragment"
     private val viewModel by lazy {
         ViewModelProvider(this, object : ViewModelProvider.Factory {
@@ -33,6 +36,7 @@ class DownloadsFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var loadingPlaceholder: ShimmerFrameLayout
     private lateinit var adapter: OfflineVideoListAdapter
+    private var urlsHashMap = HashMap<String, List<String>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,10 +82,16 @@ class DownloadsFragment : Fragment() {
 
     private fun initializeObservers() {
         showLoadingPlaceholder()
+        viewModel.urls.observe(viewLifecycleOwner, Observer {
+            urlsHashMap["urls"] = it
+            checkExpiry()
+        })
         viewModel.offlineVideos.observe(viewLifecycleOwner, Observer {
             hideLoadingPlaceholder()
             if (it.isEmpty()) {
                 showEmptyScreen()
+            } else if (!VideoDownloadManager(requireContext()).isVideosRefreshed()) {
+                showRefreshScreen()
             } else {
                 adapter.offlineVideos = it
                 adapter.notifyDataSetChanged()
@@ -95,6 +105,12 @@ class DownloadsFragment : Fragment() {
         emptyViewFragment.showOrHideButton(false)
     }
 
+    private fun showRefreshScreen() {
+        emptyViewFragment.setEmptyText(R.string.refresh_videos, R.string.refresh_videos_description, null)
+        emptyViewFragment.setImage(R.drawable.ic_empty_video)
+        emptyViewFragment.showOrHideButton(true)
+    }
+
     private fun showLoadingPlaceholder() {
         loadingPlaceholder.visibility = View.VISIBLE
         loadingPlaceholder.startShimmer()
@@ -103,5 +119,15 @@ class DownloadsFragment : Fragment() {
     private fun hideLoadingPlaceholder() {
         loadingPlaceholder.stopShimmer()
         loadingPlaceholder.visibility = View.GONE
+    }
+
+    override fun onRetryClick() {
+        checkExpiry()
+    }
+
+    private fun checkExpiry() {
+        DownloadedVideoExpiryCheckHandler(requireContext()).check(urlsHashMap) {
+            viewModel.refresh()
+        }
     }
 }

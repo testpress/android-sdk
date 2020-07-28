@@ -35,4 +35,8 @@ class OfflineVideoRepository(val context: Context) {
     fun get(url: String): LiveData<OfflineVideo?> {
         return offlineVideoDao.get(url)
     }
+
+    fun getUrls(): LiveData<List<String>> {
+        return offlineVideoDao.getUrls()
+    }
 }

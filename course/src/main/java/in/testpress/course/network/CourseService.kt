@@ -2,6 +2,7 @@ package `in`.testpress.course.network
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.api.TestpressCourseApiClient
+import `in`.testpress.course.api.TestpressCourseApiClient.REFRESH_DOWNLOADED_VIDEOS_PATH
 import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.network.RetrofitCall
@@ -9,13 +10,14 @@ import `in`.testpress.network.TestpressApiClient
 import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.ContentsListResponse
 import android.content.Context
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.QueryMap
 import retrofit2.http.Url
-import java.util.HashMap
+import kotlin.collections.HashMap
 
 interface CourseService {
     @GET("{content_url}")
@@ -41,6 +43,9 @@ interface CourseService {
         @Path(value = "contents_url", encoded = true) contentUrl: String,
         @QueryMap queryParams: HashMap<String, Any>
     ): RetrofitCall<ApiResponse<ContentsListResponse>>
+
+    @POST(REFRESH_DOWNLOADED_VIDEOS_PATH)
+    fun checkDownloadedVideosExpiry(@Body arguments: HashMap<String, List<String>>): RetrofitCall<NetworkDownloadedVideosAccessChecker>
 }
 
 
@@ -65,5 +70,9 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     fun getContents(url: String, arguments: HashMap<String, Any>): RetrofitCall<ApiResponse<ContentsListResponse>> {
         return getCourseService().getContents(url, arguments)
+    }
+
+    fun checkDownloadedVideosExpiry(arguments: HashMap<String, List<String>>): RetrofitCall<NetworkDownloadedVideosAccessChecker> {
+        return getCourseService().checkDownloadedVideosExpiry(arguments)
     }
 }
