@@ -34,7 +34,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.util.CommentsUtil;
-import in.testpress.exam.util.GetEmailOrUsernameUtil;
+import in.testpress.exam.util.EmailOrUsernameUtil;
 import in.testpress.exam.util.ImageUtils;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.Bookmark;
@@ -379,7 +379,7 @@ public class BookmarksFragment extends BaseFragment {
     private String getHtml(String directionHtml, String questionHtml,
                            Object answers, String explanationHtml, String subject) {
 
-        String watermarkText = GetEmailOrUsernameUtil.getEmailOrUsername(getActivity());
+        String watermarkText = EmailOrUsernameUtil.getEmailOrUsernameWatermark(getActivity());
         String html = "<div style='padding-left: 12px; padding-right: 12px;'>";
 
         // Add direction/passage

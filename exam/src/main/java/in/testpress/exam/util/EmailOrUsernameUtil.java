@@ -6,9 +6,9 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressUserDetails;
 import in.testpress.models.ProfileDetails;
 
-public class GetEmailOrUsernameUtil {
-    static String emailOrUsernameText;
-    public static String getEmailOrUsername(FragmentActivity activity) {
+public class EmailOrUsernameUtil {
+    static String emailOrUsernameText = "";
+    public static String getEmailOrUsernameWatermark(FragmentActivity activity) {
         ProfileDetails profileDetails = TestpressUserDetails.getInstance().getProfileDetails();
         if (profileDetails != null) {
             emailOrUsernameText = getEmailOrUsername(profileDetails);
@@ -24,11 +24,7 @@ public class GetEmailOrUsernameUtil {
                 }
             });
         }
-        if (emailOrUsernameText != null) {
-            return emailOrUsernameText;
-        } else {
-            return "";
-        }
+        return emailOrUsernameText;
     }
 
     public static String getEmailOrUsername(ProfileDetails profileDetails) {
