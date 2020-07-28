@@ -271,6 +271,57 @@
 
         </RelativeLayout>
 
+        <LinearLayout
+            android:id="@+id/coupon_code_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_margin="@dimen/testpress_horizontal_margin">
+
+            <TextView
+                android:id="@+id/have_coupon_code"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/have_coupon_code"
+                android:gravity="center"
+                android:textColor="@color/testpress_blue_text"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="10dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:hint="Enter Coupon Code"
+                    android:textColor="@color/testpress_black"
+                    android:background="@drawable/testpress_edit_text_plain" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Apply"
+                    android:paddingVertical="10dp"
+                    android:paddingHorizontal="8dp"
+                    android:layout_margin="0dp"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:textColor="@color/testpress_white"
+                    android:background="@color/testpress_blue_text" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>
