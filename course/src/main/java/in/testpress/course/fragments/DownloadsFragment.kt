@@ -51,9 +51,6 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         VideoDownloadService.start(requireContext())
-        if (CoursesFetchDateHandler(requireContext()).hasNotUpdated()) {
-            showRefreshScreen()
-        }
     }
 
     override fun onCreateView(
@@ -103,7 +100,9 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
             }
 
             hideLoadingPlaceholder()
-            if (it.isEmpty()) {
+            if (CoursesFetchDateHandler(requireContext()).hasNotUpdated()) {
+                showRefreshScreen()
+            } else if (it.isEmpty()) {
                 showEmptyScreen()
             } else {
                 adapter.offlineVideos = it
