@@ -129,7 +129,7 @@ public class TestQuestionFragment extends Fragment {
                     "</div>";
             boolean isImageAvailable = attemptQuestion.getDirection().contains("<img");
             if (isImageAvailable){
-                htmlContent +=  WebViewUtils.getButtonToShowOrHideImage();
+                htmlContent +=  WebViewUtils.getButtonToShowOrHideDirection();
             }
         }
         // Add question

@@ -209,10 +209,6 @@ public class WebViewUtils {
         return "initCheckBoxGroup(" + selectedOptions + ");";
     }
 
-    protected static String getButtonClick() {
-        return "showImage()";
-    }
-
     protected static String getBookmarkButtonUpdater(boolean bookmarked) {
         return "updateBookmarkButtonState(" + bookmarked + ");";
     }
@@ -290,8 +286,8 @@ public class WebViewUtils {
                 "</div>";
     }
 
-    public static String getButtonToShowOrHideImage() {
-        return "\n<button onclick='showImage()' id='show-hide-button' class= 'hide-or-show-text'>Hide Image</button>";
+    public static String getButtonToShowOrHideDirection() {
+        return "\n<button onclick='setDirectionVisibility()' id='show-hide-button'>Hide Direction</button>";
     }
 
     public static String getRadioButtonOptionWithTags(String optionText, int id) {

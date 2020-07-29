@@ -362,7 +362,7 @@ public class ReviewQuestionsFragment extends Fragment {
                     "</div>";
             boolean isImageAvailable = directionHtml.contains("<img");
             if (isImageAvailable) {
-                html += "\n" + WebViewUtils.getButtonToShowOrHideImage();
+                html += "\n" + WebViewUtils.getButtonToShowOrHideDirection();
             }
         }
 

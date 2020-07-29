@@ -52,17 +52,17 @@ function addWatermark(logoUrl) {
     document.body.classList.add("watermark");
 }
 
-function showImage() {
+function setDirectionVisibility() {
     var image = document.getElementsByTagName("img");
     var button = document.getElementById("show-hide-button");
          for (i = 0; i < image.length; i++) {
              if(image[i].style.display == 'none') {
                   image[i].style.display = 'block';
-                  button.innerHTML = 'Hide Image';
+                  button.innerHTML = 'Hide Direction';
              }
              else {
                   image[i].style.display = 'none';
-                  button.innerHTML = 'Show Image';
+                  button.innerHTML = 'Show Direction';
              }
          }
 }

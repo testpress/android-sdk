@@ -390,7 +390,7 @@ public class BookmarksFragment extends BaseFragment {
             Log.e("Onnn", directionHtml);
             boolean isImageAvailable = directionHtml.contains("<img");
             if (isImageAvailable) {
-                html += "\n" + WebViewUtils.getButtonToShowOrHideImage();
+                html += "\n" + WebViewUtils.getButtonToShowOrHideDirection();
             }
         }
 
