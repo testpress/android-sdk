@@ -13,7 +13,7 @@ public class Watermark {
         if (hasProfileDetails()) {
             return getUserDetail(profileDetails);
         } else {
-            return getUserDetailsFromAPi(activity);
+            return getUserDetailsFromNetwork(activity);
         }
     }
 
@@ -34,7 +34,7 @@ public class Watermark {
     }
 
     private String watermark = " ";
-    private String getUserDetailsFromAPi(FragmentActivity activity) {
+    private String getUserDetailsFromNetwork(FragmentActivity activity) {
         TestpressUserDetails.getInstance().load(activity, new TestpressCallback<ProfileDetails>() {
             @Override
             public void onSuccess(ProfileDetails profileDetails) {
