@@ -6,9 +6,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 
-@Database(version = 1, entities = [ContentEntity::class])
+@Database(version = 2, entities = [ContentEntity::class, OfflineVideo::class])
 abstract class TestpressDatabase: RoomDatabase() {
     abstract fun contentDao(): ContentDao
+    abstract fun offlineVideoDao(): OfflineVideoDao
 
     companion object {
         private lateinit var INSTANCE: TestpressDatabase

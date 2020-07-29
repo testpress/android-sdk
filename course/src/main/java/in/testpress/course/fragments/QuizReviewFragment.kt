@@ -8,7 +8,7 @@ import `in`.testpress.course.viewmodels.QuizViewModel
 import `in`.testpress.exam.domain.DomainQuestion
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
 import `in`.testpress.exam.ui.view.WebView
-import `in`.testpress.exam.util.EmailOrUsernameUtil
+import `in`.testpress.exam.util.Watermark
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.util.ViewUtils
 import `in`.testpress.util.WebViewUtils
@@ -274,9 +274,8 @@ class QuizReviewFragment: Fragment() {
     }
 
     private fun getEmailWaterMarkHtml(): String {
-        val watermarkText = EmailOrUsernameUtil.getEmailOrUsernameWatermark(activity)
-        return """<div class ='emailWaterMark'>© ${getString(R.string.testpress_app_name)}
-                        $watermarkText </div>"""
+        return """<div class ='watermark'>© ${getString(R.string.testpress_app_name)}
+                        ${Watermark().get(activity)} </div>"""
     }
 }
 

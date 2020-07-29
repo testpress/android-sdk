@@ -41,7 +41,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.util.CommentsUtil;
-import in.testpress.exam.util.EmailOrUsernameUtil;
+import in.testpress.exam.util.Watermark;
 import in.testpress.exam.util.ImageUtils;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Bookmark;
@@ -125,7 +125,8 @@ public class ReviewQuestionsFragment extends Fragment {
         imageUtils = new ImageUtils(rootLayout, this);
         //noinspection ConstantConditions
         instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
-        loadComments = instituteSettings.getBaseUrl().contains("elixir") || instituteSettings.getBaseUrl().contains("medpgbasics");
+        loadComments = instituteSettings.getBaseUrl().contains("elixir") || instituteSettings.getBaseUrl().contains("medpgbasics") ||
+                instituteSettings.getBaseUrl().contains("onlyiasnothingelse");
 
         List<ReviewItem> reviewItems = reviewItemDao.queryBuilder()
                 .where(ReviewItemDao.Properties.Id.eq(reviewItemId)).list();
@@ -348,8 +349,6 @@ public class ReviewQuestionsFragment extends Fragment {
                            Object answers, String explanationHtml, String subject) {
 
         String html = "<div style='padding-left: 2px; padding-right: 4px;'>";
-        String watermarkText = EmailOrUsernameUtil.getEmailOrUsernameWatermark(getActivity());
-
         // Add index
         html += "<div>" +
                 "<div class='review-question-index'>" +
@@ -451,10 +450,11 @@ public class ReviewQuestionsFragment extends Fragment {
         }
 
         // Add explanation with watermark
+        String watermark = new Watermark().get(getActivity());
         if (explanationHtml != null && !explanationHtml.isEmpty()) {
             html += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation));
-            html += "<div class ='emailWaterMark'>" +
-                    "© "+ getString(R.string.testpress_app_name) +" "+ watermarkText +
+            html += "<div class ='watermark'>" +
+                    "© "+ getString(R.string.testpress_app_name) +" "+ watermark +
                     "\n" + "</div>";
             html += "<div class='review-explanation'>" +
                         explanationHtml +

@@ -50,6 +50,12 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                 showSDK(R.id.leaderboard);
             }
         });
+        findViewById(R.id.downloads).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showSDK(R.id.downloads);
+            }
+        });
         findViewById(R.id.course_contents).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -150,6 +156,9 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                     break;
                 case R.id.content_detail:
                     TestpressCourse.showContentDetail(this, text, session);
+                    break;
+                case R.id.downloads:
+                    TestpressCourse.showDownloads(this, session);
                     break;
             }
         } else {
