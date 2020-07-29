@@ -113,6 +113,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
 
     private fun initializeCourseFetchObserver() {
         courseViewModel.courses.observe(viewLifecycleOwner, Observer {
+            hideLoadingPlaceholder()
             when (it.status) {
                 Status.ERROR -> {
                     showRefreshScreen()
@@ -155,9 +156,8 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
     }
 
     private fun showRefreshScreen() {
-        emptyViewFragment.setEmptyText(R.string.nothing_here, R.string.no_downloads, null)
+        emptyViewFragment.setEmptyText(R.string.refresh_videos, R.string.refresh_videos_description, null)
         emptyViewFragment.setImage(R.drawable.ic_empty_video)
-        emptyViewFragment.showOrHideButton(true)
     }
 
     private fun showInCorrectDateScreen() {
@@ -182,5 +182,6 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
 
     override fun onRetryClick() {
         courseViewModel.load()
+        showLoadingPlaceholder()
     }
 }

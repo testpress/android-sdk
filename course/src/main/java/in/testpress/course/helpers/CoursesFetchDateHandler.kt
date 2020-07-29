@@ -19,7 +19,7 @@ class CoursesFetchDateHandler(val context: Context) {
         val today = Date()
 
         if (isDateTampered()) {
-            return false
+            return true
         }
         return DateUtils.difference(Date(lastFetchTime), today) > 15
     }
