@@ -1,6 +1,7 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
+import `in`.testpress.course.helpers.DownloadedVideoRemoveHandler
 import `in`.testpress.course.repository.OfflineVideoRepository
 import `in`.testpress.course.services.VideoDownloadService
 import `in`.testpress.course.ui.OfflineVideoListAdapter
@@ -21,6 +22,7 @@ import com.facebook.shimmer.ShimmerFrameLayout
 
 class DownloadsFragment : Fragment() {
     private val TAG = "DownloadsFragment"
+    private lateinit var downloadedVideoRemoveHandler: DownloadedVideoRemoveHandler
     private val viewModel by lazy {
         ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -79,6 +81,11 @@ class DownloadsFragment : Fragment() {
     private fun initializeObservers() {
         showLoadingPlaceholder()
         viewModel.offlineVideos.observe(viewLifecycleOwner, Observer {
+            downloadedVideoRemoveHandler = DownloadedVideoRemoveHandler(it, requireContext())
+            if (downloadedVideoRemoveHandler.hasVideosToRemove()) {
+                downloadedVideoRemoveHandler.remove()
+            }
+
             hideLoadingPlaceholder()
             if (it.isEmpty()) {
                 showEmptyScreen()

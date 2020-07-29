@@ -16,5 +16,6 @@ data class OfflineVideo(
     val contentId: Long? = null,
     var percentageDownloaded: Int = 0,
     var bytesDownloaded: Long = 0,
-    var totalSize: Long = 0
+    var totalSize: Long = 0,
+    val courseId: Long? = null
 )

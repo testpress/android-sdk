@@ -13,7 +13,8 @@ data class DomainOfflineVideo(
     val contentId: Long? = null,
     val percentageDownloaded: Int = 0,
     val bytesDownloaded: Long = 0,
-    val totalSize: Long = 0
+    val totalSize: Long = 0,
+    val courseId: Long = -1
 ) {
     val isDownloadCompleted = percentageDownloaded == 100
 }
@@ -36,6 +37,7 @@ fun OfflineVideo.asDomainModel(): DomainOfflineVideo {
         contentId = contentId,
         percentageDownloaded = percentageDownloaded,
         bytesDownloaded = bytesDownloaded,
-        totalSize = totalSize
+        totalSize = totalSize,
+        courseId = courseId!!
     )
 }
