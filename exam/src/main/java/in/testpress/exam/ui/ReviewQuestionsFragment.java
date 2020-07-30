@@ -7,6 +7,11 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +46,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.util.CommentsUtil;
+import in.testpress.exam.util.Watermark;
 import in.testpress.exam.util.ImageUtils;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Bookmark;
@@ -347,7 +353,6 @@ public class ReviewQuestionsFragment extends Fragment {
                            Object answers, String explanationHtml, String subject) {
 
         String html = "<div style='padding-left: 2px; padding-right: 4px;'>";
-
         // Add index
         html += "<div>" +
                 "<div class='review-question-index'>" +
@@ -357,13 +362,10 @@ public class ReviewQuestionsFragment extends Fragment {
 
         // Add direction/passage
         if (directionHtml != null && !directionHtml.isEmpty()) {
-            html += "<div class='question' style='padding-bottom: 0px;'>" +
+            html += "<div class='question' id = 'direction' style='padding-bottom: 0px;'>" +
                         directionHtml +
                     "</div>";
-            boolean isImageAvailable = directionHtml.contains("<img");
-            if (isImageAvailable) {
-                html += "\n" + WebViewUtils.getButtonToShowOrHideDirection();
-            }
+            html += "\n" + WebViewUtils.getButtonToShowOrHideDirection();
         }
 
         // Add question
@@ -452,9 +454,13 @@ public class ReviewQuestionsFragment extends Fragment {
                     "</div>";
         }
 
-        // Add explanation
+        // Add explanation with watermark
+        String watermark = new Watermark().get(getActivity());
         if (explanationHtml != null && !explanationHtml.isEmpty()) {
             html += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation));
+            html += "<div class ='watermark'>" +
+                    "© "+ getString(R.string.testpress_app_name) +" "+ watermark +
+                    "\n" + "</div>";
             html += "<div class='review-explanation'>" +
                         explanationHtml +
                     "</div>";

@@ -118,16 +118,15 @@ function addWatermark(logoUrl) {
     document.body.classList.add("watermark");
 }
 function setDirectionVisibility() {
-    var image = document.getElementsByTagName("img");
     var button = document.getElementById("show-hide-button");
-         for (i = 0; i < image.length; i++) {
-             if(image[i].style.display == 'none') {
-                  image[i].style.display = 'block';
-                  button.innerHTML = 'Hide Direction';
-             }
-             else {
-                  image[i].style.display = 'none';
-                  button.innerHTML = 'Show Direction';
-             }
-         }
+       var direction = document.getElementById("direction");
+        if(direction.style.display == 'none'){
+           direction.style.display = 'block';
+           button.innerHTML = 'Hide Direction';
+           ButtonHandler.onButtonClick()
+        }else {
+            direction.style.display = 'none';
+            button.innerHTML = 'Show Direction';
+            ButtonHandler.onButtonClick()
+        }
 }

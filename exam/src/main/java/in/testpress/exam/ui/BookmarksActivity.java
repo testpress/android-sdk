@@ -42,6 +42,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.pager.BookmarksPager;
 import in.testpress.exam.api.TestpressExamApiClient;
+import in.testpress.exam.pager.CustomViewPager;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.BookmarkDao;
 import in.testpress.models.greendao.BookmarkFolder;
@@ -58,7 +59,6 @@ import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
-
 import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 import static in.testpress.network.TestpressApiClient.CREATED_SINCE;
@@ -220,6 +220,7 @@ public class BookmarksActivity extends BaseToolBarActivity
                 });
         pagerAdapter = new BookmarkPagerAdapter(this, currentFolder);
         viewPager.setAdapter(pagerAdapter);
+        viewPager.setOffscreenPageLimit(0);
         goToPosition(0);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -1016,4 +1017,8 @@ public class BookmarksActivity extends BaseToolBarActivity
     @Override
     public void onLoaderReset(@NonNull Loader<List<Bookmark>> loader) {
     }
+}
+
+interface UpdateButtonState {
+    void updateButtonState();
 }

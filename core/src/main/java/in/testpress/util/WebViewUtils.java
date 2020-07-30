@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+import androidx.core.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -23,7 +25,7 @@ public class WebViewUtils {
 
     private WebView webView;
     private boolean hasError;
-
+    public static boolean directionButtonStateVisible = true;
     public WebViewUtils(WebView webView) {
         this.webView = webView;
     }
@@ -49,6 +51,7 @@ public class WebViewUtils {
     public void initWebView(String htmlContent, final Activity activity) {
         initWebView(webView);
         webView.addJavascriptInterface(new ImageHandler(activity), "ImageHandler");
+        webView.addJavascriptInterface(new ButtonHandler(),"ButtonHandler");
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -62,6 +65,7 @@ public class WebViewUtils {
                 super.onPageFinished(view, url);
                 if (!hasError) {
                     String javascript = getJavascript(activity);
+                    String buttonJavascript = getJavascript(activity);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                         webView.evaluateJavascript(javascript, null);
                     } else {
@@ -287,7 +291,7 @@ public class WebViewUtils {
     }
 
     public static String getButtonToShowOrHideDirection() {
-        return "\n<button onclick='setDirectionVisibility()' id='show-hide-button'>Hide Direction</button>";
+        return "\n<button id='show-hide-button' onclick = 'setDirectionVisibility()'>Hide Direction</button>";
     }
 
     public static String getRadioButtonOptionWithTags(String optionText, int id) {
@@ -361,6 +365,24 @@ public class WebViewUtils {
 
     protected void onClickImage(String url, Activity activity) {
         activity.startActivity(ZoomableImageActivity.createIntent(url, activity));
+    }
+
+    private class ButtonHandler {
+        @JavascriptInterface
+        public void onButtonClick() {
+            Log.e("buttonState", String.valueOf(directionButtonStateVisible));
+            Log.e("buttonState","Working");
+            WebViewUtils.this.onButtonClicked();
+        }
+    }
+
+    protected void onButtonClicked() {
+        if (directionButtonStateVisible) {
+            directionButtonStateVisible = false;
+        } else {
+            directionButtonStateVisible = true;
+        }
+        Log.e("buttonState", String.valueOf(directionButtonStateVisible));
     }
 
 }

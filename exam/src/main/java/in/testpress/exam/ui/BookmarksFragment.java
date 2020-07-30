@@ -21,12 +21,15 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModel;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import in.testpress.core.TestpressCallback;
@@ -36,6 +39,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.util.CommentsUtil;
+import in.testpress.exam.util.Watermark;
 import in.testpress.exam.util.ImageUtils;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.Bookmark;
@@ -101,6 +105,9 @@ public class BookmarksFragment extends BaseFragment {
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
     private RetrofitCall<Bookmark> updateBookmarkAPIRequest;
     private RetrofitCall<Void> deleteBookmarkAPIRequest;
+    private static String previousDiv = " ";
+    private BookmarksViewModel bookmarksViewModel;
+    public boolean isHidden = false;
 
     public static BookmarksFragment getInstance(long bookmarkId, Language selectedLanguage) {
         BookmarksFragment reviewQuestionsFragment = new BookmarksFragment();
@@ -116,6 +123,7 @@ public class BookmarksFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         apiClient = new TestpressExamApiClient(getContext());
         assert getArguments() != null;
+        bookmarksViewModel = new BookmarksViewModel();
         long bookmarkId = getArguments().getLong(PARAM_BOOKMARK_ID);
         bookmarkDao = TestpressSDKDatabase.getBookmarkDao(getContext());
         bookmark = bookmarkDao.queryBuilder().where(BookmarkDao.Properties.Id.eq(bookmarkId))
@@ -212,11 +220,11 @@ public class BookmarksFragment extends BaseFragment {
 
         rootLayout = view;
         ViewUtils.setTypeface(
-                new TextView[] {difficultyTitle, difficultyPercentageText },
+                new TextView[]{difficultyTitle, difficultyPercentageText},
                 TestpressSdk.getRubikMediumFont(view.getContext())
         );
         ViewUtils.setTypeface(
-                new TextView[] { usersAnsweredRight, moveBookmarkText, removeBookmarkText },
+                new TextView[]{usersAnsweredRight, moveBookmarkText, removeBookmarkText},
                 TestpressSdk.getRubikRegularFont(view.getContext())
         );
         webViewUtils = new WebViewUtils(webView) {
@@ -286,7 +294,7 @@ public class BookmarksFragment extends BaseFragment {
             HtmlContent htmlContent = content.getHtml();
             setContentTitle(Html.fromHtml(htmlContent.getTitle()));
             String html = "<div style='padding-left: 20px; padding-right: 20px;'>" +
-                                htmlContent.getTextHtml() + "</div>";
+                    htmlContent.getTextHtml() + "</div>";
 
             webViewUtils.initWebView(html, getActivity());
         } else if (content.getRawVideo() != null) {
@@ -384,14 +392,37 @@ public class BookmarksFragment extends BaseFragment {
 
         // Add direction/passage
         if (directionHtml != null && !directionHtml.isEmpty()) {
-            html += "<div class='question' style='padding-bottom: 0px;'>" +
+            Log.e("Similar", String.valueOf(previousDiv.equals(directionHtml)));
+            Log.e("Checking..", String.valueOf(WebViewUtils.directionButtonStateVisible));
+            if (previousDiv.equals(directionHtml)) {
+                bookmarksViewModel.isHidden.postValue(WebViewUtils.directionButtonStateVisible);
+                bookmarksViewModel.isHidden.observe(getActivity(), new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(Boolean isHided) {
+                        isHidden = isHided;
+                    }
+                });
+                if (isHidden) {
+                    html += "<div class='question' id='direction' style='padding-bottom: 0px; display: none;'>" +
+                            directionHtml +
+                            "</div>";
+                    Log.e("..", "Entered Hidden block");
+                } else {
+                    html += "<div class='question' id='direction' style='padding-bottom: 0px;'>" +
+                            directionHtml +
+                            "</div>";
+                    Log.e("..", "Entered Show block");
+                }
+            } else {
+                WebViewUtils.directionButtonStateVisible = true;
+                html += "<div class='question' id='direction' style='padding-bottom: 0px;'>" +
                         directionHtml +
                     "</div>";
-            Log.e("Onnn", directionHtml);
-            boolean isImageAvailable = directionHtml.contains("<img");
-            if (isImageAvailable) {
-                html += "\n" + WebViewUtils.getButtonToShowOrHideDirection();
+                Log.e("..", "Entered New block");
+                previousDiv = directionHtml;
             }
+
+            html += "\n" + WebViewUtils.getButtonToShowOrHideDirection();
         }
 
         // Add question
@@ -477,19 +508,23 @@ public class BookmarksFragment extends BaseFragment {
                     "</div>";
         }
 
-        // Add explanation
+        // Add explanation with watermark
+        String watermark = new Watermark().get(getActivity());
         if (explanationHtml != null && !explanationHtml.isEmpty()) {
             html += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation));
+            html += "<div class ='watermark'>" +
+                    "© " + getString(R.string.testpress_app_name) + " " + watermark +
+                    "\n" + "</div>";
             html += "<div class='review-explanation'>" +
-                        explanationHtml +
+                    explanationHtml +
                     "</div>";
         }
 
         // Add subject
         if (subject != null && !subject.isEmpty() && !subject.equals("Uncategorized")) {
             html += "<div>" +
-                        WebViewUtils.getHeadingTags(getString(R.string.testpress_subject)) +
-                        "<div class='subject'>" + subject + "</div>" +
+                    WebViewUtils.getHeadingTags(getString(R.string.testpress_subject)) +
+                    "<div class='subject'>" + subject + "</div>" +
                     "</div>";
         }
         return html + "</div>";
@@ -654,7 +689,7 @@ public class BookmarksFragment extends BaseFragment {
 
     void addFoldersToSpinner() {
         folderSpinnerAdapter.clear();
-        for (BookmarkFolder folder: bookmarkFolders) {
+        for (BookmarkFolder folder : bookmarkFolders) {
             folderSpinnerAdapter.addItem(folder.getName(), folder.getName(), false, 0);
         }
         folderSpinnerAdapter.addItem(UNCATEGORIZED, UNCATEGORIZED, false, 0);
@@ -728,7 +763,7 @@ public class BookmarksFragment extends BaseFragment {
 
     @Override
     public RetrofitCall[] getRetrofitCalls() {
-        return new RetrofitCall[] {
+        return new RetrofitCall[]{
                 bookmarkFoldersLoader, updateBookmarkAPIRequest, deleteBookmarkAPIRequest
         };
     }
