@@ -55,14 +55,22 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
     private fun createAttemptAndInitializeExoplayer(content: DomainContent) {
         val greenDaoContent = content.getGreenDaoContent(requireContext())
         val video = content.video
+        exoPlayerUtil = ExoPlayerUtil(activity, exoPlayerMainFrame, video?.hlsUrl(), 0F)
+        exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil)
+
         viewModel.createContentAttempt(content.id)
             .observe(viewLifecycleOwner, Observer { resource ->
-                val contentAttempt = resource.data!!
-                val videoStartPosition = contentAttempt.video?.lastPosition?.toFloat() ?: 0F
-                exoPlayerUtil = ExoPlayerUtil(activity, exoPlayerMainFrame, video?.hlsUrl(), videoStartPosition)
-                exoPlayerUtil?.setVideoAttemptParameters(contentAttempt.objectId!!.toLong(), greenDaoContent!!)
-                exoPlayerUtil?.initializePlayer()
-                exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil)
+                when(resource.status) {
+                    Status.SUCCESS -> {
+                        val contentAttempt = resource.data!!
+                        val videoStartPosition = contentAttempt.video?.lastPosition?.toFloat() ?: 0F
+                        exoPlayerUtil?.setStartPosition(videoStartPosition)
+                        exoPlayerUtil?.setVideoAttemptParameters(contentAttempt.objectId!!.toLong(), greenDaoContent!!)
+                        exoPlayerUtil?.initializePlayer()
+                    }
+                    else -> exoPlayerUtil?.initializePlayer()
+                }
+
             })
     }
 

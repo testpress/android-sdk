@@ -23,7 +23,6 @@ public class ExoPlayerActivity extends AppCompatActivity {
     public static final String SPEED_RATE = "speedRate";
 
     private ExoPlayerUtil exoPlayerUtil;
-    private ExoplayerFullscreenHelper exoplayerFullscreenHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +40,7 @@ public class ExoPlayerActivity extends AppCompatActivity {
         exoPlayerUtil =
                 new ExoPlayerUtil(this, exoPlayerMainFrame, url, startPosition, true, speedRate);
 
-        exoplayerFullscreenHelper = new ExoplayerFullscreenHelper(this, exoPlayerUtil);
-        exoplayerFullscreenHelper.initializeOrientationListener();
+        exoPlayerUtil.openOnlyInFullScreen();
     }
 
     @Override
@@ -72,6 +70,5 @@ public class ExoPlayerActivity extends AppCompatActivity {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        exoplayerFullscreenHelper.disableOrientationListener();
     }
 }

@@ -29,12 +29,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import org.greenrobot.greendao.query.QueryBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
@@ -42,7 +39,6 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.pager.BookmarksPager;
 import in.testpress.exam.api.TestpressExamApiClient;
-import in.testpress.exam.pager.CustomViewPager;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.BookmarkDao;
 import in.testpress.models.greendao.BookmarkFolder;
@@ -220,7 +216,6 @@ public class BookmarksActivity extends BaseToolBarActivity
                 });
         pagerAdapter = new BookmarkPagerAdapter(this, currentFolder);
         viewPager.setAdapter(pagerAdapter);
-        viewPager.setOffscreenPageLimit(0);
         goToPosition(0);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -229,6 +224,8 @@ public class BookmarksActivity extends BaseToolBarActivity
 
             @Override
             public void onPageSelected(int position) {
+                pagerAdapter.notifyDataSetChanged();
+                viewPager.setCurrentItem(position);
                 goToPosition(position);
             }
 
@@ -1017,8 +1014,4 @@ public class BookmarksActivity extends BaseToolBarActivity
     @Override
     public void onLoaderReset(@NonNull Loader<List<Bookmark>> loader) {
     }
-}
-
-interface UpdateButtonState {
-    void updateButtonState();
 }

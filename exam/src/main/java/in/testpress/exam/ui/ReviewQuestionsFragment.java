@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -68,6 +67,7 @@ import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
 import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
+import static in.testpress.exam.ui.DirectionQuestionUtil.addDirectionQuestionAndButton;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 import static in.testpress.util.CommonUtils.isAppInstalled;
 
@@ -105,6 +105,7 @@ public class ReviewQuestionsFragment extends Fragment {
     private InstituteSettings instituteSettings;
     private boolean loadComments = true;
     private MenuItem bookmarkIcon;
+    private static String previousDirectionQuestion = " ";
 
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
     private RetrofitCall<Bookmark> bookmarkAPIRequest;
@@ -130,7 +131,8 @@ public class ReviewQuestionsFragment extends Fragment {
         imageUtils = new ImageUtils(rootLayout, this);
         //noinspection ConstantConditions
         instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
-        loadComments = instituteSettings.getBaseUrl().contains("elixir") || instituteSettings.getBaseUrl().contains("medpgbasics");
+        loadComments = instituteSettings.getBaseUrl().contains("elixir") || instituteSettings.getBaseUrl().contains("medpgbasics") ||
+                instituteSettings.getBaseUrl().contains("onlyiasnothingelse");
 
         List<ReviewItem> reviewItems = reviewItemDao.queryBuilder()
                 .where(ReviewItemDao.Properties.Id.eq(reviewItemId)).list();
@@ -362,10 +364,7 @@ public class ReviewQuestionsFragment extends Fragment {
 
         // Add direction/passage
         if (directionHtml != null && !directionHtml.isEmpty()) {
-            html += "<div class='question' id = 'direction' style='padding-bottom: 0px;'>" +
-                        directionHtml +
-                    "</div>";
-            html += "\n" + WebViewUtils.getButtonToShowOrHideDirection();
+            html += addDirectionQuestionAndButton(directionHtml);
         }
 
         // Add question

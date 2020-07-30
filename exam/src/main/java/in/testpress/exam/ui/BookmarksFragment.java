@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,23 +14,16 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import androidx.annotation.ColorRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
-
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.theartofdev.edmodo.cropper.CropImage;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
@@ -64,8 +56,8 @@ import in.testpress.util.ViewUtils;
 import in.testpress.util.WebViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
-
 import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
+import static in.testpress.exam.ui.DirectionQuestionUtil.addDirectionQuestionAndButton;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 
 public class BookmarksFragment extends BaseFragment {
@@ -105,9 +97,6 @@ public class BookmarksFragment extends BaseFragment {
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
     private RetrofitCall<Bookmark> updateBookmarkAPIRequest;
     private RetrofitCall<Void> deleteBookmarkAPIRequest;
-    private static String previousDiv = " ";
-    private BookmarksViewModel bookmarksViewModel;
-    public boolean isHidden = false;
 
     public static BookmarksFragment getInstance(long bookmarkId, Language selectedLanguage) {
         BookmarksFragment reviewQuestionsFragment = new BookmarksFragment();
@@ -123,7 +112,6 @@ public class BookmarksFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         apiClient = new TestpressExamApiClient(getContext());
         assert getArguments() != null;
-        bookmarksViewModel = new BookmarksViewModel();
         long bookmarkId = getArguments().getLong(PARAM_BOOKMARK_ID);
         bookmarkDao = TestpressSDKDatabase.getBookmarkDao(getContext());
         bookmark = bookmarkDao.queryBuilder().where(BookmarkDao.Properties.Id.eq(bookmarkId))
@@ -392,37 +380,7 @@ public class BookmarksFragment extends BaseFragment {
 
         // Add direction/passage
         if (directionHtml != null && !directionHtml.isEmpty()) {
-            Log.e("Similar", String.valueOf(previousDiv.equals(directionHtml)));
-            Log.e("Checking..", String.valueOf(WebViewUtils.directionButtonStateVisible));
-            if (previousDiv.equals(directionHtml)) {
-                bookmarksViewModel.isHidden.postValue(WebViewUtils.directionButtonStateVisible);
-                bookmarksViewModel.isHidden.observe(getActivity(), new Observer<Boolean>() {
-                    @Override
-                    public void onChanged(Boolean isHided) {
-                        isHidden = isHided;
-                    }
-                });
-                if (isHidden) {
-                    html += "<div class='question' id='direction' style='padding-bottom: 0px; display: none;'>" +
-                            directionHtml +
-                            "</div>";
-                    Log.e("..", "Entered Hidden block");
-                } else {
-                    html += "<div class='question' id='direction' style='padding-bottom: 0px;'>" +
-                            directionHtml +
-                            "</div>";
-                    Log.e("..", "Entered Show block");
-                }
-            } else {
-                WebViewUtils.directionButtonStateVisible = true;
-                html += "<div class='question' id='direction' style='padding-bottom: 0px;'>" +
-                        directionHtml +
-                    "</div>";
-                Log.e("..", "Entered New block");
-                previousDiv = directionHtml;
-            }
-
-            html += "\n" + WebViewUtils.getButtonToShowOrHideDirection();
+            html += addDirectionQuestionAndButton(directionHtml);
         }
 
         // Add question
@@ -689,7 +647,7 @@ public class BookmarksFragment extends BaseFragment {
 
     void addFoldersToSpinner() {
         folderSpinnerAdapter.clear();
-        for (BookmarkFolder folder : bookmarkFolders) {
+        for (BookmarkFolder folder: bookmarkFolders) {
             folderSpinnerAdapter.addItem(folder.getName(), folder.getName(), false, 0);
         }
         folderSpinnerAdapter.addItem(UNCATEGORIZED, UNCATEGORIZED, false, 0);
@@ -763,7 +721,7 @@ public class BookmarksFragment extends BaseFragment {
 
     @Override
     public RetrofitCall[] getRetrofitCalls() {
-        return new RetrofitCall[]{
+        return new RetrofitCall[] {
                 bookmarkFoldersLoader, updateBookmarkAPIRequest, deleteBookmarkAPIRequest
         };
     }
@@ -829,5 +787,4 @@ public class BookmarksFragment extends BaseFragment {
         parentView.findViewById(viewId).setBackground(
                 ContextCompat.getDrawable(parentView.getContext(), drawableResId));
     }
-
 }

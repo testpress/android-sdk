@@ -20,6 +20,8 @@ import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Language;
 import in.testpress.util.WebViewUtils;
 
+import static in.testpress.exam.ui.DirectionQuestionUtil.addDirectionQuestionAndButton;
+
 public class TestQuestionFragment extends Fragment {
 
     static final String PARAM_ATTEMPT_ITEM = "attemptItem";
@@ -33,6 +35,7 @@ public class TestQuestionFragment extends Fragment {
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
     private InstituteSettings instituteSettings;
+    private static String previousDirectionQuestion = " ";
 
     static TestQuestionFragment getInstance(AttemptItem attemptItem, int questionIndex,
                                             Language selectedLanguage) {
@@ -123,14 +126,7 @@ public class TestQuestionFragment extends Fragment {
 
         // Add direction if present
         if (attemptQuestion.getDirection() != null && !attemptQuestion.getDirection().isEmpty()) {
-            htmlContent += "" +
-                    "<div class='question' style='padding-bottom: 0px;'>" +
-                        attemptQuestion.getDirection() +
-                    "</div>";
-            boolean isImageAvailable = attemptQuestion.getDirection().contains("<img");
-            if (isImageAvailable){
-                htmlContent +=  WebViewUtils.getButtonToShowOrHideDirection();
-            }
+            htmlContent += addDirectionQuestionAndButton(attemptQuestion.getDirection());
         }
         // Add question
         htmlContent += "" +

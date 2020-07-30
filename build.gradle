@@ -8,7 +8,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.3'
+        classpath 'com.android.tools.build:gradle:4.0.0'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath 'com.google.gms:google-services:3.2.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -31,13 +31,13 @@ task clean(type: Delete) {
 }
 
 ext {
-    compileSdkVersion = 28
+    compileSdkVersion = 29
     minSdkVersion = 16
     targetSdkVersion = 27
     minSdkVersionForUITest = 18
     buildToolsVersion = '28.0.3'
     supportLib = '27.1.1'
-    exoPlayer = '2.9.6'
+    exoPlayer = '2.11.7'
     powermock = '2.0.5'
 
     junit = 'junit:junit:4.12'

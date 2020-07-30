@@ -2,16 +2,28 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainVideoContent
+import `in`.testpress.course.helpers.DownloadTask
+import `in`.testpress.course.repository.OfflineVideoRepository
+import `in`.testpress.course.services.VideoDownloadService
+import `in`.testpress.course.ui.DownloadsActivity
+import `in`.testpress.course.ui.VideoDownloadQualityChooserDialog
 import `in`.testpress.course.util.PatternEditableBuilder
+import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import io.netopen.hotbitmapgg.library.view.RingProgressBar
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -24,10 +36,23 @@ class VideoContentFragment : BaseContentDetailFragment() {
     private lateinit var description: TextView
     private lateinit var titleLayout: LinearLayout
     private lateinit var videoWidgetFragment: BaseVideoWidgetFragment
+    private lateinit var offlineVideoViewModel: OfflineVideoViewModel
+    private lateinit var videoDownloadProgress: RingProgressBar
+    private lateinit var menu: Menu
 
     override var isBookmarkEnabled: Boolean
         get() = false
         set(value) {}
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        VideoDownloadService.start(requireContext())
+        offlineVideoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return OfflineVideoViewModel(OfflineVideoRepository(requireContext())) as T
+            }
+        }).get(OfflineVideoViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,12 +70,56 @@ class VideoContentFragment : BaseContentDetailFragment() {
         initializeListeners()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.video_content_menu, menu)
+        this.menu = menu
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        setProgressBarInMenuItem()
+    }
+
+    private fun setProgressBarInMenuItem() {
+        menu.findItem(R.id.download_progress).setActionView(R.layout.download_progress)
+        val progressView = menu.findItem(R.id.download_progress).actionView
+        progressView.setOnClickListener {
+            requireContext().startActivity(DownloadsActivity.createIntent(requireContext()))
+        }
+        videoDownloadProgress = progressView.findViewById(R.id.video_download_progress)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.download) {
+            showDownloadDialog()
+            return true
+        } else if (item.itemId == R.id.downloaded) {
+            requireContext().startActivity(DownloadsActivity.createIntent(requireContext()))
+            return true
+        } else if (item.itemId == R.id.download_progress) {
+            requireContext().startActivity(DownloadsActivity.createIntent(requireContext()))
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun showDownloadDialog() {
+        val videoQualityChooserDialog =
+            VideoDownloadQualityChooserDialog(content)
+        videoQualityChooserDialog.show(childFragmentManager, null)
+        videoQualityChooserDialog.setOnSubmitListener {downloadRequest ->
+            DownloadTask(downloadRequest.uri.toString(), requireContext()).start(downloadRequest, content)
+        }
+    }
+
     private fun initializeListeners() {
         titleLayout.setOnClickListener {
             val isDescriptionVisible = description.visibility == View.VISIBLE
             toggleDescription(!isDescriptionVisible)
         }
     }
+
     private fun toggleDescription(show: Boolean) {
         if (show) {
             description.visibility = View.VISIBLE
@@ -73,9 +142,47 @@ class VideoContentFragment : BaseContentDetailFragment() {
         videoWidgetFragment = VideoWidgetFragmentFactory.getWidget(content.video!!)
         videoWidgetFragment.arguments = arguments
         parseVideoDescription()
+        showDownloadProgress()
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.video_widget_fragment, videoWidgetFragment)
         transaction.commit()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(isContentInitialized()) {
+            showDownloadProgress()
+        }
+    }
+
+    private fun showDownloadProgress() {
+        offlineVideoViewModel.get(content.video!!.hlsUrl()!!).observe(viewLifecycleOwner, Observer {
+            if(it != null && !it.isDownloadCompleted) {
+                showProgress(it.percentageDownloaded)
+            } else if(it != null && it.isDownloadCompleted){
+                showDownloadedIcon()
+            } else {
+                showDownloadIcon()
+            }
+        })
+    }
+
+    private fun showProgress(percentage: Int) {
+        menu.findItem(R.id.download_progress).isVisible = true
+        menu.findItem(R.id.download).isVisible = false
+        videoDownloadProgress.progress = percentage
+    }
+
+    private fun showDownloadedIcon() {
+        menu.findItem(R.id.download).isVisible = false
+        menu.findItem(R.id.download_progress).isVisible = false
+        menu.findItem(R.id.downloaded).isVisible = true
+    }
+
+    private fun showDownloadIcon() {
+        menu.findItem(R.id.download).isVisible = true
+        menu.findItem(R.id.download_progress).isVisible = false
+        menu.findItem(R.id.downloaded).isVisible = false
     }
 
     private fun parseVideoDescription() {

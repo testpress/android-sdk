@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 
@@ -24,6 +25,7 @@ class EmptyViewFragment : Fragment() {
     lateinit var emptyContainer: LinearLayout
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var retryButton: Button
+    private lateinit var image: ImageView
 
     private var emptyViewListener: EmptyViewListener? = null
 
@@ -47,14 +49,19 @@ class EmptyViewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        emptyContainer = view.findViewById(R.id.empty_container)
-        emptyTitleView = view.findViewById(R.id.empty_title)
-        emptyDescView = view.findViewById(R.id.empty_description)
-        retryButton = view.findViewById(R.id.retry_button)
+        bindViews(view)
         retryButton.setOnClickListener {
             emptyContainer.visibility = View.GONE
             emptyViewListener?.onRetryClick()
         }
+    }
+
+    private fun bindViews(view: View) {
+        emptyContainer = view.findViewById(R.id.empty_container)
+        emptyTitleView = view.findViewById(R.id.empty_title)
+        emptyDescView = view.findViewById(R.id.empty_description)
+        retryButton = view.findViewById(R.id.retry_button)
+        image = view.findViewById(R.id.image)
     }
 
     fun displayError(exception: TestpressException) {
@@ -92,12 +99,26 @@ class EmptyViewFragment : Fragment() {
                 R.drawable.ic_error_outline_black_18dp)
     }
 
-    fun setEmptyText(title: Int, description: Int, left: Int) {
+    fun setEmptyText(title: Int, description: Int, leftDrawable: Int?) {
         emptyContainer.visibility = View.VISIBLE
         emptyTitleView.setText(title)
-        emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0)
+        if (leftDrawable != null) {
+            emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(leftDrawable, 0, 0, 0)
+        }
         emptyDescView.setText(description)
         retryButton.visibility = View.VISIBLE
+    }
+
+    fun setImage(resId: Int) {
+        image.setImageResource(resId)
+    }
+
+    fun showOrHideButton(show: Boolean) {
+        if (show) {
+            retryButton.visibility = View.VISIBLE
+        } else {
+            retryButton.visibility = View.GONE
+        }
     }
 }
 

@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import androidx.core.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -17,7 +16,6 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import androidx.core.content.ContextCompat;
 import java.util.List;
 import in.testpress.ui.ZoomableImageActivity;
 
@@ -291,7 +289,7 @@ public class WebViewUtils {
     }
 
     public static String getButtonToShowOrHideDirection() {
-        return "\n<button id='show-hide-button' onclick = 'setDirectionVisibility()'>Hide Direction</button>";
+        return "\n<button id='show-hide-button' onclick = 'setDirectionVisibility()'>Hide/Show Direction</button>";
     }
 
     public static String getRadioButtonOptionWithTags(String optionText, int id) {
@@ -370,19 +368,16 @@ public class WebViewUtils {
     private class ButtonHandler {
         @JavascriptInterface
         public void onButtonClick() {
-            Log.e("buttonState", String.valueOf(directionButtonStateVisible));
-            Log.e("buttonState","Working");
-            WebViewUtils.this.onButtonClicked();
+            WebViewUtils.this.setDirectionButtonState();
         }
     }
 
-    protected void onButtonClicked() {
+    protected void setDirectionButtonState() {
         if (directionButtonStateVisible) {
             directionButtonStateVisible = false;
         } else {
             directionButtonStateVisible = true;
         }
-        Log.e("buttonState", String.valueOf(directionButtonStateVisible));
     }
 
 }

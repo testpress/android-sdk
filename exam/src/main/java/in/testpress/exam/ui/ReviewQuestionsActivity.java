@@ -217,6 +217,8 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
 
             @Override
             public void onPageSelected(int position) {
+                pagerAdapter.notifyDataSetChanged();
+                pager.setCurrentItem(position);
                 goToQuestion(position);
             }
 
