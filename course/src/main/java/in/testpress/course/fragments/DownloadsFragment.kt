@@ -1,6 +1,7 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
+import `in`.testpress.course.helpers.DownloadedVideoRemoveHandler
 import `in`.testpress.course.repository.OfflineVideoRepository
 import `in`.testpress.course.services.VideoDownloadService
 import `in`.testpress.course.ui.OfflineVideoListAdapter
@@ -79,6 +80,11 @@ class DownloadsFragment : Fragment() {
     private fun initializeObservers() {
         showLoadingPlaceholder()
         viewModel.offlineVideos.observe(viewLifecycleOwner, Observer {
+            val handler = DownloadedVideoRemoveHandler(it, requireContext())
+            if (handler.hasVideosToRemove()) {
+                handler.remove()
+            }
+
             hideLoadingPlaceholder()
             if (it.isEmpty()) {
                 showEmptyScreen()
