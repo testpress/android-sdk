@@ -87,8 +87,8 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
     }
 
     private void storeCourseFetchDate() {
-        CoursesFetchDateHandler coursesFetchDateHandler = new CoursesFetchDateHandler(requireContext());
-        coursesFetchDateHandler.update();
+        CoursesFetchDateHandler handler = new CoursesFetchDateHandler(requireContext());
+        handler.update();
     }
 
     private void unassignLocalCourses() {
