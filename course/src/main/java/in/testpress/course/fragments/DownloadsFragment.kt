@@ -22,7 +22,6 @@ import com.facebook.shimmer.ShimmerFrameLayout
 
 class DownloadsFragment : Fragment() {
     private val TAG = "DownloadsFragment"
-    private lateinit var downloadedVideoRemoveHandler: DownloadedVideoRemoveHandler
     private val viewModel by lazy {
         ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -81,9 +80,9 @@ class DownloadsFragment : Fragment() {
     private fun initializeObservers() {
         showLoadingPlaceholder()
         viewModel.offlineVideos.observe(viewLifecycleOwner, Observer {
-            downloadedVideoRemoveHandler = DownloadedVideoRemoveHandler(it, requireContext())
-            if (downloadedVideoRemoveHandler.hasVideosToRemove()) {
-                downloadedVideoRemoveHandler.remove()
+            val handler = DownloadedVideoRemoveHandler(it, requireContext())
+            if (handler.hasVideosToRemove()) {
+                handler.remove()
             }
 
             hideLoadingPlaceholder()
