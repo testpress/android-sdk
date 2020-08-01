@@ -123,23 +123,17 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
                         Toast.LENGTH_LONG
                     ).show()
                 }
-                Status.SUCCESS -> checkCourseRefreshDate()
+                Status.SUCCESS -> checkCourseRefreshDateAndDisplay()
             }
         })
     }
 
-    private fun checkCourseRefreshDate() {
+    private fun checkCourseRefreshDateAndDisplay() {
         val courseRefreshDate = CourseRefreshDate(requireContext())
         when {
-            courseRefreshDate.isTampered() -> {
-                showInCorrectDateScreen()
-            }
-            courseRefreshDate.hasNotUpdated() -> {
-                showRefreshScreen()
-            }
-            else -> {
-                hideEmptyScreen()
-            }
+            courseRefreshDate.isTampered() -> showInCorrectDateScreen()
+            courseRefreshDate.hasNotUpdated() -> showRefreshScreen()
+            else -> hideEmptyScreen()
         }
     }
 

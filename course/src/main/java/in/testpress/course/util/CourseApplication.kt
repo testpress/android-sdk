@@ -25,16 +25,11 @@ class CourseApplication : Application() {
         }
     }
 
-    private fun isDeviceTimeCorrect(): Boolean {
+    fun isDeviceTimeCorrect(): Boolean {
         val instituteSettings: InstituteSettings = TestpressSdk.getTestpressSession(this)!!.instituteSettings
         val oldDate = sharedPreferences.getLong("TODAY", -1)
         val today = Date()
         return today.time > oldDate && today.time > instituteSettings.serverTime
-    }
-
-    fun getCurrentDateTime(): Long {
-        val sharedPreferences = getSharedPreferences("DATE", Context.MODE_PRIVATE)
-        return sharedPreferences.getLong("TODAY", -1)
     }
 
     fun getDownloadDirectory(): File {
