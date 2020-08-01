@@ -2,7 +2,7 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
 import `in`.testpress.course.enums.Status
-import `in`.testpress.course.helpers.CoursesFetchDateHandler
+import `in`.testpress.course.helpers.CourseRefreshDate
 import `in`.testpress.course.helpers.DownloadedVideoRemoveHandler
 import `in`.testpress.course.repository.CourseRepository
 import `in`.testpress.course.repository.OfflineVideoRepository
@@ -100,7 +100,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
             }
 
             hideLoadingPlaceholder()
-            if (CoursesFetchDateHandler(requireContext()).hasNotUpdated()) {
+            if (CourseRefreshDate(requireContext()).hasNotUpdated()) {
                 showRefreshScreen()
             } else if (it.isEmpty()) {
                 showEmptyScreen()
@@ -123,20 +123,18 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
                         Toast.LENGTH_LONG
                     ).show()
                 }
-                Status.SUCCESS -> {
-                    handleCourseFetchDate()
-                }
+                Status.SUCCESS -> checkCourseRefreshDate()
             }
         })
     }
 
-    private fun handleCourseFetchDate() {
-        val coursesFetchDateHandler = CoursesFetchDateHandler(requireContext())
+    private fun checkCourseRefreshDate() {
+        val courseRefreshDate = CourseRefreshDate(requireContext())
         when {
-            coursesFetchDateHandler.isDateTampered() -> {
+            courseRefreshDate.isTampered() -> {
                 showInCorrectDateScreen()
             }
-            coursesFetchDateHandler.hasNotUpdated() -> {
+            courseRefreshDate.hasNotUpdated() -> {
                 showRefreshScreen()
             }
             else -> {

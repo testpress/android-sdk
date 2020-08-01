@@ -3,7 +3,7 @@ package `in`.testpress.course.repository
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSDKDatabase
-import `in`.testpress.course.helpers.CoursesFetchDateHandler
+import `in`.testpress.course.helpers.CourseRefreshDate
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.Resource
 import `in`.testpress.models.TestpressApiResponse
@@ -71,6 +71,6 @@ class CourseRepository(val context: Context) {
     }
 
     private fun updateFetchTime() {
-        CoursesFetchDateHandler(context).update()
+        CourseRefreshDate(context).update()
     }
 }

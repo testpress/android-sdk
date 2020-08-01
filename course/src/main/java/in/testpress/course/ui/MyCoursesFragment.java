@@ -12,7 +12,7 @@ import java.util.List;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.R;
-import in.testpress.course.helpers.CoursesFetchDateHandler;
+import in.testpress.course.helpers.CourseRefreshDate;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.course.pagers.CoursePager;
@@ -87,7 +87,7 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
     }
 
     private void storeCourseFetchDate() {
-        CoursesFetchDateHandler handler = new CoursesFetchDateHandler(requireContext());
+        CourseRefreshDate handler = new CourseRefreshDate(requireContext());
         handler.update();
     }
 

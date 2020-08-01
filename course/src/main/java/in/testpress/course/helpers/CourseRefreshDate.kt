@@ -5,10 +5,10 @@ import `in`.testpress.course.util.DateUtils
 import android.content.Context
 import java.util.Date
 
-class CoursesFetchDateHandler(val context: Context) {
+class CourseRefreshDate(val context: Context) {
     private val sharedPreferences = context.getSharedPreferences("COURSES_FETCH", Context.MODE_PRIVATE)
 
-    fun isDateTampered(): Boolean {
+    fun isTampered(): Boolean {
         val today = Date()
         val courseApplication = context.applicationContext as CourseApplication
         return courseApplication.getCurrentDateTime() > today.time
@@ -18,7 +18,7 @@ class CoursesFetchDateHandler(val context: Context) {
         val lastFetchTime = sharedPreferences.getLong("FETCH_TIME", 0)
         val today = Date()
 
-        if (isDateTampered()) {
+        if (isTampered()) {
             return true
         }
         return DateUtils.difference(Date(lastFetchTime), today) > 15
