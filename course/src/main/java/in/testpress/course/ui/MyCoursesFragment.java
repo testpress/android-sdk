@@ -73,7 +73,7 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
                 showError(errorMessage);
             }
             showList();
-            storeCourseFetchDate();
+            updateCourseRefreshDate();
             getLoaderManager().destroyLoader(loader.getId());
             return;
         }
@@ -86,9 +86,9 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
         showList();
     }
 
-    private void storeCourseFetchDate() {
-        CourseRefreshDate handler = new CourseRefreshDate(requireContext());
-        handler.update();
+    private void updateCourseRefreshDate() {
+        CourseRefreshDate courseRefreshDate = new CourseRefreshDate(requireContext());
+        courseRefreshDate.update();
     }
 
     private void unassignLocalCourses() {

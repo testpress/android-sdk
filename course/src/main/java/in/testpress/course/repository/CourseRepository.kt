@@ -35,7 +35,7 @@ class CourseRepository(val context: Context) {
                         fetch(page + 1)
                     } else {
                         updateLiveData()
-                        updateFetchTime()
+                        updateRefreshDate()
                     }
                 }
 
@@ -70,7 +70,7 @@ class CourseRepository(val context: Context) {
             .where(CourseDao.Properties.IsMyCourse.eq(true)).list()
     }
 
-    private fun updateFetchTime() {
+    private fun updateRefreshDate() {
         CourseRefreshDate(context).update()
     }
 }

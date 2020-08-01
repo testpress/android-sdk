@@ -8,6 +8,7 @@ import `in`.testpress.course.repository.CourseRepository
 import `in`.testpress.course.repository.OfflineVideoRepository
 import `in`.testpress.course.services.VideoDownloadService
 import `in`.testpress.course.ui.OfflineVideoListAdapter
+import `in`.testpress.course.util.CourseApplication
 import `in`.testpress.course.viewmodels.CourseViewModel
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import `in`.testpress.fragments.EmptyViewFragment
@@ -42,7 +43,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
             }
         }).get(CourseViewModel::class.java)
     }
-
+    private lateinit var courseRefreshDate: CourseRefreshDate
     private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var recyclerView: RecyclerView
     private lateinit var loadingPlaceholder: ShimmerFrameLayout
@@ -51,6 +52,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         VideoDownloadService.start(requireContext())
+        courseRefreshDate = CourseRefreshDate(requireContext())
     }
 
     override fun onCreateView(
@@ -66,7 +68,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
         bindViews(view)
         initializeRecyclerView()
         initializeObservers()
-        initializeCourseFetchObserver()
+        initializeCourseRefreshStatusObserver()
     }
 
     private fun bindViews(view: View) {
@@ -100,7 +102,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
             }
 
             hideLoadingPlaceholder()
-            if (CourseRefreshDate(requireContext()).hasNotUpdated()) {
+            if (courseRefreshDate.hasNotUpdated()) {
                 showRefreshScreen()
             } else if (it.isEmpty()) {
                 showEmptyScreen()
@@ -111,7 +113,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
         })
     }
 
-    private fun initializeCourseFetchObserver() {
+    private fun initializeCourseRefreshStatusObserver() {
         courseViewModel.courses.observe(viewLifecycleOwner, Observer {
             hideLoadingPlaceholder()
             when (it.status) {
@@ -129,9 +131,9 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
     }
 
     private fun checkCourseRefreshDateAndDisplay() {
-        val courseRefreshDate = CourseRefreshDate(requireContext())
+        val courseApplication = requireContext().applicationContext as CourseApplication
         when {
-            courseRefreshDate.isTampered() -> showInCorrectDateScreen()
+            courseApplication.isDeviceTimeInCorrect() -> showInCorrectDateScreen()
             courseRefreshDate.hasNotUpdated() -> showRefreshScreen()
             else -> hideEmptyScreen()
         }

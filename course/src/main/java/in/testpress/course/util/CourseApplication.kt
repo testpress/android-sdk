@@ -1,7 +1,6 @@
 package `in`.testpress.course.util
 
 import `in`.testpress.core.TestpressSdk
-import `in`.testpress.models.InstituteSettings
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
@@ -14,22 +13,26 @@ class CourseApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        sharedPreferences = getSharedPreferences("DATE", Context.MODE_PRIVATE)
-        storeTodayDate()
+        sharedPreferences = getSharedPreferences(APP_DATA, Context.MODE_PRIVATE)
+        storeAppStartTime()
     }
 
-    private fun storeTodayDate() {
+    private fun storeAppStartTime() {
         val today = Date()
         if (isDeviceTimeCorrect()) {
-            sharedPreferences.edit().putLong("TODAY", today.time).apply()
+            sharedPreferences.edit().putLong(APP_TIME, today.time).apply()
         }
     }
 
     fun isDeviceTimeCorrect(): Boolean {
-        val instituteSettings: InstituteSettings = TestpressSdk.getTestpressSession(this)!!.instituteSettings
-        val oldDate = sharedPreferences.getLong("TODAY", -1)
-        val today = Date()
-        return today.time > oldDate && today.time > instituteSettings.serverTime
+        val instituteSettings = TestpressSdk.getTestpressSession(this)!!.instituteSettings
+        val previousAppTime = sharedPreferences.getLong(APP_TIME, -1)
+        val now = Date()
+        return now.time > previousAppTime && now.time > instituteSettings.serverTime
+    }
+
+    fun isDeviceTimeInCorrect(): Boolean {
+        return !isDeviceTimeCorrect()
     }
 
     fun getDownloadDirectory(): File {
@@ -41,5 +44,10 @@ class CourseApplication : Application() {
             }
         }
         return downloadDirectory
+    }
+
+    companion object {
+        const val APP_TIME = "appStartTime"
+        const val APP_DATA = "appData"
     }
 }
