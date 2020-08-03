@@ -105,7 +105,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
 
             hideLoadingPlaceholder()
             if (courseApplication.isAutoTimeDisabledInDevice()) {
-                showInCorrectDateScreen()
+                showEnableAutoTimeScreen()
             }else if (courseRefreshDate.hasNotUpdated()) {
                 showRefreshScreen()
             } else if (it.isEmpty()) {
@@ -141,7 +141,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
 
     private fun checkCourseRefreshDateAndDisplay() {
         when {
-            courseApplication.isAutoTimeDisabledInDevice() -> showInCorrectDateScreen()
+            courseApplication.isAutoTimeDisabledInDevice() -> showEnableAutoTimeScreen()
             courseRefreshDate.hasNotUpdated() -> showRefreshScreen()
             else -> {
                 if(adapter.offlineVideos.isNotEmpty()) {
@@ -168,7 +168,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
         emptyViewFragment.setImage(R.drawable.ic_empty_video)
     }
 
-    private fun showInCorrectDateScreen() {
+    private fun showEnableAutoTimeScreen() {
         emptyViewFragment.setEmptyText(
             R.string.auto_time_disabled,
             R.string.enable_auto_time_description,
