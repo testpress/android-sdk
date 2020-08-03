@@ -14,7 +14,7 @@ class CourseLastSyncedDate(val context: Context) {
     fun hasExpired(): Boolean {
         val lastFetchTime = sharedPreferences.getLong(COURSE_REFRESH_TIME, 0)
         val now = Date()
-        return DateUtils.difference(Date(lastFetchTime), now) > 15 && now.time > instituteSettings.serverTime
+        return DateUtils.difference(Date(lastFetchTime), now) > 2 && now.time > instituteSettings.serverTime
     }
 
     fun refresh() {
