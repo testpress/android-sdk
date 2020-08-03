@@ -3,55 +3,30 @@ package in.testpress.store.models;
 import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class Order{
+public class CouponCodeResponse {
 
-	@SerializedName("date")
 	private String date;
-
-	@SerializedName("voucher")
 	private Voucher voucher;
-
-	@SerializedName("amount_without_discounts")
 	private String amountWithoutDiscounts;
-
-	@SerializedName("access_code")
 	private String accessCode;
-
-	@SerializedName("product_info")
 	private String productInfo;
-
-	@SerializedName("pg_url")
 	private String pgUrl;
-
-	@SerializedName("land_mark")
 	private String landMark;
-
-	@SerializedName("amount_without_processing_fee")
 	private String amountWithoutProcessingFee;
-
-	@SerializedName("checksum")
 	private String checksum;
-
-	@SerializedName("id")
 	private int id;
-
-	@SerializedName("shipping_address")
 	private String shippingAddress;
-
-	@SerializedName("email")
 	private String email;
+	private String status;
+	private String zip;
+	private String amount;
+	private String apikey;
+	private String phone;
+	private String name;
+	private int user;
 
 	@SerializedName("order_items")
 	private List<OrderItemsItem> orderItems;
-
-	@SerializedName("zip")
-	private String zip;
-
-	@SerializedName("amount")
-	private String amount;
-
-	@SerializedName("apikey")
-	private String apikey;
 
 	@SerializedName("ip_address")
 	private String ipAddress;
@@ -59,26 +34,14 @@ public class Order{
 	@SerializedName("enc_data")
 	private Object encData;
 
-	@SerializedName("phone")
-	private String phone;
-
-	@SerializedName("name")
-	private String name;
-
 	@SerializedName("uses_testpress_pg")
 	private boolean usesTestpressPg;
 
 	@SerializedName("order_id")
 	private String orderId;
 
-	@SerializedName("user")
-	private int user;
-
 	@SerializedName("mobile_sdk_hash")
 	private String mobileSdkHash;
-
-	@SerializedName("status")
-	private String status;
 
 	public String getDate(){
 		return date;

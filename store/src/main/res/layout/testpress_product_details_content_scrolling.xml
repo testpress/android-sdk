@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:padding="@dimen/testpress_horizontal_margin"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior" >
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -272,7 +272,6 @@
         </RelativeLayout>
 
         <LinearLayout
-            android:id="@+id/coupon_code_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -289,6 +288,7 @@
                 android:textStyle="bold" />
 
             <LinearLayout
+                android:id="@+id/coupon_code_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -296,16 +296,19 @@
                 android:visibility="gone">
 
                 <EditText
+                    android:id="@+id/et_coupon_code"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingVertical="10dp"
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
                     android:hint="Enter Coupon Code"
+                    android:textAllCaps="true"
                     android:textColor="@color/testpress_black"
                     android:background="@drawable/testpress_edit_text_plain" />
 
                 <Button
+                    android:id="@+id/button_apply_coupon"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="Apply"
@@ -318,6 +321,14 @@
                     android:background="@color/testpress_blue_text" />
 
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_coupon_code_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                tools:text="Coupon Applied Successfully" />
 
         </LinearLayout>
 
