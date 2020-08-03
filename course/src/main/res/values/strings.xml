@@ -41,8 +41,8 @@
     <string name="refresh_videos">Please refresh videos</string>
     <string name="refresh_videos_description">Looks like you’ve not refreshed videos for long time. Press refresh to continue.</string>
 
-    <string name="incorrect_date">Incorrect date time</string>
-    <string name="incorrect_date_description">Looks like your device date is incorrect, please change it and open the app.</string>
+    <string name="auto_time_disabled">Automatic Date/Time is disabled</string>
+    <string name="enable_auto_time_description">Looks like you have disabled automatic date/time. Please go to your mobile date and time settings and enable Auto Date/Time</string>
 
     <string name="testpress_leaderboard">Leaderboard</string>
     <string name="testpress_targets_or_threads">Targets / Threats</string>

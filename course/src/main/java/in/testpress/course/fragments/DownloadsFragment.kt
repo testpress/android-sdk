@@ -48,11 +48,13 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var loadingPlaceholder: ShimmerFrameLayout
     private lateinit var adapter: OfflineVideoListAdapter
+    private lateinit var courseApplication: CourseApplication
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         VideoDownloadService.start(requireContext())
         courseRefreshDate = CourseRefreshDate(requireContext())
+        courseApplication = requireContext().applicationContext as CourseApplication
     }
 
     override fun onCreateView(
@@ -102,7 +104,9 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
             }
 
             hideLoadingPlaceholder()
-            if (courseRefreshDate.hasNotUpdated()) {
+            if (courseApplication.isAutoTimeDisabledInDevice()) {
+                showInCorrectDateScreen()
+            }else if (courseRefreshDate.hasNotUpdated()) {
                 showRefreshScreen()
             } else if (it.isEmpty()) {
                 showEmptyScreen()
@@ -130,12 +134,22 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+        checkCourseRefreshDateAndDisplay()
+    }
+
     private fun checkCourseRefreshDateAndDisplay() {
-        val courseApplication = requireContext().applicationContext as CourseApplication
         when {
-            courseApplication.isDeviceTimeInCorrect() -> showInCorrectDateScreen()
+            courseApplication.isAutoTimeDisabledInDevice() -> showInCorrectDateScreen()
             courseRefreshDate.hasNotUpdated() -> showRefreshScreen()
-            else -> hideEmptyScreen()
+            else -> {
+                if(adapter.offlineVideos.isNotEmpty()) {
+                    hideEmptyScreen()
+                } else {
+                    showEmptyScreen()
+                }
+            }
         }
     }
 
@@ -156,8 +170,8 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
 
     private fun showInCorrectDateScreen() {
         emptyViewFragment.setEmptyText(
-            R.string.incorrect_date,
-            R.string.incorrect_date_description,
+            R.string.auto_time_disabled,
+            R.string.enable_auto_time_description,
             null
         )
         emptyViewFragment.setImage(R.drawable.ic_empty_video)

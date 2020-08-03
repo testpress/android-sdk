@@ -1,11 +1,11 @@
 package `in`.testpress.course.util
 
-import `in`.testpress.core.TestpressSdk
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
+import android.provider.Settings
 import java.io.File
-import java.util.Date
 
 class CourseApplication : Application() {
     private lateinit var downloadDirectory: File
@@ -14,25 +14,14 @@ class CourseApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         sharedPreferences = getSharedPreferences(APP_DATA, Context.MODE_PRIVATE)
-        storeAppStartTime()
     }
 
-    private fun storeAppStartTime() {
-        val today = Date()
-        if (isDeviceTimeCorrect()) {
-            sharedPreferences.edit().putLong(APP_TIME, today.time).apply()
+    fun isAutoTimeDisabledInDevice(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            Settings.Global.getInt(this.contentResolver, Settings.Global.AUTO_TIME, 0) != 1;
+        } else {
+            Settings.System.getInt(this.contentResolver, Settings.System.AUTO_TIME, 0) != 1;
         }
-    }
-
-    fun isDeviceTimeCorrect(): Boolean {
-        val instituteSettings = TestpressSdk.getTestpressSession(this)!!.instituteSettings
-        val previousAppTime = sharedPreferences.getLong(APP_TIME, -1)
-        val now = Date()
-        return now.time > previousAppTime && now.time > instituteSettings.serverTime
-    }
-
-    fun isDeviceTimeInCorrect(): Boolean {
-        return !isDeviceTimeCorrect()
     }
 
     fun getDownloadDirectory(): File {
@@ -47,7 +36,6 @@ class CourseApplication : Application() {
     }
 
     companion object {
-        const val APP_TIME = "appStartTime"
         const val APP_DATA = "appData"
     }
 }
