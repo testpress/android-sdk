@@ -3,7 +3,7 @@ package `in`.testpress.course.repository
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSDKDatabase
-import `in`.testpress.course.helpers.CourseRefreshDate
+import `in`.testpress.course.helpers.CourseLastSyncedDate
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.Resource
 import `in`.testpress.models.TestpressApiResponse
@@ -28,14 +28,14 @@ class CourseRepository(val context: Context) {
             .enqueue(object : TestpressCallback<TestpressApiResponse<Course>>() {
                 override fun onSuccess(response: TestpressApiResponse<Course>) {
                     if (page == 1) {
-                        unassign()
+                        clearExistingCoursesForUser()
                     }
-                    store(response.results)
+                    addNewCoursesForUser(response.results)
                     if (response.hasMore()) {
                         fetch(page + 1)
                     } else {
-                        updateLiveData()
-                        updateRefreshDate()
+                        postToLiveData()
+                        refreshLastSyncedDate()
                     }
                 }
 
@@ -45,7 +45,7 @@ class CourseRepository(val context: Context) {
             })
     }
 
-    private fun unassign() {
+    private fun clearExistingCoursesForUser() {
         val coursesFromDB = courseDao.queryBuilder()
             .where(CourseDao.Properties.IsMyCourse.eq(true)).list()
         for (course in coursesFromDB) {
@@ -54,23 +54,23 @@ class CourseRepository(val context: Context) {
         courseDao.insertOrReplaceInTx(coursesFromDB)
     }
 
-    private fun store(courses: List<Course>) {
+    private fun addNewCoursesForUser(courses: List<Course>) {
         for (course in courses) {
             course.isMyCourse = true
         }
         courseDao.insertOrReplaceInTx(courses)
     }
 
-    private fun updateLiveData() {
-        _resourceCourses.postValue(Resource.success(get()))
+    private fun postToLiveData() {
+        _resourceCourses.postValue(Resource.success(getAll()))
     }
 
-    private fun get(): MutableList<Course>? {
+    private fun getAll(): MutableList<Course>? {
         return courseDao.queryBuilder()
             .where(CourseDao.Properties.IsMyCourse.eq(true)).list()
     }
 
-    private fun updateRefreshDate() {
-        CourseRefreshDate(context).update()
+    private fun refreshLastSyncedDate() {
+        CourseLastSyncedDate(context).refresh()
     }
 }

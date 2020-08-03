@@ -6,20 +6,20 @@ import `in`.testpress.course.util.DateUtils
 import android.content.Context
 import java.util.Date
 
-class CourseRefreshDate(val context: Context) {
+class CourseLastSyncedDate(val context: Context) {
     private val sharedPreferences = context.getSharedPreferences(COURSE_DATA, Context.MODE_PRIVATE)
     private val application = context.applicationContext as CourseApplication
     private val instituteSettings = TestpressSdk.getTestpressSession(context)!!.instituteSettings
 
-    fun hasNotUpdated(): Boolean {
+    fun hasExpired(): Boolean {
         val lastFetchTime = sharedPreferences.getLong(COURSE_REFRESH_TIME, 0)
         val now = Date()
         return DateUtils.difference(Date(lastFetchTime), now) > 15 && now.time > instituteSettings.serverTime
     }
 
-    fun update() {
+    fun refresh() {
         val today = Date()
-        if (!application.isAutoTimeDisabledInDevice()) {
+        if (!application.isAutoTimeUpdateDisabledInDevice()) {
             sharedPreferences.edit().putLong(COURSE_REFRESH_TIME, today.time).apply()
         }
     }

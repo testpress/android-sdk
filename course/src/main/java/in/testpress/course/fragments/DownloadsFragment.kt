@@ -2,7 +2,7 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
 import `in`.testpress.course.enums.Status
-import `in`.testpress.course.helpers.CourseRefreshDate
+import `in`.testpress.course.helpers.CourseLastSyncedDate
 import `in`.testpress.course.helpers.DownloadedVideoRemoveHandler
 import `in`.testpress.course.repository.CourseRepository
 import `in`.testpress.course.repository.OfflineVideoRepository
@@ -43,7 +43,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
             }
         }).get(CourseViewModel::class.java)
     }
-    private lateinit var courseRefreshDate: CourseRefreshDate
+    private lateinit var courseLastSyncedDate: CourseLastSyncedDate
     private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var recyclerView: RecyclerView
     private lateinit var loadingPlaceholder: ShimmerFrameLayout
@@ -53,7 +53,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         VideoDownloadService.start(requireContext())
-        courseRefreshDate = CourseRefreshDate(requireContext())
+        courseLastSyncedDate = CourseLastSyncedDate(requireContext())
         courseApplication = requireContext().applicationContext as CourseApplication
     }
 
@@ -104,9 +104,9 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
             }
 
             hideLoadingPlaceholder()
-            if (courseApplication.isAutoTimeDisabledInDevice()) {
-                showEnableAutoTimeScreen()
-            }else if (courseRefreshDate.hasNotUpdated()) {
+            if (courseApplication.isAutoTimeUpdateDisabledInDevice()) {
+                showEnableAutoTimeUpdateScreen()
+            } else if (courseLastSyncedDate.hasExpired()) {
                 showRefreshScreen()
             } else if (it.isEmpty()) {
                 showEmptyScreen()
@@ -141,8 +141,8 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
 
     private fun checkCourseRefreshDateAndDisplay() {
         when {
-            courseApplication.isAutoTimeDisabledInDevice() -> showEnableAutoTimeScreen()
-            courseRefreshDate.hasNotUpdated() -> showRefreshScreen()
+            courseApplication.isAutoTimeUpdateDisabledInDevice() -> showEnableAutoTimeUpdateScreen()
+            courseLastSyncedDate.hasExpired() -> showRefreshScreen()
             else -> {
                 if(adapter.offlineVideos.isNotEmpty()) {
                     hideEmptyScreen()
@@ -168,7 +168,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
         emptyViewFragment.setImage(R.drawable.ic_empty_video)
     }
 
-    private fun showEnableAutoTimeScreen() {
+    private fun showEnableAutoTimeUpdateScreen() {
         emptyViewFragment.setEmptyText(
             R.string.auto_time_disabled,
             R.string.enable_auto_time_description,

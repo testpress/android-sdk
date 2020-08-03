@@ -10,7 +10,7 @@ import java.io.File
 class CourseApplication : Application() {
     private lateinit var downloadDirectory: File
 
-    fun isAutoTimeDisabledInDevice(): Boolean {
+    fun isAutoTimeUpdateDisabledInDevice(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             Settings.Global.getInt(this.contentResolver, Settings.Global.AUTO_TIME, 0) != 1;
         } else {
