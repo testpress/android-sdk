@@ -9,12 +9,6 @@ import java.io.File
 
 class CourseApplication : Application() {
     private lateinit var downloadDirectory: File
-    private lateinit var sharedPreferences: SharedPreferences
-
-    override fun onCreate() {
-        super.onCreate()
-        sharedPreferences = getSharedPreferences(APP_DATA, Context.MODE_PRIVATE)
-    }
 
     fun isAutoTimeDisabledInDevice(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
@@ -33,9 +27,5 @@ class CourseApplication : Application() {
             }
         }
         return downloadDirectory
-    }
-
-    companion object {
-        const val APP_DATA = "appData"
     }
 }
