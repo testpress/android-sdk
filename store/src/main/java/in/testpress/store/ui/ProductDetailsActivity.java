@@ -155,22 +155,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
                     @Override
                     public void onException(TestpressException exception) {
-                        handleNetworkException(exception);
-                    }
-                });
-    }
-
-    private void getProductDetails() {
-        new TestpressStoreApiClient(this).getProductDetails(productSlug)
-                .enqueue(new TestpressCallback<ProductDetailResponse>() {
-                    @Override
-                    public void onSuccess(ProductDetailResponse result) {
-                        productDetailResponse = result;
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        handleNetworkException(exception);
+                        handleNetworkException(exception, false);
                     }
                 });
     }
@@ -321,7 +306,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
                     }
                     @Override
                     public void onException(TestpressException exception) {
-                        handleCouponCodeException(exception);
+                        handleNetworkException(exception,true);
                     }
                 });
     }
@@ -333,22 +318,6 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         discountedAmount = result.getAmount();
         float discountedAmount = Float.parseFloat(result.getAmountWithoutDiscounts()) - Float.parseFloat(result.getAmount());
         discountAmount.setText("You have saved " + getString(R.string.rupee_symbol) + discountedAmount + " on this course.");
-    }
-
-    private void handleCouponCodeException(TestpressException exception) {
-        progressBar.setVisibility(View.GONE);
-        if (exception.isNetworkError()) {
-            setEmptyText(R.string.testpress_network_error,
-                    R.string.testpress_no_internet_try_again,
-                    R.drawable.ic_error_outline_black_18dp);
-        } else if (exception.isClientError()) {
-            discountAmount.setText(R.string.invalid_coupon_code);
-        } else {
-            setEmptyText(R.string.testpress_error_loading_products,
-                    R.string.testpress_some_thing_went_wrong_try_again,
-                    R.drawable.ic_error_outline_black_18dp);
-            retryButton.setVisibility(View.INVISIBLE);
-        }
     }
 
     public void order() {
@@ -376,19 +345,41 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         startActivity(intent);
     }
 
-    private void handleNetworkException(TestpressException exception) {
+    private void getProductDetails() {
+        new TestpressStoreApiClient(this).getProductDetails(productSlug)
+                .enqueue(new TestpressCallback<ProductDetailResponse>() {
+                    @Override
+                    public void onSuccess(ProductDetailResponse result) {
+                        productDetailResponse = result;
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        handleNetworkException(exception,false);
+                    }
+                });
+    }
+
+    private void handleNetworkException(TestpressException exception, boolean isCouponCodeException) {
         if (exception.isNetworkError()) {
-            setEmptyText(R.string.testpress_network_error,
-                    R.string.testpress_no_internet_try_again,
+            setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again,
                     R.drawable.ic_error_outline_black_18dp);
         } else if (exception.isClientError()) {
-            setEmptyText(R.string.testpress_no_product_found,
-                    R.string.testpress_no_product_found_description,
-                    R.drawable.ic_error_outline_black_18dp);
-            retryButton.setVisibility(View.INVISIBLE);
+            handleClientException(isCouponCodeException);
         } else {
             setEmptyText(R.string.testpress_error_loading_products,
                     R.string.testpress_some_thing_went_wrong_try_again,
+                    R.drawable.ic_error_outline_black_18dp);
+            retryButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void handleClientException(boolean isCouponCodeException) {
+        if (isCouponCodeException) {
+            discountAmount.setText(R.string.invalid_coupon_code);
+        } else {
+            setEmptyText(R.string.testpress_no_product_found,
+                    R.string.testpress_no_product_found_description,
                     R.drawable.ic_error_outline_black_18dp);
             retryButton.setVisibility(View.INVISIBLE);
         }
