@@ -8,7 +8,7 @@ import `in`.testpress.course.repository.CourseRepository
 import `in`.testpress.course.repository.OfflineVideoRepository
 import `in`.testpress.course.services.VideoDownloadService
 import `in`.testpress.course.ui.OfflineVideoListAdapter
-import `in`.testpress.course.util.CourseApplication
+import `in`.testpress.course.util.DateUtils
 import `in`.testpress.course.viewmodels.CourseViewModel
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import `in`.testpress.fragments.EmptyViewFragment
@@ -48,13 +48,11 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var loadingPlaceholder: ShimmerFrameLayout
     private lateinit var adapter: OfflineVideoListAdapter
-    private lateinit var courseApplication: CourseApplication
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         VideoDownloadService.start(requireContext())
         courseLastSyncedDate = CourseLastSyncedDate(requireContext())
-        courseApplication = requireContext().applicationContext as CourseApplication
     }
 
     override fun onCreateView(
@@ -104,7 +102,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
             }
 
             hideLoadingPlaceholder()
-            if (courseApplication.isAutoTimeUpdateDisabledInDevice()) {
+            if (DateUtils.isAutoTimeUpdateDisabledInDevice(requireContext())) {
                 showEnableAutoTimeUpdateScreen()
             } else if (courseLastSyncedDate.hasExpired()) {
                 showRefreshScreen()
@@ -141,7 +139,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
 
     private fun checkCourseRefreshDateAndDisplay() {
         when {
-            courseApplication.isAutoTimeUpdateDisabledInDevice() -> showEnableAutoTimeUpdateScreen()
+            DateUtils.isAutoTimeUpdateDisabledInDevice(requireContext()) -> showEnableAutoTimeUpdateScreen()
             courseLastSyncedDate.hasExpired() -> showRefreshScreen()
             else -> {
                 if(adapter.offlineVideos.isNotEmpty()) {

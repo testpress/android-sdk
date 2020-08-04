@@ -1,14 +1,12 @@
 package `in`.testpress.course.helpers
 
 import `in`.testpress.core.TestpressSdk
-import `in`.testpress.course.util.CourseApplication
 import `in`.testpress.course.util.DateUtils
 import android.content.Context
 import java.util.Date
 
 class CourseLastSyncedDate(val context: Context) {
     private val sharedPreferences = context.getSharedPreferences(COURSE_DATA, Context.MODE_PRIVATE)
-    private val application = context.applicationContext as CourseApplication
     private val instituteSettings = TestpressSdk.getTestpressSession(context)!!.instituteSettings
 
     fun hasExpired(): Boolean {
@@ -19,7 +17,7 @@ class CourseLastSyncedDate(val context: Context) {
 
     fun refresh() {
         val today = Date()
-        if (!application.isAutoTimeUpdateDisabledInDevice()) {
+        if (!DateUtils.isAutoTimeUpdateDisabledInDevice(context)) {
             sharedPreferences.edit().putLong(COURSE_REFRESH_TIME, today.time).apply()
         }
     }
