@@ -10,14 +10,20 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import android.os.Handler;
 import android.view.MenuItem;
 
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
+import in.testpress.database.TestpressDatabase;
 
 public abstract class BaseNavigationDrawerActivity extends AppCompatActivity {
 
@@ -77,6 +83,8 @@ public abstract class BaseNavigationDrawerActivity extends AppCompatActivity {
 
     protected void logout() {
         TestpressSdk.clearActiveSession(this);
+        Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> TestpressDatabase.Companion.invoke(BaseNavigationDrawerActivity.this).clearAllTables());
         LoginManager.getInstance().logOut();
         GoogleSignInOptions signInOptions =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build();

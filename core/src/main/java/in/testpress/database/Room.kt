@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 
-@Database(version = 3, entities = [ContentEntity::class, OfflineVideo::class])
+@Database(version = 3, entities = [ContentEntity::class, OfflineVideo::class], exportSchema = false)
 abstract class TestpressDatabase: RoomDatabase() {
     abstract fun contentDao(): ContentDao
     abstract fun offlineVideoDao(): OfflineVideoDao
@@ -18,8 +18,7 @@ abstract class TestpressDatabase: RoomDatabase() {
             synchronized(TestpressDatabase::class.java) {
                 if (!::INSTANCE.isInitialized) {
                     INSTANCE = Room.databaseBuilder(context.applicationContext,
-                            TestpressDatabase::class.java, "testpress-db")
-                        .fallbackToDestructiveMigration().build()
+                            TestpressDatabase::class.java, "testpress-db1").build()
                 }
             }
             return INSTANCE

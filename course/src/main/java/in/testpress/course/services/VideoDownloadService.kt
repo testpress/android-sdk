@@ -6,6 +6,7 @@ import `in`.testpress.course.helpers.VideoDownloadMonitor
 import `in`.testpress.course.repository.OfflineVideoRepository
 import android.app.Notification
 import android.content.Context
+import android.util.Log
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
 import com.google.android.exoplayer2.offline.DownloadService

@@ -37,6 +37,7 @@ class DownloadedVideoRemoveHandler(val videos: List<DomainOfflineVideo>, val con
     fun remove() {
         val courseIdsToRemove = videosByCourseId.keys subtract userCourseIds
         val videosToRemove = getVideosToRemove(courseIdsToRemove)
+
         for (video in videosToRemove) {
             val downloadTask = DownloadTask(video.url!!, context)
             downloadTask.delete()

@@ -17,15 +17,4 @@ class CourseApplication : Application() {
             Settings.System.getInt(this.contentResolver, Settings.System.AUTO_TIME, 0) != 1;
         }
     }
-
-    fun getDownloadDirectory(): File {
-        if (!::downloadDirectory.isInitialized) {
-            downloadDirectory = if (getExternalFilesDir(null) != null) {
-                getExternalFilesDir(null)!!
-            } else {
-                filesDir
-            }
-        }
-        return downloadDirectory
-    }
 }
