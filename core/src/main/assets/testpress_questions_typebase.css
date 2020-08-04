@@ -424,7 +424,7 @@ body.watermark::before {
     color: #18be99 !important;
 }
 
-#show-hide-button {
+#direction-toggle-button {
     color: rgb(33,150,243);
     font-size: 0.814rem;
     margin-left: 8px;

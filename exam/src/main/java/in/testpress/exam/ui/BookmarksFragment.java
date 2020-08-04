@@ -19,6 +19,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -30,6 +31,7 @@ import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.api.TestpressExamApiClient;
+import in.testpress.exam.ui.view.DirectionQuestionViewModel;
 import in.testpress.exam.util.CommentsUtil;
 import in.testpress.exam.util.Watermark;
 import in.testpress.exam.util.ImageUtils;
@@ -57,7 +59,6 @@ import in.testpress.util.WebViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
-import static in.testpress.exam.ui.DirectionQuestionUtil.addDirectionQuestionAndButton;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 
 public class BookmarksFragment extends BaseFragment {
@@ -97,6 +98,7 @@ public class BookmarksFragment extends BaseFragment {
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
     private RetrofitCall<Bookmark> updateBookmarkAPIRequest;
     private RetrofitCall<Void> deleteBookmarkAPIRequest;
+    private DirectionQuestionViewModel directionQuestionViewModel;
 
     public static BookmarksFragment getInstance(long bookmarkId, Language selectedLanguage) {
         BookmarksFragment reviewQuestionsFragment = new BookmarksFragment();
@@ -111,6 +113,7 @@ public class BookmarksFragment extends BaseFragment {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         apiClient = new TestpressExamApiClient(getContext());
+        initializeViewModel();
         assert getArguments() != null;
         long bookmarkId = getArguments().getLong(PARAM_BOOKMARK_ID);
         bookmarkDao = TestpressSDKDatabase.getBookmarkDao(getContext());
@@ -277,6 +280,10 @@ public class BookmarksFragment extends BaseFragment {
         }
     }
 
+    private void initializeViewModel() {
+        directionQuestionViewModel = new ViewModelProvider(getActivity()).get(DirectionQuestionViewModel.class);
+    }
+
     private void checkContentType() {
         if (content.getHtml() != null) {
             HtmlContent htmlContent = content.getHtml();
@@ -380,7 +387,7 @@ public class BookmarksFragment extends BaseFragment {
 
         // Add direction/passage
         if (directionHtml != null && !directionHtml.isEmpty()) {
-            html += addDirectionQuestionAndButton(directionHtml);
+            html += directionQuestionViewModel.prepare(directionHtml);
         }
 
         // Add question

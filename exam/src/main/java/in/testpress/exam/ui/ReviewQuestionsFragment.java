@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,26 +26,18 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-
 import com.airbnb.lottie.LottieAnimationView;
 import com.theartofdev.edmodo.cropper.CropImage;
-
 import junit.framework.Assert;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.api.TestpressExamApiClient;
+import in.testpress.exam.ui.view.DirectionQuestionViewModel;
 import in.testpress.exam.util.CommentsUtil;
 import in.testpress.exam.util.Watermark;
 import in.testpress.exam.util.ImageUtils;
@@ -65,9 +59,7 @@ import in.testpress.util.ViewUtils;
 import in.testpress.util.WebViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
-
 import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
-import static in.testpress.exam.ui.DirectionQuestionUtil.addDirectionQuestionAndButton;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 import static in.testpress.util.CommonUtils.isAppInstalled;
 
@@ -105,7 +97,7 @@ public class ReviewQuestionsFragment extends Fragment {
     private InstituteSettings instituteSettings;
     private boolean loadComments = true;
     private MenuItem bookmarkIcon;
-    private static String previousDirectionQuestion = " ";
+    private DirectionQuestionViewModel directionQuestionViewModel;
 
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
     private RetrofitCall<Bookmark> bookmarkAPIRequest;
@@ -123,6 +115,7 @@ public class ReviewQuestionsFragment extends Fragment {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initializeViewModel();
         apiClient = new TestpressExamApiClient(getContext());
         long reviewItemId = getArguments().getLong(PARAM_REVIEW_ITEM_ID);
         Assert.assertNotNull("PARAM_REVIEW_ITEM_ID must not be null", reviewItemId);
@@ -263,6 +256,11 @@ public class ReviewQuestionsFragment extends Fragment {
         }
     }
 
+    private void initializeViewModel() {
+        directionQuestionViewModel = new ViewModelProvider(getActivity())
+                .get(DirectionQuestionViewModel.class);
+    }
+
     private void initalizeBookmarkButtonListener() {
         bookmarkIcon.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -364,7 +362,7 @@ public class ReviewQuestionsFragment extends Fragment {
 
         // Add direction/passage
         if (directionHtml != null && !directionHtml.isEmpty()) {
-            html += addDirectionQuestionAndButton(directionHtml);
+            html += directionQuestionViewModel.prepare(directionHtml);
         }
 
         // Add question

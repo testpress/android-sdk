@@ -52,16 +52,16 @@ function addWatermark(logoUrl) {
     document.body.classList.add("watermark");
 }
 
-function setDirectionVisibility() {
-    var button = document.getElementById("show-hide-button");
+function toggleDirectionVisibility() {
+    var button = document.getElementById("direction-toggle-button");
     var direction = document.getElementById("direction");
-     if(direction.style.display == 'none'){
-        direction.style.display = 'block';
-        button.innerHTML = 'Hide Direction';
-        ButtonHandler.onButtonClick()
-        }else{
+     if (direction.style.display == 'none') {
+            direction.style.display = 'block';
+            button.innerHTML = 'Hide Direction';
+            ToggleDirectionButtonHandler.onButtonClick()
+        } else {
             direction.style.display = 'none';
             button.innerHTML = 'Show Direction';
-            ButtonHandler.onButtonClick()
+            ToggleDirectionButtonHandler.onButtonClick()
         }
 }

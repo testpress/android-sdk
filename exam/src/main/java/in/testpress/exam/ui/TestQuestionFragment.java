@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
 import java.util.ArrayList;
 import java.util.List;
 import in.testpress.core.TestpressSdk;
@@ -15,12 +17,11 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptAnswer;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.AttemptQuestion;
+import in.testpress.exam.ui.view.DirectionQuestionViewModel;
 import in.testpress.exam.ui.view.WebView;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Language;
 import in.testpress.util.WebViewUtils;
-
-import static in.testpress.exam.ui.DirectionQuestionUtil.addDirectionQuestionAndButton;
 
 public class TestQuestionFragment extends Fragment {
 
@@ -35,7 +36,7 @@ public class TestQuestionFragment extends Fragment {
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
     private InstituteSettings instituteSettings;
-    private static String previousDirectionQuestion = " ";
+    private DirectionQuestionViewModel directionQuestionViewModel;
 
     static TestQuestionFragment getInstance(AttemptItem attemptItem, int questionIndex,
                                             Language selectedLanguage) {
@@ -52,6 +53,7 @@ public class TestQuestionFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initializeViewModel();
         attemptItem = getArguments().getParcelable(PARAM_ATTEMPT_ITEM);
         index = getArguments().getInt(PARAM_QUESTION_INDEX);
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
@@ -105,6 +107,11 @@ public class TestQuestionFragment extends Fragment {
         return view;
     }
 
+    private void initializeViewModel() {
+        directionQuestionViewModel = new ViewModelProvider(getActivity())
+                .get(DirectionQuestionViewModel.class);
+    }
+
     private String getQuestionItemHtml() {
         AttemptQuestion attemptQuestion = attemptItem.getAttemptQuestion();
         ArrayList<AttemptQuestion> translations = attemptQuestion.getTranslations();
@@ -125,8 +132,9 @@ public class TestQuestionFragment extends Fragment {
                             "<div class='question-index'>" + index + "</div>";
 
         // Add direction if present
-        if (attemptQuestion.getDirection() != null && !attemptQuestion.getDirection().isEmpty()) {
-            htmlContent += addDirectionQuestionAndButton(attemptQuestion.getDirection());
+        String directionHtml = attemptQuestion.getDirection();
+        if (directionHtml != null && !directionHtml.isEmpty()) {
+            htmlContent += directionQuestionViewModel.prepare(directionHtml);
         }
         // Add question
         htmlContent += "" +

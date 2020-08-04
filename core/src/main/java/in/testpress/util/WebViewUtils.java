@@ -23,7 +23,7 @@ public class WebViewUtils {
 
     private WebView webView;
     private boolean hasError;
-    public static boolean directionButtonStateVisible = true;
+    public static boolean isDirectionButtonStateVisible = true;
     public WebViewUtils(WebView webView) {
         this.webView = webView;
     }
@@ -49,7 +49,7 @@ public class WebViewUtils {
     public void initWebView(String htmlContent, final Activity activity) {
         initWebView(webView);
         webView.addJavascriptInterface(new ImageHandler(activity), "ImageHandler");
-        webView.addJavascriptInterface(new ButtonHandler(),"ButtonHandler");
+        webView.addJavascriptInterface(new ToggleDirectionButtonHandler(),"ToggleDirectionButtonHandler");
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -288,10 +288,6 @@ public class WebViewUtils {
                 "</div>";
     }
 
-    public static String getButtonToShowOrHideDirection() {
-        return "\n<button id='show-hide-button' onclick = 'setDirectionVisibility()'>Hide/Show Direction</button>";
-    }
-
     public static String getRadioButtonOptionWithTags(String optionText, int id) {
         return "" +
                 "<tr style='border-bottom:1px solid #e6e6e6;'>" +
@@ -365,18 +361,18 @@ public class WebViewUtils {
         activity.startActivity(ZoomableImageActivity.createIntent(url, activity));
     }
 
-    private class ButtonHandler {
+    private class ToggleDirectionButtonHandler {
         @JavascriptInterface
         public void onButtonClick() {
-            WebViewUtils.this.setDirectionButtonState();
+            WebViewUtils.this.toggleDirectionButtonState();
         }
     }
 
-    protected void setDirectionButtonState() {
-        if (directionButtonStateVisible) {
-            directionButtonStateVisible = false;
+    protected void toggleDirectionButtonState() {
+        if (isDirectionButtonStateVisible) {
+            isDirectionButtonStateVisible = false;
         } else {
-            directionButtonStateVisible = true;
+            isDirectionButtonStateVisible = true;
         }
     }
 
