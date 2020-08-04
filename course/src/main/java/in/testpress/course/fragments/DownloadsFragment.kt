@@ -109,6 +109,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
             } else if (it.isEmpty()) {
                 showEmptyScreen()
             } else {
+                hideEmptyScreen()
                 adapter.offlineVideos = it
                 adapter.notifyDataSetChanged()
             }
