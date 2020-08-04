@@ -1,6 +1,7 @@
 package in.testpress.store.network;
 
 import android.content.Context;
+import android.text.Editable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,18 +15,19 @@ import in.testpress.store.models.CouponCodeResponse;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
-import in.testpress.store.models.Response;
+import in.testpress.store.models.ProductDetailResponse;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.ProductsListResponse;
 
 public class TestpressStoreApiClient extends TestpressApiClient {
 
     public static final String PRODUCTS_LIST_PATH =  "/api/v2.2/products/";
+
     public static final String V4_PRODUCTS_LIST_PATH =  "/api/v2.4/products/";
 
     public static final String ORDERS_PATH = "/api/v2.2/orders/";
 
-    public static final String COUPON_PATH = "api/v2.4/orders/";
+    public static final String COUPON_PATH = "/api/v2.4/orders/";
 
     public static final String APPLY_COUPON = "/apply-coupon/";
 
@@ -49,8 +51,12 @@ public class TestpressStoreApiClient extends TestpressApiClient {
         return getProductService().getv4Products(queryParams);
     }
 
-    public RetrofitCall<Response> getProductDetail(String productSlug) {
+    public RetrofitCall<Product> getProductDetail(String productSlug) {
         return getProductService().getProductDetails(productSlug);
+    }
+
+    public RetrofitCall<ProductDetailResponse> getProductDetails(String productSlug) {
+        return getProductService().getProductDetail(productSlug);
     }
 
     public RetrofitCall<Order> order(List<OrderItem> orderItems) {
@@ -70,8 +76,10 @@ public class TestpressStoreApiClient extends TestpressApiClient {
         return getProductService().orderConfirm(order.getId(), orderParameters);
     }
 
-    public RetrofitCall<CouponCodeResponse> applyCouponCode(int id) {
-        return getProductService().applyCouponCode(id);
+    public RetrofitCall<CouponCodeResponse> applyCouponCode(int id, Editable couponCode) {
+        HashMap<String,String> couponCodeMap = new HashMap<String, String>();
+        couponCodeMap.put("code",couponCode.toString());
+        return getProductService().applyCouponCode(id, couponCodeMap);
     }
 
 }

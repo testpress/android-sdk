@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import in.testpress.store.R;
 import in.testpress.ui.BaseToolBarActivity;
 
+import static in.testpress.store.ui.ProductDetailsActivity.CURRENT_AMOUNT;
+
 public class PaymentModeActivity extends BaseToolBarActivity implements
         PaymentOptionsAdapter.OnRecyclerItemClickListener, PaymentRelatedDetailsListener {
 

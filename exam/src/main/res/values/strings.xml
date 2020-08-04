@@ -253,4 +253,7 @@
     <string name="testpress_no_app_available">No App Available</string>
     <string name="testpress_share_screenshot_text">Do check out this question from %1$s. Get it at %2$s</string>
     <string name="share_app_message">Share this app to your friends twice to unlock explanations</string>
+
+    <string name="invalid_coupon_code">Invalid Coupon Code</string>
+    <string name="rupee_symbol">\u20B9</string>
 </resources>

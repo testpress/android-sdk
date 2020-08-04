@@ -1,182 +1,391 @@
 package in.testpress.store.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.List;
-import com.google.gson.annotations.SerializedName;
 
-public class Order{
+public class Order implements Parcelable {
 
-	@SerializedName("date")
-	private String date;
+    private String url;
+    private Integer id;
+    private String orderId;
+    private String date;
+    private String user;
+    private String status;
+    private String email;
+    private String name;
+    private String phone;
+    private String shippingAddress;
+    private List<OrderItem> orderItems = new ArrayList<OrderItem>();
+    private String amount;
+    private String mobileSdkHash;
+    private String checksum;
+    private String apikey;
+    private String zip;
+    private String landMark;
+    private String productInfo;
 
-	@SerializedName("voucher")
-	private Voucher voucher;
+    // Parcelling part
+    public Order(Parcel parcel){
+        url     = parcel.readString();
+        date    = parcel.readString();
+        id      = parcel.readInt();
+        orderId = parcel.readString();
+        user    = parcel.readString();
+        status  = parcel.readString();
+        email   = parcel.readString();
+        name    = parcel.readString();
+        phone   = parcel.readString();
+        shippingAddress = parcel.readString();
+        amount   = parcel.readString();
+        checksum = parcel.readString();
+        mobileSdkHash = parcel.readString();
+        apikey   = parcel.readString();
+        zip      = parcel.readString();
+        landMark = parcel.readString();
+        parcel.readTypedList(orderItems, OrderItem.CREATOR);
+    }
 
-	@SerializedName("amount_without_discounts")
-	private String amountWithoutDiscounts;
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
-	@SerializedName("access_code")
-	private String accessCode;
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(url);
+        parcel.writeString(date);
+        parcel.writeInt(id);
+        parcel.writeString(orderId);
+        parcel.writeString(user);
+        parcel.writeString(status);
+        parcel.writeString(email);
+        parcel.writeString(name);
+        parcel.writeString(phone);
+        parcel.writeString(shippingAddress);
+        parcel.writeString(amount);
+        parcel.writeString(checksum);
+        parcel.writeString(mobileSdkHash);
+        parcel.writeString(apikey);
+        parcel.writeString(zip);
+        parcel.writeString(landMark);
+        parcel.writeTypedList(orderItems);
+    }
 
-	@SerializedName("product_info")
-	private String productInfo;
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Order createFromParcel(Parcel in) {
+            return new Order(in);
+        }
 
-	@SerializedName("pg_url")
-	private String pgUrl;
+        public Order[] newArray(int size) {
+            return new Order[size];
+        }
+    };
 
-	@SerializedName("land_mark")
-	private String landMark;
+    /**
+     *
+     * @return
+     * The url
+     */
+    public String getUrl() {
+        return url;
+    }
 
-	@SerializedName("amount_without_processing_fee")
-	private String amountWithoutProcessingFee;
+    /**
+     *
+     * @param url
+     * The url
+     */
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-	@SerializedName("checksum")
-	private String checksum;
+    /**
+     *
+     * @return
+     * The id
+     */
+    public Integer getId() {
+        return id;
+    }
 
-	@SerializedName("id")
-	private int id;
+    /**
+     *
+     * @param id
+     * The id
+     */
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	@SerializedName("shipping_address")
-	private String shippingAddress;
+    public String getOrderId() {
+        return orderId;
+    }
 
-	@SerializedName("email")
-	private String email;
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
 
-	@SerializedName("order_items")
-	private List<OrderItemsItem> orderItems;
+    /**
+     *
+     * @return
+     * The date
+     */
+    public String getDate() {
+        return date;
+    }
 
-	@SerializedName("zip")
-	private String zip;
+    /**
+     *
+     * @param date
+     * The date
+     */
+    public void setDate(String date) {
+        this.date = date;
+    }
 
-	@SerializedName("amount")
-	private String amount;
+    /**
+     *
+     * @return
+     * The user
+     */
+    public String getUser() {
+        return user;
+    }
 
-	@SerializedName("apikey")
-	private String apikey;
+    /**
+     *
+     * @param user
+     * The user
+     */
+    public void setUser(String user) {
+        this.user = user;
+    }
 
-	@SerializedName("ip_address")
-	private String ipAddress;
+    /**
+     *
+     * @return
+     * The status
+     */
+    public String getStatus() {
+        return status;
+    }
 
-	@SerializedName("enc_data")
-	private Object encData;
+    /**
+     *
+     * @param status
+     * The status
+     */
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	@SerializedName("phone")
-	private String phone;
+    /**
+     *
+     * @return
+     * The email
+     */
+    public String getEmail() {
+        return email;
+    }
 
-	@SerializedName("name")
-	private String name;
+    /**
+     *
+     * @param email
+     * The email
+     */
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	@SerializedName("uses_testpress_pg")
-	private boolean usesTestpressPg;
+    /**
+     *
+     * @return
+     * The name
+     */
+    public String getName() {
+        return name;
+    }
 
-	@SerializedName("order_id")
-	private String orderId;
+    /**
+     *
+     * @param name
+     * The name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	@SerializedName("user")
-	private int user;
+    /**
+     *
+     * @return
+     * The phone
+     */
+    public String getPhone() {
+        return phone;
+    }
 
-	@SerializedName("mobile_sdk_hash")
-	private String mobileSdkHash;
+    /**
+     *
+     * @param phone
+     * The phone
+     */
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
-	@SerializedName("status")
-	private String status;
+    /**
+     *
+     * @return
+     * The shippingAddress
+     */
+    public String getShippingAddress() {
+        return shippingAddress;
+    }
 
-	public String getDate(){
-		return date;
-	}
+    /**
+     *
+     * @param shippingAddress
+     * The shipping_address
+     */
+    public void setShippingAddress(String shippingAddress) {
+        this.shippingAddress = shippingAddress;
+    }
 
-	public Voucher getVoucher(){
-		return voucher;
-	}
+    /**
+     *
+     * @return
+     * The orderItems
+     */
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
 
-	public String getAmountWithoutDiscounts(){
-		return amountWithoutDiscounts;
-	}
+    /**
+     *
+     * @param orderItems
+     * The order_items
+     */
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
+    }
 
-	public String getAccessCode(){
-		return accessCode;
-	}
+    /**
+     *
+     * @return
+     * The amount
+     */
+    public String getAmount() {
+        return amount;
+    }
 
-	public String getProductInfo(){
-		return productInfo;
-	}
+    /**
+     *
+     * @param amount
+     * The amount
+     */
+    public void setAmount(String amount) {
+        this.amount = amount;
+    }
 
-	public String getPgUrl(){
-		return pgUrl;
-	}
+    /**
+     *
+     * @return
+     * The checksum
+     */
+    public String getChecksum() {
+        return checksum;
+    }
 
-	public String getLandMark(){
-		return landMark;
-	}
+    /**
+     *
+     * @param checksum
+     * The checksum
+     */
+    public void setChecksum(String checksum) {
+        this.checksum = checksum;
+    }
 
-	public String getAmountWithoutProcessingFee(){
-		return amountWithoutProcessingFee;
-	}
+    /**
+     *
+     * @return
+     * The checksum
+     */
+    public String getMobileSdkHash() {
+        return mobileSdkHash;
+    }
 
-	public String getChecksum(){
-		return checksum;
-	}
+    /**
+     *
+     * @param mobileSdkHash
+     * The checksum
+     */
+    public void setMobileSdkHash(String mobileSdkHash) {
+        this.mobileSdkHash = mobileSdkHash;
+    }
 
-	public int getId(){
-		return id;
-	}
+    /**
+     *
+     * @return
+     * The apikey
+     */
+    public String getApikey() {
+        return apikey;
+    }
 
-	public String getShippingAddress(){
-		return shippingAddress;
-	}
+    /**
+     *
+     * @param apikey
+     * The apikey
+     */
+    public void setApikey(String apikey) {
+        this.apikey = apikey;
+    }
 
-	public String getEmail(){
-		return email;
-	}
+    /**
+     *
+     * @return
+     * The zip
+     */
+    public String getZip() {
+        return zip;
+    }
 
-	public List<OrderItemsItem> getOrderItems(){
-		return orderItems;
-	}
+    /**
+     *
+     * @param zip
+     * The zip
+     */
+    public void setZip(String zip) {
+        this.zip = zip;
+    }
 
-	public String getZip(){
-		return zip;
-	}
+    /**
+     *
+     * @return
+     * The landMark
+     */
+    public String getLandMark() {
+        return landMark;
+    }
 
-	public String getAmount(){
-		return amount;
-	}
+    /**
+     *
+     * @param landMark
+     * The land_mark
+     */
+    public void setLandMark(String landMark) {
+        this.landMark = landMark;
+    }
 
-	public String getApikey(){
-		return apikey;
-	}
+    public String getProductInfo() {
+        return productInfo;
+    }
 
-	public String getIpAddress(){
-		return ipAddress;
-	}
+    public void setProductInfo(String productInfo) {
+        this.productInfo = productInfo;
+    }
 
-	public Object getEncData(){
-		return encData;
-	}
-
-	public String getPhone(){
-		return phone;
-	}
-
-	public String getName(){
-		return name;
-	}
-
-	public boolean isUsesTestpressPg(){
-		return usesTestpressPg;
-	}
-
-	public String getOrderId(){
-		return orderId;
-	}
-
-	public int getUser(){
-		return user;
-	}
-
-	public String getMobileSdkHash(){
-		return mobileSdkHash;
-	}
-
-	public String getStatus(){
-		return status;
-	}
 }

@@ -293,7 +293,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <EditText
                     android:id="@+id/et_coupon_code"
@@ -327,8 +327,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
                 android:gravity="center"
                 tools:text="Coupon Applied Successfully" />
+
+            <TextView
+                android:id="@+id/tv_discount_amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                tools:text="@string/have_coupon_code"
+                android:textColor="@color/testpress_red"
+                android:textStyle="bold" />
+
 
         </LinearLayout>
 

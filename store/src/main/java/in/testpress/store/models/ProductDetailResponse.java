@@ -3,7 +3,7 @@ package in.testpress.store.models;
 import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class Response{
+public class ProductDetailResponse {
 
 	@SerializedName("end_date")
 	private Object endDate;
@@ -48,7 +48,7 @@ public class Response{
 	private Object startDate;
 
 	@SerializedName("order")
-	private Order order;
+	private OrderDetail orderDetail;
 
 	public Object getEndDate(){
 		return endDate;
@@ -106,7 +106,7 @@ public class Response{
 		return startDate;
 	}
 
-	public Order getOrder(){
-		return order;
+	public OrderDetail getOrder(){
+		return orderDetail;
 	}
 }

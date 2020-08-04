@@ -15,16 +15,13 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.payu.india.Model.PaymentParams;
 import com.payu.india.Model.PayuConfig;
 import com.payu.india.Model.PayuHashes;
 import com.payu.india.Payu.PayuConstants;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
@@ -40,10 +37,10 @@ import in.testpress.util.EventsTrackerFacade;
 import in.testpress.util.FBEventsTrackerFacade;
 import in.testpress.util.TextWatcherAdapter;
 import in.testpress.util.UIUtils;
-
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 import static in.testpress.store.network.TestpressStoreApiClient.URL_PAYMENT_RESPONSE_HANDLER;
+import static in.testpress.store.ui.ProductDetailsActivity.CURRENT_AMOUNT;
 import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
 
 public class OrderConfirmActivity extends BaseToolBarActivity {
@@ -70,6 +67,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
     private TestpressStoreApiClient apiClient;
     private FBEventsTrackerFacade fbEventsLogger;
     private EventsTrackerFacade eventsTrackerFacade;
+    private String discountedAmount;
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -97,6 +95,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
         retryButton = (Button) findViewById(R.id.retry_button);
 
         product = getIntent().getParcelableExtra(PRODUCT);
+        discountedAmount = getIntent().getStringExtra(CURRENT_AMOUNT);
         orderItem.setProduct(product.getUrl());
         orderItem.setQuantity(1);
         orderItem.setPrice(product.getPrice());
@@ -207,7 +206,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
                         PaymentParams paymentParams = new PaymentParams();
                         paymentParams.setKey(order.getApikey());
                         paymentParams.setTxnId(order.getOrderId());
-                        paymentParams.setAmount(order.getAmount());
+                        paymentParams.setAmount(getAmount());
                         paymentParams.setProductInfo(order.getProductInfo());
                         paymentParams.setFirstName(order.getName());
                         paymentParams.setEmail(order.getEmail());
@@ -276,6 +275,14 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
                         }
                     }
                 });
+    }
+
+    private String getAmount() {
+        if (discountedAmount!=null){
+            return discountedAmount;
+        } else {
+           return order.getAmount();
+        }
     }
 
     void showPaymentStatus() {

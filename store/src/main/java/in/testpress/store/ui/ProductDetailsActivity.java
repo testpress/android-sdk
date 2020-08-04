@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,7 +26,7 @@ import in.testpress.models.InstituteSettings;
 import in.testpress.store.R;
 import in.testpress.store.models.CouponCodeResponse;
 import in.testpress.store.models.Product;
-import in.testpress.store.models.Response;
+import in.testpress.store.models.ProductDetailResponse;
 import in.testpress.store.network.TestpressStoreApiClient;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.EventsTrackerFacade;
@@ -39,16 +38,15 @@ import in.testpress.util.ZoomableImageString;
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 
 public class ProductDetailsActivity extends BaseToolBarActivity {
-
     public static final String PRODUCT_SLUG = "productSlug";
     public static final String PRODUCT = "product";
-
+    public static final String CURRENT_AMOUNT = "currentAmount";
     private LinearLayout emptyView;
     private TextView emptyTitleView;
     private TextView emptyDescView;
     private Button retryButton;
     private ProgressBar progressBar;
-    private Response product;
+    private Product product;
     private String productSlug;
     private EventsTrackerFacade eventsTrackerFacade;
     private TextView haveCouponCode;
@@ -66,6 +64,9 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     private TextView descriptionText;
     private View descriptionContainerLine;
     private TextView accessCodeButton;
+    private ProductDetailResponse productDetailResponse;
+    private TextView discountAmount;
+    private String discountedAmount = null;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -75,6 +76,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         getDataFromIntent();
         initializeViews();
         initClickListeners();
+        getProductDetails();
         loadProductDetails();
     }
 
@@ -106,6 +108,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         descriptionText = (TextView) findViewById(R.id.description);
         descriptionContainerLine = (View) findViewById(R.id.description_line);
         accessCodeButton = (TextView) findViewById(R.id.have_access_code);
+        discountAmount = findViewById(R.id.tv_discount_amount);
         UIUtils.setIndeterminateDrawable(this, progressBar, 4);
     }
 
@@ -119,12 +122,13 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         haveCouponCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               setCouponCodeContainerVisibility();
+                setCouponCodeContainerVisibility();
             }
         });
         applyCoupon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                progressBar.setVisibility(View.VISIBLE);
                 verifyCouponCode();
             }
         });
@@ -143,9 +147,9 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     private void getProductDetailsFromNetwork() {
         new TestpressStoreApiClient(this).getProductDetail(productSlug)
-                .enqueue(new TestpressCallback<Response>() {
+                .enqueue(new TestpressCallback<Product>() {
                     @Override
-                    public void onSuccess(Response product) {
+                    public void onSuccess(Product product) {
                         onProductLoaded(product);
                     }
 
@@ -156,7 +160,22 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
                 });
     }
 
-    public void onProductLoaded(Response product) {
+    private void getProductDetails() {
+        new TestpressStoreApiClient(this).getProductDetails(productSlug)
+                .enqueue(new TestpressCallback<ProductDetailResponse>() {
+                    @Override
+                    public void onSuccess(ProductDetailResponse result) {
+                        productDetailResponse = result;
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        handleNetworkException(exception);
+                    }
+                });
+    }
+
+    public void onProductLoaded(Product product) {
         priceText = (TextView) findViewById(R.id.price);
         View productDetailsView = findViewById(R.id.main_content);
         progressBar.setVisibility(View.GONE);
@@ -171,7 +190,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         logEvent(EventsTrackerFacade.VIEWED_PRODUCT_EVENT);
     }
 
-    private void setProductDetail(Response product) {
+    private void setProductDetail(Product product) {
         ImageView image = (ImageView) findViewById(R.id.thumbnail_image);
         TextView titleText = (TextView) findViewById(R.id.title);
         ImageLoader imageLoader = ImageUtils.initImageLoader(this);
@@ -190,7 +209,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
             //noinspection ConstantConditions
             InstituteSettings settings = session.getInstituteSettings();
             if (settings.isAccessCodeEnabled()) {
-               handleAccessCode(session);
+                handleAccessCode(session);
             } else {
                 accessCodeButton.setVisibility(View.GONE);
             }
@@ -294,19 +313,42 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     }
 
     private void verifyCouponCode() {
-        new TestpressStoreApiClient(this).applyCouponCode(product.getId()).enqueue(new TestpressCallback<CouponCodeResponse>() {
-            @Override
-            public void onSuccess(CouponCodeResponse result) {
-                priceText.setText(result.getAmount());
-                couponCodeStatus.setText(result.getStatus());
-                Log.e("result", result.toString());
-            }
+        new TestpressStoreApiClient(this).applyCouponCode(productDetailResponse.getOrder().getId(), couponCode.getText())
+                .enqueue(new TestpressCallback<CouponCodeResponse>() {
+                    @Override
+                    public void onSuccess(CouponCodeResponse result) {
+                        setCouponCodeSuccess(result);
+                    }
+                    @Override
+                    public void onException(TestpressException exception) {
+                        handleCouponCodeException(exception);
+                    }
+                });
+    }
 
-            @Override
-            public void onException(TestpressException exception) {
-                handleNetworkException(exception);
-            }
-        });
+    private void setCouponCodeSuccess(CouponCodeResponse result) {
+        progressBar.setVisibility(View.GONE);
+        priceText.setText(result.getAmount());
+        couponCodeStatus.setText(result.getVoucher().getCode() + " applied");
+        discountedAmount = result.getAmount();
+        float discountedAmount = Float.parseFloat(result.getAmountWithoutDiscounts()) - Float.parseFloat(result.getAmount());
+        discountAmount.setText("You have saved " + getString(R.string.rupee_symbol) + discountedAmount + " on this course.");
+    }
+
+    private void handleCouponCodeException(TestpressException exception) {
+        progressBar.setVisibility(View.GONE);
+        if (exception.isNetworkError()) {
+            setEmptyText(R.string.testpress_network_error,
+                    R.string.testpress_no_internet_try_again,
+                    R.drawable.ic_error_outline_black_18dp);
+        } else if (exception.isClientError()) {
+            discountAmount.setText(R.string.invalid_coupon_code);
+        } else {
+            setEmptyText(R.string.testpress_error_loading_products,
+                    R.string.testpress_some_thing_went_wrong_try_again,
+                    R.drawable.ic_error_outline_black_18dp);
+            retryButton.setVisibility(View.INVISIBLE);
+        }
     }
 
     public void order() {
@@ -315,7 +357,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         }
         logEvent(EventsTrackerFacade.CLICKED_BUY_NOW);
         if (this.product.getPaymentLink().isEmpty()) {
-           navigateToOrderConfirmActivity();
+            navigateToOrderConfirmActivity();
         } else {
             openPayment();
         }
@@ -324,6 +366,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     private void navigateToOrderConfirmActivity() {
         Intent intent = new Intent(ProductDetailsActivity.this, OrderConfirmActivity.class);
         intent.putExtra(PRODUCT, product);
+        intent.putExtra(CURRENT_AMOUNT,discountedAmount);
         startActivityForResult(intent, STORE_REQUEST_CODE);
     }
 
