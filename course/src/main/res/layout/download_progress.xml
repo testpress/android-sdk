@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginRight="20dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
 <io.netopen.hotbitmapgg.library.view.RingProgressBar
     android:layout_width="30dp"
     android:layout_height="30dp"
+    android:layout_marginRight="10dp"
     app:max="100"
     app:ringColor="@color/testpress_white"
     app:ringProgressColor="@color/testpress_white"
@@ -11,3 +18,4 @@
     android:id="@+id/video_download_progress"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto" />
+</LinearLayout>
