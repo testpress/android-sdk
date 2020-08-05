@@ -1,18 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tool="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/color_primary"
-    android:layout_height="?attr/actionBarSize">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <TextView
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="50dp"
+            app:strokeColor="@color/browser_actions_bg_grey"
+            app:strokeWidth="1dp">
+
+            <ImageView
+                android:id="@+id/img_profile"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:scaleType="fitCenter" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="25dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_profile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/testpress_black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tool:text="@string/username" />
+
+            <TextView
+                android:id="@+id/tv_view_profile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/view_profile"
+                android:textColor="@color/testpress_black" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="25dp"
+        android:background="@color/browser_actions_bg_grey" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_profile"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:paddingLeft="20dp"
-        android:text="Testpress Demo" />
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="img_profile,tv_profile,tv_view_profile" />
 
 </LinearLayout>

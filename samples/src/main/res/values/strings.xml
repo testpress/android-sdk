@@ -19,6 +19,7 @@
     <string name="home">Home</string>
     <string name="navigation_drawer_open">Drawer Open</string>
     <string name="navigation_drawer_close">Drawer Close</string>
+    <string name="view_profile">View Profile</string>
 
     <string name="facebook_app_id">1244600758892095</string>
     <string name="fb_login_protocol_scheme">1244600758892095</string>
