@@ -329,8 +329,11 @@ public class ExoPlayerUtil {
                     MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
                     int rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo);
                     DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
-                    parametersBuilder.clearSelectionOverrides(rendererIndex)
-                            .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), trackSelectionDialog.getOverrides().get(0));
+                    if (!trackSelectionDialog.getOverrides().isEmpty()) {
+                        parametersBuilder.clearSelectionOverrides(rendererIndex)
+                                .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), trackSelectionDialog.getOverrides().get(0));
+                        trackSelector.setParameters(parametersBuilder.build());
+                    }
                 }
             };
         }
