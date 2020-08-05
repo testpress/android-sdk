@@ -179,8 +179,8 @@
                 app:iconGravity="textStart"
                 app:icon="@drawable/ic_close_black_24dp"
                 android:gravity="center_vertical|center_horizontal"
-                android:textColor="@color/testpress_red"
-                app:iconTint="@color/testpress_red"
+                android:textColor="@color/testpress_color_primary"
+                app:iconTint="@color/testpress_color_primary"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Button" />
         </LinearLayout>
