@@ -5,6 +5,9 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:paddingHorizontal="10dp"
+    android:focusable="true"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground"
     android:paddingVertical="15dp">
 
     <RelativeLayout
