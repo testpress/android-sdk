@@ -2,6 +2,7 @@ package `in`.testpress.course.ui
 
 import `in`.testpress.course.domain.DomainOfflineVideo
 import `in`.testpress.course.helpers.DownloadTask
+import `in`.testpress.course.ui.ContentActivity.HIDE_BOTTOM_NAVIGATION
 import `in`.testpress.course.ui.viewholders.OfflineVideoViewHolder
 import android.content.Context
 import android.content.Intent
@@ -41,9 +42,8 @@ class OfflineVideoListAdapter :
             }
 
             override fun onClick(offlineVideo: DomainOfflineVideo) {
-                val intent = Intent(context, ExoPlayerActivity::class.java).apply {
-                    putExtra("videoUrl", offlineVideo.url)
-                }
+                val intent = ContentActivity.createIntent(offlineVideo.contentId, context, null)
+                intent.putExtra(HIDE_BOTTOM_NAVIGATION, true)
                 context.startActivity(intent)
             }
 

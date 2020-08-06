@@ -29,6 +29,7 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
     public static final String CONTENT_ID = "contentId";
     public static final String CHAPTER_ID = "chapterId";
     public static final String POSITION = "position";
+    public static final String HIDE_BOTTOM_NAVIGATION = "hideBottomNavigation";
 
     public static Intent createIntent(Long contentId, Context context, String productSlug) {
         Intent intent = new Intent(context, ContentActivity.class);
@@ -68,6 +69,7 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
         bundle.putLong(CONTENT_ID, content.getId());
         bundle.putString(CONTENT_TYPE, content.getContentType());
         bundle.putString(PRODUCT_SLUG, getIntent().getStringExtra(PRODUCT_SLUG));
+        bundle.putBoolean(HIDE_BOTTOM_NAVIGATION, getIntent().getBooleanExtra(HIDE_BOTTOM_NAVIGATION, false));
         fragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, fragment).commitAllowingStateLoss();
