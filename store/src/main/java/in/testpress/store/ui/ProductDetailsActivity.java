@@ -361,6 +361,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     }
 
     private void handleNetworkException(TestpressException exception, boolean isCouponCodeException) {
+        progressBar.setVisibility(View.GONE);
         if (exception.isNetworkError()) {
             setEmptyText(R.string.testpress_network_error, R.string.testpress_no_internet_try_again,
                     R.drawable.ic_error_outline_black_18dp);
