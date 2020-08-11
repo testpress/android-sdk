@@ -1,17 +1,23 @@
 package in.testpress.store.payu;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.payu.india.Interfaces.PaymentRelatedDetailsListener;
 import com.payu.india.Model.MerchantWebService;
 import com.payu.india.Model.PaymentParams;
@@ -23,13 +29,14 @@ import com.payu.india.Payu.PayuConstants;
 import com.payu.india.Payu.PayuErrors;
 import com.payu.india.PostParams.MerchantWebServicePostParams;
 import com.payu.india.Tasks.GetPaymentRelatedDetailsTask;
-
 import java.util.ArrayList;
-
 import in.testpress.store.R;
+import in.testpress.store.models.CouponCodeResponse;
+import in.testpress.store.ui.CouponCodeFragment;
+import in.testpress.store.ui.CouponCodeViewModel;
 import in.testpress.ui.BaseToolBarActivity;
 
-import static in.testpress.store.ui.ProductDetailsActivity.CURRENT_AMOUNT;
+import static in.testpress.store.ui.ProductDetailsActivity.ORDER_ID;
 
 public class PaymentModeActivity extends BaseToolBarActivity implements
         PaymentOptionsAdapter.OnRecyclerItemClickListener, PaymentRelatedDetailsListener {
@@ -44,6 +51,13 @@ public class PaymentModeActivity extends BaseToolBarActivity implements
     private PayuHashes payuHashes;
     private PayuResponse mPayuResponse = null;
     private AlertDialog.Builder builder;
+    private FrameLayout couponCodeContainer;
+    private CouponCodeViewModel couponCodeViewModel;
+    private TextView discountedAmount;
+    private LinearLayout discountedAmountContainer;
+    private CouponCodeResponse couponCodeResponse;
+    private TextView amountPayable;
+    private int orderId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,15 +77,29 @@ public class PaymentModeActivity extends BaseToolBarActivity implements
                 })
                 .setNegativeButton(R.string.testpress_no, null);
 
+        getDataFromIntent();
+        amountPayable = (TextView) findViewById(R.id.amount_payable);
+        amountPayable.append(paymentParams.getAmount());
+
+        initializeViews();
+        init();
+        initializeViewModel();
+        initializeObservers();
+        AttachCouponCodeFragment();
+    }
+
+    private void getDataFromIntent() {
         Intent intent = getIntent();
         paymentParams = intent.getParcelableExtra(PayuConstants.PAYMENT_PARAMS);
         payuConfig = intent.getParcelableExtra(PayuConstants.PAYU_CONFIG);
         payuHashes = intent.getParcelableExtra(PayuConstants.PAYU_HASHES);
+        orderId = intent.getIntExtra(ORDER_ID, 0);
+    }
 
-        TextView amountPayable = (TextView) findViewById(R.id.amount_payable);
-        amountPayable.append(paymentParams.getAmount());
-
-        init();
+    private void initializeViews() {
+        couponCodeContainer = findViewById(R.id.fragment_container);
+        discountedAmount = findViewById(R.id.discounted_amount_text);
+        discountedAmountContainer = findViewById(R.id.discounted_amount_container);
     }
 
     private synchronized void init() {
@@ -180,8 +208,13 @@ public class PaymentModeActivity extends BaseToolBarActivity implements
 
     @Override
     public void onBackPressed() {
-        builder.create().show();
+        if (getFragmentManager().getBackStackEntryCount() > 0) {
+            getFragmentManager().popBackStack();
+        } else {
+            builder.create().show();
+        }
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -190,5 +223,48 @@ public class PaymentModeActivity extends BaseToolBarActivity implements
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void initializeViewModel() {
+        couponCodeViewModel = new ViewModelProvider(this).get(CouponCodeViewModel.class);
+    }
+
+    private void initializeObservers() {
+        couponCodeViewModel.getCouponCodeResult().observe(this, new Observer<CouponCodeResponse>() {
+            @Override
+            public void onChanged(CouponCodeResponse response) {
+                couponCodeResponse = response;
+                if (response != null) {
+                    setAppliedCouponData();
+                    updatePayableAmount();
+                }
+            }
+        });
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void setAppliedCouponData() {
+        discountedAmountContainer.setVisibility(View.VISIBLE);
+        amountPayable.setText(getString(R.string.rupee_symbol) + couponCodeResponse.getAmount());
+        discountedAmount.setText("You have saved " + getString(R.string.rupee_symbol)
+                + getDiscountedAmount() + " on this course.");
+
+    }
+
+    private void updatePayableAmount() {
+        paymentParams.setAmount(couponCodeResponse.getAmount());
+    }
+
+    private Float getDiscountedAmount() {
+        return Float.parseFloat(couponCodeResponse.getAmountWithoutDiscounts())
+                - Float.parseFloat(couponCodeResponse.getAmount());
+    }
+
+    private void AttachCouponCodeFragment() {
+        CouponCodeFragment couponCodeFragment =  CouponCodeFragment.Companion.newInstance(orderId);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.addToBackStack("CouponCodeFragment");
+        transaction.replace(R.id.fragment_container, couponCodeFragment, "CouponCodeFragment").commit();
     }
 }

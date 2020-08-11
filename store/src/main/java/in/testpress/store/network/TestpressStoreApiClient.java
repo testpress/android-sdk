@@ -1,7 +1,6 @@
 package in.testpress.store.network;
 
 import android.content.Context;
-import android.text.Editable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -76,9 +75,9 @@ public class TestpressStoreApiClient extends TestpressApiClient {
         return getProductService().orderConfirm(order.getId(), orderParameters);
     }
 
-    public RetrofitCall<CouponCodeResponse> applyCouponCode(int id, Editable couponCode) {
+    public RetrofitCall<CouponCodeResponse> applyCouponCode(int id, String couponCode) {
         HashMap<String,String> couponCodeMap = new HashMap<String, String>();
-        couponCodeMap.put("code",couponCode.toString());
+        couponCodeMap.put("code",couponCode);
         return getProductService().applyCouponCode(id, couponCodeMap);
     }
 
