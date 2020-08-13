@@ -124,13 +124,6 @@ public class CommentsUtil implements LoaderManager.LoaderCallbacks<List<Comment>
         loadNewCommentsText = rootLayout.findViewById(R.id.load_new_comments_text);
         commentsEditText = rootLayout.findViewById(R.id.comment_box);
         commentBoxLayout = rootLayout.findViewById(R.id.comment_box_layout);
-        TextView commentsLabel = rootLayout.findViewById(R.id.comments_label);
-
-        ViewUtils.setTypeface(
-                new TextView[] { loadPreviousCommentsText, commentsLabel, loadNewCommentsText },
-                TestpressSdk.getRubikMediumFont(activity)
-        );
-
         commentsEditText.setTypeface(TestpressSdk.getRubikRegularFont(activity));
 
         progressDialog = new ProgressDialog(activity);
