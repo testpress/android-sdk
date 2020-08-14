@@ -1,10 +1,13 @@
 package `in`.testpress.exam.ui
 
+import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.exam.R
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.util.CommentsUtil
 import `in`.testpress.exam.util.ImageUtils
+import `in`.testpress.models.greendao.BookmarkDao
 import `in`.testpress.models.greendao.ReviewItem
+import `in`.testpress.models.greendao.ReviewItemDao
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,33 +20,40 @@ class CommentsFragment: DialogFragment() {
 
     private var apiClient: TestpressExamApiClient? = null
     private var commentsUtil: CommentsUtil? = null
-    private var rootLayout: View? = null
     private lateinit var imageUtils: ImageUtils
+    private var reviewItem: ReviewItem? = null
+    private var reviewItemId: Long? = null
+    private var bookmarkId: Long? = null
+    private var isReviewQuestion: Boolean = true
 
     companion object {
-        private var reviewItem: ReviewItem? = null
-        private var isReviewQuestion: Boolean = true
-        fun getNewInstance(review: ReviewItem, isFromReviewQuestion: Boolean): CommentsFragment {
-            reviewItem = review
-            isReviewQuestion = isFromReviewQuestion
-            return CommentsFragment()
+        private const val IS_REVIEW_QUESTION = "isReviewQuestion"
+        fun getNewInstance(itemId: Long, isFromReviewQuestion: Boolean): CommentsFragment {
+            val commentsFragment = CommentsFragment()
+            val bundle = Bundle()
+            bundle.putBoolean(IS_REVIEW_QUESTION, isFromReviewQuestion)
+            bundle.putLong(ReviewQuestionsFragment.PARAM_REVIEW_ITEM_ID, itemId)
+            commentsFragment.arguments = bundle
+            return commentsFragment
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         apiClient = TestpressExamApiClient(context)
-        imageUtils = ImageUtils(rootLayout, this)
+        imageUtils = ImageUtils(view, this)
         setStyle(STYLE_NORMAL, R.style.FullScreenDialogTheme)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        rootLayout = inflater.inflate(R.layout.fragment_comments, container, false)
-        return rootLayout
+        getDataFromBundle()
+        return inflater.inflate(R.layout.fragment_comments, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        getReviewItem()
+        createCommentUtil()
         displayComments()
         setOnClickListeners()
     }
@@ -53,14 +63,45 @@ class CommentsFragment: DialogFragment() {
         imageUtils.permissionsUtils.onResume()
     }
 
-    private fun displayComments() {
+    private fun getDataFromBundle() {
+        isReviewQuestion = arguments!!.getBoolean(IS_REVIEW_QUESTION)
+        if (isReviewQuestion) {
+            reviewItemId = arguments!!.getLong(ReviewQuestionsFragment.PARAM_REVIEW_ITEM_ID)
+        } else {
+            bookmarkId = arguments!!.getLong(ReviewQuestionsFragment.PARAM_REVIEW_ITEM_ID)
+        }
+    }
+
+    private fun getReviewItem() {
+        reviewItem = if (isReviewQuestion) {
+            getReviewItemFromReview()
+        } else {
+            getReviewItemFromBookmark()
+        }
+
+    }
+
+    private fun getReviewItemFromReview(): ReviewItem? {
+        val reviewItemDao = TestpressSDKDatabase.getReviewItemDao(context)
+        val reviewItems = reviewItemDao!!.queryBuilder()
+                .where(ReviewItemDao.Properties.Id.eq(reviewItemId)).list()
+        return reviewItems[0]
+    }
+
+    private fun getReviewItemFromBookmark(): ReviewItem? {
+        val bookmarkDao = TestpressSDKDatabase.getBookmarkDao(context)
+        val bookmark = bookmarkDao.queryBuilder().where(BookmarkDao.Properties.Id.eq(bookmarkId))
+                .list()[0]
+        return bookmark.bookmarkedObject as ReviewItem
+    }
+
+    private fun createCommentUtil() {
         if (commentsUtil == null) {
             if (isReviewQuestion) {
                 createReviewCommentUtil()
             } else {
                 createBookmarkCommentUtil()
             }
-            commentsUtil!!.displayComments()
         }
     }
 
@@ -69,7 +110,7 @@ class CommentsFragment: DialogFragment() {
                 this,
                 loaderManager,
                 CommentsUtil.getQuestionCommentsUrl(apiClient, reviewItem),
-                rootLayout,
+                view,
                 (activity as ReviewQuestionsActivity?)!!.buttonLayout
         )
     }
@@ -79,9 +120,13 @@ class CommentsFragment: DialogFragment() {
                 this,
                 loaderManager,
                 CommentsUtil.getQuestionCommentsUrl(apiClient, reviewItem),
-                rootLayout,
+                view,
                 (activity as BookmarksActivity?)!!.buttonLayout
         )
+    }
+
+    private fun displayComments() {
+        commentsUtil!!.displayComments()
     }
 
     private fun setOnClickListeners() {

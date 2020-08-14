@@ -95,14 +95,14 @@ public class ReviewQuestionsFragment extends Fragment {
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
     private InstituteSettings instituteSettings;
-    private boolean loadComments = true;
     private MenuItem bookmarkIcon;
 
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
     private RetrofitCall<Bookmark> bookmarkAPIRequest;
     private RetrofitCall<Void> deleteBookmarkAPIRequest;
-    private Button viewComments;
+    private Button viewCommentsButton;
     private LinearLayout commentsLayout;
+    private long reviewItemId;
 
     public static ReviewQuestionsFragment getInstance(long reviewItemId, Language selectedLanguage) {
         ReviewQuestionsFragment reviewQuestionsFragment = new ReviewQuestionsFragment();
@@ -117,14 +117,12 @@ public class ReviewQuestionsFragment extends Fragment {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         apiClient = new TestpressExamApiClient(getContext());
-        long reviewItemId = getArguments().getLong(PARAM_REVIEW_ITEM_ID);
+        reviewItemId = getArguments().getLong(PARAM_REVIEW_ITEM_ID);
         Assert.assertNotNull("PARAM_REVIEW_ITEM_ID must not be null", reviewItemId);
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
         reviewItemDao = TestpressSDKDatabase.getReviewItemDao(getContext());
         //noinspection ConstantConditions
         instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
-        loadComments = instituteSettings.getBaseUrl().contains("elixir") || instituteSettings.getBaseUrl().contains("medpgbasics") ||
-                instituteSettings.getBaseUrl().contains("onlyiasnothingelse");
 
         List<ReviewItem> reviewItems = reviewItemDao.queryBuilder()
                 .where(ReviewItemDao.Properties.Id.eq(reviewItemId)).list();
@@ -182,7 +180,7 @@ public class ReviewQuestionsFragment extends Fragment {
         imageView3 = view.findViewById(R.id.difficulty3);
         imageView4 = view.findViewById(R.id.difficulty4);
         imageView5 = view.findViewById(R.id.difficulty5);
-        viewComments = view.findViewById(R.id.button_view_comments);
+        viewCommentsButton = view.findViewById(R.id.button_view_comments);
         commentsLayout = view.findViewById(R.id.comments_layout);
         percentageCorrect = Math.round(reviewItem.getQuestion().getPercentageGotCorrect() == null ?
                 0 : reviewItem.getQuestion().getPercentageGotCorrect());
@@ -202,9 +200,7 @@ public class ReviewQuestionsFragment extends Fragment {
                 }
                 setDifficulty(view);
                 progressBar.setVisibility(View.GONE);
-                if (loadComments) {
-                    showCommentButton();
-                }
+                showCommentButton();
                 animationView.bringToFront();
                 webViewUtils.addLogo(instituteSettings.getAppToolbarLogo());
 
@@ -574,7 +570,7 @@ public class ReviewQuestionsFragment extends Fragment {
     }
 
     private void setOnClickListeners() {
-        viewComments.setOnClickListener(new View.OnClickListener() {
+        viewCommentsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openCommentFragment();
@@ -583,7 +579,7 @@ public class ReviewQuestionsFragment extends Fragment {
     }
 
     private void openCommentFragment() {
-        CommentsFragment commentsFragment = CommentsFragment.Companion.getNewInstance(reviewItem, true);
+        CommentsFragment commentsFragment = CommentsFragment.Companion.getNewInstance(reviewItemId, true);
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         commentsFragment.show(transaction, "CommentsFragment");
     }

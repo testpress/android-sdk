@@ -88,11 +88,12 @@ public class BookmarksFragment extends BaseFragment {
     private LottieAnimationView removeBookmarkProgressBar;
     private TextView difficultyPercentageText;
     private Bookmark bookmark;
-    private Button viewComments;
+    private Button viewCommentsButton;
     private LinearLayout commentsLayout;
     private BookmarksActivity bookmarksActivity;
     private FullScreenChromeClient fullScreenChromeClient;
     private TestpressExamApiClient apiClient;
+    private long bookmarkId;
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
@@ -113,7 +114,7 @@ public class BookmarksFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         apiClient = new TestpressExamApiClient(getContext());
         assert getArguments() != null;
-        long bookmarkId = getArguments().getLong(PARAM_BOOKMARK_ID);
+        bookmarkId = getArguments().getLong(PARAM_BOOKMARK_ID);
         bookmarkDao = TestpressSDKDatabase.getBookmarkDao(getContext());
         bookmark = bookmarkDao.queryBuilder().where(BookmarkDao.Properties.Id.eq(bookmarkId))
                 .list().get(0);
@@ -146,7 +147,7 @@ public class BookmarksFragment extends BaseFragment {
         rightGradientShadow = view.findViewById(R.id.right_gradient_shadow);
         TextView moveBookmarkText = view.findViewById(R.id.move_bookmark_text);
         TextView removeBookmarkText = view.findViewById(R.id.remove_bookmark_text);
-        viewComments = view.findViewById(R.id.button_view_comments);
+        viewCommentsButton = view.findViewById(R.id.button_view_comments);
         commentsLayout = view.findViewById(R.id.comments_layout);
         moveBookmarkLayout = view.findViewById(R.id.move_bookmark_layout);
         moveBookmarkLayout.setOnClickListener(new View.OnClickListener() {
@@ -225,9 +226,7 @@ public class BookmarksFragment extends BaseFragment {
                 bookmarksLayout.setVisibility(View.VISIBLE);
                 if (reviewItem != null) {
                     setDifficulty(view);
-                    if (getActivity() != null) {
-                       commentsLayout.setVisibility(View.VISIBLE);
-                    }
+                    commentsLayout.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -691,7 +690,7 @@ public class BookmarksFragment extends BaseFragment {
     }
 
     private void setOnClickListeners() {
-        viewComments.setOnClickListener(new View.OnClickListener() {
+        viewCommentsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openCommentFragment();
@@ -700,7 +699,7 @@ public class BookmarksFragment extends BaseFragment {
     }
 
     private void openCommentFragment() {
-        CommentsFragment commentsFragment = CommentsFragment.Companion.getNewInstance(reviewItem, true);
+        CommentsFragment commentsFragment = CommentsFragment.Companion.getNewInstance(bookmarkId, false);
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         commentsFragment.show(transaction, "CommentsFragment");
     }
