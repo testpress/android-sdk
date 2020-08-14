@@ -3,18 +3,18 @@ package `in`.testpress.store.models
 import com.google.gson.annotations.SerializedName
 
 data class CouponCodeResponse(
-        val date: String? = null,
-        val voucher: Voucher? = null,
-        val checksum: String? = null,
-        val id: Int? = null,
+        val phone: String? = null,
         val email: String? = null,
-        val zip: String? = null,
+        val id: Int? = null,
+        val user: Int? = null,
         val amount: String? = null,
         val apikey: String? = null,
-        val phone: String? = null,
-        val name: String? = null,
-        val user: Int? = null,
+        val zip: String? = null,
         val status: String? = null,
+        val voucher: Voucher? = null,
+        val name: String? = null,
+        val date: String? = null,
+        val checksum: String? = null,
 
         @field:SerializedName("amount_without_discounts")
         val amountWithoutDiscounts: String? = null,
@@ -44,7 +44,7 @@ data class CouponCodeResponse(
         val ipAddress: String? = null,
 
         @field:SerializedName("enc_data")
-        val encData: Any? = null,
+        val encData: String? = null,
 
         @field:SerializedName("uses_testpress_pg")
         val usesTestpressPg: Boolean? = null,

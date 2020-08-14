@@ -3,12 +3,14 @@ package `in`.testpress.store.ui
 import `in`.testpress.core.TestpressException
 import `in`.testpress.store.R
 import `in`.testpress.store.models.CouponCodeResponse
+import `in`.testpress.store.network.Status
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.coupon_code_fragment.*
 
@@ -22,9 +24,9 @@ class CouponCodeFragment : Fragment() {
 
         fun newInstance(orderId: Int): CouponCodeFragment {
             val couponCodeFragment = CouponCodeFragment()
-            val bundle = Bundle()
-            bundle.putInt(ORDER_ID, orderId)
-            couponCodeFragment.arguments = bundle
+            couponCodeFragment.arguments = Bundle().apply {
+                putInt(ORDER_ID, orderId)
+            }
             return couponCodeFragment
         }
     }
@@ -46,7 +48,12 @@ class CouponCodeFragment : Fragment() {
     }
 
     private fun initializeViewModel() {
-        couponCodeViewModel = ViewModelProvider(requireActivity()).get(CouponCodeViewModel::class.java)
+        couponCodeViewModel = ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return CouponCodeViewModel(context) as T
+            }
+
+        }).get(CouponCodeViewModel::class.java)
     }
 
     private fun setOnClickListeners() {
@@ -87,35 +94,33 @@ class CouponCodeFragment : Fragment() {
     }
 
     private fun verifyCouponCode() {
-        couponCodeViewModel.verify(context, orderId, couponCode.text.toString())
+        couponCodeViewModel.verify(orderId, couponCode.text.toString())
     }
 
     private fun initializeObservers() {
-        couponCodeViewModel.couponCodeResult.observe(this, Observer {
-            setCouponAppliedLayout(it)
-        })
-
-        couponCodeViewModel.couponCodeException.observe(this, Observer {
-            progressBar.visibility = View.GONE
-            handleNetworkException(it)
+        couponCodeViewModel.verifyCouponResponse.observe(this, Observer { resource ->
+            when (resource.status) {
+                Status.SUCCESS -> setCouponAppliedLayout(resource.data)
+                Status.ERROR -> {
+                    handleNetworkException(resource.exception)
+                }
+            }
         })
     }
 
-    private fun setCouponAppliedLayout(couponCodeResponse: CouponCodeResponse) {
+    private fun setCouponAppliedLayout(couponCodeResponse: CouponCodeResponse?) {
         progressBar.visibility = View.GONE
         couponCodeContainer.visibility = View.GONE
         appliedCouponContainer.visibility = View.VISIBLE
-        couponCodeResponse.voucher?.code?.let {
+        couponCodeResponse?.voucher?.code?.let {
             couponAppliedText.text = it
         }
     }
 
-    private fun handleNetworkException(exception: TestpressException) {
+    private fun handleNetworkException(exception: TestpressException?) {
         progressBar.visibility = View.GONE
-        when {
-            exception.isClientError -> {
-                couponCodeTextLayout.error = getString(R.string.invalid_coupon_code)
-            }
+        if (exception?.isClientError == true) {
+            couponCodeTextLayout.error = getString(R.string.invalid_coupon_code)
         }
     }
 }

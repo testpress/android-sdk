@@ -13,6 +13,12 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import java.util.HashMap;
@@ -25,6 +31,8 @@ import in.testpress.models.InstituteSettings;
 import in.testpress.store.R;
 import in.testpress.store.models.Product;
 import in.testpress.store.models.ProductDetailResponse;
+import in.testpress.store.network.Resource;
+import in.testpress.store.network.Status;
 import in.testpress.store.network.TestpressStoreApiClient;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.EventsTrackerFacade;
@@ -51,6 +59,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     private String productSlug;
     private EventsTrackerFacade eventsTrackerFacade;
     private ProductDetailResponse productDetailResponse;
+    private ProductDetailViewModel productDetailViewModel;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -76,6 +85,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         });
         eventsTrackerFacade = new EventsTrackerFacade(getApplicationContext());
 
+        initializeViewModel();
         getProductDetails();
         loadProductDetails();
     }
@@ -269,20 +279,33 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         emptyDescView.setText(description);
     }
 
-    private void getProductDetails() {
-        new TestpressStoreApiClient(this).getProductDetails(productSlug)
-                .enqueue(new TestpressCallback<ProductDetailResponse>() {
-                    @Override
-                    public void onSuccess(ProductDetailResponse result) {
-                        productDetailResponse = result;
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        handleNetworkException(exception);
-                    }
-                });
+    private void initializeViewModel() {
+        productDetailViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
+            @NonNull
+            @Override
+            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+                return (T) new ProductDetailViewModel(getBaseContext());
+            }
+        }).get(ProductDetailViewModel.class);
     }
 
+    void getProductDetails() {
+        progressBar.setVisibility(View.VISIBLE);
+        productDetailViewModel.get(productSlug).observe(this, new Observer<Resource<ProductDetailResponse>>() {
+            @Override
+            public void onChanged(Resource<ProductDetailResponse> resource) {
+                switch (resource.getStatus()) {
+                    case SUCCESS: {
+                        productDetailResponse = resource.getData();
+                        break;
+                    }
+                    case ERROR: {
+                        handleNetworkException(resource.getException());
+                        break;
+                    }
+                }
+            }
+        });
+    }
 
 }

@@ -4,10 +4,13 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,6 +35,8 @@ import com.payu.india.Tasks.GetPaymentRelatedDetailsTask;
 import java.util.ArrayList;
 import in.testpress.store.R;
 import in.testpress.store.models.CouponCodeResponse;
+import in.testpress.store.network.Resource;
+import in.testpress.store.network.Status;
 import in.testpress.store.ui.CouponCodeFragment;
 import in.testpress.store.ui.CouponCodeViewModel;
 import in.testpress.ui.BaseToolBarActivity;
@@ -85,7 +90,7 @@ public class PaymentModeActivity extends BaseToolBarActivity implements
         init();
         initializeViewModel();
         initializeObservers();
-        AttachCouponCodeFragment();
+        attachCouponCodeFragment();
     }
 
     private void getDataFromIntent() {
@@ -208,13 +213,8 @@ public class PaymentModeActivity extends BaseToolBarActivity implements
 
     @Override
     public void onBackPressed() {
-        if (getFragmentManager().getBackStackEntryCount() > 0) {
-            getFragmentManager().popBackStack();
-        } else {
-            builder.create().show();
-        }
+        builder.create().show();
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -226,24 +226,32 @@ public class PaymentModeActivity extends BaseToolBarActivity implements
     }
 
     private void initializeViewModel() {
-        couponCodeViewModel = new ViewModelProvider(this).get(CouponCodeViewModel.class);
+        couponCodeViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
+            @NonNull
+            @Override
+            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+                return (T) new CouponCodeViewModel(getBaseContext());
+            }
+        }).get(CouponCodeViewModel.class);
     }
 
     private void initializeObservers() {
-        couponCodeViewModel.getCouponCodeResult().observe(this, new Observer<CouponCodeResponse>() {
+        couponCodeViewModel.getVerifyCouponResponse().observe(this, new Observer<Resource<CouponCodeResponse>>() {
             @Override
-            public void onChanged(CouponCodeResponse response) {
-                couponCodeResponse = response;
-                if (response != null) {
-                    setAppliedCouponData();
-                    updatePayableAmount();
+            public void onChanged(Resource<CouponCodeResponse> resource) {
+                if (resource.getStatus() == Status.SUCCESS) {
+                    couponCodeResponse = resource.getData();
+                    if (couponCodeResponse != null) {
+                        showDiscount();
+                        updateAmount();
+                    }
                 }
             }
         });
     }
 
     @SuppressLint("SetTextI18n")
-    private void setAppliedCouponData() {
+    private void showDiscount() {
         discountedAmountContainer.setVisibility(View.VISIBLE);
         amountPayable.setText(getString(R.string.rupee_symbol) + couponCodeResponse.getAmount());
         discountedAmount.setText("You have saved " + getString(R.string.rupee_symbol)
@@ -251,7 +259,7 @@ public class PaymentModeActivity extends BaseToolBarActivity implements
 
     }
 
-    private void updatePayableAmount() {
+    private void updateAmount() {
         paymentParams.setAmount(couponCodeResponse.getAmount());
     }
 
@@ -260,7 +268,7 @@ public class PaymentModeActivity extends BaseToolBarActivity implements
                 - Float.parseFloat(couponCodeResponse.getAmount());
     }
 
-    private void AttachCouponCodeFragment() {
+    private void attachCouponCodeFragment() {
         CouponCodeFragment couponCodeFragment =  CouponCodeFragment.Companion.newInstance(orderId);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
