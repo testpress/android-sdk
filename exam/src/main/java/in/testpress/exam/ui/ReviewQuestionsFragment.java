@@ -92,6 +92,7 @@ public class ReviewQuestionsFragment extends Fragment {
     ImageView imageView5;
     int percentageCorrect;
     TestpressExamApiClient apiClient;
+    private CommentsUtil commentsUtil;
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
     private InstituteSettings instituteSettings;
@@ -102,7 +103,6 @@ public class ReviewQuestionsFragment extends Fragment {
     private RetrofitCall<Void> deleteBookmarkAPIRequest;
     private Button viewCommentsButton;
     private LinearLayout commentsLayout;
-    private long reviewItemId;
 
     public static ReviewQuestionsFragment getInstance(long reviewItemId, Language selectedLanguage) {
         ReviewQuestionsFragment reviewQuestionsFragment = new ReviewQuestionsFragment();
@@ -117,7 +117,7 @@ public class ReviewQuestionsFragment extends Fragment {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         apiClient = new TestpressExamApiClient(getContext());
-        reviewItemId = getArguments().getLong(PARAM_REVIEW_ITEM_ID);
+        long reviewItemId = getArguments().getLong(PARAM_REVIEW_ITEM_ID);
         Assert.assertNotNull("PARAM_REVIEW_ITEM_ID must not be null", reviewItemId);
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
         reviewItemDao = TestpressSDKDatabase.getReviewItemDao(getContext());
@@ -579,7 +579,7 @@ public class ReviewQuestionsFragment extends Fragment {
     }
 
     private void openCommentFragment() {
-        CommentsFragment commentsFragment = CommentsFragment.Companion.getNewInstance(reviewItemId, true);
+        CommentsFragment commentsFragment = CommentsFragment.Companion.getNewInstance(reviewItem);
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         commentsFragment.show(transaction, "CommentsFragment");
     }

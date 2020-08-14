@@ -33,6 +33,7 @@ import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.api.TestpressExamApiClient;
+import in.testpress.exam.util.CommentsUtil;
 import in.testpress.exam.util.Watermark;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.Bookmark;
@@ -93,7 +94,7 @@ public class BookmarksFragment extends BaseFragment {
     private BookmarksActivity bookmarksActivity;
     private FullScreenChromeClient fullScreenChromeClient;
     private TestpressExamApiClient apiClient;
-    private long bookmarkId;
+    private CommentsUtil commentsUtil;
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
@@ -114,7 +115,7 @@ public class BookmarksFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         apiClient = new TestpressExamApiClient(getContext());
         assert getArguments() != null;
-        bookmarkId = getArguments().getLong(PARAM_BOOKMARK_ID);
+        long bookmarkId = getArguments().getLong(PARAM_BOOKMARK_ID);
         bookmarkDao = TestpressSDKDatabase.getBookmarkDao(getContext());
         bookmark = bookmarkDao.queryBuilder().where(BookmarkDao.Properties.Id.eq(bookmarkId))
                 .list().get(0);
@@ -699,7 +700,7 @@ public class BookmarksFragment extends BaseFragment {
     }
 
     private void openCommentFragment() {
-        CommentsFragment commentsFragment = CommentsFragment.Companion.getNewInstance(bookmarkId, false);
+        CommentsFragment commentsFragment = CommentsFragment.Companion.getNewInstance(reviewItem);
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         commentsFragment.show(transaction, "CommentsFragment");
     }
