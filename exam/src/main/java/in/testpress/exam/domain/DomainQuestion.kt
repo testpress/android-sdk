@@ -19,6 +19,7 @@ data class DomainQuestion(
     val isMultipleMCQType: Boolean = type == "C"
     val isShortAnswerType: Boolean = type == "S"
     val isNumericalType: Boolean = type == "N"
+    val isFileType: Boolean = type == "F"
 }
 
 fun Question.asDomainModel(): DomainQuestion {

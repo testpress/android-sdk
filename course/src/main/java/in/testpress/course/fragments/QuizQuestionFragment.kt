@@ -131,7 +131,9 @@ class QuizQuestionFragment : Fragment() {
                 }
             }
             htmlContent += "</table>"
-        } else {
+        } else if (question.isFileType) {
+            htmlContent += "<input type='file' id='fileInput' accept='text/plain' onchange='openFile(event);'"
+        }else {
             val numberType = question.type == "N"
             questionsView.setNumberType(numberType)
             htmlContent += "<input class='edit_box' type='text' onpaste='return false'" +
