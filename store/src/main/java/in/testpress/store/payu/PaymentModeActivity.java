@@ -263,7 +263,7 @@ public class PaymentModeActivity extends BaseToolBarActivity implements
         paymentParams.setAmount(couponCodeResponse.getAmount());
     }
 
-    private Float getDiscountedAmount() {
+    private float getDiscountedAmount() {
         return Float.parseFloat(couponCodeResponse.getAmountWithoutDiscounts())
                 - Float.parseFloat(couponCodeResponse.getAmount());
     }
@@ -272,7 +272,6 @@ public class PaymentModeActivity extends BaseToolBarActivity implements
         CouponCodeFragment couponCodeFragment =  CouponCodeFragment.Companion.newInstance(orderId);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.addToBackStack("CouponCodeFragment");
         transaction.replace(R.id.fragment_container, couponCodeFragment, "CouponCodeFragment").commit();
     }
 }

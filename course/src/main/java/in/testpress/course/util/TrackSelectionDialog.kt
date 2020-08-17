@@ -53,7 +53,7 @@ open class TrackSelectionDialog(
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = AppCompatDialog(activity, R.style.TestpressAppCompatAlertDialogStyle)
+        val dialog = AppCompatDialog(activity, android.R.style.Theme_Material_Light_Dialog_Alert)
         dialog.setTitle(R.string.quality_selector)
         return dialog
     }

@@ -43,7 +43,7 @@ dependencies {
     api rootProject.constraintLayout
     api rootProject.mediarouter
     api rootProject.shimmer
-    implementation 'com.github.HotBitmapGG:RingProgressBar:V1.2.3'
+    api 'com.github.HotBitmapGG:RingProgressBar:V1.2.3'
     api "androidx.viewpager2:viewpager2:1.0.0"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutine_version"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutine_version"

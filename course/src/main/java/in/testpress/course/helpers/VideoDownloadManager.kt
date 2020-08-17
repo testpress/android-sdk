@@ -1,6 +1,5 @@
 package `in`.testpress.course.helpers
 
-import `in`.testpress.course.util.CourseApplication
 import `in`.testpress.course.util.ExoPlayerDataSourceFactory
 import android.content.Context
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
@@ -18,6 +17,7 @@ class VideoDownloadManager {
     private lateinit var context: Context
     private var downloadManger: DownloadManager? = null
     private lateinit var databaseProvider: ExoDatabaseProvider
+    private lateinit var downloadDirectory: File
 
     fun init() {
         databaseProvider = ExoDatabaseProvider(context)
@@ -46,12 +46,22 @@ class VideoDownloadManager {
         )
     }
 
+    fun getDownloadDirectory(): File {
+        if (!::downloadDirectory.isInitialized) {
+            downloadDirectory = if (context.getExternalFilesDir(null) != null) {
+                context.getExternalFilesDir(null)!!
+            } else {
+                context.filesDir
+            }
+        }
+        return downloadDirectory
+    }
+
     @Synchronized
     fun getDownloadCache(): Cache {
         if (!::downloadCache.isInitialized) {
-            val courseApplication = context.applicationContext as CourseApplication
             val downloadContentDirectory =
-                File(courseApplication.getDownloadDirectory(), DOWNLOAD_CONTENT_DIRECTORY)
+                File(getDownloadDirectory(), DOWNLOAD_CONTENT_DIRECTORY)
             downloadCache =
                 SimpleCache(downloadContentDirectory, NoOpCacheEvictor(), databaseProvider)
         }

@@ -114,7 +114,12 @@ class ContentListFragment : Fragment(), EmptyViewListener {
                 Status.ERROR -> {
                     Log.d("ContentListFragment", "Got status ERROR")
                     hideLoadingPlaceholder()
-                    emptyViewFragment.displayError(resource.exception!!)
+                    if (resource.data != null) {
+                        mAdapter.contents = resource.data as List<DomainContent>
+                        mAdapter.notifyDataSetChanged()
+                    } else {
+                        emptyViewFragment.displayError(resource.exception!!)
+                    }
                 }
             }
         })

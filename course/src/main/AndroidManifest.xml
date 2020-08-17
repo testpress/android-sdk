@@ -10,7 +10,6 @@
 
     <application
         android:allowBackup="true"
-        android:name=".util.CourseApplication"
         android:supportsRtl="true" >
 
         <activity android:name=".ui.CourseListActivity"

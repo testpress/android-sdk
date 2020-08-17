@@ -120,6 +120,10 @@ class EmptyViewFragment : Fragment() {
             retryButton.visibility = View.GONE
         }
     }
+
+    fun hide() {
+        emptyContainer.visibility = View.GONE
+    }
 }
 
 interface EmptyViewListener {

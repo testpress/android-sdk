@@ -50,9 +50,10 @@
                 android:id="@+id/applyButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/background_coupon_code_button"
+                android:background="@color/testpress_color_primary"
                 android:gravity="center"
                 android:text="Apply"
+                android:layout_marginBottom="8dp"
                 android:textColor="@color/testpress_white"
                 android:textSize="12sp" />
 

@@ -60,11 +60,11 @@ class CouponCodeFragment : Fragment() {
         haveCouponButton.setOnClickListener {
             hideHaveCouponButton()
             showCouponInputContainer()
-            resetCouponInput()
         }
         changeButton.setOnClickListener {
-            showHaveCouponButton()
             hideAppliedCoupon()
+            showCouponInputContainer()
+            resetCouponInput()
         }
         applyButton.setOnClickListener {
             progressBar.visibility = View.VISIBLE
@@ -83,10 +83,6 @@ class CouponCodeFragment : Fragment() {
     private fun resetCouponInput() {
         couponCode.text = null
         couponCodeTextLayout.isErrorEnabled = false
-    }
-
-    private fun showHaveCouponButton() {
-        haveCouponButtonContainer.visibility = View.VISIBLE
     }
 
     private fun hideAppliedCoupon() {
