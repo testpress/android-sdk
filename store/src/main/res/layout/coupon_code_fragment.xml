@@ -18,7 +18,7 @@
         android:visibility="gone" />
 
     <LinearLayout
-        android:id="@+id/couponCodeContainer"
+        android:id="@+id/couponInputContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
@@ -103,8 +103,8 @@
 
         </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/closeButton"
+        <Button
+            android:id="@+id/changeButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -112,19 +112,20 @@
             android:layout_marginRight="8dp"
             android:layout_weight="1"
             android:background="@null"
-            android:src="@drawable/ic_close" />
+            android:textColor="@color/testpress_red"
+            android:text="Change" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/applyCouponButtonContainer"
+        android:id="@+id/haveCouponButtonContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingVertical="16dp"
         android:gravity="center">
 
         <Button
-            android:id="@+id/applycouponButton"
+            android:id="@+id/haveCouponButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/background_coupon_code_button"
@@ -134,7 +135,7 @@
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:padding="8dp"
-            android:text="@string/apply_coupon"
+            android:text="Have Coupon?"
             android:textColor="@color/testpress_white"
             android:textSize="12sp" />
 

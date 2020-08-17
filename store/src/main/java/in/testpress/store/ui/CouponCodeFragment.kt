@@ -32,19 +32,19 @@ class CouponCodeFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        getDataFromBundle()
         return inflater.inflate(R.layout.coupon_code_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        getDataFromBundle()
         initializeViewModel()
         setOnClickListeners()
         initializeObservers()
     }
 
     private fun getDataFromBundle() {
-        orderId = arguments?.getInt(ORDER_ID)?.let { it }?: run { 0 }
+        orderId = arguments?.getInt(ORDER_ID, 0) ?: 0
     }
 
     private fun initializeViewModel() {
@@ -57,13 +57,13 @@ class CouponCodeFragment : Fragment() {
     }
 
     private fun setOnClickListeners() {
-        applycouponButton.setOnClickListener {
-            hideApplyCouponButton()
-            showCouponCodeContainer()
+        haveCouponButton.setOnClickListener {
+            hideHaveCouponButton()
+            showCouponInputContainer()
             resetCouponInput()
         }
-        closeButton.setOnClickListener {
-            showApplyCouponButton()
+        changeButton.setOnClickListener {
+            showHaveCouponButton()
             hideAppliedCoupon()
         }
         applyButton.setOnClickListener {
@@ -72,12 +72,12 @@ class CouponCodeFragment : Fragment() {
         }
     }
 
-    private fun hideApplyCouponButton() {
-        applyCouponButtonContainer.visibility = View.GONE
+    private fun hideHaveCouponButton() {
+        haveCouponButtonContainer.visibility = View.GONE
     }
 
-    private fun showCouponCodeContainer() {
-        couponCodeContainer.visibility = View.VISIBLE
+    private fun showCouponInputContainer() {
+        couponInputContainer.visibility = View.VISIBLE
     }
 
     private fun resetCouponInput() {
@@ -85,8 +85,8 @@ class CouponCodeFragment : Fragment() {
         couponCodeTextLayout.isErrorEnabled = false
     }
 
-    private fun showApplyCouponButton() {
-        applyCouponButtonContainer.visibility = View.VISIBLE
+    private fun showHaveCouponButton() {
+        haveCouponButtonContainer.visibility = View.VISIBLE
     }
 
     private fun hideAppliedCoupon() {
@@ -101,16 +101,14 @@ class CouponCodeFragment : Fragment() {
         couponCodeViewModel.verifyCouponResponse.observe(this, Observer { resource ->
             when (resource.status) {
                 Status.SUCCESS -> setCouponAppliedLayout(resource.data)
-                Status.ERROR -> {
-                    handleNetworkException(resource.exception)
-                }
+                Status.ERROR -> handleNetworkException(resource.exception)
             }
         })
     }
 
     private fun setCouponAppliedLayout(couponCodeResponse: CouponCodeResponse?) {
         progressBar.visibility = View.GONE
-        couponCodeContainer.visibility = View.GONE
+        couponInputContainer.visibility = View.GONE
         appliedCouponContainer.visibility = View.VISIBLE
         couponCodeResponse?.voucher?.code?.let {
             couponAppliedText.text = it
