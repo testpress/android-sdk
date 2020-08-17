@@ -62,6 +62,8 @@ import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
 import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.COMMENTS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.QUESTIONS_PATH;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 import static in.testpress.util.CommonUtils.isAppInstalled;
 
@@ -579,9 +581,16 @@ public class ReviewQuestionsFragment extends Fragment {
     }
 
     private void openCommentFragment() {
-        CommentsFragment commentsFragment = CommentsFragment.Companion.getNewInstance(reviewItem);
+        CommentsFragment commentsFragment = CommentsFragment.Companion.getNewInstance(getCommentsUrl(apiClient, reviewItem));
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         commentsFragment.show(transaction, "CommentsFragment");
+    }
+
+    private String getCommentsUrl(TestpressExamApiClient apiClient,
+                                                ReviewItem reviewItem) {
+
+        return apiClient.getBaseUrl() + QUESTIONS_PATH + reviewItem.getQuestionId() +
+                COMMENTS_PATH;
     }
 
     protected void setEmptyText(final int title, final int description) {
