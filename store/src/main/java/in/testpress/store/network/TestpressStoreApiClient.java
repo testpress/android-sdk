@@ -10,18 +10,25 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
+import in.testpress.store.models.CouponCodeResponse;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
+import in.testpress.store.models.ProductDetailResponse;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.ProductsListResponse;
 
 public class TestpressStoreApiClient extends TestpressApiClient {
 
     public static final String PRODUCTS_LIST_PATH =  "/api/v2.2/products/";
+
     public static final String V4_PRODUCTS_LIST_PATH =  "/api/v2.4/products/";
 
     public static final String ORDERS_PATH = "/api/v2.2/orders/";
+
+    public static final String COUPON_PATH = "/api/v2.4/orders/";
+
+    public static final String APPLY_COUPON = "/apply-coupon/";
 
     public static final String ORDER_CONFIRM_PATH = "/confirm/";
 
@@ -47,6 +54,10 @@ public class TestpressStoreApiClient extends TestpressApiClient {
         return getProductService().getProductDetails(productSlug);
     }
 
+    public RetrofitCall<ProductDetailResponse> getProductDetails(String productSlug) {
+        return getProductService().getProductDetail(productSlug);
+    }
+
     public RetrofitCall<Order> order(List<OrderItem> orderItems) {
         HashMap<String, Object> orderParameters = new HashMap<String, Object>();
         orderParameters.put("order_items", orderItems);
@@ -62,6 +73,12 @@ public class TestpressStoreApiClient extends TestpressApiClient {
         orderParameters.put("phone", order.getPhone());
         orderParameters.put("land_mark", order.getLandMark());
         return getProductService().orderConfirm(order.getId(), orderParameters);
+    }
+
+    public RetrofitCall<CouponCodeResponse> applyCouponCode(int id, String couponCode) {
+        HashMap<String,String> couponCodeMap = new HashMap<String, String>();
+        couponCodeMap.put("code",couponCode);
+        return getProductService().applyCouponCode(id, couponCodeMap);
     }
 
 }

@@ -10,7 +10,7 @@
             <solid android:color="@color/testpress_white" />
             <stroke
                 android:width="0.25dp"
-                android:color="#ccc" />
+                android:color="#dedede" />
         </shape>
     </item>
 
