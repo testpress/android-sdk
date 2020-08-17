@@ -9,6 +9,7 @@ import `in`.testpress.course.ui.DownloadsActivity
 import `in`.testpress.course.ui.VideoDownloadQualityChooserDialog
 import `in`.testpress.course.util.PatternEditableBuilder
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
+import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -104,7 +105,20 @@ class VideoContentFragment : BaseContentDetailFragment() {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun showDownloadUnavailableDialog() {
+        val builder =
+            AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle)
+        builder.setTitle("Download Unavailable")
+        builder.setMessage("This content is not available for download, please purchase it to watch it in offline.")
+        builder.setPositiveButton("Ok", null)
+        builder.show()
+    }
+
     private fun showDownloadDialog() {
+        if (content.isCourseNotPurchased) {
+            showDownloadUnavailableDialog()
+            return
+        }
         val videoQualityChooserDialog =
             VideoDownloadQualityChooserDialog(content)
         videoQualityChooserDialog.show(childFragmentManager, null)
