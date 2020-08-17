@@ -33,5 +33,6 @@ data class ContentEntity(
     var videoId: Long? = null,
     var htmlId: Long? = null,
     var start: String? = null,
-    var hasStarted: Boolean
+    var hasStarted: Boolean,
+    var isCourseAvailable: Boolean? = null
 )

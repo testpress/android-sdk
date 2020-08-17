@@ -46,6 +46,12 @@
             android:text="Content Detail"
             android:id="@+id/content_detail" />
 
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/Button"
+            android:text="Downloads"
+            android:id="@+id/downloads" />
+
         <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
             android:text="Fragment"

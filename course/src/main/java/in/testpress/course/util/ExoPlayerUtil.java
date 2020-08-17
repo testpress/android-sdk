@@ -1,29 +1,18 @@
 package in.testpress.course.util;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Handler;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.StringRes;
-import androidx.core.content.ContextCompat;
-import androidx.mediarouter.media.MediaControlIntent;
-import androidx.mediarouter.media.MediaRouteSelector;
-import androidx.mediarouter.media.MediaRouter;
-import androidx.mediarouter.media.MediaRouter.RouteInfo;
-import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -33,31 +22,35 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.mediarouter.media.MediaControlIntent;
+import androidx.mediarouter.media.MediaRouteSelector;
+import androidx.mediarouter.media.MediaRouter;
+import androidx.mediarouter.media.MediaRouter.RouteInfo;
+
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultControlDispatcher;
-import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.offline.DownloadHelper;
+import com.google.android.exoplayer2.offline.DownloadRequest;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.ui.TrackSelectionView;
-import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
 import java.util.HashMap;
@@ -71,17 +64,17 @@ import in.testpress.core.TestpressSession;
 import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
 import in.testpress.course.api.TestpressCourseApiClient;
+import in.testpress.course.helpers.DownloadTask;
+import in.testpress.course.helpers.VideoDownload;
 import in.testpress.models.ProfileDetails;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
-import in.testpress.util.UserAgentProvider;
-import okhttp3.OkHttpClient;
 
 import static android.content.Context.AUDIO_SERVICE;
-import static androidx.mediarouter.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
+import static androidx.mediarouter.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 import static in.testpress.course.api.TestpressCourseApiClient.LAST_POSITION;
 import static in.testpress.course.api.TestpressCourseApiClient.TIME_RANGES;
@@ -100,10 +93,11 @@ public class ExoPlayerUtil {
     private SimpleExoPlayer player;
     private ImageView fullscreenIcon;
     private Dialog fullscreenDialog;
+    private TrackSelectionDialog trackSelectionDialog;
 
 
     private Activity activity;
-    private long videoAttemptId;
+    private long videoAttemptId = -1;
     private Content content;
     private String url;
     private boolean isopenFullscreenDialogCalled;
@@ -139,6 +133,7 @@ public class ExoPlayerUtil {
     AudioManager audioManager;
     AudioManager.OnAudioFocusChangeListener audioFocusChangeListener;
     private DefaultTrackSelector trackSelector;
+    private DialogInterface.OnClickListener dialogOnClickListener;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition) {
@@ -191,12 +186,9 @@ public class ExoPlayerUtil {
                 initializePlayer();
             }
         });
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
 
-        TrackSelection.Factory videoTrackSelectionFactory =
-                new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        trackSelector =
-                new DefaultTrackSelector(videoTrackSelectionFactory);
+        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory();
+        trackSelector =  new DefaultTrackSelector(activity, videoTrackSelectionFactory);
         initFullscreenDialog();
         initResolutionSelector();
 
@@ -211,7 +203,6 @@ public class ExoPlayerUtil {
         this.playWhenReady = playWhenReady;
         setSpeedRate(speedRate);
     }
-
 
     private void initializeViews() {
         emailIdTextView = exoPlayerMainFrame.findViewById(R.id.email_id);
@@ -240,6 +231,17 @@ public class ExoPlayerUtil {
         });
     }
 
+    public void openOnlyInFullScreen() {
+        openFullscreenDialog();
+        fullscreenDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                fullscreenDialog.dismiss();
+                activity.finish();
+            }
+        });
+    }
+
     public void seekTo(Long milliSeconds) {
         player.seekTo(milliSeconds);
     }
@@ -260,18 +262,9 @@ public class ExoPlayerUtil {
                                     && mappedTrackInfo.getTypeSupport(C.TRACK_TYPE_VIDEO)
                                     == MappingTrackSelector.MappedTrackInfo.RENDERER_SUPPORT_NO_TRACKS);
 
-                    Pair<AlertDialog, TrackSelectionView> dialogPair =
-                            TrackSelectionView.getDialog(activity, "Quality", trackSelector, rendererIndex);
-                    Window window = dialogPair.first.getWindow();
-
-                    if (window != null) {
-                        window.setBackgroundDrawable(new ColorDrawable(Color.DKGRAY));
-                        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    }
-
-                    dialogPair.second.setShowDisableOption(false);
-                    dialogPair.second.setAllowAdaptiveSelections(allowAdaptiveSelections);
-                    dialogPair.first.show();
+                    trackSelectionDialog = new TrackSelectionDialog(trackSelector);
+                    trackSelectionDialog.setOnClickListener(trackSelectionListener());
+                    trackSelectionDialog.show(((AppCompatActivity)activity).getSupportFragmentManager(), null);
                 }
             }
         });
@@ -298,8 +291,8 @@ public class ExoPlayerUtil {
         errorMessageTextView.setVisibility(View.GONE);
         if (player == null) {
             progressBar.setVisibility(View.VISIBLE);
-            player = ExoPlayerFactory.newSimpleInstance(activity, new DefaultRenderersFactory(activity),
-                    trackSelector, new DefaultLoadControl());
+            player = new SimpleExoPlayer.Builder(activity, new DefaultRenderersFactory(activity))
+                    .setTrackSelector(trackSelector).build();
 
             player.addListener(new PlayerEventListener());
             playerView.setPlayer(player);
@@ -311,7 +304,8 @@ public class ExoPlayerUtil {
             player.seekTo((long) (startPosition * 1000));
             player.setPlaybackParameters(new PlaybackParameters(speedRate));
         }
-        MediaSource mediaSource = buildMediaSource(Uri.parse(url));
+
+        MediaSource mediaSource = getMediaSource();
         player.prepare(mediaSource, false, false);
         if (overlayPositionHandler != null) {
             overlayPositionHandler
@@ -326,6 +320,42 @@ public class ExoPlayerUtil {
 
         addPlayPauseOnClickListener();
     }
+
+    private DialogInterface.OnClickListener trackSelectionListener() {
+        if (dialogOnClickListener == null) {
+            dialogOnClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
+                    int rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo);
+                    DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
+                    if (!trackSelectionDialog.getOverrides().isEmpty()) {
+                        parametersBuilder.clearSelectionOverrides(rendererIndex)
+                                .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), trackSelectionDialog.getOverrides().get(0));
+                        trackSelector.setParameters(parametersBuilder.build());
+                    }
+                }
+            };
+        }
+
+        return dialogOnClickListener;
+    }
+
+    private MediaSource getMediaSource() {
+        DownloadTask downloadTask = new DownloadTask(url, activity);
+        DownloadRequest downloadRequest = VideoDownload.getDownloadRequest(url, activity);
+        if (downloadTask.isDownloaded()) {
+            return DownloadHelper.createMediaSource(downloadRequest, buildDataSourceFactory());
+        } else {
+            return buildNetworkMediaSource(Uri.parse(url));
+        }
+    }
+
+
+    private DataSource.Factory buildDataSourceFactory() {
+        return new ExoPlayerDataSourceFactory(activity).build();
+    }
+
 
     private void addPlayPauseOnClickListener() {
         playerView.setControlDispatcher(new DefaultControlDispatcher() {
@@ -377,24 +407,15 @@ public class ExoPlayerUtil {
                 .build();
     }
 
-    private DataSource.Factory getDataSourceFactory() {
-        String userAgent = UserAgentProvider.get(activity);
-        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new VideoPlayerInterceptor(activity))
-                .build();
-        OkHttpDataSourceFactory okHttpDataSourceFactory = new OkHttpDataSourceFactory(okHttpClient, userAgent, bandwidthMeter);
-        return new DefaultDataSourceFactory(activity, bandwidthMeter, okHttpDataSourceFactory);
-    }
+    private MediaSource buildNetworkMediaSource(Uri uri) {
+        DataSource.Factory dataSourceFactory = buildDataSourceFactory();
 
-    private MediaSource buildMediaSource(Uri uri) {
-        DataSource.Factory dataSourceFactory = getDataSourceFactory();
         int type = Util.inferContentType(uri);
         switch (type) {
             case C.TYPE_HLS:
                 return new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
             case C.TYPE_OTHER:
-                return new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+                return new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
             default:
                 throw new IllegalStateException("Unsupported type: " + type);
         }
@@ -552,6 +573,10 @@ public class ExoPlayerUtil {
     }
 
     public void updateVideoAttempt() {
+        if (videoAttemptId == -1) {
+            return;
+        }
+
         Map<String, Object> parameters = getVideoAttemptParameters();
         new TestpressCourseApiClient(activity).updateVideoAttempt(videoAttemptId, parameters)
                 .enqueue(new TestpressCallback<VideoAttempt>() {
@@ -675,6 +700,16 @@ public class ExoPlayerUtil {
             super.onSeekProcessed();
             updateVideoAttempt();
         }
+    }
+
+    public static int getRendererIndex(int trackType, MappingTrackSelector.MappedTrackInfo mappedTrackInfo) {
+        for (int i=0; i < mappedTrackInfo.getRendererCount(); i++) {
+            if (mappedTrackInfo.getRendererType(i) == trackType) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
 }

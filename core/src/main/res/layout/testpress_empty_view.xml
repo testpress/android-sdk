@@ -8,6 +8,13 @@
     android:gravity="center_vertical"
     android:visibility="gone">
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/image"
+        android:layout_marginBottom="20dp"
+        android:layout_gravity="center" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,8 +25,6 @@
         android:textColor="@color/testpress_black"
         android:textSize="18sp"
         android:layout_gravity="center"
-        android:drawableLeft="@drawable/ic_error_outline_black_18dp"
-        android:drawableStart="@drawable/ic_error_outline_black_18dp"
         android:drawablePadding="3dp"/>
 
     <TextView

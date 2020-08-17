@@ -11,6 +11,9 @@ data class NetworkVideoContent(
     val requiredWatchDuration: String = "",
     val isDomainRestricted: Boolean,
     val description: String = "",
+    val thumbnailSmall: String? = "",
+    val thumbnail: String? = "",
+    val thumbnailMedium: String? = "",
     val streams: List<NetworkStream> = arrayListOf<NetworkStream>()
 )
 
@@ -22,8 +25,8 @@ fun NetworkVideoContent.asGreenDaoModel(): Video {
         this.embedCode,
         this.duration,
         this.isDomainRestricted,
-        null,
-        null,
-        null
+        thumbnail,
+        thumbnailMedium,
+        thumbnailSmall
     )
 }
