@@ -48,6 +48,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     public static final String PRODUCT_SLUG = "productSlug";
     public static final String PRODUCT = "product";
+    public static final String ORDER_ID = "order_id";
 
     private LinearLayout emptyView;
     private TextView emptyTitleView;
@@ -228,6 +229,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         if (this.product.getPaymentLink().isEmpty()) {
             Intent intent = new Intent(ProductDetailsActivity.this, OrderConfirmActivity.class);
             intent.putExtra(PRODUCT, product);
+            intent.putExtra(ORDER_ID, productDetailResponse.getOrder().getId());
             startActivityForResult(intent, STORE_REQUEST_CODE);
         } else {
             Uri uri = Uri.parse(this.product.getPaymentLink());

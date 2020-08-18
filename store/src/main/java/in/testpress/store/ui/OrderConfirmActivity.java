@@ -44,6 +44,7 @@ import in.testpress.util.UIUtils;
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 import static in.testpress.store.network.TestpressStoreApiClient.URL_PAYMENT_RESPONSE_HANDLER;
+import static in.testpress.store.ui.ProductDetailsActivity.ORDER_ID;
 import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
 
 public class OrderConfirmActivity extends BaseToolBarActivity {
@@ -70,6 +71,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
     private TestpressStoreApiClient apiClient;
     private FBEventsTrackerFacade fbEventsLogger;
     private EventsTrackerFacade eventsTrackerFacade;
+    private int orderId;
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -97,6 +99,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
         retryButton = (Button) findViewById(R.id.retry_button);
 
         product = getIntent().getParcelableExtra(PRODUCT);
+        orderId = getIntent().getIntExtra(ORDER_ID, 0);
         orderItem.setProduct(product.getUrl());
         orderItem.setQuantity(1);
         orderItem.setPrice(product.getPrice());
@@ -231,6 +234,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
                         intent.putExtra(PayuConstants.PAYU_CONFIG, payuConfig);
                         intent.putExtra(PayuConstants.PAYMENT_PARAMS, paymentParams);
                         intent.putExtra(PayuConstants.PAYU_HASHES, payuHashes);
+                        intent.putExtra(ORDER_ID, orderId);
                         startActivityForResult(intent, PayuConstants.PAYU_REQUEST_CODE);
                     }
 
