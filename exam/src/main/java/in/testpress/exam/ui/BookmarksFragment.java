@@ -34,6 +34,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.util.CommentsUtil;
+import in.testpress.exam.util.Watermark;
 import in.testpress.exam.util.ImageUtils;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.Bookmark;
@@ -470,9 +471,13 @@ public class BookmarksFragment extends BaseFragment {
                     "</div>";
         }
 
-        // Add explanation
+        // Add explanation with watermark
+        String watermark = new Watermark().get(getActivity());
         if (explanationHtml != null && !explanationHtml.isEmpty()) {
             html += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation));
+            html += "<div class ='watermark'>" +
+                    "© "+ getString(R.string.testpress_app_name) +" "+ watermark +
+                    "\n" + "</div>";
             html += "<div class='review-explanation'>" +
                         explanationHtml +
                     "</div>";

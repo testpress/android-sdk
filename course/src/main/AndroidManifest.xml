@@ -1,9 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="in.testpress.course">
     <uses-permission android:name="android.permission.MICROPHONE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-sdk tools:overrideLibrary="us.zoom.androidlib,us.zoom.videomeetings"/>
 
     <application
         android:allowBackup="true"
@@ -52,11 +55,31 @@
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
+        <activity android:name=".ui.DownloadsActivity"
+            android:label="Downloads"
+            android:theme="@style/TestpressTheme"
+            android:configChanges="orientation|keyboard|screenSize" />
+
         <activity
             android:name=".ui.WebViewActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="Web View" />
 
+        <activity
+            android:name=".ui.ZoomMeetActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="Zoom Meet"
+            android:theme="@style/TestpressTheme"/>
+
+        <service android:name=".services.VideoDownloadService" android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.exoplayer.downloadService.action.RESTART" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+        
+        <service android:name="com.google.android.exoplayer2.scheduler.PlatformScheduler$PlatformSchedulerService" android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>
