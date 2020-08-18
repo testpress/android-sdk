@@ -9,7 +9,6 @@ import `in`.testpress.course.domain.asDomainContentAttempts
 import `in`.testpress.course.domain.toDomainLanguages
 import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkContentAttempt
-import `in`.testpress.course.network.Resource
 import `in`.testpress.course.network.asDomainContentAttempt
 import `in`.testpress.course.network.asGreenDaoModel
 import `in`.testpress.exam.network.ExamNetwork
@@ -19,6 +18,7 @@ import `in`.testpress.exam.network.asGreenDaoModels
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.CourseAttemptDao
 import `in`.testpress.models.greendao.LanguageDao
+import `in`.testpress.network.Resource
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData

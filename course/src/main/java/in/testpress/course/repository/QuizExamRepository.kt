@@ -9,7 +9,6 @@ import `in`.testpress.course.domain.asDomainContentAttempt
 import `in`.testpress.course.domain.asDomainModel
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContentAttempt
-import `in`.testpress.course.network.Resource
 import `in`.testpress.course.network.asGreenDaoModel
 import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.exam.network.asGreenDaoModel
@@ -17,6 +16,7 @@ import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.AttemptDao
 import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.models.greendao.CourseAttemptDao
+import `in`.testpress.network.Resource
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

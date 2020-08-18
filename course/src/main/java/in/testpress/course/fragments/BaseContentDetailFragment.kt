@@ -7,9 +7,9 @@ import `in`.testpress.course.TestpressCourse.CONTENT_TYPE
 import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.viewmodels.ContentViewModel
+import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import android.app.Activity

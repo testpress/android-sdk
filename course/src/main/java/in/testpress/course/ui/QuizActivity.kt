@@ -3,7 +3,6 @@ package `in`.testpress.course.ui
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
-import `in`.testpress.course.enums.Status
 import `in`.testpress.course.fragments.ExamEndHanlder
 import `in`.testpress.course.fragments.LoadingQuestionsFragment
 import `in`.testpress.course.fragments.QuestionNumberHandler
@@ -12,6 +11,7 @@ import `in`.testpress.course.fragments.ShowQuizHandler
 import `in`.testpress.course.repository.QuizExamRepository
 import `in`.testpress.course.util.ProgressDialog
 import `in`.testpress.course.viewmodels.QuizExamViewModel
+import `in`.testpress.enums.Status
 import `in`.testpress.exam.ui.ReviewStatsActivity
 import `in`.testpress.ui.BaseToolBarActivity
 import `in`.testpress.util.InternetConnectivityChecker
@@ -141,12 +141,12 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
     override fun showQuiz(attemptId: Long, totalNoOfQuestions:Int, index: Int) {
         viewModel.loadAttempt(attemptId).observe(this, Observer {
             contentAttemptId = it?.data!!.id
-            this.attemptId = it.data.assessment?.id!!
+            this.attemptId = it.data!!.assessment?.id!!
             examEndUrl = it?.data?.assessment?.endUrl
             val examId = intent.getLongExtra("EXAM_ID", -1)
             val bundle = Bundle().apply {
                 putLong("EXAM_ID", examId)
-                putLong("ATTEMPT_ID", it.data.assessment!!.id)
+                putLong("ATTEMPT_ID", it.data!!.assessment!!.id)
                 putInt("NO_OF_QUESTIONS", totalNoOfQuestions)
                 putInt("START_INDEX", index)
             }
