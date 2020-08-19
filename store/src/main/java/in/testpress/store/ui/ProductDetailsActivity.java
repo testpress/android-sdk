@@ -13,6 +13,12 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import java.util.HashMap;
@@ -22,8 +28,10 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.TestpressExam;
 import in.testpress.models.InstituteSettings;
+import in.testpress.network.Resource;
 import in.testpress.store.R;
 import in.testpress.store.models.Product;
+import in.testpress.store.models.ProductDetailResponse;
 import in.testpress.store.network.TestpressStoreApiClient;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.EventsTrackerFacade;
@@ -49,6 +57,8 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     private Product product;
     private String productSlug;
     private EventsTrackerFacade eventsTrackerFacade;
+    private ProductDetailResponse productDetailResponse;
+    private ProductDetailViewModel productDetailViewModel;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -74,6 +84,8 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         });
         eventsTrackerFacade = new EventsTrackerFacade(getApplicationContext());
 
+        initializeViewModel();
+        getProductDetails();
         loadProductDetails();
     }
 
@@ -88,21 +100,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
                     @Override
                     public void onException(TestpressException exception) {
-                        if (exception.isNetworkError()) {
-                            setEmptyText(R.string.testpress_network_error,
-                                    R.string.testpress_no_internet_try_again,
-                                    R.drawable.ic_error_outline_black_18dp);
-                        } else if (exception.isClientError()) {
-                            setEmptyText(R.string.testpress_no_product_found,
-                                    R.string.testpress_no_product_found_description,
-                                    R.drawable.ic_error_outline_black_18dp);
-                            retryButton.setVisibility(View.INVISIBLE);
-                        } else {
-                            setEmptyText(R.string.testpress_error_loading_products,
-                                    R.string.testpress_some_thing_went_wrong_try_again,
-                                    R.drawable.ic_error_outline_black_18dp);
-                            retryButton.setVisibility(View.INVISIBLE);
-                        }
+                        handleNetworkException(exception);
                     }
                 });
     }
@@ -254,11 +252,58 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         }
     }
 
+    private void handleNetworkException(TestpressException exception) {
+        if (exception.isNetworkError()) {
+            setEmptyText(R.string.testpress_network_error,
+                    R.string.testpress_no_internet_try_again,
+                    R.drawable.ic_error_outline_black_18dp);
+        } else if (exception.isClientError()) {
+            setEmptyText(R.string.testpress_no_product_found,
+                    R.string.testpress_no_product_found_description,
+                    R.drawable.ic_error_outline_black_18dp);
+            retryButton.setVisibility(View.INVISIBLE);
+        } else {
+            setEmptyText(R.string.testpress_error_loading_products,
+                    R.string.testpress_some_thing_went_wrong_try_again,
+                    R.drawable.ic_error_outline_black_18dp);
+            retryButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
     protected void setEmptyText(final int title, final int description, final int left) {
         emptyView.setVisibility(View.VISIBLE);
         emptyTitleView.setText(title);
         emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0);
         emptyDescView.setText(description);
+    }
+
+    private void initializeViewModel() {
+        productDetailViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
+            @NonNull
+            @Override
+            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+                return (T) new ProductDetailViewModel(getBaseContext());
+            }
+        }).get(ProductDetailViewModel.class);
+    }
+
+    void getProductDetails() {
+        progressBar.setVisibility(View.VISIBLE);
+        productDetailViewModel.get(productSlug).observe(this, new Observer<Resource<ProductDetailResponse>>() {
+            @Override
+            public void onChanged(Resource<ProductDetailResponse> resource) {
+                switch (resource.getStatus()) {
+                    case SUCCESS: {
+                        productDetailResponse = resource.getData();
+                        break;
+                    }
+                    case ERROR: {
+                        handleNetworkException(resource.getException());
+                        break;
+                    }
+                }
+            }
+        });
     }
 
 }

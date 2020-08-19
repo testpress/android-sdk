@@ -1,4 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -29,6 +32,9 @@ dependencies {
 
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
+    implementation "androidx.lifecycle:lifecycle-viewmodel:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-livedata:2.2.0"
+    kapt "androidx.lifecycle:lifecycle-compiler:2.2.0"
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

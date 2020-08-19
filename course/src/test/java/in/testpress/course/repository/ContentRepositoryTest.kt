@@ -3,12 +3,7 @@ package `in`.testpress.course.repository
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.asDomainContent
 import `in`.testpress.course.domain.asDomainContents
-import `in`.testpress.course.network.CourseNetwork
-import `in`.testpress.course.network.NetworkAttachmentContent
-import `in`.testpress.course.network.NetworkContent
-import `in`.testpress.exam.network.NetworkContentAttempt
-import `in`.testpress.course.network.NetworkHtmlContent
-import `in`.testpress.course.network.Resource
+import `in`.testpress.course.network.*
 import `in`.testpress.course.util.RetrofitCallMock
 import `in`.testpress.course.util.getOrAwaitValue
 import `in`.testpress.course.util.mock
@@ -18,6 +13,7 @@ import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.models.greendao.ExamDao
 import `in`.testpress.models.greendao.HtmlContentDao
 import `in`.testpress.models.greendao.VideoDao
+import `in`.testpress.network.Resource
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
@@ -37,7 +33,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.atLeastOnce
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
-import org.mockito.Mockito.reset
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 

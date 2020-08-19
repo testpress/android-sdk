@@ -3,8 +3,8 @@ package `in`.testpress.course.fragments
 import `in`.testpress.course.R
 import `in`.testpress.course.api.TestpressCourseApiClient
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.enums.Status
 import `in`.testpress.course.ui.ContentActivity
+import `in`.testpress.enums.Status
 import `in`.testpress.util.FullScreenChromeClient
 import `in`.testpress.util.WebViewUtils
 import android.app.Activity
