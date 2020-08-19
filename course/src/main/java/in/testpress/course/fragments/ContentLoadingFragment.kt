@@ -3,10 +3,10 @@ package `in`.testpress.course.fragments
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.enums.Status
 import `in`.testpress.course.repository.ContentRepository
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.viewmodels.ContentViewModel
+import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import android.content.Context
@@ -75,9 +75,9 @@ class ContentLoadingFragment : Fragment(),
             when (resource.status) {
                 Status.SUCCESS -> {
                     if (!isContentLoaded(resource.data!!)) {
-                        refetchContent(resource.data.id)
+                        refetchContent(resource.data!!.id)
                     } else {
-                        changeFragment(resource.data)
+                        changeFragment(resource.data!!)
                     }
                 }
                 Status.ERROR -> {

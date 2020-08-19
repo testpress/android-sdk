@@ -58,6 +58,8 @@
     <string name="testpress_check_your_mail">Further Details check your mail\n(%s)</string>
 
     <string name="testpress_payment_status">Payment Status</string>
+    <string name="invalid_coupon_code">Invalid Coupon Code</string>
+    <string name="rupee_symbol">\u20B9</string>
 
     <string name="testpress_have_access_code">Have Access Code?</string>
 

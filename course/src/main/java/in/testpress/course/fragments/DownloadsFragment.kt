@@ -1,7 +1,6 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
-import `in`.testpress.course.enums.Status
 import `in`.testpress.course.helpers.CourseLastSyncedDate
 import `in`.testpress.course.helpers.DownloadedVideoRemoveHandler
 import `in`.testpress.course.repository.CourseRepository
@@ -11,6 +10,7 @@ import `in`.testpress.course.ui.OfflineVideoListAdapter
 import `in`.testpress.course.util.DateUtils
 import `in`.testpress.course.viewmodels.CourseViewModel
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
+import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import android.os.Bundle

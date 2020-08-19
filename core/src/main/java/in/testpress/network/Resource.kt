@@ -1,7 +1,7 @@
-package `in`.testpress.course.network
+package `in`.testpress.network
 
 import `in`.testpress.core.TestpressException
-import `in`.testpress.course.enums.Status
+import `in`.testpress.enums.Status
 
 data class Resource<out T>(val status: Status, val data: T?, val exception: TestpressException?) {
     companion object {
