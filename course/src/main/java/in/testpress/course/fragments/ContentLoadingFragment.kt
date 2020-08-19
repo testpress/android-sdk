@@ -75,9 +75,9 @@ class ContentLoadingFragment : Fragment(),
             when (resource.status) {
                 Status.SUCCESS -> {
                     if (!isContentLoaded(resource.data!!)) {
-                        refetchContent(resource.data.id)
+                        refetchContent(resource.data!!.id)
                     } else {
-                        changeFragment(resource.data)
+                        changeFragment(resource.data!!)
                     }
                 }
                 Status.ERROR -> {

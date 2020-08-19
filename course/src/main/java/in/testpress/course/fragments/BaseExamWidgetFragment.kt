@@ -15,7 +15,6 @@ import `in`.testpress.course.network.Resource
 import `in`.testpress.course.repository.ExamContentRepository
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.QuizActivity
-import `in`.testpress.course.ui.StartQuizActivity
 import `in`.testpress.course.viewmodels.ExamContentViewModel
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient

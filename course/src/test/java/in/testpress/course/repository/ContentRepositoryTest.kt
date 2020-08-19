@@ -8,7 +8,6 @@ import `in`.testpress.course.network.NetworkAttachmentContent
 import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.exam.network.NetworkContentAttempt
 import `in`.testpress.course.network.NetworkHtmlContent
-import `in`.testpress.course.network.Resource
 import `in`.testpress.course.util.RetrofitCallMock
 import `in`.testpress.course.util.getOrAwaitValue
 import `in`.testpress.course.util.mock
@@ -37,7 +36,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.atLeastOnce
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
-import org.mockito.Mockito.reset
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 
