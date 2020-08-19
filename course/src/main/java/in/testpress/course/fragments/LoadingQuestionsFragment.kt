@@ -89,7 +89,7 @@ class LoadingQuestionsFragment : Fragment(),
                     val index = resource.data!!.indexOfFirst{
                         it.duration == null
                     }
-                    fragmentChangeListener.showQuiz(contentAttempt.id, resource.data.size, index)
+                    fragmentChangeListener.showQuiz(contentAttempt.id, resource.data!!.size, index)
                 }
                 Status.ERROR -> {
                     loadingLayout.visibility = View.GONE

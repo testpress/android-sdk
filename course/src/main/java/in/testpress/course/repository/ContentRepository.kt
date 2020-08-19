@@ -8,12 +8,7 @@ import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.asDomainContent
 import `in`.testpress.course.domain.asDomainContents
 import `in`.testpress.course.enums.Status
-import `in`.testpress.course.network.CourseNetwork
-import `in`.testpress.course.network.NetworkContent
-import `in`.testpress.course.network.NetworkContentAttempt
-import `in`.testpress.course.network.Resource
-import `in`.testpress.course.network.asDatabaseModel
-import `in`.testpress.course.network.asGreenDaoModel
+import `in`.testpress.course.network.*
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao

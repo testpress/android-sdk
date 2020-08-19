@@ -7,11 +7,7 @@ import `in`.testpress.course.domain.DomainContentAttempt
 import `in`.testpress.course.domain.DomainLanguage
 import `in`.testpress.course.domain.asDomainContentAttempts
 import `in`.testpress.course.domain.toDomainLanguages
-import `in`.testpress.course.network.NetworkContent
-import `in`.testpress.course.network.NetworkContentAttempt
-import `in`.testpress.course.network.Resource
-import `in`.testpress.course.network.asDomainContentAttempt
-import `in`.testpress.course.network.asGreenDaoModel
+import `in`.testpress.course.network.*
 import `in`.testpress.exam.network.ExamNetwork
 import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.exam.network.asGreenDaoModel

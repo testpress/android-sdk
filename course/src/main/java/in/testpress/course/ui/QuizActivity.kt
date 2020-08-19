@@ -141,12 +141,12 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
     override fun showQuiz(attemptId: Long, totalNoOfQuestions:Int, index: Int) {
         viewModel.loadAttempt(attemptId).observe(this, Observer {
             contentAttemptId = it?.data!!.id
-            this.attemptId = it.data.assessment?.id!!
+            this.attemptId = it.data!!.assessment?.id!!
             examEndUrl = it?.data?.assessment?.endUrl
             val examId = intent.getLongExtra("EXAM_ID", -1)
             val bundle = Bundle().apply {
                 putLong("EXAM_ID", examId)
-                putLong("ATTEMPT_ID", it.data.assessment!!.id)
+                putLong("ATTEMPT_ID", it.data!!.assessment!!.id)
                 putInt("NO_OF_QUESTIONS", totalNoOfQuestions)
                 putInt("START_INDEX", index)
             }

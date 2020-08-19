@@ -6,7 +6,6 @@ import `in`.testpress.core.TestpressSession
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.network.Resource
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.viewmodels.ContentViewModel
 import `in`.testpress.models.InstituteSettings
@@ -27,7 +26,6 @@ import org.mockito.Mockito.anyBoolean
 import org.mockito.Mockito.anyLong
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
-import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.shadows.support.v4.SupportFragmentController
