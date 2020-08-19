@@ -12,6 +12,12 @@
         <item name="android:textColorPrimary">@color/testpress_actionbar_text</item>
         <item name="colorButtonNormal">@color/testpress_color_primary</item>
         <item name="android:statusBarColor">@color/testpress_color_primary</item>
+        <item name="android:textAppearanceLargePopupMenu">@style/myPopupMenuTextAppearanceLarge</item>
+    </style>
+
+
+    <style name="myPopupMenuTextAppearanceLarge" parent="@android:style/TextAppearance.DeviceDefault.Widget.PopupMenu.Large">
+        <item name="android:textColor">@color/testpress_black</item>
     </style>
 
     <style name="TestpressTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" >

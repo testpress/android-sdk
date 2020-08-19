@@ -9,19 +9,22 @@ import `in`.testpress.course.domain.DomainLanguage
 import `in`.testpress.course.domain.asGreenDaoModel
 import `in`.testpress.course.domain.getGreenDaoContent
 import `in`.testpress.course.domain.getGreenDaoContentAttempt
+import `in`.testpress.course.domain.toGreenDaoModels
+import `in`.testpress.enums.Status
+import `in`.testpress.network.Resource
 import `in`.testpress.course.repository.ExamContentRepository
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.QuizActivity
+import `in`.testpress.course.ui.StartQuizActivity
 import `in`.testpress.course.viewmodels.ExamContentViewModel
-import `in`.testpress.enums.Status
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.util.MultiLanguagesUtil
 import `in`.testpress.exam.util.RetakeExamUtil
-import `in`.testpress.network.Resource
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.fragment.app.Fragment
@@ -199,6 +202,9 @@ open class BaseExamWidgetFragment : Fragment() {
 
     private fun startCourseExam(hasMultipleLanguages: Boolean, isPartial: Boolean) {
         val greenDaoContent = content.getGreenDaoContent(requireContext())
+        greenDaoContent?.exam?.refresh()
+        val languages = content.exam?.languages
+        greenDaoContent?.exam?.languages = languages?.toGreenDaoModels()
         TestpressExam.startCourseExam(
             requireActivity(), greenDaoContent!!, hasMultipleLanguages, isPartial,
             TestpressSdk.getTestpressSession(requireActivity())!!

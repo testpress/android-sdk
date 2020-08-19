@@ -51,10 +51,13 @@ data class DomainContent(
     val htmlContent: DomainHtmlContent? = null,
     var exam: DomainExamContent? = null,
     val video: DomainVideoContent? = null,
-    val videoConference: DomainVideoConferenceContent? = null
+    val videoConference: DomainVideoConferenceContent? = null,
+    val isCourseAvailable: Boolean?
 ) {
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
+
+    val isCourseNotPurchased = isCourseAvailable == false
 
     fun getFormattedStart(): String? {
         start?.let {
@@ -102,7 +105,8 @@ fun createDomainContent(contentEntity: ContentEntity): DomainContent {
         videoId = contentEntity.videoId,
         htmlId = contentEntity.htmlId,
         start = contentEntity.start,
-        hasStarted = contentEntity.hasStarted
+        hasStarted = contentEntity.hasStarted,
+        isCourseAvailable = contentEntity.isCourseAvailable
     )
 }
 
@@ -144,7 +148,8 @@ fun createDomainContent(content: Content): DomainContent {
         video = content.rawVideo?.asDomainContent(),
         attemptsUrl = content.attemptsUrl,
         videoConferenceID = content.videoConferenceId,
-        videoConference = content.rawVideoConference?.asDomainContent()
+        videoConference = content.rawVideoConference?.asDomainContent(),
+        isCourseAvailable = content.isCourseAvailable
     )
 }
 
