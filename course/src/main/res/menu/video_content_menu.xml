@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/download_progress"
+        android:icon="@drawable/ic_downloads"
+        android:title="Download"
+        android:visible="false"
+        app:contentInsetEnd="10dp"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/download"
+        android:icon="@drawable/ic_downloads"
+        android:title="Download"
+        android:visible="true"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/downloaded"
+        android:icon="@drawable/ic_offline_available"
+        android:title="Offline"
+        android:visible="false"
+        app:showAsAction="always" />
+</menu>

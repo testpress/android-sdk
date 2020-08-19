@@ -41,10 +41,10 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:autoText">false</item>
+        <item name="android:textColor">@color/color_primary_text</item>
         <item name="android:capitalize">none</item>
         <item name="android:scrollHorizontally">true</item>
         <item name="android:singleLine">true</item>
         <item name="android:imeOptions">actionNext</item>
     </style>
-
 </resources>
