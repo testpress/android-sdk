@@ -13,6 +13,7 @@ import in.testpress.course.ui.ChapterDetailActivity;
 import in.testpress.course.ui.ContentActivity;
 import in.testpress.course.ui.CourseListActivity;
 import in.testpress.course.ui.CourseListFragment;
+import in.testpress.course.ui.DownloadsActivity;
 import in.testpress.course.ui.MyCoursesFragment;
 import in.testpress.course.ui.LeaderboardActivity;
 import in.testpress.course.ui.LeaderboardFragment;
@@ -172,6 +173,11 @@ public class TestpressCourse {
         );
     }
 
+
+    public static void showDownloads(@NonNull Activity activity, @NonNull TestpressSession testpressSession) {
+        init(activity.getApplicationContext(), testpressSession);
+        activity.startActivity(DownloadsActivity.createIntent(activity));
+    }
     /**
      * Use when overall leaderboard need to be open in a container as a fragment.
      *
