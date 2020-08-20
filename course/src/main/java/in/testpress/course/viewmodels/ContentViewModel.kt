@@ -2,8 +2,8 @@ package `in`.testpress.course.viewmodels
 
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.network.NetworkContentAttempt
-import `in`.testpress.course.repository.ContentRepository
 import `in`.testpress.network.Resource
+import `in`.testpress.course.repository.ContentRepository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 

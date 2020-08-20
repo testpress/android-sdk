@@ -1,8 +1,8 @@
 package `in`.testpress.course.viewmodels
 
 import `in`.testpress.course.domain.DomainContentAttempt
-import `in`.testpress.course.repository.QuizExamRepository
 import `in`.testpress.network.Resource
+import `in`.testpress.course.repository.QuizExamRepository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 

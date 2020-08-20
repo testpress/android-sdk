@@ -3,6 +3,7 @@ package `in`.testpress.course.ui
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
+import `in`.testpress.enums.Status
 import `in`.testpress.course.fragments.ExamEndHanlder
 import `in`.testpress.course.fragments.LoadingQuestionsFragment
 import `in`.testpress.course.fragments.QuestionNumberHandler
@@ -11,7 +12,6 @@ import `in`.testpress.course.fragments.ShowQuizHandler
 import `in`.testpress.course.repository.QuizExamRepository
 import `in`.testpress.course.util.ProgressDialog
 import `in`.testpress.course.viewmodels.QuizExamViewModel
-import `in`.testpress.enums.Status
 import `in`.testpress.exam.ui.ReviewStatsActivity
 import `in`.testpress.ui.BaseToolBarActivity
 import `in`.testpress.util.InternetConnectivityChecker

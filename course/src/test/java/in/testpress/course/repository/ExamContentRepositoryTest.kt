@@ -2,12 +2,13 @@ package `in`.testpress.course.repository
 
 import `in`.testpress.core.TestpressException
 import `in`.testpress.course.domain.asDomainLanguage
+import `in`.testpress.enums.Status
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.exam.network.NetworkAttempt
+import `in`.testpress.network.Resource
 import `in`.testpress.course.util.RetrofitCallMock
 import `in`.testpress.course.util.getOrAwaitValue
-import `in`.testpress.enums.Status
 import `in`.testpress.exam.network.ExamNetwork
 import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.models.TestpressApiResponse
@@ -17,7 +18,6 @@ import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.models.greendao.CourseAttemptDao
 import `in`.testpress.models.greendao.Language
 import `in`.testpress.models.greendao.LanguageDao
-import `in`.testpress.network.Resource
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import org.greenrobot.greendao.query.DeleteQuery

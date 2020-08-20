@@ -4,6 +4,7 @@ import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.asDomainContent
 import `in`.testpress.course.domain.asDomainContents
 import `in`.testpress.course.network.*
+import `in`.testpress.network.Resource
 import `in`.testpress.course.util.RetrofitCallMock
 import `in`.testpress.course.util.getOrAwaitValue
 import `in`.testpress.course.util.mock
@@ -13,7 +14,6 @@ import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.models.greendao.ExamDao
 import `in`.testpress.models.greendao.HtmlContentDao
 import `in`.testpress.models.greendao.VideoDao
-import `in`.testpress.network.Resource
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData

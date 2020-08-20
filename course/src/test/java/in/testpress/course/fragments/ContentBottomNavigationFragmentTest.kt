@@ -6,10 +6,10 @@ import `in`.testpress.core.TestpressSession
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.domain.DomainContent
+import `in`.testpress.network.Resource
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.viewmodels.ContentViewModel
 import `in`.testpress.models.InstituteSettings
-import `in`.testpress.network.Resource
 import android.content.Context
 import android.os.Bundle
 import android.view.View

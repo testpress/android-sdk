@@ -3,6 +3,7 @@ package `in`.testpress.course.repository
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSDKDatabase
+import `in`.testpress.network.Resource
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
 import `in`.testpress.exam.domain.asDomainModel
 import `in`.testpress.exam.domain.asDomainModels
@@ -16,7 +17,6 @@ import `in`.testpress.models.greendao.ExamQuestion
 import `in`.testpress.models.greendao.ExamQuestionDao
 import `in`.testpress.models.greendao.UserSelectedAnswer
 import `in`.testpress.models.greendao.UserSelectedAnswerDao
-import `in`.testpress.network.Resource
 import `in`.testpress.util.IntegerList
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context

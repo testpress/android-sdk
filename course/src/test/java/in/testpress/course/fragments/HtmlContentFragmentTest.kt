@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.core.TestpressSession
 import `in`.testpress.course.domain.asDomainContent
+import `in`.testpress.network.Resource
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.util.GreendaoCleanupMixin
 import `in`.testpress.course.viewmodels.ContentViewModel
@@ -11,7 +12,6 @@ import `in`.testpress.models.InstituteSettings
 import `in`.testpress.models.greendao.Chapter
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.HtmlContent
-import `in`.testpress.network.Resource
 import `in`.testpress.util.WebViewUtils
 import android.content.Context
 import android.os.Bundle

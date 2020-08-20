@@ -4,10 +4,10 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.getGreenDaoContent
+import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
-import `in`.testpress.enums.Status
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
