@@ -19,6 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12sp"
+        android:textColor="@color/testpress_text_gray"
         android:id="@+id/loading_text"
         android:text="@string/testpress_loading" />
 
