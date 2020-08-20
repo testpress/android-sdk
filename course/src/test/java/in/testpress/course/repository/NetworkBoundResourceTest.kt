@@ -1,8 +1,8 @@
 package `in`.testpress.course.repository
 
 import `in`.testpress.core.TestpressException
-import `in`.testpress.course.enums.Status
-import `in`.testpress.course.network.Resource
+import `in`.testpress.enums.Status
+import `in`.testpress.network.Resource
 import `in`.testpress.course.util.RetrofitCallMock
 import `in`.testpress.course.util.getOrAwaitValue
 import `in`.testpress.course.util.mock

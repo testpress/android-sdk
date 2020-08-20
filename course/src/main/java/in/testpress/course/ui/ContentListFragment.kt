@@ -3,7 +3,7 @@ package `in`.testpress.course.ui
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.enums.Status
+import `in`.testpress.enums.Status
 import `in`.testpress.course.repository.ContentsRepository
 import `in`.testpress.course.viewmodels.ContentsListViewModel
 import `in`.testpress.fragments.EmptyViewFragment
