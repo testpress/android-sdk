@@ -10,6 +10,12 @@ import kotlinx.android.synthetic.main.fragment_comments.*
 
 class CommentsFragment : DialogFragment() {
 
+    companion object {
+        fun getNewInstance(): CommentsFragment {
+            return CommentsFragment()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.FullScreenDialogTheme)
