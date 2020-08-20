@@ -30,6 +30,7 @@ public class InstituteSettings {
     private String facebookAppId;
     private boolean isFirebaseEventTrackingEnabled;
     private boolean isBranchEventTrackingEnabled;
+    private long serverTime;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -255,5 +256,14 @@ public class InstituteSettings {
 
     public void setBranchEventTrackingEnabled(boolean branchEventTrackingEnabled) {
         isBranchEventTrackingEnabled = branchEventTrackingEnabled;
+    }
+
+    public long getServerTime() {
+        return serverTime;
+    }
+
+    public InstituteSettings setServerTime(long serverTime) {
+        this.serverTime = serverTime;
+        return this;
     }
 }
