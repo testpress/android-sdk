@@ -5,10 +5,10 @@ import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.course.helpers.CourseLastSyncedDate
 import `in`.testpress.course.network.CourseNetwork
-import `in`.testpress.course.network.Resource
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Course
 import `in`.testpress.models.greendao.CourseDao
+import `in`.testpress.network.Resource
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
