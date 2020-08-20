@@ -12,6 +12,9 @@ data class DomainVideoContent(
     val requiredWatchDuration: String? = null,
     val isDomainRestricted: Boolean? = null,
     val description: String? = null,
+    val thumbnailSmall: String? = "",
+    val thumbnail: String? = "",
+    val thumbnailMedium: String? = "",
     val streams: List<DomainVideoStream>? = arrayListOf<DomainVideoStream>()
 ) {
     fun hlsUrl(): String? {
@@ -46,7 +49,10 @@ fun createDomainVideoContent(video: Video): DomainVideoContent {
         embedCode = video.embedCode,
         duration = video.duration,
         isDomainRestricted = video.isDomainRestricted,
-        streams = video.rawStreams?.asDomainStreams()
+        streams = video.rawStreams?.asDomainStreams(),
+        thumbnail = video.thumbnail,
+        thumbnailMedium = video.thumbnailMedium,
+        thumbnailSmall = video.thumbnailSmall
     )
 }
 

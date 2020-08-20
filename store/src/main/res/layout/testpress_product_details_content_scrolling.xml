@@ -49,67 +49,11 @@
                 android:id="@+id/price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/testpress_horizontal_margin"
                 android:layout_marginStart="@dimen/testpress_horizontal_margin"
+                android:layout_marginLeft="@dimen/testpress_horizontal_margin"
                 android:layout_toEndOf="@id/price_icon"
                 android:layout_toRightOf="@id/price_icon"
                 android:text="1500.00"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:textColor="#212121" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/testpress_horizontal_margin" >
-
-            <ImageView
-                android:id="@+id/date_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="@dimen/testpress_horizontal_margin"
-                android:layout_marginRight="@dimen/testpress_horizontal_margin"
-                android:src="@drawable/ic_event_black_18dp" />
-
-            <TextView
-                android:id="@+id/date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/testpress_horizontal_margin"
-                android:layout_marginStart="@dimen/testpress_horizontal_margin"
-                android:layout_toEndOf="@id/date_icon"
-                android:layout_toRightOf="@id/date_icon"
-                android:text="Feb 11, 2014 to Jul 9, 2019"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:textColor="#212121" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/testpress_horizontal_margin">
-
-            <ImageView
-                android:id="@+id/categories_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="@dimen/testpress_horizontal_margin"
-                android:layout_marginRight="@dimen/testpress_horizontal_margin"
-                android:src="@drawable/ic_school_black_18dp" />
-
-            <TextView
-                android:id="@+id/categories"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/testpress_horizontal_margin"
-                android:layout_marginStart="@dimen/testpress_horizontal_margin"
-                android:layout_toEndOf="@id/categories_icon"
-                android:layout_toRightOf="@id/categories_icon"
-                android:text="20"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textColor="#212121" />
 
@@ -236,6 +180,7 @@
         </RelativeLayout>
 
         <View xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/description_line"
               android:layout_width="match_parent"
               android:layout_height="1dp"
               android:layout_marginBottom="8dp"
