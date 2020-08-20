@@ -6,10 +6,9 @@ import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.asDomainContents
 import `in`.testpress.course.network.CourseNetwork
-import `in`.testpress.course.network.Resource
+import `in`.testpress.network.Resource
 import `in`.testpress.models.greendao.Chapter
 import `in`.testpress.models.greendao.ChapterDao
-import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.ContentsListResponse

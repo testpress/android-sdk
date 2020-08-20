@@ -10,12 +10,11 @@ import `in`.testpress.course.domain.asGreenDaoModel
 import `in`.testpress.course.domain.getGreenDaoContent
 import `in`.testpress.course.domain.getGreenDaoContentAttempt
 import `in`.testpress.course.domain.toGreenDaoModels
-import `in`.testpress.course.enums.Status
-import `in`.testpress.course.network.Resource
+import `in`.testpress.enums.Status
+import `in`.testpress.network.Resource
 import `in`.testpress.course.repository.ExamContentRepository
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.QuizActivity
-import `in`.testpress.course.ui.StartQuizActivity
 import `in`.testpress.course.viewmodels.ExamContentViewModel
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient

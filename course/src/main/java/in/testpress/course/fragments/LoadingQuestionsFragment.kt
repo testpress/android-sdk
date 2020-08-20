@@ -2,7 +2,7 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainContentAttempt
-import `in`.testpress.course.enums.Status
+import `in`.testpress.enums.Status
 import `in`.testpress.course.repository.QuizQuestionsRepository
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.viewmodels.QuizViewModel
@@ -89,7 +89,7 @@ class LoadingQuestionsFragment : Fragment(),
                     val index = resource.data!!.indexOfFirst{
                         it.duration == null
                     }
-                    fragmentChangeListener.showQuiz(contentAttempt.id, resource.data.size, index)
+                    fragmentChangeListener.showQuiz(contentAttempt.id, resource.data!!.size, index)
                 }
                 Status.ERROR -> {
                     loadingLayout.visibility = View.GONE

@@ -9,7 +9,7 @@ import `in`.testpress.course.domain.asDomainContentAttempt
 import `in`.testpress.course.domain.asDomainModel
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContentAttempt
-import `in`.testpress.course.network.Resource
+import `in`.testpress.network.Resource
 import `in`.testpress.course.network.asGreenDaoModel
 import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.exam.network.asGreenDaoModel

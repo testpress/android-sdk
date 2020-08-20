@@ -4,7 +4,7 @@ import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.core.TestpressSession
 import `in`.testpress.course.domain.asDomainContent
-import `in`.testpress.course.network.Resource
+import `in`.testpress.network.Resource
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.util.GreendaoCleanupMixin
 import `in`.testpress.course.viewmodels.ContentViewModel
