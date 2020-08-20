@@ -37,14 +37,14 @@
     </LinearLayout>
 
     <include
-        android:id="@+id/loading_new_comments_layout"
+        android:id="@+id/loadingNewCommentsLayout"
         layout="@layout/testpress_loading_layout_small"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone" />
 
     <LinearLayout
-        android:id="@+id/load_new_comments_layout"
+        android:id="@+id/loadNewCommentsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -54,7 +54,7 @@
         android:visibility="gone">
 
         <TextView
-            android:id="@+id/load_new_comments_text"
+            android:id="@+id/loadNewCommentsText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/load_new_comments"
@@ -63,7 +63,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/loading_previous_comments_layout"
+        android:id="@+id/loadingPreviousCommentsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -84,14 +84,14 @@
         android:layout_weight="1">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/comments_list_view"
+            android:id="@+id/commentsListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
     </FrameLayout>
 
     <LinearLayout
-        android:id="@+id/load_previous_comments_layout"
+        android:id="@+id/loadPreviousCommentsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -104,7 +104,7 @@
             android:background="#e6e6e6" />
 
         <TextView
-            android:id="@+id/load_previous_comments"
+            android:id="@+id/loadPreviousComments"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="15dp"
@@ -116,7 +116,7 @@
 
 
     <LinearLayout
-        android:id="@+id/comment_box_layout"
+        android:id="@+id/commentBoxLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
@@ -127,7 +127,7 @@
         android:visibility="visible">
 
         <ImageButton
-            android:id="@+id/image_comment_button"
+            android:id="@+id/imageCommentButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="bottom"
@@ -139,7 +139,7 @@
             android:tint="@android:color/white" />
 
         <in.testpress.ui.view.BackEventListeningEditText
-            android:id="@+id/comment_box"
+            android:id="@+id/commentBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -160,7 +160,7 @@
             tools:ignore="RtlHardcoded" />
 
         <ImageButton
-            android:id="@+id/post_comment_button"
+            android:id="@+id/postCommentButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="bottom"
