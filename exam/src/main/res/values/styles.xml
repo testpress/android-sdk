@@ -137,4 +137,10 @@
         <item name="android:textColorPrimary">@color/testpress_white</item>
     </style>
 
+    <style name="FullScreenDialogTheme" parent="Theme.MaterialComponents.DialogWhenLarge">
+        <item name="android:statusBarColor">@color/testpress_color_primary</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowAnimationStyle">@style/Animation.Design.BottomSheetDialog</item>
+    </style>
+
 </resources>
