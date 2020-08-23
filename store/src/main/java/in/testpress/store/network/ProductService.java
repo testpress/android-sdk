@@ -5,9 +5,11 @@ import java.util.Map;
 
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
+import in.testpress.store.models.CouponCodeResponse;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.Product;
 
+import in.testpress.store.models.ProductDetailResponse;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.ProductsListResponse;
 import retrofit2.http.Body;
@@ -17,6 +19,8 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 
+import static in.testpress.store.network.TestpressStoreApiClient.APPLY_COUPON;
+import static in.testpress.store.network.TestpressStoreApiClient.COUPON_PATH;
 import static in.testpress.store.network.TestpressStoreApiClient.ORDERS_PATH;
 import static in.testpress.store.network.TestpressStoreApiClient.ORDER_CONFIRM_PATH;
 
@@ -40,6 +44,14 @@ public interface ProductService {
             @Path(value = "order_id", encoded = true) int orderId,
             @Body HashMap<String, Object> arguments);
 
+    @POST(COUPON_PATH + "{customer_id}" + APPLY_COUPON)
+    RetrofitCall<CouponCodeResponse> applyCouponCode(
+            @Path(value = "customer_id") int customerId,
+            @Body HashMap<String,String> couponCodeMap);
+
+    @GET(TestpressStoreApiClient.V4_PRODUCTS_LIST_PATH + "{product_slug}")
+    RetrofitCall<ProductDetailResponse> getProductDetail(
+            @Path(value = "product_slug") String productUrlFrag);
 }
 
 

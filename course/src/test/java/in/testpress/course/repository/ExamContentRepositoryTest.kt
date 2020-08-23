@@ -4,8 +4,8 @@ import `in`.testpress.core.TestpressException
 import `in`.testpress.course.domain.asDomainLanguage
 import `in`.testpress.enums.Status
 import `in`.testpress.course.network.CourseNetwork
+import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.exam.network.NetworkAttempt
-import `in`.testpress.exam.network.NetworkContentAttempt
 import `in`.testpress.network.Resource
 import `in`.testpress.course.util.RetrofitCallMock
 import `in`.testpress.course.util.getOrAwaitValue
