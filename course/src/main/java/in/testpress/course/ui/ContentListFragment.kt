@@ -3,7 +3,7 @@ package `in`.testpress.course.ui
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.enums.Status
+import `in`.testpress.enums.Status
 import `in`.testpress.course.repository.ContentsRepository
 import `in`.testpress.course.viewmodels.ContentsListViewModel
 import `in`.testpress.fragments.EmptyViewFragment
@@ -114,7 +114,12 @@ class ContentListFragment : Fragment(), EmptyViewListener {
                 Status.ERROR -> {
                     Log.d("ContentListFragment", "Got status ERROR")
                     hideLoadingPlaceholder()
-                    emptyViewFragment.displayError(resource.exception!!)
+                    if (resource.data != null) {
+                        mAdapter.contents = resource.data as List<DomainContent>
+                        mAdapter.notifyDataSetChanged()
+                    } else {
+                        emptyViewFragment.displayError(resource.exception!!)
+                    }
                 }
             }
         })

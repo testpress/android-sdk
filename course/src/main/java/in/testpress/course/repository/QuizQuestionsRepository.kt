@@ -3,7 +3,7 @@ package `in`.testpress.course.repository
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSDKDatabase
-import `in`.testpress.course.network.Resource
+import `in`.testpress.network.Resource
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
 import `in`.testpress.exam.domain.asDomainModel
 import `in`.testpress.exam.domain.asDomainModels
@@ -107,7 +107,6 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
             } else {
                 _resourceUserSelectedAnswers.postValue(Resource.success(userSelectedAnswers.asDomainModels()))
             }
-            fetchQuestions(url, examId, attemptId)
         } else {
             cleanQuestionInDB(examId)
             fetchQuestions(url, examId, attemptId)

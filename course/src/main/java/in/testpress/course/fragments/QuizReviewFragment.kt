@@ -2,12 +2,13 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
-import `in`.testpress.course.enums.Status
+import `in`.testpress.enums.Status
 import `in`.testpress.course.repository.QuizQuestionsRepository
 import `in`.testpress.course.viewmodels.QuizViewModel
 import `in`.testpress.exam.domain.DomainQuestion
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
 import `in`.testpress.exam.ui.view.WebView
+import `in`.testpress.exam.util.Watermark
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.util.ViewUtils
 import `in`.testpress.util.WebViewUtils
@@ -265,10 +266,16 @@ class QuizReviewFragment: Fragment() {
         var htmlContent = ""
         userSelectedAnswer.explanationHtml?.let {
             htmlContent +=  WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation))
+            htmlContent += getEmailWaterMarkHtml()
             htmlContent += "<div class='review-explanation'>${it}</div>"
         }
 
         return htmlContent
+    }
+
+    private fun getEmailWaterMarkHtml(): String {
+        return """<div class ='watermark'>© ${getString(R.string.testpress_app_name)}
+                        ${Watermark().get(activity)} </div>"""
     }
 }
 

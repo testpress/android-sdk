@@ -1,8 +1,8 @@
 package `in`.testpress.course.util
 
 import `in`.testpress.core.TestpressCallback
-import `in`.testpress.course.enums.Status
-import `in`.testpress.course.network.Resource
+import `in`.testpress.enums.Status
+import `in`.testpress.network.Resource
 import `in`.testpress.network.RetrofitCall
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
