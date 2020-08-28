@@ -6,7 +6,7 @@ import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.asDomainContents
 import `in`.testpress.course.network.CourseNetwork
-import `in`.testpress.course.network.Resource
+import `in`.testpress.network.Resource
 import `in`.testpress.models.greendao.Chapter
 import `in`.testpress.models.greendao.ChapterDao
 import `in`.testpress.models.greendao.Content
@@ -50,7 +50,12 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
                 }
 
                 override fun onException(exception: TestpressException?) {
-                    _resourceContents.postValue(Resource.error(exception!!, null))
+                    val contents = getAll()
+                    if (contents?.isNotEmpty() == true) {
+                        _resourceContents.postValue(Resource.error(exception!!, contents.asDomainContents()))
+                    } else {
+                        _resourceContents.postValue(Resource.error(exception!!, null))
+                    }
                 }
             })
     }
@@ -80,6 +85,12 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
             .where(ContentDao.Properties.ChapterId.eq(chapterId))
             .buildDelete()
             .executeDeleteWithoutDetachingEntities()
+    }
+
+    private fun getAll(): MutableList<Content>? {
+        return contentDao.queryBuilder()
+            .where(ContentDao.Properties.ChapterId.eq(chapterId))
+            .list()
     }
 
     private fun storeContent(response: ContentsListResponse): List<DomainContent> {

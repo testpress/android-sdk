@@ -10,8 +10,10 @@ import android.widget.Spinner;
 
 import java.util.ArrayList;
 
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.exam.R;
 import in.testpress.models.greendao.Exam;
+import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.Language;
 import in.testpress.ui.ExploreSpinnerAdapter;
 
@@ -52,6 +54,9 @@ public class MultiLanguagesUtil {
                             languageSpinnerAdapter.getTag(languageSpinner.getSelectedItemPosition());
 
                     if (!selectedItemTag.isEmpty()) {
+                        ExamDao examDao = TestpressSDKDatabase.getExamDao(activity);
+                        exam.saveLanguages(activity);
+                        examDao.updateInTx(exam);
                         listener.onLanguageSelected();
                     } else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(
@@ -62,7 +67,9 @@ public class MultiLanguagesUtil {
                                             @Override
                                             public void onClick(DialogInterface dialog,
                                                                 int which) {
-
+                                                ExamDao examDao = TestpressSDKDatabase.getExamDao(activity);
+                                                exam.saveLanguages(activity);
+                                                examDao.updateInTx(exam);
                                                 listener.onLanguageSelected();
                                             }
                                         });

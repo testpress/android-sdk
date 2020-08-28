@@ -7,8 +7,9 @@ import `in`.testpress.course.TestpressCourse.CONTENT_TYPE
 import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.enums.Status
+import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
+import `in`.testpress.course.ui.ContentActivity.HIDE_BOTTOM_NAVIGATION
 import `in`.testpress.course.viewmodels.ContentViewModel
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
@@ -42,6 +43,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener,
     lateinit var bookmarkFragment: BookmarkFragment
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     open lateinit var viewModel: ContentViewModel
+    private var hideBottomNavigation: Boolean = false
 
     override val bookmarkId: Long?
         get() = if (!::content.isInitialized) null else content.bookmarkId
@@ -68,7 +70,9 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener,
         initializeListenters()
         initializeEmptyViewFragment()
         loadContentAndInitializeBoomarkFragment()
-        initBottomNavigationFragment()
+        if(!hideBottomNavigation) {
+            initBottomNavigationFragment()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -116,6 +120,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener,
     private fun parseIntentArguments() {
         contentId = requireArguments().getLong(CONTENT_ID, -1)
         productSlug = requireArguments().getString(PRODUCT_SLUG)
+        hideBottomNavigation = requireArguments().getBoolean(HIDE_BOTTOM_NAVIGATION, false)
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
