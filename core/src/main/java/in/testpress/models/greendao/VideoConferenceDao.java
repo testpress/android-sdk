@@ -29,6 +29,8 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
         public final static Property Duration = new Property(4, Integer.class, "duration", false, "DURATION");
         public final static Property Provider = new Property(5, String.class, "provider", false, "PROVIDER");
         public final static Property ConferenceId = new Property(6, String.class, "conferenceId", false, "CONFERENCE_ID");
+        public final static Property AccessToken = new Property(7, String.class, "accessToken", false, "ACCESS_TOKEN");
+        public final static Property Password = new Property(8, String.class, "password", false, "PASSWORD");
     }
 
 
@@ -50,7 +52,9 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
                 "\"START\" TEXT," + // 3: start
                 "\"DURATION\" INTEGER," + // 4: duration
                 "\"PROVIDER\" TEXT," + // 5: provider
-                "\"CONFERENCE_ID\" TEXT);"); // 6: conferenceId
+                "\"CONFERENCE_ID\" TEXT," + // 6: conferenceId
+                "\"ACCESS_TOKEN\" TEXT," + // 7: accessToken
+                "\"PASSWORD\" TEXT);"); // 8: password
     }
 
     /** Drops the underlying database table. */
@@ -97,6 +101,16 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
         if (conferenceId != null) {
             stmt.bindString(7, conferenceId);
         }
+ 
+        String accessToken = entity.getAccessToken();
+        if (accessToken != null) {
+            stmt.bindString(8, accessToken);
+        }
+ 
+        String password = entity.getPassword();
+        if (password != null) {
+            stmt.bindString(9, password);
+        }
     }
 
     @Override
@@ -137,6 +151,16 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
         if (conferenceId != null) {
             stmt.bindString(7, conferenceId);
         }
+ 
+        String accessToken = entity.getAccessToken();
+        if (accessToken != null) {
+            stmt.bindString(8, accessToken);
+        }
+ 
+        String password = entity.getPassword();
+        if (password != null) {
+            stmt.bindString(9, password);
+        }
     }
 
     @Override
@@ -153,7 +177,9 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // start
             cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4), // duration
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // provider
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6) // conferenceId
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // conferenceId
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // accessToken
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8) // password
         );
         return entity;
     }
@@ -167,6 +193,8 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
         entity.setDuration(cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4));
         entity.setProvider(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setConferenceId(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setAccessToken(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setPassword(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
      }
     
     @Override

@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.api.TestpressCourseApiClient
 import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.models.TestpressApiResponse
+import `in`.testpress.models.greendao.Course
 import `in`.testpress.network.RetrofitCall
 import `in`.testpress.network.TestpressApiClient
 import `in`.testpress.v2_4.models.ApiResponse
@@ -41,6 +42,9 @@ interface CourseService {
         @Path(value = "contents_url", encoded = true) contentUrl: String,
         @QueryMap queryParams: HashMap<String, Any>
     ): RetrofitCall<ApiResponse<ContentsListResponse>>
+
+    @GET(TestpressCourseApiClient.COURSE_LIST_PATH)
+    fun getCourses(@QueryMap queryParams: HashMap<String, Any>): RetrofitCall<TestpressApiResponse<Course>>
 }
 
 
@@ -65,5 +69,9 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     fun getContents(url: String, arguments: HashMap<String, Any>): RetrofitCall<ApiResponse<ContentsListResponse>> {
         return getCourseService().getContents(url, arguments)
+    }
+
+    fun getCourses(arguments: HashMap<String, Any>): RetrofitCall<TestpressApiResponse<Course>> {
+        return getCourseService().getCourses(arguments)
     }
 }

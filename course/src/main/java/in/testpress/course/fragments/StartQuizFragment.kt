@@ -2,7 +2,7 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
-import `in`.testpress.course.enums.Status
+import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.ui.QuizActivity
@@ -12,7 +12,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.lifecycle.Observer

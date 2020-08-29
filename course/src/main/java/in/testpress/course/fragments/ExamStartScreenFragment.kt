@@ -4,7 +4,6 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainExamContent
 import `in`.testpress.course.domain.getGreenDaoContentAttempt
-import `in`.testpress.course.enums.Status
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.exam.api.TestpressExamApiClient.STATE_PAUSED
 import `in`.testpress.util.ViewUtils
@@ -14,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.lifecycle.Observer
 
 class ExamStartScreenFragment : BaseExamWidgetFragment() {
     private lateinit var numberOfQuestions: TextView

@@ -5,7 +5,7 @@ import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.DomainContentAttempt
 import `in`.testpress.course.domain.getGreenDaoContent
 import `in`.testpress.course.domain.getGreenDaoContentAttempts
-import `in`.testpress.course.enums.Status
+import `in`.testpress.enums.Status
 import `in`.testpress.course.repository.ExamContentRepository
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.ContentAttemptListAdapter
