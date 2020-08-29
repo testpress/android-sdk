@@ -64,6 +64,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     api "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutine_version"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutine_version"
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
