@@ -2,7 +2,6 @@ package `in`.testpress.database
 
 import `in`.testpress.util.Converters
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 
@@ -13,7 +12,6 @@ data class ProductsListEntity(
         var id: Long? = null,
         @field:TypeConverters(Converters::class)
         var courses: List<CoursesItem>? = null,
-        @Ignore var prices: List<PricesItem>? = null,
         @field:TypeConverters(Converters::class)
         var products: List<ProductsItem>? = null
 )
@@ -36,15 +34,6 @@ data class CoursesItem(
         var modified: String? = null,
         var videosCount: Int? = null,
         var externalContentLink: String? = null
-)
-
-data class PricesItem(
-        var id: Int? = null,
-        var name: String? = null,
-        var price: String? = null,
-        var validity: Int? = null,
-        var endDate: String? = null,
-        var startDate: String? = null
 )
 
 data class ProductsItem(

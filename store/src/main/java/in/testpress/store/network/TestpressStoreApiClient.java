@@ -66,8 +66,8 @@ public class TestpressStoreApiClient extends TestpressApiClient {
         return getProductService().orderConfirm(order.getId(), orderParameters);
     }
 
-    public RetrofitCall<ApiResponse<ProductsList>> getProductsList(Map<String, Object> queryParams) {
-        return getProductService().getProductsList(queryParams);
+    public RetrofitCall<ProductsList> getProductsList() {
+        return getProductService().getProductsList();
     }
 
 }

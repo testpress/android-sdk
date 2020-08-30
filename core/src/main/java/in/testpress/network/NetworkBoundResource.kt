@@ -1,8 +1,6 @@
-package `in`.testpress.course.repository
+package `in`.testpress.network
 
 import `in`.testpress.core.TestpressException
-import `in`.testpress.network.Resource
-import `in`.testpress.network.RetrofitCall
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
