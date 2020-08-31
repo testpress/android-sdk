@@ -14,6 +14,7 @@ data class Results(
 	val products: List<ProductsItem?>? = null
 )
 
+
 data class ProductsItem(
 	val endDate: String? = null,
 	val image: String? = null,
