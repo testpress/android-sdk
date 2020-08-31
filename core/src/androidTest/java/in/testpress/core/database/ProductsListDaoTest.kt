@@ -14,7 +14,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ProductsListDaoTest: DbTestMixin() {
 
-    private fun createCoursesItem(): List<CoursesItem>? {
+    private fun createCoursesItem(): List<CoursesItem> {
         return listOf(CoursesItem(
                 id = 1, image = "https://media.testpress.in/i/189189f925444d48abf627bbe17f73d6.png",
                 examsCount = 10, created = "Jan 12", description = "Course",title = "Soft Skills",
@@ -24,7 +24,7 @@ class ProductsListDaoTest: DbTestMixin() {
         ))
     }
 
-    private fun createProductsItem(): List<ProductsItem>? {
+    private fun createProductsItem(): List<ProductsItem> {
         return listOf(ProductsItem(
                 id = 1, endDate = "Jan 15", image = "https://media.testpress.in/i/189189f925444d48abf627bbe17f73d6.png",
                 title = "Soft Skills",surl = "soft-skills", paymentLink = "",buyNowText = "buy",furl = "",
@@ -49,6 +49,7 @@ class ProductsListDaoTest: DbTestMixin() {
     fun getProductsList() {
         val productsList = createProductList()
         db.productsListDao().insert(productsList)
+
         val fetchedProducts = db.productsListDao().getAll().getOrAwaitValue()
         Assert.assertEquals(productsList,fetchedProducts)
     }
