@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 
 class ProductsListViewModel(val repository: ProductsListRepository): ViewModel() {
 
-    fun loadProductsList(): LiveData<Resource<ProductsListEntity>> {
-        return repository.fetch()
+    fun loadProductsList(forceFetch: Boolean): LiveData<Resource<ProductsListEntity>> {
+        return repository.fetch(forceFetch)
     }
 }
