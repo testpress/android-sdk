@@ -1,9 +1,12 @@
 package `in`.testpress.store.ui
 
+import `in`.testpress.core.TestpressSdk
 import `in`.testpress.database.CoursesItem
 import `in`.testpress.database.ProductsItem
 import `in`.testpress.store.R
+import `in`.testpress.store.ui.ProductDetailsActivity.PRODUCT_SLUG
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,14 +38,32 @@ class ProductListAdapter: RecyclerView.Adapter<ProductListAdapter.ProductsListVi
     }
 
     class ProductsListViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        @SuppressLint("SetTextI18n")
         fun bindItems(coursesItem: CoursesItem, productsItem: ProductsItem) {
-            itemView.title.text = coursesItem.title
+            setDataOnView(coursesItem, productsItem)
+            setOnClickListener(productsItem)
+        }
+
+        @SuppressLint("SetTextI18n")
+        private fun setDataOnView(coursesItem: CoursesItem, productsItem: ProductsItem) {
+            itemView.title.text = productsItem.title
             itemView.price.text = "\u20B9 ${productsItem.currentPrice}"
             itemView.totalVideos.text = "${coursesItem.videosCount} Videos"
             itemView.totalExams.text = "${coursesItem.examsCount} Exams"
             itemView.totalDocs.text = "${coursesItem.contentsCount} Docs"
-            Picasso.get().load(coursesItem.image).into(itemView.thumbnailImage)
+            itemView.title.typeface = TestpressSdk.getRubikMediumFont(itemView.context)
+            Picasso.get().load(productsItem.image).into(itemView.thumbnailImage)
+        }
+
+        private fun setOnClickListener(productsItem: ProductsItem) {
+            itemView.productContainer.setOnClickListener {
+                navigateToProductDetailActivity(productsItem)
+            }
+        }
+
+        private fun navigateToProductDetailActivity(productsItem: ProductsItem) {
+            val intent = Intent(itemView.context, ProductDetailsActivity::class.java)
+            intent.putExtra(PRODUCT_SLUG, productsItem.slug)
+            itemView.context.startActivity(intent)
         }
     }
 }

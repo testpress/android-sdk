@@ -61,4 +61,7 @@
 
     <string name="testpress_have_access_code">Have Access Code?</string>
 
+    <string name="product_not_available">Products Not Available</string>
+    <string name="error_loading_products">Loading Products Failed</string>
+
 </resources>

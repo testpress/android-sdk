@@ -16,14 +16,14 @@ import androidx.lifecycle.MediatorLiveData
 open class ProductsListRepository(val context: Context) {
     private val roomProductsListDao = TestpressDatabase(context).productsListDao()
 
-    fun fetch(forceRefresh: Boolean = true): LiveData<Resource<ProductsListEntity>> {
+    fun fetch(forceRefresh: Boolean = false): LiveData<Resource<ProductsListEntity>> {
         return object : NetworkBoundResource<ProductsListEntity, ProductsListResponse>() {
             override fun saveNetworkResponseToDB(item: ProductsListResponse) {
                 saveNetworkResponseToDatabase(item.results)
             }
 
             override fun shouldFetch(data: ProductsListEntity?): Boolean {
-                return forceRefresh
+                return forceRefresh || data == null
             }
 
             override fun loadFromDb(): LiveData<ProductsListEntity> {
@@ -35,7 +35,6 @@ open class ProductsListRepository(val context: Context) {
             }
 
             override fun createCall(): RetrofitCall<ProductsListResponse> {
-                roomProductsListDao.delete()
                 return TestpressStoreApiClient(context).productsList
             }
         }.asLiveData()

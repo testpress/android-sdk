@@ -17,7 +17,7 @@
         tools:ignore="UnknownIdInLayout" />
 
     <ProgressBar
-        android:id="@+id/pb_loading"
+        android:id="@+id/progressbar"
         android:visibility="gone"
         android:layout_width="45dp"
         android:layout_height="45dp"
@@ -29,7 +29,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/appbar" />
-
-    <include layout="@layout/testpress_empty_view" />
 
 </RelativeLayout>
