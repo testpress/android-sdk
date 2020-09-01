@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="@dimen/testpress_horizontal_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/product_details"
+        android:paddingBottom="40dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:lineSpacingExtra="3dp"
+            android:lineSpacingMultiplier="1.25"
+            android:layout_height="wrap_content"
+            android:textColor="@color/testpress_black"
+            android:textSize="24sp"
+            android:layout_marginHorizontal="6dp"
+            android:text="Grand tests - Series 1"
+            android:padding="5dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/testpress_horizontal_margin">
+
+            <TextView
+                android:id="@+id/currentPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1500.00"
+                android:textSize="24sp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@color/price_text_green" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="@dimen/testpress_horizontal_margin"
+                android:layout_marginLeft="@dimen/testpress_horizontal_margin"
+                tools:text="8000"
+                android:textSize="16sp"
+                android:lineSpacingMultiplier="1.43" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#F5F5F5"
+            android:layout_marginHorizontal="6dp"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Course details"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/testpress_black"
+                android:padding="5dp"
+                android:textSize="12sp"
+                android:textAllCaps="true"
+                android:lineSpacingMultiplier="1.67" />
+
+            <TextView
+                android:id="@+id/totalExams"
+                android:text="30 Exams"
+                android:textSize="12sp"
+                android:drawableLeft="@drawable/ic_board"
+                android:drawablePadding="5dp"
+                android:layout_marginTop="8dp"
+                android:padding="5dp"
+                android:textColor="@color/testpress_text_gray_dark"
+                android:layout_marginRight="5dp"
+                android:lineSpacingMultiplier="1.67"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/totalVideos"
+                android:text="20 Videos"
+                android:textSize="12sp"
+                android:layout_marginStart="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_video"
+                android:drawablePadding="5dp"
+                android:layout_marginTop="8dp"
+                android:lineSpacingMultiplier="1.67"
+                android:textColor="@color/testpress_text_gray_dark"
+                android:layout_marginLeft="4dp" />
+
+            <TextView
+                android:id="@+id/totalDocs"
+                android:drawableLeft="@drawable/ic_document"
+                android:text="10 Docs"
+                android:textSize="12sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:drawablePadding="5dp"
+                android:layout_marginVertical="8dp"
+                android:layout_marginStart="4dp"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:textColor="@color/testpress_text_gray_dark"
+                android:layout_marginLeft="4dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Description test goes here. It can be upto two lines or a particular character count limit. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                android:textSize="16sp"
+                android:layout_marginTop="8dp"
+                android:lineSpacingMultiplier="1.5" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#F5F5F5"
+            android:layout_marginHorizontal="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/sky_blue_text"
+                android:text="Read more >"
+                android:textAllCaps="true"
+                android:textSize="12sp"
+                android:lineSpacingMultiplier="1.67" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
