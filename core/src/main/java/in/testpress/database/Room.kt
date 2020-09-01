@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.room.*
 
 
-@Database(version = 5,
+@Database(version = 6,
         entities = [
             ContentEntity::class, OfflineVideo::class,
             ProductsListEntity::class
@@ -23,7 +23,7 @@ abstract class TestpressDatabase: RoomDatabase() {
             synchronized(TestpressDatabase::class.java) {
                 if (!::INSTANCE.isInitialized) {
                     INSTANCE = Room.databaseBuilder(context.applicationContext,
-                            TestpressDatabase::class.java, "testpress-database").build()
+                            TestpressDatabase::class.java, "testpress-database").fallbackToDestructiveMigration().build()
                 }
             }
             return INSTANCE

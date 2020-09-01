@@ -3,6 +3,7 @@ package in.testpress.store.network;
 import android.content.Context;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,8 +67,7 @@ public class TestpressStoreApiClient extends TestpressApiClient {
         return getProductService().orderConfirm(order.getId(), orderParameters);
     }
 
-    public RetrofitCall<ProductsList> getProductsList() {
+    public RetrofitCall<in.testpress.store.models.ProductsListResponse> getProductsList() {
         return getProductService().getProductsList();
     }
-
 }

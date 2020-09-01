@@ -34,6 +34,7 @@ dependencies {
     def core_testing_version = "2.1.0"
     def room_version = "2.2.4"
     def multi_dex_version = "2.0.1"
+    def lifecycle_version = "2.2.0"
     api rootProject.design
     api rootProject.retrofit2
     api rootProject.gsonConverter
@@ -67,8 +68,12 @@ dependencies {
     implementation "androidx.multidex:multidex:$multi_dex_version"
     api "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
+    implementation 'androidx.room:room-ktx:2.2.5'
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutine_version"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutine_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

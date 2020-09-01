@@ -1,6 +1,7 @@
 package `in`.testpress.database
 
 import `in`.testpress.util.Converters
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
@@ -10,9 +11,9 @@ import androidx.room.TypeConverters
 data class ProductsListEntity(
         @PrimaryKey(autoGenerate = true)
         var id: Long? = null,
-        @field:TypeConverters(Converters::class)
+        @ColumnInfo(name = "courses")
         var courses: List<CoursesItem>? = null,
-        @field:TypeConverters(Converters::class)
+        @ColumnInfo(name = "products")
         var products: List<ProductsItem>? = null
 )
 

@@ -5,44 +5,49 @@ import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.network.NetworkBoundResource
 import `in`.testpress.network.Resource
 import `in`.testpress.network.RetrofitCall
-import `in`.testpress.store.models.ProductsList
+import `in`.testpress.store.models.ProductsListResponse
+import `in`.testpress.store.models.Result
 import `in`.testpress.store.models.asDatabaseModel
 import `in`.testpress.store.network.TestpressStoreApiClient
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.MediatorLiveData
 
 open class ProductsListRepository(val context: Context) {
-    val roomProductsListDao = TestpressDatabase(context).productsListDao()
+    private val roomProductsListDao = TestpressDatabase(context).productsListDao()
 
-    fun fetch(forceRefresh: Boolean = false): LiveData<Resource<ProductsListEntity>> {
-        return object : NetworkBoundResource<ProductsListEntity, ProductsList>() {
-            override fun saveNetworkResponseToDB(item: ProductsList) {
-                roomProductsListDao.insert(item.asDatabaseModel())
-                saveNetworkResponseToDatabase(item)
+    fun fetch(forceRefresh: Boolean = true): LiveData<Resource<ProductsListEntity>> {
+        return object : NetworkBoundResource<ProductsListEntity, ProductsListResponse>() {
+            override fun saveNetworkResponseToDB(item: ProductsListResponse) {
+                saveNetworkResponseToDatabase(item.results)
             }
 
             override fun shouldFetch(data: ProductsListEntity?): Boolean {
-                return forceRefresh || fetchFromDatabase() == null
+                return forceRefresh
             }
 
             override fun loadFromDb(): LiveData<ProductsListEntity> {
-                val liveData = MutableLiveData<ProductsListEntity>()
-                liveData.postValue(fetchFromDatabase())
+                val liveData = MediatorLiveData<ProductsListEntity>()
+                liveData.addSource(fetchFromDatabase()) {
+                    liveData.postValue(it)
+                }
                 return liveData
             }
 
-            override fun createCall(): RetrofitCall<ProductsList> {
+            override fun createCall(): RetrofitCall<ProductsListResponse> {
+                roomProductsListDao.delete()
                 return TestpressStoreApiClient(context).productsList
             }
         }.asLiveData()
     }
 
-    private fun saveNetworkResponseToDatabase(productsList: ProductsList) {
-       roomProductsListDao.insert(productsList.asDatabaseModel())
+    private fun saveNetworkResponseToDatabase(productsList: Result?) {
+        productsList?.asDatabaseModel()?.let {
+            roomProductsListDao.insert(it)
+        }
     }
 
-    private fun fetchFromDatabase(): ProductsListEntity? {
-        return roomProductsListDao.getAll().value
+    private fun fetchFromDatabase(): LiveData<ProductsListEntity?> {
+        return roomProductsListDao.getAll()
     }
 }
