@@ -1,13 +1,21 @@
-package `in`.testpress.store.models
+package `in`.testpress.database
 
-data class ProductDetailResponse(
+import androidx.room.ColumnInfo
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
+data class ProductDetailEntity(
+    @PrimaryKey
+    var id: Int? = null,
+    @Embedded
+    var order: Orders? = null,
     var image: String? = null,
     var courses: List<Course?>? = null,
     var surl: String? = null,
     var title: String? = null,
     var furl: String? = null,
-    var id: Int? = null,
-    var order: Orders? = null,
     var prices: List<PricesItem?>? = null,
     var slug: String? = null,
     var endDate: String? = null,
@@ -16,34 +24,6 @@ data class ProductDetailResponse(
     var descriptionHtml: String? = null,
     var currentPrice: String? = null,
     var startDate: String? = null
-)
-
-data class Orders(
-    var date: String? = null,
-    var voucher: Voucher? = null,
-    var checksum: String? = null,
-    var id: Int? = null,
-    var zip: String? = null,
-    var amount: String? = null,
-    var apikey: String? = null,
-    var phone: String? = null,
-    var email: String? = null,
-    var name: String? = null,
-    var user: Int? = null,
-    var status: String? = null,
-    var amountWithoutDiscounts: String? = null,
-    var accessCode: String? = null,
-    var productInfo: String? = null,
-    var pgUrl: String? = null,
-    var landMark: String? = null,
-    var amountWithoutProcessingFee: String? = null,
-    var shippingAddress: String? = null,
-    var orderItems: List<OrderItems?>? = null,
-    var ipAddress: String? = null,
-    var encData: String? = null,
-    var usesTestpressPg: Boolean? = null,
-    var orderId: String? = null,
-    var mobileSdkHash: String? = null
 )
 
 data class Course(
@@ -79,3 +59,43 @@ data class PricesItem(
     var endDate: String? = null,
     var startDate: String? = null
 )
+
+data class Orders(
+    @Embedded
+    var voucher: Voucher? = null,
+    @ColumnInfo(name = "order_id")
+    var id: Int? = null,
+    var date: String? = null,
+    var checksum: String? = null,
+    var zip: String? = null,
+    var amount: String? = null,
+    var apikey: String? = null,
+    var phone: String? = null,
+    var email: String? = null,
+    var name: String? = null,
+    var user: Int? = null,
+    var status: String? = null,
+    var amountWithoutDiscounts: String? = null,
+    var accessCode: String? = null,
+    var productInfo: String? = null,
+    var pgUrl: String? = null,
+    var landMark: String? = null,
+    var amountWithoutProcessingFee: String? = null,
+    var shippingAddress: String? = null,
+    var orderItems: List<OrderItems?>? = null,
+    var ipAddress: String? = null,
+    var encData: String? = null,
+    var usesTestpressPg: Boolean? = null,
+    var orderId: String? = null,
+    var mobileSdkHash: String? = null
+)
+data class Voucher(
+    var code: String? = null
+)
+
+data class OrderItems(
+    var product: String? = null,
+    var quantity: Int? = null,
+    var price: String? = null
+)
+
