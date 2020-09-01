@@ -16,7 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_products_list.*
+import kotlinx.android.synthetic.main.activity_products_list.*
 
 class ProductListActivity: BaseToolBarActivity() {
 
@@ -29,13 +29,13 @@ class ProductListActivity: BaseToolBarActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_products_list)
+        setContentView(R.layout.activity_products_list)
         setActionBarTitle()
         initializeViews()
         initViewModel()
         getDataFromViewModel()
         initRecyclerView()
-        setOnClickListener()
+        setListeners()
     }
 
     private fun setActionBarTitle() {
@@ -115,10 +115,14 @@ class ProductListActivity: BaseToolBarActivity() {
         retryButton.visibility = View.VISIBLE
     }
 
-    private fun setOnClickListener() {
+    private fun setListeners() {
         retryButton.setOnClickListener {
             getDataFromViewModel()
-            initRecyclerView()
+        }
+
+        swipeToRefresh.setOnRefreshListener {
+            getDataFromViewModel()
+            swipeToRefresh.isRefreshing = false
         }
     }
 
