@@ -1,14 +1,19 @@
 package `in`.testpress.store.models
 
+import `in`.testpress.database.Course
+import `in`.testpress.database.Orders
+import `in`.testpress.database.PricesItem
+import `in`.testpress.database.ProductDetailEntity
+
 data class ProductDetailResponse(
     var image: String? = null,
-    var courses: List<Course?>? = null,
+    var courses: List<Courses?>? = null,
     var surl: String? = null,
     var title: String? = null,
     var furl: String? = null,
     var id: Int? = null,
-    var order: Orders? = null,
-    var prices: List<PricesItem?>? = null,
+    var order: Order? = null,
+    var prices: List<Prices?>? = null,
     var slug: String? = null,
     var endDate: String? = null,
     var paymentLink: String? = null,
@@ -18,7 +23,7 @@ data class ProductDetailResponse(
     var startDate: String? = null
 )
 
-data class Orders(
+data class Order(
     var date: String? = null,
     var voucher: Voucher? = null,
     var checksum: String? = null,
@@ -46,7 +51,7 @@ data class Orders(
     var mobileSdkHash: String? = null
 )
 
-data class Course(
+data class Courses(
     var image: String? = null,
     var examsCount: Int? = null,
     var created: String? = null,
@@ -71,7 +76,7 @@ data class Course(
     var externalLinkLabel: String? = null
 )
 
-data class PricesItem(
+data class Prices(
     var id: Int? = null,
     var name: String? = null,
     var price: String? = null,
@@ -79,3 +84,23 @@ data class PricesItem(
     var endDate: String? = null,
     var startDate: String? = null
 )
+
+fun ProductDetailResponse.asDatabaseModel(): ProductDetailEntity {
+    return ProductDetailEntity(
+            image = this.image,
+            id = this.id,
+            courses = this.courses as  List<Course?>,
+            surl = this.surl,
+            title = this.title,
+            furl = this.furl,
+            order = this.order as Orders,
+            prices = this.prices as List<PricesItem?>,
+            slug = this.slug,
+            endDate = this.endDate,
+            paymentLink = this.paymentLink,
+            buyNowText = this.buyNowText,
+            descriptionHtml = this.descriptionHtml,
+            currentPrice = this.currentPrice,
+            startDate = this.startDate
+    )
+}
