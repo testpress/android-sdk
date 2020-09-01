@@ -62,10 +62,6 @@ class ProductListActivity: BaseToolBarActivity() {
         }).get(ProductsListViewModel::class.java)
     }
 
-    private fun isInternetConnected(): Boolean {
-        return InternetConnectivityChecker.isConnected(this)
-    }
-
     private fun getDataFromViewModel() {
         productsListViewModel.loadProductsList(isInternetConnected()).observe(this, Observer { resource ->
             when (resource.status) {
@@ -87,6 +83,10 @@ class ProductListActivity: BaseToolBarActivity() {
                 Status.LOADING -> progressbar.visibility = View.VISIBLE
             }
         })
+    }
+
+    private fun isInternetConnected(): Boolean {
+        return InternetConnectivityChecker.isConnected(this)
     }
 
     private fun initRecyclerView() {
