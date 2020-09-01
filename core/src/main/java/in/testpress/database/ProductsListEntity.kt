@@ -1,18 +1,17 @@
 package `in`.testpress.database
 
-import `in`.testpress.util.Converters
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
 
 @Entity
 data class ProductsListEntity(
-    @PrimaryKey(autoGenerate = true)
-    var id: Long? = null,
-    @field:TypeConverters(Converters::class)
-    var courses: List<CoursesItem>? = null,
-    @field:TypeConverters(Converters::class)
-    var products: List<ProductsItem>? = null
+     @PrimaryKey(autoGenerate = true)
+     var id: Long? = null,
+     @ColumnInfo(name = "courses")
+     var courses: List<CoursesItem>? = null,
+     @ColumnInfo(name = "products")
+     var products: List<ProductsItem>? = null
 )
 
 data class CoursesItem(
