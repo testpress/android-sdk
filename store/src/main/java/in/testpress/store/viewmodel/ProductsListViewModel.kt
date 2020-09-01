@@ -9,17 +9,7 @@ import androidx.lifecycle.ViewModel
 
 class ProductsListViewModel(val repository: ProductsListRepository): ViewModel() {
 
-    fun loadProductsList(): LiveData<Resource<ProductsListEntity>> {
-        Log.e("TAGG net", internetIsConnected().toString())
-        return repository.fetch(internetIsConnected())
-    }
-
-    private fun internetIsConnected(): Boolean {
-        return try {
-            val command = "ping -c 1 google.com"
-            Runtime.getRuntime().exec(command).waitFor() == 0
-        } catch (e: Exception) {
-            false
-        }
+    fun loadProductsList(forceFetch: Boolean): LiveData<Resource<ProductsListEntity>> {
+        return repository.fetch(forceFetch)
     }
 }
