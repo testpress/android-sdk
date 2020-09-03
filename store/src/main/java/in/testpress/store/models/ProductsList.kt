@@ -1,14 +1,6 @@
 package `in`.testpress.store.models
 
 data class ProductsList(
-	val next: String? = null,
-	val perPage: Int? = null,
-	val previous: String? = null,
-	val count: Int? = null,
-	val results: Results? = null
-)
-
-data class Results(
 	val courses: List<CoursesItem?>? = null,
 	val prices: List<PricesItem?>? = null,
 	val products: List<ProductsItem?>? = null
