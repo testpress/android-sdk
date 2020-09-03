@@ -18,8 +18,7 @@ object Converters {
     @TypeConverter
     @JvmStatic
     fun coursesItemToString(courses: List<CoursesItem?>?): String? {
-        val gson = Gson()
-        return gson.toJson(courses)
+        return Gson().toJson(courses)
     }
 
     @TypeConverter
@@ -32,7 +31,6 @@ object Converters {
     @TypeConverter
     @JvmStatic
     fun productsItemToString(products: List<ProductsItem?>?): String? {
-        val gson = Gson()
-        return gson.toJson(products)
+        return Gson().toJson(products)
     }
 }
