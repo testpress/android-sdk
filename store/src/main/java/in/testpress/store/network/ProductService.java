@@ -8,6 +8,8 @@ import in.testpress.network.RetrofitCall;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.Product;
 
+import in.testpress.store.models.ProductDetailResponse;
+import in.testpress.store.models.ProductsList;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.ProductsListResponse;
 import retrofit2.http.Body;
@@ -40,6 +42,11 @@ public interface ProductService {
             @Path(value = "order_id", encoded = true) int orderId,
             @Body HashMap<String, Object> arguments);
 
+    @GET(TestpressStoreApiClient.V4_PRODUCTS_LIST_PATH)
+    RetrofitCall<in.testpress.store.models.ProductsListResponse> getProductsList();
+
+    @GET(TestpressStoreApiClient.V4_PRODUCTS_LIST_PATH + "{product_slug}")
+    RetrofitCall<ProductDetailResponse> getProductDetail(
+            @Path(value = "product_slug") String productUrlFrag);
+
 }
-
-
