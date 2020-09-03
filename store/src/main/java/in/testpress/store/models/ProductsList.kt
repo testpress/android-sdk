@@ -14,15 +14,6 @@ data class Results(
 	val products: List<ProductsItem?>? = null
 )
 
-data class PricesItem(
-	val endDate: String? = null,
-	val price: String? = null,
-	val name: String? = null,
-	val id: Int? = null,
-	val validity: Any? = null,
-	val startDate: String? = null
-)
-
 data class ProductsItem(
 	val endDate: String? = null,
 	val image: String? = null,
