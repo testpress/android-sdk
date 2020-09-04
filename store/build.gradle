@@ -32,6 +32,11 @@ dependencies {
 
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
+    testImplementation rootProject.powermockJunit
+    testImplementation rootProject.roboelectric
+    testImplementation rootProject.androidxCore
+    testImplementation rootProject.mockServer
+    testImplementation "androidx.arch.core:core-testing:2.1.0"
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
