@@ -13,6 +13,7 @@ import in.testpress.network.TestpressApiClient;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
+import in.testpress.store.models.ProductListResponse;
 import in.testpress.store.models.ProductsList;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.ProductsListResponse;
@@ -66,8 +67,8 @@ public class TestpressStoreApiClient extends TestpressApiClient {
         return getProductService().orderConfirm(order.getId(), orderParameters);
     }
 
-    public RetrofitCall<ApiResponse<ProductsList>> getProductsList(Map<String, Object> queryParams) {
-        return getProductService().getProductsList(queryParams);
+    public RetrofitCall<ApiResponse<ProductListResponse>> getProductsList() {
+        return getProductService().getProductsList();
     }
 
 }
