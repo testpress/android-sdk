@@ -6,6 +6,7 @@ import `in`.testpress.network.Resource
 import `in`.testpress.course.util.RetrofitCallMock
 import `in`.testpress.course.util.getOrAwaitValue
 import `in`.testpress.course.util.mock
+import `in`.testpress.network.NetworkBoundResource
 import `in`.testpress.network.RetrofitCall
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
