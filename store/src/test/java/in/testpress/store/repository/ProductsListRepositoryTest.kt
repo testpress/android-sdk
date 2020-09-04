@@ -2,11 +2,9 @@ package `in`.testpress.store.repository
 
 import `in`.testpress.database.ProductsListEntity
 import `in`.testpress.store.network.NetworkTestMixin
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import org.junit.Assert
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
