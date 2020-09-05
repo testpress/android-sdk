@@ -6,9 +6,9 @@ import `in`.testpress.store.repository.ProductsListRepository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 
-class ProductsListViewModel(val repository: ProductsListRepository): ViewModel() {
+class ProductsListViewModel(private val productsListRepository: ProductsListRepository): ViewModel() {
 
-    fun loadProductsList(forceFetch: Boolean): LiveData<Resource<ProductsListEntity>> {
-        return repository.fetch(forceFetch)
+    fun load(forceFetch: Boolean): LiveData<Resource<ProductsListEntity?>> {
+        return productsListRepository.fetch(forceFetch)
     }
 }

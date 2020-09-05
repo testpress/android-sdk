@@ -4,8 +4,7 @@ import `in`.testpress.util.Converters
 import android.content.Context
 import androidx.room.*
 
-
-@Database(version = 5,
+@Database(version = 6,
         entities = [
             ContentEntity::class, OfflineVideo::class,
             ProductsListEntity::class
