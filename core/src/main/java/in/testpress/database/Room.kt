@@ -4,10 +4,10 @@ import `in`.testpress.util.Converters
 import android.content.Context
 import androidx.room.*
 
-
-@Database(version = 6,
+@Database(version = 5,
         entities = [
-            ContentEntity::class, OfflineVideo::class,
+            ContentEntity::class,
+            OfflineVideo::class,
             ProductsListEntity::class
 ])
 @TypeConverters(Converters::class)
@@ -23,7 +23,7 @@ abstract class TestpressDatabase: RoomDatabase() {
             synchronized(TestpressDatabase::class.java) {
                 if (!::INSTANCE.isInitialized) {
                     INSTANCE = Room.databaseBuilder(context.applicationContext,
-                            TestpressDatabase::class.java, "testpress-database").fallbackToDestructiveMigration().build()
+                            TestpressDatabase::class.java, "testpress-database").build()
                 }
             }
             return INSTANCE
