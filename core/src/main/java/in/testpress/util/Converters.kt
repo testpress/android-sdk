@@ -17,8 +17,7 @@ object Converters {
     @TypeConverter
     @JvmStatic
     fun coursesItemToString(courses: List<CoursesItem?>?): String? {
-        val gson = Gson()
-        return gson.toJson(courses)
+        return Gson().toJson(courses)
     }
 
     @TypeConverter
@@ -31,15 +30,13 @@ object Converters {
     @TypeConverter
     @JvmStatic
     fun productsItemToString(products: List<ProductsItem?>?): String? {
-        val gson = Gson()
-        return gson.toJson(products)
+        return Gson().toJson(products)
     }
 
     @TypeConverter
     @JvmStatic
     fun courseToString(course: List<Course?>?): String? {
-        val gson = Gson()
-        return gson.toJson(course)
+        return Gson().toJson(course)
     }
 
     @TypeConverter
@@ -52,8 +49,7 @@ object Converters {
     @TypeConverter
     @JvmStatic
     fun pricesItemToString(prices: List<PricesItem?>?): String? {
-        val gson = Gson()
-        return gson.toJson(prices)
+        return Gson().toJson(prices)
     }
 
     @TypeConverter
@@ -66,8 +62,7 @@ object Converters {
     @TypeConverter
     @JvmStatic
     fun orderItemsToString(ordersItem: List<OrderItems?>?): String? {
-        val gson = Gson()
-        return gson.toJson(ordersItem)
+        return Gson().toJson(ordersItem)
     }
 
     @TypeConverter
