@@ -12,6 +12,7 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
         versionName VERSION_NAME
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -32,6 +33,7 @@ dependencies {
     def core_version = "1.2.0"
     def core_testing_version = "2.1.0"
     def room_version = "2.2.4"
+    def multi_dex_version = "2.0.1"
     api rootProject.design
     api rootProject.retrofit2
     api rootProject.gsonConverter
@@ -62,6 +64,7 @@ dependencies {
     implementation "androidx.arch.core:core-runtime:2.1.0"
     implementation "androidx.core:core-ktx:$core_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "androidx.multidex:multidex:$multi_dex_version"
     api "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutine_version"
