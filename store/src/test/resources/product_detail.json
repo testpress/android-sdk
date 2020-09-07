@@ -1,0 +1,78 @@
+{
+  "id": 66,
+  "title": "Soft Skills",
+  "slug": "soft-skills",
+  "description_html": "<html><body><p>This course help you to get the soft skills </p>\n</body></html>",
+  "image": "https://media.testpress.in/i/189189f925444d48abf627bbe17f73d6.png",
+  "start_date": null,
+  "end_date": null,
+  "buy_now_text": "Buy Now",
+  "surl": null,
+  "furl": null,
+  "prices": [
+    {
+      "id": 70,
+      "name": "price",
+      "price": "100000.00",
+      "validity": null,
+      "start_date": "2020-07-06",
+      "end_date": "2020-11-13"
+    },
+    {
+      "id": 69,
+      "name": "qw",
+      "price": "5430.00",
+      "validity": null,
+      "start_date": "2020-07-07",
+      "end_date": "2020-09-11"
+    },
+    {
+      "id": 67,
+      "name": "Price",
+      "price": "10000.00",
+      "validity": null,
+      "start_date": "2020-07-20",
+      "end_date": "2020-08-06"
+    }
+  ],
+  "courses": [
+
+  ],
+  "current_price": "100000.00",
+  "payment_link": "",
+  "order": {
+    "id": 513,
+    "order_id": "SANDBO513",
+    "date": "2020-08-24T10:14:16.521981Z",
+    "user": 143,
+    "status": "Processing",
+    "email": "karthik@testpress.in",
+    "name": "ChikkiOkay",
+    "ip_address": "223.181.235.67",
+    "phone": "981232132",
+    "shipping_address": "sasd,\nasfasf,\nChennai - 123456789.\nTamil Nadu\nPhone: 981232132",
+    "order_items": [
+      {
+        "product": "soft-skills",
+        "quantity": 1,
+        "price": "90000.00"
+      }
+    ],
+    "amount": "94860.00",
+    "amount_without_discounts": "104860.00",
+    "amount_without_processing_fee": "90000.00",
+    "checksum": "",
+    "mobile_sdk_hash": "",
+    "apikey": "",
+    "zip": "123456789",
+    "land_mark": "",
+    "uses_testpress_pg": true,
+    "pg_url": "",
+    "product_info": "Soft Skills",
+    "enc_data": null,
+    "access_code": "",
+    "voucher": {
+      "code": "SECOND"
+    }
+  }
+}
