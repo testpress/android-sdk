@@ -31,7 +31,7 @@ public class ProductsListAdapter extends SingleTypeAdapter<Product> {
     @Override
     protected int[] getChildViewIds() {
         return new int[] { R.id.title, R.id.total_exams, R.id.total_notes, R.id.price,
-                R.id.categories, R.id.thumbnail_image };
+                R.id.totalDocs, R.id.thumbnail_image };
     }
 
     @Override

@@ -1,39 +1,39 @@
 package `in`.testpress.store.models
 
 data class CouponCodeResponse(
-    val phone: String? = null,
-    val email: String? = null,
-    val id: Int? = null,
-    val user: Int? = null,
-    val amount: String? = null,
-    val apikey: String? = null,
-    val zip: String? = null,
-    val status: String? = null,
-    val voucher: Voucher? = null,
-    val name: String? = null,
-    val date: String? = null,
-    val checksum: String? = null,
-    val amountWithoutDiscounts: String? = null,
-    val accessCode: String? = null,
-    val productInfo: String? = null,
-    val pgUrl: String? = null,
-    val landMark: String? = null,
-    val amountWithoutProcessingFee: String? = null,
-    val shippingAddress: String? = null,
-    val orderItems: List<OrderItemsItem?>? = null,
-    val ipAddress: String? = null,
-    val encData: String? = null,
-    val usesTestpressPg: Boolean? = null,
-    val orderId: String? = null,
-    val mobileSdkHash: String? = null
+    var phone: String? = null,
+    var email: String? = null,
+    var id: Int? = null,
+    var user: Int? = null,
+    var amount: String? = null,
+    var apikey: String? = null,
+    var zip: String? = null,
+    var status: String? = null,
+    var voucher: Voucher? = null,
+    var name: String? = null,
+    var date: String? = null,
+    var checksum: String? = null,
+    var amountWithoutDiscounts: String? = null,
+    var accessCode: String? = null,
+    var productInfo: String? = null,
+    var pgUrl: String? = null,
+    var landMark: String? = null,
+    var amountWithoutProcessingFee: String? = null,
+    var shippingAddress: String? = null,
+    var orderItems: List<OrderItems?>? = null,
+    var ipAddress: String? = null,
+    var encData: String? = null,
+    var usesTestpressPg: Boolean? = null,
+    var orderId: String? = null,
+    var mobileSdkHash: String? = null
 )
 
 data class Voucher(
-    val code: String? = null
+    var code: String? = null
 )
 
-data class OrderItemsItem(
-    val product: String? = null,
-    val quantity: Int? = null,
-    val price: String? = null
+data class OrderItems(
+    var product: String? = null,
+    var quantity: Int? = null,
+    var price: String? = null
 )
