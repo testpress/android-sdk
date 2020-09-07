@@ -121,7 +121,7 @@ class QuizReviewFragment: Fragment() {
 
                 setDifficulty()
 
-                if (instituteSettings.isGrowthHackEnabled || instituteSettings.baseUrl.contains("edzorb")) {
+                if (instituteSettings.appToolbarLogo != null) {
                     webViewUtils.addWatermark(instituteSettings.appToolbarLogo)
                 }
             }

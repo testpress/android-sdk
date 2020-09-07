@@ -5,17 +5,17 @@ import `in`.testpress.database.ProductsItem
 import `in`.testpress.database.ProductsListEntity
 
 data class ProductListResponse(
-		val next: String? = null,
-		val perPage: Int? = null,
-		val previous: String? = null,
-		val count: Int? = null,
-		val results: ProductsList? = null
+	var next: String? = null,
+	var perPage: Int? = null,
+	var previous: String? = null,
+	var count: Int? = null,
+	var results: ProductsList? = null
 )
 
 data class ProductsList(
-		val courses: List<CoursesItem>? = null,
-		val prices: List<PricesItem>? = null,
-		val products: List<ProductsItem>? = null
+	var courses: List<CoursesItem>? = null,
+	var prices: List<PricesItem>? = null,
+	var products: List<ProductsItem>? = null
 )
 
 fun ProductsList.asDatabaseModel(): ProductsListEntity {
