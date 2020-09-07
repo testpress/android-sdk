@@ -16,8 +16,8 @@ class ProductDetailRepository(val context: Context) {
 
     private val roomProductDetailDao = TestpressDatabase(context).productDetailDao()
 
-    fun fetch(forceRefresh: Boolean = false, productSlug: String): LiveData<Resource<ProductDetailEntity>> {
-        return object : NetworkBoundResource<ProductDetailEntity, ProductDetailResponse>() {
+    fun fetch(forceRefresh: Boolean = false, productSlug: String): LiveData<Resource<ProductDetailEntity?>> {
+        return object : NetworkBoundResource<ProductDetailEntity?, ProductDetailResponse>() {
             override fun saveNetworkResponseToDB(item: ProductDetailResponse) {
                 saveNetworkResponseToDatabase(item)
             }
@@ -26,12 +26,8 @@ class ProductDetailRepository(val context: Context) {
                 return forceRefresh || data == null
             }
 
-            override fun loadFromDb(): LiveData<ProductDetailEntity> {
-                val liveData = MediatorLiveData<ProductDetailEntity>()
-                liveData.addSource(fetchFromDatabase()) {
-                    liveData.postValue(it)
-                }
-                return liveData
+            override fun loadFromDb(): LiveData<ProductDetailEntity?> {
+                return fetchFromDatabase()
             }
 
             override fun createCall(): RetrofitCall<ProductDetailResponse> {

@@ -8,6 +8,7 @@ import org.junit.Assert
 import org.junit.Test
 
 class ProductDetailRepositoryTest: NetworkTestMixin() {
+
     @Test
     fun shouldFetchReturnsNetworkCallNeededOrNot() {
         var forceFetch = false
