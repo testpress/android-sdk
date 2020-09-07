@@ -8,7 +8,4 @@ import androidx.room.Query
 interface ProductDetailDao: BaseDao<ProductDetailEntity> {
     @Query("SELECT * FROM productdetailentity")
     fun getAll(): LiveData<ProductDetailEntity?>
-
-    @Query("SELECT * from productdetailentity where id = :id LIMIT 1")
-    fun findById(id: Long): LiveData<ProductDetailEntity?>
 }
