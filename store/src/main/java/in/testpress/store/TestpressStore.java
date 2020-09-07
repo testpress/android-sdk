@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentActivity;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.store.ui.ProductDetailsActivity;
+import in.testpress.store.ui.ProductListActivity;
 import in.testpress.store.ui.ProductListFragment;
 import in.testpress.store.ui.ProductsListActivity;
 import in.testpress.util.Assert;
@@ -69,7 +70,7 @@ public class TestpressStore {
         Assert.assertNotNull("Activity must not be null.", activity);
 
         init(activity.getApplicationContext(), testpressSession);
-        Intent intent = new Intent(activity, ProductsListActivity.class);
+        Intent intent = new Intent(activity, ProductListActivity.class);
         intent = populateIntent(intent, activity);
         activity.startActivityForResult(intent, STORE_REQUEST_CODE);
     }
