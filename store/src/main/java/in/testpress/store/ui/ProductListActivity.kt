@@ -6,6 +6,7 @@ import `in`.testpress.store.R
 import `in`.testpress.store.repository.ProductsListRepository
 import `in`.testpress.store.viewmodel.ProductsListViewModel
 import `in`.testpress.ui.BaseToolBarActivity
+import `in`.testpress.util.InternetConnectivityChecker
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -62,7 +63,7 @@ class ProductListActivity: BaseToolBarActivity() {
     }
 
     private fun getDataFromViewModel() {
-        productsListViewModel.loadProductsList().observe(this, Observer { resource ->
+        productsListViewModel.load(isInternetConnected()).observe(this, Observer { resource ->
             when (resource.status) {
                 Status.SUCCESS -> {
                     productsListAdapter.setData(resource.data?.courses, resource.data?.products)
@@ -82,6 +83,10 @@ class ProductListActivity: BaseToolBarActivity() {
                 Status.LOADING -> progressbar.visibility = View.VISIBLE
             }
         })
+    }
+
+    private fun isInternetConnected(): Boolean {
+        return InternetConnectivityChecker.isConnected(this)
     }
 
     private fun initRecyclerView() {
