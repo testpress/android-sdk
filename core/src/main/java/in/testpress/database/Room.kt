@@ -1,15 +1,20 @@
 package `in`.testpress.database
 
+import `in`.testpress.util.Converters
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.*
 
-
-@Database(version = 4, entities = [ContentEntity::class, OfflineVideo::class])
+@Database(version = 5,
+        entities = [
+            ContentEntity::class,
+            OfflineVideo::class,
+            ProductsListEntity::class
+])
+@TypeConverters(Converters::class)
 abstract class TestpressDatabase: RoomDatabase() {
     abstract fun contentDao(): ContentDao
     abstract fun offlineVideoDao(): OfflineVideoDao
+    abstract fun productsListDao(): ProductsListDao
 
     companion object {
         private lateinit var INSTANCE: TestpressDatabase
