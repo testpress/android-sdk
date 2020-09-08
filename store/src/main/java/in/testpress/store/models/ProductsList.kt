@@ -1,9 +1,26 @@
 package `in`.testpress.store.models
 
 data class ProductsList(
+	val next: String? = null,
+	val perPage: Int? = null,
+	val previous: String? = null,
+	val count: Int? = null,
+	val results: Results? = null
+)
+
+data class Results(
 	val courses: List<CoursesItem?>? = null,
 	val prices: List<PricesItem?>? = null,
 	val products: List<ProductsItem?>? = null
+)
+
+data class PricesItem(
+	val endDate: String? = null,
+	val price: String? = null,
+	val name: String? = null,
+	val id: Int? = null,
+	val validity: Any? = null,
+	val startDate: String? = null
 )
 
 data class ProductsItem(
