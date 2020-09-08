@@ -10,6 +10,8 @@ import org.mockito.Mockito
 
 open class ProductDetailViewModelTestMixin {
 
+    var isAccessCodeEnabled = false
+
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
@@ -28,5 +30,9 @@ open class ProductDetailViewModelTestMixin {
             fun <T : Any?> MutableLiveData<T>.default(initialValue: T) = apply { setValue(initialValue) }
             return MutableLiveData<Resource<ProductDetailEntity>>().default(resource)
         }
+    }
+
+    fun enableHaveAccessCode() {
+        isAccessCodeEnabled = true
     }
 }

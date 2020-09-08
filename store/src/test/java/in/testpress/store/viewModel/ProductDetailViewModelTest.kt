@@ -10,15 +10,30 @@ import org.junit.runners.JUnit4
 class ProductDetailViewModelTest: ProductDetailViewModelTestMixin() {
 
     @Test
-    fun fetchShouldReturnResponseOfProductDetail() {
-        var expectedResponse = Resource.success(null)
+    fun fetchShouldReturnSuccessResponseWhenItIsSuccess() {
+        val expectedResponse = Resource.success(null)
         repository.setResponse(Resource.success(null))
 
         Assert.assertEquals(expectedResponse,repository.fetch().value)
+    }
 
-        expectedResponse = Resource.loading(null)
+    @Test
+    fun fetchShouldReturnLoadingWhenItsBeenLoading() {
+        val expectedResponse = Resource.loading(null)
         repository.setResponse(Resource.loading(null))
 
         Assert.assertEquals(expectedResponse,repository.fetch().value)
+    }
+
+    @Test
+    fun isAccessCodeEnabledReturnsFalseWhenItIsDisabled() {
+        Assert.assertFalse(isAccessCodeEnabled)
+    }
+
+    @Test
+    fun isAccessCodeEnabledReturnsTrueWhenItIsEnabled() {
+        enableHaveAccessCode()
+
+        Assert.assertTrue(isAccessCodeEnabled)
     }
 }
