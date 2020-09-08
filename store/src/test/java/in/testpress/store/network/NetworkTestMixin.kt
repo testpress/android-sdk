@@ -35,7 +35,7 @@ open class NetworkTestMixin {
         mockWebServer.shutdown()
     }
 
-    fun getProductListFromFile(filename: String): String {
+    fun getResponseFromFile(filename: String): String {
         val inputStream = ClassLoader.getSystemResourceAsStream(filename)
         return String(ByteStreams.toByteArray(inputStream))
     }
