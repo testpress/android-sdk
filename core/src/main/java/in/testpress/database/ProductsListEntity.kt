@@ -35,16 +35,16 @@ data class CoursesItem(
 )
 
 data class ProductsItem(
-        var id: Int? = null,
-        var endDate: String? = null,
-        var image: String? = null,
-        var surl: String? = null,
-        var title: String? = null,
-        var paymentLink: String? = null,
-        var buyNowText: String? = null,
-        var furl: String? = null,
-        var descriptionHtml: String? = null,
-        var currentPrice: String? = null,
-        var slug: String? = null,
-        var startDate: String? = null
+    var id: Int? = null,
+    var endDate: String? = null,
+    var image: String? = null,
+    var surl: String? = null,
+    var title: String? = null,
+    var paymentLink: String? = null,
+    var buyNowText: String? = null,
+    var furl: String? = null,
+    var descriptionHtml: String? = null,
+    var currentPrice: String? = null,
+    var slug: String? = null,
+    var startDate: String? = null
 )
