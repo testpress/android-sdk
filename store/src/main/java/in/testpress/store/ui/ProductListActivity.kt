@@ -63,7 +63,7 @@ class ProductListActivity: BaseToolBarActivity() {
     }
 
     private fun getDataFromViewModel() {
-        productsListViewModel.loadProductsList(isInternetConnected()).observe(this, Observer { resource ->
+        productsListViewModel.load(isInternetConnected()).observe(this, Observer { resource ->
             when (resource.status) {
                 Status.SUCCESS -> {
                     productsListAdapter.setData(resource.data?.courses, resource.data?.products)

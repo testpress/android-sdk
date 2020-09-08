@@ -16,7 +16,7 @@
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:visibility="gone"
-        android:id="@+id/main_content"
+        android:id="@+id/productDetailView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -36,7 +36,7 @@
                 app:layout_scrollFlags="scroll|enterAlwaysCollapsed">
 
                 <ImageView
-                    android:id="@+id/thumbnailImage"
+                    android:id="@+id/thumbnail_image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"

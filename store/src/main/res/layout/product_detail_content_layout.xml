@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/testpress_horizontal_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <LinearLayout
+        android:id="@+id/product_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="40dp">
+
+        <TextView
+            android:id="@+id/productTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="6dp"
+            android:lineSpacingExtra="3dp"
+            android:lineSpacingMultiplier="1.25"
+            android:padding="5dp"
+            android:text="Grand tests - Series 1"
+            android:textColor="@color/testpress_black"
+            android:textSize="24sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/testpress_horizontal_margin">
+
+            <TextView
+                android:id="@+id/currentPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1500.00"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@color/price_text_green"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/actualPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="@dimen/testpress_horizontal_margin"
+                android:layout_marginLeft="@dimen/testpress_horizontal_margin"
+                android:lineSpacingMultiplier="1.43"
+                android:textSize="16sp"
+                tools:text="8000" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="6dp"
+            android:background="#F5F5F5"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingMultiplier="1.67"
+                android:padding="5dp"
+                android:text="Course details"
+                android:textAllCaps="true"
+                android:textColor="@color/testpress_black"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/totalExams"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="5dp"
+                android:drawableLeft="@drawable/ic_board"
+                android:drawablePadding="5dp"
+                android:lineSpacingMultiplier="1.67"
+                android:padding="5dp"
+                android:text="30 Exams"
+                android:textColor="@color/testpress_text_gray_dark"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/totalVideos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginTop="8dp"
+                android:drawableLeft="@drawable/ic_video"
+                android:drawablePadding="5dp"
+                android:lineSpacingMultiplier="1.67"
+                android:text="20 Videos"
+                android:textColor="@color/testpress_text_gray_dark"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/totalDocs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="8dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginLeft="4dp"
+                android:drawableLeft="@drawable/ic_document"
+                android:drawablePadding="5dp"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:text="10 Docs"
+                android:textColor="@color/testpress_text_gray_dark"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/haveAccessCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/testpress_horizontal_margin"
+                android:layout_marginLeft="2dp"
+                android:text="@string/testpress_have_access_code"
+                android:textColor="@color/testpress_green" />
+
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingMultiplier="1.5"
+                android:text="Description test goes here."
+                android:textSize="16sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

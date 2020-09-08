@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:padding="@dimen/testpress_horizontal_margin"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,40 +17,47 @@
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
+            android:text="Koncpt Online Grand Test TNPG- 2016"
             android:lineSpacingExtra="3dp"
-            android:lineSpacingMultiplier="1.25"
             android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@color/testpress_black"
-            android:textSize="24sp"
-            android:layout_marginHorizontal="6dp"
-            android:text="Grand tests - Series 1"
             android:padding="5dp"/>
 
-        <LinearLayout
+        <View xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:layout_marginBottom="8dp"
+              android:layout_marginTop="8dp"
+              android:background="#B6B6B6" />
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/testpress_horizontal_margin">
 
-            <TextView
-                android:id="@+id/currentPrice"
+            <ImageView
+                android:id="@+id/price_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1500.00"
-                android:textSize="24sp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:textColor="@color/price_text_green" />
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="@dimen/testpress_horizontal_margin"
+                android:layout_marginRight="@dimen/testpress_horizontal_margin"
+                android:src="@drawable/testpress_indian_rupee" />
 
             <TextView
+                android:id="@+id/price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_marginStart="@dimen/testpress_horizontal_margin"
                 android:layout_marginLeft="@dimen/testpress_horizontal_margin"
-                tools:text="8000"
-                android:textSize="16sp"
-                android:lineSpacingMultiplier="1.43" />
+                android:layout_toEndOf="@id/price_icon"
+                android:layout_toRightOf="@id/price_icon"
+                android:text="1500.00"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="#212121" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
