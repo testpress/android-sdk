@@ -6,7 +6,6 @@ import androidx.room.*
 @Dao
 interface ProductsListDao: BaseDao<ProductsListEntity> {
 
-    @Transaction
     @Query("SELECT * FROM productslistentity")
-    fun getAll(): LiveData<ProductsListEntity>
+    fun getAll(): LiveData<ProductsListEntity?>
 }
