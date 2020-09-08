@@ -15,23 +15,23 @@ data class ProductsListEntity(
 )
 
 data class CoursesItem(
-    var id: Int? = null,
-    var image: String? = null,
-    var examsCount: Int? = null,
-    var created: String? = null,
-    var description: String? = null,
-    var title: String? = null,
-    var chaptersCount: Int? = null,
-    var deviceAccessControl: String? = null,
-    var createdBy: Int? = null,
-    var enableDiscussions: Boolean? = null,
-    var url: String? = null,
-    var contentsCount: Int? = null,
-    var contentsUrl: String? = null,
-    var chaptersUrl: String? = null,
-    var modified: String? = null,
-    var videosCount: Int? = null,
-    var externalContentLink: String? = null
+        var id: Int? = null,
+        var image: String? = null,
+        var examsCount: Int? = null,
+        var created: String? = null,
+        var description: String? = null,
+        var title: String? = null,
+        var chaptersCount: Int? = null,
+        var deviceAccessControl: String? = null,
+        var createdBy: Int? = null,
+        var enableDiscussions: Boolean? = null,
+        var url: String? = null,
+        var contentsCount: Int? = null,
+        var contentsUrl: String? = null,
+        var chaptersUrl: String? = null,
+        var modified: String? = null,
+        var videosCount: Int? = null,
+        var externalContentLink: String? = null
 )
 
 data class ProductsItem(
