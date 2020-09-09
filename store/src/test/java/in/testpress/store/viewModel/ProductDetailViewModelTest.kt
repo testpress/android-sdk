@@ -10,7 +10,6 @@ import org.junit.runners.JUnit4
 class ProductDetailViewModelTest: ProductDetailViewModelTestMixin() {
 
     @Test
-<<<<<<< Updated upstream
     fun fetchShouldReturnSuccessResponseWhenItIsSuccess() {
         val expectedResponse = Resource.success(null)
         repository.setResponse(Resource.success(null))
@@ -21,20 +20,10 @@ class ProductDetailViewModelTest: ProductDetailViewModelTestMixin() {
     @Test
     fun fetchShouldReturnLoadingWhenItsBeenLoading() {
         val expectedResponse = Resource.loading(null)
-=======
-    fun fetchShouldReturnResponseOfProductDetail() {
-        var expectedResponse = Resource.success(null)
-        repository.setResponse(Resource.success(null))
-
-        Assert.assertEquals(expectedResponse,repository.fetch().value)
-
-        expectedResponse = Resource.loading(null)
->>>>>>> Stashed changes
         repository.setResponse(Resource.loading(null))
 
         Assert.assertEquals(expectedResponse,repository.fetch().value)
     }
-<<<<<<< Updated upstream
 
     @Test
     fun isAccessCodeEnabledReturnsFalseWhenItIsDisabled() {
@@ -47,6 +36,4 @@ class ProductDetailViewModelTest: ProductDetailViewModelTestMixin() {
 
         Assert.assertTrue(isAccessCodeEnabled)
     }
-=======
->>>>>>> Stashed changes
 }

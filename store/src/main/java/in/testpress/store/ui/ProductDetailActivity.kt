@@ -6,12 +6,10 @@ import `in`.testpress.core.TestpressSession
 import `in`.testpress.database.Course
 import `in`.testpress.database.ProductDetailEntity
 import `in`.testpress.enums.Status
-import `in`.testpress.exam.TestpressExam
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.store.R
 import `in`.testpress.store.TestpressStore
 import `in`.testpress.store.models.Product
-import `in`.testpress.store.models.ProductListResponse
 import `in`.testpress.store.repository.ProductDetailRepository
 import `in`.testpress.store.viewmodel.ProductDetailViewModel
 import `in`.testpress.ui.BaseToolBarActivity
@@ -45,6 +43,7 @@ class ProductDetailActivity : BaseToolBarActivity() {
     private lateinit var viewModel: ProductDetailViewModel
     private lateinit var product: ProductDetailEntity
     private var coursesList: List<Course?>? = null
+    val session: TestpressSession? = TestpressSdk.getTestpressSession(this)
 
     companion object {
         const val PRODUCT_SLUG = "productSlug"
@@ -102,11 +101,11 @@ class ProductDetailActivity : BaseToolBarActivity() {
 
     private fun handleSuccessResponse(response: ProductDetailEntity?) {
         response?.let {
-            setProductDetails(it)
+            setProductDetailsView(it)
         } ?: setEmptyProduct()
     }
 
-    private fun setProductDetails(product: ProductDetailEntity) {
+    private fun setProductDetailsView(product: ProductDetailEntity) {
         progressbar.visibility = View.GONE
         productDetailView.visibility = View.VISIBLE
         productTitle.text = product.title
@@ -116,7 +115,7 @@ class ProductDetailActivity : BaseToolBarActivity() {
         setActualPrice()
         setExamsCount()
         setContentsCount()
-        setDescription()
+        setDescriptionVisibility()
     }
 
     private fun setProductThumbnail() {
@@ -143,12 +142,8 @@ class ProductDetailActivity : BaseToolBarActivity() {
     }
 
     private fun setHaveAccessCode() {
-        val session: TestpressSession? = TestpressSdk.getTestpressSession(this)
         val settings: InstituteSettings? = session?.instituteSettings
         if (settings?.isAccessCodeEnabled == true) {
-            haveAccessCode.setOnClickListener {
-                TestpressExam.showExamsForAccessCode(this, session)
-            }
             haveAccessCode.visibility = View.VISIBLE
         } else {
             haveAccessCode.visibility = View.GONE
@@ -165,18 +160,22 @@ class ProductDetailActivity : BaseToolBarActivity() {
         }
     }
 
-    private fun setDescription() {
+    private fun setDescriptionVisibility() {
         if (product.descriptionHtml?.isEmpty() == true) {
             description.visibility = View.GONE
         } else {
             description.visibility = View.VISIBLE
-            val html = Html.fromHtml(product.descriptionHtml,
-                    UILImageGetter(description, this), null)
-            description.setText(
-                    ZoomableImageString.convertString(html, this, false),
-                    TextView.BufferType.SPANNABLE)
-            description.movementMethod = LinkMovementMethod.getInstance()
+            setDescriptionFromHtml()
         }
+    }
+
+    private fun setDescriptionFromHtml() {
+        val html = Html.fromHtml(product.descriptionHtml,
+                UILImageGetter(description, this), null)
+        description.setText(
+                ZoomableImageString.convertString(html, this, false),
+                TextView.BufferType.SPANNABLE)
+        description.movementMethod = LinkMovementMethod.getInstance()
     }
 
     private fun setEmptyProduct() {

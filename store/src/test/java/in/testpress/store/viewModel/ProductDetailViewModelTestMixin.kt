@@ -10,11 +10,8 @@ import org.mockito.Mockito
 
 open class ProductDetailViewModelTestMixin {
 
-<<<<<<< Updated upstream
     var isAccessCodeEnabled = false
 
-=======
->>>>>>> Stashed changes
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
@@ -34,11 +31,8 @@ open class ProductDetailViewModelTestMixin {
             return MutableLiveData<Resource<ProductDetailEntity>>().default(resource)
         }
     }
-<<<<<<< Updated upstream
 
     fun enableHaveAccessCode() {
         isAccessCodeEnabled = true
     }
-=======
->>>>>>> Stashed changes
 }

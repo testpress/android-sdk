@@ -1,5 +1,7 @@
 package `in`.testpress.util
 
+import `in`.testpress.database.CoursesItem
+import `in`.testpress.database.ProductsItem
 import `in`.testpress.database.*
 import androidx.room.TypeConverter
 import com.google.gson.Gson
