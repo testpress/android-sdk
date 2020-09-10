@@ -10,7 +10,6 @@ import `in`.testpress.store.models.asDatabaseModel
 import `in`.testpress.store.network.TestpressStoreApiClient
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 
 class ProductDetailRepository(val context: Context) {
 

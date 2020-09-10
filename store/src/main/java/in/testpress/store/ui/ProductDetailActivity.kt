@@ -6,6 +6,7 @@ import `in`.testpress.core.TestpressSession
 import `in`.testpress.database.Course
 import `in`.testpress.database.ProductDetailEntity
 import `in`.testpress.enums.Status
+import `in`.testpress.exam.TestpressExam
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.store.R
 import `in`.testpress.store.TestpressStore
@@ -41,7 +42,7 @@ class ProductDetailActivity : BaseToolBarActivity() {
     private lateinit var retryButton: Button
     private lateinit var eventsTrackerFacade: EventsTrackerFacade
     private lateinit var viewModel: ProductDetailViewModel
-    private lateinit var product: ProductDetailEntity
+    private var product: ProductDetailEntity? = null
     private var coursesList: List<Course?>? = null
     val session: TestpressSession? = TestpressSdk.getTestpressSession(this)
 
@@ -56,6 +57,7 @@ class ProductDetailActivity : BaseToolBarActivity() {
         getDataFromBundle()
         initializeViews()
         initViewModel()
+        loadProductDetails()
         setClickListeners()
     }
 
@@ -111,26 +113,26 @@ class ProductDetailActivity : BaseToolBarActivity() {
         productTitle.text = product.title
         buyButton.text = product.buyNowText
         currentPrice.text = product.currentPrice
-        setProductThumbnail()
-        setActualPrice()
-        setExamsCount()
-        setContentsCount()
-        setDescriptionVisibility()
+        setProductThumbnail(product)
+        setActualPrice(product)
+        setExamsCount(product)
+        setContentsCount(product)
+        setDescriptionVisibility(product)
     }
 
-    private fun setProductThumbnail() {
+    private fun setProductThumbnail(product: ProductDetailEntity) {
         val imageLoader = ImageUtils.initImageLoader(this)
         val options = ImageUtils.getPlaceholdersOption()
         imageLoader.displayImage(product.image, thumbnailImage, options)
     }
 
-    private fun setActualPrice() {
+    private fun setActualPrice(product: ProductDetailEntity) {
         actualPrice.visibility = View.VISIBLE
         actualPrice.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
         actualPrice.text = product.prices?.get(0)?.price ?: ""
     }
 
-    private fun setExamsCount() {
+    private fun setExamsCount(product: ProductDetailEntity) {
         if (coursesList?.isNotEmpty() == true) {
             var examsCount = 0
             product.courses?.forEach {
@@ -144,13 +146,22 @@ class ProductDetailActivity : BaseToolBarActivity() {
     private fun setHaveAccessCode() {
         val settings: InstituteSettings? = session?.instituteSettings
         if (settings?.isAccessCodeEnabled == true) {
-            haveAccessCode.visibility = View.VISIBLE
+            if (session != null) {
+                setAccessCodeClickListener(session)
+            }
+            accessCodeButton.visibility = View.VISIBLE
         } else {
-            haveAccessCode.visibility = View.GONE
+            accessCodeButton.visibility = View.GONE
         }
     }
 
-    private fun setContentsCount() {
+    private fun setAccessCodeClickListener(session: TestpressSession) {
+        accessCodeButton.setOnClickListener {
+            TestpressExam.showExamsForAccessCode(this, session)
+        }
+    }
+
+    private fun setContentsCount(product: ProductDetailEntity) {
         if (product.courses?.isNotEmpty() == true) {
             var attachmentCount: Int = 0
             product.courses?.forEach {
@@ -160,16 +171,16 @@ class ProductDetailActivity : BaseToolBarActivity() {
         }
     }
 
-    private fun setDescriptionVisibility() {
+    private fun setDescriptionVisibility(product: ProductDetailEntity) {
         if (product.descriptionHtml?.isEmpty() == true) {
             description.visibility = View.GONE
         } else {
             description.visibility = View.VISIBLE
-            setDescriptionFromHtml()
+            setDescriptionFromHtml(product)
         }
     }
 
-    private fun setDescriptionFromHtml() {
+    private fun setDescriptionFromHtml(product: ProductDetailEntity) {
         val html = Html.fromHtml(product.descriptionHtml,
                 UILImageGetter(description, this), null)
         description.setText(
@@ -186,6 +197,7 @@ class ProductDetailActivity : BaseToolBarActivity() {
     }
 
     private fun handleException(exception: TestpressException) {
+        progressbar.visibility = View.GONE
         when {
             exception.isUnauthenticated -> {
                 setEmptyText(R.string.testpress_authentication_failed,

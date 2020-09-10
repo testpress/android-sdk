@@ -2,6 +2,7 @@ package `in`.testpress.course.util
 
 import `in`.testpress.course.R
 import `in`.testpress.course.util.ProductUtils.getPriceForProduct
+import `in`.testpress.store.ui.ProductDetailActivity
 import `in`.testpress.store.ui.ProductDetailsActivity
 import android.content.Context
 import android.content.Intent
@@ -20,8 +21,8 @@ object UIUtils {
         }
 
         button.setOnClickListener {
-            val intent = Intent(context, ProductDetailsActivity::class.java)
-            intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, productSlug)
+            val intent = Intent(context, ProductDetailActivity::class.java)
+            intent.putExtra(ProductDetailActivity.PRODUCT_SLUG, productSlug)
             context.startActivity(intent)
         }
     }

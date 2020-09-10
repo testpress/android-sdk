@@ -61,7 +61,7 @@ class ProductListAdapter: RecyclerView.Adapter<ProductListAdapter.ProductsListVi
         }
 
         private fun navigateToProductDetailActivity(productsItem: ProductsItem) {
-            val intent = Intent(itemView.context, ProductDetailsActivity::class.java)
+            val intent = Intent(itemView.context, ProductDetailActivity::class.java)
             intent.putExtra(PRODUCT_SLUG, productsItem.slug)
             itemView.context.startActivity(intent)
         }
