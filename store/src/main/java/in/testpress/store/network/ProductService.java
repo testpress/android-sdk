@@ -6,6 +6,7 @@ import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.Product;
+import in.testpress.store.models.ProductDetailResponse;
 import in.testpress.store.models.ProductListResponse;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.ProductsListResponse;
@@ -41,6 +42,8 @@ public interface ProductService {
     @GET(TestpressStoreApiClient.V4_PRODUCTS_LIST_PATH)
     RetrofitCall<ProductListResponse> getProductsList();
 
+    @GET(TestpressStoreApiClient.V4_PRODUCTS_LIST_PATH + "{product_slug}")
+    RetrofitCall<ProductDetailResponse> getProductDetail(
+            @Path(value = "product_slug") String productUrlFrag);
+
 }
-
-

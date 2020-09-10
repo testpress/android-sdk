@@ -8,13 +8,15 @@ import androidx.room.*
         entities = [
             ContentEntity::class,
             OfflineVideo::class,
-            ProductsListEntity::class
+            ProductsListEntity::class,
+            ProductDetailEntity::class
 ])
 @TypeConverters(Converters::class)
 abstract class TestpressDatabase: RoomDatabase() {
     abstract fun contentDao(): ContentDao
     abstract fun offlineVideoDao(): OfflineVideoDao
     abstract fun productsListDao(): ProductsListDao
+    abstract fun productDetailDao(): ProductDetailDao
 
     companion object {
         private lateinit var INSTANCE: TestpressDatabase

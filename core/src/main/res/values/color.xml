@@ -52,5 +52,7 @@
 
     <color name="testpress_blue_text">#3b99d8</color>
     <color name="testpress_blue_image">#3598db</color>
+    <color name="price_text_green">#00997F</color>
+    <color name="sky_blue_text">#1793E6</color>
 
 </resources>

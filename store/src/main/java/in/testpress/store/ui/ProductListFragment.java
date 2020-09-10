@@ -47,8 +47,8 @@ public class ProductListFragment extends PagedItemFragment<Product> {
 
     public void onListItemClick(ListView l, View v, int position, long id) {
         Product product = ((Product) l.getItemAtPosition(position));
-        Intent intent = new Intent(getActivity(), ProductDetailsActivity.class);
-        intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.getSlug());
+        Intent intent = new Intent(getActivity(), ProductDetailActivity.class);
+        intent.putExtra(ProductDetailActivity.PRODUCT_SLUG, product.getSlug());
         getActivity().startActivityForResult(intent, STORE_REQUEST_CODE);
     }
 

@@ -4,13 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:id="@+id/productContainer"
     android:paddingLeft="20dp"
     android:paddingRight="20dp"
     android:paddingBottom="20dp"
     android:paddingTop="20dp" >
 
     <ImageView
-        android:id="@+id/thumbnail_image"
+        android:id="@+id/thumbnailImage"
         android:layout_width="120dp"
         android:layout_height="99dp"
         android:layout_gravity="center"
@@ -19,12 +20,12 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
         <TextView
             android:id="@+id/title"
-            android:text="IAS Prelims Power Pack"
+            android:text="Grand tests - Series 1"
             android:layout_width="wrap_content"
             android:textSize="16sp"
             android:textColor="@color/testpress_black"
@@ -32,7 +33,8 @@
             android:ellipsize="end"
             android:layout_marginBottom="5dp"
             android:gravity="top"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:lineSpacingMultiplier="1.43" />
 
         <TextView
             android:id="@+id/price"
@@ -51,44 +53,49 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:id="@+id/counts" >
 
             <TextView
-                android:id="@+id/total_exams"
-                android:text="0 Exams"
+                android:id="@+id/totalExams"
+                android:text="30 Exams"
                 android:textSize="12sp"
-                android:drawableLeft="@drawable/ic_assignment_black_18dp"
+                android:drawableLeft="@drawable/ic_board"
                 android:drawablePadding="5dp"
-                android:textColor="@color/testpress_black"
+                android:textColor="@color/testpress_text_gray_dark"
                 android:layout_marginRight="5dp"
+                android:lineSpacingMultiplier="1.67"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:id="@+id/total_notes"
-                android:text="0 Documents"
+                android:id="@+id/totalVideos"
+                android:text="20 Videos"
                 android:textSize="12sp"
+                android:layout_marginStart="4dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/ic_book_black_18dp"
+                android:drawableLeft="@drawable/ic_video"
                 android:drawablePadding="5dp"
-                android:textColor="@color/testpress_black" />
+                android:lineSpacingMultiplier="1.67"
+                android:textColor="@color/testpress_text_gray_dark"
+                android:layout_marginLeft="4dp" />
 
         </LinearLayout>
 
         <TextView
-            android:id="@+id/categories"
-            android:drawableLeft="@drawable/ic_school_black_18dp"
+            android:id="@+id/totalDocs"
+            android:drawableLeft="@drawable/ic_document"
             android:drawablePadding="5dp"
-            android:text="AIIMS, AIPGMEE, NBE, PGI"
+            android:text="10 Docs"
             android:textSize="12sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:ellipsize="end"
             android:gravity="center_vertical"
-            android:textColor="@color/testpress_black"
+            android:textColor="@color/testpress_text_gray_dark"
             />
 
     </LinearLayout>

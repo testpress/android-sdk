@@ -37,6 +37,7 @@ dependencies {
     testImplementation rootProject.androidxCore
     testImplementation rootProject.mockServer
     testImplementation "androidx.arch.core:core-testing:2.1.0"
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
