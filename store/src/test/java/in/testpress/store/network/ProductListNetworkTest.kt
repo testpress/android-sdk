@@ -48,7 +48,7 @@ class ProductListNetworkTest : NetworkTestMixin() {
             val response = service.productsList.execute()
             mockWebServer.takeRequest()
 
-            Assert.assertEquals(10, response.body().count)
+            Assert.assertEquals(null, response.body().prices?.get(0)?.validity)
         }
     }
 }
