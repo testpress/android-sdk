@@ -10,15 +10,15 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class ProductListNetworkTest : NetworkTestMixin() {
 
-    private val productsListJson = getResponseFromFile("products_list.json")
+    private val productsJson = getResponseFromFile("products_list.json")
 
     @Test
     fun successNetworkCallShouldReturnSuccessResponse() {
-        val successResponse = MockResponse().setResponseCode(200).setBody(productsListJson)
+        val successResponse = MockResponse().setResponseCode(200).setBody(productsJson)
         mockWebServer.enqueue(successResponse)
 
         runBlocking {
-            val response = service.productsList.execute()
+            val response = service.product.execute()
             mockWebServer.takeRequest()
 
             Assert.assertTrue(response.isSuccessful)
@@ -27,11 +27,11 @@ class ProductListNetworkTest : NetworkTestMixin() {
 
     @Test
     fun networkFailureShouldReturnException() {
-        val failureResponse = MockResponse().setStatus("Exception").setResponseCode(404).setBody(productsListJson)
+        val failureResponse = MockResponse().setStatus("Exception").setResponseCode(404).setBody(productsJson)
         mockWebServer.enqueue(failureResponse)
 
         runBlocking {
-            val response = service.productsList.execute()
+            val response = service.product.execute()
             mockWebServer.takeRequest()
 
             Assert.assertEquals(404, response.code())
@@ -41,14 +41,14 @@ class ProductListNetworkTest : NetworkTestMixin() {
 
     @Test
     fun successNetworkCallShouldReturnCorrectProductsList() {
-        val successResponse = MockResponse().setResponseCode(200).setBody(productsListJson)
+        val successResponse = MockResponse().setResponseCode(200).setBody(productsJson)
         mockWebServer.enqueue(successResponse)
 
         runBlocking {
-            val response = service.productsList.execute()
+            val response = service.product.execute()
             mockWebServer.takeRequest()
 
-            Assert.assertEquals(null, response.body().prices?.get(0)?.validity)
+            Assert.assertEquals(null, response.body()?.prices?.get(1)?.validity)
         }
     }
 }

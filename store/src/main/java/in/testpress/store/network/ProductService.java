@@ -38,7 +38,7 @@ public interface ProductService {
             @Body HashMap<String, Object> arguments);
 
     @GET(TestpressStoreApiClient.V4_PRODUCTS_LIST_PATH)
-    RetrofitCall<NetworkProductResponse> getProductsList();
+    RetrofitCall<NetworkProductResponse> getProduct();
 
 }
 
