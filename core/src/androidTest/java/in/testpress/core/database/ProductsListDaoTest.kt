@@ -11,10 +11,11 @@ class ProductsListDaoTest: ProductListDaoTestMixin() {
 
     @Test
     fun readShouldReturnInsertedData() {
-        val productsList = productListFixture()
-        db.productsListDao().insert(productsList)
+        insertProductIntoDb()
+        insertCourseIntoDb()
+        db.productDao().insert(productCourseFixture())
 
-        val fetchedProducts = db.productsListDao().getAll().getOrAwaitValue()
-        Assert.assertEquals(productsList,fetchedProducts)
+        val fetchedProductCourse = db.productDao().getAll().getOrAwaitValue()
+        Assert.assertEquals(productWithCoursesFixture(),fetchedProductCourse)
     }
 }
