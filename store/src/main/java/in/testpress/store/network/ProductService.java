@@ -37,6 +37,9 @@ public interface ProductService {
             @Path(value = "order_id", encoded = true) int orderId,
             @Body HashMap<String, Object> arguments);
 
+    @GET(TestpressStoreApiClient.V4_PRODUCTS_LIST_PATH)
+    RetrofitCall<NetworkProductResponse> getProduct();
+
 }
 
 

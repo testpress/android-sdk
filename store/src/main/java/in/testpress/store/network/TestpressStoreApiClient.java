@@ -62,4 +62,8 @@ public class TestpressStoreApiClient extends TestpressApiClient {
         orderParameters.put("land_mark", order.getLandMark());
         return getProductService().orderConfirm(order.getId(), orderParameters);
     }
+
+    public RetrofitCall<NetworkProductResponse> getProductsList() {
+        return getProductService().getProduct();
+    }
 }
