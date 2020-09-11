@@ -6,7 +6,6 @@ import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.Product;
-import in.testpress.store.models.ProductListResponse;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.ProductsListResponse;
 import retrofit2.http.Body;
@@ -37,9 +36,6 @@ public interface ProductService {
     RetrofitCall<Order> orderConfirm(
             @Path(value = "order_id", encoded = true) int orderId,
             @Body HashMap<String, Object> arguments);
-
-    @GET(TestpressStoreApiClient.V4_PRODUCTS_LIST_PATH)
-    RetrofitCall<ProductListResponse> getProductsList();
 
 }
 

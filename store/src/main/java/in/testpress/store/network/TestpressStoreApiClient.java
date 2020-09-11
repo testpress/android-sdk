@@ -11,7 +11,6 @@ import in.testpress.network.TestpressApiClient;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
-import in.testpress.store.models.ProductListResponse;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.ProductsListResponse;
 
@@ -62,9 +61,5 @@ public class TestpressStoreApiClient extends TestpressApiClient {
         orderParameters.put("phone", order.getPhone());
         orderParameters.put("land_mark", order.getLandMark());
         return getProductService().orderConfirm(order.getId(), orderParameters);
-    }
-
-    public RetrofitCall<ProductListResponse> getProductsList() {
-        return getProductService().getProductsList();
     }
 }
