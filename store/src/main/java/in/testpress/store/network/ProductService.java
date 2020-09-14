@@ -14,18 +14,18 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
-import static in.testpress.store.network.TestpressStoreApiClient.ORDERS_PATH;
-import static in.testpress.store.network.TestpressStoreApiClient.ORDER_CONFIRM_PATH;
+import static in.testpress.store.network.StoreApiClient.ORDERS_PATH;
+import static in.testpress.store.network.StoreApiClient.ORDER_CONFIRM_PATH;
 
 public interface ProductService {
 
-    @GET(TestpressStoreApiClient.PRODUCTS_LIST_PATH)
+    @GET(StoreApiClient.PRODUCTS_LIST_PATH)
     RetrofitCall<TestpressApiResponse<Product>> getProducts(@QueryMap Map<String, Object> options);
 
-    @GET(TestpressStoreApiClient.V4_PRODUCTS_LIST_PATH)
+    @GET(StoreApiClient.V4_PRODUCTS_LIST_PATH)
     RetrofitCall<ApiResponse<ProductsListResponse>> getv4Products(@QueryMap Map<String, Object> options);
 
-    @GET(TestpressStoreApiClient.PRODUCTS_LIST_PATH + "{product_slug}")
+    @GET(StoreApiClient.PRODUCTS_LIST_PATH + "{product_slug}")
     RetrofitCall<Product> getProductDetails(
             @Path(value = "product_slug", encoded = true) String productUrlFrag);
 
@@ -37,7 +37,7 @@ public interface ProductService {
             @Path(value = "order_id", encoded = true) int orderId,
             @Body HashMap<String, Object> arguments);
 
-    @GET(TestpressStoreApiClient.V4_PRODUCTS_LIST_PATH)
+    @GET(StoreApiClient.V4_PRODUCTS_LIST_PATH)
     RetrofitCall<NetworkProductResponse> getProduct();
 
 }

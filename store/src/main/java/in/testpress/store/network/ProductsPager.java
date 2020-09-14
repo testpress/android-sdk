@@ -11,9 +11,9 @@ import static in.testpress.network.TestpressApiClient.PAGE;
 
 public class ProductsPager extends BaseResourcePager<Product> {
 
-    private TestpressStoreApiClient apiClient;;
+    private StoreApiClient apiClient;;
 
-    public ProductsPager(TestpressStoreApiClient apiClient) {
+    public ProductsPager(StoreApiClient apiClient) {
         this.apiClient = apiClient;
     }
 

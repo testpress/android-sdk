@@ -24,10 +24,9 @@ import in.testpress.exam.TestpressExam;
 import in.testpress.models.InstituteSettings;
 import in.testpress.store.R;
 import in.testpress.store.models.Product;
-import in.testpress.store.network.TestpressStoreApiClient;
+import in.testpress.store.network.StoreApiClient;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.EventsTrackerFacade;
-import in.testpress.util.FormatDate;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.UILImageGetter;
 import in.testpress.util.UIUtils;
@@ -79,7 +78,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     void loadProductDetails() {
         progressBar.setVisibility(View.VISIBLE);
-        new TestpressStoreApiClient(this).getProductDetail(productSlug)
+        new StoreApiClient(this).getProductDetail(productSlug)
                 .enqueue(new TestpressCallback<Product>() {
                     @Override
                     public void onSuccess(Product product) {

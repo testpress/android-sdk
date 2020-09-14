@@ -33,7 +33,7 @@ import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderConfirmErrorDetails;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
-import in.testpress.store.network.TestpressStoreApiClient;
+import in.testpress.store.network.StoreApiClient;
 import in.testpress.store.payu.PaymentModeActivity;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.EventsTrackerFacade;
@@ -43,7 +43,7 @@ import in.testpress.util.UIUtils;
 
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
-import static in.testpress.store.network.TestpressStoreApiClient.URL_PAYMENT_RESPONSE_HANDLER;
+import static in.testpress.store.network.StoreApiClient.URL_PAYMENT_RESPONSE_HANDLER;
 import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
 
 public class OrderConfirmActivity extends BaseToolBarActivity {
@@ -67,7 +67,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
     private List<OrderItem> orderItems;
     private Order order;
     private OrderItem orderItem = new OrderItem();
-    private TestpressStoreApiClient apiClient;
+    private StoreApiClient apiClient;
     private FBEventsTrackerFacade fbEventsLogger;
     private EventsTrackerFacade eventsTrackerFacade;
 
@@ -102,7 +102,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
         orderItem.setPrice(product.getPrice());
         orderItems = new ArrayList<>();
         orderItems.add(orderItem);
-        apiClient = new TestpressStoreApiClient(this);
+        apiClient = new StoreApiClient(this);
         eventsTrackerFacade = new EventsTrackerFacade(getApplicationContext());
         order();
     }

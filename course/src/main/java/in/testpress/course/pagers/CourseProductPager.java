@@ -1,15 +1,10 @@
 package in.testpress.course.pagers;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
-import in.testpress.models.greendao.Course;
-import in.testpress.models.greendao.Price;
 import in.testpress.models.greendao.Product;
-import in.testpress.store.network.TestpressStoreApiClient;
+import in.testpress.store.network.StoreApiClient;
 import in.testpress.v2_4.BaseResourcePager;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.ProductsListResponse;
@@ -19,8 +14,8 @@ import static in.testpress.network.TestpressApiClient.PAGE;
 
 public class CourseProductPager extends BaseResourcePager<ProductsListResponse, Product> {
 
-    private TestpressStoreApiClient apiClient;
-    public CourseProductPager(TestpressStoreApiClient apiClient) {
+    private StoreApiClient apiClient;
+    public CourseProductPager(StoreApiClient apiClient) {
         this.apiClient = apiClient;
     }
 

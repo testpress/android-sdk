@@ -14,7 +14,7 @@ import in.testpress.store.models.Product;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.ProductsListResponse;
 
-public class TestpressStoreApiClient extends TestpressApiClient {
+public class StoreApiClient extends TestpressApiClient {
 
     public static final String PRODUCTS_LIST_PATH =  "/api/v2.2/products/";
 
@@ -26,7 +26,7 @@ public class TestpressStoreApiClient extends TestpressApiClient {
 
     public static final String URL_PAYMENT_RESPONSE_HANDLER = "/payments/response/payu/";
 
-    public TestpressStoreApiClient(final Context context) {
+    public StoreApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
     }
     

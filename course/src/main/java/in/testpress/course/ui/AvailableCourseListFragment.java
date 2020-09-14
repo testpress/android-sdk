@@ -18,7 +18,7 @@ import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.Product;
 import in.testpress.models.greendao.ProductDao;
-import in.testpress.store.network.TestpressStoreApiClient;
+import in.testpress.store.network.StoreApiClient;
 import in.testpress.ui.BaseListViewFragment;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ThrowableLoader;
@@ -28,7 +28,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
     private CourseDao courseDao;
     private CourseProductPager pager;
     private ProductDao productDao;
-    protected TestpressStoreApiClient apiClient;
+    protected StoreApiClient apiClient;
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
@@ -39,7 +39,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        apiClient = new TestpressStoreApiClient(getActivity());
+        apiClient = new StoreApiClient(getActivity());
         courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
         productDao = TestpressSDKDatabase.getProductDao(getContext());
         pager = new CourseProductPager(apiClient);

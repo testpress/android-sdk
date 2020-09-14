@@ -13,7 +13,7 @@ import in.testpress.network.BaseResourcePager;
 import in.testpress.store.R;
 import in.testpress.store.models.Product;
 import in.testpress.store.network.ProductsPager;
-import in.testpress.store.network.TestpressStoreApiClient;
+import in.testpress.store.network.StoreApiClient;
 import in.testpress.ui.PagedItemFragment;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -21,7 +21,7 @@ import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 
 public class ProductListFragment extends PagedItemFragment<Product> {
 
-    protected TestpressStoreApiClient apiClient;
+    protected StoreApiClient apiClient;
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
@@ -31,7 +31,7 @@ public class ProductListFragment extends PagedItemFragment<Product> {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        apiClient = new TestpressStoreApiClient(getActivity());
+        apiClient = new StoreApiClient(getActivity());
         pager = new ProductsPager(apiClient);
         super.onCreate(savedInstanceState);
     }
