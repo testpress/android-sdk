@@ -348,7 +348,7 @@ public class ReviewQuestionsFragment extends Fragment {
     private String getHtml(String directionHtml, String questionHtml,
                            Object answers, String explanationHtml, String subject) {
 
-        String html = "<div style='padding-left: 2px; padding-right: 4px;'>";
+        String html = "<div style='padding-left: 2px; padding-right: 4px; font-size:calc(12px + 1.5vw);'>";
         // Add index
         html += "<div>" +
                 "<div class='review-question-index'>" +

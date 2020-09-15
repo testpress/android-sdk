@@ -117,7 +117,7 @@ public class TestQuestionFragment extends Fragment {
                 }
             }
         }
-        String htmlContent = "<div class='question_container'>";
+        String htmlContent = "<div class='question_container' style='font-size:calc(12px + 1.5vw);'>";
 
         // Add index
         htmlContent += "<div style='padding-right:10px; padding-left:10px;'>" +

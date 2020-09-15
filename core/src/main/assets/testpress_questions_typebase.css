@@ -147,6 +147,7 @@ p {
     font-family: 'Rubik-Medium', sans-serif;
     color: #444;
     padding: 10px;
+    font-size:calc(12px + 1.5vw);
 }
 
 .question p{

@@ -182,7 +182,7 @@ class QuizReviewFragment: Fragment() {
 
     private fun getHtml(): String {
         val question = userSelectedAnswer.question!!
-        var htmlContent = "<div style='padding-left: 2px; padding-right: 4px;'>"
+        var htmlContent = "<div style='padding-left: 2px; padding-right: 4px; font-size:calc(12px + 1.5vw);'>"
         htmlContent += getQuestionHtml(question)
         htmlContent += getAnswerHtml(userSelectedAnswer)
         htmlContent += getExplanationHtml(userSelectedAnswer)
