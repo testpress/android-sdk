@@ -33,7 +33,8 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
             .where(ContentDao.Properties.ChapterId.eq(chapterId))
             .list()
         if (contents.isNotEmpty()) {
-            _resourceContents.postValue(Resource.success(contents.asDomainContents()))
+             val sortedContents = sortContentsByOrder(contents)
+            _resourceContents.postValue(Resource.success(sortedContents.asDomainContents()))
         } else {
             _resourceContents.value = Resource.loading(null)
         }
@@ -70,7 +71,8 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
         val contents = contentDao.queryBuilder()
                 .where(ContentDao.Properties.ChapterId.eq(chapterId))
                 .list()
-        _resourceContents.postValue(Resource.success(contents.asDomainContents()))
+        val sortedContents = sortContentsByOrder(contents)
+        _resourceContents.postValue(Resource.success(sortedContents.asDomainContents()))
 
         if (response.next != null) {
             page += 1
@@ -116,5 +118,11 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
         contentDao.insertOrReplaceInTx(response.contents)
 
         return response.contents.asDomainContents()
+    }
+
+    private fun sortContentsByOrder(contents: List<Content>): List<Content> {
+        return contents.sortedWith(compareBy {
+            it.order
+        })
     }
 }
