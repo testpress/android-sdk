@@ -29,7 +29,7 @@ abstract class TestpressDatabase: RoomDatabase() {
                         "CREATE TABLE " +
                                 "ProductEntity (image TEXT, endDate TEXT, furl TEXT,currentPrice TEXT," +
                                 "surl TEXT,descriptionHtml TEXT,id INTEGER,title TEXT,paymentLink TEXT," +
-                                "buyNowText TEXT, slug TEXT, startDate TEXT, PRIMARY KEY(id)  )" +
+                                "buyNowText TEXT, slug TEXT, startDate TEXT, PRIMARY KEY(id))" +
                                 "")
 
                 database.execSQL(
@@ -40,7 +40,7 @@ abstract class TestpressDatabase: RoomDatabase() {
                                 "externalContentLink TEXT, PRIMARY KEY(id))")
 
                 database.execSQL(
-                        "CREATE TABLE ProductCourseEntity(courseId INTEGER NOT NULL DEFAULT '', productId INTEGER NOT NULL DEFAULT '', PRIMARY KEY(courseId,productId))")
+                        "CREATE TABLE ProductCourseEntity(courseId INTEGER NOT NULL DEFAULT '', productId INTEGER NOT NULL DEFAULT '', PRIMARY KEY(productId,courseId))")
 
             }
         }
