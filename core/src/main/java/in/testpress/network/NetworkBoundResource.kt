@@ -4,6 +4,8 @@ import `in`.testpress.core.TestpressException
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -11,36 +13,25 @@ import kotlinx.coroutines.withContext
 import retrofit2.Response
 
 abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
-    private val result = MediatorLiveData<Resource<ResultDataType>>()
+    private val result = MutableLiveData<Resource<ResultDataType>>()
     private var dbSource = loadFromDb()
 
     init {
-        result.value = Resource.loading(null)
-        showDBDataIfAvailable(true) { updateDBDataIfNeeded() }
-    }
-
-
-    private fun showDBDataIfAvailable(nonce: Boolean = false, callback: ()->Unit = {}) {
-        result.addSource(dbSource) { data ->
-            if (nonce) result.removeSource(dbSource)
-            if (nonce && shouldFetch(data)) {
-                data?.let { setValue(Resource.loading(data)) }
-            } else {
-                data?.let { setValue(Resource.success(data)) }
-            }
-            callback()
-        }
-    }
-
-    private fun updateDBDataIfNeeded() {
-        result.addSource(dbSource) { data ->
-            result.removeSource(dbSource)
-            if (shouldFetch(data)) {
-                setValue(Resource.loading(data))
+        Transformations.map(dbSource) {
+            if (shouldFetch(it)) {
+                result.postValue(Resource.loading(it))
                 GlobalScope.launch {
                     fetchFromNetwork()
                 }
+            } else {
+                result.postValue(Resource.success(it))
             }
+        }
+    }
+
+    private fun loadFreshData() {
+        Transformations.map(dbSource) {
+            result.postValue(Resource.success(it))
         }
     }
 
@@ -67,20 +58,16 @@ abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
     }
 
     private suspend fun handleResponse(response: Response<NetworkDataType>) {
-        println("Handle Response : ${response.isSuccessful}")
         if (response.isSuccessful) {
             saveNetworkResponseToDB(processNetworkResponse(response.body()))
             refreshDBSource()
             withContext(Dispatchers.Main) {
-                println("NBT : ")
-                showDBDataIfAvailable()
+                loadFreshData()
             }
         } else {
             onFetchFailed()
-            result.addSource(dbSource) { newData ->
-                val exception = TestpressException.httpError(response)
-                setValue(Resource.error(exception, null))
-            }
+            val exception = TestpressException.httpError(response)
+            setValue(Resource.error(exception, null))
         }
     }
 
