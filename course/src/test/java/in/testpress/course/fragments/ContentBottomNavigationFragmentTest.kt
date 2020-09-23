@@ -43,7 +43,7 @@ class ContentBottomNavigationFragmentTest {
     private val data = MutableLiveData<Resource<DomainContent>>()
     private val content = DomainContent(1, chapterId = 1,
             active = true, contentType = "dummy", hasStarted = true,
-            isLocked = false, isScheduled = false)
+            isLocked = false, isScheduled = false, isCourseAvailable = false)
 
     @Before
     fun setUp() {

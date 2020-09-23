@@ -3,11 +3,7 @@ package `in`.testpress.course.repository
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.asDomainContent
 import `in`.testpress.course.domain.asDomainContents
-import `in`.testpress.course.network.CourseNetwork
-import `in`.testpress.course.network.NetworkAttachmentContent
-import `in`.testpress.course.network.NetworkContent
-import `in`.testpress.exam.network.NetworkContentAttempt
-import `in`.testpress.course.network.NetworkHtmlContent
+import `in`.testpress.course.network.*
 import `in`.testpress.network.Resource
 import `in`.testpress.course.util.RetrofitCallMock
 import `in`.testpress.course.util.getOrAwaitValue

@@ -1,11 +1,9 @@
 package `in`.testpress.network
 
 import `in`.testpress.core.TestpressException
+import android.util.Log
 import androidx.annotation.MainThread
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -17,7 +15,9 @@ abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
     private var dbSource = loadFromDb()
 
     init {
-        Transformations.map(dbSource) {
+        result.value = Resource.loading(null)
+
+        dbSource.observeOnce {
             if (shouldFetch(it)) {
                 result.postValue(Resource.loading(it))
                 GlobalScope.launch {
@@ -30,7 +30,7 @@ abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
     }
 
     private fun loadFreshData() {
-        Transformations.map(dbSource) {
+        dbSource.observeOnce {
             result.postValue(Resource.success(it))
         }
     }
@@ -90,4 +90,14 @@ abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
     protected open fun onFetchFailed() {}
 
     fun asLiveData() = result as LiveData<Resource<ResultDataType>>
+}
+
+// https://stackoverflow.com/a/56479746/400236
+fun <T> LiveData<T>.observeOnce(callback: (T) -> Unit) {
+    observeForever(object: Observer<T> {
+        override fun onChanged(value: T) {
+            removeObserver(this)
+            callback(value)
+        }
+    })
 }

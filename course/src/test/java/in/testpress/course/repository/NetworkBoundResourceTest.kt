@@ -114,17 +114,16 @@ class NetworkBoundResourceTest {
     }
 
     @Test
-    fun doesDataSavedToDiskOnNetworkSucess() = runBlocking {
+    fun doesDataSavedToDiskOnNetworkSuccess() = runBlocking {
         var saved = false
         shouldFetchHandler = { true }
         saveNetworkResponseToDBHandler = { saved = true }
         createCallHandler = { RetrofitCallMock(Resource.success(Foo(1))) }
         initObserver()
         dbData.value = null
-        delay(50)
+        delay(200)
 
         Assert.assertTrue(saved)
-        verifyNoMoreInteractions(observer)
     }
 
     @Test
