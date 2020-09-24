@@ -18,7 +18,7 @@ class ProductListNetworkTest : NetworkTestMixin() {
         mockWebServer.enqueue(successResponse)
 
         runBlocking {
-            val response = service.product.execute()
+            val response = service.productsList.execute()
             mockWebServer.takeRequest()
 
             Assert.assertTrue(response.isSuccessful)
@@ -31,7 +31,7 @@ class ProductListNetworkTest : NetworkTestMixin() {
         mockWebServer.enqueue(failureResponse)
 
         runBlocking {
-            val response = service.product.execute()
+            val response = service.productsList.execute()
             mockWebServer.takeRequest()
 
             Assert.assertEquals(404, response.code())
@@ -45,7 +45,7 @@ class ProductListNetworkTest : NetworkTestMixin() {
         mockWebServer.enqueue(successResponse)
 
         runBlocking {
-            val response = service.product.execute()
+            val response = service.productsList.execute()
             mockWebServer.takeRequest()
 
             Assert.assertEquals(null, response.body()?.prices?.get(1)?.validity)

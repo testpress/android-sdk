@@ -38,7 +38,23 @@ data class CourseEntity(
     var chaptersUrl: String? = null,
     var modified: String? = null,
     var videosCount: Int? = null,
-    var externalContentLink: String? = null
+    var externalContentLink: String? = null,
+    val attachmentsCount: Int? = null,
+    val slug: String? = null,
+    val htmlContentsCount: Int? = null,
+    val order: Int? = null,
+    val externalLinkLabel: String? = null
+)
+
+@Entity
+data class PriceEntity(
+    @PrimaryKey
+    var id: Int? = null,
+    var name: String? = null,
+    var price: String? = null,
+    var validity: Int? = null,
+    var endDate: String? = null,
+    var startDate: String? = null
 )
 
 @Entity(
@@ -48,6 +64,15 @@ data class ProductCourseEntity(
     var courseId: Long,
     var productId: Long
 )
+
+@Entity(
+        primaryKeys = ["productId", "priceId"]
+)
+data class ProductPriceEntity(
+    var priceId: Long,
+    var productId: Long
+)
+
 
 data class ProductWithCourses(
     @Embedded
@@ -62,5 +87,17 @@ data class ProductWithCourses(
                     entityColumn = "courseId"
             )
     )
-    var courses: List<CourseEntity>
+    var courses: List<CourseEntity>,
+
+    @Relation(
+            parentColumn = "id",
+            entity = PriceEntity::class,
+            entityColumn = "id",
+            associateBy = Junction(
+                    value = ProductPriceEntity::class,
+                    parentColumn = "productId",
+                    entityColumn = "priceId"
+            )
+    )
+    var prices: List<PriceEntity>
 )

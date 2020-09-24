@@ -1,5 +1,7 @@
 package `in`.testpress.store.network
 
+import `in`.testpress.database.CourseEntity
+
 data class NetworkProductResponse(
     var courses: List<NetworkCourse?>? = null,
     var prices: List<NetworkPrice?>? = null,
@@ -47,6 +49,35 @@ data class NetworkCourse(
     val order: Int? = null,
     val externalLinkLabel: String? = null
 )
+
+
+fun NetworkCourse.asDatabaseModel(): CourseEntity {
+    return CourseEntity(
+        image = this.image,
+        examsCount = this.examsCount,
+        created = this.created,
+        description = this.description,
+        title = this.title,
+        chaptersCount = this.chaptersCount,
+        deviceAccessControl = this.deviceAccessControl,
+        createdBy = this.createdBy,
+        enableDiscussions = this.enableDiscussions,
+        url = this.url,
+        contentsCount = this.contentsCount,
+        contentsUrl = this.contentsUrl,
+        chaptersUrl = this.chaptersUrl,
+        modified = this.modified,
+        videosCount = this.videosCount,
+        externalContentLink = this.externalContentLink,
+        id = this.id,
+        attachmentsCount = this.attachmentsCount,
+        slug = this.slug,
+        htmlContentsCount = this.htmlContentsCount,
+        order = this.order,
+        externalLinkLabel = this.externalLinkLabel
+    )
+}
+
 
 data class NetworkPrice(
     var id: Int? = null,

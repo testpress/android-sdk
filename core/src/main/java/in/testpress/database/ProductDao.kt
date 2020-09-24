@@ -16,6 +16,9 @@ interface ProductDao: BaseDao<ProductCourseEntity> {
     @Query("SELECT * FROM productentity")
     fun getAll(): LiveData<List<ProductWithCourses>>
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(join: ProductWithCourses)
+
     @Delete
     fun deleteProduct(product: ProductEntity)
 
