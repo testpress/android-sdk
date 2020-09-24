@@ -1,9 +1,6 @@
 package `in`.testpress.store.domain
 
-import `in`.testpress.database.ContentEntity
-import `in`.testpress.database.CourseEntity
-import `in`.testpress.database.ProductEntity
-import `in`.testpress.database.ProductWithCourses
+import `in`.testpress.database.*
 
 data class DomainProduct(
     var endDate: String? = null,
@@ -13,10 +10,10 @@ data class DomainProduct(
     var paymentLink: String? = null,
     var buyNowText: String? = null,
     var furl: String? = null,
-    var id: Int? = null,
+    var id: Long? = null,
     var descriptionHtml: String? = null,
     var currentPrice: String? = null,
-//    var prices: List<Int?>? = null,
+    var prices: List<Int?>? = null,
     var slug: String? = null,
     var startDate: String? = null
 )
@@ -38,7 +35,7 @@ data class DomainCourse(
     var modified: String? = null,
     var videosCount: Int? = null,
     var externalContentLink: String? = null,
-    var id: Int? = null,
+    var id: Long? = null,
     var attachmentsCount: Int? = null,
     var slug: String? = null,
     var htmlContentsCount: Int? = null,
@@ -55,9 +52,10 @@ data class DomainPrice(
     var startDate: String? = null
 )
 
-data class DomainProductWithCourse(
+data class DomainProductWithCoursesAndPrices(
     var product: DomainProduct? = null,
-    var courses: List<DomainCourse>? = null
+    var courses: List<DomainCourse>? = null,
+    var prices: List<DomainPrice>? = null
 )
 
 
@@ -128,18 +126,37 @@ fun List<CourseEntity>.asDomainContent(): List<DomainCourse> {
     }
 }
 
-fun createDomainProductWithCourse(productWithCourses: ProductWithCourses): DomainProductWithCourse {
-    return DomainProductWithCourse(
-            product = productWithCourses.product.asDomainContent(),
-            courses = productWithCourses.courses.asDomainContent()
+@JvmName("asDomainContentPriceEntity")
+fun List<PriceEntity>.asDomainContent(): List<DomainPrice>? {
+    return this.map {
+        createDomainPrice(it)
+    }
+}
+
+fun createDomainPrice(priceEntity: PriceEntity): DomainPrice {
+    return DomainPrice(
+        id       = priceEntity.id,
+        name     = priceEntity.name,
+        price    = priceEntity.price,
+        validity = priceEntity.validity,
+        endDate  = priceEntity.endDate,
+        startDate= priceEntity.startDate
     )
 }
 
-fun ProductWithCourses.asDomainContent(): DomainProductWithCourse {
+fun createDomainProductWithCourse(productWithCoursesAndPrices: ProductWithCoursesAndPrices): DomainProductWithCoursesAndPrices {
+    return DomainProductWithCoursesAndPrices(
+            product = productWithCoursesAndPrices.product.asDomainContent(),
+            courses = productWithCoursesAndPrices.courses.asDomainContent(),
+            prices = productWithCoursesAndPrices.prices.asDomainContent()
+    )
+}
+
+fun ProductWithCoursesAndPrices.asDomainContent(): DomainProductWithCoursesAndPrices {
     return createDomainProductWithCourse(this)
 }
 
-fun List<ProductWithCourses>.asDomainContent(): List<DomainProductWithCourse> {
+fun List<ProductWithCoursesAndPrices>.asDomainContent(): List<DomainProductWithCoursesAndPrices> {
     return this.map {
         createDomainProductWithCourse(it)
     }

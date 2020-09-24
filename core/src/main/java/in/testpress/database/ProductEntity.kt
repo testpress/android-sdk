@@ -5,7 +5,7 @@ import androidx.room.*
 @Entity
 data class ProductEntity(
     @PrimaryKey
-    var id: Int? = null,
+    var id: Long? = null,
     var endDate: String? = null,
     var image: String? = null,
     var surl: String? = null,
@@ -22,7 +22,7 @@ data class ProductEntity(
 @Entity
 data class CourseEntity(
     @PrimaryKey
-    var id: Int? = null,
+    var id: Long? = null,
     var image: String? = null,
     var examsCount: Int? = null,
     var created: String? = null,
@@ -74,7 +74,7 @@ data class ProductPriceEntity(
 )
 
 
-data class ProductWithCourses(
+data class ProductWithCoursesAndPrices(
     @Embedded
     var product: ProductEntity,
     @Relation(
