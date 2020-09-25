@@ -12,9 +12,15 @@ interface ProductDao: BaseDao<ProductCourseEntity> {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCourse(course: CourseEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertPrice(price: PriceEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertProductPrice(price: ProductPriceEntity)
+
     @Transaction
     @Query("SELECT * FROM productentity")
-    fun getAll(): LiveData<List<ProductWithCourses>>
+    fun getAll(): LiveData<List<ProductWithCoursesAndPrices>>
 
     @Delete
     fun deleteProduct(product: ProductEntity)

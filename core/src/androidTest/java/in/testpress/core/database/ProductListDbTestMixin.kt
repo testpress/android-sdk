@@ -3,7 +3,7 @@ package `in`.testpress.core.database
 import `in`.testpress.database.CourseEntity
 import `in`.testpress.database.ProductCourseEntity
 import `in`.testpress.database.ProductEntity
-import `in`.testpress.database.ProductWithCourses
+import `in`.testpress.database.ProductWithCoursesAndPrices
 
 abstract class ProductListDaoTestMixin: DbTestMixin() {
 
@@ -33,8 +33,8 @@ abstract class ProductListDaoTestMixin: DbTestMixin() {
         return ProductCourseEntity(productId = 1,courseId = 1)
     }
 
-    fun productWithCoursesFixture(): List<ProductWithCourses> {
-        return listOf(ProductWithCourses(productFixture(),coursesListFixture()))
+    fun productWithCoursesFixture(): List<ProductWithCoursesAndPrices> {
+        return listOf(ProductWithCoursesAndPrices(productFixture(),coursesListFixture()))
     }
 
     private fun coursesListFixture(): List<CourseEntity> {
