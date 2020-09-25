@@ -64,6 +64,6 @@ public class StoreApiClient extends TestpressApiClient {
     }
 
     public RetrofitCall<NetworkProductResponse> getProductsList() {
-        return getProductService().getProduct();
+        return getProductService().getProductsList();
     }
 }
