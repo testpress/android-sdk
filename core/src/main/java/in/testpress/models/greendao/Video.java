@@ -29,6 +29,7 @@ public class Video implements android.os.Parcelable {
     private String thumbnail;
     private String thumbnailMedium;
     private String thumbnailSmall;
+    private Long streamId;
 
     /** Used to resolve relations */
     @Generated
@@ -37,6 +38,12 @@ public class Video implements android.os.Parcelable {
     /** Used for active entity operations. */
     @Generated
     private transient VideoDao myDao;
+
+    @ToOne(joinProperty = "streamId")
+    private Stream stream;
+
+    @Generated
+    private transient Long stream__resolvedKey;
 
     @ToMany(joinProperties = {
         @JoinProperty(name = "id", referencedName = "videoId")
@@ -55,7 +62,7 @@ public class Video implements android.os.Parcelable {
     }
 
     @Generated
-    public Video(String title, String url, Long id, String embedCode, String duration, Boolean isDomainRestricted, String thumbnail, String thumbnailMedium, String thumbnailSmall) {
+    public Video(String title, String url, Long id, String embedCode, String duration, Boolean isDomainRestricted, String thumbnail, String thumbnailMedium, String thumbnailSmall, Long streamId) {
         this.title = title;
         this.url = url;
         this.id = id;
@@ -65,6 +72,7 @@ public class Video implements android.os.Parcelable {
         this.thumbnail = thumbnail;
         this.thumbnailMedium = thumbnailMedium;
         this.thumbnailSmall = thumbnailSmall;
+        this.streamId = streamId;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -144,6 +152,39 @@ public class Video implements android.os.Parcelable {
 
     public void setThumbnailSmall(String thumbnailSmall) {
         this.thumbnailSmall = thumbnailSmall;
+    }
+
+    public Long getStreamId() {
+        return streamId;
+    }
+
+    public void setStreamId(Long streamId) {
+        this.streamId = streamId;
+    }
+
+    /** To-one relationship, resolved on first access. */
+    @Generated
+    public Stream getStream() {
+        Long __key = this.streamId;
+        if (stream__resolvedKey == null || !stream__resolvedKey.equals(__key)) {
+            __throwIfDetached();
+            StreamDao targetDao = daoSession.getStreamDao();
+            Stream streamNew = targetDao.load(__key);
+            synchronized (this) {
+                stream = streamNew;
+            	stream__resolvedKey = __key;
+            }
+        }
+        return stream;
+    }
+
+    @Generated
+    public void setStream(Stream stream) {
+        synchronized (this) {
+            this.stream = stream;
+            streamId = stream == null ? null : stream.getId();
+            stream__resolvedKey = streamId;
+        }
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

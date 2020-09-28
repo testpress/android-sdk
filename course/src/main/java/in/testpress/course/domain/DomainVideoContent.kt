@@ -15,10 +15,15 @@ data class DomainVideoContent(
     val thumbnailSmall: String? = "",
     val thumbnail: String? = "",
     val thumbnailMedium: String? = "",
+    val stream: DomainVideoStream? = null,
     val streams: List<DomainVideoStream>? = arrayListOf<DomainVideoStream>()
 ) {
     fun hlsUrl(): String? {
-        if (streams != null) {
+        if (stream != null) {
+            if (stream.format == "HLS") {
+                return stream.url
+            }
+        } else if (streams != null) {
             for (stream in streams) {
                 if (stream.format == "HLS") {
                     return stream.url
@@ -52,7 +57,8 @@ fun createDomainVideoContent(video: Video): DomainVideoContent {
         streams = video.rawStreams?.asDomainStreams(),
         thumbnail = video.thumbnail,
         thumbnailMedium = video.thumbnailMedium,
-        thumbnailSmall = video.thumbnailSmall
+        thumbnailSmall = video.thumbnailSmall,
+        stream = video.stream?.asDomainStream()
     )
 }
 

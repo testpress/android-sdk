@@ -1,10 +1,13 @@
 package in.testpress.models.greendao;
 
+import java.util.List;
+import java.util.ArrayList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
 
 import org.greenrobot.greendao.AbstractDao;
 import org.greenrobot.greendao.Property;
+import org.greenrobot.greendao.internal.SqlUtils;
 import org.greenrobot.greendao.internal.DaoConfig;
 import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.database.DatabaseStatement;
@@ -31,6 +34,7 @@ public class VideoDao extends AbstractDao<Video, Long> {
         public final static Property Thumbnail = new Property(6, String.class, "thumbnail", false, "THUMBNAIL");
         public final static Property ThumbnailMedium = new Property(7, String.class, "thumbnailMedium", false, "THUMBNAIL_MEDIUM");
         public final static Property ThumbnailSmall = new Property(8, String.class, "thumbnailSmall", false, "THUMBNAIL_SMALL");
+        public final static Property StreamId = new Property(9, Long.class, "streamId", false, "STREAM_ID");
     }
 
     private DaoSession daoSession;
@@ -57,7 +61,8 @@ public class VideoDao extends AbstractDao<Video, Long> {
                 "\"IS_DOMAIN_RESTRICTED\" INTEGER," + // 5: isDomainRestricted
                 "\"THUMBNAIL\" TEXT," + // 6: thumbnail
                 "\"THUMBNAIL_MEDIUM\" TEXT," + // 7: thumbnailMedium
-                "\"THUMBNAIL_SMALL\" TEXT);"); // 8: thumbnailSmall
+                "\"THUMBNAIL_SMALL\" TEXT," + // 8: thumbnailSmall
+                "\"STREAM_ID\" INTEGER);"); // 9: streamId
     }
 
     /** Drops the underlying database table. */
@@ -114,6 +119,11 @@ public class VideoDao extends AbstractDao<Video, Long> {
         if (thumbnailSmall != null) {
             stmt.bindString(9, thumbnailSmall);
         }
+ 
+        Long streamId = entity.getStreamId();
+        if (streamId != null) {
+            stmt.bindLong(10, streamId);
+        }
     }
 
     @Override
@@ -164,6 +174,11 @@ public class VideoDao extends AbstractDao<Video, Long> {
         if (thumbnailSmall != null) {
             stmt.bindString(9, thumbnailSmall);
         }
+ 
+        Long streamId = entity.getStreamId();
+        if (streamId != null) {
+            stmt.bindLong(10, streamId);
+        }
     }
 
     @Override
@@ -188,7 +203,8 @@ public class VideoDao extends AbstractDao<Video, Long> {
             cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0, // isDomainRestricted
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // thumbnail
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // thumbnailMedium
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8) // thumbnailSmall
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // thumbnailSmall
+            cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9) // streamId
         );
         return entity;
     }
@@ -204,6 +220,7 @@ public class VideoDao extends AbstractDao<Video, Long> {
         entity.setThumbnail(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setThumbnailMedium(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setThumbnailSmall(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setStreamId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
      }
     
     @Override
@@ -231,4 +248,95 @@ public class VideoDao extends AbstractDao<Video, Long> {
         return true;
     }
     
+    private String selectDeep;
+
+    protected String getSelectDeep() {
+        if (selectDeep == null) {
+            StringBuilder builder = new StringBuilder("SELECT ");
+            SqlUtils.appendColumns(builder, "T", getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T0", daoSession.getStreamDao().getAllColumns());
+            builder.append(" FROM VIDEO T");
+            builder.append(" LEFT JOIN STREAM T0 ON T.\"STREAM_ID\"=T0.\"_id\"");
+            builder.append(' ');
+            selectDeep = builder.toString();
+        }
+        return selectDeep;
+    }
+    
+    protected Video loadCurrentDeep(Cursor cursor, boolean lock) {
+        Video entity = loadCurrent(cursor, 0, lock);
+        int offset = getAllColumns().length;
+
+        Stream stream = loadCurrentOther(daoSession.getStreamDao(), cursor, offset);
+        entity.setStream(stream);
+
+        return entity;    
+    }
+
+    public Video loadDeep(Long key) {
+        assertSinglePk();
+        if (key == null) {
+            return null;
+        }
+
+        StringBuilder builder = new StringBuilder(getSelectDeep());
+        builder.append("WHERE ");
+        SqlUtils.appendColumnsEqValue(builder, "T", getPkColumns());
+        String sql = builder.toString();
+        
+        String[] keyArray = new String[] { key.toString() };
+        Cursor cursor = db.rawQuery(sql, keyArray);
+        
+        try {
+            boolean available = cursor.moveToFirst();
+            if (!available) {
+                return null;
+            } else if (!cursor.isLast()) {
+                throw new IllegalStateException("Expected unique result, but count was " + cursor.getCount());
+            }
+            return loadCurrentDeep(cursor, true);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+    /** Reads all available rows from the given cursor and returns a list of new ImageTO objects. */
+    public List<Video> loadAllDeepFromCursor(Cursor cursor) {
+        int count = cursor.getCount();
+        List<Video> list = new ArrayList<Video>(count);
+        
+        if (cursor.moveToFirst()) {
+            if (identityScope != null) {
+                identityScope.lock();
+                identityScope.reserveRoom(count);
+            }
+            try {
+                do {
+                    list.add(loadCurrentDeep(cursor, false));
+                } while (cursor.moveToNext());
+            } finally {
+                if (identityScope != null) {
+                    identityScope.unlock();
+                }
+            }
+        }
+        return list;
+    }
+    
+    protected List<Video> loadDeepAllAndCloseCursor(Cursor cursor) {
+        try {
+            return loadAllDeepFromCursor(cursor);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+
+    /** A raw-style query where you can pass any WHERE clause and arguments. */
+    public List<Video> queryDeep(String where, String... selectionArg) {
+        Cursor cursor = db.rawQuery(getSelectDeep() + where, selectionArg);
+        return loadDeepAllAndCloseCursor(cursor);
+    }
+ 
 }

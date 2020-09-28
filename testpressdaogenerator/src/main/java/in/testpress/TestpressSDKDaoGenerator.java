@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 38;
+    private static final int VERSION = 39;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -63,6 +63,7 @@ public class TestpressSDKDaoGenerator {
         addStreamToVideo(stream, video);
         addAttachmentToContent(content, attachment);
         addExamToContent(content, exam);
+        addStreamIdToVideoContent(video, stream);
 
 
         Entity courseAttempt = addCourseAttempt(schema);
@@ -306,6 +307,11 @@ public class TestpressSDKDaoGenerator {
         htmlContent.addStringProperty("sourceUrl");
         htmlContent.addStringProperty("readTime");
         return htmlContent;
+    }
+
+    private static void addStreamIdToVideoContent(Entity video, Entity stream) {
+        Property streamId = video.addLongProperty("streamId").getProperty();
+        video.addToOne(stream, streamId, "stream");
     }
 
     private static Entity addContent(Schema schema) {
