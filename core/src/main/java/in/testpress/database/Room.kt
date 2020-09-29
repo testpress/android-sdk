@@ -7,13 +7,15 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(version = 5,
+@Database(version = 6,
         entities = [
             ContentEntity::class,
             OfflineVideo::class,
             ProductEntity::class,
+            PriceEntity::class,
             CourseEntity::class,
-            ProductCourseEntity::class
+            ProductCourseEntity::class,
+            ProductPriceEntity::class
 ])
 abstract class TestpressDatabase: RoomDatabase() {
     abstract fun contentDao(): ContentDao

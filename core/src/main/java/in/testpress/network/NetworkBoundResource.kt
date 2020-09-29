@@ -12,11 +12,11 @@ import retrofit2.Response
 
 abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
     private val result = MutableLiveData<Resource<ResultDataType>>()
-    private var dbSource = loadFromDb()
+    private var dbSource: LiveData<ResultDataType>
 
     init {
         result.value = Resource.loading(null)
-
+        dbSource = loadFromDb()
         dbSource.observeOnce {
             if (shouldFetch(it)) {
                 result.postValue(Resource.loading(it))
