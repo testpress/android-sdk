@@ -92,10 +92,13 @@ class ContentBottomNavigationFragment : Fragment() {
     fun initializeAndShowNavigationButtons() {
         bottomLayout.visibility = View.VISIBLE
         val contentsFromChapterObserver = Observer<List<DomainContent>> { contents ->
-            val position = contents.indexOf(content)
-            initNextButton(position)
-            initPrevButton(position, contents)
-            pageNumber.text = String.format("%d/%d", position + 1, contents.size)
+            val openableContents = contents.filter { content ->
+                content.isLocked == false && content.isScheduled == false
+            }
+            val position = openableContents.indexOf(content)
+            initNextButton(position, openableContents)
+            initPrevButton(position, openableContents)
+            pageNumber.text = String.format("%d/%d", contents.indexOf(content) + 1, contents.size)
         }
 
         viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer { resource ->
@@ -122,18 +125,12 @@ class ContentBottomNavigationFragment : Fragment() {
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun initNextButton(position: Int) {
-        val contentsFromChapterObserver = Observer<List<DomainContent>> { contents ->
-            if (hasNextContent(position, contents)) {
-                nextShouldOpenNextContentOnClick(position, contents)
-            } else {
-                nextShouldOpenMenuOnClick()
-            }
+    fun initNextButton(position: Int, contents: List<DomainContent>) {
+        if (hasNextContent(position, contents)) {
+            nextShouldOpenNextContentOnClick(position, contents)
+        } else {
+            nextShouldOpenMenuOnClick()
         }
-
-        viewModel.getContentsForChapter(
-                content.chapterId!!)?.observe(
-                viewLifecycleOwner, contentsFromChapterObserver)
     }
 
     private fun hasNextContent(position: Int, contents: List<DomainContent>): Boolean {
