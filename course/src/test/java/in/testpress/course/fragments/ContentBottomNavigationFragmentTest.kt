@@ -45,6 +45,12 @@ class ContentBottomNavigationFragmentTest {
     private val content = DomainContent(1, chapterId = 1,
             active = true, contentType = "dummy", hasStarted = true,
             isLocked = false, isScheduled = false, isCourseAvailable = false)
+    private val lockedContent = DomainContent(2, chapterId = 1,
+        active = true, contentType = "dummy", hasStarted = true,
+        isLocked = true, isScheduled = false, isCourseAvailable = false)
+    private val scheduledContent = DomainContent(3, chapterId = 1,
+        active = true, contentType = "dummy", hasStarted = true,
+        isLocked = false, isScheduled = true, isCourseAvailable = false)
 
     @Before
     fun setUp() {
@@ -83,7 +89,7 @@ class ContentBottomNavigationFragmentTest {
         val contents = MutableLiveData<List<DomainContent>>(listOf(content))
         contentFragment.content = content
         `when`(contentFragment.viewModel.getContentsForChapter(anyLong())).thenReturn(contents)
-        contentFragment.initNextButton(0)
+        contentFragment.initNextButton(0, listOf())
         Assert.assertEquals(View.VISIBLE, contentFragment.nextButton.visibility)
         Assert.assertEquals(context.getString(R.string.testpress_menu), contentFragment.nextButton.text)
     }
@@ -93,7 +99,7 @@ class ContentBottomNavigationFragmentTest {
         val contents = MutableLiveData<List<DomainContent>>(listOf(content, content))
         contentFragment.content = content
         `when`(contentFragment.viewModel.getContentsForChapter(anyLong())).thenReturn(contents)
-        contentFragment.initNextButton(0)
+        contentFragment.initNextButton(0, listOf(content, content))
         Assert.assertEquals(View.VISIBLE, contentFragment.nextButton.visibility)
         Assert.assertEquals(context.getString(R.string.testpress_next_content), contentFragment.nextButton.text)
     }
@@ -107,6 +113,41 @@ class ContentBottomNavigationFragmentTest {
         Assert.assertEquals(contentFragment.pageNumber.text, "1/1")
         // verify(contentFragment).initNextButton(0)
         // verify(contentFragment).initPrevButton(0, listOf())
+    }
+    @Test
+    fun nextButtonShouldNotBeShownForLockedContent() {
+        val contents = MutableLiveData<List<DomainContent>>(listOf(content, lockedContent, lockedContent))
+        `when`(contentFragment.viewModel.getContentsForChapter(anyLong())).thenReturn(contents)
+        contentFragment.initializeAndShowNavigationButtons()
+
+        Assert.assertEquals(context.getString(R.string.testpress_menu), contentFragment.nextButton.text)
+    }
+
+    @Test
+    fun nextButtonShouldNotBeShownForScheduledContent() {
+        val contents = MutableLiveData<List<DomainContent>>(listOf(content, scheduledContent, scheduledContent))
+        `when`(contentFragment.viewModel.getContentsForChapter(anyLong())).thenReturn(contents)
+        contentFragment.initializeAndShowNavigationButtons()
+
+        Assert.assertEquals(context.getString(R.string.testpress_menu), contentFragment.nextButton.text)
+    }
+
+    @Test
+    fun previousButtonShouldNotBeShownForScheduledContent() {
+        val contents = MutableLiveData<List<DomainContent>>(listOf(scheduledContent, scheduledContent, content))
+        `when`(contentFragment.viewModel.getContentsForChapter(anyLong())).thenReturn(contents)
+        contentFragment.initializeAndShowNavigationButtons()
+
+        Assert.assertEquals(View.INVISIBLE, contentFragment.previousButton.visibility)
+    }
+
+    @Test
+    fun previousButtonShouldNotBeShownForLockedContent() {
+        val contents = MutableLiveData<List<DomainContent>>(listOf(lockedContent, lockedContent, content))
+        `when`(contentFragment.viewModel.getContentsForChapter(anyLong())).thenReturn(contents)
+        contentFragment.initializeAndShowNavigationButtons()
+
+        Assert.assertEquals(View.INVISIBLE, contentFragment.previousButton.visibility)
     }
 
     @After
