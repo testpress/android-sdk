@@ -92,12 +92,12 @@ class ContentBottomNavigationFragment : Fragment() {
     fun initializeAndShowNavigationButtons() {
         bottomLayout.visibility = View.VISIBLE
         val contentsFromChapterObserver = Observer<List<DomainContent>> { contents ->
-            val openableContents = contents.filter { content ->
+            val unLockedContents = contents.filter { content ->
                 content.isLocked == false && content.isScheduled == false
             }
-            val position = openableContents.indexOf(content)
-            initNextButton(position, openableContents)
-            initPrevButton(position, openableContents)
+            val position = unLockedContents.indexOf(content)
+            initNextButton(position, unLockedContents)
+            initPrevButton(position, unLockedContents)
             pageNumber.text = String.format("%d/%d", contents.indexOf(content) + 1, contents.size)
         }
 
