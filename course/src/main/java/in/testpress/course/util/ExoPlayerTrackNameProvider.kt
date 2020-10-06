@@ -6,12 +6,12 @@ import com.google.android.exoplayer2.ui.TrackNameProvider
 class ExoPlayerTrackNameProvider : TrackNameProvider {
     override fun getTrackName(format: Format): String {
         return when {
-            format.width <= 240 -> "Very Low"
-            format.width <= 360 -> "Low"
-            format.width <= 480 -> "High"
-            format.width <= 540 -> "High"
-            format.width <= 720 -> "HD"
-            format.width <= 1080 -> "HD1080"
+            format.height <= 240 -> "Very Low"
+            format.height <= 360 -> "Low"
+            format.height <= 480 -> "Medium"
+            format.height <= 540 -> "High"
+            format.height <= 720 -> "Very High"
+            format.height <= 1080 -> "HD"
             else -> "${format.width}p"
         }
     }
