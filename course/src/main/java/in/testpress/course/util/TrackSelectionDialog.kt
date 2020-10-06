@@ -63,6 +63,7 @@ open class TrackSelectionDialog(
         trackSelectionView.setShowDisableOption(false)
         trackSelectionView.setAllowAdaptiveSelections(allowAdaptiveSelections)
         trackSelectionView.setAllowMultipleOverrides(false)
+        trackSelectionView.setTrackNameProvider(ExoPlayerTrackNameProvider())
         trackSelectionView.init(mappedTrackInfo, rendererIndex, false, overrides, this)
     }
 
