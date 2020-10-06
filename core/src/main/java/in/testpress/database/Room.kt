@@ -1,5 +1,6 @@
 package `in`.testpress.database
 
+import `in`.testpress.database.roommigration.RoomMigration4To5
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
@@ -27,23 +28,24 @@ abstract class TestpressDatabase: RoomDatabase() {
 
         private val MIGRATION_4_5: Migration = object : Migration(4, 5) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL(
-                        "CREATE TABLE " +
-                                "ProductEntity (image TEXT, endDate TEXT, furl TEXT,currentPrice TEXT," +
-                                "surl TEXT,descriptionHtml TEXT,id INTEGER,title TEXT,paymentLink TEXT," +
-                                "buyNowText TEXT, slug TEXT, startDate TEXT, PRIMARY KEY(id))" +
-                                "")
+                database.execSQL(RoomMigration4To5.getCreateProductEntity())
+                database.execSQL(RoomMigration4To5.getCreateCourseEntity())
+                database.execSQL(RoomMigration4To5.getCreateProductCourseEntity())
+            }
+        }
 
-                database.execSQL(
-                        "CREATE TABLE " +
-                                "CourseEntity (id INTEGER,image TEXT,examsCount INTEGER,created TEXT,description TEXT,title TEXT," +
-                                "chaptersCount INTEGER,deviceAccessControl TEXT,createdBy INTEGER,enableDiscussions INTEGER," +
-                                "url TEXT, contentsCount INTEGER,contentsUrl TEXT,chaptersUrl TEXT,modified TEXT,videosCount INTEGER," +
-                                "externalContentLink TEXT, PRIMARY KEY(id))")
+        private val MIGRATION_5_6: Migration = object : Migration(5,6) {
+            override fun migrate(database: SupportSQLiteDatabase) {
 
-                database.execSQL(
-                        "CREATE TABLE ProductCourseEntity(courseId INTEGER NOT NULL DEFAULT '', productId INTEGER NOT NULL DEFAULT '', PRIMARY KEY(productId,courseId))")
+                database.execSQL("ALTER TABLE CourseEntity ADD COLUMN attachmentsCount INTEGER")
+                database.execSQL("ALTER TABLE CourseEntity ADD COLUMN slug TEXT")
+                database.execSQL("ALTER TABLE CourseEntity ADD COLUMN htmlContentsCount INTEGER")
+                database.execSQL("ALTER TABLE CourseEntity ADD COLUMN `order` INTEGER")
+                database.execSQL("ALTER TABLE CourseEntity ADD COLUMN externalLinkLabel TEXT")
 
+                database.execSQL("CREATE TABLE IF NOT EXISTS PriceEntity(id INTEGER, name TEXT, price TEXT, validity INTEGER, endDate TEXT, startDate TEXT, PRIMARY KEY(id))")
+
+                database.execSQL("CREATE TABLE IF NOT EXISTS ProductPriceEntity(priceId INTEGER NOT NULL DEFAULT '', productId INTEGER NOT NULL DEFAULT '', PRIMARY KEY(productId,priceId))")
             }
         }
 
@@ -52,7 +54,7 @@ abstract class TestpressDatabase: RoomDatabase() {
                 if (!::INSTANCE.isInitialized) {
                     INSTANCE = Room.databaseBuilder(context.applicationContext,
                             TestpressDatabase::class.java, "testpress-database")
-                            .addMigrations(MIGRATION_4_5)
+                            .addMigrations(MIGRATION_4_5, MIGRATION_5_6)
                             .build()
                 }
             }
