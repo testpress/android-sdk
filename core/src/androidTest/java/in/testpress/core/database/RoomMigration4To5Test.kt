@@ -2,6 +2,7 @@ package `in`.testpress.core.database
 
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.roommigration.RoomMigration4To5
+import `in`.testpress.database.roommigration.RoomMigration4To5.MIGRATION_4_5
 import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -19,8 +20,6 @@ class RoomMigration4To5Test {
 
     private val testPressDatabase = "testpress-database"
 
-    private val ALL_MIGRATIONS = arrayOf(RoomMigration4To5.MIGRATION_4_5)
-
     @Rule @JvmField
     val helper: MigrationTestHelper = MigrationTestHelper(InstrumentationRegistry.getInstrumentation(),
             TestpressDatabase::class.java.canonicalName,
@@ -29,7 +28,7 @@ class RoomMigration4To5Test {
 
     @Test
     @Throws(IOException::class)
-    fun migrateAll() {
+    fun migrateFrom5to6ShouldNotProduceError() {
         val db: SupportSQLiteDatabase = helper.createDatabase(testPressDatabase, 4)
         db.close()
 
@@ -37,7 +36,7 @@ class RoomMigration4To5Test {
                 InstrumentationRegistry.getInstrumentation().targetContext,
                 TestpressDatabase::class.java,
                 testPressDatabase)
-                .addMigrations(*ALL_MIGRATIONS).build()
+                .addMigrations(MIGRATION_4_5).build()
         appDb.openHelper.writableDatabase
         appDb.close()
     }
