@@ -1,6 +1,6 @@
 package `in`.testpress.database
 
-import `in`.testpress.database.roommigration.RoomMigration4To5
+import `in`.testpress.database.roommigration.RoomMigration4To5.MIGRATION_4_5
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
@@ -23,8 +23,6 @@ abstract class TestpressDatabase: RoomDatabase() {
 
     companion object {
         private lateinit var INSTANCE: TestpressDatabase
-
-        private val MIGRATION_4_5 = RoomMigration4To5.MIGRATION_4_5
 
         operator fun invoke(context: Context): TestpressDatabase {
             synchronized(TestpressDatabase::class.java) {
