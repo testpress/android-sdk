@@ -21,15 +21,13 @@ class RoomMigrationsTest {
             TestpressDatabase::class.java.canonicalName,
             FrameworkSQLiteOpenHelperFactory())
 
-    private val MIGRATIONS = arrayOf(MIGRATION_4_5, MIGRATION_5_6)
-
     private val testPressDatabase = "testpress-database"
 
     private val appDb: TestpressDatabase = Room.databaseBuilder(
             InstrumentationRegistry.getInstrumentation().targetContext,
             TestpressDatabase::class.java,
             testPressDatabase)
-            .addMigrations(*MIGRATIONS).build()
+            .addMigrations(*TestpressDatabase.MIGRATIONS).build()
 
     private val databaseCurrentVersion = appDb.openHelper.readableDatabase.version
 
