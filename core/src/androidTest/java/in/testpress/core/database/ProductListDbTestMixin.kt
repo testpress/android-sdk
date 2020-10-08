@@ -1,9 +1,6 @@
 package `in`.testpress.core.database
 
-import `in`.testpress.database.CourseEntity
-import `in`.testpress.database.ProductCourseEntity
-import `in`.testpress.database.ProductEntity
-import `in`.testpress.database.ProductWithCoursesAndPrices
+import `in`.testpress.database.*
 
 abstract class ProductListDaoTestMixin: DbTestMixin() {
 
@@ -34,10 +31,14 @@ abstract class ProductListDaoTestMixin: DbTestMixin() {
     }
 
     fun productWithCoursesFixture(): List<ProductWithCoursesAndPrices> {
-        return listOf(ProductWithCoursesAndPrices(productFixture(),coursesListFixture()))
+        return listOf(ProductWithCoursesAndPrices(productFixture(),coursesListFixture(),pricesListFixture()))
     }
 
     private fun coursesListFixture(): List<CourseEntity> {
         return listOf(courseFixture())
+    }
+
+    private fun pricesListFixture(): List<PriceEntity> {
+        return listOf(PriceEntity(1,price = "10000"))
     }
 }
