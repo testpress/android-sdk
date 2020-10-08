@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class RoomMigration4To5Test {
+class RoomMigrationsTest {
 
     @Rule @JvmField
     val helper: MigrationTestHelper = MigrationTestHelper(InstrumentationRegistry.getInstrumentation(),
