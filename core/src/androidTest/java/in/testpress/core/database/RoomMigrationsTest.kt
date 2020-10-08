@@ -2,6 +2,7 @@ package `in`.testpress.core.database
 
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.roommigration.RoomMigration4To5.MIGRATION_4_5
+import `in`.testpress.database.roommigration.RoomMigration5To6.MIGRATION_5_6
 import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
@@ -20,7 +21,7 @@ class RoomMigrationsTest {
             TestpressDatabase::class.java.canonicalName,
             FrameworkSQLiteOpenHelperFactory())
 
-    private val MIGRATIONS = arrayOf(MIGRATION_4_5)
+    private val MIGRATIONS = arrayOf(MIGRATION_4_5, MIGRATION_5_6)
 
     private val testPressDatabase = "testpress-database"
 
