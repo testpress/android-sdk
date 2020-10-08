@@ -19,6 +19,8 @@ class RoomMigration4To5Test {
 
     private val testPressDatabase = "testpress-database"
 
+    private val ALL_MIGRATIONS = arrayOf(RoomMigration4To5.MIGRATION_4_5)
+
     @Rule @JvmField
     val helper: MigrationTestHelper = MigrationTestHelper(InstrumentationRegistry.getInstrumentation(),
             TestpressDatabase::class.java.canonicalName,
@@ -39,7 +41,4 @@ class RoomMigration4To5Test {
         appDb.openHelper.writableDatabase
         appDb.close()
     }
-
-    private val ALL_MIGRATIONS = arrayOf(RoomMigration4To5.MIGRATION_4_5)
-
 }
