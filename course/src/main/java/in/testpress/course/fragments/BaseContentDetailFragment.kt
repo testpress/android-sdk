@@ -38,6 +38,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener,
     protected var contentId: Long = -1
     private var productSlug: String? = null
     open var isBookmarkEnabled = true
+    protected var isNetworkCallSuccess = false
     protected lateinit var content: DomainContent
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var bookmarkFragment: BookmarkFragment
@@ -125,6 +126,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener,
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     fun forceReloadContent() {
+        isNetworkCallSuccess = false
         swipeRefresh.isRefreshing = true
         viewModel.getContent(contentId, forceRefresh = true).observe(viewLifecycleOwner,
             Observer { resource ->
@@ -132,6 +134,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener,
                 if (resource != null) {
                     when (resource.status) {
                         Status.SUCCESS -> {
+                            isNetworkCallSuccess = true
                             content = resource.data!!
                             display()
                         }
