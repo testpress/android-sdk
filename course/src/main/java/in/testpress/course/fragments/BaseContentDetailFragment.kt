@@ -6,7 +6,6 @@ import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.TestpressCourse.CONTENT_TYPE
 import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.di.InjectorUtils
-import `in`.testpress.course.domain.DomainAttachmentContent
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
