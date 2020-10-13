@@ -50,8 +50,7 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
         }
 
         downloadButton.setOnClickListener {
-            forceReloadContent()
-            if (isNetworkCallSuccess) {
+            forceReloadContent {
                 context!!.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(attachment.attachmentUrl)))
             }
         }
