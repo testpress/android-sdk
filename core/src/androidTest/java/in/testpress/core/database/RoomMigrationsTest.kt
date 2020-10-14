@@ -40,7 +40,7 @@ class RoomMigrationsTest {
     }
 
     private fun createDatabaseWithPreviousVersion() {
-        helper.createDatabase(testPressDatabase, databaseCurrentVersion - 1).apply {
+        helper.createDatabase(testPressDatabase, 3).apply {
             close()
         }
     }

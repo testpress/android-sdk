@@ -2,8 +2,8 @@ package `in`.testpress.database
 
 import `in`.testpress.database.roommigration.RoomMigration4To5.MIGRATION_4_5
 import `in`.testpress.database.roommigration.RoomMigration5To6.MIGRATION_5_6
+import `in`.testpress.database.roommigration.RoomMigration3To4.MIGRATION_3_4
 import android.content.Context
-import androidx.annotation.VisibleForTesting
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -26,7 +26,7 @@ abstract class TestpressDatabase: RoomDatabase() {
     companion object {
         private lateinit var INSTANCE: TestpressDatabase
 
-        val MIGRATIONS = arrayOf(MIGRATION_4_5, MIGRATION_5_6)
+        val MIGRATIONS = arrayOf(MIGRATION_3_4,MIGRATION_4_5, MIGRATION_5_6)
 
         operator fun invoke(context: Context): TestpressDatabase {
             synchronized(TestpressDatabase::class.java) {
