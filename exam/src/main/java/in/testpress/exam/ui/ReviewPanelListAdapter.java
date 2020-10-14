@@ -56,6 +56,7 @@ class ReviewPanelListAdapter extends SingleTypeAdapter<ReviewItem> {
         if (question == null) {
             question = Html.fromHtml(reviewQuestion.getQuestionHtml()).toString();
         }
+        question = question.replaceAll("@font-face \\{.*\\}", "");
         updater.view.findViewById(R.id.marked_question).setVisibility(View.GONE);
         updater.view.findViewById(R.id.answered_question).setVisibility(View.GONE);
         updater.view.findViewById(R.id.all_question).setVisibility(View.VISIBLE);
