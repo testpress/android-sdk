@@ -21,6 +21,8 @@ class RoomMigrationsTest {
             TestpressDatabase::class.java.canonicalName,
             FrameworkSQLiteOpenHelperFactory())
 
+    private val BASE_VERSION = 3
+
     private val testPressDatabase = "testpress-database"
 
     private val appDb: TestpressDatabase = Room.databaseBuilder(
@@ -40,7 +42,7 @@ class RoomMigrationsTest {
     }
 
     private fun createDatabaseWithPreviousVersion() {
-        helper.createDatabase(testPressDatabase, 3).apply {
+        helper.createDatabase(testPressDatabase, BASE_VERSION).apply {
             close()
         }
     }
