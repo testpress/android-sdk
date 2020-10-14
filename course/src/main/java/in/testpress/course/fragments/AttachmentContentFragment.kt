@@ -50,7 +50,9 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
         }
 
         downloadButton.setOnClickListener {
-            context!!.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(attachment.attachmentUrl)))
+            forceReloadContent {
+                context!!.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(attachment.attachmentUrl)))
+            }
         }
         attachmentContentLayout.visibility = View.VISIBLE
         viewModel.createContentAttempt(contentId)

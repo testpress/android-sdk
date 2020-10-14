@@ -124,7 +124,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener,
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    fun forceReloadContent() {
+    fun forceReloadContent(onSuccessCallback: (() -> Unit) = {}) {
         swipeRefresh.isRefreshing = true
         viewModel.getContent(contentId, forceRefresh = true).observe(viewLifecycleOwner,
             Observer { resource ->
@@ -134,6 +134,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener,
                         Status.SUCCESS -> {
                             content = resource.data!!
                             display()
+                            onSuccessCallback.invoke()
                         }
                         Status.ERROR -> {
                             toast.show()
