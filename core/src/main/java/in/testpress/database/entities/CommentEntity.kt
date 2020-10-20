@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class CommentEntity(
     @PrimaryKey
-    var id: Int? = null,
+    var id: Long? = null,
     @Embedded
     var contentObject: ContentObject? = null,
     @Embedded
@@ -18,22 +18,22 @@ data class CommentEntity(
     var userUrl: String?= null,
     var comment: String? = null,
     var submitDate: String? =null,
-    var upvotes: Int? = null,
-    var downvotes: Int? = null,
-    var typeOfVote: Int? = null,
-    var voteId: Int? = null
+    var upvotes: Long? = null,
+    var downvotes: Long? = null,
+    var typeOfVote: Long? = null,
+    var voteId: Long? = null
 )
 
 data class ContentObject (
     @ColumnInfo(name = "contentId")
-    var id: Int? = null,
+    var id: Long? = null,
     @ColumnInfo(name = "contentUrl")
     var url: String? = null
 )
 
 data class ProfileDetails (
     @ColumnInfo(name = "profileId")
-    var id: Int? = null,
+    var id: Long? = null,
     @ColumnInfo(name = "profileUrl")
     var url: String? = null,
     var username: String? = null,
