@@ -1,8 +1,6 @@
 package `in`.testpress.core.database
 
 import `in`.testpress.database.TestpressDatabase
-import `in`.testpress.database.roommigration.RoomMigration4To5.MIGRATION_4_5
-import `in`.testpress.database.roommigration.RoomMigration5To6.MIGRATION_5_6
 import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
@@ -16,7 +14,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class RoomMigrationsTest {
 
-    @Rule @JvmField
+    @Rule
+    @JvmField
     val helper: MigrationTestHelper = MigrationTestHelper(InstrumentationRegistry.getInstrumentation(),
             TestpressDatabase::class.java.canonicalName,
             FrameworkSQLiteOpenHelperFactory())
