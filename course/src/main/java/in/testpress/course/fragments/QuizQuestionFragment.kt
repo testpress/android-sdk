@@ -101,7 +101,7 @@ class QuizQuestionFragment : Fragment() {
 
     private fun getHtml(): String {
         val question = userSelectedAnswer.question!!
-        var htmlContent = "<div class='quiz_question_container'>"
+        var htmlContent = "<div class='quiz_question_container' style='font-size:calc(12px + 1.5vw);'>"
 
         question.directionHtml?.let {
             htmlContent += "<div class='question' style='padding-bottom: 0px;'>${it}</div>"
@@ -111,7 +111,7 @@ class QuizQuestionFragment : Fragment() {
         htmlContent += "<div class='question' style='padding-bottom: 10px;'> ${question.questionHtml} </div></div>"
         if (question.type == "R" || question.type == "C") {
             // Add options
-            htmlContent += "<table width='100%' style='margin-top:0px; margin-bottom:20px;'>"
+            htmlContent += "<table width='100%' style='margin-top:0px; margin-bottom:20px; font-size:calc(12px + 1.5vw);'>"
             for (answer in question.answers ?: listOf()) {
                 htmlContent += if (question.isSingleMCQType) {
                     "\n" + WebViewUtils.getRadioButtonOptionWithTags(
