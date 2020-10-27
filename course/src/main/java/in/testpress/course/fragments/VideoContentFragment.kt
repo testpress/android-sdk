@@ -24,6 +24,8 @@ import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.util.Util
 import io.netopen.hotbitmapgg.library.view.RingProgressBar
 import java.text.DateFormat
 import java.text.ParseException
@@ -156,10 +158,19 @@ class VideoContentFragment : BaseContentDetailFragment() {
         videoWidgetFragment = VideoWidgetFragmentFactory.getWidget(content.video!!)
         videoWidgetFragment.arguments = arguments
         parseVideoDescription()
-        showDownloadProgress()
+        if (isHls()) {
+            showDownloadProgress()
+        } else {
+            menu.clear()
+        }
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.video_widget_fragment, videoWidgetFragment)
         transaction.commit()
+    }
+
+    private fun isHls(): Boolean {
+        val type = content.video?.hlsUrl()?.let { Util.inferContentType(it) } ?: 0
+        return type == C.TYPE_HLS
     }
 
     override fun onResume() {
