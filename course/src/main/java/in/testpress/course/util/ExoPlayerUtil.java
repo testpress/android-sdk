@@ -371,9 +371,7 @@ public class ExoPlayerUtil {
     }
 
     public void releasePlayer() {
-        if (audioManager != null) {
-            audioManager.abandonAudioFocus(audioFocusChangeListener);
-        }
+        audioManager.abandonAudioFocus(audioFocusChangeListener);
         if (player != null) {
             startPosition = getCurrentPosition();
             playWhenReady = player.getPlayWhenReady();
