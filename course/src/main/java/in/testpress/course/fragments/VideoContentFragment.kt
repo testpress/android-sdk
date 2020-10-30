@@ -24,8 +24,6 @@ import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.util.Util
 import io.netopen.hotbitmapgg.library.view.RingProgressBar
 import java.text.DateFormat
 import java.text.ParseException
@@ -159,7 +157,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
         videoWidgetFragment.arguments = arguments
         parseVideoDescription()
         if (content.video!!.isDownloadable()) {
-            showDownloadProgress()
+            showDownloadStatus()
         } else {
             menu.clear()
         }
@@ -171,11 +169,11 @@ class VideoContentFragment : BaseContentDetailFragment() {
     override fun onResume() {
         super.onResume()
         if(isContentInitialized()) {
-            showDownloadProgress()
+            showDownloadStatus()
         }
     }
 
-    private fun showDownloadProgress() {
+    private fun showDownloadStatus() {
         offlineVideoViewModel.get(content.video!!.hlsUrl()!!).observe(viewLifecycleOwner, Observer {
             if(it != null && !it.isDownloadCompleted) {
                 showProgress(it.percentageDownloaded)
