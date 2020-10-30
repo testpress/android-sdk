@@ -158,7 +158,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
         videoWidgetFragment = VideoWidgetFragmentFactory.getWidget(content.video!!)
         videoWidgetFragment.arguments = arguments
         parseVideoDescription()
-        if (isHls()) {
+        if (content.isDownloadable()) {
             showDownloadProgress()
         } else {
             menu.clear()
@@ -166,11 +166,6 @@ class VideoContentFragment : BaseContentDetailFragment() {
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.video_widget_fragment, videoWidgetFragment)
         transaction.commit()
-    }
-
-    private fun isHls(): Boolean {
-        val type = content.video?.hlsUrl()?.let { Util.inferContentType(it) } ?: 0
-        return type == C.TYPE_HLS
     }
 
     override fun onResume() {

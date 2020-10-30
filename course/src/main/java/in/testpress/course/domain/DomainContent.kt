@@ -10,6 +10,8 @@ import `in`.testpress.models.greendao.CourseAttemptDao
 import `in`.testpress.util.FormatDate
 import android.content.Context
 import android.text.format.DateUtils
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.util.Util
 
 data class DomainContent(
     val id: Long,
@@ -72,6 +74,11 @@ data class DomainContent(
 
     fun hasAttempted(): Boolean {
         return (attemptsCount ?: 0) > 0
+    }
+
+    fun isDownloadable(): Boolean {
+        val type = video?.hlsUrl()?.let { Util.inferContentType(it) } ?: 0
+        return type == C.TYPE_HLS
     }
 }
 
