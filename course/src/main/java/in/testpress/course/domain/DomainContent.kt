@@ -10,6 +10,8 @@ import `in`.testpress.models.greendao.CourseAttemptDao
 import `in`.testpress.util.FormatDate
 import android.content.Context
 import android.text.format.DateUtils
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.util.Util
 
 data class DomainContent(
     val id: Long,
