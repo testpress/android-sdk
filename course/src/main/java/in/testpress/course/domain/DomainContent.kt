@@ -75,11 +75,6 @@ data class DomainContent(
     fun hasAttempted(): Boolean {
         return (attemptsCount ?: 0) > 0
     }
-
-    fun isDownloadable(): Boolean {
-        val type = video?.hlsUrl()?.let { Util.inferContentType(it) } ?: 0
-        return type == C.TYPE_HLS
-    }
 }
 
 fun createDomainContent(contentEntity: ContentEntity): DomainContent {

@@ -158,7 +158,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
         videoWidgetFragment = VideoWidgetFragmentFactory.getWidget(content.video!!)
         videoWidgetFragment.arguments = arguments
         parseVideoDescription()
-        if (content.isDownloadable()) {
+        if (content.video!!.isDownloadable()) {
             showDownloadProgress()
         } else {
             menu.clear()

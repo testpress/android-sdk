@@ -2,6 +2,8 @@ package `in`.testpress.course.domain
 
 import `in`.testpress.models.greendao.Stream
 import `in`.testpress.models.greendao.Video
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.util.Util
 
 data class DomainVideoContent(
     val id: Long,
@@ -35,6 +37,11 @@ data class DomainVideoContent(
 
     fun hasEmbedCode(): Boolean {
         return embedCode != null && embedCode.isNotBlank()
+    }
+
+    fun isDownloadable(): Boolean {
+        val type = hlsUrl()?.let { Util.inferContentType(it) }
+        return type == C.TYPE_HLS
     }
 
 }
