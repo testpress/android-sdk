@@ -87,15 +87,4 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     private fun joinMeeting() {
         videoConferenceHandler?.joinMeet()
     }
-
-    private fun openVideoConferenceInWebView() {
-        val videoConference = content.videoConference
-        val intent = Intent(activity, WebViewActivity::class.java)
-        val session = TestpressSdk.getTestpressSession(requireContext())
-        val token = session?.token
-        intent.putExtra("URL", videoConference?.joinUrl)
-        intent.putExtra("JWT_TOKEN", token)
-        intent.putExtra("TITLE", videoConference?.title)
-        activity!!.startActivity(intent)
-    }
 }
