@@ -17,18 +17,27 @@ class CommentDaoTest: DbTestMixin() {
         insertCommentIntoDb()
 
         val fetchedComment = db.commentDao().getAll().getOrAwaitValue()
-        Assert.assertEquals(commentFixture(),fetchedComment)
+        Assert.assertEquals(createCommentFixture(),fetchedComment)
     }
 
     private fun insertCommentIntoDb() {
-        commentFixture().forEach {
+        createCommentFixture().forEach {
             db.commentDao().insert(it)
         }
     }
 
-    private fun commentFixture(): List<CommentEntity> {
-        return listOf(CommentEntity(id = 1, contentObject = ContentObject(id = 1, url = "url"),
-                user = ProfileDetails(id = 1, displayName = "testPress",url = "url",username = "username",
-                mediumImage = null, email = "email", miniImage = null,address2 = "address", address1 = null)))
+    private fun createCommentFixture(): List<CommentEntity> {
+        return listOf(CommentEntity(id = 1, contentObject = getContentObjectFixture(),
+                user = getProfileDetailsFixture()))
     }
+
+    private fun getContentObjectFixture(): ContentObject {
+        return ContentObject(id = 1, url = "url")
+    }
+
+    private fun getProfileDetailsFixture(): ProfileDetails {
+        return ProfileDetails(id = 1, displayName = "testPress",url = "url",username = "username",
+                mediumImage = null, email = "email", miniImage = null,address2 = "address", address1 = null)
+    }
+
 }
