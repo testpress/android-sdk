@@ -5,57 +5,57 @@ import `in`.testpress.database.entities.ContentObject
 import `in`.testpress.database.entities.ProfileDetails
 
 data class DomainComment(
-        var id: Long? = null,
-        var contentObject: DomainContentObject? = null,
-        var user: DomainProfileDetails? = null,
-        var url: String? = null,
-        var userEmail: String? = null,
-        var userUrl: String?= null,
-        var comment: String? = null,
-        var submitDate: String? =null,
-        var upvotes: Long? = null,
-        var downvotes: Long? = null,
-        var typeOfVote: Long? = null,
-        var voteId: Long? = null
+    var id: Long? = null,
+    var contentObject: DomainContentObject? = null,
+    var user: DomainProfileDetails? = null,
+    var url: String? = null,
+    var userEmail: String? = null,
+    var userUrl: String?= null,
+    var comment: String? = null,
+    var submitDate: String? =null,
+    var upvotes: Long? = null,
+    var downvotes: Long? = null,
+    var typeOfVote: Long? = null,
+    var voteId: Long? = null
 )
 
 data class DomainContentObject (
-        var id: Long? = null,
-        var url: String? = null
+    var id: Long? = null,
+    var url: String? = null
 )
 
 data class DomainProfileDetails (
-        var id: Long? = null,
-        var url: String? = null,
-        var username: String? = null,
-        var displayName: String? = null,
-        var firstName: String? = null,
-        var lastName: String? = null,
-        var email: String? = null,
-        var photo: String? = null,
-        var largeImage: String? = null,
-        var mediumImage: String? = null,
-        var smallImage: String? = null,
-        var xSmallImage: String? = null,
-        var miniImage: String? = null,
-        var birthDate: String? = null,
-        var gender: String? = null,
-        var address1: String? = null,
-        var address2: String? = null,
-        var city: String? = null,
-        var zip: String? = null,
-        var state: String? = null,
-        var stateChoices: String? = null,
-        var phone: String? = null
+    var id: Long? = null,
+    var url: String? = null,
+    var username: String? = null,
+    var displayName: String? = null,
+    var firstName: String? = null,
+    var lastName: String? = null,
+    var email: String? = null,
+    var photo: String? = null,
+    var largeImage: String? = null,
+    var mediumImage: String? = null,
+    var smallImage: String? = null,
+    var xSmallImage: String? = null,
+    var miniImage: String? = null,
+    var birthDate: String? = null,
+    var gender: String? = null,
+    var address1: String? = null,
+    var address2: String? = null,
+    var city: String? = null,
+    var zip: String? = null,
+    var state: String? = null,
+    var stateChoices: String? = null,
+    var phone: String? = null
 )
 
 fun List<CommentEntity>.asDomainComment(): List<DomainComment> {
     return this.map {
-        createDomainContent(it)
+        createDomainComment(it)
     }
 }
 
-private fun createDomainContent(comment: CommentEntity): DomainComment {
+private fun createDomainComment(comment: CommentEntity): DomainComment {
     return DomainComment(
             id = comment.id,
             contentObject = comment.contentObject?.asDomainContent(),
