@@ -158,7 +158,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
         parseVideoDescription()
         if (content.video!!.isDownloadable()) {
             showDownloadStatus()
-        } else {
+        } else if (::menu.isInitialized) {
             menu.clear()
         }
         val transaction = childFragmentManager.beginTransaction()
@@ -168,19 +168,21 @@ class VideoContentFragment : BaseContentDetailFragment() {
 
     override fun onResume() {
         super.onResume()
-        if(isContentInitialized()) {
+        if(isContentInitialized() && content.video!!.isDownloadable()) {
             showDownloadStatus()
         }
     }
 
     private fun showDownloadStatus() {
         offlineVideoViewModel.get(content.video!!.hlsUrl()!!).observe(viewLifecycleOwner, Observer {
-            if(it != null && !it.isDownloadCompleted) {
-                showProgress(it.percentageDownloaded)
-            } else if(it != null && it.isDownloadCompleted){
-                showDownloadedIcon()
-            } else {
-                showDownloadIcon()
+            if (::menu.isInitialized) {
+                if(it != null && !it.isDownloadCompleted) {
+                    showProgress(it.percentageDownloaded)
+                } else if(it != null && it.isDownloadCompleted){
+                    showDownloadedIcon()
+                } else {
+                    showDownloadIcon()
+                }
             }
         })
     }
