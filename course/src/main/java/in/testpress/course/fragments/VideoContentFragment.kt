@@ -20,6 +20,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -39,7 +40,8 @@ class VideoContentFragment : BaseContentDetailFragment() {
     private lateinit var videoWidgetFragment: BaseVideoWidgetFragment
     private lateinit var offlineVideoViewModel: OfflineVideoViewModel
     private lateinit var videoDownloadProgress: RingProgressBar
-    private lateinit var menu: Menu
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var menu: Menu
 
     override var isBookmarkEnabled: Boolean
         get() = false
@@ -158,12 +160,18 @@ class VideoContentFragment : BaseContentDetailFragment() {
         parseVideoDescription()
         if (content.video!!.isDownloadable()) {
             showDownloadStatus()
-        } else if (::menu.isInitialized) {
-            menu.clear()
         }
+        setDownloadMenuVisibility()
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.video_widget_fragment, videoWidgetFragment)
         transaction.commit()
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun setDownloadMenuVisibility() {
+        if (::menu.isInitialized) {
+            menu.clear()
+        }
     }
 
     override fun onResume() {
