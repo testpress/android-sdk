@@ -15,8 +15,7 @@ import java.util.*
 interface CommentService {
 
     @GET
-    fun getComments(@Url commentsUrl: String,
-                    @QueryMap options: Map<String, Any>): RetrofitCall<NetworkCommentResponse>
+    fun getComments(@Url commentsUrl: String): RetrofitCall<NetworkCommentResponse>
 
     @POST
     fun postComment(@Url commentsUrl: String?,
@@ -37,9 +36,8 @@ interface CommentService {
 open class CommentApiClient(context: Context): TestpressApiClient(context, TestpressSdk.getTestpressSession(context)) {
     private fun getService() = retrofit.create(CommentService::class.java)
 
-    fun getComments(urlFrag: String,
-                    queryParams: Map<String, Any>): RetrofitCall<NetworkCommentResponse> {
-        return getService().getComments(urlFrag, queryParams)
+    fun getComments(urlFrag: String): RetrofitCall<NetworkCommentResponse> {
+        return getService().getComments(urlFrag)
     }
 
     fun postComment(urlFrag: String?, comment: String): RetrofitCall<NetworkComment> {
