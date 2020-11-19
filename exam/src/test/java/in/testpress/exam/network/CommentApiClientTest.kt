@@ -15,7 +15,7 @@ class CommentApiClientTest: NetworkTestMixin() {
         mockWebServer.enqueue(successResponse)
 
         runBlocking {
-            val response = service.getComments("url", mapOf()).execute()
+            val response = service.getComments("url").execute()
             mockWebServer.takeRequest()
 
             Assert.assertTrue(response.isSuccessful)
@@ -28,7 +28,7 @@ class CommentApiClientTest: NetworkTestMixin() {
         mockWebServer.enqueue(failureResponse)
 
         runBlocking {
-            val response = service.getComments("url", mapOf()).execute()
+            val response = service.getComments("url").execute()
             mockWebServer.takeRequest()
 
             Assert.assertEquals(404, response.code())
@@ -42,7 +42,7 @@ class CommentApiClientTest: NetworkTestMixin() {
         mockWebServer.enqueue(successResponse)
 
         runBlocking {
-            val response = service.getComments("url", mapOf()).execute()
+            val response = service.getComments("url").execute()
             mockWebServer.takeRequest()
 
             Assert.assertEquals("Hey", response.body().results?.get(0)?.comment)
