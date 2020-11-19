@@ -3,7 +3,6 @@ package `in`.testpress.core.database
 import `in`.testpress.database.entities.CommentEntity
 import `in`.testpress.database.entities.ContentObject
 import `in`.testpress.database.entities.ProfileDetails
-import `in`.testpress.util.getOrAwaitValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert
 import org.junit.Test
@@ -16,7 +15,7 @@ class CommentDaoTest: DbTestMixin() {
     fun readShouldReturnInsertedData() {
         insertCommentIntoDb()
 
-        val fetchedComment = db.commentDao().getAll().getOrAwaitValue()
+        val fetchedComment = db.commentDao().getAll()
         Assert.assertEquals(getComments(),fetchedComment)
     }
 
