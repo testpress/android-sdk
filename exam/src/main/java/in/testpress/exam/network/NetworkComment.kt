@@ -157,3 +157,53 @@ fun DomainProfileDetails.asNetworkProfileDetail(): NetworkProfileDetails {
             phone = this.phone
     )
 }
+
+fun NetworkComment.asDomainComment(): DomainComment {
+    return DomainComment(
+            id = this.id,
+            contentObject = this.contentObject?.asDomainContent(),
+            user = this.user?.asDomainProfileDetail(),
+            url = this.url,
+            userUrl = this.userUrl,
+            userEmail = this.userEmail,
+            comment = this.comment,
+            submitDate = this.submitDate,
+            upvotes = this.upvotes,
+            downvotes = this.downvotes,
+            typeOfVote = this.typeOfVote,
+            voteId = this.voteId
+    )
+}
+fun NetworkContentObject.asDomainContent(): DomainContentObject {
+    return DomainContentObject(
+            id = this.id,
+            url = this.url
+    )
+}
+
+fun NetworkProfileDetails.asDomainProfileDetail(): DomainProfileDetails {
+    return DomainProfileDetails(
+            id = this.id,
+            url = this.url,
+            username = this.username,
+            displayName = this.displayName,
+            firstName = this.firstName,
+            lastName = this.lastName,
+            email = this.email,
+            photo = this.photo,
+            largeImage = this.largeImage,
+            mediumImage = this.mediumImage,
+            smallImage = this.smallImage,
+            xSmallImage = this.xSmallImage,
+            miniImage = this.miniImage,
+            birthDate = this.birthDate,
+            gender = this.gender,
+            address1 = this.address1,
+            address2 = this.address2,
+            city = this.city,
+            zip = this.zip,
+            state = this.state,
+            stateChoices = this.stateChoices,
+            phone = this.phone
+    )
+}
