@@ -54,7 +54,9 @@ data class DomainContent(
     var exam: DomainExamContent? = null,
     val video: DomainVideoContent? = null,
     val videoConference: DomainVideoConferenceContent? = null,
-    val isCourseAvailable: Boolean?
+    val isCourseAvailable: Boolean?,
+    val coverImageSmall: String? = null,
+    val coverImageMedium: String? = null
 ) {
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
@@ -108,7 +110,10 @@ fun createDomainContent(contentEntity: ContentEntity): DomainContent {
         htmlId = contentEntity.htmlId,
         start = contentEntity.start,
         hasStarted = contentEntity.hasStarted,
-        isCourseAvailable = contentEntity.isCourseAvailable
+        isCourseAvailable = contentEntity.isCourseAvailable,
+        coverImage = contentEntity.coverImage,
+        coverImageSmall = contentEntity.coverImageSmall,
+        coverImageMedium = contentEntity.coverImageMedium
     )
 }
 
@@ -151,7 +156,10 @@ fun createDomainContent(content: Content): DomainContent {
         attemptsUrl = content.attemptsUrl,
         videoConferenceID = content.videoConferenceId,
         videoConference = content.rawVideoConference?.asDomainContent(),
-        isCourseAvailable = content.isCourseAvailable
+        isCourseAvailable = content.isCourseAvailable,
+        coverImageMedium = content.coverImageMedium,
+        coverImage = content.coverImage,
+        coverImageSmall = content.coverImageSmall
     )
 }
 

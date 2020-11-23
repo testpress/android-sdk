@@ -114,6 +114,8 @@ fun NetworkContent.asGreenDaoModel(): Content {
         this.freePreview,
         this.isScheduled,
         this.coverImage,
+        this.coverImageMedium,
+        this.coverImageSmall,
         this.isCourseAvailable,
         this.courseId,
         this.chapterId,
