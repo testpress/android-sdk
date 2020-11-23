@@ -48,7 +48,7 @@ data class DomainContent(
     val htmlContentUrl: String? = null,
     val attemptsUrl: String? = null,
     val hasStarted: Boolean?,
-    val coverImage: String? = null,
+    var coverImage: String? = null,
     val attachment: DomainAttachmentContent? = null,
     val htmlContent: DomainHtmlContent? = null,
     var exam: DomainExamContent? = null,

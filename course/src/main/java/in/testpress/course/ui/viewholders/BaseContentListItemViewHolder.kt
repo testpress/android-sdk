@@ -9,6 +9,7 @@ import `in`.testpress.models.greendao.CourseDao
 import `in`.testpress.util.ImageUtils
 import android.content.Context
 import android.opengl.Visibility
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -45,11 +46,15 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
     }
 
     private fun updateThumbnail(content: DomainContent) {
-        if (content.image.isNullOrEmpty()) {
-            thumbnail.visibility = View.GONE
+        if (content.coverImage.isNullOrEmpty()) {
+            if (content.image.isNullOrEmpty()) {
+                thumbnail.visibility = View.GONE
+            } else {
+                imageLoader.displayImage(content.image, thumbnail, imageOptions)
+            }
         } else {
             thumbnail.visibility = View.VISIBLE
-            imageLoader.displayImage(content.image, thumbnail, imageOptions)
+            imageLoader.displayImage(content.coverImage, thumbnail, imageOptions)
         }
     }
 
