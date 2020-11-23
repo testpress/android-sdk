@@ -39,6 +39,8 @@ data class NetworkContent(
     val attemptsUrl: String? = null,
     val hasStarted: Boolean,
     val coverImage: String? = null,
+    val coverImageSmall: String? = null,
+    val coverImageMedium: String? = null,
     val exam: NetworkExamContent? = null,
     val htmlContent: NetworkHtmlContent? = null,
     val attachment: NetworkAttachmentContent? = null,
@@ -78,7 +80,10 @@ fun NetworkContent.asDatabaseModel(): ContentEntity {
         htmlId = this.htmlId,
         start = this.start,
         hasStarted = this.hasStarted,
-        isCourseAvailable = this.isCourseAvailable
+        isCourseAvailable = this.isCourseAvailable,
+        coverImage = this.coverImage,
+        coverImageMedium = this.coverImageMedium,
+        coverImageSmall = this.coverImageSmall
     )
 }
 

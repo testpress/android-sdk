@@ -11,7 +11,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(version = 7,
+@Database(version = 8,
         entities = [
             ContentEntity::class,
             OfflineVideo::class,
