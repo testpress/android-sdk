@@ -6,12 +6,13 @@ import `in`.testpress.database.roommigration.RoomMigration4To5.MIGRATION_4_5
 import `in`.testpress.database.roommigration.RoomMigration5To6.MIGRATION_5_6
 import `in`.testpress.database.roommigration.RoomMigration3To4.MIGRATION_3_4
 import `in`.testpress.database.roommigration.RoomMigration6To7.MIGRATION_6_7
+import `in`.testpress.database.roommigration.RoomMigration7To8.MIGRATION_7_8
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(version = 7,
+@Database(version = 8,
         entities = [
             ContentEntity::class,
             OfflineVideo::class,
@@ -31,7 +32,9 @@ abstract class TestpressDatabase : RoomDatabase() {
     companion object {
         private lateinit var INSTANCE: TestpressDatabase
 
-        val MIGRATIONS = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+        val MIGRATIONS = arrayOf(
+                MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8
+        )
 
         operator fun invoke(context: Context): TestpressDatabase {
             synchronized(TestpressDatabase::class.java) {
