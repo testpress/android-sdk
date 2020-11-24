@@ -46,7 +46,7 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
     }
 
     private fun updateThumbnail(content: DomainContent) {
-        if (content.coverImage.isNullOrEmpty()) {
+        if (content.coverImageMedium.isNullOrEmpty()) {
             if (content.image.isNullOrEmpty()) {
                 thumbnail.visibility = View.GONE
             } else {
@@ -54,7 +54,7 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
             }
         } else {
             thumbnail.visibility = View.VISIBLE
-            imageLoader.displayImage(content.coverImage, thumbnail, imageOptions)
+            imageLoader.displayImage(content.coverImageMedium, thumbnail, imageOptions)
         }
     }
 
