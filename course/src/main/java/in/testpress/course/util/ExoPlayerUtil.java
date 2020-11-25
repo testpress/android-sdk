@@ -387,8 +387,8 @@ public class ExoPlayerUtil {
         if (usbConnectionStateReceiver != null) {
             try {
                 activity.unregisterReceiver(usbConnectionStateReceiver);
-            } catch (Exception e) {
-                Log.i("ExoplayerUtil", "unregisterReceiver: "+ e.getMessage());
+            } catch (IllegalArgumentException exception) {
+                Log.i("ExoplayerUtil", "unregisterReceiver: "+ exception.getMessage());
             }
             mediaRouter.removeCallback(mediaRouterCallback);
         }
