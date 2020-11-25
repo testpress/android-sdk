@@ -3,49 +3,52 @@
     android:id="@+id/exo_player_main_frame"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:resize_mode="fixed_width"
-    >
+    app:resize_mode="fixed_width">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/exo_player_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#000000"
-        >
+        android:background="#000000">
 
-        <com.google.android.exoplayer2.ui.PlayerView android:id="@+id/exo_player_view"
+        <com.google.android.exoplayer2.ui.PlayerView
+            android:id="@+id/exo_player_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
+            app:hide_on_touch="true"
+            app:rewind_increment="10000"
+            app:fastforward_increment="10000"
+            app:use_controller="true"
+            app:controller_layout_id="@layout/custom_exoplayer_video_control"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <com.airbnb.lottie.LottieAnimationView android:id="@+id/exo_player_progress"
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/exo_player_progress"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:lottie_rawRes="@raw/testpress_material_wave_loading"
-            app:lottie_loop="true"
-            app:lottie_colorFilter="@color/testpress_white"
             app:lottie_autoPlay="true"
-            />
+            app:lottie_colorFilter="@color/testpress_white"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/testpress_material_wave_loading" />
 
-        <TextView android:id="@+id/error_message"
+        <TextView
+            android:id="@+id/error_message"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:background="#40000000"
+            android:gravity="center"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="#ffffff"
-            android:background="#40000000"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
