@@ -51,6 +51,7 @@ import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
 
 import java.util.HashMap;
@@ -384,7 +385,11 @@ public class ExoPlayerUtil {
             }
         }
         if (usbConnectionStateReceiver != null) {
-            activity.unregisterReceiver(usbConnectionStateReceiver);
+            try {
+                activity.unregisterReceiver(usbConnectionStateReceiver);
+            } catch (IllegalArgumentException exception) {
+                Log.i("ExoplayerUtil", "unregisterReceiver: "+ exception.getMessage());
+            }
             mediaRouter.removeCallback(mediaRouterCallback);
         }
     }
