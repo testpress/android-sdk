@@ -246,6 +246,14 @@ public class ExoPlayerUtil {
         player.seekTo(milliSeconds);
     }
 
+    public void fastForward(Long milliSeconds) {
+        player.seekTo(player.getCurrentPosition() + milliSeconds);
+    }
+
+    public void backward(Long milliSeconds) {
+        player.seekTo(player.getCurrentPosition() - milliSeconds);
+    }
+
     private void initResolutionSelector() {
         FrameLayout resolutionButton = playerView.findViewById(R.id.exo_resolution_button);
         resolutionButton.setOnClickListener(new View.OnClickListener() {

@@ -22,7 +22,8 @@
     <ImageButton
         android:id="@+id/exo_rew"
         style="@style/ExoMediaButton.Rewind"
-        android:layout_marginRight="40dp"
+        android:layout_marginRight="10dp"
+        android:paddingRight="30dp"
         android:src="@drawable/ic_exo_icon_rewind"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@id/exo_play"
@@ -32,7 +33,8 @@
     <ImageButton
         android:id="@+id/exo_ffwd"
         style="@style/ExoMediaButton.FastForward"
-        android:layout_marginLeft="40dp"
+        android:paddingStart="30dp"
+        android:layout_marginStart="10dp"
         android:src="@drawable/ic_exo_icon_fastforward"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@id/exo_play"
@@ -45,6 +47,35 @@
         android:layout_height="wrap_content"
         app:barrierDirection="right"
         app:constraint_referenced_ids="exo_pause,exo_play" />
+
+    <LinearLayout
+        android:id="@+id/fastForward"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/left_curved_ripple"
+        app:layout_constraintStart_toEndOf="@+id/exo_ffwd"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/videoTimeContainer"
+        android:orientation="horizontal">
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/backward"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        style="@style/ExoMediaButton.Rewind"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingRight="30dp"
+        android:background="@drawable/right_curved_ripple"
+        app:layout_constraintBottom_toTopOf="@+id/videoTimeContainer"
+        app:layout_constraintEnd_toStartOf="@+id/exo_rew"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:orientation="horizontal" />
 
     <ImageButton
         android:id="@+id/exo_play"
@@ -114,12 +145,13 @@
                 android:includeFontPadding="false"
                 android:textColor="#FFBEBEBE"/>
 
-            <Spinner android:id="@+id/exo_speed_rate_spinner"
+            <Spinner
+                android:id="@+id/exo_speed_rate_spinner"
+                style="@style/Widget.Testpress.HeaderBar.Spinner.Base"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="15dp"
                 android:layout_marginLeft="3dp"
-                android:gravity="center"
-                style="@style/Widget.Testpress.HeaderBar.Spinner.Base" />
+                android:gravity="center" />
 
             <FrameLayout
                 android:id="@+id/exo_fullscreen_button"

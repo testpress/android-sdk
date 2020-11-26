@@ -6,14 +6,14 @@ import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.getGreenDaoContent
 import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
+import `in`.testpress.course.util.DoubleClickListener
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.lifecycle.Observer
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import kotlinx.android.synthetic.main.custom_exoplayer_video_control.*
 
 class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
     private lateinit var exoPlayerMainFrame: AspectRatioFrameLayout
@@ -35,6 +35,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindViews(view)
+        setOnClickListener()
         val contentId = requireArguments().getLong(CONTENT_ID)
         viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer {
             when (it?.status) {
@@ -43,6 +44,21 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
                 }
             }
         })
+    }
+
+    private fun setOnClickListener() {
+        fastForward.setOnClickListener(DoubleClickListener(
+                        callback = object : DoubleClickListener.Callback {
+                            override fun doubleClicked() {
+                                fastForward(10000)
+                            }
+                        }))
+        backward.setOnClickListener(DoubleClickListener(
+                callback = object : DoubleClickListener.Callback {
+                    override fun doubleClicked() {
+                        backward(10000)
+                    }
+                }))
     }
 
     fun bindViews(view: View) {
@@ -76,6 +92,14 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
 
     override fun seekTo(milliSeconds: Long?) {
         exoPlayerUtil?.seekTo(milliSeconds)
+    }
+
+    override fun fastForward(milliSeconds: Long?) {
+        exoPlayerUtil?.fastForward(milliSeconds)
+    }
+
+    override fun backward(milliSeconds: Long?) {
+        exoPlayerUtil?.backward(milliSeconds)
     }
 
     override fun onPause() {
