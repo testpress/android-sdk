@@ -1,84 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/content_item_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white"
-    android:orientation="horizontal"
-    android:padding="20dp">
+    android:padding="10dp"
+    tools:ignore="MissingDefaultResource">
 
-    <RelativeLayout
-        android:layout_width="84dp"
-        android:layout_height="72dp"
-        android:layout_gravity="center_vertical"
-        android:orientation="vertical">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container"
+        android:layout_width="155dp"
+        android:layout_height="87dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/thumbnail"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            android:scaleType="fitXY"
-            android:src="@drawable/testpress_exam_icon" />
-
-        <View
-            android:id="@+id/white_foreground"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/thumbnailContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#aaffffff" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
-            android:id="@+id/lock_container"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginEnd="13dp"
-            android:layout_marginRight="13dp"
-            android:background="@drawable/testpress_round_gray_background"
-            android:gravity="center">
+            <androidx.cardview.widget.CardView
+                android:id="@+id/thumbnailImageContainer"
+                android:layout_width="155dp"
+                android:layout_height="87dp"
+                android:visibility="visible"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:id="@+id/lock_image"
-                android:layout_width="wrap_content"
-                android:layout_height="16dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="10dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/testpress_lock_outline_white" />
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center">
 
-        </LinearLayout>
+                <ImageView
+                    android:id="@+id/thumbnail"
+                    android:layout_width="155dp"
+                    android:layout_height="87dp"
+                    android:adjustViewBounds="true"
+                    android:background="#CAC8C8" />
 
-        <LinearLayout
-            android:id="@+id/attempted_tick_container"
-            android:layout_width="30dp"
-            android:layout_height="25dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp"
-            android:gravity="center"
-            android:visibility="gone">
+                <ImageView
+                    android:id="@+id/content_icon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:paddingBottom="10dp"
+                    android:visibility="visible"
+                    android:src="@drawable/test"/>
 
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:background="@drawable/testpress_white_circle_background"
-                android:src="@drawable/testpress_tick"
-                android:tint="@color/testpress_green" />
+                </FrameLayout>
 
-        </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-    </RelativeLayout>
+            <LinearLayout
+                android:id="@+id/lock_container"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginEnd="0dp"
+                android:layout_marginRight="13dp"
+                android:background="@drawable/testpress_round_gray_background"
+                android:gravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/lock_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="16dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/testpress_lock_outline_white" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/attempted_tick_container"
+                android:layout_width="30dp"
+                android:layout_height="25dp"
+                android:gravity="center"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:background="@drawable/testpress_white_circle_background"
+                    android:src="@drawable/testpress_tick"
+                    android:tint="@color/testpress_green" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:orientation="vertical">
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toEndOf="@+id/container"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/title"
@@ -165,4 +198,4 @@
 
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
