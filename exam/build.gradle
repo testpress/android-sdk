@@ -34,6 +34,7 @@ dependencies {
     api rootProject.chart
     api rootProject.imageCropper
     api rootProject.lottie
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
     testImplementation rootProject.roboelectric

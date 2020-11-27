@@ -1,14 +1,9 @@
 package `in`.testpress.course.ui.viewholders
 
-import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.models.greendao.ChapterDao
-import `in`.testpress.models.greendao.CourseDao
 import `in`.testpress.util.ImageUtils
-import android.content.Context
-import android.opengl.Visibility
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -21,12 +16,12 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
     private val title: TextView = view.findViewById(R.id.title)
     private val thumbnail: ImageView = view.findViewById(R.id.thumbnail)
     private val scheduledInfo: TextView = view.findViewById(R.id.scheduled_info)
-    private val whiteForeground: View = view.findViewById(R.id.white_foreground)
     private val lockContainer: LinearLayout = view.findViewById(R.id.lock_container)
     val attemptedTickContainer: LinearLayout = view.findViewById(R.id.attempted_tick_container)
     private val lockImage: ImageView = view.findViewById(R.id.lock_image)
     private val scheduledInfoContainer: LinearLayout = view.findViewById(R.id.scheduled_info_container)
     private val contentDetailsContainer: LinearLayout = view.findViewById(R.id.content_details_container)
+    val contentTypeIcon: ImageView = view.findViewById(R.id.content_type_icon)
     private var imageLoader: ImageLoader = ImageUtils.initImageLoader(view.context)
     private var imageOptions: DisplayImageOptions = ImageUtils.getPlaceholdersOption()
 
@@ -45,11 +40,8 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
     }
 
     private fun updateThumbnail(content: DomainContent) {
-        if (content.image.isNullOrEmpty()) {
-            thumbnail.visibility = View.GONE
-        } else {
-            thumbnail.visibility = View.VISIBLE
-            imageLoader.displayImage(content.image, thumbnail, imageOptions)
+        if (!content.coverImageMedium.isNullOrEmpty()) {
+            imageLoader.displayImage(content.coverImageMedium, thumbnail, imageOptions)
         }
     }
 
@@ -64,7 +56,6 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
     }
 
     private fun showLockIcon() {
-        whiteForeground.visibility = View.VISIBLE
         lockContainer.visibility = View.VISIBLE
     }
 
@@ -79,7 +70,6 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
     }
 
     private fun hideLockIcon() {
-        whiteForeground.visibility = View.GONE
         lockContainer.visibility = View.GONE
     }
 

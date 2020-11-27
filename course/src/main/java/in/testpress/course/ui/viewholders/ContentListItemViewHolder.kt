@@ -1,15 +1,11 @@
 package `in`.testpress.course.ui.viewholders
 
-import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.ContentType
 import `in`.testpress.course.domain.DomainContent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 
 class ContentListItemViewHolder(view: View) : BaseContentListItemViewHolder(view) {
     companion object {
@@ -19,5 +15,14 @@ class ContentListItemViewHolder(view: View) : BaseContentListItemViewHolder(view
             return ContentListItemViewHolder(view)
         }
 
+    }
+
+    override fun bindContentDetails(content: DomainContent) {
+        super.bindContentDetails(content)
+        when (content.contentTypeEnum) {
+            ContentType.Notes -> contentTypeIcon.setImageResource(R.drawable.writing)
+            ContentType.Attachment -> contentTypeIcon.setImageResource(R.drawable.paperclip)
+            else -> contentTypeIcon.setImageResource(R.drawable.ic_live)
+        }
     }
 }
