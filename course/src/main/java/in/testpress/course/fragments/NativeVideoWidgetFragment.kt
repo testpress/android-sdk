@@ -48,11 +48,11 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
 
     private fun setOnClickListener() {
         fastForward.setOnClickListener(DoubleClickListener(
-                        callback = object : DoubleClickListener.Callback {
-                            override fun doubleClicked() {
-                                fastForward(10000)
-                            }
-                        }))
+                callback = object : DoubleClickListener.Callback {
+                    override fun doubleClicked() {
+                        fastForward(10000)
+                    }
+                }))
         backward.setOnClickListener(DoubleClickListener(
                 callback = object : DoubleClickListener.Callback {
                     override fun doubleClicked() {
