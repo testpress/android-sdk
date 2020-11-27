@@ -21,7 +21,7 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
     private val lockImage: ImageView = view.findViewById(R.id.lock_image)
     private val scheduledInfoContainer: LinearLayout = view.findViewById(R.id.scheduled_info_container)
     private val contentDetailsContainer: LinearLayout = view.findViewById(R.id.content_details_container)
-    val contentIcon: ImageView = view.findViewById(R.id.content_icon)
+    val contentTypeIcon: ImageView = view.findViewById(R.id.content_type_icon)
     private var imageLoader: ImageLoader = ImageUtils.initImageLoader(view.context)
     private var imageOptions: DisplayImageOptions = ImageUtils.getPlaceholdersOption()
 

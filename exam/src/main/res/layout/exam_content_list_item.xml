@@ -45,7 +45,7 @@
                     android:background="#CAC8C8" />
 
                 <ImageView
-                    android:id="@+id/content_icon"
+                    android:id="@+id/content_type_icon"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_gravity="center"

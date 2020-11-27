@@ -35,11 +35,11 @@ class VideoContentListItemViewHolder(view: View) : BaseContentListItemViewHolder
         when (content.videoWatchedPercentage) {
             0, null -> {}
             100 ->  attemptedTickContainer.visibility = View.VISIBLE
-            else -> showVideoProgressPercentage(content.videoWatchedPercentage)
+            else -> showVideoProgress(content.videoWatchedPercentage)
         }
     }
 
-    private fun showVideoProgressPercentage(videoWatchedPercentage: Int) {
+    private fun showVideoProgress(videoWatchedPercentage: Int) {
         videoCompletionProgressContainer.visibility = View.VISIBLE
         progressbar.progress = videoWatchedPercentage
     }

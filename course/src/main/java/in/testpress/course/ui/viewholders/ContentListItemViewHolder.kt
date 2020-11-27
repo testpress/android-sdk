@@ -20,9 +20,9 @@ class ContentListItemViewHolder(view: View) : BaseContentListItemViewHolder(view
     override fun bindContentDetails(content: DomainContent) {
         super.bindContentDetails(content)
         when (content.contentTypeEnum) {
-            ContentType.Notes -> contentIcon.setImageResource(R.drawable.writing)
-            ContentType.Attachment -> contentIcon.setImageResource(R.drawable.paperclip)
-            else -> contentIcon.setImageResource(R.drawable.ic_live)
+            ContentType.Notes -> contentTypeIcon.setImageResource(R.drawable.writing)
+            ContentType.Attachment -> contentTypeIcon.setImageResource(R.drawable.paperclip)
+            else -> contentTypeIcon.setImageResource(R.drawable.ic_live)
         }
     }
 }
