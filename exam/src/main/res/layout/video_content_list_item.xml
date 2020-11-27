@@ -16,7 +16,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/thumbnailContainer"
-            android:layout_width="155dp"
+            android:layout_width="160dp"
             android:layout_height="87dp"
             android:layout_margin="10dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -79,6 +79,7 @@
                         </FrameLayout>
 
                     </LinearLayout>
+
                 </FrameLayout>
             </androidx.cardview.widget.CardView>
 
@@ -87,7 +88,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginRight="4dp"
+                android:layout_marginRight="6dp"
                 android:layout_marginBottom="4dp"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -115,24 +116,13 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/placeholder"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <LinearLayout
                 android:id="@+id/lock_container"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginEnd="0dp"
-                android:layout_marginRight="13dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginRight="8dp"
                 android:background="@drawable/testpress_round_gray_background"
                 android:gravity="center"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -150,6 +140,16 @@
                     android:src="@drawable/testpress_lock_outline_white" />
 
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/placeholder"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

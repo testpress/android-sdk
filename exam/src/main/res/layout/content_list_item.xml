@@ -16,7 +16,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/thumbnailContainer"
-            android:layout_width="155dp"
+            android:layout_width="160dp"
             android:layout_height="87dp"
             android:layout_margin="10dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -29,6 +29,7 @@
                 android:visibility="visible"
                 app:cardCornerRadius="4dp"
                 app:cardElevation="0dp"
+                android:paddingRight="10dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -62,8 +63,9 @@
                 android:layout_height="36dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_marginEnd="0dp"
-                android:layout_marginRight="13dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginRight="8dp"
                 android:background="@drawable/testpress_round_gray_background"
                 android:gravity="center"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -96,6 +98,7 @@
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
+                android:gravity="end|bottom"
                 android:background="@drawable/green_circle_background"
                 android:src="@drawable/ic_tick" />
 
