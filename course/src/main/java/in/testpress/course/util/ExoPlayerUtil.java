@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -32,6 +34,8 @@ import androidx.mediarouter.media.MediaRouter;
 import androidx.mediarouter.media.MediaRouter.RouteInfo;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.github.vkay94.dtpv.DoubleTapPlayerView;
+import com.github.vkay94.dtpv.youtube.YouTubeOverlay;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultControlDispatcher;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -72,6 +76,8 @@ import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
+import kotlinx.coroutines.CoroutineScope;
+import kotlinx.coroutines.Dispatchers;
 
 import static android.content.Context.AUDIO_SERVICE;
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
@@ -95,6 +101,10 @@ public class ExoPlayerUtil {
     private ImageView fullscreenIcon;
     private Dialog fullscreenDialog;
     private TrackSelectionDialog trackSelectionDialog;
+    private LottieAnimationView fastForward;
+    private LottieAnimationView backward;
+    private ImageButton exoPlayerFastForward;
+    private ImageButton exoPlayerBackward;
 
 
     private Activity activity;
@@ -149,6 +159,8 @@ public class ExoPlayerUtil {
         playerView = exoPlayerMainFrame.findViewById(R.id.exo_player_view);
         fullscreenIcon = exoPlayerMainFrame.findViewById(R.id.exo_fullscreen_icon);
         progressBar = exoPlayerMainFrame.findViewById(R.id.exo_player_progress);
+        fastForward = exoPlayerMainFrame.findViewById(R.id.fastForwardAnimation);
+        backward = exoPlayerMainFrame.findViewById(R.id.backwardAnimation);
         errorMessageTextView = exoPlayerMainFrame.findViewById(R.id.error_message);
         TestpressSession session = TestpressSdk.getTestpressSession(activity);
         if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
@@ -192,6 +204,7 @@ public class ExoPlayerUtil {
         trackSelector =  new DefaultTrackSelector(activity, videoTrackSelectionFactory);
         initFullscreenDialog();
         initResolutionSelector();
+        setOnClickListener();
 
         // set activity as portrait mode at first
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -245,6 +258,65 @@ public class ExoPlayerUtil {
 
     public void seekTo(Long milliSeconds) {
         player.seekTo(milliSeconds);
+    }
+
+    public void fastForward(Long milliSeconds) {
+        animateFastForward();
+        player.seekTo(player.getCurrentPosition() + milliSeconds);
+    }
+
+    public void backward(Long milliSeconds) {
+        animateBackward();
+        player.seekTo(player.getCurrentPosition() - milliSeconds);
+    }
+
+    public void animateFastForward() {
+        playerView.hideController();
+        fastForward.setVisibility(View.VISIBLE);
+        fastForward.playAnimation();
+        new CountDownTimer(1000,100){
+            @Override
+            public void onTick(long millisUntilFinished) { }
+
+            @Override
+            public void onFinish() {
+                fastForward.setVisibility(View.GONE);
+            }
+        }.start();
+    }
+
+    public void animateBackward() {
+        playerView.hideController();
+        backward.setVisibility(View.VISIBLE);
+        backward.playAnimation();
+        new CountDownTimer(1000,100){
+            @Override
+            public void onTick(long millisUntilFinished) { }
+
+            @Override
+            public void onFinish() {
+                backward.setVisibility(View.GONE);
+                exoPlayerBackward.setVisibility(View.VISIBLE);
+                exoPlayerFastForward.setVisibility(View.VISIBLE);
+            }
+        }.start();
+    }
+
+    private void setOnClickListener() {
+        exoPlayerFastForward = playerView.findViewById(R.id.exo_ffwd);
+        exoPlayerBackward = playerView.findViewById(R.id.exo_rew);
+        exoPlayerFastForward.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               fastForward(10_000L);
+            }
+        });
+        exoPlayerBackward.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                backward(10_000L);
+            }
+        });
     }
 
     private void initResolutionSelector() {

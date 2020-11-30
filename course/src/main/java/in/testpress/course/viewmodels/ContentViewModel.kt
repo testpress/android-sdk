@@ -5,10 +5,14 @@ import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.network.Resource
 import `in`.testpress.course.repository.ContentRepository
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 
 open class ContentViewModel(open val repository: ContentRepository) : ViewModel() {
+    var isFastForwardClicked = MutableLiveData<Boolean>()
+    var isBackwardClicked = MutableLiveData<Boolean>()
+
     fun getContent(contentId: Long,
                  forceRefresh: Boolean = false): LiveData<Resource<DomainContent>> {
         return repository.loadContent(contentId, forceRefresh)

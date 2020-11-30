@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <corners android:bottomLeftRadius="250dp"
+                android:topLeftRadius="250dp"/>
+        </shape>
+    </item>
+    <item android:drawable="@drawable/fast_forward_background" />
+</selector>

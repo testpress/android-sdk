@@ -27,4 +27,12 @@ open class BaseVideoWidgetFragment : Fragment() {
     }
 
     open fun seekTo(milliSeconds: Long?) {}
+
+    open fun fastForward(milliSeconds: Long?) {}
+
+    open fun backward(milliSeconds: Long?) {}
+
+    open fun animateFastForward() {}
+
+    open fun animateBackward() {}
 }

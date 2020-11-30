@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?android:attr/colorControlHighlight">
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/testpress_table_text" />
+            <corners android:bottomRightRadius="250dp"
+                android:topRightRadius="250dp" />
+        </shape>
+    </item>
+    <item android:drawable="@drawable/fast_forward_background" />
+</ripple>
