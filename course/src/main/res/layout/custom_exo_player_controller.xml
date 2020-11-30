@@ -1,132 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tool="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#99000000"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingTop="12dp"
     android:paddingBottom="12dp"
-    android:visibility="visible"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent">
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/barrier_left"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="left"
-        app:constraint_referenced_ids="exo_pause,exo_play" />
-
-    <ImageButton
-        android:id="@+id/exo_rew"
-        style="@style/ExoMediaButton.Rewind"
-        android:layout_marginRight="10dp"
-        android:paddingRight="30dp"
-        android:src="@drawable/ic_exo_icon_rewind"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@id/exo_play"
-        app:layout_constraintRight_toLeftOf="@+id/barrier_left"
-        app:layout_constraintTop_toTopOf="@id/exo_play" />
-
-    <ImageButton
-        android:id="@+id/exo_ffwd"
-        style="@style/ExoMediaButton.FastForward"
-        android:layout_marginStart="10dp"
-        android:paddingStart="30dp"
-        android:src="@drawable/ic_exo_icon_fastforward"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@id/exo_play"
-        app:layout_constraintLeft_toRightOf="@+id/barrier_right"
-        app:layout_constraintTop_toTopOf="@id/exo_play" />
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/videoControllers"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:constraint_referenced_ids="exo_ffwd,exo_rew, exo_play, exo_pause" />
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/barrier_right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="right"
-        app:constraint_referenced_ids="exo_pause,exo_play" />
+    android:background="#99000000">
 
     <LinearLayout
-        android:id="@+id/fastForward"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/videoTimeContainer"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/exo_ffwd"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:orientation="horizontal">
 
         <LinearLayout
-            android:id="@+id/fastForwardContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:gravity="center"
-            android:visibility="visible"
+            android:id="@+id/backward"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginEnd="40dp"
+            android:layout_marginBottom="40dp"
             android:orientation="horizontal">
 
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/fastForwardAnimation"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                app:lottie_autoPlay="true"
-                android:visibility="visible"
-                app:lottie_colorFilter="@color/testpress_white"
-                app:lottie_loop="true"
-                app:lottie_rawRes="@raw/fastforward" />
-
-            <ImageView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:src="@drawable/exo_controls_fastforward" />
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp">
+
+                <LinearLayout
+                    android:id="@+id/backwardContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:focusable="true"
+                    android:clickable="true">
+
+<!--                    <com.airbnb.lottie.LottieAnimationView-->
+<!--                        android:id="@+id/backwardAnimation"-->
+<!--                        style="@style/ExoMediaButton.Rewind"-->
+<!--                        android:layout_width="40dp"-->
+<!--                        android:layout_height="40dp"-->
+<!--                        app:lottie_autoPlay="false"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:visibility="gone"-->
+<!--                        android:focusable="false"-->
+<!--                        android:clickable="false"-->
+<!--                        app:lottie_colorFilter="@color/testpress_white"-->
+<!--                        app:lottie_loop="false"-->
+<!--                        app:lottie_rawRes="@raw/rewind" />-->
+
+                </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/exo_rew"
+                    style="@style/ExoMediaButton.Rewind"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_exo_icon_rewind"
+                    android:visibility="visible"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/backward"
-        style="@style/ExoMediaButton.Rewind"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/videoTimeContainer"
-        app:layout_constraintEnd_toStartOf="@+id/exo_rew"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
         <LinearLayout
-            android:id="@+id/backwardContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="30dp"
-            android:visibility="gone"
-            android:orientation="vertical">
+            android:id="@+id/fastForward"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="40dp"
+            android:layout_weight="1">
 
-            <com.airbnb.lottie.LottieAnimationView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                style="@style/ExoMediaButton.Rewind"
-                app:lottie_autoPlay="true"
-                android:visibility="gone"
-                app:lottie_colorFilter="@color/testpress_white"
-                app:lottie_loop="true"
-                app:lottie_rawRes="@raw/rewind" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp">
+
+                <ImageButton
+                    android:id="@+id/exo_ffwd"
+                    style="@style/ExoMediaButton.FastForward"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_exo_icon_fastforward"
+                    android:visibility="visible"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/fastForwardContainer"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:background="@android:color/transparent"-->
+<!--                    android:focusable="true"-->
+<!--                    android:clickable="true">-->
+
+<!--                    <com.airbnb.lottie.LottieAnimationView-->
+<!--                        android:id="@+id/fastForwardAnimation"-->
+<!--                        style="@style/ExoMediaButton.FastForward"-->
+<!--                        android:layout_width="40dp"-->
+<!--                        android:layout_height="40dp"-->
+<!--                        app:lottie_autoPlay="false"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:visibility="gone"-->
+<!--                        android:focusable="false"-->
+<!--                        android:clickable="false"-->
+<!--                        app:lottie_colorFilter="@color/testpress_white"-->
+<!--                        app:lottie_loop="false"-->
+<!--                        app:lottie_rawRes="@raw/fastforward" />-->
+
+<!--                </LinearLayout>-->
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -153,7 +145,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <LinearLayout
         android:id="@+id/videoTimeContainer"
@@ -248,4 +239,5 @@
 
         </LinearLayout>
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

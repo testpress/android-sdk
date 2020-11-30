@@ -2,7 +2,7 @@ package `in`.testpress.course.util
 
 import android.view.View
 
-class DoubleClickListener(
+open class DoubleClickListener(
         private val doubleClickTimeLimitMills: Long = 1000,
         private val callback: Callback
 ): View.OnClickListener {

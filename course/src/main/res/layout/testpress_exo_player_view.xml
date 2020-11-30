@@ -1,5 +1,6 @@
 <com.google.android.exoplayer2.ui.AspectRatioFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/exo_player_main_frame"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -19,7 +20,7 @@
             app:rewind_increment="10000"
             app:fastforward_increment="10000"
             app:use_controller="true"
-            app:controller_layout_id="@layout/custom_exoplayer_video_control"
+            app:controller_layout_id="@layout/custom_exo_player_controller"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -36,6 +37,44 @@
             app:lottie_colorFilter="@color/testpress_white"
             app:lottie_loop="true"
             app:lottie_rawRes="@raw/testpress_material_wave_loading" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/backwardAnimation"
+            style="@style/ExoMediaButton.Rewind"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="50dp"
+            android:clickable="false"
+            android:focusable="false"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/exo_player_progress"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="false"
+            app:lottie_colorFilter="@color/testpress_white"
+            app:lottie_loop="false"
+            app:lottie_rawRes="@raw/rewind" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/fastForwardAnimation"
+            style="@style/ExoMediaButton.FastForward"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:clickable="false"
+            android:layout_marginStart="50dp"
+            android:focusable="false"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/exo_player_progress"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="false"
+            app:lottie_colorFilter="@color/testpress_white"
+            app:lottie_loop="false"
+            app:lottie_rawRes="@raw/fastforward" />
 
         <TextView
             android:id="@+id/error_message"

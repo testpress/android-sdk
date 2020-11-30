@@ -3,7 +3,7 @@
     android:color="?android:attr/colorControlHighlight">
     <item android:id="@android:id/mask">
         <shape android:shape="rectangle">
-            <solid android:color="#000000" />
+            <solid android:color="@color/testpress_table_text" />
             <corners android:bottomLeftRadius="250dp"
                 android:topLeftRadius="250dp" />
         </shape>

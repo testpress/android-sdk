@@ -4,20 +4,34 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.getGreenDaoContent
-import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
-import `in`.testpress.course.util.DoubleClickListener
+import `in`.testpress.course.util.DoubleTapListener
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
+import `in`.testpress.enums.Status
 import android.os.Bundle
-import android.view.*
+import android.os.CountDownTimer
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import com.airbnb.lottie.LottieAnimationView
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import kotlinx.android.synthetic.main.custom_exoplayer_video_control.*
+import kotlinx.android.synthetic.main.custom_exo_player_controller.*
+import kotlinx.android.synthetic.main.custom_exoplayer_video_control.backward
+import kotlinx.android.synthetic.main.custom_exoplayer_video_control.fastForward
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
 
 class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
     private lateinit var exoPlayerMainFrame: AspectRatioFrameLayout
     private var exoPlayerUtil: ExoPlayerUtil? = null
+    private lateinit var fastForwardAnimationView: LottieAnimationView
+    private lateinit var backwardAnimationView: LottieAnimationView
 
     private val session by lazy { TestpressSdk.getTestpressSession(requireActivity()) }
     private val exoplayerFullscreenHelper: ExoplayerFullscreenHelper by lazy {
@@ -46,26 +60,25 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         })
     }
 
-    private fun setOnClickListener() {
-        fastForward.setOnClickListener(DoubleClickListener(
-                callback = object : DoubleClickListener.Callback {
-                    override fun doubleClicked() {
-                        fastForward(10000)
-                    }
-                }))
-        backward.setOnClickListener(DoubleClickListener(
-                callback = object : DoubleClickListener.Callback {
-                    override fun doubleClicked() {
-                        backward(10000)
-                    }
-                }))
-    }
-
     fun bindViews(view: View) {
         exoPlayerMainFrame = view.findViewById(R.id.exo_player_main_frame)
         exoPlayerMainFrame.visibility = View.VISIBLE
         exoPlayerMainFrame.setAspectRatio(16f/9f)
         exoplayerFullscreenHelper.initializeOrientationListener()
+
+    }
+
+    private fun setOnClickListener() {
+        fastForward.setOnClickListener(object : DoubleTapListener() {
+            override fun onDoubleClick(v: View) {
+                fastForward(10_000)
+            }
+        })
+        backward.setOnClickListener(object : DoubleTapListener() {
+            override fun onDoubleClick(v: View) {
+                backward(10_000)
+            }
+        })
     }
 
     private fun createAttemptAndInitializeExoplayer(content: DomainContent) {
@@ -100,6 +113,14 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
 
     override fun backward(milliSeconds: Long?) {
         exoPlayerUtil?.backward(milliSeconds)
+    }
+
+    override fun animateFastForward() {
+        exoPlayerUtil?.animateFastForward()
+    }
+
+    override fun animateBackward() {
+        exoPlayerUtil?.animateBackward()
     }
 
     override fun onPause() {
