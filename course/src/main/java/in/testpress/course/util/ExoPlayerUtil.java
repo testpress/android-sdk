@@ -271,6 +271,44 @@ public class ExoPlayerUtil {
         });
     }
 
+    public void initializePlayer() {
+        MediaSource mediaSource = getMediaSource();
+        errorMessageTextView.setVisibility(View.GONE);
+        if (player == null) {
+            progressBar.setVisibility(View.VISIBLE);
+            setPlayerProperties();
+            initializeAudioManager();
+        }
+        player.prepare(mediaSource, false, false);
+        if (overlayPositionHandler != null) {
+            overlayPositionHandler
+                    .postDelayed(overlayPositionChangeTask, OVERLAY_POSITION_CHANGE_INTERVAL);
+        }
+        registerUsbConnectionStateReceiver();
+        addPlayPauseOnClickListener();
+    }
+
+    private void setPlayerProperties() {
+        player = new SimpleExoPlayer.Builder(activity, new DefaultRenderersFactory(activity))
+                .setTrackSelector(trackSelector).build();
+
+        player.addListener(new PlayerEventListener());
+        playerView.setPlayer(player);
+        player.setPlayWhenReady(playWhenReady);
+        player.seekTo(getStartPositionInMilliSeconds());
+        player.setPlaybackParameters(new PlaybackParameters(speedRate));
+    }
+
+    private long getStartPositionInMilliSeconds() {
+        return (long)(startPosition * 1000);
+    }
+
+    private void initializeAudioManager() {
+        audioManager = (AudioManager) activity.getSystemService(AUDIO_SERVICE);
+        initAudioFocusChangeListener();
+        audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+    }
+
     private void initAudioFocusChangeListener() {
         audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
             public void onAudioFocusChange(int focusChange) {
@@ -288,38 +326,13 @@ public class ExoPlayerUtil {
         };
     }
 
-    public void initializePlayer() {
-        errorMessageTextView.setVisibility(View.GONE);
-        if (player == null) {
-            progressBar.setVisibility(View.VISIBLE);
-            player = new SimpleExoPlayer.Builder(activity, new DefaultRenderersFactory(activity))
-                    .setTrackSelector(trackSelector).build();
-
-            player.addListener(new PlayerEventListener());
-            playerView.setPlayer(player);
-            player.setPlayWhenReady(playWhenReady);
-            audioManager = (AudioManager) activity.getSystemService(AUDIO_SERVICE);
-            initAudioFocusChangeListener();
-            audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-            // Convert seconds to ms
-            player.seekTo((long) (startPosition * 1000));
-            player.setPlaybackParameters(new PlaybackParameters(speedRate));
-        }
-
-        MediaSource mediaSource = getMediaSource();
-        player.prepare(mediaSource, false, false);
-        if (overlayPositionHandler != null) {
-            overlayPositionHandler
-                    .postDelayed(overlayPositionChangeTask, OVERLAY_POSITION_CHANGE_INTERVAL);
-        }
+    private void registerUsbConnectionStateReceiver() {
         if (usbConnectionStateReceiver != null) {
             IntentFilter filter = new IntentFilter("android.hardware.usb.action.USB_STATE");
             activity.registerReceiver(usbConnectionStateReceiver, filter);
             mediaRouter.addCallback(mediaRouteSelector, mediaRouterCallback,
                     MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
         }
-
-        addPlayPauseOnClickListener();
     }
 
     private DialogInterface.OnClickListener trackSelectionListener() {
