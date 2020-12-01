@@ -272,23 +272,17 @@ public class ExoPlayerUtil {
     }
 
     public void initializePlayer() {
-        MediaSource mediaSource = getMediaSource();
-        errorMessageTextView.setVisibility(View.GONE);
         if (player == null) {
             progressBar.setVisibility(View.VISIBLE);
-            setPlayerProperties();
+            buildPlayer();
             initializeAudioManager();
         }
-        player.prepare(mediaSource, false, false);
-        if (overlayPositionHandler != null) {
-            overlayPositionHandler
-                    .postDelayed(overlayPositionChangeTask, OVERLAY_POSITION_CHANGE_INTERVAL);
-        }
-        registerUsbConnectionStateReceiver();
-        addPlayPauseOnClickListener();
+        preparePlayer();
+        initializeUsernameOverlay();
+        registerListeners();
     }
 
-    private void setPlayerProperties() {
+    private void buildPlayer() {
         player = new SimpleExoPlayer.Builder(activity, new DefaultRenderersFactory(activity))
                 .setTrackSelector(trackSelector).build();
 
@@ -326,6 +320,22 @@ public class ExoPlayerUtil {
         };
     }
 
+    private void preparePlayer() {
+        player.prepare(getMediaSource(), false, false);
+    }
+
+    private void initializeUsernameOverlay() {
+        if (overlayPositionHandler != null) {
+            overlayPositionHandler
+                    .postDelayed(overlayPositionChangeTask, OVERLAY_POSITION_CHANGE_INTERVAL);
+        }
+    }
+
+    private void registerListeners() {
+        registerUsbConnectionStateReceiver();
+        addPlayPauseOnClickListener();
+    }
+
     private void registerUsbConnectionStateReceiver() {
         if (usbConnectionStateReceiver != null) {
             IntentFilter filter = new IntentFilter("android.hardware.usb.action.USB_STATE");
@@ -333,6 +343,19 @@ public class ExoPlayerUtil {
             mediaRouter.addCallback(mediaRouteSelector, mediaRouterCallback,
                     MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
         }
+    }
+
+    private void addPlayPauseOnClickListener() {
+        playerView.setControlDispatcher(new DefaultControlDispatcher() {
+            @Override
+            public boolean dispatchSetPlayWhenReady(Player player, boolean playWhenReady) {
+                if (playWhenReady) {
+                    audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+                }
+                updateVideoAttempt();
+                return super.dispatchSetPlayWhenReady(player, playWhenReady);
+            }
+        });
     }
 
     private DialogInterface.OnClickListener trackSelectionListener() {
@@ -368,20 +391,6 @@ public class ExoPlayerUtil {
 
     private DataSource.Factory buildDataSourceFactory() {
         return new ExoPlayerDataSourceFactory(activity).build();
-    }
-
-
-    private void addPlayPauseOnClickListener() {
-        playerView.setControlDispatcher(new DefaultControlDispatcher() {
-            @Override
-            public boolean dispatchSetPlayWhenReady(Player player, boolean playWhenReady) {
-                if (playWhenReady) {
-                    audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-                }
-                updateVideoAttempt();
-                return super.dispatchSetPlayWhenReady(player, playWhenReady);
-            }
-        });
     }
 
     public void releasePlayer() {
