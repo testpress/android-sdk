@@ -13,6 +13,7 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
         versionName VERSION_NAME
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -26,6 +27,13 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
         unitTests.includeAndroidResources = true
+    }
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 }
 
@@ -62,6 +70,16 @@ dependencies {
     androidTestImplementation rootProject.testRunner
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+
+    androidTestImplementation "androidx.test:core:1.1.0"
+    androidTestImplementation "androidx.test:rules:1.1.0"
+
+    // Allow methods more than 64K
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+    def fragment_version = "1.2.5"
+
+    debugImplementation "androidx.fragment:fragment-testing:$fragment_version"
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
