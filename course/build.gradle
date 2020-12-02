@@ -70,6 +70,12 @@ dependencies {
     androidTestImplementation rootProject.testRunner
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+
+    androidTestImplementation "androidx.test:core:1.1.0"
+    androidTestImplementation "androidx.test:rules:1.1.0"
+
+    // Allow methods more than 64K
+    implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.github.vkay94:DoubleTapPlayerView:1.0.0'
 
     androidTestImplementation "androidx.test:core:1.1.0"
