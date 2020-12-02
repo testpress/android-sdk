@@ -33,6 +33,8 @@ import androidx.mediarouter.media.MediaRouter;
 import androidx.mediarouter.media.MediaRouter.RouteInfo;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.github.vkay94.dtpv.DoubleTapPlayerView;
+import com.github.vkay94.dtpv.youtube.YouTubeOverlay;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultControlDispatcher;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -50,7 +52,6 @@ import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
@@ -87,7 +88,7 @@ public class ExoPlayerUtil {
 
     private FrameLayout exoPlayerMainFrame;
     private View exoPlayerLayout;
-    private PlayerView playerView;
+    private DoubleTapPlayerView playerView;
     private LottieAnimationView progressBar;
     private TextView errorMessageTextView;
     private LinearLayout emailIdLayout;
@@ -97,6 +98,7 @@ public class ExoPlayerUtil {
     private ImageView fullscreenIcon;
     private Dialog fullscreenDialog;
     private TrackSelectionDialog trackSelectionDialog;
+    private YouTubeOverlay youtubeOverlay;
 
 
     private Activity activity;
@@ -211,6 +213,7 @@ public class ExoPlayerUtil {
     private void initializeViews() {
         emailIdTextView = exoPlayerMainFrame.findViewById(R.id.email_id);
         emailIdLayout = exoPlayerMainFrame.findViewById(R.id.email_id_layout);
+        youtubeOverlay = activity.findViewById(R.id.youtube_overlay);
     }
 
     private void initFullscreenDialog() {
@@ -278,6 +281,7 @@ public class ExoPlayerUtil {
         if (player == null) {
             progressBar.setVisibility(View.VISIBLE);
             buildPlayer();
+            initializeDoubleClickOverlay();
             initializeAudioManager();
         }
         preparePlayer();
@@ -294,11 +298,29 @@ public class ExoPlayerUtil {
         player.setPlayWhenReady(playWhenReady);
         player.seekTo(getStartPositionInMilliSeconds());
         player.setPlaybackParameters(new PlaybackParameters(speedRate));
+        youtubeOverlay.player(player);
+        playerView.controller(youtubeOverlay);
     }
 
     private long getStartPositionInMilliSeconds() {
         return (long)(startPosition * 1000);
     }
+
+    private void initializeDoubleClickOverlay() {
+        youtubeOverlay.playerView(playerView)
+                .performListener(new YouTubeOverlay.PerformListener() {
+                    @Override
+                    public void onAnimationStart() {
+                        youtubeOverlay.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onAnimationEnd() {
+                        youtubeOverlay.setVisibility(View.GONE);
+                    }
+                });
+    }
+
 
     private void initializeAudioManager() {
         audioManager = (AudioManager) activity.getSystemService(AUDIO_SERVICE);
