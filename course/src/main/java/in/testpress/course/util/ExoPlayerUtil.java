@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.mediarouter.media.MediaControlIntent;
@@ -91,7 +92,8 @@ public class ExoPlayerUtil {
     private TextView errorMessageTextView;
     private LinearLayout emailIdLayout;
     private TextView emailIdTextView;
-    private SimpleExoPlayer player;
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    public SimpleExoPlayer player;
     private ImageView fullscreenIcon;
     private Dialog fullscreenDialog;
     private TrackSelectionDialog trackSelectionDialog;
@@ -131,7 +133,8 @@ public class ExoPlayerUtil {
             }
         }
     };
-    AudioManager audioManager;
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    public AudioManager audioManager;
     AudioManager.OnAudioFocusChangeListener audioFocusChangeListener;
     private DefaultTrackSelector trackSelector;
     private DialogInterface.OnClickListener dialogOnClickListener;
