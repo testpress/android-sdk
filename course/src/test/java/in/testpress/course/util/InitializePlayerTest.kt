@@ -2,7 +2,6 @@ package `in`.testpress.course.util
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.core.TestpressSession
-import `in`.testpress.course.EmptyActivity
 import `in`.testpress.models.InstituteSettings
 import android.app.Activity
 import android.content.Context
