@@ -13,13 +13,20 @@
         android:background="#000000"
         >
 
-        <com.google.android.exoplayer2.ui.PlayerView android:id="@+id/exo_player_view"
+        <com.github.vkay94.dtpv.DoubleTapPlayerView
+            android:id="@+id/exo_player_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.github.vkay94.dtpv.youtube.YouTubeOverlay
+            android:id="@+id/youtube_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            app:yt_playerView="@+id/exo_player_view" />
 
         <com.airbnb.lottie.LottieAnimationView android:id="@+id/exo_player_progress"
             android:layout_width="50dp"

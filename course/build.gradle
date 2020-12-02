@@ -76,6 +76,10 @@ dependencies {
 
     // Allow methods more than 64K
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'com.github.vkay94:DoubleTapPlayerView:1.0.0'
+
+    // Allow methods more than 64K
+    implementation 'androidx.multidex:multidex:2.0.1'
 
     def fragment_version = "1.2.5"
 
