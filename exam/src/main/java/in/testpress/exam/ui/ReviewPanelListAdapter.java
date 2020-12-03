@@ -3,12 +3,14 @@ package in.testpress.exam.ui;
 import android.graphics.Color;
 import androidx.core.content.ContextCompat;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import java.util.List;
 
 import in.testpress.exam.R;
+import in.testpress.exam.util.TextUtil;
 import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.ReviewItem;
 import in.testpress.models.greendao.ReviewQuestion;
@@ -54,9 +56,8 @@ class ReviewPanelListAdapter extends SingleTypeAdapter<ReviewItem> {
             }
         }
         if (question == null) {
-            question = Html.fromHtml(reviewQuestion.getQuestionHtml()).toString();
+            question = TextUtil.removeHtmlTags(reviewQuestion.getQuestionHtml());
         }
-        question = question.replaceAll("@font-face \\{.*\\}", "");
         updater.view.findViewById(R.id.marked_question).setVisibility(View.GONE);
         updater.view.findViewById(R.id.answered_question).setVisibility(View.GONE);
         updater.view.findViewById(R.id.all_question).setVisibility(View.VISIBLE);
