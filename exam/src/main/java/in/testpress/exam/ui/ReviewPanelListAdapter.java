@@ -2,18 +2,15 @@ package in.testpress.exam.ui;
 
 import android.app.Activity;
 import android.graphics.Color;
-import androidx.core.content.ContextCompat;
-import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import java.lang.reflect.Array;
+import androidx.core.content.ContextCompat;
+
 import java.util.List;
 
 import in.testpress.exam.R;
 import in.testpress.exam.ui.view.WebView;
-import in.testpress.exam.util.TextUtil;
 import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.ReviewItem;
 import in.testpress.models.greendao.ReviewQuestion;
