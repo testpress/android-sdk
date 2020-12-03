@@ -364,7 +364,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
     private void initializeQuestionsListAdapter() {
         questionsListAdapter = new TestPanelListAdapter(getLayoutInflater(), filterItems,
-                R.layout.testpress_test_panel_list_item);
+                R.layout.testpress_test_panel_list_item, this.getActivity());
     }
 
     private void bindViews() {

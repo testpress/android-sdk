@@ -1,7 +1,7 @@
 package in.testpress.exam.ui;
 
+import android.app.Activity;
 import android.graphics.Color;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -10,8 +10,10 @@ import java.util.List;
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.AttemptQuestion;
+import in.testpress.exam.ui.view.WebView;
 import in.testpress.models.greendao.Language;
 import in.testpress.util.SingleTypeAdapter;
+import in.testpress.util.WebViewUtils;
 
 /**
  * Adapter that used to show the list of questions in test engine
@@ -20,9 +22,11 @@ class TestPanelListAdapter extends SingleTypeAdapter<AttemptItem> {
 
     private int currentAttemptItemIndex = 1;
     private Language selectedLanguage;
+    private final Activity activity;
 
-    TestPanelListAdapter(final LayoutInflater inflater, final List<AttemptItem> items, int layout) {
+    TestPanelListAdapter(final LayoutInflater inflater, final List<AttemptItem> items, int layout, Activity activity) {
         super(inflater, layout);
+        this.activity = activity;
         setItems(items);
     }
 
@@ -47,36 +51,46 @@ class TestPanelListAdapter extends SingleTypeAdapter<AttemptItem> {
                 }
             }
         }
-        String question = Html.fromHtml(attemptQuestion.getQuestionHtml()).toString();
+        String question = attemptQuestion.getQuestionHtml();
         if(item.getReview() || item.getCurrentReview()) {
             // Marked question
+            WebView markedQuestion = updater.view.findViewById(R.id.question_marked);
             updater.view.findViewById(R.id.all_question).setVisibility(View.GONE);
             updater.view.findViewById(R.id.answered_question).setVisibility(View.GONE);
             updater.view.findViewById(R.id.marked_question).setVisibility(View.VISIBLE);
             setNumber(3, item.getIndex());
-            setText(1, question.trim());
+            initWebView(markedQuestion, question);
         } else if(!item.getSelectedAnswers().isEmpty() || !item.getSavedAnswers().isEmpty()
                 || (item.getShortText() != null && !item.getShortText().isEmpty())
                 || (item.getCurrentShortText() != null && !item.getCurrentShortText().isEmpty())) {
 
             // Answered question
+            WebView answeredQuestion = updater.view.findViewById(R.id.question_answered);
             updater.view.findViewById(R.id.marked_question).setVisibility(View.GONE);
             updater.view.findViewById(R.id.answered_question).setVisibility(View.VISIBLE);
             updater.view.findViewById(R.id.all_question).setVisibility(View.GONE);
             setNumber(5, item.getIndex());
-            setText(4, question.trim());
+            initWebView(answeredQuestion, question);
         } else {
             // Unanswered question
+            WebView unAnsweredQuestion = updater.view.findViewById(R.id.question_all);
             updater.view.findViewById(R.id.marked_question).setVisibility(View.GONE);
             updater.view.findViewById(R.id.answered_question).setVisibility(View.GONE);
             updater.view.findViewById(R.id.all_question).setVisibility(View.VISIBLE);
             setNumber(2, item.getIndex());
-            setText(0, question.trim());
+            initWebView(unAnsweredQuestion, question);
         }
         updater.view.findViewById(R.id.panel_item_layout).setBackgroundColor(
                 (item.getIndex() == currentAttemptItemIndex) ? Color.parseColor("#80b6dcfb") :
-                        Color.parseColor("#f9f9f9")
+                        Color.parseColor("#ffffff")
         );
+    }
+
+    private void initWebView(WebView view, String questionHtml) {
+        String question = "<div style='padding-left: 6px; padding-right: 6px; padding-top: 0px;'>";
+        question = question + questionHtml;
+        WebViewUtils webViewUtils = new WebViewUtils(view);
+        webViewUtils.initWebView(question, activity);
     }
 
     public void setCurrentAttemptItemIndex(int currentAttemptItemIndex) {

@@ -189,7 +189,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
                     }
                 });
         panelListAdapter = new ReviewPanelListAdapter(getLayoutInflater(), reviewItems,
-                R.layout.testpress_test_panel_list_item);
+                R.layout.testpress_test_panel_list_item, this);
         questionsListView.setAdapter(panelListAdapter);
         questionsListView.addFooterView(questionsListProgressBar);
         pagerAdapter = new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems);
