@@ -8,8 +8,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import androidx.core.content.ContextCompat;
-
-import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -146,7 +144,6 @@ public class WebViewUtils {
     }
 
     protected void onLoadFinished() {
-        Log.e("TAG", "onLoadFinished: " );
         webView.setVisibility(View.VISIBLE);
     }
 

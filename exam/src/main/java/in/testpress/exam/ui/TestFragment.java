@@ -554,7 +554,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         }
     }
 
-    public void goToQuestion(int position, boolean saveCurrentOptions) {
+    private void goToQuestion(int position, boolean saveCurrentOptions) {
         if (attemptItemList.isEmpty()) {
             return;
         }
