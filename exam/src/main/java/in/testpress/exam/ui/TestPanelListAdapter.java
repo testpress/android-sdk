@@ -48,7 +48,6 @@ class TestPanelListAdapter extends SingleTypeAdapter<AttemptItem> {
             }
         }
         String question = Html.fromHtml(attemptQuestion.getQuestionHtml()).toString();
-        question = question.replaceAll("@font-face \\{.*\\}", "");
         if(item.getReview() || item.getCurrentReview()) {
             // Marked question
             updater.view.findViewById(R.id.all_question).setVisibility(View.GONE);
