@@ -1,6 +1,5 @@
 package in.testpress.exam.ui;
 
-import android.app.Activity;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +21,11 @@ class TestPanelListAdapter extends SingleTypeAdapter<AttemptItem> {
 
     private int currentAttemptItemIndex = 1;
     private Language selectedLanguage;
-    private final Activity activity;
+    private final TestFragment fragment;
 
-    TestPanelListAdapter(final LayoutInflater inflater, final List<AttemptItem> items, int layout, Activity activity) {
+    TestPanelListAdapter(final LayoutInflater inflater, final List<AttemptItem> items, int layout, TestFragment fragment) {
         super(inflater, layout);
-        this.activity = activity;
+        this.fragment = fragment;
         setItems(items);
     }
 
@@ -84,13 +83,24 @@ class TestPanelListAdapter extends SingleTypeAdapter<AttemptItem> {
                 (item.getIndex() == currentAttemptItemIndex) ? Color.parseColor("#80b6dcfb") :
                         Color.parseColor("#ffffff")
         );
+
+        setOnClickListener(item.getIndex() - 1);
     }
 
     private void initWebView(WebView view, String questionHtml) {
         String question = "<div style='padding-left: 6px; padding-right: 6px; padding-top: 0px;'>";
         question = question + questionHtml;
         WebViewUtils webViewUtils = new WebViewUtils(view);
-        webViewUtils.initWebView(question, activity);
+        webViewUtils.initWebView(question, fragment.getActivity());
+    }
+
+    private void setOnClickListener(final int index) {
+        updater.view.findViewById(R.id.panel_item_layout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fragment.viewPager.setCurrentItem(index);
+            }
+        });
     }
 
     public void setCurrentAttemptItemIndex(int currentAttemptItemIndex) {

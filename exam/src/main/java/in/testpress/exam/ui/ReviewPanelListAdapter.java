@@ -1,14 +1,11 @@
 package in.testpress.exam.ui;
 
-import android.app.Activity;
+
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
-
 import androidx.core.content.ContextCompat;
-
 import java.util.List;
-
 import in.testpress.exam.R;
 import in.testpress.exam.ui.view.WebView;
 import in.testpress.models.greendao.Language;
@@ -17,7 +14,6 @@ import in.testpress.models.greendao.ReviewQuestion;
 import in.testpress.models.greendao.ReviewQuestionTranslation;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.WebViewUtils;
-
 import static in.testpress.models.greendao.ReviewItem.ANSWERED_INCORRECT;
 import static in.testpress.models.greendao.ReviewItem.UNANSWERED;
 
@@ -28,9 +24,9 @@ class ReviewPanelListAdapter extends SingleTypeAdapter<ReviewItem> {
 
     private int currentItemPosition = 1;
     private Language selectedLanguage;
-    private final Activity activity;
+    private final ReviewQuestionsActivity activity;
 
-    ReviewPanelListAdapter(final LayoutInflater inflater, final List<ReviewItem> items, int layout, Activity activity) {
+    ReviewPanelListAdapter(final LayoutInflater inflater, final List<ReviewItem> items, int layout, ReviewQuestionsActivity activity) {
         super(inflater, layout);
         this.activity = activity;
         setItems(items);
@@ -78,6 +74,8 @@ class ReviewPanelListAdapter extends SingleTypeAdapter<ReviewItem> {
                 (position == currentItemPosition) ? Color.parseColor("#80b6dcfb") :
                         Color.parseColor("#ffffff")
         );
+
+        setOnClickListener(item.getIndex() - 1);
     }
 
     private void initWebView(String questionHtml) {
@@ -86,6 +84,16 @@ class ReviewPanelListAdapter extends SingleTypeAdapter<ReviewItem> {
         question = question + questionHtml;
         WebViewUtils webViewUtils = new WebViewUtils(questionAll);
         webViewUtils.initWebView(question, activity);
+    }
+
+    private void setOnClickListener(final int index) {
+        updater.view.findViewById(R.id.panel_item_layout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.goToQuestion(index);
+                activity.setPanelOpen(false);
+            }
+        });
     }
 
     private void setBackgroundColor(View view, int colorResId) {

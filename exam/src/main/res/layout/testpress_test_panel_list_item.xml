@@ -5,6 +5,8 @@
     android:id="@+id/panel_item_layout"
     android:layout_width="match_parent"
     android:background="#fff"
+    android:focusable="true"
+    android:clickable="true"
     android:layout_height="match_parent" >
 
     <RelativeLayout

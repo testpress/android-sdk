@@ -11,6 +11,8 @@ import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.slidingpanelayout.widget.SlidingPaneLayout;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -626,7 +628,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         }
     }
 
-    private void setPanelOpen(boolean open) {
+    public void setPanelOpen(boolean open) {
         if(open) {
             slidingPaneLayout.openPane();
         } else {
@@ -662,7 +664,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         }
     }
 
-    private void goToQuestion(int position) {
+    public void goToQuestion(int position) {
         if (reviewItems.isEmpty()) {
             return;
         }

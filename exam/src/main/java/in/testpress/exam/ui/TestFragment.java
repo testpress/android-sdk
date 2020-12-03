@@ -89,7 +89,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     private Spinner questionsFilter;
     Spinner sectionsFilter;
     private RelativeLayout sectionsFilterContainer;
-    private NonSwipeableViewPager viewPager;
+    public NonSwipeableViewPager viewPager;
     private TestQuestionPagerAdapter viewPagerAdapter;
     private List<AttemptItem> filterItems = new ArrayList<>();
     private TestPanelListAdapter questionsListAdapter;
@@ -364,7 +364,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
     private void initializeQuestionsListAdapter() {
         questionsListAdapter = new TestPanelListAdapter(getLayoutInflater(), filterItems,
-                R.layout.testpress_test_panel_list_item, this.getActivity());
+                R.layout.testpress_test_panel_list_item, this);
     }
 
     private void bindViews() {
@@ -554,7 +554,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         }
     }
 
-    private void goToQuestion(int position, boolean saveCurrentOptions) {
+    public void goToQuestion(int position, boolean saveCurrentOptions) {
         if (attemptItemList.isEmpty()) {
             return;
         }
