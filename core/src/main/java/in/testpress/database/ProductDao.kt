@@ -20,7 +20,7 @@ interface ProductDao: BaseDao<ProductCourseEntity> {
 
     @Transaction
     @Query("SELECT * FROM productentity")
-    fun getAll(): LiveData<List<ProductWithCoursesAndPrices>>
+    fun getAll(): List<ProductWithCoursesAndPrices>
 
     @Delete
     fun deleteProduct(product: ProductEntity)
