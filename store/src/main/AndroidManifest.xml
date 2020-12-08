@@ -52,6 +52,10 @@
             android:label="@string/testpress_payment_status"
             android:configChanges="orientation|keyboardHidden|screenSize" />
 
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+
     </application>
 
 </manifest>
