@@ -47,4 +47,6 @@
     <string name="session_cleared_message">Your session has been cleared. Please log out and login again.</string>
     <string name="lockout_limit_info">Note : Admin has restricted login attempts to %d</string>
 
+    <string name="failed_loading_pdf"> Failed to load the PDF </string>
+
 </resources>

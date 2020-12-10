@@ -10,26 +10,23 @@ import org.mockito.MockitoAnnotations
 class ShowPdfFromUriTest {
 
     @Mock
-    lateinit var activity: PdfViewerActivity
-
-    private lateinit var showPdfFromUri: ShowPdfFromUri
+    lateinit var pdfViewerActivity: PdfViewerActivity
 
     @Before
     fun setup() {
         MockitoAnnotations.initMocks(this)
-        showPdfFromUri = ShowPdfFromUri(activity)
     }
 
     @Test
-    fun forCorrectUrlPdfShouldDisplayWithoutException() {
+    fun correctUrlShouldNotThrowException() {
         assertDoesNotThrow {
-            showPdfFromUri.execute("http://www.pdf995.com/samples/pdf.pdf")
+            pdfViewerActivity.ShowPdfFromUri().execute("http://www.pdf995.com/samples/pdf.pdf")
         }
     }
 
     @Test
-    fun whenUrlIsEmptyPdfShouldNotDisplay() {
-        showPdfFromUri.execute("")
-        Assert.assertNull(showPdfFromUri.inputStream)
+    fun forIncorrectUrlInputStreamShouldBeNull() {
+        pdfViewerActivity.ShowPdfFromUri().execute()
+        Assert.assertNull(pdfViewerActivity.ShowPdfFromUri().inputStream)
     }
 }
