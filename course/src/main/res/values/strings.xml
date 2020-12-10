@@ -33,6 +33,7 @@
 
     <string name="testpress_start">Start</string>
     <string name="testpress_download_attachment">Download Attachment</string>
+    <string name="view_document">View Document</string>
 
     <string name="testpress_menu">Menu</string>
     <string name="nothing_here">Nothing Here</string>
