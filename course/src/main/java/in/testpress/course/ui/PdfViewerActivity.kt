@@ -4,6 +4,7 @@ import `in`.testpress.course.R
 import android.os.AsyncTask
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.layout_pdf_viewer.*
 import java.io.BufferedInputStream
@@ -16,15 +17,16 @@ class PdfViewerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_pdf_viewer)
-        val file = intent.getStringExtra("fileUrl") ?: ""
+        val file = intent.getStringExtra("pdfUrl") ?: ""
         progressbar.visibility = View.VISIBLE
-        RetrievePDFStream(this).execute(file)
+        ShowPdfFromUri(this).execute(file)
     }
 }
 
-class RetrievePDFStream(private val activity: PdfViewerActivity) : AsyncTask<String, Unit, InputStream>() {
+class ShowPdfFromUri(private val activity: PdfViewerActivity) : AsyncTask<String, Unit, InputStream>() {
 
-    private var inputStream: InputStream? = null
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var inputStream: InputStream? = null
 
     override fun doInBackground(vararg params: String): InputStream? {
         try {
