@@ -1,8 +1,8 @@
 package `in`.testpress.course.ui
 
 import `in`.testpress.course.R
-import `in`.testpress.course.fragments.InputStreamListener
-import `in`.testpress.course.fragments.PdfUtil
+import `in`.testpress.course.util.PdfDownloadUtil
+import `in`.testpress.course.util.PdfDownloadListener
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -12,15 +12,17 @@ import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import kotlinx.android.synthetic.main.layout_pdf_viewer.*
-import java.io.InputStream
+import java.io.File
 
-class PdfViewerActivity : AppCompatActivity(), InputStreamListener, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener {
+class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener {
 
-    var inputStreamListener: InputStreamListener? = null
+    private lateinit var pdfDownloadListener: PdfDownloadListener
 
     private var pageNumber = 0
 
     private lateinit var url: String
+
+    private lateinit var fileName: String
 
     private lateinit var password: String
 
@@ -28,9 +30,9 @@ class PdfViewerActivity : AppCompatActivity(), InputStreamListener, OnPageChange
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_pdf_viewer)
         hideStatusBar()
-        inputStreamListener = this
+        pdfDownloadListener = this
         getDataFromBundle()
-        PdfUtil(this).get(url)
+        PdfDownloadUtil(pdfDownloadListener).downloadPdfFromInternet(url,this, fileName)
     }
 
     private fun hideStatusBar() {
@@ -45,14 +47,19 @@ class PdfViewerActivity : AppCompatActivity(), InputStreamListener, OnPageChange
         pageNumber = intent.getIntExtra("pageNumber", 0)
         password = intent.getStringExtra("password") ?: ""
         url = intent.getStringExtra("pdfUrl") ?: ""
+        fileName = intent.getStringExtra("fileName")?: ""
     }
 
-    override fun getResponse(response: InputStream?) {
-        response?.let { loadPDF(it) }?: showErrorView()
+    override fun isPdfDownloaded(response: Boolean, file: File?) {
+        if (response) {
+            file?.let { showPdfFromFile(file) }?: showErrorView()
+        } else {
+            showErrorView()
+        }
     }
 
-    private fun loadPDF(inputStream: InputStream) {
-        pdfView.fromStream(inputStream)
+    private fun showPdfFromFile(file: File) {
+        pdfView.fromFile(file)
                 .enableSwipe(true)
                 .enableDoubletap(true)
                 .password(password)

@@ -3,9 +3,12 @@ package `in`.testpress.course.fragments
 import `in`.testpress.course.R
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.PdfViewerActivity
+import `in`.testpress.course.util.PdfDownloadUtil
+import `in`.testpress.course.util.PdfDownloadListener
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import com.downloader.PRDownloader
 import com.github.barteksc.pdfviewer.listener.OnErrorListener
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
@@ -15,14 +18,17 @@ import kotlinx.android.synthetic.main.layout_document_viewer.*
 import kotlinx.android.synthetic.main.layout_document_viewer.emptyContainer
 import kotlinx.android.synthetic.main.layout_pdf_viewer.pdfView
 import kotlinx.android.synthetic.main.layout_pdf_viewer.progressbar
-import java.io.InputStream
+import java.io.File
 
-class DocumentViewerFragment: BaseContentDetailFragment(), InputStreamListener,
+
+class DocumentViewerFragment: BaseContentDetailFragment(), PdfDownloadListener,
         OnPageChangeListener, OnErrorListener, OnLoadCompleteListener, OnPageErrorListener {
 
     private var pageNumber = 0
 
-    var inputStreamListener: InputStreamListener? = null
+    private lateinit var fileName: String
+
+    private lateinit var pdfDownloadListener: PdfDownloadListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +45,8 @@ class DocumentViewerFragment: BaseContentDetailFragment(), InputStreamListener,
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        inputStreamListener = this
+        PRDownloader.initialize(requireContext())
+        pdfDownloadListener = this
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -62,20 +69,28 @@ class DocumentViewerFragment: BaseContentDetailFragment(), InputStreamListener,
             putExtra("pdfUrl", content.attachment?.attachmentUrl)
             putExtra("pageNumber", pageNumber)
             putExtra("password", contentId.toString())
+            putExtra("fileName", fileName)
         })
     }
 
     override fun display() {
         (activity as ContentActivity).setActionBarTitle(content.attachment?.title)
-        PdfUtil(this).get(content.attachment?.attachmentUrl)
+        fileName = content.attachment?.title ?: ""
+        content.attachment?.attachmentUrl?.let {
+            PdfDownloadUtil(pdfDownloadListener).downloadPdfFromInternet(it,requireContext(),fileName)
+        }
     }
 
-    override fun getResponse(response: InputStream?) {
-        response?.let { loadPDF(it) }?: showErrorView()
+    override fun isPdfDownloaded(response: Boolean, file: File?) {
+        if (response) {
+            file?.let { showPdfFromFile(file) }?: showErrorView()
+        } else {
+            showErrorView()
+        }
     }
 
-    private fun loadPDF(inputStream: InputStream?) {
-        pdfView.fromStream(inputStream)
+    private fun showPdfFromFile(file: File) {
+        pdfView.fromFile(file)
                 .enableSwipe(true)
                 .enableDoubletap(true)
                 .password(contentId.toString())
