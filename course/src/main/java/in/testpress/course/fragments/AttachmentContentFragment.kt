@@ -2,7 +2,6 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
-import `in`.testpress.course.ui.PdfViewerActivity
 import `in`.testpress.util.ViewUtils
 import android.content.Intent
 import android.net.Uri
@@ -52,10 +51,7 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
 
         downloadButton.setOnClickListener {
             forceReloadContent {
-                startActivity(Intent(this.activity, PdfViewerActivity::class.java).apply {
-                    putExtra("pdfUrl", attachment.attachmentUrl)
-                })
-                //context!!.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(attachment.attachmentUrl)))
+                context!!.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(attachment.attachmentUrl)))
             }
         }
         attachmentContentLayout.visibility = View.VISIBLE

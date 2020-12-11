@@ -1,5 +1,6 @@
 package `in`.testpress.course.ui
 
+import `in`.testpress.course.fragments.PdfUtil
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -20,13 +21,13 @@ class ShowPdfFromUriTest {
     @Test
     fun correctUrlShouldNotThrowException() {
         assertDoesNotThrow {
-            pdfViewerActivity.ShowPdfFromUri().execute("http://www.pdf995.com/samples/pdf.pdf")
+            PdfUtil(pdfViewerActivity).get("http://www.pdf995.com/samples/pdf.pdf")
         }
     }
 
     @Test
     fun forIncorrectUrlInputStreamShouldBeNull() {
-        pdfViewerActivity.ShowPdfFromUri().execute()
-        Assert.assertNull(pdfViewerActivity.ShowPdfFromUri().inputStream)
+        PdfUtil(pdfViewerActivity).get("")
+        Assert.assertNull( PdfUtil(pdfViewerActivity).inputStream)
     }
 }
