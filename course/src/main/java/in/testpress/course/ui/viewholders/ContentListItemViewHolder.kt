@@ -21,8 +21,16 @@ class ContentListItemViewHolder(view: View) : BaseContentListItemViewHolder(view
         super.bindContentDetails(content)
         when (content.contentTypeEnum) {
             ContentType.Notes -> contentTypeIcon.setImageResource(R.drawable.writing)
-            ContentType.Attachment -> contentTypeIcon.setImageResource(R.drawable.paperclip)
+            ContentType.Attachment -> setAttachmentIcon(content)
             else -> contentTypeIcon.setImageResource(R.drawable.ic_live)
+        }
+    }
+
+    private fun setAttachmentIcon(content: DomainContent) {
+        if (content.attachment?.isRenderable == true) {
+            contentTypeIcon.setImageResource(R.drawable.ic_pdf)
+        } else {
+            contentTypeIcon.setImageResource(R.drawable.paperclip)
         }
     }
 }

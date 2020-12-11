@@ -1,29 +1,50 @@
 package `in`.testpress.course.ui
 
 import `in`.testpress.course.R
-import android.annotation.SuppressLint
-import android.os.AsyncTask
+import `in`.testpress.course.fragments.InputStreamListener
+import `in`.testpress.course.fragments.PdfUtil
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener
+import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
+import com.github.barteksc.pdfviewer.listener.OnPageErrorListener
+import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import kotlinx.android.synthetic.main.layout_pdf_viewer.*
-import java.io.BufferedInputStream
-import java.io.IOException
 import java.io.InputStream
-import java.net.HttpURLConnection
-import java.net.URL
 
-class PdfViewerActivity : AppCompatActivity(), InputStreamListener {
+class PdfViewerActivity : AppCompatActivity(), InputStreamListener, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener {
 
     var inputStreamListener: InputStreamListener? = null
+
+    private var pageNumber = 0
+
+    private lateinit var url: String
+
+    private lateinit var password: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_pdf_viewer)
+        hideStatusBar()
         inputStreamListener = this
-        val file = intent.getStringExtra("pdfUrl") ?: ""
-        progressbar.visibility = View.VISIBLE
-        ShowPdfFromUri().execute(file)
+        getDataFromBundle()
+        PdfUtil(this).get(url)
+    }
+
+    private fun hideStatusBar() {
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        this.window.setFlags(
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
+    }
+
+    private fun getDataFromBundle() {
+        pageNumber = intent.getIntExtra("pageNumber", 0)
+        password = intent.getStringExtra("password") ?: ""
+        url = intent.getStringExtra("pdfUrl") ?: ""
     }
 
     override fun getResponse(response: InputStream?) {
@@ -31,44 +52,43 @@ class PdfViewerActivity : AppCompatActivity(), InputStreamListener {
     }
 
     private fun loadPDF(inputStream: InputStream) {
-        emptyConatiner.visibility = View.GONE
-        pdfView.visibility = View.VISIBLE
-        pdfView.fromStream(inputStream).load()
+        pdfView.fromStream(inputStream)
+                .enableSwipe(true)
+                .enableDoubletap(true)
+                .password(password)
+                .swipeHorizontal(true)
+                .onError {
+                    showErrorView()
+                }
+                .onLoad {
+                    progressbar.visibility = View.GONE
+                }
+                .spacing(0)
+                .onPageChange(this)
+                .enableAnnotationRendering(true)
+                .onLoad(this)
+                .scrollHandle(DefaultScrollHandle(this))
+                .onPageError(this)
+                .enableAntialiasing(true)
+                .defaultPage(pageNumber)
+                .load()
+    }
+
+    override fun onPageChanged(page: Int, pageCount: Int) {
+        pageNumber = page
+    }
+
+    override fun loadComplete(nbPages: Int) {
         progressbar.visibility = View.GONE
+    }
+
+    override fun onPageError(page: Int, t: Throwable?) {
+        showErrorView()
     }
 
     private fun showErrorView() {
-        pdfView.visibility = View.GONE
-        emptyConatiner.visibility = View.VISIBLE
-        emptyTitle.setText(R.string.failed_loading_pdf)
         progressbar.visibility = View.GONE
+        pdfView.visibility = View.GONE
+        emptyContainer.visibility = View.VISIBLE
     }
-
-    @SuppressLint("StaticFieldLeak")
-    inner class ShowPdfFromUri : AsyncTask<String, Unit, InputStream>() {
-
-        var inputStream: InputStream? = null
-
-        override fun doInBackground(vararg params: String): InputStream? {
-            try {
-                val uri = URL(params[0])
-                val urlConnection: HttpURLConnection = uri.openConnection() as HttpURLConnection
-                if (urlConnection.responseCode == 200) {
-                    inputStream = BufferedInputStream(urlConnection.inputStream)
-                }
-            } catch (e: IOException) {
-                return null
-            }
-            return inputStream
-        }
-
-        override fun onPostExecute(result: InputStream?) {
-            super.onPostExecute(result)
-            inputStreamListener?.getResponse(inputStream)
-        }
-    }
-}
-
-interface InputStreamListener {
-    fun getResponse(response: InputStream?)
 }

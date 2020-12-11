@@ -19,25 +19,26 @@
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:indeterminate="true"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <LinearLayout
+        android:id="@+id/emptyContainer"
         android:orientation="vertical"
         android:background="@color/testpress_white"
-        android:id="@+id/emptyConatiner"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
         android:visibility="gone">
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:id="@+id/emptyImage"
+        android:src="@drawable/ic_error_outline_black_18dp"
         android:layout_marginBottom="20dp"
         android:layout_gravity="center" />
 
@@ -46,10 +47,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:id="@+id/emptyTitle"
-        android:text="Network Error"
+        android:text="Failed to load Document"
         android:textStyle="bold"
         android:textColor="@color/testpress_black"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:layout_gravity="center"
         android:drawablePadding="3dp"/>
     </LinearLayout>
