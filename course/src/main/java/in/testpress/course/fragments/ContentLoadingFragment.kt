@@ -142,7 +142,12 @@ class ContentFragmentFactory {
                 "Exam" -> ExamContentFragment()
                 "Quiz" -> QuizContentFragment()
                 "Video" -> VideoContentFragment()
-                "Attachment" -> AttachmentContentFragment()
+                "Attachment" -> {
+                    if (content.attachment?.isRenderable == true) {
+                        return DocumentViewerFragment()
+                    }
+                    return AttachmentContentFragment()
+                }
                 "Html" -> HtmlContentFragment()
                 "Notes" -> HtmlContentFragment()
                 "VideoConference" -> VideoConferenceFragment()

@@ -26,6 +26,7 @@ public class AttachmentDao extends AbstractDao<Attachment, Long> {
         public final static Property AttachmentUrl = new Property(1, String.class, "attachmentUrl", false, "ATTACHMENT_URL");
         public final static Property Description = new Property(2, String.class, "description", false, "DESCRIPTION");
         public final static Property Id = new Property(3, Long.class, "id", true, "ID");
+        public final static Property IsRenderable = new Property(4, Boolean.class, "isRenderable", false, "IS_RENDERABLE");
     }
 
 
@@ -44,7 +45,8 @@ public class AttachmentDao extends AbstractDao<Attachment, Long> {
                 "\"TITLE\" TEXT," + // 0: title
                 "\"ATTACHMENT_URL\" TEXT," + // 1: attachmentUrl
                 "\"DESCRIPTION\" TEXT," + // 2: description
-                "\"ID\" INTEGER PRIMARY KEY );"); // 3: id
+                "\"ID\" INTEGER PRIMARY KEY ," + // 3: id
+                "\"IS_RENDERABLE\" INTEGER);"); // 4: isRenderable
     }
 
     /** Drops the underlying database table. */
@@ -76,6 +78,11 @@ public class AttachmentDao extends AbstractDao<Attachment, Long> {
         if (id != null) {
             stmt.bindLong(4, id);
         }
+ 
+        Boolean isRenderable = entity.getIsRenderable();
+        if (isRenderable != null) {
+            stmt.bindLong(5, isRenderable ? 1L: 0L);
+        }
     }
 
     @Override
@@ -101,6 +108,11 @@ public class AttachmentDao extends AbstractDao<Attachment, Long> {
         if (id != null) {
             stmt.bindLong(4, id);
         }
+ 
+        Boolean isRenderable = entity.getIsRenderable();
+        if (isRenderable != null) {
+            stmt.bindLong(5, isRenderable ? 1L: 0L);
+        }
     }
 
     @Override
@@ -114,7 +126,8 @@ public class AttachmentDao extends AbstractDao<Attachment, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // title
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // attachmentUrl
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // description
-            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3) // id
+            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // id
+            cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0 // isRenderable
         );
         return entity;
     }
@@ -125,6 +138,7 @@ public class AttachmentDao extends AbstractDao<Attachment, Long> {
         entity.setAttachmentUrl(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setDescription(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
+        entity.setIsRenderable(cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0);
      }
     
     @Override

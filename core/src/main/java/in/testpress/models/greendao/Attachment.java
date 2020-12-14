@@ -20,6 +20,7 @@ public class Attachment implements android.os.Parcelable {
 
     @Id
     private Long id;
+    private Boolean isRenderable;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -33,11 +34,12 @@ public class Attachment implements android.os.Parcelable {
     }
 
     @Generated
-    public Attachment(String title, String attachmentUrl, String description, Long id) {
+    public Attachment(String title, String attachmentUrl, String description, Long id, Boolean isRenderable) {
         this.title = title;
         this.attachmentUrl = attachmentUrl;
         this.description = description;
         this.id = id;
+        this.isRenderable = isRenderable;
     }
 
     public String getTitle() {
@@ -70,6 +72,14 @@ public class Attachment implements android.os.Parcelable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Boolean getIsRenderable() {
+        return isRenderable;
+    }
+
+    public void setIsRenderable(Boolean isRenderable) {
+        this.isRenderable = isRenderable;
     }
 
     // KEEP METHODS - put your custom methods here

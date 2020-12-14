@@ -71,6 +71,11 @@
             android:label="Zoom Meet"
             android:theme="@style/TestpressTheme"/>
 
+        <activity android:name=".ui.PdfViewerActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="PDFViewer"
+            android:theme="@style/TestpressTheme"/>
+
         <service android:name=".services.VideoDownloadService" android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.exoplayer.downloadService.action.RESTART" />

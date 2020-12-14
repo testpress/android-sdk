@@ -6,7 +6,8 @@ data class DomainAttachmentContent(
     val id: Long,
     val title: String? = null,
     val attachmentUrl: String? = null,
-    val description: String? = null
+    val description: String? = null,
+    val isRenderable: Boolean? = null
 )
 
 
@@ -15,7 +16,8 @@ fun createDomainAttachmentContent(attachment: Attachment): DomainAttachmentConte
         id = attachment.id,
         title = attachment.title,
         attachmentUrl = attachment.attachmentUrl,
-        description = attachment.description
+        description = attachment.description,
+        isRenderable = attachment.isRenderable
     )
 }
 
