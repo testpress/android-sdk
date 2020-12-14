@@ -7,28 +7,32 @@ import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import java.io.File
 
-class PdfDownloadUtil(private val pdfDownloadListener: PdfDownloadListener) {
+class PDFDownloader(private val pdfDownloadListener: PdfDownloadListener) {
 
     var file: File? = null
 
-    fun downloadPdfFromInternet(url: String, context: Context, fileName: String) {
+    fun download(url: String, context: Context, fileName: String) {
         val dirPath = getRootDirPath(context)
         file = File(dirPath, fileName)
-        if (file?.isFile == true) {
-            pdfDownloadListener.isPdfDownloaded(true, file)
+        if (isDownloaded(file)) {
+            pdfDownloadListener.pdfDownloaded(true)
         } else {
             PRDownloader.download(url, dirPath, fileName)
                     .build().start(object : OnDownloadListener {
                         override fun onDownloadComplete() {
                             file = File(dirPath, fileName)
-                            pdfDownloadListener.isPdfDownloaded(true, file)
+                            pdfDownloadListener.pdfDownloaded(true)
                         }
 
                         override fun onError(error: com.downloader.Error?) {
-                            pdfDownloadListener.isPdfDownloaded(false, null)
+                            pdfDownloadListener.pdfDownloaded(false)
                         }
                     })
         }
+    }
+
+    private fun isDownloaded(file: File?): Boolean {
+        return file?.isFile == true
     }
 
     private fun getRootDirPath(context: Context): String {
@@ -39,11 +43,15 @@ class PdfDownloadUtil(private val pdfDownloadListener: PdfDownloadListener) {
             )[0]
             file.absolutePath
         } else {
-           context.applicationContext.filesDir.absolutePath
+            context.applicationContext.filesDir.absolutePath
         }
+    }
+
+    fun get(): File? {
+        return file
     }
 }
 
 interface PdfDownloadListener {
-    fun isPdfDownloaded(response: Boolean, file: File?)
+    fun pdfDownloaded(response: Boolean)
 }

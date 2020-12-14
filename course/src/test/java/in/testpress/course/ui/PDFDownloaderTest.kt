@@ -1,6 +1,6 @@
 package `in`.testpress.course.ui
 
-import `in`.testpress.course.util.PdfDownloadUtil
+import `in`.testpress.course.util.PDFDownloader
 import android.content.Context
 import org.junit.Assert
 import org.junit.Before
@@ -13,7 +13,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
-class PdfDownloadUtilTest {
+class PDFDownloaderTest {
 
     @Mock
     lateinit var pdfViewerActivity: PdfViewerActivity
@@ -29,7 +29,7 @@ class PdfDownloadUtilTest {
     @Test
     fun correctUrlShouldNotThrowException() {
         assertDoesNotThrow {
-            PdfDownloadUtil(pdfViewerActivity).downloadPdfFromInternet(
+            PDFDownloader(pdfViewerActivity).download(
                     "http://www.pdf995.com/samples/pdf.pdf",
                     fileName = "fileName",
                     context = context
@@ -39,11 +39,11 @@ class PdfDownloadUtilTest {
 
     @Test
     fun forIncorrectUrlInputStreamShouldBeNull() {
-        PdfDownloadUtil(pdfViewerActivity).downloadPdfFromInternet(
+        PDFDownloader(pdfViewerActivity).download(
                 "",
                 fileName = "fileName",
                 context = context
         )
-        Assert.assertNull( PdfDownloadUtil(pdfViewerActivity).file)
+        Assert.assertNull(PDFDownloader(pdfViewerActivity).file)
     }
 }

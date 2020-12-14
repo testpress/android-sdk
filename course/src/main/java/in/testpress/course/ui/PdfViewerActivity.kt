@@ -1,7 +1,7 @@
 package `in`.testpress.course.ui
 
 import `in`.testpress.course.R
-import `in`.testpress.course.util.PdfDownloadUtil
+import `in`.testpress.course.util.PDFDownloader
 import `in`.testpress.course.util.PdfDownloadListener
 import android.os.Bundle
 import android.view.View
@@ -12,11 +12,10 @@ import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import kotlinx.android.synthetic.main.layout_pdf_viewer.*
-import java.io.File
 
 class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener {
 
-    private lateinit var pdfDownloadListener: PdfDownloadListener
+    private lateinit var pdfDownloader: PDFDownloader
 
     private var pageNumber = 0
 
@@ -30,9 +29,9 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, OnPageChange
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_pdf_viewer)
         hideStatusBar()
-        pdfDownloadListener = this
+        pdfDownloader = PDFDownloader(this)
         getDataFromBundle()
-        PdfDownloadUtil(pdfDownloadListener).downloadPdfFromInternet(url,this, fileName)
+        pdfDownloader.download(url, this, fileName)
     }
 
     private fun hideStatusBar() {
@@ -47,18 +46,19 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, OnPageChange
         pageNumber = intent.getIntExtra("pageNumber", 0)
         password = intent.getStringExtra("password") ?: ""
         url = intent.getStringExtra("pdfUrl") ?: ""
-        fileName = intent.getStringExtra("fileName")?: ""
+        fileName = intent.getStringExtra("fileName") ?: ""
     }
 
-    override fun isPdfDownloaded(response: Boolean, file: File?) {
+    override fun pdfDownloaded(response: Boolean) {
         if (response) {
-            file?.let { showPdfFromFile(file) }?: showErrorView()
+            showPdfFromFile()
         } else {
             showErrorView()
         }
     }
 
-    private fun showPdfFromFile(file: File) {
+    private fun showPdfFromFile() {
+        val file = pdfDownloader.get()
         pdfView.fromFile(file)
                 .enableSwipe(true)
                 .enableDoubletap(true)

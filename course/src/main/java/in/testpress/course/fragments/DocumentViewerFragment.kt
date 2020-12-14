@@ -3,8 +3,9 @@ package `in`.testpress.course.fragments
 import `in`.testpress.course.R
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.PdfViewerActivity
-import `in`.testpress.course.util.PdfDownloadUtil
+import `in`.testpress.course.util.PDFDownloader
 import `in`.testpress.course.util.PdfDownloadListener
+import `in`.testpress.course.util.SHA256Generator.getSha256
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
@@ -18,17 +19,16 @@ import kotlinx.android.synthetic.main.layout_document_viewer.*
 import kotlinx.android.synthetic.main.layout_document_viewer.emptyContainer
 import kotlinx.android.synthetic.main.layout_pdf_viewer.pdfView
 import kotlinx.android.synthetic.main.layout_pdf_viewer.progressbar
-import java.io.File
 
 
-class DocumentViewerFragment: BaseContentDetailFragment(), PdfDownloadListener,
+class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         OnPageChangeListener, OnErrorListener, OnLoadCompleteListener, OnPageErrorListener {
 
     private var pageNumber = 0
 
     private lateinit var fileName: String
 
-    private lateinit var pdfDownloadListener: PdfDownloadListener
+    private lateinit var pdfDownloader: PDFDownloader
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +46,7 @@ class DocumentViewerFragment: BaseContentDetailFragment(), PdfDownloadListener,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         PRDownloader.initialize(requireContext())
-        pdfDownloadListener = this
+        pdfDownloader = PDFDownloader(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -75,21 +75,29 @@ class DocumentViewerFragment: BaseContentDetailFragment(), PdfDownloadListener,
 
     override fun display() {
         (activity as ContentActivity).setActionBarTitle(content.attachment?.title)
-        fileName = content.attachment?.title ?: ""
+        fileName = getFileName().getSha256()
         content.attachment?.attachmentUrl?.let {
-            PdfDownloadUtil(pdfDownloadListener).downloadPdfFromInternet(it,requireContext(),fileName)
+            pdfDownloader.download(it, requireContext(), fileName)
         }
     }
 
-    override fun isPdfDownloaded(response: Boolean, file: File?) {
+    private fun getFileName(): String {
+        var filename = contentId.toString()
+        filename += content.attachment?.title ?: ""
+        filename += content.attachment?.attachmentUrl
+        return filename
+    }
+
+    override fun pdfDownloaded(response: Boolean) {
         if (response) {
-            file?.let { showPdfFromFile(file) }?: showErrorView()
+            showPdfFromFile()
         } else {
             showErrorView()
         }
     }
 
-    private fun showPdfFromFile(file: File) {
+    private fun showPdfFromFile() {
+        val file = pdfDownloader.get()
         pdfView.fromFile(file)
                 .enableSwipe(true)
                 .enableDoubletap(true)
