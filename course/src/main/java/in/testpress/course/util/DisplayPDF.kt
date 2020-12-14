@@ -14,8 +14,11 @@ class DisplayPDF(
         private val displayPDFListener: DisplayPDFListener
 ) : OnPageChangeListener, OnErrorListener, OnLoadCompleteListener, OnPageErrorListener {
 
+    private var fileEncryptionAndDecryption = FileEncryptionAndDecryption(context)
+
     fun showPdfFromFile(pageNumber: Int = 0, file: File?, pdfView: PDFView) {
-        pdfView.fromFile(file)
+        val fileByteArray = file?.absolutePath?.let { fileEncryptionAndDecryption.decryptEncryptedFile(it) }
+        pdfView.fromBytes(fileByteArray)
                 .enableSwipe(true)
                 .enableDoubletap(true)
                 .swipeHorizontal(true)

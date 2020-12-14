@@ -14,6 +14,8 @@ open class PDFDownloader(
 
     var file: File? = null
 
+    private var fileEncryptionAndDecryption = FileEncryptionAndDecryption(context)
+
     init {
         file = File(getRootDirPath(context), fileName)
     }
@@ -25,6 +27,8 @@ open class PDFDownloader(
                 .build().start(object : OnDownloadListener {
                     override fun onDownloadComplete() {
                         file = File(dirPath, fileName)
+                        val filePath: String? = file?.absolutePath
+                        filePath?.let { fileEncryptionAndDecryption.encryptDownloadedFile(it) }
                         pdfDownloadListener.onDownloadSuccess()
                     }
 
