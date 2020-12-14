@@ -7,18 +7,14 @@ import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
-import java.io.File
 
 class DisplayPDF(
         val context: Context,
         private val displayPDFListener: DisplayPDFListener
 ) : OnPageChangeListener, OnErrorListener, OnLoadCompleteListener, OnPageErrorListener {
 
-    private var fileEncryptionAndDecryption = FileEncryptionAndDecryption(context)
-
-    fun showPdfFromFile(pageNumber: Int = 0, file: File?, pdfView: PDFView) {
-        val fileByteArray = file?.absolutePath?.let { fileEncryptionAndDecryption.decryptEncryptedFile(it) }
-        pdfView.fromBytes(fileByteArray)
+    fun showPdfFromFile(pageNumber: Int = 0, file: ByteArray?, pdfView: PDFView) {
+        pdfView.fromBytes(file)
                 .enableSwipe(true)
                 .enableDoubletap(true)
                 .swipeHorizontal(true)
