@@ -58,7 +58,6 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
     private fun displayPDF() {
         DisplayPDF(this,displayPDFListener = this).showPdfFromFile(
                 pageNumber = pageNumber,
-                password = password,
                 file = pdfDownloader.get(),
                 pdfView = pdfView
         )

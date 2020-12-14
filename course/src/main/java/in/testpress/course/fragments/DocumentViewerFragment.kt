@@ -85,7 +85,6 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     private fun displayPDF() {
         DisplayPDF(requireContext(),displayPDFListener = this).showPdfFromFile(
-                password = contentId.toString(),
                 file = pdfDownloader.get(),
                 pdfView = pdfView
         )

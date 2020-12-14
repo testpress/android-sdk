@@ -14,11 +14,10 @@ class DisplayPDF(
         private val displayPDFListener: DisplayPDFListener
 ) : OnPageChangeListener, OnErrorListener, OnLoadCompleteListener, OnPageErrorListener {
 
-    fun showPdfFromFile(pageNumber: Int = 0, password: String? = null, file: File?, pdfView: PDFView) {
+    fun showPdfFromFile(pageNumber: Int = 0, file: File?, pdfView: PDFView) {
         pdfView.fromFile(file)
                 .enableSwipe(true)
                 .enableDoubletap(true)
-                .password(password)
                 .swipeHorizontal(true)
                 .onError {
                     displayPDFListener.onError()
