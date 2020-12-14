@@ -1,19 +1,17 @@
 package `in`.testpress.course.ui
 
 import `in`.testpress.course.R
+import `in`.testpress.course.util.DisplayPDF
+import `in`.testpress.course.util.DisplayPDFListener
 import `in`.testpress.course.util.PDFDownloader
 import `in`.testpress.course.util.PdfDownloadListener
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener
-import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
-import com.github.barteksc.pdfviewer.listener.OnPageErrorListener
-import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import kotlinx.android.synthetic.main.layout_pdf_viewer.*
 
-class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener {
+class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFListener {
 
     private lateinit var pdfDownloader: PDFDownloader
 
@@ -29,9 +27,9 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, OnPageChange
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_pdf_viewer)
         hideStatusBar()
-        pdfDownloader = PDFDownloader(this)
         getDataFromBundle()
-        pdfDownloader.download(url, this, fileName)
+        pdfDownloader = PDFDownloader(this,this,fileName)
+        pdfDownloader.isDownloaded()
     }
 
     private fun hideStatusBar() {
@@ -49,48 +47,35 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, OnPageChange
         fileName = intent.getStringExtra("fileName") ?: ""
     }
 
-    override fun pdfDownloaded(response: Boolean) {
-        if (response) {
-            showPdfFromFile()
-        } else {
-            showErrorView()
-        }
+    override fun onDownloadSuccess() {
+        DisplayPDF(this,displayPDFListener = this).showPdfFromFile(
+                pageNumber = pageNumber,
+                password = password,
+                pdfDownloader = pdfDownloader,
+                pdfView = pdfView
+        )
     }
 
-    private fun showPdfFromFile() {
-        val file = pdfDownloader.get()
-        pdfView.fromFile(file)
-                .enableSwipe(true)
-                .enableDoubletap(true)
-                .password(password)
-                .swipeHorizontal(true)
-                .onError {
-                    showErrorView()
-                }
-                .onLoad {
-                    progressbar.visibility = View.GONE
-                }
-                .spacing(0)
-                .onPageChange(this)
-                .enableAnnotationRendering(true)
-                .onLoad(this)
-                .scrollHandle(DefaultScrollHandle(this))
-                .onPageError(this)
-                .enableAntialiasing(true)
-                .defaultPage(pageNumber)
-                .load()
+    override fun onDownloadFailed() {
+        showErrorView()
     }
 
-    override fun onPageChanged(page: Int, pageCount: Int) {
-        pageNumber = page
+    override fun downloadPdf() {
+        pdfDownloader.download(url)
     }
 
-    override fun loadComplete(nbPages: Int) {
+    override fun onSingleTapOnPDF() {}
+
+    override fun onPDFLoaded() {
         progressbar.visibility = View.GONE
     }
 
-    override fun onPageError(page: Int, t: Throwable?) {
+    override fun onError() {
         showErrorView()
+    }
+
+    override fun onPageChanged(pageNumber: Int) {
+        this.pageNumber = pageNumber
     }
 
     private fun showErrorView() {

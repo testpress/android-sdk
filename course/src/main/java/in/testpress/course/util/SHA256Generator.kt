@@ -3,7 +3,7 @@ package `in`.testpress.course.util
 import java.security.MessageDigest
 
 object SHA256Generator {
-    fun String.getSha256(): String {
+    fun String.generateSha256(): String {
         val digest = MessageDigest.getInstance("SHA-256").apply { reset() }
         val byteData: ByteArray = digest.digest(this.toByteArray())
         return StringBuffer().apply {

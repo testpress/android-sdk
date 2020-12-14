@@ -142,19 +142,16 @@ class ContentFragmentFactory {
                 "Exam" -> ExamContentFragment()
                 "Quiz" -> QuizContentFragment()
                 "Video" -> VideoContentFragment()
-                "Attachment" -> getAttachmentFragment(content)
+                "Attachment" -> {
+                    if (content.attachment?.isRenderable == true) {
+                        return DocumentViewerFragment()
+                    }
+                    return AttachmentContentFragment()
+                }
                 "Html" -> HtmlContentFragment()
                 "Notes" -> HtmlContentFragment()
                 "VideoConference" -> VideoConferenceFragment()
                 else -> ContentLoadingFragment()
-            }
-        }
-
-        private fun getAttachmentFragment(content: DomainContent): Fragment {
-            return if (content.attachment?.isRenderable == true) {
-                DocumentViewerFragment()
-            } else {
-                AttachmentContentFragment()
             }
         }
     }

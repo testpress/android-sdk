@@ -1,50 +1,45 @@
 package `in`.testpress.course.util
 
+import `in`.testpress.course.util.FileUtils.getRootDirPath
 import android.content.Context
-import android.os.Environment
-import androidx.core.content.ContextCompat
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import java.io.File
 
-class PDFDownloader(private val pdfDownloadListener: PdfDownloadListener) {
+open class PDFDownloader(
+        private val pdfDownloadListener: PdfDownloadListener,
+        private val context: Context,
+        private val fileName: String
+) {
 
     var file: File? = null
 
-    fun download(url: String, context: Context, fileName: String) {
+    init {
+        file = File(getRootDirPath(context), fileName)
+    }
+
+    fun download(url: String) {
         val dirPath = getRootDirPath(context)
-        file = File(dirPath, fileName)
-        if (isDownloaded(file)) {
-            pdfDownloadListener.pdfDownloaded(true)
-        } else {
-            PRDownloader.download(url, dirPath, fileName)
-                    .build().start(object : OnDownloadListener {
-                        override fun onDownloadComplete() {
-                            file = File(dirPath, fileName)
-                            pdfDownloadListener.pdfDownloaded(true)
-                        }
+        PRDownloader.initialize(context)
+        PRDownloader.download(url, dirPath, fileName)
+                .build().start(object : OnDownloadListener {
+                    override fun onDownloadComplete() {
+                        file = File(dirPath, fileName)
+                        pdfDownloadListener.onDownloadSuccess()
+                    }
 
-                        override fun onError(error: com.downloader.Error?) {
-                            pdfDownloadListener.pdfDownloaded(false)
-                        }
-                    })
-        }
+                    override fun onError(error: com.downloader.Error?) {
+                        pdfDownloadListener.onDownloadFailed()
+                    }
+                })
     }
 
-    private fun isDownloaded(file: File?): Boolean {
-        return file?.isFile == true
-    }
-
-    private fun getRootDirPath(context: Context): String {
-        return if (Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()) {
-            val file: File = ContextCompat.getExternalFilesDirs(
-                    context.applicationContext,
-                    null
-            )[0]
-            file.absolutePath
-        } else {
-            context.applicationContext.filesDir.absolutePath
-        }
+    fun isDownloaded() {
+       if (file?.isFile == true) {
+           pdfDownloadListener.onDownloadSuccess()
+       } else {
+           pdfDownloadListener.downloadPdf()
+       }
     }
 
     fun get(): File? {
@@ -53,5 +48,7 @@ class PDFDownloader(private val pdfDownloadListener: PdfDownloadListener) {
 }
 
 interface PdfDownloadListener {
-    fun pdfDownloaded(response: Boolean)
+    fun onDownloadSuccess()
+    fun onDownloadFailed()
+    fun downloadPdf()
 }
