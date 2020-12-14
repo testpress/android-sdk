@@ -34,12 +34,8 @@ open class PDFDownloader(
                 })
     }
 
-    fun isDownloaded() {
-       if (file?.isFile == true) {
-           pdfDownloadListener.onDownloadSuccess()
-       } else {
-           pdfDownloadListener.downloadPdf()
-       }
+    fun isDownloaded(): Boolean {
+       return file?.isFile == true
     }
 
     fun get(): File? {
@@ -50,5 +46,4 @@ open class PDFDownloader(
 interface PdfDownloadListener {
     fun onDownloadSuccess()
     fun onDownloadFailed()
-    fun downloadPdf()
 }

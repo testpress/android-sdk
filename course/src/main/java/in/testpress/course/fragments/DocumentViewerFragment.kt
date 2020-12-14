@@ -64,7 +64,13 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         (activity as ContentActivity).setActionBarTitle(content.attachment?.title)
         fileName = getFileName()
         pdfDownloader = PDFDownloader(this,requireContext(),fileName)
-        pdfDownloader.isDownloaded()
+        if (pdfDownloader.isDownloaded()) {
+            displayPDF()
+        } else {
+            content.attachment?.attachmentUrl?.let {
+                pdfDownloader.download(it)
+            }
+        }
     }
 
     private fun getFileName(): String {
@@ -73,17 +79,14 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         return filename.generateSha256()
     }
 
-    override fun downloadPdf() {
-        content.attachment?.attachmentUrl?.let {
-            pdfDownloader.download(it)
-        }
+    override fun onDownloadSuccess() {
+        displayPDF()
     }
 
-    override fun onDownloadSuccess() {
+    private fun displayPDF() {
         DisplayPDF(requireContext(),displayPDFListener = this).showPdfFromFile(
-                pageNumber = 0,
                 password = contentId.toString(),
-                pdfDownloader = pdfDownloader,
+                file = pdfDownloader.get(),
                 pdfView = pdfView
         )
     }

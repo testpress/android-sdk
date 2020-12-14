@@ -47,7 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:id="@+id/emptyTitle"
-        android:text="Failed to load Document"
+        android:text="Failed to load PDF"
         android:textStyle="bold"
         android:textColor="@color/testpress_black"
         android:textSize="16sp"

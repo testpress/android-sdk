@@ -29,7 +29,11 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
         hideStatusBar()
         getDataFromBundle()
         pdfDownloader = PDFDownloader(this,this,fileName)
-        pdfDownloader.isDownloaded()
+        if (pdfDownloader.isDownloaded()) {
+            displayPDF()
+        } else {
+            pdfDownloader.download(url)
+        }
     }
 
     private fun hideStatusBar() {
@@ -48,20 +52,20 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
     }
 
     override fun onDownloadSuccess() {
+        displayPDF()
+    }
+
+    private fun displayPDF() {
         DisplayPDF(this,displayPDFListener = this).showPdfFromFile(
                 pageNumber = pageNumber,
                 password = password,
-                pdfDownloader = pdfDownloader,
+                file = pdfDownloader.get(),
                 pdfView = pdfView
         )
     }
 
     override fun onDownloadFailed() {
         showErrorView()
-    }
-
-    override fun downloadPdf() {
-        pdfDownloader.download(url)
     }
 
     override fun onSingleTapOnPDF() {}

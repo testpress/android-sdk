@@ -7,17 +7,14 @@ import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
+import java.io.File
 
 class DisplayPDF(
         val context: Context,
         private val displayPDFListener: DisplayPDFListener
 ) : OnPageChangeListener, OnErrorListener, OnLoadCompleteListener, OnPageErrorListener {
 
-    private var pageNumber: Int = 0
-
-    fun showPdfFromFile(pageNumber: Int, password: String, pdfDownloader: PDFDownloader, pdfView: PDFView) {
-        val file = pdfDownloader.get()
-        this.pageNumber = pageNumber
+    fun showPdfFromFile(pageNumber: Int = 0, password: String? = null, file: File?, pdfView: PDFView) {
         pdfView.fromFile(file)
                 .enableSwipe(true)
                 .enableDoubletap(true)
@@ -45,8 +42,7 @@ class DisplayPDF(
     }
 
     override fun onPageChanged(page: Int, pageCount: Int) {
-        pageNumber = page
-        displayPDFListener.onPageChanged(pageNumber)
+        displayPDFListener.onPageChanged(page)
     }
 
     override fun loadComplete(nbPages: Int) {
