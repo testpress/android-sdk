@@ -14,6 +14,8 @@ open class PDFDownloader(
 
     var file: File? = null
 
+    private var fileEncryptionAndDecryption = FileEncryptionAndDecryption(context)
+
     init {
         file = File(getRootDirPath(context), fileName)
     }
@@ -25,6 +27,7 @@ open class PDFDownloader(
                 .build().start(object : OnDownloadListener {
                     override fun onDownloadComplete() {
                         file = File(dirPath, fileName)
+                        file?.let { fileEncryptionAndDecryption.encrypt(it) }
                         pdfDownloadListener.onDownloadSuccess()
                     }
 
@@ -38,8 +41,8 @@ open class PDFDownloader(
        return file?.isFile == true
     }
 
-    fun get(): File? {
-        return file
+    fun get(): ByteArray? {
+        return file?.let { fileEncryptionAndDecryption.decrypt(it) }
     }
 }
 
