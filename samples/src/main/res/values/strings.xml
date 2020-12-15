@@ -20,7 +20,7 @@
     <string name="navigation_drawer_open">Drawer Open</string>
     <string name="navigation_drawer_close">Drawer Close</string>
 
-<!--    <string name="facebook_app_id">1244600758892095</string>-->
+    <string name="facebook_app_id">1244600758892095</string>
     <string name="fb_login_protocol_scheme">1244600758892095</string>
     <string name="server_client_id">968875728029-sm73rufgcctiuen4ohnrtq7c19fi6ugp.apps.googleusercontent.com</string>
 </resources>

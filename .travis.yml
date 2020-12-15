@@ -6,7 +6,7 @@ dist: precise
 
 env:
   global:
-    - ANDROID_API_LEVEL=28  # Compile SDK version
+    - ANDROID_API_LEVEL=29  # Compile SDK version
     - EMULATOR_API_LEVEL=19
     - ANDROID_BUILD_TOOLS_VERSION=28.0.3
     - ANDROID_ABI=armeabi-v7a
