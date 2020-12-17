@@ -73,7 +73,7 @@ public class ChaptersListFragmentTest {
 //        activity = Robolectric.buildActivity(ChapterDetailActivity.class, intent)
 //                .create()
 //                .resume()
-//                .get();
+//                .get(); ̰
 //        activity = spy(activity);
 //        fragment = new ChaptersListFragment();
 //        fragment.setArguments(activity.getIntent().getExtras());
