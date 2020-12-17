@@ -11,7 +11,7 @@
         android:id="@+id/container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@+id/content_details_container"
+        app:layout_constraintEnd_toStartOf="@+id/info_conatainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -108,7 +108,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
-        android:id="@+id/content_details_container"
+        android:id="@+id/info_conatainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -131,23 +131,37 @@
             android:textSize="16sp" />
 
         <LinearLayout
-            android:id="@+id/scheduled_info_container"
+            android:id="@+id/content_details_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/scheduled_info"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:lineSpacingExtra="4dp"
-                android:maxLines="1"
-                android:text="Extra Info"
-                android:textColor="@color/testpress_text_gray_medium"
-                android:textSize="12sp" />
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="0dp"
+            android:orientation="vertical"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/container"
+            app:layout_constraintTop_toTopOf="parent">
 
         </LinearLayout>
-    </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/scheduled_info_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/scheduled_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="4dp"
+                    android:maxLines="1"
+                    android:text=""
+                    android:textColor="@color/testpress_text_gray_medium"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+        </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
