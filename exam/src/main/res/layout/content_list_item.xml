@@ -111,10 +111,10 @@
         android:id="@+id/info_conatainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginLeft="0dp"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/container"
         app:layout_constraintTop_toTopOf="parent">
@@ -150,7 +150,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/scheduled_info"
@@ -158,7 +158,7 @@
                     android:layout_height="wrap_content"
                     android:lineSpacingExtra="4dp"
                     android:maxLines="1"
-                    android:text="Extra Info dewfdew"
+                    android:text=""
                     android:textColor="@color/testpress_text_gray_medium"
                     android:textSize="12sp" />
 
