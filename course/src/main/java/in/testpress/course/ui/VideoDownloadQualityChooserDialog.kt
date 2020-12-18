@@ -75,7 +75,9 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
     }
 
     private fun showLoading() {
-        loadingProgress.visibility = View.VISIBLE
+        if (loadingProgress != null) {
+            loadingProgress.visibility = View.VISIBLE
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -107,7 +109,9 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
     }
 
     private fun hideLoading() {
-        loadingProgress.visibility = View.GONE
+        if (loadingProgress != null) {
+            loadingProgress.visibility = View.GONE
+        }
     }
 
     override fun onTrackSelectionChanged(
