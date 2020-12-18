@@ -189,7 +189,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
                     }
                 });
         panelListAdapter = new ReviewPanelListAdapter(getLayoutInflater(), reviewItems,
-                R.layout.testpress_test_panel_list_item);
+                R.layout.testpress_test_panel_list_item, this);
         questionsListView.setAdapter(panelListAdapter);
         questionsListView.addFooterView(questionsListProgressBar);
         pagerAdapter = new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems);
@@ -626,7 +626,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         }
     }
 
-    private void setPanelOpen(boolean open) {
+    public void setPanelOpen(boolean open) {
         if(open) {
             slidingPaneLayout.openPane();
         } else {
@@ -662,7 +662,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         }
     }
 
-    private void goToQuestion(int position) {
+    public void goToQuestion(int position) {
         if (reviewItems.isEmpty()) {
             return;
         }

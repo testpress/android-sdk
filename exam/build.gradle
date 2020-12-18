@@ -10,6 +10,7 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionName VERSION_NAME
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -54,6 +55,7 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.2.0'
     implementation "androidx.core:core-ktx:1.2.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.multidex:multidex:2.0.1'
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
