@@ -66,8 +66,10 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
 
     private fun setOnClickListeners() {
         okButton.setOnClickListener {
-            val downloadRequest = videoDownloadRequestCreateHandler.buildDownloadRequest(overrides)
-            onSubmitListener?.invoke(downloadRequest)
+            if (::overrides.isInitialized) {
+                val downloadRequest = videoDownloadRequestCreateHandler.buildDownloadRequest(overrides)
+                onSubmitListener?.invoke(downloadRequest)
+            }
             dismiss()
         }
 
