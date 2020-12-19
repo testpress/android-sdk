@@ -11,6 +11,8 @@ import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.slidingpanelayout.widget.SlidingPaneLayout;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -69,7 +71,7 @@ import static in.testpress.models.greendao.ReviewItem.ANSWERED_CORRECT;
 import static in.testpress.models.greendao.ReviewItem.ANSWERED_INCORRECT;
 import static in.testpress.models.greendao.ReviewItem.UNANSWERED;
 
-public class ReviewQuestionsActivity extends BaseToolBarActivity {
+public class ReviewQuestionsActivity extends BaseToolBarActivity implements ReviewPanelListAdapter.ListItemClickListener {
 
     static final String PARAM_ATTEMPT = "attempt";
     static final String PARAM_EXAM = "exam";
@@ -188,8 +190,8 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
                         setPanelOpen(false);
                     }
                 });
-        panelListAdapter = new ReviewPanelListAdapter(getLayoutInflater(), reviewItems,
-                R.layout.testpress_test_panel_list_item);
+        panelListAdapter = new ReviewPanelListAdapter(reviewItems,
+                R.layout.testpress_test_panel_list_item, this, this);
         questionsListView.setAdapter(panelListAdapter);
         questionsListView.addFooterView(questionsListProgressBar);
         pagerAdapter = new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems);
@@ -777,4 +779,9 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity {
         };
     }
 
+    @Override
+    public void onItemClicked(int position) {
+        goToQuestion(position);
+        setPanelOpen(false);
+    }
 }

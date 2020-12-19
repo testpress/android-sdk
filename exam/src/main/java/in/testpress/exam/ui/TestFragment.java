@@ -74,7 +74,8 @@ import static in.testpress.exam.ui.TestActivity.PARAM_COURSE_CONTENT;
 import static in.testpress.models.greendao.Attempt.COMPLETED;
 import static in.testpress.models.greendao.Attempt.NOT_STARTED;
 
-public class TestFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>>, PlainSpinnerItemAdapter.SectionInfoClickListener {
+public class TestFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>>,
+        PlainSpinnerItemAdapter.SectionInfoClickListener, TestPanelListAdapter.ListItemClickListener {
 
     private static final int APP_BACKGROUND_DELAY = 60000; // 1m
 
@@ -124,6 +125,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
      * Map of subjects/sections & its starting point(first question index)
      */
     private HashMap<String, Integer> plainSpinnerItemOffsets = new HashMap<>();
+
     private enum Action { PAUSE, END, UPDATE_ANSWER, END_SECTION }
     private RetrofitCall<Attempt> heartBeatApiRequest;
     private RetrofitCall<AttemptSection> endSectionApiRequest;
@@ -363,8 +365,13 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     private void initializeQuestionsListAdapter() {
-        questionsListAdapter = new TestPanelListAdapter(getLayoutInflater(), filterItems,
-                R.layout.testpress_test_panel_list_item);
+        questionsListAdapter = new TestPanelListAdapter(filterItems,
+                R.layout.testpress_test_panel_list_item, this.requireActivity(), this);
+    }
+
+    @Override
+    public void onItemClicked(int position) {
+        viewPager.setCurrentItem(position);
     }
 
     private void bindViews() {
@@ -481,13 +488,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             @Override
             public void onClick(View view) {
                 showNextQuestion();
-            }
-        });
-        questionsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                int index = ((AttemptItem) questionsListView.getItemAtPosition(position)).getIndex();
-                viewPager.setCurrentItem(index - 1);
             }
         });
         previous.setOnClickListener(new View.OnClickListener() {
