@@ -1,6 +1,9 @@
 package in.testpress.course.ui;
 
+import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
@@ -21,6 +24,7 @@ public class ExoPlayerActivity extends AppCompatActivity {
     public static final String START_POSITION = "startPosition";
     public static final String PLAY_WHEN_READY = "playWhenReady";
     public static final String SPEED_RATE = "speedRate";
+    public static final String WIDE_VINE_URL = "WideVineUrl";
 
     private ExoPlayerUtil exoPlayerUtil;
 
@@ -34,11 +38,12 @@ public class ExoPlayerActivity extends AppCompatActivity {
         playerView.setLayoutParams(new ConstraintLayout.LayoutParams(matchParent, matchParent));
         findViewById(R.id.exo_fullscreen_button).setVisibility(View.GONE);
         String url = getIntent().getStringExtra(VIDEO_URL);
+        String wideVineUrl = getIntent().getStringExtra(WIDE_VINE_URL);
         float startPosition = getIntent().getFloatExtra(START_POSITION, 0);
         float speedRate = getIntent().getFloatExtra(SPEED_RATE, 1);
         FrameLayout exoPlayerMainFrame = findViewById(R.id.exo_player_main_frame);
         exoPlayerUtil =
-                new ExoPlayerUtil(this, exoPlayerMainFrame, url, startPosition, true, speedRate);
+                new ExoPlayerUtil(this, exoPlayerMainFrame, url, startPosition, true, speedRate, wideVineUrl);
 
         exoPlayerUtil.openOnlyInFullScreen();
     }
@@ -49,6 +54,7 @@ public class ExoPlayerActivity extends AppCompatActivity {
         exoPlayerUtil.onStart();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     public void onResume() {
         super.onResume();

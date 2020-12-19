@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.annotation.DrawableRes;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,22 +44,37 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
+import com.google.android.exoplayer2.drm.DummyExoMediaDrm;
+import com.google.android.exoplayer2.drm.ExoMediaCrypto;
+import com.google.android.exoplayer2.drm.ExoMediaDrm;
+import com.google.android.exoplayer2.drm.FrameworkMediaCrypto;
+import com.google.android.exoplayer2.drm.FrameworkMediaDrm;
+import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
+import com.google.android.exoplayer2.drm.UnsupportedDrmException;
 import com.google.android.exoplayer2.offline.DownloadHelper;
 import com.google.android.exoplayer2.offline.DownloadRequest;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.source.dash.DashChunkSource;
+import com.google.android.exoplayer2.source.dash.DashMediaSource;
+import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
@@ -98,6 +115,8 @@ public class ExoPlayerUtil {
     private Dialog fullscreenDialog;
     private TrackSelectionDialog trackSelectionDialog;
     private YouTubeOverlay youtubeOverlay;
+    private final String widevineLicence;
+    private DashMediaSource dashMediaSource;
 
 
     private Activity activity;
@@ -141,12 +160,13 @@ public class ExoPlayerUtil {
     private DialogInterface.OnClickListener dialogOnClickListener;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
-                         float startPosition) {
+                         float startPosition, String widevineLicence) {
 
         this.activity = activity;
         this.exoPlayerMainFrame = exoPlayerMainFrame;
         this.url = url;
         this.startPosition = startPosition;
+        this.widevineLicence = widevineLicence;
 
         initializeViews();
         exoPlayerLayout = exoPlayerMainFrame.findViewById(R.id.exo_player_layout);
@@ -186,6 +206,7 @@ public class ExoPlayerUtil {
         }
         setSpeedRate(1);
         playerView.setPlaybackPreparer(new PlaybackPreparer() {
+            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
             @Override
             public void preparePlayback() {
                 initializePlayer();
@@ -202,9 +223,9 @@ public class ExoPlayerUtil {
     }
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
-                         float startPosition, boolean playWhenReady, float speedRate) {
+                         float startPosition, boolean playWhenReady, float speedRate, String wideVineUrl) {
 
-        this(activity, exoPlayerMainFrame, url, startPosition);
+        this(activity, exoPlayerMainFrame, url, startPosition, wideVineUrl);
         this.playWhenReady = playWhenReady;
         setSpeedRate(speedRate);
     }
@@ -276,7 +297,20 @@ public class ExoPlayerUtil {
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public void initializePlayer() {
+
+        if (content.getVideo().getDashUrl() != null) {
+            DefaultDrmSessionManager<ExoMediaCrypto> drmSessionManager = null;
+            UUID drmSchemeUuid = Util.getDrmUuid(C.WIDEVINE_UUID.toString());
+            try {
+                drmSessionManager = buildDrmSessionManager(drmSchemeUuid, widevineLicence, true);
+            } catch (UnsupportedDrmException e) {
+               e.printStackTrace();
+            }
+            dashMediaSource = buildDashMediaSource(Uri.parse(url), drmSessionManager);
+        }
+
         if (player == null) {
             progressBar.setVisibility(View.VISIBLE);
             buildPlayer();
@@ -286,6 +320,36 @@ public class ExoPlayerUtil {
         preparePlayer();
         initializeUsernameOverlay();
         registerListeners();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+    private DefaultDrmSessionManager<ExoMediaCrypto> buildDrmSessionManager(UUID uuid, String licenseUrl, Boolean multiSession) throws UnsupportedDrmException {
+        HttpDataSource.Factory licenseDataSourceFactory = new DefaultHttpDataSourceFactory(Util.getUserAgent(this.activity, this.activity.getPackageName()));
+        HttpMediaDrmCallback drmCallback = new HttpMediaDrmCallback(licenseUrl, licenseDataSourceFactory);
+        ExoMediaDrm<FrameworkMediaCrypto> mediaDrm = FrameworkMediaDrm.newInstance(uuid);
+        return new DefaultDrmSessionManager.Builder()
+                .setMultiSession(multiSession)
+                .setUuidAndExoMediaDrmProvider(uuid, UUID -> {
+                    try {
+                        FrameworkMediaDrm mediaDRM = FrameworkMediaDrm.newInstance(uuid);
+                        mediaDRM.setPropertyString("securityLevel", "L3");
+                        return mediaDRM;
+                    } catch (UnsupportedDrmException e) {
+                        return new DummyExoMediaDrm<>();
+                    }
+                })
+                .setMultiSession(multiSession)
+                .build(drmCallback);
+    }
+
+    private DashMediaSource buildDashMediaSource(Uri uri, DefaultDrmSessionManager<ExoMediaCrypto> drmSessionManager) {
+        String userAgent = "ExoPlayer-Drm";
+        DashChunkSource.Factory dashChunkSourceFactory = new DefaultDashChunkSource.Factory(
+                new DefaultHttpDataSourceFactory("userAgent", new DefaultBandwidthMeter()));
+        DataSource.Factory manifestDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent);
+        return new DashMediaSource.Factory(dashChunkSourceFactory, manifestDataSourceFactory)
+                .setDrmSessionManager(drmSessionManager)
+                .createMediaSource(uri);
     }
 
     private void buildPlayer() {
@@ -345,7 +409,13 @@ public class ExoPlayerUtil {
     }
 
     private void preparePlayer() {
-        player.prepare(getMediaSource(), false, false);
+        if (widevineLicence == null) {
+            player.prepare(getMediaSource(), false, false);
+        } else {
+            if (dashMediaSource != null) {
+                player.prepare(dashMediaSource, true, false);
+            }
+        }
     }
 
     private void initializeUsernameOverlay() {
@@ -467,6 +537,8 @@ public class ExoPlayerUtil {
         switch (type) {
             case C.TYPE_HLS:
                 return new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+            case C.TYPE_DASH:
+                return new DashMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
             case C.TYPE_OTHER:
                 return new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
             default:
@@ -515,6 +587,7 @@ public class ExoPlayerUtil {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public void onResume() {
         if ((Util.SDK_INT <= 23 || player == null)) {
             initializePlayer();
@@ -737,9 +810,20 @@ public class ExoPlayerUtil {
             }
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
         @Override
         public void onPlayerError(ExoPlaybackException exception) {
-            handleError(exception.type == TYPE_SOURCE);
+
+            if (content.getVideo().getDashUrl() != null) {
+                switch (exception.type) {
+                    case ExoPlaybackException.TYPE_SOURCE:
+                        //todo: Fetch licence from api
+                        initializePlayer();
+                        break;
+                }
+            } else {
+                handleError(exception.type == TYPE_SOURCE);
+            }
         }
 
         @Override

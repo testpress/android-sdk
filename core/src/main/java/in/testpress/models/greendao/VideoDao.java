@@ -34,7 +34,9 @@ public class VideoDao extends AbstractDao<Video, Long> {
         public final static Property Thumbnail = new Property(6, String.class, "thumbnail", false, "THUMBNAIL");
         public final static Property ThumbnailMedium = new Property(7, String.class, "thumbnailMedium", false, "THUMBNAIL_MEDIUM");
         public final static Property ThumbnailSmall = new Property(8, String.class, "thumbnailSmall", false, "THUMBNAIL_SMALL");
-        public final static Property StreamId = new Property(9, Long.class, "streamId", false, "STREAM_ID");
+        public final static Property DashUrl = new Property(9, String.class, "dashUrl", false, "DASH_URL");
+        public final static Property WidevineLicenseUrl = new Property(10, String.class, "widevineLicenseUrl", false, "WIDEVINE_LICENSE_URL");
+        public final static Property StreamId = new Property(11, Long.class, "streamId", false, "STREAM_ID");
     }
 
     private DaoSession daoSession;
@@ -62,7 +64,9 @@ public class VideoDao extends AbstractDao<Video, Long> {
                 "\"THUMBNAIL\" TEXT," + // 6: thumbnail
                 "\"THUMBNAIL_MEDIUM\" TEXT," + // 7: thumbnailMedium
                 "\"THUMBNAIL_SMALL\" TEXT," + // 8: thumbnailSmall
-                "\"STREAM_ID\" INTEGER);"); // 9: streamId
+                "\"DASH_URL\" TEXT," + // 9: dashUrl
+                "\"WIDEVINE_LICENSE_URL\" TEXT," + // 10: widevineLicenseUrl
+                "\"STREAM_ID\" INTEGER);"); // 11: streamId
     }
 
     /** Drops the underlying database table. */
@@ -120,9 +124,19 @@ public class VideoDao extends AbstractDao<Video, Long> {
             stmt.bindString(9, thumbnailSmall);
         }
  
+        String dashUrl = entity.getDashUrl();
+        if (dashUrl != null) {
+            stmt.bindString(10, dashUrl);
+        }
+ 
+        String widevineLicenseUrl = entity.getWidevineLicenseUrl();
+        if (widevineLicenseUrl != null) {
+            stmt.bindString(11, widevineLicenseUrl);
+        }
+ 
         Long streamId = entity.getStreamId();
         if (streamId != null) {
-            stmt.bindLong(10, streamId);
+            stmt.bindLong(12, streamId);
         }
     }
 
@@ -175,9 +189,19 @@ public class VideoDao extends AbstractDao<Video, Long> {
             stmt.bindString(9, thumbnailSmall);
         }
  
+        String dashUrl = entity.getDashUrl();
+        if (dashUrl != null) {
+            stmt.bindString(10, dashUrl);
+        }
+ 
+        String widevineLicenseUrl = entity.getWidevineLicenseUrl();
+        if (widevineLicenseUrl != null) {
+            stmt.bindString(11, widevineLicenseUrl);
+        }
+ 
         Long streamId = entity.getStreamId();
         if (streamId != null) {
-            stmt.bindLong(10, streamId);
+            stmt.bindLong(12, streamId);
         }
     }
 
@@ -204,7 +228,9 @@ public class VideoDao extends AbstractDao<Video, Long> {
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // thumbnail
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // thumbnailMedium
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // thumbnailSmall
-            cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9) // streamId
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // dashUrl
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // widevineLicenseUrl
+            cursor.isNull(offset + 11) ? null : cursor.getLong(offset + 11) // streamId
         );
         return entity;
     }
@@ -220,7 +246,9 @@ public class VideoDao extends AbstractDao<Video, Long> {
         entity.setThumbnail(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setThumbnailMedium(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setThumbnailSmall(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setStreamId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
+        entity.setDashUrl(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setWidevineLicenseUrl(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setStreamId(cursor.isNull(offset + 11) ? null : cursor.getLong(offset + 11));
      }
     
     @Override

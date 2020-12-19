@@ -48,6 +48,7 @@ dependencies {
     api 'com.google.android.exoplayer:exoplayer-ui:' + rootProject.exoPlayer
     api 'com.google.android.exoplayer:exoplayer-hls:' + rootProject.exoPlayer
     api 'com.google.android.exoplayer:extension-okhttp:' + rootProject.exoPlayer
+    api 'com.google.android.exoplayer:exoplayer-dash:' + rootProject.exoPlayer
     api rootProject.constraintLayout
     api rootProject.mediarouter
     api rootProject.shimmer

@@ -4,14 +4,16 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.getGreenDaoContent
-import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
+import `in`.testpress.enums.Status
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.Observer
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 
@@ -32,6 +34,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         return inflater.inflate(R.layout.native_video_widget, container, false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindViews(view)
@@ -52,10 +55,18 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         exoplayerFullscreenHelper.initializeOrientationListener()
     }
 
+    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private fun createAttemptAndInitializeExoplayer(content: DomainContent) {
         val greenDaoContent = content.getGreenDaoContent(requireContext())
         val video = content.video
-        exoPlayerUtil = ExoPlayerUtil(activity, exoPlayerMainFrame, video?.hlsUrl(), 0F)
+        var wideVineLicenceUrl: String? = null
+        val videoUrl: String? = if (video?.dashUrl.isNullOrEmpty()) {
+            video?.hlsUrl()
+        } else {
+            wideVineLicenceUrl = video?.widevineLicenseUrl
+            video?.dashUrl
+        }
+        exoPlayerUtil = ExoPlayerUtil(activity, exoPlayerMainFrame, videoUrl, 0F, wideVineLicenceUrl)
         exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil)
 
         viewModel.createContentAttempt(content.id)
@@ -83,6 +94,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         exoPlayerUtil?.onPause()
     }
 
+    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     override fun onResume() {
         super.onResume()
         exoPlayerUtil?.onResume()
