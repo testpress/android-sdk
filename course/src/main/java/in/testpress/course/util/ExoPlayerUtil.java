@@ -117,6 +117,7 @@ public class ExoPlayerUtil {
     private YouTubeOverlay youtubeOverlay;
     private final String widevineLicence;
     private DashMediaSource dashMediaSource;
+    private DefaultDrmSessionManager<ExoMediaCrypto> drmSessionManager = null;
 
 
     private Activity activity;
@@ -301,13 +302,7 @@ public class ExoPlayerUtil {
     public void initializePlayer() {
 
         if (content.getVideo().getDashUrl() != null) {
-            DefaultDrmSessionManager<ExoMediaCrypto> drmSessionManager = null;
-            UUID drmSchemeUuid = Util.getDrmUuid(C.WIDEVINE_UUID.toString());
-            try {
-                drmSessionManager = buildDrmSessionManager(drmSchemeUuid, widevineLicence, true);
-            } catch (UnsupportedDrmException e) {
-               e.printStackTrace();
-            }
+            setDrmSessionManager();
             dashMediaSource = buildDashMediaSource(Uri.parse(url), drmSessionManager);
         }
 
@@ -320,6 +315,16 @@ public class ExoPlayerUtil {
         preparePlayer();
         initializeUsernameOverlay();
         registerListeners();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+    private void setDrmSessionManager() {
+        UUID drmSchemeUuid = Util.getDrmUuid(C.WIDEVINE_UUID.toString());
+        try {
+            drmSessionManager = buildDrmSessionManager(drmSchemeUuid, widevineLicence, true);
+        } catch (UnsupportedDrmException e) {
+            e.printStackTrace();
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
