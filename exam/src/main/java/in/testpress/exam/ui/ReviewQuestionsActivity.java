@@ -190,7 +190,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
                         setPanelOpen(false);
                     }
                 });
-        panelListAdapter = new ReviewPanelListAdapter(getLayoutInflater(), reviewItems,
+        panelListAdapter = new ReviewPanelListAdapter(reviewItems,
                 R.layout.testpress_test_panel_list_item, this, this);
         questionsListView.setAdapter(panelListAdapter);
         questionsListView.addFooterView(questionsListProgressBar);

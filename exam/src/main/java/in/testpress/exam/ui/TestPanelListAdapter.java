@@ -27,9 +27,9 @@ class TestPanelListAdapter extends SingleTypeAdapter<AttemptItem> {
     private final Activity activity;
     private final ListItemClickListener listItemClickListener;
 
-    TestPanelListAdapter(final LayoutInflater inflater, final List<AttemptItem> items,
-                         int layout, Activity activity, ListItemClickListener listItemClickListener) {
-        super(inflater, layout);
+    TestPanelListAdapter(final List<AttemptItem> items, int layout, Activity activity,
+                         ListItemClickListener listItemClickListener) {
+        super(activity.getLayoutInflater(), layout);
         this.activity = activity;
         this.listItemClickListener = listItemClickListener;
         setItems(items);

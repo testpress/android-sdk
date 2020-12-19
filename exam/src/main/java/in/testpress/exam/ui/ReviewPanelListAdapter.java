@@ -31,9 +31,9 @@ class ReviewPanelListAdapter extends SingleTypeAdapter<ReviewItem> {
     private final Activity activity;
     private final ListItemClickListener listItemClickListener;
 
-    ReviewPanelListAdapter(final LayoutInflater inflater, final List<ReviewItem> items, int layout,
-                           Activity activity,  ListItemClickListener listItemClickListener) {
-        super(inflater, layout);
+    ReviewPanelListAdapter(final List<ReviewItem> items, int layout, Activity activity,
+                           ListItemClickListener listItemClickListener) {
+        super(activity.getLayoutInflater(), layout);
         this.activity = activity;
         this.listItemClickListener = listItemClickListener;
         setItems(items);
