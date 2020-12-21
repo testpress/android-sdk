@@ -25,6 +25,7 @@ public class ExoPlayerActivity extends AppCompatActivity {
     public static final String PLAY_WHEN_READY = "playWhenReady";
     public static final String SPEED_RATE = "speedRate";
     public static final String WIDE_VINE_URL = "WideVineUrl";
+    public static final String IS_DRM_VIDEO = "isDrmVideo";
 
     private ExoPlayerUtil exoPlayerUtil;
 
@@ -39,11 +40,12 @@ public class ExoPlayerActivity extends AppCompatActivity {
         findViewById(R.id.exo_fullscreen_button).setVisibility(View.GONE);
         String url = getIntent().getStringExtra(VIDEO_URL);
         String wideVineUrl = getIntent().getStringExtra(WIDE_VINE_URL);
+        boolean isDrmVideo = getIntent().getBooleanExtra(IS_DRM_VIDEO, false);
         float startPosition = getIntent().getFloatExtra(START_POSITION, 0);
         float speedRate = getIntent().getFloatExtra(SPEED_RATE, 1);
         FrameLayout exoPlayerMainFrame = findViewById(R.id.exo_player_main_frame);
         exoPlayerUtil =
-                new ExoPlayerUtil(this, exoPlayerMainFrame, url, startPosition, true, speedRate, wideVineUrl);
+                new ExoPlayerUtil(this, exoPlayerMainFrame, url, startPosition, true, speedRate, wideVineUrl, isDrmVideo);
 
         exoPlayerUtil.openOnlyInFullScreen();
     }

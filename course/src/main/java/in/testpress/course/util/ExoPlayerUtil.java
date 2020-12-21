@@ -115,9 +115,10 @@ public class ExoPlayerUtil {
     private Dialog fullscreenDialog;
     private TrackSelectionDialog trackSelectionDialog;
     private YouTubeOverlay youtubeOverlay;
-    private final String widevineLicence;
+    private String widevineLicence;
     private DashMediaSource dashMediaSource;
     private DefaultDrmSessionManager<ExoMediaCrypto> drmSessionManager = null;
+    private boolean isDrmVideo;
 
 
     private Activity activity;
@@ -161,13 +162,14 @@ public class ExoPlayerUtil {
     private DialogInterface.OnClickListener dialogOnClickListener;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
-                         float startPosition, String widevineLicence) {
+                         float startPosition, String widevineLicence, boolean isDrmVideo) {
 
         this.activity = activity;
         this.exoPlayerMainFrame = exoPlayerMainFrame;
         this.url = url;
         this.startPosition = startPosition;
         this.widevineLicence = widevineLicence;
+        this.isDrmVideo = isDrmVideo;
 
         initializeViews();
         exoPlayerLayout = exoPlayerMainFrame.findViewById(R.id.exo_player_layout);
@@ -223,10 +225,10 @@ public class ExoPlayerUtil {
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
-    public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
-                         float startPosition, boolean playWhenReady, float speedRate, String wideVineUrl) {
+    public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url, float startPosition,
+                         boolean playWhenReady, float speedRate, String wideVineUrl, boolean isDrmVideo) {
 
-        this(activity, exoPlayerMainFrame, url, startPosition, wideVineUrl);
+        this(activity, exoPlayerMainFrame, url, startPosition, wideVineUrl, isDrmVideo);
         this.playWhenReady = playWhenReady;
         setSpeedRate(speedRate);
     }
@@ -301,7 +303,7 @@ public class ExoPlayerUtil {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public void initializePlayer() {
 
-        if (content.getVideo().getDashUrl() != null) {
+        if (isDrmVideo) {
             setDrmSessionManager();
             dashMediaSource = buildDashMediaSource(Uri.parse(url), drmSessionManager);
         }
@@ -819,7 +821,7 @@ public class ExoPlayerUtil {
         @Override
         public void onPlayerError(ExoPlaybackException exception) {
 
-            if (content.getVideo().getDashUrl() != null) {
+            if (isDrmVideo) {
                 switch (exception.type) {
                     case ExoPlaybackException.TYPE_SOURCE:
                         //todo: Fetch licence from api

@@ -29,8 +29,6 @@ public class Video implements android.os.Parcelable {
     private String thumbnail;
     private String thumbnailMedium;
     private String thumbnailSmall;
-    private String dashUrl;
-    private String widevineLicenseUrl;
     private Long streamId;
 
     /** Used to resolve relations */
@@ -64,7 +62,7 @@ public class Video implements android.os.Parcelable {
     }
 
     @Generated
-    public Video(String title, String url, Long id, String embedCode, String duration, Boolean isDomainRestricted, String thumbnail, String thumbnailMedium, String thumbnailSmall, String dashUrl, String widevineLicenseUrl, Long streamId) {
+    public Video(String title, String url, Long id, String embedCode, String duration, Boolean isDomainRestricted, String thumbnail, String thumbnailMedium, String thumbnailSmall, Long streamId) {
         this.title = title;
         this.url = url;
         this.id = id;
@@ -74,8 +72,6 @@ public class Video implements android.os.Parcelable {
         this.thumbnail = thumbnail;
         this.thumbnailMedium = thumbnailMedium;
         this.thumbnailSmall = thumbnailSmall;
-        this.dashUrl = dashUrl;
-        this.widevineLicenseUrl = widevineLicenseUrl;
         this.streamId = streamId;
     }
 
@@ -156,22 +152,6 @@ public class Video implements android.os.Parcelable {
 
     public void setThumbnailSmall(String thumbnailSmall) {
         this.thumbnailSmall = thumbnailSmall;
-    }
-
-    public String getDashUrl() {
-        return dashUrl;
-    }
-
-    public void setDashUrl(String dashUrl) {
-        this.dashUrl = dashUrl;
-    }
-
-    public String getWidevineLicenseUrl() {
-        return widevineLicenseUrl;
-    }
-
-    public void setWidevineLicenseUrl(String widevineLicenseUrl) {
-        this.widevineLicenseUrl = widevineLicenseUrl;
     }
 
     public Long getStreamId() {

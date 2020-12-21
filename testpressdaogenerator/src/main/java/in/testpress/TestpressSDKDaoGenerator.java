@@ -417,8 +417,6 @@ public class TestpressSDKDaoGenerator {
         video.addStringProperty("thumbnailMedium");
         video.addStringProperty("thumbnailSmall");
         video.implementsInterface("android.os.Parcelable");
-        video.addStringProperty("dashUrl");
-        video.addStringProperty("widevineLicenseUrl");
         return video;
     }
 
@@ -663,6 +661,8 @@ public class TestpressSDKDaoGenerator {
         stream.addIdProperty().autoincrement();
         stream.addStringProperty("format");
         stream.addStringProperty("url");
+        stream.addStringProperty("dashUrl");
+        stream.addStringProperty("widevineLicenseUrl");
         return stream;
     }
 

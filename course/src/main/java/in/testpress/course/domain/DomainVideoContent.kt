@@ -18,9 +18,7 @@ data class DomainVideoContent(
     val thumbnail: String? = "",
     val thumbnailMedium: String? = "",
     val stream: DomainVideoStream? = null,
-    val streams: List<DomainVideoStream>? = arrayListOf<DomainVideoStream>(),
-    var dashUrl: String? = null,
-    var widevineLicenseUrl: String? = null
+    val streams: List<DomainVideoStream>? = arrayListOf<DomainVideoStream>()
 ) {
     fun hlsUrl(): String? {
         if (stream != null) {
@@ -35,6 +33,17 @@ data class DomainVideoContent(
             }
         }
         return url
+    }
+
+    fun dashURL(): String? {
+        if (streams != null) {
+            for (stream in streams) {
+                if (stream.format == "DASH") {
+                    return stream.dashUrl
+                }
+            }
+        }
+        return null
     }
 
     fun hasEmbedCode(): Boolean {
@@ -52,7 +61,9 @@ data class DomainVideoStream(
     val id: Long,
     val url: String? = null,
     val format: String? = null,
-    val videoId: Long? = null
+    val videoId: Long? = null,
+    var dashUrl: String? = null,
+    var widevineLicenseUrl: String? = null
 )
 
 fun createDomainVideoContent(video: Video): DomainVideoContent {
@@ -67,9 +78,7 @@ fun createDomainVideoContent(video: Video): DomainVideoContent {
         thumbnail = video.thumbnail,
         thumbnailMedium = video.thumbnailMedium,
         thumbnailSmall = video.thumbnailSmall,
-        stream = video.stream?.asDomainStream(),
-        dashUrl = video.dashUrl,
-        widevineLicenseUrl = video.widevineLicenseUrl
+        stream = video.stream?.asDomainStream()
     )
 }
 
@@ -78,7 +87,9 @@ fun createDomainVideoStream(stream: Stream): DomainVideoStream {
         id = stream.id,
         url = stream.url,
         format = stream.format,
-        videoId = stream.videoId
+        videoId = stream.videoId,
+        dashUrl = stream.dashUrl,
+        widevineLicenseUrl = stream.widevineLicenseUrl
     )
 }
 

@@ -15,9 +15,7 @@ data class NetworkVideoContent(
     val thumbnail: String? = "",
     val thumbnailMedium: String? = "",
     val streamID: Long? = null,
-    val streams: List<NetworkStream> = arrayListOf<NetworkStream>(),
-    val dashUrl: String? = null,
-    val widevineLicenseUrl: String? = null
+    val streams: List<NetworkStream> = arrayListOf<NetworkStream>()
 )
 
 fun NetworkVideoContent.asGreenDaoModel(): Video {
@@ -31,8 +29,6 @@ fun NetworkVideoContent.asGreenDaoModel(): Video {
         thumbnail,
         thumbnailMedium,
         thumbnailSmall,
-        this.dashUrl,
-        this.widevineLicenseUrl,
         this.streamID
     )
 }

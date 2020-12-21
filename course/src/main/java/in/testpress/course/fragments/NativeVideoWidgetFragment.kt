@@ -59,14 +59,17 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
     private fun createAttemptAndInitializeExoplayer(content: DomainContent) {
         val greenDaoContent = content.getGreenDaoContent(requireContext())
         val video = content.video
+        val isDRMVideo: Boolean
         var wideVineLicenceUrl: String? = null
-        val videoUrl: String? = if (video?.dashUrl.isNullOrEmpty()) {
+        val videoUrl: String? = if (video?.dashURL().isNullOrEmpty()) {
+            isDRMVideo = false
             video?.hlsUrl()
         } else {
-            wideVineLicenceUrl = video?.widevineLicenseUrl
-            video?.dashUrl
+            isDRMVideo = true
+            wideVineLicenceUrl = video?.stream?.widevineLicenseUrl
+            video?.dashURL()
         }
-        exoPlayerUtil = ExoPlayerUtil(activity, exoPlayerMainFrame, videoUrl, 0F, wideVineLicenceUrl)
+        exoPlayerUtil = ExoPlayerUtil(activity, exoPlayerMainFrame, videoUrl, 0F, wideVineLicenceUrl, isDRMVideo)
         exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil)
 
         viewModel.createContentAttempt(content.id)
