@@ -121,6 +121,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
             showDownloadProgress()
             downloadProgress.progress = progress
             progressPercentage.text = "$progress%"
+            progressBar.visibility = View.GONE
         }
         if (progress == completeProgress) {
             hideDownloadProgress()
