@@ -2,7 +2,6 @@ package `in`.testpress.course.util
 
 import `in`.testpress.course.util.FileUtils.getRootDirPath
 import android.content.Context
-import android.util.Log
 import com.downloader.Error
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
