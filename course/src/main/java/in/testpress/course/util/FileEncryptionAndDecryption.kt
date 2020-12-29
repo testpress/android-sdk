@@ -1,5 +1,6 @@
 package `in`.testpress.course.util
 
+import androidx.annotation.VisibleForTesting
 import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile
@@ -68,8 +69,9 @@ object FileEncryptionAndDecryption {
         }
     }
 
-    private fun reverseBytes(array: ByteArray?) {
-        if (array == null) return
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun reverseBytes(array: ByteArray?): ByteArray {
+        if (array == null) return byteArrayOf()
         var startPosition = 0
         var endPosition = array.size - 1
         var temp: Byte
@@ -80,5 +82,6 @@ object FileEncryptionAndDecryption {
             endPosition--
             startPosition++
         }
+        return array
     }
 }
