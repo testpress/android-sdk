@@ -40,11 +40,6 @@ open class PDFDownloadManager(
                 pdfDownloadListener.onDownloadFailed()
             }
         })
-
-        prDownloader.setOnProgressListener {
-            val progress = ((it.currentBytes*100)/it.totalBytes)
-            pdfDownloadListener.downloadProgress(progress.toInt())
-        }
     }
 
     fun cancel() {
@@ -65,5 +60,4 @@ open class PDFDownloadManager(
 interface PdfDownloadListener {
     fun onDownloadSuccess()
     fun onDownloadFailed()
-    fun downloadProgress(progress: Int)
 }

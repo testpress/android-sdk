@@ -56,7 +56,6 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
     }
 
     override fun onDownloadSuccess() {
-        hideDownloadProgress()
         displayPDF()
     }
 
@@ -70,16 +69,7 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
     }
 
     override fun onDownloadFailed() {
-        hideDownloadProgress()
         showErrorView()
-    }
-
-    override fun downloadProgress(progress: Int) {
-        if (progressPercentage != null) {
-            showDownloadProgress()
-            downloadProgress.progress = progress
-            progressPercentage.text = "$progress%"
-        }
     }
 
     override fun onSingleTapOnPDF() {}
@@ -94,16 +84,6 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
 
     override fun onPageChanged(pageNumber: Int) {
         this.pageNumber = pageNumber
-    }
-
-    private fun showDownloadProgress() {
-        downloadProgress.visibility = View.VISIBLE
-        progressPercentage.visibility = View.VISIBLE
-    }
-
-    private fun hideDownloadProgress() {
-        downloadProgress.visibility = View.GONE
-        progressPercentage.visibility = View.GONE
     }
 
     private fun showErrorView() {

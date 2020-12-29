@@ -28,8 +28,6 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     private lateinit var fullScreenMenu: MenuItem
 
-    private val completeProgress = 100
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
