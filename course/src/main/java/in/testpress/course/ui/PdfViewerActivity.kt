@@ -10,10 +10,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.layout_pdf_viewer.*
-import kotlinx.android.synthetic.main.layout_pdf_viewer.downloadProgress
-import kotlinx.android.synthetic.main.layout_pdf_viewer.emptyContainer
 import kotlinx.android.synthetic.main.layout_pdf_viewer.pdfView
-import kotlinx.android.synthetic.main.layout_pdf_viewer.progressPercentage
 
 class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFListener {
 

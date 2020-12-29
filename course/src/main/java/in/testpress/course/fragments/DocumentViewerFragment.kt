@@ -12,10 +12,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import kotlinx.android.synthetic.main.layout_document_viewer.*
-import kotlinx.android.synthetic.main.layout_document_viewer.downloadProgress
-import kotlinx.android.synthetic.main.layout_document_viewer.emptyContainer
 import kotlinx.android.synthetic.main.layout_document_viewer.pdfView
-import kotlinx.android.synthetic.main.layout_document_viewer.progressPercentage
 
 class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         DisplayPDFListener {
