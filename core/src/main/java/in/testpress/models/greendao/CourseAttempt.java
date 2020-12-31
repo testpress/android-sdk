@@ -352,10 +352,6 @@ public class CourseAttempt implements android.os.Parcelable {
         setAssessmentId(attempt.getId());
         setChapterContentId(content.getId());
         attemptSectionDao.insertOrReplaceInTx(attempt.getRawSections());
-        for (AttemptSection attemptSection: attempt.getRawSections()) {
-            attemptSection.setAttemptId(attempt.getId());
-            attemptSectionDao.insertOrReplaceInTx(attemptSection);
-        }
         courseAttemptDao.insertOrReplace(this);
     }
 
