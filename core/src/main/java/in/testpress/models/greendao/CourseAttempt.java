@@ -12,6 +12,9 @@ import in.testpress.core.TestpressSDKDatabase;
 
 import android.content.Context;
 import android.os.Parcel;
+import android.util.Log;
+
+import java.util.List;
 // KEEP INCLUDES END
 
 /**
@@ -344,12 +347,18 @@ public class CourseAttempt implements android.os.Parcelable {
     };
 
     public void saveInDB(Context context, Content content) {
+        AttemptSectionDao attemptSectionDao = TestpressSDKDatabase.getAttemptSectionDao(context);
         CourseAttemptDao courseAttemptDao = TestpressSDKDatabase.getCourseAttemptDao(context);
         AttemptDao attemptDao = TestpressSDKDatabase.getAttemptDao(context);
         Attempt attempt = getRawAssessment();
         attemptDao.insertOrReplace(attempt);
         setAssessmentId(attempt.getId());
         setChapterContentId(content.getId());
+        attemptSectionDao.insertOrReplaceInTx(attempt.getRawSections());
+        for (AttemptSection attemptSection: attempt.getRawSections()) {
+            attemptSection.setAttemptId(attempt.getId());
+            attemptSectionDao.insertOrReplaceInTx(attemptSection);
+        }
         courseAttemptDao.insertOrReplace(this);
     }
 
