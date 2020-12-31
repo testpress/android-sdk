@@ -12,9 +12,6 @@ import in.testpress.core.TestpressSDKDatabase;
 
 import android.content.Context;
 import android.os.Parcel;
-import android.util.Log;
-
-import java.util.List;
 // KEEP INCLUDES END
 
 /**
