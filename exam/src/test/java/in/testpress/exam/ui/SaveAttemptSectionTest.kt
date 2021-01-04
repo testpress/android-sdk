@@ -22,16 +22,13 @@ class SaveAttemptSectionTest {
     private val attemptSectionDao =
             TestpressSDKDatabase.getAttemptSectionDao(context)
 
-
-    @Before
-    fun setup() {
-        saveAttempt()
-        saveAttemptSection()
-    }
-
     @Test
     fun saveInDBShouldSaveAttemptSection() {
+        saveAttempt()
+        saveAttemptSection()
+
         courseAttempt.saveInDB(context, Content(1))
+
         val section = attemptSectionDao.queryBuilder().where(AttemptSectionDao.Properties.AttemptId.eq(1)).list()
         Assert.assertFalse(section.isEmpty())
     }
