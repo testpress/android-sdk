@@ -49,7 +49,7 @@ class ShareToUnlockActivityTest {
         val shareIntent = activity.getShareIntent()
 
         Assert.assertEquals(shareIntent.action, Intent.ACTION_SEND)
-        Assert.assertEquals(shareIntent.extras[EXTRA_TEXT], messageToShare)
+        Assert.assertEquals(shareIntent.extras?.get(EXTRA_TEXT), messageToShare)
         Assert.assertEquals(shareIntent.type, "text/html")
     }
 
