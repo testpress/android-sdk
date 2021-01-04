@@ -344,12 +344,14 @@ public class CourseAttempt implements android.os.Parcelable {
     };
 
     public void saveInDB(Context context, Content content) {
+        AttemptSectionDao attemptSectionDao = TestpressSDKDatabase.getAttemptSectionDao(context);
         CourseAttemptDao courseAttemptDao = TestpressSDKDatabase.getCourseAttemptDao(context);
         AttemptDao attemptDao = TestpressSDKDatabase.getAttemptDao(context);
         Attempt attempt = getRawAssessment();
         attemptDao.insertOrReplace(attempt);
         setAssessmentId(attempt.getId());
         setChapterContentId(content.getId());
+        attemptSectionDao.insertOrReplaceInTx(attempt.getRawSections());
         courseAttemptDao.insertOrReplace(this);
     }
 

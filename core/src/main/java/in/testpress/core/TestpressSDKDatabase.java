@@ -9,6 +9,7 @@ import in.testpress.models.greendao.AnswerDao;
 import in.testpress.models.greendao.AnswerTranslationDao;
 import in.testpress.models.greendao.AttachmentDao;
 import in.testpress.models.greendao.AttemptDao;
+import in.testpress.models.greendao.AttemptSectionDao;
 import in.testpress.models.greendao.BookmarkDao;
 import in.testpress.models.greendao.BookmarkFolderDao;
 import in.testpress.models.greendao.ChapterDao;
@@ -106,6 +107,10 @@ public class TestpressSDKDatabase {
 
     public static AttemptDao getAttemptDao(Context context) {
         return getDaoSession(context).getAttemptDao();
+    }
+
+    public static AttemptSectionDao getAttemptSectionDao(Context context) {
+        return getDaoSession(context).getAttemptSectionDao();
     }
 
     public static CourseDao getCourseDao(Context context) {
