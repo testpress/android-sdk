@@ -66,6 +66,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         pdfDownloader = PDFDownloader(this,requireContext(),fileName)
         if (pdfDownloader.isDownloaded()) {
             displayPDF()
+            viewModel.createContentAttempt(contentId)
         } else {
             content.attachment?.attachmentUrl?.let {
                 pdfDownloader.download(it)
@@ -81,6 +82,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     override fun onDownloadSuccess() {
         displayPDF()
+        viewModel.createContentAttempt(contentId)
     }
 
     private fun displayPDF() {
