@@ -7,6 +7,7 @@ import `in`.testpress.course.TestpressCourse.CONTENT_TYPE
 import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.domain.DomainContent
+import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.ui.ContentActivity.HIDE_BOTTOM_NAVIGATION
@@ -14,7 +15,9 @@ import `in`.testpress.course.viewmodels.ContentViewModel
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -27,7 +30,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
-abstract class BaseContentDetailFragment : Fragment(), BookmarkListener,
+abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, ContentActivity.OnBackPressedListener,
     EmptyViewListener {
     protected lateinit var swipeRefresh: SwipeRefreshLayout
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
@@ -181,6 +184,14 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener,
 
     override fun onRetryClick() {
         forceReloadContent()
+    }
+
+    override fun onBackPressed() {
+        val prefs: SharedPreferences = requireActivity().getSharedPreferences(
+                ContentActivity.TESTPRESS_CONTENT_SHARED_PREFS,
+                Context.MODE_PRIVATE
+        )
+        prefs.edit().putBoolean(ContentActivity.FORCE_REFRESH, true).apply()
     }
 
     abstract fun display()

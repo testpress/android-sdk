@@ -55,11 +55,20 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
             if (getCallingActivity() != null) {
                 return false;
             } else {
+                delegateBackPressToFragments()
                 super.onBackPressed();
             }
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void delegateBackPressToFragments() {
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            if(fragment instanceof OnBackPressedListener){
+                ((OnBackPressedListener)fragment).onBackPressed();
+            }
+        }
     }
 
     @Override
@@ -81,5 +90,9 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
         for (Fragment fragment : getSupportFragmentManager().getFragments()) {
             fragment.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    public interface OnBackPressedListener {
+        public void onBackPressed();
     }
 }
