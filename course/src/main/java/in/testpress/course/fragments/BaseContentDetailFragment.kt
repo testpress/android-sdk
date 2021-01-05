@@ -173,7 +173,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
         transaction.commit()
     }
 
-    protected fun refreshNextContentAndBottomNavigation() {
+    protected fun checkAndUnlockNextContent() {
         if (content.nextContentId != null) {
             viewModel.getContent(content.nextContentId!!, forceRefresh = true).observe(viewLifecycleOwner, Observer {
                 when(it.status) {
