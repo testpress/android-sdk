@@ -11,8 +11,8 @@ import `in`.testpress.course.util.SHA256Generator.generateSha256
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.layout_document_viewer.*
-import kotlinx.android.synthetic.main.layout_document_viewer.emptyContainer
 
 class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         DisplayPDFListener {
@@ -66,7 +66,9 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         pdfDownloader = PDFDownloader(this,requireContext(),fileName)
         if (pdfDownloader.isDownloaded()) {
             displayPDF()
-            viewModel.createContentAttempt(contentId)
+            viewModel.createContentAttempt(contentId).observe(viewLifecycleOwner, Observer {
+                refreshContentsAndBottomNavigation()
+            })
         } else {
             content.attachment?.attachmentUrl?.let {
                 pdfDownloader.download(it)
@@ -82,7 +84,9 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     override fun onDownloadSuccess() {
         displayPDF()
-        viewModel.createContentAttempt(contentId)
+        viewModel.createContentAttempt(contentId).observe(viewLifecycleOwner, Observer {
+            refreshContentsAndBottomNavigation()
+        })
     }
 
     private fun displayPDF() {
