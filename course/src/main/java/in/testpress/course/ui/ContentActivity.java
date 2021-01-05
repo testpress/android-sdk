@@ -55,7 +55,7 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
             if (getCallingActivity() != null) {
                 return false;
             } else {
-                delegateBackPressToFragments()
+                delegateBackPressToFragments();
                 super.onBackPressed();
             }
             return true;

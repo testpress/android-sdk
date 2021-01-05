@@ -187,6 +187,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
     }
 
     override fun onBackPressed() {
+        // ChapterDetailActivity will force refresh content list if FORCE_REFRESH is true in preference
         val prefs: SharedPreferences = requireActivity().getSharedPreferences(
                 ContentActivity.TESTPRESS_CONTENT_SHARED_PREFS,
                 Context.MODE_PRIVATE

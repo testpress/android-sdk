@@ -4,15 +4,17 @@ import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.core.TestpressSession
 import `in`.testpress.course.R
+import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.domain.asDomainContent
-import `in`.testpress.network.Resource
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.util.GreendaoCleanupMixin
 import `in`.testpress.course.viewmodels.ContentViewModel
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.models.greendao.Chapter
 import `in`.testpress.models.greendao.Content
+import `in`.testpress.network.Resource
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,12 +27,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.doNothing
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.reset
-import org.mockito.Mockito.spy
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.shadows.support.v4.SupportFragmentController
@@ -42,6 +39,8 @@ class BaseContentDetailFragmentTest : GreendaoCleanupMixin() {
     private val chapter = Chapter()
     private val contentDao =
         TestpressSDKDatabase.getContentDao(ApplicationProvider.getApplicationContext())
+    private val chapterDao =
+            TestpressSDKDatabase.getChapterDao(ApplicationProvider.getApplicationContext())
 
     @Rule
     @JvmField
@@ -67,12 +66,14 @@ class BaseContentDetailFragmentTest : GreendaoCleanupMixin() {
         content.active = true
         content.chapter = chapter
         content.isLocked = false
+        chapterDao.insertOrReplaceInTx(chapter)
         contentDao.insertOrReplaceInTx(content)
     }
 
     private fun initializeContentFragment() {
         val bundle = Bundle()
         bundle.putLong(ContentActivity.CONTENT_ID, 1)
+        bundle.putString(TestpressCourse.CONTENT_TYPE, "Attachment")
 
         contentFragment = ConcreteContentFragment()
         contentFragment = spy(contentFragment)
@@ -127,6 +128,17 @@ class BaseContentDetailFragmentTest : GreendaoCleanupMixin() {
         contentFragment.onRetryClick()
 
         verify(contentFragment).forceReloadContent()
+    }
+
+    @Test
+    fun onBackpressedContentListShouldBeForceRefreshed() {
+        contentFragment.onBackPressed()
+
+        val prefs = ApplicationProvider.getApplicationContext<Context>().getSharedPreferences(
+                ContentActivity.TESTPRESS_CONTENT_SHARED_PREFS,
+                Context.MODE_PRIVATE
+        )
+        assert(prefs.getBoolean(ContentActivity.FORCE_REFRESH, false))
     }
 
     class ConcreteContentFragment : BaseContentDetailFragment() {
