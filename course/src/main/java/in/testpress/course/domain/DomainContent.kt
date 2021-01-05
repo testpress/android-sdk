@@ -56,8 +56,9 @@ data class DomainContent(
     val videoConference: DomainVideoConferenceContent? = null,
     val isCourseAvailable: Boolean?,
     val coverImageSmall: String? = null,
-    val coverImageMedium: String? = null
-) {
+    val coverImageMedium: String? = null,
+    var nextContentId: Long? = null
+    ) {
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
 
@@ -113,7 +114,8 @@ fun createDomainContent(contentEntity: ContentEntity): DomainContent {
         isCourseAvailable = contentEntity.isCourseAvailable,
         coverImage = contentEntity.coverImage,
         coverImageSmall = contentEntity.coverImageSmall,
-        coverImageMedium = contentEntity.coverImageMedium
+        coverImageMedium = contentEntity.coverImageMedium,
+        nextContentId = contentEntity.nextContentId
     )
 }
 
@@ -159,7 +161,8 @@ fun createDomainContent(content: Content): DomainContent {
         isCourseAvailable = content.isCourseAvailable,
         coverImageMedium = content.coverImageMedium,
         coverImage = content.coverImage,
-        coverImageSmall = content.coverImageSmall
+        coverImageSmall = content.coverImageSmall,
+        nextContentId = content.nextContentId
     )
 }
 

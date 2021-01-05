@@ -66,7 +66,7 @@ class ExamContentFragment: BaseContentDetailFragment(), ExamRefreshListener {
                 prefs.edit().putBoolean(FORCE_REFRESH, true).apply()
             }
             forceReloadContent()
-            refreshContentsAndBottomNavigation()
+            refreshNextContentAndBottomNavigation()
         }
     }
 

@@ -68,7 +68,7 @@ class HtmlContentFragment : BaseContentDetailFragment() {
             swipeRefresh.isRefreshing = false
             webView.visibility = View.VISIBLE
             viewModel.createContentAttempt(contentId).observe(viewLifecycleOwner, Observer {
-                refreshContentsAndBottomNavigation()
+                refreshNextContentAndBottomNavigation()
             })
 
             Timer().schedule(5000) {

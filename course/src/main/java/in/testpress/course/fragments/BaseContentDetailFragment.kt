@@ -7,13 +7,11 @@ import `in`.testpress.course.TestpressCourse.CONTENT_TYPE
 import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.repository.ContentsRepository
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.ui.ContentActivity.HIDE_BOTTOM_NAVIGATION
 import `in`.testpress.course.viewmodels.ContentViewModel
-import `in`.testpress.course.viewmodels.ContentsListViewModel
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import android.app.Activity
@@ -50,7 +48,6 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     open lateinit var viewModel: ContentViewModel
     private var hideBottomNavigation: Boolean = false
-    lateinit var contentsListViewModel: ContentsListViewModel
 
     override val bookmarkId: Long?
         get() = if (!::content.isInitialized) null else content.bookmarkId
@@ -101,7 +98,6 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
             when (resource.status) {
                 Status.SUCCESS -> {
                     content = resource.data!!
-                    initializeContentsListViewModel()
                     display()
 
                     if (isBookmarkEnabled && !::bookmarkFragment.isInitialized) {
@@ -110,14 +106,6 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
                 }
             }
         })
-    }
-
-    private fun initializeContentsListViewModel() {
-        contentsListViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ContentsListViewModel(ContentsRepository(requireContext(), content.chapterId!!)) as T
-            }
-        }).get(ContentsListViewModel::class.java)
     }
 
     private fun bindViews() {
@@ -185,11 +173,14 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
         transaction.commit()
     }
 
-    protected fun refreshContentsAndBottomNavigation() {
-        contentsListViewModel.loadContents()
-        contentsListViewModel.items.observe(viewLifecycleOwner, Observer {
-            bottomNavigationFragment.initializeAndShowNavigationButtons()
-        })
+    protected fun refreshNextContentAndBottomNavigation() {
+        if (content.nextContentId != null) {
+            viewModel.getContent(content.nextContentId!!, forceRefresh = true).observe(viewLifecycleOwner, Observer {
+                when(it.status) {
+                    Status.SUCCESS -> bottomNavigationFragment.initializeAndShowNavigationButtons()
+                }
+            })
+        }
     }
 
     override fun onBookmarkSuccess(bookmarkId: Long?) {

@@ -67,7 +67,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         if (pdfDownloader.isDownloaded()) {
             displayPDF()
             viewModel.createContentAttempt(contentId).observe(viewLifecycleOwner, Observer {
-                refreshContentsAndBottomNavigation()
+                refreshNextContentAndBottomNavigation()
             })
         } else {
             content.attachment?.attachmentUrl?.let {
@@ -85,7 +85,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     override fun onDownloadSuccess() {
         displayPDF()
         viewModel.createContentAttempt(contentId).observe(viewLifecycleOwner, Observer {
-            refreshContentsAndBottomNavigation()
+            refreshNextContentAndBottomNavigation()
         })
     }
 
