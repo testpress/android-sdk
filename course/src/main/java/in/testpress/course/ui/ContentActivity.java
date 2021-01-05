@@ -52,6 +52,7 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         if(item.getItemId() == android.R.id.home) {
+            delegateBackPressToFragments();
             if (getCallingActivity() != null) {
                 return false;
             } else {
@@ -60,6 +61,20 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        delegateBackPressToFragments();
+    }
+
+    private void delegateBackPressToFragments() {
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            if(fragment instanceof OnBackPressedListener){
+                ((OnBackPressedListener)fragment).onBackPressed();
+            }
+        }
     }
 
     @Override
@@ -81,5 +96,9 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
         for (Fragment fragment : getSupportFragmentManager().getFragments()) {
             fragment.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    public interface OnBackPressedListener {
+        public void onBackPressed();
     }
 }
