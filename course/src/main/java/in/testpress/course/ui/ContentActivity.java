@@ -52,15 +52,21 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         if(item.getItemId() == android.R.id.home) {
+            delegateBackPressToFragments();
             if (getCallingActivity() != null) {
                 return false;
             } else {
-                delegateBackPressToFragments();
                 super.onBackPressed();
             }
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        delegateBackPressToFragments();
     }
 
     private void delegateBackPressToFragments() {
