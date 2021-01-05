@@ -58,7 +58,7 @@ data class DomainContent(
     val coverImageSmall: String? = null,
     val coverImageMedium: String? = null,
     var nextContentId: Long? = null
-    ) {
+) {
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
 
