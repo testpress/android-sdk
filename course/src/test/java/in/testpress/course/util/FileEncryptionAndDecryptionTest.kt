@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert
 import org.junit.Test
-import org.junit.jupiter.api.Assertions
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.io.File
@@ -26,20 +25,14 @@ class FileEncryptionAndDecryptionTest {
     }
 
     @Test
-    fun fileEncryptionShouldEncryptCorrectly() {
+    fun decryptedFileAndOriginalFileShouldBeSame() {
         val resource = ClassLoader.getSystemResource("dummy.pdf")
-        val file = File(resource.file)
-        Assertions.assertDoesNotThrow {
-            FileEncryptionAndDecryption().encrypt(file = file)
-        }
-    }
+        val originalFile = File(resource.file)
 
-    @Test
-    fun fileDecryptedDataAndEncryptedShouldBeDifferent() {
-        val resource = ClassLoader.getSystemResource("dummy.pdf")
+        FileEncryptionAndDecryption().encrypt(originalFile)
         val encryptedFile = File(resource.file)
         val decryptedFile = FileEncryptionAndDecryption().decrypt(encryptedFile)
 
-        Assert.assertNotEquals(decryptedFile, encryptedFile.readBytes())
+        Assert.assertEquals(String(decryptedFile), String(originalFile.readBytes()))
     }
 }
