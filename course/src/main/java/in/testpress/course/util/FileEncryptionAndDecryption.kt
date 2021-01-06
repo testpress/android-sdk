@@ -15,9 +15,10 @@ class FileEncryptionAndDecryption {
         try {
             val randomAccessFile = RandomAccessFile(file, READ_WRITE)
             randomAccessFile.seek(0)
-            val reverseByteSize = getBytesSizeToReverse(file)
 
+            val reverseByteSize = getBytesSizeToReverse(file)
             val fileBytes = ByteArray(reverseByteSize)
+
             readFile(randomAccessFile,fileBytes)
             reverseBytes(fileBytes)
             writeFile(randomAccessFile, fileBytes)
@@ -55,11 +56,12 @@ class FileEncryptionAndDecryption {
 
     fun decrypt(file: File): ByteArray {
         try {
-            val reverseByteSize = getBytesSizeToReverse(file)
             val randomAccessFile = RandomAccessFile(file, READ_WRITE)
             randomAccessFile.seek(0)
 
+            val reverseByteSize = getBytesSizeToReverse(file)
             val fileBytes = ByteArray(reverseByteSize)
+
             readFile(randomAccessFile,fileBytes)
             reverseBytes(fileBytes)
             writeFile(randomAccessFile, fileBytes)
