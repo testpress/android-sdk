@@ -15,9 +15,9 @@ class FileEncryptionAndDecryption {
         try {
             val randomAccessFile = RandomAccessFile(file, READ_WRITE)
             randomAccessFile.seek(0)
-            val byteCountToReverse = getBytesCountToReverse(file)
+            val reverseByteSize = getBytesSizeToReverse(file)
 
-            val fileBytes = ByteArray(byteCountToReverse)
+            val fileBytes = ByteArray(reverseByteSize)
             readFile(randomAccessFile,fileBytes)
             reverseBytes(fileBytes)
             writeFile(randomAccessFile, fileBytes)
@@ -28,7 +28,7 @@ class FileEncryptionAndDecryption {
         }
     }
 
-    private fun getBytesCountToReverse(file: File): Int {
+    private fun getBytesSizeToReverse(file: File): Int {
         return if (file.length() < REVERSE_BYTE_COUNT) {
             file.length().toInt()
         } else {
@@ -44,16 +44,7 @@ class FileEncryptionAndDecryption {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun reverseBytes(fileBytes: ByteArray?): ByteArray {
         if (fileBytes == null) return byteArrayOf()
-        var startPosition = 0
-        var endPosition = fileBytes.size - 1
-        var temp: Byte
-        while (endPosition > startPosition) {
-            temp = fileBytes[endPosition]
-            fileBytes[endPosition] = fileBytes[startPosition]
-            fileBytes[startPosition] = temp
-            endPosition--
-            startPosition++
-        }
+        fileBytes.reverse()
         return fileBytes
     }
 
@@ -64,11 +55,11 @@ class FileEncryptionAndDecryption {
 
     fun decrypt(file: File): ByteArray {
         try {
-            val byteCountToReverse = getBytesCountToReverse(file)
+            val reverseByteSize = getBytesSizeToReverse(file)
             val randomAccessFile = RandomAccessFile(file, READ_WRITE)
             randomAccessFile.seek(0)
 
-            val fileBytes = ByteArray(byteCountToReverse)
+            val fileBytes = ByteArray(reverseByteSize)
             readFile(randomAccessFile,fileBytes)
             reverseBytes(fileBytes)
             writeFile(randomAccessFile, fileBytes)
