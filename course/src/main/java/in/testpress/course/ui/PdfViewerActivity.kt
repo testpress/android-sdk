@@ -3,7 +3,7 @@ package `in`.testpress.course.ui
 import `in`.testpress.course.R
 import `in`.testpress.course.util.DisplayPDF
 import `in`.testpress.course.util.DisplayPDFListener
-import `in`.testpress.course.util.PDFDownloader
+import `in`.testpress.course.util.PDFDownloadManager
 import `in`.testpress.course.util.PdfDownloadListener
 import android.os.Bundle
 import android.view.View
@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.layout_pdf_viewer.*
 
 class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFListener {
 
-    private lateinit var pdfDownloader: PDFDownloader
+    private lateinit var pdfDownloadManager: PDFDownloadManager
 
     private var pageNumber = 0
 
@@ -28,11 +28,11 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
         setContentView(R.layout.layout_pdf_viewer)
         hideStatusBar()
         getDataFromBundle()
-        pdfDownloader = PDFDownloader(this,this,fileName)
-        if (pdfDownloader.isDownloaded()) {
+        pdfDownloadManager = PDFDownloadManager(this,this,fileName)
+        if (pdfDownloadManager.isDownloaded()) {
             displayPDF()
         } else {
-            pdfDownloader.download(url)
+            pdfDownloadManager.download(url)
         }
     }
 
@@ -58,7 +58,7 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
     private fun displayPDF() {
         DisplayPDF(this,displayPDFListener = this).showPdfFromFile(
                 pageNumber = pageNumber,
-                file = pdfDownloader.get(),
+                file = pdfDownloadManager.get(),
                 pdfView = pdfView
         )
     }

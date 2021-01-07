@@ -5,7 +5,7 @@ import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.PdfViewerActivity
 import `in`.testpress.course.util.DisplayPDF
 import `in`.testpress.course.util.DisplayPDFListener
-import `in`.testpress.course.util.PDFDownloader
+import `in`.testpress.course.util.PDFDownloadManager
 import `in`.testpress.course.util.PdfDownloadListener
 import `in`.testpress.course.util.SHA256Generator.generateSha256
 import android.content.Intent
@@ -21,7 +21,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     private lateinit var fileName: String
 
-    private lateinit var pdfDownloader: PDFDownloader
+    private lateinit var pdfDownloadManager: PDFDownloadManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,13 +63,13 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     override fun display() {
         (activity as ContentActivity).setActionBarTitle(content.attachment?.title)
         fileName = getFileName()
-        pdfDownloader = PDFDownloader(this,requireContext(),fileName)
-        if (pdfDownloader.isDownloaded()) {
+        pdfDownloadManager = PDFDownloadManager(this,requireContext(),fileName)
+        if (pdfDownloadManager.isDownloaded()) {
             displayPDF()
             viewModel.createContentAttempt(contentId)
         } else {
             content.attachment?.attachmentUrl?.let {
-                pdfDownloader.download(it)
+                pdfDownloadManager.download(it)
             }
         }
     }
@@ -87,7 +87,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     private fun displayPDF() {
         DisplayPDF(requireContext(),displayPDFListener = this).showPdfFromFile(
-                file = pdfDownloader.get(),
+                file = pdfDownloadManager.get(),
                 pdfView = pdfView
         )
     }

@@ -6,7 +6,7 @@ import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import java.io.File
 
-open class PDFDownloader(
+open class PDFDownloadManager(
         private val pdfDownloadListener: PdfDownloadListener,
         private val context: Context,
         private val fileName: String
