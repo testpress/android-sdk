@@ -25,8 +25,8 @@ class FileReversalTest {
         val originalFile = File(resource.file)
 
         val reversedBytes = fileReversal.reverse(originalFile)
-        val encryptedFile = File(resource.file)
         fileReversal.saveFile(reversedBytes)
+        val encryptedFile = File(resource.file)
         val decryptedFile = fileReversal.reverse(encryptedFile)
 
         Assert.assertEquals(String(decryptedFile), String(originalFile.readBytes()))
