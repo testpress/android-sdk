@@ -95,7 +95,6 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     private fun displayPDF() {
-        progressBar.visibility = View.VISIBLE
         DisplayPDF(requireContext(),displayPDFListener = this).showPdfFromFile(
                 file = pdfDownloadManager.get(),
                 pdfView = pdfView

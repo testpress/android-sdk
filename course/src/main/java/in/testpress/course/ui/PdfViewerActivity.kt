@@ -10,7 +10,6 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.layout_pdf_viewer.*
-import kotlinx.android.synthetic.main.layout_pdf_viewer.pdfView
 
 class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFListener {
 
@@ -57,7 +56,6 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
     }
 
     private fun displayPDF() {
-        progressbar.visibility = View.VISIBLE
         DisplayPDF(this,displayPDFListener = this).showPdfFromFile(
                 pageNumber = pageNumber,
                 file = pdfDownloadManager.get(),
