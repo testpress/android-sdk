@@ -23,7 +23,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     private lateinit var fileName: String
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    lateinit var pdfDownloader: PDFDownloadManager
+    lateinit var pdfDownloadManager: PDFDownloadManager
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var fullScreenMenu: MenuItem
