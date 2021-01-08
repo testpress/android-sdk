@@ -14,8 +14,9 @@ import android.webkit.WebView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.Observer
 import java.io.IOException
-import java.util.Timer
+import java.util.*
 import kotlin.concurrent.schedule
 
 class HtmlContentFragment : BaseContentDetailFragment() {
@@ -66,7 +67,9 @@ class HtmlContentFragment : BaseContentDetailFragment() {
             super.onLoadFinished()
             swipeRefresh.isRefreshing = false
             webView.visibility = View.VISIBLE
-            viewModel.createContentAttempt(contentId)
+            viewModel.createContentAttempt(contentId).observe(viewLifecycleOwner, Observer {
+                checkAndUnlockNextContent()
+            })
 
             Timer().schedule(5000) {
                 activity?.applicationContext?.let {

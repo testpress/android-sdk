@@ -57,6 +57,7 @@ public class Content implements android.os.Parcelable {
     private String coverImageMedium;
     private String coverImageSmall;
     private Boolean isCourseAvailable;
+    private Long nextContentId;
     private Long courseId;
     private Long chapterId;
     private Long videoConferenceId;
@@ -127,7 +128,7 @@ public class Content implements android.os.Parcelable {
     }
 
     @Generated
-    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, String coverImage, String coverImageMedium, String coverImageSmall, Boolean isCourseAvailable, Long courseId, Long chapterId, Long videoConferenceId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
+    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, String coverImage, String coverImageMedium, String coverImageSmall, Boolean isCourseAvailable, Long nextContentId, Long courseId, Long chapterId, Long videoConferenceId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
         this.order = order;
         this.htmlContentTitle = htmlContentTitle;
         this.htmlContentUrl = htmlContentUrl;
@@ -156,6 +157,7 @@ public class Content implements android.os.Parcelable {
         this.coverImageMedium = coverImageMedium;
         this.coverImageSmall = coverImageSmall;
         this.isCourseAvailable = isCourseAvailable;
+        this.nextContentId = nextContentId;
         this.courseId = courseId;
         this.chapterId = chapterId;
         this.videoConferenceId = videoConferenceId;
@@ -394,6 +396,14 @@ public class Content implements android.os.Parcelable {
 
     public void setIsCourseAvailable(Boolean isCourseAvailable) {
         this.isCourseAvailable = isCourseAvailable;
+    }
+
+    public Long getNextContentId() {
+        return nextContentId;
+    }
+
+    public void setNextContentId(Long nextContentId) {
+        this.nextContentId = nextContentId;
     }
 
     public Long getCourseId() {
