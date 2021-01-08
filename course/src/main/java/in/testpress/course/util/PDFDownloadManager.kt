@@ -2,6 +2,7 @@ package `in`.testpress.course.util
 
 import `in`.testpress.course.util.FileUtils.getRootDirPath
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import com.downloader.Error
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
@@ -18,7 +19,8 @@ open class PDFDownloadManager(
 
     private var fileEncryptionAndDecryption = FileEncryptionAndDecryption(context)
 
-    private lateinit var prDownloader: DownloadRequest
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var prDownloader: DownloadRequest
 
     init {
         file = File(getRootDirPath(context), fileName)
