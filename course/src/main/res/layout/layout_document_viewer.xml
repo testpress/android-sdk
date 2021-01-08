@@ -16,8 +16,33 @@
             android:id="@+id/progressBar"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:visibility="gone"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"  />
+
+    <ProgressBar
+        android:id="@+id/downloadProgress"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:indeterminateOnly="false"
+        android:progressDrawable="@drawable/progress_circle"
+        android:progress="65"
+        android:visibility="gone"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
+
+    <TextView
+        android:id="@+id/progressPercentage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        tools:text="65%"
+        android:visibility="gone"
+        android:textStyle="bold"
+        android:textColor="@color/testpress_black"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_container"

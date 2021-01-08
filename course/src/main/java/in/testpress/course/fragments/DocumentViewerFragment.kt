@@ -12,7 +12,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import kotlinx.android.synthetic.main.layout_document_viewer.*
+import kotlinx.android.synthetic.main.layout_document_viewer.downloadProgress
 import kotlinx.android.synthetic.main.layout_document_viewer.emptyContainer
+import kotlinx.android.synthetic.main.layout_document_viewer.pdfView
+import kotlinx.android.synthetic.main.layout_document_viewer.progressPercentage
 
 class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         DisplayPDFListener {
@@ -22,6 +25,10 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     private lateinit var fileName: String
 
     private lateinit var pdfDownloadManager: PDFDownloadManager
+
+    private lateinit var fullScreenMenu: MenuItem
+
+    private val completeProgress = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +46,8 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.full_screen_menu, menu)
+        fullScreenMenu = menu.findItem(R.id.fullScreen)
+        fullScreenMenu.isVisible = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -81,11 +90,14 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     override fun onDownloadSuccess() {
-        displayPDF()
+        if (!DocumentViewerFragment().isDetached) {
+            displayPDF()
+        }
         viewModel.createContentAttempt(contentId)
     }
 
     private fun displayPDF() {
+        progressBar.visibility = View.VISIBLE
         DisplayPDF(requireContext(),displayPDFListener = this).showPdfFromFile(
                 file = pdfDownloadManager.get(),
                 pdfView = pdfView
@@ -106,6 +118,9 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     override fun onPDFLoaded() {
         progressBar.visibility = View.GONE
+        if (::fullScreenMenu.isInitialized) {
+            fullScreenMenu.isVisible = true
+        }
     }
 
     override fun onError() {
@@ -115,5 +130,10 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     private fun showErrorView() {
         pdfView.visibility = View.GONE
         emptyContainer.visibility = View.VISIBLE
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        pdfDownloadManager.cancel()
     }
 }

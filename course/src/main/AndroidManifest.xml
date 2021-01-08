@@ -10,7 +10,8 @@
 
     <application
         android:allowBackup="true"
-        android:supportsRtl="true" >
+        android:supportsRtl="true"
+        android:largeHeap="true">
 
         <activity android:name=".ui.CourseListActivity"
             android:label="@string/testpress_courses"
