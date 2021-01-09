@@ -55,7 +55,7 @@ open class PDFDownloadManager(
     }
 
     fun get(): ByteArray? {
-        return file?.let { FileEncryptionAndDecryption.decrypt(it) }
+        return file?.let { fileEncryptionAndDecryption.decrypt(it) }
     }
 }
 

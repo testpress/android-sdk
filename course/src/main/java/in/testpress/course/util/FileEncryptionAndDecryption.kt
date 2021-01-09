@@ -5,55 +5,22 @@ import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile
 
-object FileEncryptionAndDecryption {
+class FileEncryptionAndDecryption {
 
-    const val REVERSE_BYTE_COUNT = 1024
+    private val REVERSE_BYTE_COUNT = 1024
 
-    fun decrypt(file: File): ByteArray {
-        try {
-            val byteToReverse = getBytesCountToReverse(file)
-            val randomAccessFile = RandomAccessFile(file, "rw")
-            randomAccessFile.seek(0)
-
-            var byteArray = ByteArray(byteToReverse)
-            readFile(randomAccessFile,byteArray)
-            reverseBytes(byteArray)
-            writeFile(randomAccessFile, byteArray)
-
-            byteArray = ByteArray(byteToReverse)
-            randomAccessFile.read(byteArray)
-            randomAccessFile.close()
-
-            return file.readBytes()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        return byteArrayOf()
-    }
-
-    private fun readFile(randomAccessFile: RandomAccessFile,byteArray: ByteArray) {
-        randomAccessFile.read(byteArray)
-        randomAccessFile.seek(0)
-    }
-
-    private fun writeFile(randomAccessFile: RandomAccessFile, byteArray: ByteArray) {
-        randomAccessFile.write(byteArray)
-        randomAccessFile.seek(0)
-    }
+    private val READ_WRITE = "rw"
 
     fun encrypt(file: File) {
         try {
-            val randomAccessFile = RandomAccessFile(file, "rw")
+            val randomAccessFile = RandomAccessFile(file, READ_WRITE)
             randomAccessFile.seek(0)
-            val byteToReverse = getBytesCountToReverse(file)
+            val byteCountToReverse = getBytesCountToReverse(file)
 
-            var byteArray = ByteArray(byteToReverse)
-            readFile(randomAccessFile,byteArray)
-            reverseBytes(byteArray)
-            writeFile(randomAccessFile, byteArray)
-
-            byteArray = ByteArray(byteToReverse)
-            randomAccessFile.read(byteArray)
+            val fileBytes = ByteArray(byteCountToReverse)
+            readFile(randomAccessFile,fileBytes)
+            reverseBytes(fileBytes)
+            writeFile(randomAccessFile, fileBytes)
             randomAccessFile.close()
 
         } catch (e: IOException) {
@@ -67,6 +34,11 @@ object FileEncryptionAndDecryption {
         } else {
             REVERSE_BYTE_COUNT
         }
+    }
+
+    private fun readFile(randomAccessFile: RandomAccessFile,byteArray: ByteArray) {
+        randomAccessFile.read(byteArray)
+        randomAccessFile.seek(0)
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -83,5 +55,29 @@ object FileEncryptionAndDecryption {
             startPosition++
         }
         return array
+    }
+
+    private fun writeFile(randomAccessFile: RandomAccessFile, byteArray: ByteArray) {
+        randomAccessFile.write(byteArray)
+        randomAccessFile.seek(0)
+    }
+
+    fun decrypt(file: File): ByteArray {
+        try {
+            val byteCountToReverse = getBytesCountToReverse(file)
+            val randomAccessFile = RandomAccessFile(file, READ_WRITE)
+            randomAccessFile.seek(0)
+
+            val fileBytes = ByteArray(byteCountToReverse)
+            readFile(randomAccessFile,fileBytes)
+            reverseBytes(fileBytes)
+            writeFile(randomAccessFile, fileBytes)
+            randomAccessFile.close()
+
+            return file.readBytes()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return byteArrayOf()
     }
 }
