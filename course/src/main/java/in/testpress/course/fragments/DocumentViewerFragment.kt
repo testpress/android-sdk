@@ -12,6 +12,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.layout_document_viewer.*
 import kotlinx.android.synthetic.main.layout_document_viewer.pdfView
 
@@ -73,7 +74,9 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         pdfDownloadManager = PDFDownloadManager(this,requireContext(),fileName)
         if (pdfDownloadManager.isDownloaded()) {
             displayPDF()
-            viewModel.createContentAttempt(contentId)
+            viewModel.createContentAttempt(contentId).observe(viewLifecycleOwner, Observer {
+                checkAndUnlockNextContent()
+            })
         } else {
             content.attachment?.attachmentUrl?.let {
                 pdfDownloadManager.download(it)
@@ -91,7 +94,9 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         if (!DocumentViewerFragment().isDetached) {
             displayPDF()
         }
-        viewModel.createContentAttempt(contentId)
+        viewModel.createContentAttempt(contentId).observe(viewLifecycleOwner, Observer {
+            checkAndUnlockNextContent()
+        })
     }
 
     private fun displayPDF() {

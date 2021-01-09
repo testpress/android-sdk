@@ -55,13 +55,14 @@ public class ContentDao extends AbstractDao<Content, Long> {
         public final static Property CoverImageMedium = new Property(25, String.class, "coverImageMedium", false, "COVER_IMAGE_MEDIUM");
         public final static Property CoverImageSmall = new Property(26, String.class, "coverImageSmall", false, "COVER_IMAGE_SMALL");
         public final static Property IsCourseAvailable = new Property(27, Boolean.class, "isCourseAvailable", false, "IS_COURSE_AVAILABLE");
-        public final static Property CourseId = new Property(28, Long.class, "courseId", false, "COURSE_ID");
-        public final static Property ChapterId = new Property(29, Long.class, "chapterId", false, "CHAPTER_ID");
-        public final static Property VideoConferenceId = new Property(30, Long.class, "videoConferenceId", false, "VIDEO_CONFERENCE_ID");
-        public final static Property HtmlId = new Property(31, Long.class, "htmlId", false, "HTML_ID");
-        public final static Property VideoId = new Property(32, Long.class, "videoId", false, "VIDEO_ID");
-        public final static Property AttachmentId = new Property(33, Long.class, "attachmentId", false, "ATTACHMENT_ID");
-        public final static Property ExamId = new Property(34, Long.class, "examId", false, "EXAM_ID");
+        public final static Property NextContentId = new Property(28, Long.class, "nextContentId", false, "NEXT_CONTENT_ID");
+        public final static Property CourseId = new Property(29, Long.class, "courseId", false, "COURSE_ID");
+        public final static Property ChapterId = new Property(30, Long.class, "chapterId", false, "CHAPTER_ID");
+        public final static Property VideoConferenceId = new Property(31, Long.class, "videoConferenceId", false, "VIDEO_CONFERENCE_ID");
+        public final static Property HtmlId = new Property(32, Long.class, "htmlId", false, "HTML_ID");
+        public final static Property VideoId = new Property(33, Long.class, "videoId", false, "VIDEO_ID");
+        public final static Property AttachmentId = new Property(34, Long.class, "attachmentId", false, "ATTACHMENT_ID");
+        public final static Property ExamId = new Property(35, Long.class, "examId", false, "EXAM_ID");
     }
 
     private DaoSession daoSession;
@@ -110,13 +111,14 @@ public class ContentDao extends AbstractDao<Content, Long> {
                 "\"COVER_IMAGE_MEDIUM\" TEXT," + // 25: coverImageMedium
                 "\"COVER_IMAGE_SMALL\" TEXT," + // 26: coverImageSmall
                 "\"IS_COURSE_AVAILABLE\" INTEGER," + // 27: isCourseAvailable
-                "\"COURSE_ID\" INTEGER," + // 28: courseId
-                "\"CHAPTER_ID\" INTEGER," + // 29: chapterId
-                "\"VIDEO_CONFERENCE_ID\" INTEGER," + // 30: videoConferenceId
-                "\"HTML_ID\" INTEGER," + // 31: htmlId
-                "\"VIDEO_ID\" INTEGER," + // 32: videoId
-                "\"ATTACHMENT_ID\" INTEGER," + // 33: attachmentId
-                "\"EXAM_ID\" INTEGER);"); // 34: examId
+                "\"NEXT_CONTENT_ID\" INTEGER," + // 28: nextContentId
+                "\"COURSE_ID\" INTEGER," + // 29: courseId
+                "\"CHAPTER_ID\" INTEGER," + // 30: chapterId
+                "\"VIDEO_CONFERENCE_ID\" INTEGER," + // 31: videoConferenceId
+                "\"HTML_ID\" INTEGER," + // 32: htmlId
+                "\"VIDEO_ID\" INTEGER," + // 33: videoId
+                "\"ATTACHMENT_ID\" INTEGER," + // 34: attachmentId
+                "\"EXAM_ID\" INTEGER);"); // 35: examId
     }
 
     /** Drops the underlying database table. */
@@ -261,39 +263,44 @@ public class ContentDao extends AbstractDao<Content, Long> {
             stmt.bindLong(28, isCourseAvailable ? 1L: 0L);
         }
  
+        Long nextContentId = entity.getNextContentId();
+        if (nextContentId != null) {
+            stmt.bindLong(29, nextContentId);
+        }
+ 
         Long courseId = entity.getCourseId();
         if (courseId != null) {
-            stmt.bindLong(29, courseId);
+            stmt.bindLong(30, courseId);
         }
  
         Long chapterId = entity.getChapterId();
         if (chapterId != null) {
-            stmt.bindLong(30, chapterId);
+            stmt.bindLong(31, chapterId);
         }
  
         Long videoConferenceId = entity.getVideoConferenceId();
         if (videoConferenceId != null) {
-            stmt.bindLong(31, videoConferenceId);
+            stmt.bindLong(32, videoConferenceId);
         }
  
         Long htmlId = entity.getHtmlId();
         if (htmlId != null) {
-            stmt.bindLong(32, htmlId);
+            stmt.bindLong(33, htmlId);
         }
  
         Long videoId = entity.getVideoId();
         if (videoId != null) {
-            stmt.bindLong(33, videoId);
+            stmt.bindLong(34, videoId);
         }
  
         Long attachmentId = entity.getAttachmentId();
         if (attachmentId != null) {
-            stmt.bindLong(34, attachmentId);
+            stmt.bindLong(35, attachmentId);
         }
  
         Long examId = entity.getExamId();
         if (examId != null) {
-            stmt.bindLong(35, examId);
+            stmt.bindLong(36, examId);
         }
     }
 
@@ -433,39 +440,44 @@ public class ContentDao extends AbstractDao<Content, Long> {
             stmt.bindLong(28, isCourseAvailable ? 1L: 0L);
         }
  
+        Long nextContentId = entity.getNextContentId();
+        if (nextContentId != null) {
+            stmt.bindLong(29, nextContentId);
+        }
+ 
         Long courseId = entity.getCourseId();
         if (courseId != null) {
-            stmt.bindLong(29, courseId);
+            stmt.bindLong(30, courseId);
         }
  
         Long chapterId = entity.getChapterId();
         if (chapterId != null) {
-            stmt.bindLong(30, chapterId);
+            stmt.bindLong(31, chapterId);
         }
  
         Long videoConferenceId = entity.getVideoConferenceId();
         if (videoConferenceId != null) {
-            stmt.bindLong(31, videoConferenceId);
+            stmt.bindLong(32, videoConferenceId);
         }
  
         Long htmlId = entity.getHtmlId();
         if (htmlId != null) {
-            stmt.bindLong(32, htmlId);
+            stmt.bindLong(33, htmlId);
         }
  
         Long videoId = entity.getVideoId();
         if (videoId != null) {
-            stmt.bindLong(33, videoId);
+            stmt.bindLong(34, videoId);
         }
  
         Long attachmentId = entity.getAttachmentId();
         if (attachmentId != null) {
-            stmt.bindLong(34, attachmentId);
+            stmt.bindLong(35, attachmentId);
         }
  
         Long examId = entity.getExamId();
         if (examId != null) {
-            stmt.bindLong(35, examId);
+            stmt.bindLong(36, examId);
         }
     }
 
@@ -511,13 +523,14 @@ public class ContentDao extends AbstractDao<Content, Long> {
             cursor.isNull(offset + 25) ? null : cursor.getString(offset + 25), // coverImageMedium
             cursor.isNull(offset + 26) ? null : cursor.getString(offset + 26), // coverImageSmall
             cursor.isNull(offset + 27) ? null : cursor.getShort(offset + 27) != 0, // isCourseAvailable
-            cursor.isNull(offset + 28) ? null : cursor.getLong(offset + 28), // courseId
-            cursor.isNull(offset + 29) ? null : cursor.getLong(offset + 29), // chapterId
-            cursor.isNull(offset + 30) ? null : cursor.getLong(offset + 30), // videoConferenceId
-            cursor.isNull(offset + 31) ? null : cursor.getLong(offset + 31), // htmlId
-            cursor.isNull(offset + 32) ? null : cursor.getLong(offset + 32), // videoId
-            cursor.isNull(offset + 33) ? null : cursor.getLong(offset + 33), // attachmentId
-            cursor.isNull(offset + 34) ? null : cursor.getLong(offset + 34) // examId
+            cursor.isNull(offset + 28) ? null : cursor.getLong(offset + 28), // nextContentId
+            cursor.isNull(offset + 29) ? null : cursor.getLong(offset + 29), // courseId
+            cursor.isNull(offset + 30) ? null : cursor.getLong(offset + 30), // chapterId
+            cursor.isNull(offset + 31) ? null : cursor.getLong(offset + 31), // videoConferenceId
+            cursor.isNull(offset + 32) ? null : cursor.getLong(offset + 32), // htmlId
+            cursor.isNull(offset + 33) ? null : cursor.getLong(offset + 33), // videoId
+            cursor.isNull(offset + 34) ? null : cursor.getLong(offset + 34), // attachmentId
+            cursor.isNull(offset + 35) ? null : cursor.getLong(offset + 35) // examId
         );
         return entity;
     }
@@ -552,13 +565,14 @@ public class ContentDao extends AbstractDao<Content, Long> {
         entity.setCoverImageMedium(cursor.isNull(offset + 25) ? null : cursor.getString(offset + 25));
         entity.setCoverImageSmall(cursor.isNull(offset + 26) ? null : cursor.getString(offset + 26));
         entity.setIsCourseAvailable(cursor.isNull(offset + 27) ? null : cursor.getShort(offset + 27) != 0);
-        entity.setCourseId(cursor.isNull(offset + 28) ? null : cursor.getLong(offset + 28));
-        entity.setChapterId(cursor.isNull(offset + 29) ? null : cursor.getLong(offset + 29));
-        entity.setVideoConferenceId(cursor.isNull(offset + 30) ? null : cursor.getLong(offset + 30));
-        entity.setHtmlId(cursor.isNull(offset + 31) ? null : cursor.getLong(offset + 31));
-        entity.setVideoId(cursor.isNull(offset + 32) ? null : cursor.getLong(offset + 32));
-        entity.setAttachmentId(cursor.isNull(offset + 33) ? null : cursor.getLong(offset + 33));
-        entity.setExamId(cursor.isNull(offset + 34) ? null : cursor.getLong(offset + 34));
+        entity.setNextContentId(cursor.isNull(offset + 28) ? null : cursor.getLong(offset + 28));
+        entity.setCourseId(cursor.isNull(offset + 29) ? null : cursor.getLong(offset + 29));
+        entity.setChapterId(cursor.isNull(offset + 30) ? null : cursor.getLong(offset + 30));
+        entity.setVideoConferenceId(cursor.isNull(offset + 31) ? null : cursor.getLong(offset + 31));
+        entity.setHtmlId(cursor.isNull(offset + 32) ? null : cursor.getLong(offset + 32));
+        entity.setVideoId(cursor.isNull(offset + 33) ? null : cursor.getLong(offset + 33));
+        entity.setAttachmentId(cursor.isNull(offset + 34) ? null : cursor.getLong(offset + 34));
+        entity.setExamId(cursor.isNull(offset + 35) ? null : cursor.getLong(offset + 35));
      }
     
     @Override

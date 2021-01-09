@@ -37,6 +37,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
     lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var toast: Toast
     private lateinit var contentView: RelativeLayout
+    lateinit var bottomNavigationFragment: ContentBottomNavigationFragment
 
     protected var contentId: Long = -1
     private var productSlug: String? = null
@@ -165,11 +166,21 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
     }
 
     private fun initBottomNavigationFragment() {
-        val bottomNavigationFragment = ContentBottomNavigationFragment()
+        bottomNavigationFragment = ContentBottomNavigationFragment()
         bottomNavigationFragment.arguments = arguments
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.bottom_navigation_fragment, bottomNavigationFragment)
         transaction.commit()
+    }
+
+    protected fun checkAndUnlockNextContent() {
+        if (content.nextContentId != null) {
+            viewModel.getContent(content.nextContentId!!, forceRefresh = true).observe(viewLifecycleOwner, Observer {
+                when(it.status) {
+                    Status.SUCCESS -> bottomNavigationFragment.initializeAndShowNavigationButtons()
+                }
+            })
+        }
     }
 
     override fun onBookmarkSuccess(bookmarkId: Long?) {
