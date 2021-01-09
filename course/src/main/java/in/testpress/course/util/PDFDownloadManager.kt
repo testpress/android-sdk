@@ -55,7 +55,7 @@ open class PDFDownloadManager(
     }
 
     fun get(): ByteArray? {
-        return file?.let { fileEncryptionAndDecryption.decrypt(it) }
+        return file?.let { fileReversal.reverse(it) }
     }
 }
 

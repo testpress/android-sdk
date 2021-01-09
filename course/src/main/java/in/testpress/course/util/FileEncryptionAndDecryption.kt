@@ -5,32 +5,42 @@ import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile
 
-class FileEncryptionAndDecryption {
+class FileReversal {
 
     private val REVERSE_BYTE_COUNT = 1024
 
     private val READ_WRITE = "rw"
 
-    fun encrypt(file: File) {
+    private lateinit var file: File
+
+    fun reverse(file: File): ByteArray {
         try {
+            this.file = file
+
             val randomAccessFile = RandomAccessFile(file, READ_WRITE)
             goToStartOfTheFile(randomAccessFile)
-
-            val reverseByteSize = getBytesSizeToReverse(file)
-            val fileBytes = ByteArray(reverseByteSize)
-
-            readFile(randomAccessFile,fileBytes)
+            val fileBytes = getBytesToReverse(randomAccessFile)
             reverseBytes(fileBytes)
             writeFile(randomAccessFile, fileBytes)
             randomAccessFile.close()
 
+            return file.readBytes()
+
         } catch (e: IOException) {
            e.printStackTrace()
         }
+        return byteArrayOf()
     }
 
     private fun goToStartOfTheFile(randomAccessFile: RandomAccessFile) {
         randomAccessFile.seek(0)
+    }
+
+    private fun getBytesToReverse(randomAccessFile: RandomAccessFile): ByteArray {
+        val reverseByteSize = getBytesSizeToReverse(file)
+        val fileBytes = ByteArray(reverseByteSize)
+        readFile(randomAccessFile,fileBytes)
+        return fileBytes
     }
 
     private fun getBytesSizeToReverse(file: File): Int {
@@ -56,25 +66,5 @@ class FileEncryptionAndDecryption {
     private fun writeFile(randomAccessFile: RandomAccessFile, byteArray: ByteArray) {
         randomAccessFile.write(byteArray)
         goToStartOfTheFile(randomAccessFile)
-    }
-
-    fun decrypt(file: File): ByteArray {
-        try {
-            val randomAccessFile = RandomAccessFile(file, READ_WRITE)
-            goToStartOfTheFile(randomAccessFile)
-
-            val reverseByteSize = getBytesSizeToReverse(file)
-            val fileBytes = ByteArray(reverseByteSize)
-
-            readFile(randomAccessFile,fileBytes)
-            reverseBytes(fileBytes)
-            writeFile(randomAccessFile, fileBytes)
-            randomAccessFile.close()
-
-            return file.readBytes()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        return byteArrayOf()
     }
 }

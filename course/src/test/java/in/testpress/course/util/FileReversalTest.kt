@@ -1,26 +1,19 @@
 package `in`.testpress.course.util
 
-import android.content.Context
-import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import java.io.File
 
-@RunWith(RobolectricTestRunner::class)
-class FileEncryptionAndDecryptionTest {
+class FileReversalTest {
 
     private lateinit var bytes: ByteArray
-
-    private val context: Context = ApplicationProvider.getApplicationContext()
 
     @Test
     fun testReverseBytesReversesBytesCorrectly() {
         val inputString = "testPress"
         bytes = inputString.byteInputStream().readBytes()
 
-        val result = FileEncryptionAndDecryption().reverseBytes(bytes)
+        val result = FileReversal().reverseBytes(bytes)
         Assert.assertEquals("sserPtset", String(result))
     }
 
@@ -29,9 +22,9 @@ class FileEncryptionAndDecryptionTest {
         val resource = ClassLoader.getSystemResource("dummy.pdf")
         val originalFile = File(resource.file)
 
-        FileEncryptionAndDecryption().encrypt(originalFile)
+        FileReversal().reverse(originalFile)
         val encryptedFile = File(resource.file)
-        val decryptedFile = FileEncryptionAndDecryption().decrypt(encryptedFile)
+        val decryptedFile = FileReversal().reverse(encryptedFile)
 
         Assert.assertEquals(String(decryptedFile), String(originalFile.readBytes()))
     }
