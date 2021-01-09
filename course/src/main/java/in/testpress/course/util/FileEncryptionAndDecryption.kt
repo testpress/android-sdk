@@ -1,87 +1,84 @@
 package `in`.testpress.course.util
 
-import android.content.Context
-import android.util.Base64
-import java.io.*
-import java.security.SecureRandom
-import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
-import javax.crypto.SecretKey
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
+import java.io.File
+import java.io.IOException
+import java.io.RandomAccessFile
 
-class FileEncryptionAndDecryption(val context: Context) {
+object FileEncryptionAndDecryption {
 
-    private var sharedPref = context.applicationContext.getSharedPreferences("secretKeyPref", 0)
-
-    fun encrypt(file: File) {
-        try {
-            val encodedData = getEncodedData(getKey(), read(file))
-            saveFile(encodedData, file)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun getKey(): SecretKey {
-        val key = sharedPref.getString("secretKeyPref", null)
-        if (key == null) {
-            val generatedKey = generateKey()
-            saveKey(Base64.encodeToString(generateKey()?.encoded, Base64.NO_WRAP))
-            return generatedKey!!
-        }
-        val decodedKey = Base64.decode(key, Base64.NO_WRAP)
-        return SecretKeySpec(decodedKey, 0, decodedKey.size, "AES")
-    }
-
-    private fun generateKey(): SecretKey? {
-        val keyGenerator = KeyGenerator.getInstance("AES")
-        keyGenerator?.init(128, SecureRandom())
-        return keyGenerator?.generateKey()
-    }
-
-    private fun saveKey(key: String) {
-        sharedPref.edit().putString("secretKeyPref", key).apply()
-    }
-
-    private fun read(file: File): ByteArray {
-        BufferedInputStream(FileInputStream(file)).apply {
-            read(file.readBytes())
-            close()
-        }
-        return file.readBytes()
-    }
-
-    private fun getEncodedData(key: SecretKey, data: ByteArray): ByteArray {
-        try {
-            val secretKeySpec = SecretKeySpec(key.encoded, 0, key.encoded.size, "AES")
-            Cipher.getInstance("AES", "BC").apply {
-                init(Cipher.ENCRYPT_MODE, secretKeySpec, IvParameterSpec(ByteArray(this.blockSize)))
-                return doFinal(data)
-            }
-        } catch(e: IOException) {
-            e.printStackTrace()
-        }
-        return byteArrayOf()
-    }
-
-    private fun saveFile(data: ByteArray, file: File) {
-        BufferedOutputStream(FileOutputStream(file, false)).apply {
-            write(data)
-            flush()
-            close()
-        }
-    }
+    const val REVERSE_BYTE_COUNT = 1024
 
     fun decrypt(file: File): ByteArray {
         try {
-            Cipher.getInstance("AES", "BC").apply {
-                init(Cipher.DECRYPT_MODE, getKey(), IvParameterSpec(ByteArray(this.blockSize)))
-                return doFinal(read(file.absoluteFile))
-            }
+            val byteToReverse = getBytesCountToReverse(file)
+            val randomAccessFile = RandomAccessFile(file, "rw")
+            randomAccessFile.seek(0)
+
+            var byteArray = ByteArray(byteToReverse)
+            readFile(randomAccessFile,byteArray)
+            reverseBytes(byteArray)
+            writeFile(randomAccessFile, byteArray)
+
+            byteArray = ByteArray(byteToReverse)
+            randomAccessFile.read(byteArray)
+            randomAccessFile.close()
+
+            return file.readBytes()
         } catch (e: IOException) {
             e.printStackTrace()
         }
         return byteArrayOf()
+    }
+
+    private fun readFile(randomAccessFile: RandomAccessFile,byteArray: ByteArray) {
+        randomAccessFile.read(byteArray)
+        randomAccessFile.seek(0)
+    }
+
+    private fun writeFile(randomAccessFile: RandomAccessFile, byteArray: ByteArray) {
+        randomAccessFile.write(byteArray)
+        randomAccessFile.seek(0)
+    }
+
+    fun encrypt(file: File) {
+        try {
+            val randomAccessFile = RandomAccessFile(file, "rw")
+            randomAccessFile.seek(0)
+            val byteToReverse = getBytesCountToReverse(file)
+
+            var byteArray = ByteArray(byteToReverse)
+            readFile(randomAccessFile,byteArray)
+            reverseBytes(byteArray)
+            writeFile(randomAccessFile, byteArray)
+
+            byteArray = ByteArray(byteToReverse)
+            randomAccessFile.read(byteArray)
+            randomAccessFile.close()
+
+        } catch (e: IOException) {
+           e.printStackTrace()
+        }
+    }
+
+    private fun getBytesCountToReverse(file: File): Int {
+        return if (file.length() < REVERSE_BYTE_COUNT) {
+            file.length().toInt()
+        } else {
+            REVERSE_BYTE_COUNT
+        }
+    }
+
+    private fun reverseBytes(array: ByteArray?) {
+        if (array == null) return
+        var startPosition = 0
+        var endPosition = array.size - 1
+        var temp: Byte
+        while (endPosition > startPosition) {
+            temp = array[endPosition]
+            array[endPosition] = array[startPosition]
+            array[startPosition] = temp
+            endPosition--
+            startPosition++
+        }
     }
 }

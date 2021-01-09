@@ -17,7 +17,7 @@ open class PDFDownloadManager(
 
     var file: File? = null
 
-    private var fileEncryptionAndDecryption = FileEncryptionAndDecryption(context)
+    private var fileEncryptionAndDecryption = FileEncryptionAndDecryption()
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var prDownloader: DownloadRequest
@@ -34,7 +34,7 @@ open class PDFDownloadManager(
         prDownloader.start(object : OnDownloadListener {
             override fun onDownloadComplete() {
                 file = File(dirPath, fileName)
-                file?.let { fileEncryptionAndDecryption.encrypt(it) }
+                file?.let { FileEncryptionAndDecryption.encrypt(it) }
                 pdfDownloadListener.onDownloadSuccess()
             }
 
@@ -55,7 +55,7 @@ open class PDFDownloadManager(
     }
 
     fun get(): ByteArray? {
-        return file?.let { fileEncryptionAndDecryption.decrypt(it) }
+        return file?.let { FileEncryptionAndDecryption.decrypt(it) }
     }
 }
 
