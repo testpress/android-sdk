@@ -24,6 +24,7 @@ open class PDFDownloadManager(
 
     init {
         file = File(getRootDirPath(context), fileName)
+        if (isDownloaded()) { fileEncryptAndDecryptUtil = FileEncryptAndDecryptUtil(file!!) }
     }
 
     fun download(url: String) {
@@ -56,7 +57,7 @@ open class PDFDownloadManager(
     }
 
     fun get(): ByteArray? {
-        return file?.let { fileReversal.reverse(it) }
+        return fileEncryptAndDecryptUtil.decrypt()
     }
 }
 

@@ -2,47 +2,39 @@ package `in`.testpress.course.util
 
 import androidx.annotation.VisibleForTesting
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.io.RandomAccessFile
 
-class FileReversal {
+class FileEncryptAndDecryptUtil(val file: File) {
 
     private val REVERSE_BYTE_COUNT = 1024
-
     private val READ_WRITE = "rw"
-
-    private lateinit var randomAccessFile: RandomAccessFile
-
-    private lateinit var file: File
-
+    private var randomAccessFile: RandomAccessFile
     private lateinit var tempFile: File
 
+    init {
+        randomAccessFile = RandomAccessFile(file, READ_WRITE)
+    }
 
-    fun reverse(file: File): ByteArray {
+    fun encrypt() {
+        reverse()
+        saveFile()
+    }
+
+    private fun reverse() {
         try {
-            this.file = file
-            randomAccessFile = RandomAccessFile(file, READ_WRITE)
-            goToStartOfTheFile()
             val reversedBytes = getBytesToReverse()
             reverseBytes(reversedBytes)
             saveReversedBytesInTempFile(reversedBytes)
-            return tempFile.readBytes()
-
         } catch (e: IOException) {
            e.printStackTrace()
         }
-        return byteArrayOf()
-    }
-
-    private fun goToStartOfTheFile() {
-        randomAccessFile.seek(0)
     }
 
     private fun getBytesToReverse(): ByteArray {
         val reverseByteSize = getBytesSizeToReverse(file)
         val fileBytes = ByteArray(reverseByteSize)
-        readFile(randomAccessFile, fileBytes)
+        readFile(fileBytes)
         return fileBytes
     }
 
@@ -54,9 +46,9 @@ class FileReversal {
         }
     }
 
-    private fun readFile(randomAccessFile: RandomAccessFile, byteArray: ByteArray) {
+    private fun readFile(byteArray: ByteArray) {
+        randomAccessFile.seek(0)
         randomAccessFile.read(byteArray)
-        goToStartOfTheFile()
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -68,22 +60,28 @@ class FileReversal {
 
     private fun saveReversedBytesInTempFile(reversedBytes: ByteArray) {
         tempFile = File.createTempFile("temp", "file")
-        val stream = FileOutputStream(tempFile)
+        val tempRandomAccessFile = RandomAccessFile(tempFile, READ_WRITE)
         try {
-            stream.write(file.readBytes())
-            stream.write(reversedBytes)
-        } finally {
-            stream.close()
+            tempRandomAccessFile.write(file.readBytes())
+            tempRandomAccessFile.write(reversedBytes)
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
+        tempRandomAccessFile.close()
     }
 
-    fun saveFile(fileBytes: ByteArray?) {
-        randomAccessFile.write(fileBytes)
-        goToStartOfTheFile()
-        randomAccessFile.close()
+    private fun saveFile() {
+        randomAccessFile.write(tempFile.readBytes())
+        randomAccessFile.seek(0)
     }
 
-    fun deleteTempFile() {
+    fun decrypt(): ByteArray {
+        reverse()
+        return tempFile.readBytes()
+    }
+
+    protected fun finalize() {
         tempFile.delete()
+        randomAccessFile.close()
     }
 }
