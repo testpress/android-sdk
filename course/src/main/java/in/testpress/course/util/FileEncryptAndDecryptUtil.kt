@@ -10,7 +10,7 @@ class FileEncryptAndDecryptUtil(val file: File) {
     private val REVERSE_BYTE_COUNT = 1024
     private val READ_WRITE = "rw"
     private var filePointer: RandomAccessFile
-    private lateinit var tempFile: File
+    private lateinit var tempFileToStoreReversedData: File
 
     init {
         filePointer = RandomAccessFile(file, READ_WRITE)
@@ -18,23 +18,22 @@ class FileEncryptAndDecryptUtil(val file: File) {
 
     fun encrypt() {
         reverseFirstFewBytesOfTheFile()
-        val reversedData = getReversedData()
-        saveReversedDataInFile(reversedData)
+        saveReversedDataInFile()
     }
 
     private fun reverseFirstFewBytesOfTheFile(): ByteArray {
         try {
-            val bytesToReverse = getBytesToReverse()
-            reverseBytes(bytesToReverse)
-            saveReversedDataInTempFile(bytesToReverse)
+            val data = getFirstFewBytesOfTheFile()
+            reverseBytes(data)
+            saveReversedDataInTempFile(data)
         } catch(e: IOException) {
             e.printStackTrace()
             return byteArrayOf()
         }
-        return tempFile.readBytes()
+        return tempFileToStoreReversedData.readBytes()
     }
 
-    private fun getBytesToReverse(): ByteArray {
+    private fun getFirstFewBytesOfTheFile(): ByteArray {
         val reverseByteSize = if (file.length() < REVERSE_BYTE_COUNT) {
             file.length().toInt()
         } else {
@@ -53,8 +52,8 @@ class FileEncryptAndDecryptUtil(val file: File) {
     }
 
     private fun saveReversedDataInTempFile(reversedBytes: ByteArray) {
-        tempFile = File.createTempFile("temp", "file")
-        val tempRandomAccessFile = RandomAccessFile(tempFile, READ_WRITE)
+        tempFileToStoreReversedData = File.createTempFile("temp", "file")
+        val tempRandomAccessFile = RandomAccessFile(tempFileToStoreReversedData, READ_WRITE)
         try {
             tempRandomAccessFile.write(file.readBytes())
             tempRandomAccessFile.write(reversedBytes)
@@ -64,22 +63,18 @@ class FileEncryptAndDecryptUtil(val file: File) {
         tempRandomAccessFile.close()
     }
 
-    private fun saveReversedDataInFile(fileBytes: ByteArray) {
-        filePointer.write(fileBytes)
+    private fun saveReversedDataInFile() {
         filePointer.seek(0)
-    }
-
-    private fun getReversedData(): ByteArray {
-        return tempFile.readBytes()
+        filePointer.write(tempFileToStoreReversedData.readBytes())
     }
 
     fun decrypt(): ByteArray {
         reverseFirstFewBytesOfTheFile()
-        return tempFile.readBytes()
+        return tempFileToStoreReversedData.readBytes()
     }
 
     protected fun finalize() {
-        tempFile.delete()
+        tempFileToStoreReversedData.delete()
         filePointer.close()
     }
 }
