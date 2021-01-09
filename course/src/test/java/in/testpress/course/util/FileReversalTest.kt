@@ -8,6 +8,8 @@ class FileReversalTest {
 
     private lateinit var bytes: ByteArray
 
+    private var fileReversal = FileReversal()
+
     @Test
     fun testReverseBytesReversesBytesCorrectly() {
         val inputString = "testPress"
@@ -22,9 +24,10 @@ class FileReversalTest {
         val resource = ClassLoader.getSystemResource("dummy.pdf")
         val originalFile = File(resource.file)
 
-        FileReversal().reverse(originalFile)
+        val reversedBytes = fileReversal.reverse(originalFile)
         val encryptedFile = File(resource.file)
-        val decryptedFile = FileReversal().reverse(encryptedFile)
+        fileReversal.saveFile(reversedBytes)
+        val decryptedFile = fileReversal.reverse(encryptedFile)
 
         Assert.assertEquals(String(decryptedFile), String(originalFile.readBytes()))
     }

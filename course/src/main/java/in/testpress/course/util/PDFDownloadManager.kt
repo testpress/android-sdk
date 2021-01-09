@@ -34,7 +34,8 @@ open class PDFDownloadManager(
         prDownloader.start(object : OnDownloadListener {
             override fun onDownloadComplete() {
                 file = File(dirPath, fileName)
-                file?.let { FileEncryptionAndDecryption.encrypt(it) }
+                val encryptedFile  = file?.let { FileEncryptionAndDecryption.encrypt(it) }
+                        fileReversal.saveFile(encryptedFile)
                 pdfDownloadListener.onDownloadSuccess()
             }
 
