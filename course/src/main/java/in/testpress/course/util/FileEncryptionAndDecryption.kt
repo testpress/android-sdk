@@ -42,19 +42,19 @@ class FileEncryptionAndDecryption {
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun reverseBytes(array: ByteArray?): ByteArray {
-        if (array == null) return byteArrayOf()
+    fun reverseBytes(fileBytes: ByteArray?): ByteArray {
+        if (fileBytes == null) return byteArrayOf()
         var startPosition = 0
-        var endPosition = array.size - 1
+        var endPosition = fileBytes.size - 1
         var temp: Byte
         while (endPosition > startPosition) {
-            temp = array[endPosition]
-            array[endPosition] = array[startPosition]
-            array[startPosition] = temp
+            temp = fileBytes[endPosition]
+            fileBytes[endPosition] = fileBytes[startPosition]
+            fileBytes[startPosition] = temp
             endPosition--
             startPosition++
         }
-        return array
+        return fileBytes
     }
 
     private fun writeFile(randomAccessFile: RandomAccessFile, byteArray: ByteArray) {

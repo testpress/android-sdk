@@ -38,7 +38,6 @@ class FileEncryptionAndDecryptionTest {
     fun fileDecryptedDataAndEncryptedShouldBeDifferent() {
         val resource = ClassLoader.getSystemResource("dummy.pdf")
         val encryptedFile = File(resource.file)
-        Assertions.assertDoesNotThrow {}
         val decryptedFile = FileEncryptionAndDecryption().decrypt(encryptedFile)
 
         Assert.assertNotEquals(decryptedFile, encryptedFile.readBytes())
