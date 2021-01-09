@@ -86,4 +86,9 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
         pdfView.visibility = View.GONE
         emptyContainer.visibility = View.VISIBLE
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        pdfDownloadManager.cancel()
+    }
 }

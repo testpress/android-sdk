@@ -11,8 +11,10 @@ import `in`.testpress.course.util.SHA256Generator.generateSha256
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.layout_document_viewer.*
+import kotlinx.android.synthetic.main.layout_document_viewer.pdfView
 
 class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         DisplayPDFListener {
@@ -21,7 +23,11 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     private lateinit var fileName: String
 
-    private lateinit var pdfDownloadManager: PDFDownloadManager
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var pdfDownloadManager: PDFDownloadManager
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var fullScreenMenu: MenuItem
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +45,8 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.full_screen_menu, menu)
+        fullScreenMenu = menu.findItem(R.id.fullScreen)
+        fullScreenMenu.isVisible = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -83,7 +91,9 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     override fun onDownloadSuccess() {
-        displayPDF()
+        if (!DocumentViewerFragment().isDetached) {
+            displayPDF()
+        }
         viewModel.createContentAttempt(contentId).observe(viewLifecycleOwner, Observer {
             checkAndUnlockNextContent()
         })
@@ -110,6 +120,9 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     override fun onPDFLoaded() {
         progressBar.visibility = View.GONE
+        if (::fullScreenMenu.isInitialized) {
+            fullScreenMenu.isVisible = true
+        }
     }
 
     override fun onError() {
@@ -119,5 +132,10 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     private fun showErrorView() {
         pdfView.visibility = View.GONE
         emptyContainer.visibility = View.VISIBLE
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        pdfDownloadManager.cancel()
     }
 }

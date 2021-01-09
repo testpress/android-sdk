@@ -2,8 +2,11 @@ package `in`.testpress.course.util
 
 import `in`.testpress.course.util.FileUtils.getRootDirPath
 import android.content.Context
+import androidx.annotation.VisibleForTesting
+import com.downloader.Error
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
+import com.downloader.request.DownloadRequest
 import java.io.File
 
 open class PDFDownloadManager(
@@ -16,6 +19,9 @@ open class PDFDownloadManager(
 
     private var fileEncryptionAndDecryption = FileEncryptionAndDecryption(context)
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var prDownloader: DownloadRequest
+
     init {
         file = File(getRootDirPath(context), fileName)
     }
@@ -23,18 +29,25 @@ open class PDFDownloadManager(
     fun download(url: String) {
         val dirPath = getRootDirPath(context)
         PRDownloader.initialize(context)
-        PRDownloader.download(url, dirPath, fileName)
-                .build().start(object : OnDownloadListener {
-                    override fun onDownloadComplete() {
-                        file = File(dirPath, fileName)
-                        file?.let { fileEncryptionAndDecryption.encrypt(it) }
-                        pdfDownloadListener.onDownloadSuccess()
-                    }
 
-                    override fun onError(error: com.downloader.Error?) {
-                        pdfDownloadListener.onDownloadFailed()
-                    }
-                })
+        prDownloader = PRDownloader.download(url, dirPath, fileName).build()
+        prDownloader.start(object : OnDownloadListener {
+            override fun onDownloadComplete() {
+                file = File(dirPath, fileName)
+                file?.let { fileEncryptionAndDecryption.encrypt(it) }
+                pdfDownloadListener.onDownloadSuccess()
+            }
+
+            override fun onError(error: Error?) {
+                pdfDownloadListener.onDownloadFailed()
+            }
+        })
+    }
+
+    fun cancel() {
+        if (::prDownloader.isInitialized) {
+            prDownloader.cancel()
+        }
     }
 
     fun isDownloaded(): Boolean {
