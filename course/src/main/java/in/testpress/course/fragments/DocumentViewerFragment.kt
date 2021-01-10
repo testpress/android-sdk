@@ -15,6 +15,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.layout_document_viewer.*
 import kotlinx.android.synthetic.main.layout_document_viewer.pdfView
+import java.net.URI
 
 class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         DisplayPDFListener {
@@ -86,7 +87,8 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     private fun getFileName(): String {
         var filename = content.attachment?.title ?: ""
-        filename += content.attachment?.attachmentUrl
+        val attachmentURI = URI(content.attachment?.attachmentUrl)
+        filename += attachmentURI.path
         return filename.generateSha256()
     }
 
