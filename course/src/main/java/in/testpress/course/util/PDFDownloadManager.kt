@@ -52,11 +52,17 @@ open class PDFDownloadManager(
         }
     }
 
+    fun cleanup() {
+        if (::fileEncryptAndDecryptUtil.isInitialized) {
+            fileEncryptAndDecryptUtil.cleanup()
+        }
+    }
+
     fun isDownloaded(): Boolean {
        return file?.isFile == true
     }
 
-    fun get(): ByteArray? {
+    fun get(): File {
         return fileEncryptAndDecryptUtil.decrypt()
     }
 }

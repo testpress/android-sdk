@@ -139,5 +139,6 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     override fun onDetach() {
         super.onDetach()
         pdfDownloadManager.cancel()
+        pdfDownloadManager.cleanup()
     }
 }

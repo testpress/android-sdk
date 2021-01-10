@@ -90,5 +90,6 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
     override fun onDestroy() {
         super.onDestroy()
         pdfDownloadManager.cancel()
+        pdfDownloadManager.cleanup()
     }
 }
