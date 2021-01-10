@@ -29,6 +29,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var fullScreenMenu: MenuItem
+    private val completeProgress = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,6 +94,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     override fun onDownloadSuccess() {
+        hideDownloadProgress()
         if (!DocumentViewerFragment().isDetached) {
             displayPDF()
         }
@@ -102,6 +104,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     private fun displayPDF() {
+        encryptionProgress.visibility = View.VISIBLE
         DisplayPDF(requireContext(),displayPDFListener = this).showPdfFromFile(
                 file = pdfDownloadManager.get(),
                 pdfView = pdfView
@@ -109,7 +112,19 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     override fun onDownloadFailed() {
+        hideDownloadProgress()
         showErrorView()
+    }
+
+    override fun downloadProgress(progress: Int) {
+        if (downloadProgress != null) {
+            showDownloadProgress(progress)
+            encryptionProgress.visibility = View.GONE
+        }
+        if (progress == completeProgress) {
+            hideDownloadProgress()
+            encryptionProgress.visibility = View.VISIBLE
+        }
     }
 
     override fun onSingleTapOnPDF() {
@@ -121,7 +136,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     override fun onPDFLoaded() {
-        progressBar.visibility = View.GONE
+        encryptionProgress.visibility = View.GONE
         if (::fullScreenMenu.isInitialized) {
             fullScreenMenu.isVisible = true
         }
@@ -129,6 +144,20 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     override fun onError() {
         showErrorView()
+    }
+
+    private fun showDownloadProgress(progress: Int) {
+        downloadProgress.visibility = View.VISIBLE
+        progressPercentage.visibility = View.VISIBLE
+        downloadProgress.progress = progress
+        progressPercentage.text = "$progress%"
+    }
+
+    private fun hideDownloadProgress() {
+        if (downloadProgress != null) {
+            downloadProgress.visibility = View.GONE
+            progressPercentage.visibility = View.GONE
+        }
     }
 
     private fun showErrorView() {

@@ -10,6 +10,10 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.layout_pdf_viewer.*
+import kotlinx.android.synthetic.main.layout_pdf_viewer.downloadProgress
+import kotlinx.android.synthetic.main.layout_pdf_viewer.emptyContainer
+import kotlinx.android.synthetic.main.layout_pdf_viewer.pdfView
+import kotlinx.android.synthetic.main.layout_pdf_viewer.progressPercentage
 
 class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFListener {
 
@@ -52,10 +56,12 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
     }
 
     override fun onDownloadSuccess() {
+        hideDownloadProgress()
         displayPDF()
     }
 
     private fun displayPDF() {
+        encryptionProgressbar.visibility = View.VISIBLE
         DisplayPDF(this,displayPDFListener = this).showPdfFromFile(
                 pageNumber = pageNumber,
                 file = pdfDownloadManager.get(),
@@ -64,13 +70,20 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
     }
 
     override fun onDownloadFailed() {
+        hideDownloadProgress()
         showErrorView()
+    }
+
+    override fun downloadProgress(progress: Int) {
+        if (progressPercentage != null) {
+            showDownloadProgress(progress)
+        }
     }
 
     override fun onSingleTapOnPDF() {}
 
     override fun onPDFLoaded() {
-        progressbar.visibility = View.GONE
+        encryptionProgressbar.visibility = View.GONE
     }
 
     override fun onError() {
@@ -81,8 +94,20 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
         this.pageNumber = pageNumber
     }
 
+    private fun showDownloadProgress(progress: Int) {
+        downloadProgress.visibility = View.VISIBLE
+        progressPercentage.visibility = View.VISIBLE
+        downloadProgress.progress = progress
+        progressPercentage.text = "$progress%"
+    }
+
+    private fun hideDownloadProgress() {
+        downloadProgress.visibility = View.GONE
+        progressPercentage.visibility = View.GONE
+    }
+
     private fun showErrorView() {
-        progressbar.visibility = View.GONE
+        encryptionProgressbar.visibility = View.GONE
         pdfView.visibility = View.GONE
         emptyContainer.visibility = View.VISIBLE
     }

@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <com.github.barteksc.pdfviewer.PDFView
@@ -15,15 +16,44 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <ProgressBar
-        android:id="@+id/progressbar"
+        android:id="@+id/encryptionProgressbar"
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:indeterminate="true"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/downloadProgress"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:indeterminateOnly="false"
+        android:progress="100"
+        android:visibility="gone"
+        android:progressDrawable="@drawable/progress_circle"
+        app:layout_constraintBottom_toBottomOf="@+id/pdfView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/pdfView" />
+
+    <TextView
+        android:id="@+id/progressPercentage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        tools:text="65%"
+        android:visibility="gone"
+        android:textStyle="bold"
+        android:textColor="@color/testpress_black"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        app:layout_constraintBottom_toBottomOf="@+id/downloadProgress"
+        app:layout_constraintEnd_toEndOf="@+id/downloadProgress"
+        app:layout_constraintStart_toStartOf="@+id/downloadProgress"
+        app:layout_constraintTop_toTopOf="@+id/downloadProgress"/>
 
     <LinearLayout
         android:id="@+id/emptyContainer"
