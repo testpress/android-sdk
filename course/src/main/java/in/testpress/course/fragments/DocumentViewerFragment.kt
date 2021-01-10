@@ -104,7 +104,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     private fun displayPDF() {
-        progressBar.visibility = View.VISIBLE
+        encryptionProgress.visibility = View.VISIBLE
         DisplayPDF(requireContext(),displayPDFListener = this).showPdfFromFile(
                 file = pdfDownloadManager.get(),
                 pdfView = pdfView
@@ -118,14 +118,12 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     override fun downloadProgress(progress: Int) {
         if (downloadProgress != null) {
-            showDownloadProgress()
-            downloadProgress.progress = progress
-            progressPercentage.text = "$progress%"
-            progressBar.visibility = View.GONE
+            showDownloadProgress(progress)
+            encryptionProgress.visibility = View.GONE
         }
         if (progress == completeProgress) {
             hideDownloadProgress()
-            progressBar.visibility = View.VISIBLE
+            encryptionProgress.visibility = View.VISIBLE
         }
     }
 
@@ -138,7 +136,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     override fun onPDFLoaded() {
-        progressBar.visibility = View.GONE
+        encryptionProgress.visibility = View.GONE
         if (::fullScreenMenu.isInitialized) {
             fullScreenMenu.isVisible = true
         }
@@ -148,9 +146,11 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         showErrorView()
     }
 
-    private fun showDownloadProgress() {
+    private fun showDownloadProgress(progress: Int) {
         downloadProgress.visibility = View.VISIBLE
         progressPercentage.visibility = View.VISIBLE
+        downloadProgress.progress = progress
+        progressPercentage.text = "$progress%"
     }
 
     private fun hideDownloadProgress() {

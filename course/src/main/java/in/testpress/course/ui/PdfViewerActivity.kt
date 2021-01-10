@@ -61,7 +61,7 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
     }
 
     private fun displayPDF() {
-        progressbar.visibility = View.VISIBLE
+        encryptionProgressbar.visibility = View.VISIBLE
         DisplayPDF(this,displayPDFListener = this).showPdfFromFile(
                 pageNumber = pageNumber,
                 file = pdfDownloadManager.get(),
@@ -76,16 +76,14 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
 
     override fun downloadProgress(progress: Int) {
         if (progressPercentage != null) {
-            showDownloadProgress()
-            downloadProgress.progress = progress
-            progressPercentage.text = "$progress%"
+            showDownloadProgress(progress)
         }
     }
 
     override fun onSingleTapOnPDF() {}
 
     override fun onPDFLoaded() {
-        progressbar.visibility = View.GONE
+        encryptionProgressbar.visibility = View.GONE
     }
 
     override fun onError() {
@@ -96,9 +94,11 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
         this.pageNumber = pageNumber
     }
 
-    private fun showDownloadProgress() {
+    private fun showDownloadProgress(progress: Int) {
         downloadProgress.visibility = View.VISIBLE
         progressPercentage.visibility = View.VISIBLE
+        downloadProgress.progress = progress
+        progressPercentage.text = "$progress%"
     }
 
     private fun hideDownloadProgress() {
@@ -107,7 +107,7 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
     }
 
     private fun showErrorView() {
-        progressbar.visibility = View.GONE
+        encryptionProgressbar.visibility = View.GONE
         pdfView.visibility = View.GONE
         emptyContainer.visibility = View.VISIBLE
     }

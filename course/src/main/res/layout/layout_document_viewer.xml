@@ -13,7 +13,7 @@
         android:layout_marginBottom="50dp" />
 
         <ProgressBar
-            android:id="@+id/progressBar"
+            android:id="@+id/encryptionProgress"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_centerHorizontal="true"
