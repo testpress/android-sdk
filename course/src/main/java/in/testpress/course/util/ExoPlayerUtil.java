@@ -38,6 +38,7 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultControlDispatcher;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
@@ -289,6 +290,7 @@ public class ExoPlayerUtil {
     }
 
     private void buildPlayer() {
+        MediaItem mediaItem = MediaItem.fromUri(url);
         player = new SimpleExoPlayer.Builder(activity, new DefaultRenderersFactory(activity))
                 .setTrackSelector(trackSelector).build();
 
@@ -297,6 +299,7 @@ public class ExoPlayerUtil {
         player.setPlayWhenReady(playWhenReady);
         player.seekTo(getStartPositionInMilliSeconds());
         player.setPlaybackParameters(new PlaybackParameters(speedRate));
+        player.setMediaItem(mediaItem);
         youtubeOverlay.player(player);
         playerView.controller(youtubeOverlay);
     }
@@ -332,10 +335,10 @@ public class ExoPlayerUtil {
             public void onAudioFocusChange(int focusChange) {
                 switch (focusChange) {
                     case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT):
-                        player.setPlayWhenReady(false);
+                        player.pause();
                         break;
                     case (AudioManager.AUDIOFOCUS_LOSS) :
-                        player.setPlayWhenReady(false);
+                        player.pause();
                         break;
                     default:
                         break;
@@ -345,7 +348,8 @@ public class ExoPlayerUtil {
     }
 
     private void preparePlayer() {
-        player.prepare(getMediaSource(), false, false);
+        player.setMediaSource(getMediaSource());
+        player.prepare();
     }
 
     private void initializeUsernameOverlay() {

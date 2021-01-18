@@ -3,14 +3,12 @@ package `in`.testpress.course.helpers
 import `in`.testpress.course.util.ExoPlayerDataSourceFactory
 import android.content.Context
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
-import com.google.android.exoplayer2.offline.DefaultDownloadIndex
-import com.google.android.exoplayer2.offline.DefaultDownloaderFactory
 import com.google.android.exoplayer2.offline.DownloadManager
-import com.google.android.exoplayer2.offline.DownloaderConstructorHelper
 import com.google.android.exoplayer2.upstream.cache.Cache
 import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import java.io.File
+import java.util.concurrent.Executors
 
 class VideoDownloadManager {
     private lateinit var downloadCache: Cache
@@ -33,16 +31,12 @@ class VideoDownloadManager {
 
     @Synchronized
     private fun initializeDownloadManger() {
-        val downloadIndex = DefaultDownloadIndex(databaseProvider)
-        val downloaderConstructorHelper =
-            DownloaderConstructorHelper(
-                getDownloadCache(),
-                ExoPlayerDataSourceFactory(context).getHttpDataSourceFactory()
-            )
         downloadManger = DownloadManager(
             context,
-            downloadIndex,
-            DefaultDownloaderFactory(downloaderConstructorHelper)
+            databaseProvider,
+            getDownloadCache(),
+            ExoPlayerDataSourceFactory(context).getHttpDataSourceFactory(),
+            Executors.newFixedThreadPool(6)
         )
     }
 

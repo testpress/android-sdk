@@ -21,15 +21,12 @@ class ExoPlayerDataSourceFactory(val context: Context) {
         return OkHttpDataSourceFactory(okHttpClient, userAgent, bandwidthMeter)
     }
 
-    fun build(): CacheDataSourceFactory {
+    fun build(): CacheDataSource.Factory {
         val cache = VideoDownloadManager(context).getDownloadCache()
-        return CacheDataSourceFactory(
-            cache,
-            getHttpDataSourceFactory(),
-            FileDataSource.Factory(),
-            null,
-            CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR,
-            null
-        )
+        return CacheDataSource.Factory()
+                .setCache(cache)
+                .setUpstreamDataSourceFactory(getHttpDataSourceFactory())
+                .setCacheWriteDataSinkFactory(null)
+                .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
     }
 }
