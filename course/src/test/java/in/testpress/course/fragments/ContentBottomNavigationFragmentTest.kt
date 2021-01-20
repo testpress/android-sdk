@@ -12,6 +12,7 @@ import `in`.testpress.course.viewmodels.ContentViewModel
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.network.Resource
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -30,9 +31,11 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import org.robolectric.shadows.support.v4.SupportFragmentController
 import java.lang.reflect.Field
 
+@Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(RobolectricTestRunner::class)
 class ContentBottomNavigationFragmentTest {
     private val USER_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6NDYsInVzZXJfaWQiOjQ2LCJlbWFpbCI6IiIsImV4cCI6MTUxOTAzNjUzM30.FUuyJfYNSAw_VcypZsN8_ZHvZra6gHU3njcXmr-TGVU"

@@ -6,6 +6,7 @@ import `in`.testpress.models.InstituteSettings
 import android.app.Activity
 import android.content.Context
 import android.media.AudioManager
+import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -20,7 +21,9 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.robolectric.Robolectric.setupActivity
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(RobolectricTestRunner::class)
 class InitializePlayerTest {
 

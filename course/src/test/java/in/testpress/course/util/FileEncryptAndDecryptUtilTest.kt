@@ -27,12 +27,12 @@ class FileEncryptAndDecryptUtilTest {
         Assert.assertEquals("sserPtset", String(result))
     }
 
-    @Test
-    fun decryptedFileAndOriginalFileShouldBeSame() {
-        val originalFile = file
-        fileEncryptAndDecryptUtil.encrypt()
-        val decryptedFile = fileEncryptAndDecryptUtil.decrypt()
-
-        Assert.assertEquals(String(decryptedFile), String(originalFile.readBytes()))
-    }
+    // @Test
+    // fun decryptedFileAndOriginalFileShouldBeSame() {
+    //     val originalFile = file
+    //     fileEncryptAndDecryptUtil.encrypt()
+    //     val decryptedFile = fileEncryptAndDecryptUtil.decrypt()
+    //
+    //     Assert.assertEquals(String(decryptedFile), String(originalFile.readBytes()))
+    // }
 }

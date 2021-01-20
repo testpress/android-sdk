@@ -15,6 +15,7 @@ import `in`.testpress.models.greendao.Content
 import `in`.testpress.network.Resource
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,8 +31,10 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import org.robolectric.shadows.support.v4.SupportFragmentController
 
+@Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(RobolectricTestRunner::class)
 class BaseContentDetailFragmentTest : GreendaoCleanupMixin() {
     lateinit var contentFragment: ConcreteContentFragment
