@@ -1,5 +1,7 @@
 package in.testpress.util;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -96,5 +98,15 @@ public class CommonUtils {
         }
         catch (PackageManager.NameNotFoundException ignore) {}
         return false;
+    }
+
+    public static String getUserName(Context context) {
+        AccountManager manager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+        Account[] account = manager.getAccountsByType(context.getPackageName());
+        if (account.length > 0) {
+            return account[0].name;
+        }
+
+        return "";
     }
 }
