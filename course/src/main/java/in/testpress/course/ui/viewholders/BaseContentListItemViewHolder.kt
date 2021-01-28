@@ -47,7 +47,7 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
 
     private fun showScheduledInfo(content: DomainContent) {
         if (content.getFormattedStart() != null) {
-            scheduledInfo.text = "This will be available on " + content.getFormattedStart()
+            scheduledInfo.text = "This will be available " + content.getFormattedStart()
         } else {
             scheduledInfo.text = "Coming soon"
         }

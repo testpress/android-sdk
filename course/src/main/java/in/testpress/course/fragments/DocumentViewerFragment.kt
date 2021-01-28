@@ -3,7 +3,7 @@ package `in`.testpress.course.fragments
 import `in`.testpress.course.R
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.PdfViewerActivity
-import `in`.testpress.course.util.DisplayPDF
+import `in`.testpress.course.util.PDFViewer
 import `in`.testpress.course.util.DisplayPDFListener
 import `in`.testpress.course.util.PDFDownloadManager
 import `in`.testpress.course.util.PdfDownloadListener
@@ -105,7 +105,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     private fun displayPDF() {
         encryptionProgress.visibility = View.VISIBLE
-        DisplayPDF(requireContext(),displayPDFListener = this).showPdfFromFile(
+        PDFViewer(requireContext(),displayPDFListener = this).showPdfFromFile(
                 file = pdfDownloadManager.get(),
                 pdfView = pdfView
         )

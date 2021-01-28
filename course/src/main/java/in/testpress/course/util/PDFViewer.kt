@@ -9,7 +9,7 @@ import com.github.barteksc.pdfviewer.listener.OnPageErrorListener
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import java.io.File
 
-class DisplayPDF(
+class PDFViewer(
         val context: Context,
         private val displayPDFListener: DisplayPDFListener
 ) : OnPageChangeListener, OnErrorListener, OnLoadCompleteListener, OnPageErrorListener {

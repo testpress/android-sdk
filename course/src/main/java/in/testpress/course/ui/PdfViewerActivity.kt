@@ -1,7 +1,7 @@
 package `in`.testpress.course.ui
 
 import `in`.testpress.course.R
-import `in`.testpress.course.util.DisplayPDF
+import `in`.testpress.course.util.PDFViewer
 import `in`.testpress.course.util.DisplayPDFListener
 import `in`.testpress.course.util.PDFDownloadManager
 import `in`.testpress.course.util.PdfDownloadListener
@@ -62,7 +62,7 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
 
     private fun displayPDF() {
         encryptionProgressbar.visibility = View.VISIBLE
-        DisplayPDF(this,displayPDFListener = this).showPdfFromFile(
+        PDFViewer(this,displayPDFListener = this).showPdfFromFile(
                 pageNumber = pageNumber,
                 file = pdfDownloadManager.get(),
                 pdfView = pdfView
