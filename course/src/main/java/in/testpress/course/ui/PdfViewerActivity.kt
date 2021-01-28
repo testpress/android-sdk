@@ -62,7 +62,7 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
 
     private fun displayPDF() {
         encryptionProgressbar.visibility = View.VISIBLE
-        PDFViewer(this,displayPDFListener = this).showPdfFromFile(
+        PDFViewer(this,displayPDFListener = this).display(
                 pageNumber = pageNumber,
                 file = pdfDownloadManager.get(),
                 pdfView = pdfView
