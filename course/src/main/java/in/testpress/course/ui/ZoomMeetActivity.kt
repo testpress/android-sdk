@@ -9,16 +9,12 @@ class ZoomMeetActivity: MeetingActivity() {
     val session = TestpressSdk.getTestpressSession(this)
 
     override fun setContentView(layoutResID: Int) {
-        if (session?.instituteSettings?.isScreenshotDisabled == true) {
-            disableScreenRecording()
-        }
+        disableScreenRecording()
         super.setContentView(layoutResID)
     }
 
     override fun setContentView(view: View?) {
-        if (session?.instituteSettings?.isScreenshotDisabled == true) {
-            disableScreenRecording()
-        }
+        disableScreenRecording()
         super.setContentView(view)
     }
 
