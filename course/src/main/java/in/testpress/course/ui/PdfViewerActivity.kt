@@ -29,6 +29,7 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        disableScreenShot()
         setContentView(R.layout.layout_pdf_viewer)
         hideStatusBar()
         getDataFromBundle()
@@ -38,6 +39,13 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
         } else {
             pdfDownloadManager.download(url)
         }
+    }
+
+    private fun disableScreenShot() {
+        window.setFlags(
+                WindowManager.LayoutParams.FLAG_SECURE,
+                WindowManager.LayoutParams.FLAG_SECURE
+        )
     }
 
     private fun hideStatusBar() {
