@@ -72,13 +72,13 @@ class PDFViewer(
         pageHeight: Float,
         displayedPage: Int
     ) {
-        val paint = getWatermarkStyle()
+        val paint = generateWatermarkStyle()
         val randomHorizontalPosition = pageWidth/((randomX * (displayedPage + 1)) % 12.5F)
         val randomVerticalPosition = pageHeight/(((randomY * (displayedPage + 1)) % 12.5F))
         canvas?.drawText(getUserName(context), randomHorizontalPosition, randomVerticalPosition, paint)
     }
 
-    private fun getWatermarkStyle(): Paint {
+    private fun generateWatermarkStyle(): Paint {
         val paint = Paint()
         paint.color = Color.BLACK
         paint.style = Paint.Style.FILL
