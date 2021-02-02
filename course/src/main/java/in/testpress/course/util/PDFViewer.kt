@@ -1,7 +1,12 @@
 package `in`.testpress.course.util
 
+import `in`.testpress.util.CommonUtils.getUserName
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import com.github.barteksc.pdfviewer.PDFView
+import com.github.barteksc.pdfviewer.listener.OnDrawListener
 import com.github.barteksc.pdfviewer.listener.OnErrorListener
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
@@ -12,7 +17,11 @@ import java.io.File
 class PDFViewer(
         val context: Context,
         private val displayPDFListener: DisplayPDFListener
-) : OnPageChangeListener, OnErrorListener, OnLoadCompleteListener, OnPageErrorListener {
+) : OnPageChangeListener, OnErrorListener, OnLoadCompleteListener, OnPageErrorListener,
+    OnDrawListener {
+
+    private val randomX = (0..10).random()
+    private val randomY = (0..10).random()
 
     fun display(pageNumber: Int = 0, file: File, pdfView: PDFView) {
         pdfView.fromFile(file)
@@ -37,6 +46,7 @@ class PDFViewer(
                 .onPageError(this)
                 .enableAntialiasing(true)
                 .defaultPage(pageNumber)
+                .onDraw(this)
                 .load()
     }
 
@@ -54,6 +64,27 @@ class PDFViewer(
 
     override fun onError(t: Throwable?) {
         displayPDFListener.onError()
+    }
+
+    override fun onLayerDrawn(
+        canvas: Canvas?,
+        pageWidth: Float,
+        pageHeight: Float,
+        displayedPage: Int
+    ) {
+        val paint = generateWatermarkStyle()
+        val randomHorizontalPosition = pageWidth/((randomX * (displayedPage + 1)) % 12.5F)
+        val randomVerticalPosition = pageHeight/(((randomY * (displayedPage + 1)) % 12.5F))
+        canvas?.drawText(getUserName(context), randomHorizontalPosition, randomVerticalPosition, paint)
+    }
+
+    private fun generateWatermarkStyle(): Paint {
+        val paint = Paint()
+        paint.color = Color.BLACK
+        paint.style = Paint.Style.FILL
+        paint.textSize = 80F
+        paint.alpha = 40
+        return paint
     }
 }
 
