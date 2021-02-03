@@ -29,12 +29,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import org.greenrobot.greendao.query.QueryBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
@@ -58,7 +55,6 @@ import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
-
 import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 import static in.testpress.network.TestpressApiClient.CREATED_SINCE;
@@ -228,6 +224,8 @@ public class BookmarksActivity extends BaseToolBarActivity
 
             @Override
             public void onPageSelected(int position) {
+                pagerAdapter.notifyDataSetChanged();
+                viewPager.setCurrentItem(position);
                 goToPosition(position);
             }
 

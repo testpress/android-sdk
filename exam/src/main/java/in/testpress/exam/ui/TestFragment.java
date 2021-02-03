@@ -471,6 +471,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                     questionsListProgressBar.setVisibility(View.VISIBLE);
                     getLoaderManager().restartLoader(0, null, TestFragment.this);
                 }
+                viewPagerAdapter.notifyDataSetChanged();
+                viewPager.setCurrentItem(position);
                 goToQuestion(position, true);
             }
 

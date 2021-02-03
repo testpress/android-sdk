@@ -219,6 +219,8 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
 
             @Override
             public void onPageSelected(int position) {
+                pagerAdapter.notifyDataSetChanged();
+                pager.setCurrentItem(position);
                 goToQuestion(position);
             }
 

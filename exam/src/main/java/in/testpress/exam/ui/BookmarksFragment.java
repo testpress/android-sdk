@@ -4,12 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.ColorRes;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.core.content.ContextCompat;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,19 +14,24 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.theartofdev.edmodo.cropper.CropImage;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.api.TestpressExamApiClient;
+import in.testpress.exam.ui.view.DirectionQuestionViewModel;
 import in.testpress.exam.util.CommentsUtil;
 import in.testpress.exam.util.Watermark;
 import in.testpress.exam.util.ImageUtils;
@@ -59,7 +58,6 @@ import in.testpress.util.ViewUtils;
 import in.testpress.util.WebViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
-
 import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 
@@ -100,6 +98,7 @@ public class BookmarksFragment extends BaseFragment {
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
     private RetrofitCall<Bookmark> updateBookmarkAPIRequest;
     private RetrofitCall<Void> deleteBookmarkAPIRequest;
+    private DirectionQuestionViewModel directionQuestionViewModel;
 
     public static BookmarksFragment getInstance(long bookmarkId, Language selectedLanguage) {
         BookmarksFragment reviewQuestionsFragment = new BookmarksFragment();
@@ -114,6 +113,7 @@ public class BookmarksFragment extends BaseFragment {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         apiClient = new TestpressExamApiClient(getContext());
+        initializeViewModel();
         assert getArguments() != null;
         long bookmarkId = getArguments().getLong(PARAM_BOOKMARK_ID);
         bookmarkDao = TestpressSDKDatabase.getBookmarkDao(getContext());
@@ -211,11 +211,11 @@ public class BookmarksFragment extends BaseFragment {
 
         rootLayout = view;
         ViewUtils.setTypeface(
-                new TextView[] {difficultyTitle, difficultyPercentageText },
+                new TextView[]{difficultyTitle, difficultyPercentageText},
                 TestpressSdk.getRubikMediumFont(view.getContext())
         );
         ViewUtils.setTypeface(
-                new TextView[] { usersAnsweredRight, moveBookmarkText, removeBookmarkText },
+                new TextView[]{usersAnsweredRight, moveBookmarkText, removeBookmarkText},
                 TestpressSdk.getRubikRegularFont(view.getContext())
         );
         webViewUtils = new WebViewUtils(webView) {
@@ -280,12 +280,16 @@ public class BookmarksFragment extends BaseFragment {
         }
     }
 
+    private void initializeViewModel() {
+        directionQuestionViewModel = new ViewModelProvider(getActivity()).get(DirectionQuestionViewModel.class);
+    }
+
     private void checkContentType() {
         if (content.getHtml() != null) {
             HtmlContent htmlContent = content.getHtml();
             setContentTitle(Html.fromHtml(htmlContent.getTitle()));
             String html = "<div style='padding-left: 20px; padding-right: 20px;'>" +
-                                htmlContent.getTextHtml() + "</div>";
+                    htmlContent.getTextHtml() + "</div>";
 
             webViewUtils.initWebView(html, getActivity());
         } else if (content.getRawVideo() != null) {
@@ -383,9 +387,7 @@ public class BookmarksFragment extends BaseFragment {
 
         // Add direction/passage
         if (directionHtml != null && !directionHtml.isEmpty()) {
-            html += "<div class='question' style='padding-bottom: 0px;'>" +
-                        directionHtml +
-                    "</div>";
+            html += directionQuestionViewModel.prepare(directionHtml);
         }
 
         // Add question
@@ -476,18 +478,18 @@ public class BookmarksFragment extends BaseFragment {
         if (explanationHtml != null && !explanationHtml.isEmpty()) {
             html += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation));
             html += "<div class ='watermark'>" +
-                    "© "+ getString(R.string.testpress_app_name) +" "+ watermark +
+                    "© " + getString(R.string.testpress_app_name) + " " + watermark +
                     "\n" + "</div>";
             html += "<div class='review-explanation'>" +
-                        explanationHtml +
+                    explanationHtml +
                     "</div>";
         }
 
         // Add subject
         if (subject != null && !subject.isEmpty() && !subject.equals("Uncategorized")) {
             html += "<div>" +
-                        WebViewUtils.getHeadingTags(getString(R.string.testpress_subject)) +
-                        "<div class='subject'>" + subject + "</div>" +
+                    WebViewUtils.getHeadingTags(getString(R.string.testpress_subject)) +
+                    "<div class='subject'>" + subject + "</div>" +
                     "</div>";
         }
         return html + "</div>";
@@ -792,5 +794,4 @@ public class BookmarksFragment extends BaseFragment {
         parentView.findViewById(viewId).setBackground(
                 ContextCompat.getDrawable(parentView.getContext(), drawableResId));
     }
-
 }

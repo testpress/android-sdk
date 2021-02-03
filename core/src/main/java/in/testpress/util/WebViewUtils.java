@@ -16,16 +16,14 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
 import java.util.List;
-
 import in.testpress.ui.ZoomableImageActivity;
 
 public class WebViewUtils {
 
     private WebView webView;
     private boolean hasError;
-
+    public static boolean isDirectionButtonStateVisible = true;
     public WebViewUtils(WebView webView) {
         this.webView = webView;
     }
@@ -51,6 +49,7 @@ public class WebViewUtils {
     public void initWebView(String htmlContent, final Activity activity) {
         initWebView(webView);
         webView.addJavascriptInterface(new ImageHandler(activity), "ImageHandler");
+        webView.addJavascriptInterface(new ToggleDirectionButtonHandler(),"ToggleDirectionButtonHandler");
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -64,6 +63,7 @@ public class WebViewUtils {
                 super.onPageFinished(view, url);
                 if (!hasError) {
                     String javascript = getJavascript(activity);
+                    String buttonJavascript = getJavascript(activity);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                         webView.evaluateJavascript(javascript, null);
                     } else {
@@ -359,6 +359,21 @@ public class WebViewUtils {
 
     protected void onClickImage(String url, Activity activity) {
         activity.startActivity(ZoomableImageActivity.createIntent(url, activity));
+    }
+
+    private class ToggleDirectionButtonHandler {
+        @JavascriptInterface
+        public void onButtonClick() {
+            WebViewUtils.this.toggleDirectionButtonState();
+        }
+    }
+
+    protected void toggleDirectionButtonState() {
+        if (isDirectionButtonStateVisible) {
+            isDirectionButtonStateVisible = false;
+        } else {
+            isDirectionButtonStateVisible = true;
+        }
     }
 
 }
