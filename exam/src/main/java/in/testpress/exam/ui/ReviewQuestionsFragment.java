@@ -1,7 +1,6 @@
 package in.testpress.exam.ui;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.os.Build;
@@ -11,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
-
+import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,11 +22,11 @@ import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.theartofdev.edmodo.cropper.CropImage;
 
 import junit.framework.Assert;
 
@@ -63,6 +62,8 @@ import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
 import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.COMMENTS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.QUESTIONS_PATH;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 import static in.testpress.util.CommonUtils.isAppInstalled;
 
@@ -93,17 +94,17 @@ public class ReviewQuestionsFragment extends Fragment {
     ImageView imageView5;
     int percentageCorrect;
     TestpressExamApiClient apiClient;
-    ImageUtils imageUtils;
     private CommentsUtil commentsUtil;
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
     private InstituteSettings instituteSettings;
-    private boolean loadComments = true;
     private MenuItem bookmarkIcon;
 
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
     private RetrofitCall<Bookmark> bookmarkAPIRequest;
     private RetrofitCall<Void> deleteBookmarkAPIRequest;
+    private Button viewCommentsButton;
+    private LinearLayout commentsLayout;
 
     public static ReviewQuestionsFragment getInstance(long reviewItemId, Language selectedLanguage) {
         ReviewQuestionsFragment reviewQuestionsFragment = new ReviewQuestionsFragment();
@@ -122,11 +123,8 @@ public class ReviewQuestionsFragment extends Fragment {
         Assert.assertNotNull("PARAM_REVIEW_ITEM_ID must not be null", reviewItemId);
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
         reviewItemDao = TestpressSDKDatabase.getReviewItemDao(getContext());
-        imageUtils = new ImageUtils(rootLayout, this);
         //noinspection ConstantConditions
         instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
-        loadComments = instituteSettings.getBaseUrl().contains("elixir") || instituteSettings.getBaseUrl().contains("medpgbasics") ||
-                instituteSettings.getBaseUrl().contains("onlyiasnothingelse");
 
         List<ReviewItem> reviewItems = reviewItemDao.queryBuilder()
                 .where(ReviewItemDao.Properties.Id.eq(reviewItemId)).list();
@@ -184,6 +182,8 @@ public class ReviewQuestionsFragment extends Fragment {
         imageView3 = view.findViewById(R.id.difficulty3);
         imageView4 = view.findViewById(R.id.difficulty4);
         imageView5 = view.findViewById(R.id.difficulty5);
+        viewCommentsButton = view.findViewById(R.id.button_view_comments);
+        commentsLayout = view.findViewById(R.id.comments_layout);
         percentageCorrect = Math.round(reviewItem.getQuestion().getPercentageGotCorrect() == null ?
                 0 : reviewItem.getQuestion().getPercentageGotCorrect());
 
@@ -202,16 +202,7 @@ public class ReviewQuestionsFragment extends Fragment {
                 }
                 setDifficulty(view);
                 progressBar.setVisibility(View.GONE);
-                if (commentsUtil == null && loadComments) {
-                    commentsUtil = new CommentsUtil(
-                            ReviewQuestionsFragment.this,
-                            getLoaderManager(),
-                            CommentsUtil.getQuestionCommentsUrl(apiClient, reviewItem),
-                            rootLayout,
-                            ((ReviewQuestionsActivity) getActivity()).buttonLayout
-                    );
-                    commentsUtil.displayComments();
-                }
+                showCommentButton();
                 animationView.bringToFront();
                 webViewUtils.addLogo(instituteSettings.getAppToolbarLogo());
 
@@ -219,6 +210,7 @@ public class ReviewQuestionsFragment extends Fragment {
                     webViewUtils.addWatermark(instituteSettings.getAppToolbarLogo());
                 }
                 setHasOptionsMenu(true);
+                setOnClickListeners();
             }
 
             @Override
@@ -255,6 +247,10 @@ public class ReviewQuestionsFragment extends Fragment {
                 telegram.setVisible(true);
             }
         }
+    }
+
+    private void showCommentButton() {
+        commentsLayout.setVisibility(View.VISIBLE);
     }
 
     private void initalizeBookmarkButtonListener() {
@@ -575,23 +571,26 @@ public class ReviewQuestionsFragment extends Fragment {
         folderSpinnerAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        imageUtils.onActivityResult(requestCode, resultCode, data,
-                new ImageUtils.ImagePickerResultHandler() {
-                    @Override
-                    public void onSuccessfullyImageCropped(CropImage.ActivityResult result) {
-                        commentsUtil.uploadImage(result.getUri().getPath());
-                    }
-                });
+    private void setOnClickListeners() {
+        viewCommentsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openCommentFragment();
+            }
+        });
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
+    private void openCommentFragment() {
+        CommentsFragment commentsFragment = CommentsFragment.Companion.getNewInstance(getCommentsUrl(apiClient, reviewItem));
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        commentsFragment.show(transaction, "CommentsFragment");
+    }
 
-        imageUtils.permissionsUtils.onRequestPermissionsResult(requestCode, grantResults);
+    private String getCommentsUrl(TestpressExamApiClient apiClient,
+                                                ReviewItem reviewItem) {
+
+        return apiClient.getBaseUrl() + QUESTIONS_PATH + reviewItem.getQuestionId() +
+                COMMENTS_PATH;
     }
 
     protected void setEmptyText(final int title, final int description) {
@@ -604,9 +603,6 @@ public class ReviewQuestionsFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        if (commentsUtil != null) {
-            commentsUtil.onDestroy();
-        }
         CommonUtils.cancelAPIRequests(new RetrofitCall[] {
                 bookmarkFoldersLoader, bookmarkAPIRequest, deleteBookmarkAPIRequest
         });
@@ -621,14 +617,6 @@ public class ReviewQuestionsFragment extends Fragment {
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (commentsUtil != null) {
-            commentsUtil.setUserVisibleHint(isVisibleToUser);
-        }
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
         webView.onPause();
@@ -637,9 +625,6 @@ public class ReviewQuestionsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (imageUtils != null) {
-            imageUtils.permissionsUtils.onResume();
-        }
         webView.onResume();
     }
 

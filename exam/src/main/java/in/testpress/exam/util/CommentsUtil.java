@@ -74,7 +74,6 @@ public class CommentsUtil implements LoaderManager.LoaderCallbacks<List<Comment>
     private Fragment fragment;
     private LoaderManager loaderManager;
     private View rootLayout;
-    private View bottomNavigationBarLayout;
     private String commentsUrl;
 
     private CommentsPager previousCommentsPager;
@@ -101,20 +100,19 @@ public class CommentsUtil implements LoaderManager.LoaderCallbacks<List<Comment>
     private RetrofitCall<FileDetails> imageUploadAPIRequest;
 
     public CommentsUtil(Fragment fragment, LoaderManager loaderManager, String commentsUrl,
-                        View rootLayout, View bottomNavigationBarLayout) {
+                        View rootLayout) {
 
-        this(fragment.getActivity(), loaderManager, commentsUrl, rootLayout, bottomNavigationBarLayout);
+        this(fragment.getActivity(), loaderManager, commentsUrl, rootLayout);
         this.fragment = fragment;
     }
 
     public CommentsUtil(Activity activity, LoaderManager loaderManager, String commentsUrl,
-                        View rootLayout, View bottomNavigationBarLayout) {
+                        View rootLayout) {
 
         this.activity = activity;
         this.loaderManager = loaderManager;
         this.commentsUrl = commentsUrl;
         this.rootLayout = rootLayout;
-        this.bottomNavigationBarLayout = bottomNavigationBarLayout;
         previousCommentsLoadingLayout = rootLayout.findViewById(R.id.loading_previous_comments_layout);
         newCommentsLoadingLayout = rootLayout.findViewById(R.id.loading_new_comments_layout);
 
@@ -124,13 +122,6 @@ public class CommentsUtil implements LoaderManager.LoaderCallbacks<List<Comment>
         loadNewCommentsText = rootLayout.findViewById(R.id.load_new_comments_text);
         commentsEditText = rootLayout.findViewById(R.id.comment_box);
         commentBoxLayout = rootLayout.findViewById(R.id.comment_box_layout);
-        TextView commentsLabel = rootLayout.findViewById(R.id.comments_label);
-
-        ViewUtils.setTypeface(
-                new TextView[] { loadPreviousCommentsText, commentsLabel, loadNewCommentsText },
-                TestpressSdk.getRubikMediumFont(activity)
-        );
-
         commentsEditText.setTypeface(TestpressSdk.getRubikRegularFont(activity));
 
         progressDialog = new ProgressDialog(activity);
@@ -241,13 +232,6 @@ public class CommentsUtil implements LoaderManager.LoaderCallbacks<List<Comment>
             public void onImeBack(BackEventListeningEditText editText, String text) {
                 // On back press while editing clear focus
                 commentsEditText.clearFocus();
-            }
-        });
-        commentsEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                // Hide/Show navigation bar based on focus change
-                bottomNavigationBarLayout.setVisibility(!hasFocus ? View.VISIBLE : View.GONE);
             }
         });
         loadPreviousCommentsLayout.setOnClickListener(new View.OnClickListener() {

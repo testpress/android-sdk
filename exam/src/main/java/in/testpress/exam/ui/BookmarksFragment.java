@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +23,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,6 @@ import in.testpress.exam.R;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.util.CommentsUtil;
 import in.testpress.exam.util.Watermark;
-import in.testpress.exam.util.ImageUtils;
 import in.testpress.models.greendao.Attachment;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.BookmarkDao;
@@ -61,6 +60,8 @@ import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
 import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.COMMENTS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.QUESTIONS_PATH;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 
 public class BookmarksFragment extends BaseFragment {
@@ -90,10 +91,11 @@ public class BookmarksFragment extends BaseFragment {
     private LottieAnimationView removeBookmarkProgressBar;
     private TextView difficultyPercentageText;
     private Bookmark bookmark;
+    private Button viewCommentsButton;
+    private LinearLayout commentsLayout;
     private BookmarksActivity bookmarksActivity;
     private FullScreenChromeClient fullScreenChromeClient;
     private TestpressExamApiClient apiClient;
-    ImageUtils imagePickerUtils;
     private CommentsUtil commentsUtil;
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
@@ -122,7 +124,6 @@ public class BookmarksFragment extends BaseFragment {
 
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
         bookmarkFolderDao = TestpressSDKDatabase.getBookmarkFolderDao(getContext());
-        imagePickerUtils = new ImageUtils(rootLayout, this);
     }
 
     @SuppressLint("AddJavascriptInterface")
@@ -149,6 +150,8 @@ public class BookmarksFragment extends BaseFragment {
         rightGradientShadow = view.findViewById(R.id.right_gradient_shadow);
         TextView moveBookmarkText = view.findViewById(R.id.move_bookmark_text);
         TextView removeBookmarkText = view.findViewById(R.id.remove_bookmark_text);
+        viewCommentsButton = view.findViewById(R.id.button_view_comments);
+        commentsLayout = view.findViewById(R.id.comments_layout);
         moveBookmarkLayout = view.findViewById(R.id.move_bookmark_layout);
         moveBookmarkLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -226,16 +229,7 @@ public class BookmarksFragment extends BaseFragment {
                 bookmarksLayout.setVisibility(View.VISIBLE);
                 if (reviewItem != null) {
                     setDifficulty(view);
-                    if (commentsUtil == null && getActivity() != null) {
-                        commentsUtil = new CommentsUtil(
-                                BookmarksFragment.this,
-                                getLoaderManager(),
-                                CommentsUtil.getQuestionCommentsUrl(apiClient, reviewItem),
-                                rootLayout,
-                                ((BookmarksActivity) getActivity()).buttonLayout
-                        );
-                        commentsUtil.displayComments();
-                    }
+                    commentsLayout.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -254,6 +248,7 @@ public class BookmarksFragment extends BaseFragment {
         };
         fullScreenChromeClient = new FullScreenChromeClient(getActivity());
         updateContentObject();
+        setOnClickListeners();
         return view;
     }
 
@@ -697,23 +692,26 @@ public class BookmarksFragment extends BaseFragment {
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        imagePickerUtils.onActivityResult(requestCode, resultCode, data,
-                new ImageUtils.ImagePickerResultHandler() {
-                    @Override
-                    public void onSuccessfullyImageCropped(CropImage.ActivityResult result) {
-                        commentsUtil.uploadImage(result.getUri().getPath());
-                    }
-                });
+    private void setOnClickListeners() {
+        viewCommentsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openCommentFragment();
+            }
+        });
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
+    private void openCommentFragment() {
+        CommentsFragment commentsFragment = CommentsFragment.Companion.getNewInstance(getCommentsUrl(apiClient, reviewItem));
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        commentsFragment.show(transaction, "CommentsFragment");
+    }
 
-        imagePickerUtils.permissionsUtils.onRequestPermissionsResult(requestCode, grantResults);
+    private String getCommentsUrl(TestpressExamApiClient apiClient,
+                                          ReviewItem reviewItem) {
+
+        return apiClient.getBaseUrl() + QUESTIONS_PATH + reviewItem.getQuestionId() +
+                COMMENTS_PATH;
     }
 
     protected void setEmptyText(final int title, final int description) {
@@ -733,9 +731,6 @@ public class BookmarksFragment extends BaseFragment {
 
     @Override
     public void onDestroyView() {
-        if (commentsUtil != null) {
-            commentsUtil.onDestroy();
-        }
         final ViewGroup viewGroup = (ViewGroup) webView.getParent();
         if (viewGroup != null) {
             // Remove webView from its parent before destroy to support below kitkat
@@ -748,9 +743,6 @@ public class BookmarksFragment extends BaseFragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (commentsUtil != null) {
-            commentsUtil.setUserVisibleHint(isVisibleToUser);
-        }
         if (webView != null) {
             if (isVisibleToUser) {
                 webView.onResume();
@@ -777,9 +769,6 @@ public class BookmarksFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (imagePickerUtils != null) {
-            imagePickerUtils.permissionsUtils.onResume();
-        }
         webView.onResume();
     }
 
