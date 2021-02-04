@@ -26,6 +26,9 @@ class ExamContentListItemViewHolder(view: View) : BaseContentListItemViewHolder(
             numberOfQuestions.text = it.numberOfQuestions.toString() + " Qs"
             bindDuration(content, it)
         }
+        if (!content.coverImageMedium.isNullOrEmpty()) {
+            contentTypeIcon.visibility = View.GONE
+        }
     }
 
     private fun bindDuration(content: DomainContent, exam: DomainExamContent) {
