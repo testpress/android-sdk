@@ -424,3 +424,7 @@ body.watermark::before {
 .correct{
     color: #18be99 !important;
 }
+
+video {
+    width: 100%
+}
