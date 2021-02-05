@@ -630,8 +630,17 @@ public class ReviewQuestionsFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
+        if(!isVisibleToUser) {
+            pauseWebview();
+        }
         if (commentsUtil != null) {
             commentsUtil.setUserVisibleHint(isVisibleToUser);
+        }
+    }
+
+    public void pauseWebview() {
+        if (webView != null) {
+            webView.onPause();
         }
     }
 
