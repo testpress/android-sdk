@@ -149,7 +149,6 @@ public class ReviewQuestionsFragment extends Fragment {
         emptyDescView = view.findViewById(R.id.empty_description);
         retryButton = view.findViewById(R.id.retry_button);
         UIUtils.setIndeterminateDrawable(getContext(), progressBar, 4);
-        webView = view.findViewById(R.id.web_view);
         bookmarkFolderSpinner = view.findViewById(R.id.bookmark_folder_spinner);
         folderSpinnerAdapter = new FolderSpinnerAdapter(getActivity(), getResources(),
                 new ViewUtils.OnInputCompletedListener() {
@@ -193,6 +192,13 @@ public class ReviewQuestionsFragment extends Fragment {
                 TestpressSdk.getRubikMediumFont(getContext())
         );
         usersAnsweredRight.setTypeface(TestpressSdk.getRubikRegularFont(getContext()));
+        difficultyPercentageText.setText(percentageCorrect + "%");
+        initializeWebView(view);
+        return view;
+    }
+
+    public void initializeWebView(final View view) {
+        webView = view.findViewById(R.id.web_view);
         webViewUtils = new WebViewUtils(webView) {
             @Override
             protected void onLoadFinished() {
@@ -228,9 +234,7 @@ public class ReviewQuestionsFragment extends Fragment {
 
         };
         webView.addJavascriptInterface(new BookmarkListener(), "BookmarkListener");
-        difficultyPercentageText.setText(percentageCorrect + "%");
         webViewUtils.initWebView(getReviewItemAsHtml(), getActivity());
-        return view;
     }
 
     @Override
