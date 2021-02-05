@@ -56,6 +56,7 @@ import in.testpress.models.greendao.ReviewQuestionTranslation;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.view.ClosableSpinner;
 import in.testpress.util.CommonUtils;
+import in.testpress.util.FullScreenChromeClient;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 import in.testpress.util.WebViewUtils;
@@ -235,6 +236,8 @@ public class ReviewQuestionsFragment extends Fragment {
         };
         webView.addJavascriptInterface(new BookmarkListener(), "BookmarkListener");
         webViewUtils.initWebView(getReviewItemAsHtml(), getActivity());
+        FullScreenChromeClient fullScreenChromeClient = new FullScreenChromeClient(getActivity());
+        webView.setWebChromeClient(fullScreenChromeClient);
     }
 
     @Override
