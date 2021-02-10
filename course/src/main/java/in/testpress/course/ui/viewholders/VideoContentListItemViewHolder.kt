@@ -27,6 +27,7 @@ class VideoContentListItemViewHolder(view: View) : BaseContentListItemViewHolder
             bindDuration(it)
             bindVideoProgress(content)
         }
+        contentTypeIcon.visibility = View.VISIBLE
     }
 
     private fun bindVideoProgress(content: DomainContent) {

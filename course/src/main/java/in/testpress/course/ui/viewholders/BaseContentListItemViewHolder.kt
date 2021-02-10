@@ -35,8 +35,15 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
         updateThumbnail(content)
         handleLockedAndScheduledContent(content)
         if (isPremium) showCrownIcon()
+        if (!content.coverImageMedium.isNullOrEmpty()) {
+            hideContentTypeIcon()
+        }
         bindContentDetails(content)
         itemView.setOnClickListener { clickListener(content)}
+    }
+
+    private fun hideContentTypeIcon() {
+        contentTypeIcon.visibility = View.GONE
     }
 
     private fun updateThumbnail(content: DomainContent) {
