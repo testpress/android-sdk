@@ -1,4 +1,4 @@
-package `in`.testpress.course.network
+package `in`.testpress.exam.network
 
 data class NetworkSection(
     val order: Int? = null,
