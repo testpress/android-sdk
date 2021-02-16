@@ -99,8 +99,10 @@ class ExamContentRepository(
             val attempt = networkContentAttempt.assessment!!
             attemptDao.insertOrReplace(attempt.asGreenDaoModel())
             val attemptSections = networkContentAttempt.assessment.sections
-            val attemptSectionDao = TestpressSDKDatabase.getAttemptSectionDao(context)
-            attemptSectionDao.insertOrReplaceInTx(attemptSections.asGreenDaoModel())
+            attemptSections?.let {
+                val attemptSectionDao = TestpressSDKDatabase.getAttemptSectionDao(context)
+                attemptSectionDao.insertOrReplaceInTx(it.asGreenDaoModel())
+            }
             contentAttempt.assessmentId = attempt.id
             contentAttempt.chapterContentId = contentId
             contentAttemptDao.insertOrReplace(contentAttempt)
