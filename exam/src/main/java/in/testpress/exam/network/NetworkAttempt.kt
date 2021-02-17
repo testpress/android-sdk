@@ -21,7 +21,8 @@ data class NetworkAttempt(
     val percentile: String? = null,
     val speed: Int? = null,
     val accuracy: Int? = null,
-    val percentage: String? = null
+    val percentage: String? = null,
+    val sections: List<NetworkAttemptSection>? = arrayListOf()
 )
 
 fun createNetworkAttempt(attempt: NetworkAttempt): Attempt {

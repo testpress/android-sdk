@@ -1,5 +1,6 @@
 package `in`.testpress.course.network
 
+import `in`.testpress.exam.network.NetworkSection
 import `in`.testpress.models.greendao.Exam
 
 data class NetworkExamContent(
