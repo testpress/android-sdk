@@ -44,12 +44,13 @@ data class NetworkExamContent(
     val languages: List<String> = arrayListOf(),
     val isGrowthHackEnabled: Boolean? = null,
     val shareTextForSolutionUnlock: String? = null,
-    val showAnalytics: Boolean? = null
+    val showAnalytics: Boolean? = null,
+    val totalMarks: String? = null
 )
 
 fun NetworkExamContent.asGreenDaoModel(): Exam {
     return Exam(
-        null,
+        totalMarks,
         this.url,
         this.id,
         this.attemptsCount,
