@@ -48,6 +48,7 @@ class PDFViewer(
                 .defaultPage(pageNumber)
                 .onDraw(this)
                 .load()
+        pdfView.isSwipeVertical = true
     }
 
     override fun onPageChanged(page: Int, pageCount: Int) {
