@@ -12,11 +12,11 @@
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize" >
 
-        <ImageButton
+        <Button
             android:id="@+id/exit_button"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:padding="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Submit"
             android:background="?android:selectableItemBackground"
             android:src="@drawable/ic_close_black_24dp"
             android:tint="@color/testpress_actionbar_text"
