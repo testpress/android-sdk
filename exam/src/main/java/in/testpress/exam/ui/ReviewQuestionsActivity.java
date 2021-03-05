@@ -144,56 +144,49 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_review_question);
-        exam = getIntent().getParcelableExtra(PARAM_EXAM);
-        Assert.assertNotNull("PARAM_EXAM must not be null", exam);
-        attempt = getIntent().getParcelableExtra(PARAM_ATTEMPT);
-        Assert.assertNotNull("PARAM_ATTEMPT must not be null", attempt);
-        questionsListView = (ListView) findViewById(R.id.questions_list_view);
-        emptyView = findViewById(R.id.empty_container);
-        emptyTitleView = (TextView) findViewById(R.id.empty_title);
-        emptyDescView = (TextView) findViewById(R.id.empty_description);
-        retryButton = (Button) findViewById(R.id.retry_button);
-        previousButton = (Button) findViewById(R.id.previous);
-        nextButton = (Button) findViewById(R.id.next);
-        questionsListButton = (Button) findViewById(R.id.question_list_button);
-        progressBar = (ProgressBar) findViewById(R.id.pb_loading);
-        questionsListProgressBar = (View) LayoutInflater.from(this).inflate(R.layout.progress_bar, null);
-        UIUtils.setIndeterminateDrawable(this, progressBar, 4);
-        questionLayout = findViewById(R.id.question_layout);
-        buttonLayout = findViewById(R.id.button_layout);
-        pager = (NonSwipeableViewPager) findViewById(R.id.pager);
-        slidingPaneLayout = (SlidingPaneLayout) findViewById(R.id.sliding_layout);
-        previousButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showPreviousQuestion();
-            }
-        });
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showNextQuestion();
-            }
-        });
-        questionsListButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setPanelOpen(!slidingPaneLayout.isOpen());
-            }
-        });
-        ((ListView) findViewById(R.id.questions_list_view)).setOnItemClickListener(
-                new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int position,
-                                            long id) {
-                        goToQuestion(position);
-                        setPanelOpen(false);
-                    }
-                });
+        parseArguments();
+        bindViews();
+        initializeQuestionsListSidebar();
+        initializeQuestionPager();
+        addListeners();
+        loadReviewAttempt();
+        reviewUrl = reviewAttempt.getReviewUrl().replace("v2.3", "v2.2.1");
+        // Check review items exists for the review attempt, load otherwise.
+        totalQuestions = attempt.getTotalQuestions();
+        displayQuestions();
+        int position = getIntent().getIntExtra(PARAM_POSITION, -1);
+        if (position != -1) {
+            goToQuestion(position);
+        }
+
+        InstituteSettings instituteSettings = TestpressSdk.getTestpressSession(this).getInstituteSettings();
+        if (instituteSettings.isGrowthHackEnabled()) {
+            customiseToolbar();
+        }
+    }
+
+    private void loadReviewAttempt() {
+        reviewItemDao= TestpressSDKDatabase.getReviewItemDao(this);
+        attemptDao = TestpressSDKDatabase.getReviewAttemptDao(this);
+        reviewAttempt = getReviewAttempt();
+    }
+
+    private void displayQuestions() {
+        if (reviewItemDao._queryReviewAttempt_ReviewItems(reviewAttempt.getId()).isEmpty()) {
+            loadReviewItemsFromServer(reviewUrl);
+        } else {
+            displayReviewItems();
+        }
+    }
+
+    private void initializeQuestionsListSidebar() {
         panelListAdapter = new ReviewPanelListAdapter(reviewItems,
                 R.layout.testpress_test_panel_list_item, this, this);
         questionsListView.setAdapter(panelListAdapter);
         questionsListView.addFooterView(questionsListProgressBar);
+    }
+
+    private void initializeQuestionPager() {
         pagerAdapter = new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems);
         pager.setAdapter(pagerAdapter);
         slidingPaneLayout.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
@@ -226,30 +219,34 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
             public void onPageScrollStateChanged(int state) {
             }
         });
-        addListeners();
-        apiClient = new TestpressExamApiClient(this);
+    }
+
+
+    private void bindViews() {
+        questionsListView = (ListView) findViewById(R.id.questions_list_view);
+        emptyView = findViewById(R.id.empty_container);
+        emptyTitleView = (TextView) findViewById(R.id.empty_title);
+        emptyDescView = (TextView) findViewById(R.id.empty_description);
+        retryButton = (Button) findViewById(R.id.retry_button);
+        previousButton = (Button) findViewById(R.id.previous);
+        nextButton = (Button) findViewById(R.id.next);
+        questionsListButton = (Button) findViewById(R.id.question_list_button);
+        progressBar = (ProgressBar) findViewById(R.id.pb_loading);
+        questionsListProgressBar = (View) LayoutInflater.from(this).inflate(R.layout.progress_bar, null);
+        UIUtils.setIndeterminateDrawable(this, progressBar, 4);
+        questionLayout = findViewById(R.id.question_layout);
+        buttonLayout = findViewById(R.id.button_layout);
+        pager = (NonSwipeableViewPager) findViewById(R.id.pager);
+        slidingPaneLayout = (SlidingPaneLayout) findViewById(R.id.sliding_layout);
         spinnerAdapter = new ExploreSpinnerAdapter(getLayoutInflater(), getResources(), true);
         spinnerAdapter.hideSpinner(true);
-        reviewItemDao= TestpressSDKDatabase.getReviewItemDao(this);
-        attemptDao = TestpressSDKDatabase.getReviewAttemptDao(this);
-        reviewAttempt = getReviewAttempt();
-        reviewUrl = reviewAttempt.getReviewUrl().replace("v2.3", "v2.2.1");
-        // Check review items exists for the review attempt, load otherwise.
-        totalQuestions = attempt.getTotalQuestions();
-        if (reviewItemDao._queryReviewAttempt_ReviewItems(reviewAttempt.getId()).isEmpty()) {
-            loadReviewItemsFromServer(reviewUrl);
-        } else {
-            displayReviewItems();
-        }
-        int position = getIntent().getIntExtra(PARAM_POSITION, -1);
-        if (position != -1) {
-            goToQuestion(position);
-        }
+    }
 
-        InstituteSettings instituteSettings = TestpressSdk.getTestpressSession(this).getInstituteSettings();
-        if (instituteSettings.isGrowthHackEnabled()) {
-            customiseToolbar();
-        }
+    private void parseArguments() {
+        exam = getIntent().getParcelableExtra(PARAM_EXAM);
+        Assert.assertNotNull("PARAM_EXAM must not be null", exam);
+        attempt = getIntent().getParcelableExtra(PARAM_ATTEMPT);
+        Assert.assertNotNull("PARAM_ATTEMPT must not be null", attempt);
     }
 
     private void customiseToolbar() {
@@ -278,6 +275,33 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
                 }
             }
         });
+        previousButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPreviousQuestion();
+            }
+        });
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showNextQuestion();
+            }
+        });
+        questionsListButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setPanelOpen(!slidingPaneLayout.isOpen());
+            }
+        });
+        ((ListView) findViewById(R.id.questions_list_view)).setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int position,
+                                            long id) {
+                        goToQuestion(position);
+                        setPanelOpen(false);
+                    }
+                });
     }
 
     @Override
@@ -387,6 +411,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
         isNetworkRequestLoading = true;
 
         questionsListProgressBar.setVisibility(View.VISIBLE);
+        apiClient = new TestpressExamApiClient(this);
         reviewItemsLoader = apiClient.getReviewItems(url, new HashMap<String, Object>())
                 .enqueue(new TestpressCallback<TestpressApiResponse<ReviewItem>>() {
                     @Override
