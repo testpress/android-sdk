@@ -145,6 +145,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_review_question);
         parseArguments();
+        setTitle(exam.getTitle() + " Solutions");
         bindViews();
         initializeQuestionsListSidebar();
         initializeQuestionPager();

@@ -294,7 +294,7 @@ public class ReviewStatsFragment extends BaseFragment {
                 public void onClick(View v) {
                     getActivity().startActivity(
                             AnalyticsActivity.createIntent(getActivity(), attempt.getUrlFrag() +
-                                    TestpressExamApiClient.ATTEMPT_SUBJECT_ANALYTICS_PATH, null, null)
+                                    TestpressExamApiClient.ATTEMPT_SUBJECT_ANALYTICS_PATH, null, exam.getTitle())
                     );
                 }
             });
