@@ -460,8 +460,7 @@ public class ReviewQuestionsFragment extends Fragment {
         String watermark = new Watermark().get(getActivity());
         if (explanationHtml != null && !explanationHtml.isEmpty()) {
             html += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation));
-            html += "<div class ='watermark'>" +
-                    "© "+ getString(R.string.testpress_app_name) +" "+ watermark +
+            html += "<div class ='watermark'>" +  watermark +
                     "\n" + "</div>";
             html += "<div class='review-explanation'>" +
                         explanationHtml +
