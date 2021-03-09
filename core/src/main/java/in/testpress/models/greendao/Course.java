@@ -2,6 +2,8 @@ package in.testpress.models.greendao;
 
 import org.greenrobot.greendao.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import in.testpress.models.greendao.DaoSession;
 import org.greenrobot.greendao.DaoException;
@@ -416,6 +418,24 @@ public class Course {
                 .where(ChapterDao.Properties.CourseId.eq(getId()), ChapterDao.Properties.ParentId.isNull())
                 .orderAsc(ChapterDao.Properties.Order)
                 .list();
+    }
+
+    public boolean hasTags(List<String> expectedTags) {
+        return tags != null && !Collections.disjoint(tags, expectedTags);
+    }
+
+    public static List<Course> filterByTages(List<Course> courses, List<String> tags) {
+        if (tags == null || tags.isEmpty()) {
+            return courses;
+        }
+
+        ArrayList<Course> filteredCourses = new ArrayList<Course>();
+        for (Course course : courses) {
+            if (course.hasTags(tags)) {
+                filteredCourses.add(course);
+            }
+        }
+        return filteredCourses;
     }
     // KEEP METHODS END
 
