@@ -71,7 +71,7 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
                 .where(CourseDao.Properties.IsMyCourse.eq(true))
                 .orderAsc(CourseDao.Properties.Order)
                 .list();
-        return Course.filterByTages(courses, tags);
+        return Course.filterByTags(courses, tags);
     }
 
     @Override
