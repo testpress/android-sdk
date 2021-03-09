@@ -2,8 +2,6 @@ package in.testpress.models.greendao;
 
 import org.greenrobot.greendao.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import in.testpress.models.greendao.DaoSession;
 import org.greenrobot.greendao.DaoException;
