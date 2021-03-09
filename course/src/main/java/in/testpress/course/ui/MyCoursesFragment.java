@@ -1,7 +1,6 @@
 package in.testpress.course.ui;
 
 import android.os.Bundle;
-
 import androidx.fragment.app.FragmentActivity;
 import androidx.loader.content.Loader;
 
@@ -39,10 +38,10 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
         super.onCreate(savedInstanceState);
         mApiClient = new TestpressCourseApiClient(getActivity());
         courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
-        storeArguments();
+        initializeTags();
     }
 
-    private void storeArguments() {
+    private void initializeTags() {
         if (getArguments() != null) {
             tags = getArguments().getStringArrayList(TestpressApiClient.TAGS);
         }
@@ -74,6 +73,7 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
         return Course.filterByTags(courses, tags);
     }
 
+
     @Override
     protected boolean isItemsEmpty() {
         return getDao().queryBuilder().where(CourseDao.Properties.IsMyCourse.eq(true)).count() == 0;
@@ -100,7 +100,6 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
         updateItems(getCourses());
         showList();
     }
-
 
     private void refreshLastSyncedDate() {
         CourseLastSyncedDate courseLastSyncedDate = new CourseLastSyncedDate(requireContext());
