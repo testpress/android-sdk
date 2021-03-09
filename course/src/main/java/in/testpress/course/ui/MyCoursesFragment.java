@@ -17,6 +17,7 @@ import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.course.pagers.CoursePager;
 import in.testpress.course.api.TestpressCourseApiClient;
+import in.testpress.network.TestpressApiClient;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -24,6 +25,7 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
 
     private TestpressCourseApiClient mApiClient;
     private CourseDao courseDao;
+    private ArrayList<String> tags = new ArrayList<String>();
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
@@ -36,6 +38,13 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
         super.onCreate(savedInstanceState);
         mApiClient = new TestpressCourseApiClient(getActivity());
         courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
+        initializeTags();
+    }
+
+    private void initializeTags() {
+        if (getArguments() != null) {
+            tags = getArguments().getStringArrayList(TestpressApiClient.TAGS);
+        }
     }
 
     @Override
@@ -61,7 +70,7 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
                 .where(CourseDao.Properties.IsMyCourse.eq(true))
                 .orderAsc(CourseDao.Properties.Order)
                 .list();
-        return courses;
+        return Course.filterByTags(courses, tags);
     }
 
 
