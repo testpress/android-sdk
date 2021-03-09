@@ -23,39 +23,15 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     private final Activity mActivity;
     private ImageLoader mImageLoader;
     private DisplayImageOptions mOptions;
-    private CourseDao mCourseDao;
-    private List<Course> courses;
     private String productSlug;
 
-    CourseListAdapter(Activity activity, CourseDao courseDao, List<Course> courses, String productSlug) {
+    CourseListAdapter(Activity activity, List<Course> courses, String productSlug) {
         super(activity.getLayoutInflater(), R.layout.testpress_course_list_item);
         mActivity = activity;
         mImageLoader = ImageUtils.initImageLoader(activity);
         mOptions = ImageUtils.getPlaceholdersOption();
-        mCourseDao = courseDao;
-        this.courses = courses;
         this.productSlug = productSlug;
-    }
-
-    @Override
-    public int getCount() {
-        if (!courses.isEmpty()) {
-            return courses.size();
-        }
-
-        return (int) mCourseDao.queryBuilder().where(CourseDao.Properties.IsMyCourse.eq(true)).count();
-    }
-
-    @Override
-    public Course getItem(int position) {
-        if (!courses.isEmpty()) {
-            return courses.get(position);
-        }
-
-        return mCourseDao.queryBuilder()
-                .where(CourseDao.Properties.IsMyCourse.eq(true))
-                .orderAsc(CourseDao.Properties.Order)
-                .listLazy().get(position);
+        setItems(courses);
     }
 
     @Override

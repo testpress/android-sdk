@@ -53,8 +53,15 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
 
     @Override
     protected SingleTypeAdapter<Course> createAdapter(List<Course> items) {
-        List<Course> courses = new ArrayList<>();
-        return new CourseListAdapter(getActivity(), courseDao, courses, null);
+        return new CourseListAdapter(getActivity(), getCourses(), null);
+    }
+
+    private List<Course> getCourses() {
+        List<Course> courses = courseDao.queryBuilder()
+                .where(CourseDao.Properties.IsMyCourse.eq(true))
+                .orderAsc(CourseDao.Properties.Order)
+                .list();
+        return courses;
     }
 
 
@@ -79,10 +86,9 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
         }
 
         this.exception = null;
-        this.items = courses;
         unassignLocalCourses();
         storeCourses(courses);
-        displayDataFromDB();
+        updateItems(getCourses());
         showList();
     }
 

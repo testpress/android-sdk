@@ -78,7 +78,7 @@ public class CoursePreviewFragment extends BaseListViewFragment<Course> {
     protected SingleTypeAdapter<Course> createAdapter(
             List<Course> items) {
         courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.in(courseIds)).list();
-        return new CourseListAdapter(getActivity(), courseDao, courses, productSlug);
+        return new CourseListAdapter(getActivity(), courses, productSlug);
     }
 
     @NonNull
