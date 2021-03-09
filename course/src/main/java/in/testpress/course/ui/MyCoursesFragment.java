@@ -1,12 +1,16 @@
 package in.testpress.course.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+
 import androidx.fragment.app.FragmentActivity;
 import androidx.loader.content.Loader;
 
 import org.greenrobot.greendao.AbstractDao;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import in.testpress.core.TestpressException;
@@ -17,6 +21,7 @@ import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.course.pagers.CoursePager;
 import in.testpress.course.api.TestpressCourseApiClient;
+import in.testpress.network.TestpressApiClient;
 import in.testpress.ui.BaseDataBaseFragment;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -24,6 +29,7 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
 
     private TestpressCourseApiClient mApiClient;
     private CourseDao courseDao;
+    private ArrayList<String> tags = new ArrayList<String>();
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
@@ -36,6 +42,13 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
         super.onCreate(savedInstanceState);
         mApiClient = new TestpressCourseApiClient(getActivity());
         courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
+        parseArguments();
+    }
+
+    private void parseArguments() {
+        if (getArguments() != null) {
+            tags = getArguments().getStringArrayList(TestpressApiClient.TAGS);
+        }
     }
 
     @Override
@@ -61,9 +74,22 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
                 .where(CourseDao.Properties.IsMyCourse.eq(true))
                 .orderAsc(CourseDao.Properties.Order)
                 .list();
-        return courses;
+        return filteredCourses(courses);
     }
 
+    public List<Course> filteredCourses(List<Course> courses) {
+        if (tags == null || tags.isEmpty()) {
+            return courses;
+        }
+
+        ArrayList<Course> filteredCourses = new ArrayList<Course>();
+        for (Course course : courses) {
+            if (course.getTags() != null && !Collections.disjoint(course.getTags(), tags)) {
+                filteredCourses.add(course);
+            }
+        }
+        return filteredCourses;
+    }
 
     @Override
     protected boolean isItemsEmpty() {
@@ -89,7 +115,18 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
         unassignLocalCourses();
         storeCourses(courses);
         updateItems(getCourses());
+        if (getCourses().size() == 1) {
+            openCourseDetail(getCourses().get(0));
+        }
         showList();
+    }
+
+    private void openCourseDetail(Course course) {
+        Intent intent = ChapterDetailActivity.createIntent(
+                course.getTitle(),
+                course.getId().toString(), getContext(), null);
+        startActivity(intent);
+        getActivity().finish();
     }
 
     private void refreshLastSyncedDate() {

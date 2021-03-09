@@ -56,6 +56,7 @@ public class TestpressApiClient {
     public static final String PAGE = "page";
     public static final String PAGE_SIZE = "page_size";
     public static final String PARENT = "parent";
+    public static final String TAGS = "tags";
 
     public static final String SINCE = "since";
     public static final String UNTIL = "until";
