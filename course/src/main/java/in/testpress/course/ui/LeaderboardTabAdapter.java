@@ -1,21 +1,24 @@
 package in.testpress.course.ui;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
+import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
+import in.testpress.models.InstituteSettings;
 
 class LeaderboardTabAdapter extends FragmentPagerAdapter {
-    private final Resources resources;
+    private InstituteSettings instituteSettings;
     private Bundle bundle;
 
-    LeaderboardTabAdapter(Resources resources, FragmentManager fragmentManager, Bundle bundle) {
+    LeaderboardTabAdapter(Context context, FragmentManager fragmentManager, Bundle bundle) {
         super(fragmentManager);
-        this.resources = resources;
         this.bundle = bundle;
+        instituteSettings = TestpressSdk.getTestpressSession(context).getInstituteSettings();
     }
 
     @Override
@@ -45,9 +48,9 @@ class LeaderboardTabAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(final int position) {
         switch (position) {
             case 0:
-                return resources.getString(R.string.testpress_leaderboard);
+                return instituteSettings.getLeaderboardLabel();
             case 1:
-                return resources.getString(R.string.testpress_targets_or_threads);
+                return instituteSettings.getThreatsAndTargetsLabel();
             default:
                 return null;
         }

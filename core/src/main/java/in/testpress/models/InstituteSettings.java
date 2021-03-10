@@ -31,6 +31,8 @@ public class InstituteSettings {
     private boolean isFirebaseEventTrackingEnabled;
     private boolean isBranchEventTrackingEnabled;
     private long serverTime;
+    private String leaderboardLabel;
+    private String threatsAndTargetsLabel;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -264,6 +266,30 @@ public class InstituteSettings {
 
     public InstituteSettings setServerTime(long serverTime) {
         this.serverTime = serverTime;
+        return this;
+    }
+
+    public String getLeaderboardLabel() {
+        if (leaderboardLabel == null) {
+            return "Leaderboard";
+        }
+        return leaderboardLabel;
+    }
+
+    public InstituteSettings setLeaderboardLabel(String leaderboardLabel) {
+        this.leaderboardLabel = leaderboardLabel;
+        return this;
+    }
+
+    public String getThreatsAndTargetsLabel() {
+        if (threatsAndTargetsLabel == null) {
+            return "Threats / Targets";
+        }
+        return threatsAndTargetsLabel;
+    }
+
+    public InstituteSettings setThreatsAndTargetsLabel(String threatsAndTargetsLabel) {
+        this.threatsAndTargetsLabel = threatsAndTargetsLabel;
         return this;
     }
 }

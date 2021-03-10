@@ -93,7 +93,7 @@ public class LeaderboardFragment extends BaseFragment {
                         }
                         Bundle bundle = new Bundle();
                         bundle.putParcelable(PARAM_USER_REPUTATION, reputation);
-                        LeaderboardTabAdapter adapter = new LeaderboardTabAdapter(getResources(),
+                        LeaderboardTabAdapter adapter = new LeaderboardTabAdapter(getContext(),
                                 getChildFragmentManager(), bundle);
 
                         viewPager.setAdapter(adapter);
