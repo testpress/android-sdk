@@ -10,6 +10,7 @@ android {
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
+        multiDexEnabled true
         versionName VERSION_NAME
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,6 +37,7 @@ dependencies {
     testImplementation rootProject.roboelectric
     testImplementation rootProject.androidxCore
     testImplementation rootProject.mockServer
+    implementation "androidx.multidex:multidex:2.0.1"
     testImplementation "androidx.arch.core:core-testing:2.1.0"
 }
 
