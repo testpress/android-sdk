@@ -17,11 +17,11 @@ import android.widget.Toast;
 import com.payu.india.Model.PaymentDetails;
 import com.payu.india.Model.PaymentParams;
 import com.payu.india.Model.PayuConfig;
-import com.payu.india.Model.PostData;
 import com.payu.india.Payu.Payu;
 import com.payu.india.Payu.PayuConstants;
 import com.payu.india.Payu.PayuErrors;
 import com.payu.india.PostParams.PaymentPostParams;
+import com.payu.paymentparamhelper.PostData;
 
 import java.util.ArrayList;
 

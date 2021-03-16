@@ -3,12 +3,14 @@ package in.testpress.store.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -16,11 +18,23 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.payu.india.Model.PaymentParams;
-import com.payu.india.Model.PayuConfig;
-import com.payu.india.Model.PayuHashes;
-import com.payu.india.Payu.PayuConstants;
+import androidx.appcompat.app.AlertDialog;
 
+import com.payu.base.models.ErrorResponse;
+import com.payu.base.models.OrderDetails;
+import com.payu.base.models.PayUPaymentParams;
+import com.payu.checkoutpro.PayUCheckoutPro;
+import com.payu.checkoutpro.models.PayUCheckoutProConfig;
+import com.payu.checkoutpro.utils.PayUCheckoutProConstants;
+import com.payu.india.Payu.PayuConstants;
+import com.payu.ui.model.listeners.PayUCheckoutProListener;
+import com.payu.ui.model.listeners.PayUHashGenerationListener;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +48,7 @@ import in.testpress.store.models.OrderConfirmErrorDetails;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
 import in.testpress.store.network.StoreApiClient;
-import in.testpress.store.payu.PaymentModeActivity;
+import in.testpress.store.payu.PayuPayment;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.EventsTrackerFacade;
 import in.testpress.util.FBEventsTrackerFacade;
@@ -42,6 +56,8 @@ import in.testpress.util.TextWatcherAdapter;
 import in.testpress.util.UIUtils;
 
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
+import static com.payu.checkoutpro.utils.PayUCheckoutProConstants.CP_HASH_NAME;
+import static com.payu.checkoutpro.utils.PayUCheckoutProConstants.CP_HASH_STRING;
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 import static in.testpress.store.network.StoreApiClient.URL_PAYMENT_RESPONSE_HANDLER;
 import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
@@ -49,6 +65,7 @@ import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
 public class OrderConfirmActivity extends BaseToolBarActivity {
 
     public static final String ORDER = "order";
+    private static final String TAG = "OrderConfirmActivity";
 
     private EditText address;
     private EditText zip;
@@ -197,41 +214,57 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
         apiClient.orderConfirm(order)
                 .enqueue(new TestpressCallback<Order>() {
                     @Override
-                    public void onSuccess(Order order) {
+                    public void onSuccess(final Order order) {
                         progressBar.setVisibility(View.GONE);
 
                         //noinspection ConstantConditions
                         String redirectUrl = TestpressSdk.getTestpressSession(OrderConfirmActivity.this)
                                 .getInstituteSettings().getBaseUrl() + URL_PAYMENT_RESPONSE_HANDLER;
 
-                        PaymentParams paymentParams = new PaymentParams();
-                        paymentParams.setKey(order.getApikey());
-                        paymentParams.setTxnId(order.getOrderId());
-                        paymentParams.setAmount(order.getAmount());
-                        paymentParams.setProductInfo(order.getProductInfo());
-                        paymentParams.setFirstName(order.getName());
-                        paymentParams.setEmail(order.getEmail());
-                        paymentParams.setUdf1("");
-                        paymentParams.setUdf2("");
-                        paymentParams.setUdf3("");
-                        paymentParams.setUdf4("");
-                        paymentParams.setUdf5("");
-                        paymentParams.setSurl(redirectUrl);
-                        paymentParams.setFurl(redirectUrl);
+                        PayUPaymentParams payUPaymentParams = new PayuPayment(order, OrderConfirmActivity.this).initializeParameters();
 
-                        PayuConfig payuConfig = new PayuConfig();
-                        payuConfig.setEnvironment(PayuConstants.PRODUCTION_ENV);
+                        PayUCheckoutPro.open(
+                                OrderConfirmActivity.this, payUPaymentParams, new PayUCheckoutProListener() {
+                                    @Override
+                                    public void onPaymentSuccess(@NotNull Object o) {
+                                        showPaymentStatus();
+                                    }
 
-                        PayuHashes payuHashes = new PayuHashes();
-                        payuHashes.setPaymentHash(order.getChecksum());
-                        paymentParams.setHash(payuHashes.getPaymentHash());
-                        payuHashes.setPaymentRelatedDetailsForMobileSdkHash(order.getMobileSdkHash());
+                                    @Override
+                                    public void onPaymentFailure(@NotNull Object o) {
+                                    }
 
-                        Intent intent = new Intent(OrderConfirmActivity.this, PaymentModeActivity.class);
-                        intent.putExtra(PayuConstants.PAYU_CONFIG, payuConfig);
-                        intent.putExtra(PayuConstants.PAYMENT_PARAMS, paymentParams);
-                        intent.putExtra(PayuConstants.PAYU_HASHES, payuHashes);
-                        startActivityForResult(intent, PayuConstants.PAYU_REQUEST_CODE);
+                                    @Override
+                                    public void onPaymentCancel(boolean b) {
+                                    }
+
+                                    @Override
+                                    public void onError(@NotNull ErrorResponse errorResponse) {
+
+                                    }
+
+                                    @Override
+                                    public void generateHash(@NotNull HashMap<String, String> map, @NotNull PayUHashGenerationListener payUHashGenerationListener) {
+                                        String hashName = map.get(CP_HASH_NAME);
+                                        String hashData = map.get(CP_HASH_STRING);
+                                        if (!TextUtils.isEmpty(hashName) && !TextUtils.isEmpty(hashData)) {
+
+                                            String hash = getSHA(hashData + salt);
+                                            if (!TextUtils.isEmpty(hash)) {
+                                                HashMap<String, String> hashMap = new HashMap<>();
+                                                hashMap.put(hashName, hash);
+                                                payUHashGenerationListener.onHashGenerated(hashMap);
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void setWebViewProperties(@Nullable WebView webView, @Nullable Object o) {
+                                        Log.d(TAG, "setWebViewProperties: ");
+                                    }
+                                }
+                        );
+
                     }
 
                     @Override
