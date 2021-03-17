@@ -4,13 +4,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -20,28 +17,14 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 
-import com.payu.base.models.ErrorResponse;
-import com.payu.base.models.OrderDetails;
-import com.payu.base.models.PayUPaymentParams;
-import com.payu.checkoutpro.PayUCheckoutPro;
-import com.payu.checkoutpro.models.PayUCheckoutProConfig;
-import com.payu.checkoutpro.utils.PayUCheckoutProConstants;
 import com.payu.india.Payu.PayuConstants;
-import com.payu.ui.model.listeners.PayUCheckoutProListener;
-import com.payu.ui.model.listeners.PayUHashGenerationListener;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
-import in.testpress.core.TestpressSdk;
 import in.testpress.store.PaymentFactory;
 import in.testpress.store.PaymentGateway;
 import in.testpress.store.PaymentGatewayListener;
@@ -51,7 +34,6 @@ import in.testpress.store.models.OrderConfirmErrorDetails;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
 import in.testpress.store.network.StoreApiClient;
-import in.testpress.store.payu.PayuPayment;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.EventsTrackerFacade;
 import in.testpress.util.FBEventsTrackerFacade;
@@ -59,10 +41,7 @@ import in.testpress.util.TextWatcherAdapter;
 import in.testpress.util.UIUtils;
 
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
-import static com.payu.checkoutpro.utils.PayUCheckoutProConstants.CP_HASH_NAME;
-import static com.payu.checkoutpro.utils.PayUCheckoutProConstants.CP_HASH_STRING;
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
-import static in.testpress.store.network.StoreApiClient.URL_PAYMENT_RESPONSE_HANDLER;
 import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
 
 public class OrderConfirmActivity extends BaseToolBarActivity implements PaymentGatewayListener {
@@ -340,14 +319,20 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         showPaymentStatus();
     }
 
-    @Override
-    public void onPaymentFailure() {
-
+    void showPaymentFailedScreen() {
+        logEvent(EventsTrackerFacade.PAYMENT_SUCCESS);
+        Intent intent = new Intent(this, PaymentFailureActivity.class);
+        startActivity(intent);
     }
 
     @Override
-    public void onPaymentError() {
+    public void onPaymentFailure() {
+        showPaymentFailedScreen();
+    }
 
+    @Override
+    public void onPaymentError(String errorMessage) {
+        showPaymentFailedScreen();
     }
 
     @Override

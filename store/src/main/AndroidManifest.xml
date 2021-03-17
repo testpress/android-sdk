@@ -52,6 +52,12 @@
             android:label="@string/testpress_payment_status"
             android:configChanges="orientation|keyboardHidden|screenSize" />
 
+        <activity
+            android:name=".ui.PaymentFailureActivity"
+            android:theme="@style/TestpressTheme"
+            android:label="Payment Failure"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+
     </application>
 
 </manifest>

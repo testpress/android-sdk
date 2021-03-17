@@ -12,6 +12,6 @@ abstract class PaymentGateway(val order: Order, val context: Activity) {
 interface PaymentGatewayListener {
     fun onPaymentSuccess()
     fun onPaymentFailure()
-    fun onPaymentError()
+    fun onPaymentError(errorMessage: String?)
     fun onPaymentCancel()
 }

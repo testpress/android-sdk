@@ -29,55 +29,16 @@ import com.payu.checkoutpro.utils.PayUCheckoutProConstants.CP_UDF5
 import com.payu.ui.model.listeners.PayUCheckoutProListener
 import com.payu.ui.model.listeners.PayUHashGenerationListener
 import java.util.*
+import kotlin.collections.HashMap
 
 
-class PayuPayment(order: Order, context: Activity): PaymentGateway(order, context) {
+class PayuPaymentGateway(order: Order, context: Activity): PaymentGateway(order, context), PayUCheckoutProListener {
     val instituteSettings: InstituteSettings = TestpressSdk.getTestpressSession(context)!!.instituteSettings
     val redirectURL = instituteSettings.baseUrl + StoreApiClient.URL_PAYMENT_RESPONSE_HANDLER
     val storeApiClient = StoreApiClient(context)
 
     override fun showPaymentPage() {
-        PayUCheckoutPro.open(context, getParameters(), object : PayUCheckoutProListener {
-            override fun onPaymentSuccess(o: Any) {
-                paymentGatewayListener?.onPaymentSuccess()
-            }
-
-            override fun onPaymentFailure(o: Any) {
-                paymentGatewayListener?.onPaymentFailure()
-            }
-            override fun onPaymentCancel(b: Boolean) {
-                paymentGatewayListener?.onPaymentCancel()
-            }
-            override fun onError(errorResponse: ErrorResponse) {
-                paymentGatewayListener?.onPaymentError()
-            }
-
-            override fun generateHash(map: HashMap<String, String?>, hashGenerationListener: PayUHashGenerationListener) {
-                val hashName = map[CP_HASH_NAME]
-                val hashData = map[CP_HASH_STRING]
-
-                if (!TextUtils.isEmpty(hashName) && !TextUtils.isEmpty(hashData)) {
-                    storeApiClient.generateHash(hashData).enqueue(object : TestpressCallback<NetworkHash>(){
-                        override fun onSuccess(result: NetworkHash?) {
-                            val hash = result?.hash ?: ""
-                            val dataMap: HashMap<String, String?> = HashMap()
-                            dataMap[hashName!!] = hash
-                            hashGenerationListener.onHashGenerated(dataMap)
-                        }
-
-                        override fun onException(exception: TestpressException?) {
-                            val dataMap: HashMap<String, String?> = HashMap()
-                            dataMap[hashName!!] = ""
-                            hashGenerationListener.onHashGenerated(dataMap)
-                        }
-                    })
-                }
-            }
-
-            override fun setWebViewProperties(webView: WebView?, o: Any?) {
-            }
-        }
-        )
+        PayUCheckoutPro.open(context, getParameters(), this)
     }
 
     private fun getParameters(): PayUPaymentParams {
@@ -114,5 +75,47 @@ class PayuPayment(order: Order, context: Activity): PaymentGateway(order, contex
         checkoutOrderList.add(PaymentMode(PaymentType.WALLET, PayUCheckoutProConstants.CP_PAYTM))
         val payUCheckoutProConfig = PayUCheckoutProConfig()
         payUCheckoutProConfig.paymentModesOrder = checkoutOrderList
+    }
+
+    override fun generateHash(map: HashMap<String, String?>, hashGenerationListener: PayUHashGenerationListener) {
+        val hashName = map[CP_HASH_NAME]
+        val hashData = map[CP_HASH_STRING]
+
+        if (!TextUtils.isEmpty(hashName) && !TextUtils.isEmpty(hashData)) {
+            storeApiClient.generateHash(hashData).enqueue(object : TestpressCallback<NetworkHash>(){
+                override fun onSuccess(result: NetworkHash?) {
+                    val hash = result?.hash ?: ""
+                    val dataMap: HashMap<String, String?> = HashMap()
+                    dataMap[hashName!!] = hash
+                    hashGenerationListener.onHashGenerated(dataMap)
+                }
+
+                override fun onException(exception: TestpressException?) {
+                    val dataMap: HashMap<String, String?> = HashMap()
+                    dataMap[hashName!!] = ""
+                    hashGenerationListener.onHashGenerated(dataMap)
+                }
+            })
+        }
+    }
+
+    override fun onError(errorResponse: ErrorResponse) {
+        paymentGatewayListener?.onPaymentError(errorResponse.errorMessage)
+    }
+
+    override fun onPaymentCancel(isTxnInitiated: Boolean) {
+        paymentGatewayListener?.onPaymentCancel()
+    }
+
+    override fun onPaymentFailure(response: Any) {
+        paymentGatewayListener?.onPaymentFailure()
+    }
+
+    override fun onPaymentSuccess(response: Any) {
+        paymentGatewayListener?.onPaymentSuccess()
+    }
+
+    override fun setWebViewProperties(webView: WebView?, bank: Any?) {
+
     }
 }
