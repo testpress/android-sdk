@@ -25,7 +25,7 @@ import java.util.List;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
-import in.testpress.store.PaymentFactory;
+import in.testpress.store.PaymentGatewayFactory;
 import in.testpress.store.PaymentGateway;
 import in.testpress.store.PaymentGatewayListener;
 import in.testpress.store.R;
@@ -198,7 +198,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
                     @Override
                     public void onSuccess(final Order order) {
                         progressBar.setVisibility(View.GONE);
-                        PaymentGateway paymentGateway = new PaymentFactory().create(order, OrderConfirmActivity.this);
+                        PaymentGateway paymentGateway = new PaymentGatewayFactory().create(order, OrderConfirmActivity.this);
                         paymentGateway.setPaymentGatewayListener(OrderConfirmActivity.this);
                         paymentGateway.showPaymentPage();
                     }
