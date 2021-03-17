@@ -42,6 +42,9 @@ import java.util.List;
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
+import in.testpress.store.PaymentFactory;
+import in.testpress.store.PaymentGateway;
+import in.testpress.store.PaymentGatewayListener;
 import in.testpress.store.R;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderConfirmErrorDetails;
@@ -62,7 +65,7 @@ import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 import static in.testpress.store.network.StoreApiClient.URL_PAYMENT_RESPONSE_HANDLER;
 import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
 
-public class OrderConfirmActivity extends BaseToolBarActivity {
+public class OrderConfirmActivity extends BaseToolBarActivity implements PaymentGatewayListener {
 
     public static final String ORDER = "order";
     private static final String TAG = "OrderConfirmActivity";
@@ -216,55 +219,9 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
                     @Override
                     public void onSuccess(final Order order) {
                         progressBar.setVisibility(View.GONE);
-
-                        //noinspection ConstantConditions
-                        String redirectUrl = TestpressSdk.getTestpressSession(OrderConfirmActivity.this)
-                                .getInstituteSettings().getBaseUrl() + URL_PAYMENT_RESPONSE_HANDLER;
-
-                        PayUPaymentParams payUPaymentParams = new PayuPayment(order, OrderConfirmActivity.this).initializeParameters();
-
-                        PayUCheckoutPro.open(
-                                OrderConfirmActivity.this, payUPaymentParams, new PayUCheckoutProListener() {
-                                    @Override
-                                    public void onPaymentSuccess(@NotNull Object o) {
-                                        showPaymentStatus();
-                                    }
-
-                                    @Override
-                                    public void onPaymentFailure(@NotNull Object o) {
-                                    }
-
-                                    @Override
-                                    public void onPaymentCancel(boolean b) {
-                                    }
-
-                                    @Override
-                                    public void onError(@NotNull ErrorResponse errorResponse) {
-
-                                    }
-
-                                    @Override
-                                    public void generateHash(@NotNull HashMap<String, String> map, @NotNull PayUHashGenerationListener payUHashGenerationListener) {
-                                        String hashName = map.get(CP_HASH_NAME);
-                                        String hashData = map.get(CP_HASH_STRING);
-                                        if (!TextUtils.isEmpty(hashName) && !TextUtils.isEmpty(hashData)) {
-
-                                            String hash = getSHA(hashData + salt);
-                                            if (!TextUtils.isEmpty(hash)) {
-                                                HashMap<String, String> hashMap = new HashMap<>();
-                                                hashMap.put(hashName, hash);
-                                                payUHashGenerationListener.onHashGenerated(hashMap);
-                                            }
-                                        }
-                                    }
-
-                                    @Override
-                                    public void setWebViewProperties(@Nullable WebView webView, @Nullable Object o) {
-                                        Log.d(TAG, "setWebViewProperties: ");
-                                    }
-                                }
-                        );
-
+                        PaymentGateway paymentGateway = new PaymentFactory().create(order, OrderConfirmActivity.this);
+                        paymentGateway.setPaymentGatewayListener(OrderConfirmActivity.this);
+                        paymentGateway.showPaymentPage();
                     }
 
                     @Override
@@ -376,5 +333,25 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
         emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0);
         emptyDescView.setText(description);
         retryButton.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onPaymentSuccess() {
+        showPaymentStatus();
+    }
+
+    @Override
+    public void onPaymentFailure() {
+
+    }
+
+    @Override
+    public void onPaymentError() {
+
+    }
+
+    @Override
+    public void onPaymentCancel() {
+
     }
 }
