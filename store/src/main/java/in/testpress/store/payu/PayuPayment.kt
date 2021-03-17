@@ -1,13 +1,15 @@
 package `in`.testpress.store.payu
 
+import `in`.testpress.core.TestpressCallback
+import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.store.PaymentGateway
+import `in`.testpress.store.models.NetworkHash
 import `in`.testpress.store.models.Order
 import `in`.testpress.store.network.StoreApiClient
 import android.app.Activity
 import android.text.TextUtils
-import android.util.Log
 import android.webkit.WebView
 import com.payu.base.models.ErrorResponse
 import com.payu.base.models.PayUPaymentParams
@@ -22,12 +24,13 @@ import com.payu.checkoutpro.utils.PayUCheckoutProConstants.CP_UDF4
 import com.payu.checkoutpro.utils.PayUCheckoutProConstants.CP_UDF5
 import com.payu.ui.model.listeners.PayUCheckoutProListener
 import com.payu.ui.model.listeners.PayUHashGenerationListener
-import java.security.MessageDigest
 import java.util.*
+
 
 class PayuPayment(order: Order, context: Activity): PaymentGateway(order, context) {
     val instituteSettings: InstituteSettings = TestpressSdk.getTestpressSession(context)!!.instituteSettings
     val redirectURL = instituteSettings.baseUrl + StoreApiClient.URL_PAYMENT_RESPONSE_HANDLER
+    val storeApiClient = StoreApiClient(context)
 
     override fun showPaymentPage() {
         PayUCheckoutPro.open(context, getParameters(), object : PayUCheckoutProListener {
@@ -45,20 +48,29 @@ class PayuPayment(order: Order, context: Activity): PaymentGateway(order, contex
                 paymentGatewayListener?.onPaymentError()
             }
 
-            override fun generateHash(map: HashMap<String, String?>, payUHashGenerationListener: PayUHashGenerationListener) {
+            override fun generateHash(map: HashMap<String, String?>, hashGenerationListener: PayUHashGenerationListener) {
                 val hashName = map[CP_HASH_NAME]
                 val hashData = map[CP_HASH_STRING]
+
                 if (!TextUtils.isEmpty(hashName) && !TextUtils.isEmpty(hashData)) {
-                    val hash: String = hashString(hashData!!, "SHA-512")
-                    if (!TextUtils.isEmpty(hash)) {
-                        val hashMap = hashMapOf(hash to hashName)
-                        payUHashGenerationListener.onHashGenerated(hashMap)
-                    }
+                    storeApiClient.generateHash(hashData).enqueue(object : TestpressCallback<NetworkHash>(){
+                        override fun onSuccess(result: NetworkHash?) {
+                            val hash = result?.hash ?: ""
+                            val dataMap: HashMap<String, String?> = HashMap()
+                            dataMap[hashName!!] = hash
+                            hashGenerationListener.onHashGenerated(dataMap)
+                        }
+
+                        override fun onException(exception: TestpressException?) {
+                            val dataMap: HashMap<String, String?> = HashMap()
+                            dataMap[hashName!!] = ""
+                            hashGenerationListener.onHashGenerated(dataMap)
+                        }
+                    })
                 }
             }
 
             override fun setWebViewProperties(webView: WebView?, o: Any?) {
-                Log.d("OrderConfirmActivity", "setWebViewProperties: ")
             }
         }
         )
@@ -88,12 +100,5 @@ class PayuPayment(order: Order, context: Activity): PaymentGateway(order, contex
         additionalParams[CP_UDF5] = ""
         additionalParams[CP_PAYMENT_RELATED_DETAILS_FOR_MOBILE_SDK] = order.mobileSdkHash
         return additionalParams
-    }
-
-    private fun hashString(input: String, algorithm: String): String {
-        return MessageDigest
-                .getInstance(algorithm)
-                .digest(input.toByteArray())
-                .fold("", { str, it -> str + "%02x".format(it) })
     }
 }

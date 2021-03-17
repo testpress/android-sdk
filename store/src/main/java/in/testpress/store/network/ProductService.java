@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
+import in.testpress.store.models.NetworkHash;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.Product;
 import in.testpress.v2_4.models.ApiResponse;
@@ -16,6 +17,7 @@ import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 import static in.testpress.store.network.StoreApiClient.ORDERS_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDER_CONFIRM_PATH;
+import static in.testpress.store.network.StoreApiClient.PAYU_HASH_GENERATOR_PATH;
 
 public interface ProductService {
 
@@ -40,6 +42,8 @@ public interface ProductService {
     @GET(StoreApiClient.V4_PRODUCTS_LIST_PATH)
     RetrofitCall<NetworkProductResponse> getProductsList();
 
+    @POST(PAYU_HASH_GENERATOR_PATH)
+    RetrofitCall<NetworkHash> generateHash(@Body HashMap<String, Object> arguments);
 }
 
 

@@ -8,6 +8,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
+import in.testpress.store.models.NetworkHash;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
@@ -25,6 +26,8 @@ public class StoreApiClient extends TestpressApiClient {
     public static final String ORDER_CONFIRM_PATH = "/confirm/";
 
     public static final String URL_PAYMENT_RESPONSE_HANDLER = "/payments/response/payu/";
+
+    public static final String PAYU_HASH_GENERATOR_PATH = "/api/v2.5/payu/dynamic_hash/";
 
     public StoreApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
@@ -65,5 +68,11 @@ public class StoreApiClient extends TestpressApiClient {
 
     public RetrofitCall<NetworkProductResponse> getProductsList() {
         return getProductService().getProductsList();
+    }
+
+    public RetrofitCall<NetworkHash> generateHash(String key) {
+        HashMap<String, Object> postData = new HashMap<String, Object>();
+        postData.put("data", key);
+        return getProductService().generateHash(postData);
     }
 }
