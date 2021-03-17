@@ -13,7 +13,11 @@ import android.text.TextUtils
 import android.webkit.WebView
 import com.payu.base.models.ErrorResponse
 import com.payu.base.models.PayUPaymentParams
+import com.payu.base.models.PaymentMode
+import com.payu.base.models.PaymentType
 import com.payu.checkoutpro.PayUCheckoutPro
+import com.payu.checkoutpro.models.PayUCheckoutProConfig
+import com.payu.checkoutpro.utils.PayUCheckoutProConstants
 import com.payu.checkoutpro.utils.PayUCheckoutProConstants.CP_HASH_NAME
 import com.payu.checkoutpro.utils.PayUCheckoutProConstants.CP_HASH_STRING
 import com.payu.checkoutpro.utils.PayUCheckoutProConstants.CP_PAYMENT_RELATED_DETAILS_FOR_MOBILE_SDK
@@ -88,6 +92,7 @@ class PayuPayment(order: Order, context: Activity): PaymentGateway(order, contex
                 .setSurl(redirectURL)
                 .setFurl(redirectURL)
                 .setAdditionalParams(getAdditionalParameters())
+        addAdditionalPaymentModes()
         return builder.build()
     }
 
@@ -100,5 +105,14 @@ class PayuPayment(order: Order, context: Activity): PaymentGateway(order, contex
         additionalParams[CP_UDF5] = ""
         additionalParams[CP_PAYMENT_RELATED_DETAILS_FOR_MOBILE_SDK] = order.mobileSdkHash
         return additionalParams
+    }
+
+    private fun addAdditionalPaymentModes() {
+        val checkoutOrderList = ArrayList<PaymentMode>()
+        checkoutOrderList.add(PaymentMode(PaymentType.UPI, PayUCheckoutProConstants.CP_GOOGLE_PAY))
+        checkoutOrderList.add(PaymentMode(PaymentType.WALLET, PayUCheckoutProConstants.CP_PHONEPE))
+        checkoutOrderList.add(PaymentMode(PaymentType.WALLET, PayUCheckoutProConstants.CP_PAYTM))
+        val payUCheckoutProConfig = PayUCheckoutProConfig()
+        payUCheckoutProConfig.paymentModesOrder = checkoutOrderList
     }
 }
