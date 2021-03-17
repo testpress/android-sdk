@@ -11,10 +11,7 @@ import `in`.testpress.store.network.StoreApiClient
 import android.app.Activity
 import android.text.TextUtils
 import android.webkit.WebView
-import com.payu.base.models.ErrorResponse
-import com.payu.base.models.PayUPaymentParams
-import com.payu.base.models.PaymentMode
-import com.payu.base.models.PaymentType
+import com.payu.base.models.*
 import com.payu.checkoutpro.PayUCheckoutPro
 import com.payu.checkoutpro.models.PayUCheckoutProConfig
 import com.payu.checkoutpro.utils.PayUCheckoutProConstants
@@ -36,9 +33,15 @@ class PayuPaymentGateway(order: Order, context: Activity): PaymentGateway(order,
     val instituteSettings: InstituteSettings = TestpressSdk.getTestpressSession(context)!!.instituteSettings
     val redirectURL = instituteSettings.baseUrl + StoreApiClient.URL_PAYMENT_RESPONSE_HANDLER
     val storeApiClient = StoreApiClient(context)
+    val payuConfig = PayUCheckoutProConfig()
+
+    init {
+        addAdditionalPaymentModes()
+        addOrderDetailsToCart()
+    }
 
     override fun showPaymentPage() {
-        PayUCheckoutPro.open(context, getParameters(), this)
+        PayUCheckoutPro.open(context, getParameters(), payuConfig, this)
     }
 
     private fun getParameters(): PayUPaymentParams {
@@ -53,7 +56,6 @@ class PayuPaymentGateway(order: Order, context: Activity): PaymentGateway(order,
                 .setSurl(redirectURL)
                 .setFurl(redirectURL)
                 .setAdditionalParams(getAdditionalParameters())
-        addAdditionalPaymentModes()
         return builder.build()
     }
 
@@ -73,8 +75,13 @@ class PayuPaymentGateway(order: Order, context: Activity): PaymentGateway(order,
         checkoutOrderList.add(PaymentMode(PaymentType.UPI, PayUCheckoutProConstants.CP_GOOGLE_PAY))
         checkoutOrderList.add(PaymentMode(PaymentType.WALLET, PayUCheckoutProConstants.CP_PHONEPE))
         checkoutOrderList.add(PaymentMode(PaymentType.WALLET, PayUCheckoutProConstants.CP_PAYTM))
-        val payUCheckoutProConfig = PayUCheckoutProConfig()
-        payUCheckoutProConfig.paymentModesOrder = checkoutOrderList
+        payuConfig.paymentModesOrder = checkoutOrderList
+    }
+
+    private fun addOrderDetailsToCart() {
+        val orderDetailsList = ArrayList<OrderDetails>()
+        orderDetailsList.add(OrderDetails(order.productInfo, "1"))
+        payuConfig.cartDetails = orderDetailsList
     }
 
     override fun generateHash(map: HashMap<String, String?>, hashGenerationListener: PayUHashGenerationListener) {
