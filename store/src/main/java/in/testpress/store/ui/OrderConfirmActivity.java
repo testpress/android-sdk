@@ -3,7 +3,6 @@ package in.testpress.store.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -16,9 +15,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.payu.india.Model.PaymentParams;
-import com.payu.india.Model.PayuConfig;
-import com.payu.india.Model.PayuHashes;
+import androidx.appcompat.app.AlertDialog;
+
 import com.payu.india.Payu.PayuConstants;
 
 import java.util.ArrayList;
@@ -27,14 +25,15 @@ import java.util.List;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
-import in.testpress.core.TestpressSdk;
+import in.testpress.store.PaymentGatewayFactory;
+import in.testpress.store.PaymentGateway;
+import in.testpress.store.PaymentGatewayListener;
 import in.testpress.store.R;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderConfirmErrorDetails;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
 import in.testpress.store.network.StoreApiClient;
-import in.testpress.store.payu.PaymentModeActivity;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.EventsTrackerFacade;
 import in.testpress.util.FBEventsTrackerFacade;
@@ -43,12 +42,12 @@ import in.testpress.util.UIUtils;
 
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
-import static in.testpress.store.network.StoreApiClient.URL_PAYMENT_RESPONSE_HANDLER;
 import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
 
-public class OrderConfirmActivity extends BaseToolBarActivity {
+public class OrderConfirmActivity extends BaseToolBarActivity implements PaymentGatewayListener {
 
     public static final String ORDER = "order";
+    private static final String TAG = "OrderConfirmActivity";
 
     private EditText address;
     private EditText zip;
@@ -197,41 +196,11 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
         apiClient.orderConfirm(order)
                 .enqueue(new TestpressCallback<Order>() {
                     @Override
-                    public void onSuccess(Order order) {
+                    public void onSuccess(final Order order) {
                         progressBar.setVisibility(View.GONE);
-
-                        //noinspection ConstantConditions
-                        String redirectUrl = TestpressSdk.getTestpressSession(OrderConfirmActivity.this)
-                                .getInstituteSettings().getBaseUrl() + URL_PAYMENT_RESPONSE_HANDLER;
-
-                        PaymentParams paymentParams = new PaymentParams();
-                        paymentParams.setKey(order.getApikey());
-                        paymentParams.setTxnId(order.getOrderId());
-                        paymentParams.setAmount(order.getAmount());
-                        paymentParams.setProductInfo(order.getProductInfo());
-                        paymentParams.setFirstName(order.getName());
-                        paymentParams.setEmail(order.getEmail());
-                        paymentParams.setUdf1("");
-                        paymentParams.setUdf2("");
-                        paymentParams.setUdf3("");
-                        paymentParams.setUdf4("");
-                        paymentParams.setUdf5("");
-                        paymentParams.setSurl(redirectUrl);
-                        paymentParams.setFurl(redirectUrl);
-
-                        PayuConfig payuConfig = new PayuConfig();
-                        payuConfig.setEnvironment(PayuConstants.PRODUCTION_ENV);
-
-                        PayuHashes payuHashes = new PayuHashes();
-                        payuHashes.setPaymentHash(order.getChecksum());
-                        paymentParams.setHash(payuHashes.getPaymentHash());
-                        payuHashes.setPaymentRelatedDetailsForMobileSdkHash(order.getMobileSdkHash());
-
-                        Intent intent = new Intent(OrderConfirmActivity.this, PaymentModeActivity.class);
-                        intent.putExtra(PayuConstants.PAYU_CONFIG, payuConfig);
-                        intent.putExtra(PayuConstants.PAYMENT_PARAMS, paymentParams);
-                        intent.putExtra(PayuConstants.PAYU_HASHES, payuHashes);
-                        startActivityForResult(intent, PayuConstants.PAYU_REQUEST_CODE);
+                        PaymentGateway paymentGateway = new PaymentGatewayFactory().create(order, OrderConfirmActivity.this);
+                        paymentGateway.setPaymentGatewayListener(OrderConfirmActivity.this);
+                        paymentGateway.showPaymentPage();
                     }
 
                     @Override
@@ -343,5 +312,31 @@ public class OrderConfirmActivity extends BaseToolBarActivity {
         emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0);
         emptyDescView.setText(description);
         retryButton.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onPaymentSuccess() {
+        showPaymentStatus();
+    }
+
+    void showPaymentFailedScreen() {
+        logEvent(EventsTrackerFacade.PAYMENT_SUCCESS);
+        Intent intent = new Intent(this, PaymentFailureActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onPaymentFailure() {
+        showPaymentFailedScreen();
+    }
+
+    @Override
+    public void onPaymentError(String errorMessage) {
+        showPaymentFailedScreen();
+    }
+
+    @Override
+    public void onPaymentCancel() {
+
     }
 }
