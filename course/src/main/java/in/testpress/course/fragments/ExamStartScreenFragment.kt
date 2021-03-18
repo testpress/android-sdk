@@ -88,9 +88,16 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         markPerQuestion.text = exam.markPerQuestion
         negativeMarks.text = exam.negativeMarks
         numberOfQuestions.text = exam.numberOfQuestions.toString()
-        descriptionContent.text = exam.description
+        showDescription(exam)
         showOrHideExamDate(exam)
         showExamDuration(exam)
+    }
+
+    private fun showDescription(exam: DomainExamContent) {
+        if (!exam.description.isNullOrEmpty()) {
+            description.visibility = View.VISIBLE
+            descriptionContent.text = exam.description
+        }
     }
 
     private fun showOrHideExamDate(exam: DomainExamContent) {
