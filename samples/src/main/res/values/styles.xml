@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar.Bridge">
         <item name="colorPrimary">@color/actionbar_background</item>
         <item name="colorControlNormal">@color/actionbar_text</item>
         <item name="android:textColorPrimary">@color/actionbar_text</item>

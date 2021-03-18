@@ -3,7 +3,7 @@
     tools:ignore="UnusedResources">
 
     <!-- Base application theme. -->
-    <style name="TestpressTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="TestpressTheme" parent="Theme.MaterialComponents.Light.DarkActionBar.Bridge">
         <item name="colorPrimary">@color/testpress_actionbar_background</item>
         <item name="colorAccent">@color/testpress_color_primary</item>
         <item name="windowActionBar">false</item>
