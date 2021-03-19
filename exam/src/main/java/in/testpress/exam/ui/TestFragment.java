@@ -15,7 +15,6 @@ import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.core.view.ViewCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.core.content.ContextCompat;
 import androidx.loader.content.Loader;
@@ -39,7 +38,6 @@ import android.widget.TextView;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -895,22 +893,26 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                                 return;
                             }
 
-                            if (exception.isForbidden()) {
-                                clearAndLoadSameQuestion(position);
-                            }
+                            TestpressError errorDetails = exception.getErrorBodyAs(exception.getResponse(), TestpressError.class);
 
-                            stopTimer();
-                            progressDialog.dismiss();
-                            TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception) {
-                                @Override
-                                protected void onRetry() {
-                                    if (action == Action.UPDATE_ANSWER) {
-                                        showProgress(R.string.testpress_saving_last_change);
+                            if (exception.isForbidden() && isMaxQuestionsAttemptedError(errorDetails)) {
+                                clearAndLoadSameQuestion(position);
+                                saveAnswerAlertDialog = showMaxQuestionsAttemptedError(errorDetails);
+
+                            } else {
+                                stopTimer();
+                                progressDialog.dismiss();
+                                TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception) {
+                                    @Override
+                                    protected void onRetry() {
+                                        if (action == Action.UPDATE_ANSWER) {
+                                            showProgress(R.string.testpress_saving_last_change);
+                                        }
+                                        saveResult(position, action);
                                     }
-                                    saveResult(position, action);
-                                }
-                            };
-                            saveAnswerAlertDialog = alertDialog.show();
+                                };
+                                saveAnswerAlertDialog = alertDialog.show();
+                            }
                         }
                     });
         } else if (action.equals(Action.PAUSE)) {
@@ -919,12 +921,34 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         }
     }
 
+    private boolean isMaxQuestionsAttemptedError(TestpressError errorDetails) {
+        return errorDetails.getDetail() != null && Objects.equals(errorDetails.getDetail().getErrorCode(), "max_attemptable_questions_limit_reached");
+    }
+
     private void clearAndLoadSameQuestion(int position) {
         final AttemptItem attemptItem = attemptItemList.get(position);
         attemptItem.setSelectedAnswers(new ArrayList());
         attemptItem.saveAnswers(new ArrayList());
         attemptItem.setShortText(null);
         viewPager.setCurrentItem(position);
+    }
+
+    private AlertDialog showMaxQuestionsAttemptedError(TestpressError errorDetails) {
+        String errorMessage = "You have attempted maximum number of questions. Please unanswer any question to attempt this question";
+        if (errorDetails.getDetail().getMessage() != null) {
+            errorMessage = errorDetails.getDetail().getMessage();
+        }
+        return new AlertDialog.Builder(getContext(), R.style.TestpressAppCompatAlertDialogStyle)
+                .setTitle("Maximum questions attempted")
+                .setMessage(errorMessage)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        viewPagerAdapter.notifyDataSetChanged();
+                        dialogInterface.dismiss();
+                    }
+                })
+                .show();
     }
 
     void endSection() {
@@ -1244,7 +1268,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         TestEngineAlertDialog(TestpressException exception) {
             super(getActivity(), R.style.TestpressAppCompatAlertDialogStyle);
             setCancelable(false);
-            TestpressError errorDetails = exception.getErrorBodyAs(exception.getResponse(), TestpressError.class);
 
             if (exception.isNetworkError()) {
                 setTitle(R.string.testpress_no_internet_connection)
@@ -1263,20 +1286,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                                         returnToHistory();
                                     }
                                 });
-            } else if(exception.isForbidden() && errorDetails != null) {
-                if (errorDetails.getDetail() != null && Objects.equals(errorDetails.getDetail().getErrorCode(), "max_attemptable_questions_limit_reached")) {
-                    setTitle("Maximum questions attempted")
-                        .setMessage(errorDetails.getDetail().getMessage())
-                        .setPositiveButton(R.string.testpress_ok,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        viewPagerAdapter.notifyDataSetChanged();
-                                        dialogInterface.dismiss();
-                                    }
-                                });
-                }
-
             } else {
                 setTitle(R.string.testpress_loading_failed)
                         .setMessage(R.string.testpress_some_thing_went_wrong_try_again)
