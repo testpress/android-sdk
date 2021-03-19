@@ -42,9 +42,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import in.testpress.core.TestpressCallback;
+import in.testpress.core.TestpressError;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
@@ -1242,6 +1244,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         TestEngineAlertDialog(TestpressException exception) {
             super(getActivity(), R.style.TestpressAppCompatAlertDialogStyle);
             setCancelable(false);
+            TestpressError errorDetails = exception.getErrorBodyAs(exception.getResponse(), TestpressError.class);
+
             if (exception.isNetworkError()) {
                 setTitle(R.string.testpress_no_internet_connection)
                         .setMessage(R.string.testpress_exam_paused_check_internet)
@@ -1259,10 +1263,10 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                                         returnToHistory();
                                     }
                                 });
-            } else if(exception.isForbidden() && exception.getError().getErrorCode().equals("max_attemptable_questions_limit_reached")) {
-                String errorDetail = exception.getError().getMessage();
-                setTitle("Maximum questions attempted")
-                        .setMessage(errorDetail)
+            } else if(exception.isForbidden() && errorDetails != null) {
+                if (errorDetails.getDetail() != null && Objects.equals(errorDetails.getDetail().getErrorCode(), "max_attemptable_questions_limit_reached")) {
+                    setTitle("Maximum questions attempted")
+                        .setMessage(errorDetails.getDetail().getMessage())
                         .setPositiveButton(R.string.testpress_ok,
                                 new DialogInterface.OnClickListener() {
                                     @Override
@@ -1271,6 +1275,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                                         dialogInterface.dismiss();
                                     }
                                 });
+                }
+
             } else {
                 setTitle(R.string.testpress_loading_failed)
                         .setMessage(R.string.testpress_some_thing_went_wrong_try_again)
