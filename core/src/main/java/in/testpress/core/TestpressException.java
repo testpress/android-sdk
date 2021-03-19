@@ -6,12 +6,9 @@ package in.testpress.core;
  * https://github.com/square/retrofit/tree/master/samples/src/main/java/com/example/retrofit
  */
 
-import android.util.Log;
-
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.internal.LinkedTreeMap;
 
 import java.io.IOException;
 
@@ -48,7 +45,6 @@ public class TestpressException extends RuntimeException {
     private final Kind kind;
     private int statusCode;
     private String message;
-    private TestpressError testpressError;
 
     TestpressException(String message, Response response, Kind kind, Throwable exception) {
         super(message, exception);
