@@ -6,9 +6,12 @@ package in.testpress.core;
  * https://github.com/square/retrofit/tree/master/samples/src/main/java/com/example/retrofit
  */
 
+import android.util.Log;
+
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.internal.LinkedTreeMap;
 
 import java.io.IOException;
 
@@ -45,6 +48,7 @@ public class TestpressException extends RuntimeException {
     private final Kind kind;
     private int statusCode;
     private String message;
+    private TestpressError testpressError;
 
     TestpressException(String message, Response response, Kind kind, Throwable exception) {
         super(message, exception);
@@ -114,5 +118,45 @@ public class TestpressException extends RuntimeException {
 
     public boolean isServerError() {
         return statusCode >= 500 && statusCode < 600;
+    }
+
+    public TestpressError getError() {
+        if (testpressError != null) {
+            return testpressError;
+        }
+
+        LinkedTreeMap errorResponse = getErrorBodyAs(getResponse(), LinkedTreeMap.class);
+        String errorCode = getErrorCode(errorResponse);
+        String errorMessage = getErrorMessage(errorResponse);
+        testpressError = new TestpressError(errorCode, errorMessage);
+        return testpressError;
+    }
+
+    public String getErrorCode(LinkedTreeMap errorResponse) {
+        if (errorResponse.get("error_code") != null && errorResponse.get("error_code") != "") {
+            return (String) errorResponse.get("error_code");
+        } else if (errorResponse.get("detail") != null && errorResponse.get("detail") instanceof LinkedTreeMap) {
+            LinkedTreeMap errorDetail = (LinkedTreeMap) errorResponse.get("detail");
+            if (errorDetail.get("error_code") != null && errorDetail.get("error_code") != "") {
+                return (String) errorDetail.get("error_code");
+            }
+        }
+        return null;
+    }
+
+    public String getErrorMessage(LinkedTreeMap errorResponse) {
+        if (errorResponse.get("message") != null && errorResponse.get("message") != "") {
+            return (String) errorResponse.get("message");
+        } else if (errorResponse.get("detail") != null) {
+            if (errorResponse.get("detail") instanceof LinkedTreeMap) {
+                LinkedTreeMap errorDetail = (LinkedTreeMap) errorResponse.get("detail");
+                if (errorDetail.get("message") != null && errorDetail.get("message") != "") {
+                    return (String) errorDetail.get("message");
+                }
+            } else if (errorResponse.get("detail") instanceof String) {
+                return (String) errorResponse.get("detail");
+            }
+        }
+        return null;
     }
 }

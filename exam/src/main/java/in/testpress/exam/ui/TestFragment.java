@@ -892,6 +892,11 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                                 returnToHistory();
                                 return;
                             }
+
+                            if (exception.isForbidden()) {
+                                clearAndLoadSameQuestion(position);
+                            }
+
                             stopTimer();
                             progressDialog.dismiss();
                             TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception) {
@@ -910,6 +915,14 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             progressDialog.dismiss();
             returnToHistory();
         }
+    }
+
+    private void clearAndLoadSameQuestion(int position) {
+        final AttemptItem attemptItem = attemptItemList.get(position);
+        attemptItem.setSelectedAnswers(new ArrayList());
+        attemptItem.saveAnswers(new ArrayList());
+        attemptItem.setShortText(null);
+        viewPager.setCurrentItem(position);
     }
 
     void endSection() {
@@ -1244,6 +1257,18 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         returnToHistory();
+                                    }
+                                });
+            } else if(exception.isForbidden() && exception.getError().getErrorCode().equals("max_attemptable_questions_limit_reached")) {
+                String errorDetail = exception.getError().getMessage();
+                setTitle("Maximum questions attempted")
+                        .setMessage(errorDetail)
+                        .setPositiveButton(R.string.testpress_ok,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        viewPagerAdapter.notifyDataSetChanged();
+                                        dialogInterface.dismiss();
                                     }
                                 });
             } else {
