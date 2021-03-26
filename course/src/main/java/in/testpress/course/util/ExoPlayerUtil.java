@@ -56,7 +56,9 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -82,7 +84,7 @@ import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 import static in.testpress.course.api.TestpressCourseApiClient.LAST_POSITION;
 import static in.testpress.course.api.TestpressCourseApiClient.TIME_RANGES;
 
-public class ExoPlayerUtil {
+public class ExoPlayerUtil implements VideoTimeRangeListener {
 
     private static final int OVERLAY_POSITION_CHANGE_INTERVAL = 15000; // 15s
 
@@ -99,6 +101,7 @@ public class ExoPlayerUtil {
     private Dialog fullscreenDialog;
     private TrackSelectionDialog trackSelectionDialog;
     private YouTubeOverlay youtubeOverlay;
+    List<String[]> watchedTimeRanges = new ArrayList<>();
 
 
     private Activity activity;
@@ -296,6 +299,7 @@ public class ExoPlayerUtil {
                 .setTrackSelector(trackSelector).build();
 
         player.addListener(new PlayerEventListener());
+        player.addAnalyticsListener(new ExoplayerAnalyticsListener(this));
         playerView.setPlayer(player);
         player.setPlayWhenReady(playWhenReady);
         player.setPlaybackParameters(new PlaybackParameters(speedRate));
@@ -623,11 +627,7 @@ public class ExoPlayerUtil {
         Map<String, Object> parameters = new HashMap<>();
         float currentPosition = getCurrentPosition();
         parameters.put(LAST_POSITION, currentPosition);
-        String[][] timeRanges = new String[][] {{
-                String.valueOf(startPosition),
-                String.valueOf(currentPosition)
-        }};
-        parameters.put(TIME_RANGES, timeRanges);
+        parameters.put(TIME_RANGES, watchedTimeRanges);
         return parameters;
     }
 
@@ -712,6 +712,11 @@ public class ExoPlayerUtil {
         }
     }
 
+    @Override
+    public void onTimeRangeChange(long startTime, long endTime) {
+        watchedTimeRanges.add(new String[]{String.valueOf(startTime), String.valueOf(endTime)});
+    }
+
     private class PlayerEventListener implements Player.EventListener {
         @Override
         public void onPlaybackStateChanged(int playbackState) {
@@ -740,11 +745,6 @@ public class ExoPlayerUtil {
         @Override
         public void onPlayerError(ExoPlaybackException exception) {
             handleError(exception.type == TYPE_SOURCE);
-        }
-
-        @Override
-        public void onPositionDiscontinuity(int reason) {
-            startPosition = getCurrentPosition();
         }
 
         @Override
