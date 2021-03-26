@@ -285,6 +285,7 @@ public class ExoPlayerUtil {
             initializeAudioManager();
         }
         preparePlayer();
+        player.seekTo(getStartPositionInMilliSeconds());
         initializeUsernameOverlay();
         registerListeners();
     }
@@ -297,7 +298,6 @@ public class ExoPlayerUtil {
         player.addListener(new PlayerEventListener());
         playerView.setPlayer(player);
         player.setPlayWhenReady(playWhenReady);
-        player.seekTo(getStartPositionInMilliSeconds());
         player.setPlaybackParameters(new PlaybackParameters(speedRate));
         player.setMediaItem(mediaItem);
         youtubeOverlay.player(player);
