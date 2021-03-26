@@ -64,7 +64,7 @@ open class TrackSelectionDialog(
         trackSelectionView.setAllowAdaptiveSelections(allowAdaptiveSelections)
         trackSelectionView.setAllowMultipleOverrides(false)
         trackSelectionView.setTrackNameProvider(ExoPlayerTrackNameProvider())
-        trackSelectionView.init(mappedTrackInfo, rendererIndex, false, overrides, this)
+        trackSelectionView.init(mappedTrackInfo, rendererIndex, false, overrides, null, this)
     }
 
     private fun setOnClickListeners() {

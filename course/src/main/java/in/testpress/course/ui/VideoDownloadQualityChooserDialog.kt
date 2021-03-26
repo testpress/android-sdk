@@ -96,7 +96,7 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
         hideLoading()
         trackSelectionView.visibility = View.VISIBLE
         this.overrides = overrides
-        trackSelectionView.init(mappedTrackInfo, rendererIndex, false, overrides, this)
+        trackSelectionView.init(mappedTrackInfo, rendererIndex, false, overrides, null, this)
     }
 
     override fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException) {

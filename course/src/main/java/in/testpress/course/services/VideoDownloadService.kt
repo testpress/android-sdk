@@ -17,6 +17,7 @@ import com.google.android.exoplayer2.util.Util
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import java.lang.Exception
 
 class VideoDownloadService : DownloadService(
     FOREGROUND_NOTIFICATION_ID,
@@ -52,10 +53,11 @@ class VideoDownloadService : DownloadService(
     override fun getForegroundNotification(downloads: MutableList<Download>): Notification {
         // TODO : Add intent and also download message
         return notificationHelper.buildProgressNotification(
-            R.drawable.ic_download,
-            null,
-            null,
-            downloads
+                applicationContext,
+                R.drawable.ic_download,
+                null,
+                null,
+                downloads
         )
     }
 
@@ -66,7 +68,7 @@ class VideoDownloadService : DownloadService(
         ) else null
     }
 
-    override fun onDownloadChanged(downloadManager: DownloadManager, download: Download) {
+    override fun onDownloadChanged(downloadManager: DownloadManager, download: Download, finalException: Exception?) {
         var notification: Notification? = null
 
         if (!downloadMonitor.isRunning()) {
@@ -87,18 +89,20 @@ class VideoDownloadService : DownloadService(
     private fun getFailedNotification(): Notification {
         val message = "Download is failed. Please try again"
         return notificationHelper.buildDownloadFailedNotification(
-            R.drawable.ic_download_done,
-            null,
-            message
+                applicationContext,
+                R.drawable.ic_download_done,
+                null,
+                message
         )
     }
 
     private fun getCompletedNotification(): Notification {
         val message = "Download is completed"
         return notificationHelper.buildDownloadCompletedNotification(
-            R.drawable.ic_download_done,
-            null,
-            message
+                applicationContext,
+                R.drawable.ic_download_done,
+                null,
+                message
         )
     }
 
