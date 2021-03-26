@@ -129,6 +129,24 @@
             android:textSize="16sp" />
 
         <LinearLayout
+            android:id="@+id/description_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="5dp"
+            android:visibility="gone"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="3"
+                android:textColor="@color/testpress_text_gray_medium"
+                android:id="@+id/description"
+                android:textSize="12sp"
+                />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/content_details_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
