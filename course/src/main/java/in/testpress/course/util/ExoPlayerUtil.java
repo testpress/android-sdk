@@ -710,10 +710,9 @@ public class ExoPlayerUtil {
         }
     }
 
-    private class PlayerEventListener extends Player.DefaultEventListener {
-
+    private class PlayerEventListener implements Player.EventListener {
         @Override
-        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        public void onPlaybackStateChanged(int playbackState) {
             if (usbConnectionStateReceiver != null && !isScreenCasted() &&
                     CommonUtils.isUsbConnected(activity)) {
                 
@@ -732,13 +731,8 @@ public class ExoPlayerUtil {
             } else {
                 progressBar.setVisibility(View.GONE);
             }
-            if (playbackState == Player.STATE_IDLE || playbackState == Player.STATE_ENDED ||
-                    !playWhenReady) {
 
-                playerView.setKeepScreenOn(false);
-            } else {
-                playerView.setKeepScreenOn(true);
-            }
+            playerView.setKeepScreenOn(playbackState != Player.STATE_IDLE && playbackState != Player.STATE_ENDED);
         }
 
         @Override
@@ -748,13 +742,11 @@ public class ExoPlayerUtil {
 
         @Override
         public void onPositionDiscontinuity(int reason) {
-            super.onPositionDiscontinuity(reason);
             startPosition = getCurrentPosition();
         }
 
         @Override
         public void onSeekProcessed() {
-            super.onSeekProcessed();
             updateVideoAttempt();
         }
     }
