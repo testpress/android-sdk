@@ -526,12 +526,14 @@ public class ExoPlayerUtil {
     }
 
     public void onPause() {
+        updateVideoAttempt();
         if (Util.SDK_INT <= 23) {
             releasePlayer();
         }
     }
 
     public void onStop() {
+        updateVideoAttempt();
         if (Util.SDK_INT > 23) {
             releasePlayer();
         }
