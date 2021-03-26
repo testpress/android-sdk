@@ -8,6 +8,7 @@ import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.exam.api.TestpressExamApiClient.STATE_PAUSED
 import `in`.testpress.util.ViewUtils
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -88,15 +89,15 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         markPerQuestion.text = exam.markPerQuestion
         negativeMarks.text = exam.negativeMarks
         numberOfQuestions.text = exam.numberOfQuestions.toString()
-        showDescription(exam)
+        showDescription()
         showOrHideExamDate(exam)
         showExamDuration(exam)
     }
 
-    private fun showDescription(exam: DomainExamContent) {
-        if (!exam.description.isNullOrEmpty()) {
+    private fun showDescription() {
+        if (!content.description.isNullOrEmpty()) {
             description.visibility = View.VISIBLE
-            descriptionContent.text = exam.description
+            descriptionContent.text = Html.fromHtml(content.description)
         }
     }
 
