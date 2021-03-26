@@ -3,7 +3,7 @@ package `in`.testpress.course.util
 import `in`.testpress.util.TimeUtils.convertMilliSecondsToSeconds
 import com.google.android.exoplayer2.analytics.AnalyticsListener
 
-class ExoplayerAnalyticsListener(val watchPositionListener: VideoWatchPositionListener): AnalyticsListener {
+class ExoplayerAnalyticsListener(val videoTimeRangeListener: VideoTimeRangeListener): AnalyticsListener {
     var endPosition: Long = 0
     var startPosition: Long = 0
 
@@ -12,7 +12,7 @@ class ExoplayerAnalyticsListener(val watchPositionListener: VideoWatchPositionLi
         endPosition = convertMilliSecondsToSeconds(eventTime.currentPlaybackPositionMs).toLong()
 
         if (startPosition < endPosition) {
-            watchPositionListener.onWatchDurationChange(startPosition, endPosition)
+            videoTimeRangeListener.onTimeRangeChange(startPosition, endPosition)
         }
     }
 
@@ -22,6 +22,6 @@ class ExoplayerAnalyticsListener(val watchPositionListener: VideoWatchPositionLi
     }
 }
 
-interface VideoWatchPositionListener {
-    fun onWatchDurationChange(startTime: Long, endTime: Long)
+interface VideoTimeRangeListener {
+    fun onTimeRangeChange(startTime: Long, endTime: Long)
 }

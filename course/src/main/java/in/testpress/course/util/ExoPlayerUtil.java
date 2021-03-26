@@ -84,10 +84,9 @@ import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 import static in.testpress.course.api.TestpressCourseApiClient.LAST_POSITION;
 import static in.testpress.course.api.TestpressCourseApiClient.TIME_RANGES;
 
-public class ExoPlayerUtil implements VideoWatchPositionListener {
+public class ExoPlayerUtil implements VideoTimeRangeListener {
 
     private static final int OVERLAY_POSITION_CHANGE_INTERVAL = 15000; // 15s
-    private static final String TAG = "ExoPlayerUtil";
 
     private FrameLayout exoPlayerMainFrame;
     private View exoPlayerLayout;
@@ -102,7 +101,7 @@ public class ExoPlayerUtil implements VideoWatchPositionListener {
     private Dialog fullscreenDialog;
     private TrackSelectionDialog trackSelectionDialog;
     private YouTubeOverlay youtubeOverlay;
-    List<String[]> watchedPositions = new ArrayList<>();
+    List<String[]> watchedTimeRanges = new ArrayList<>();
 
 
     private Activity activity;
@@ -628,7 +627,7 @@ public class ExoPlayerUtil implements VideoWatchPositionListener {
         Map<String, Object> parameters = new HashMap<>();
         float currentPosition = getCurrentPosition();
         parameters.put(LAST_POSITION, currentPosition);
-        parameters.put(TIME_RANGES, watchedPositions);
+        parameters.put(TIME_RANGES, watchedTimeRanges);
         return parameters;
     }
 
@@ -714,8 +713,8 @@ public class ExoPlayerUtil implements VideoWatchPositionListener {
     }
 
     @Override
-    public void onWatchDurationChange(long startTime, long endTime) {
-        watchedPositions.add(new String[]{String.valueOf(startTime), String.valueOf(endTime)});
+    public void onTimeRangeChange(long startTime, long endTime) {
+        watchedTimeRanges.add(new String[]{String.valueOf(startTime), String.valueOf(endTime)});
     }
 
     private class PlayerEventListener implements Player.EventListener {
