@@ -29,8 +29,8 @@ dependencies {
     api project(':exam')
 
     implementation 'com.payu.india:payu-sdk:4.4.3'
-    implementation 'com.payu.india:payu-checkout-pro:1.3.1'
-    implementation 'com.payu.gpay:payu-gpay:1.3.8'
+    api 'com.payu.india:payu-checkout-pro:1.3.1'
+    api 'com.payu.gpay:payu-gpay:1.3.8'
     implementation 'com.payu.phonepe:phonepe-intent:1.5.4'
 
     testImplementation rootProject.junit
