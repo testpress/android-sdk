@@ -530,6 +530,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
     }
 
     public void onPause() {
+        onTimeRangeChange((long)startPosition, (long)getCurrentPosition());
         updateVideoAttempt();
         if (Util.SDK_INT <= 23) {
             releasePlayer();
@@ -537,6 +538,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
     }
 
     public void onStop() {
+        onTimeRangeChange((long)startPosition, (long)getCurrentPosition());
         updateVideoAttempt();
         if (Util.SDK_INT > 23) {
             releasePlayer();
@@ -745,6 +747,11 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
         @Override
         public void onPlayerError(ExoPlaybackException exception) {
             handleError(exception.type == TYPE_SOURCE);
+        }
+
+        @Override
+        public void onPositionDiscontinuity(int reason) {
+            startPosition = getCurrentPosition();
         }
 
         @Override
