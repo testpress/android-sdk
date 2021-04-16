@@ -127,7 +127,7 @@ open class BaseExamWidgetFragment : Fragment() {
     }
 
     private fun updateStartButtonTextAndVisibility(exam: DomainExamContent, pausedAttempt: DomainContentAttempt?) {
-        if (pausedAttempt == null && exam.canBeAttempted()) {
+        if (pausedAttempt == null && content.canExamAttempted()) {
             if (contentAttempts.isEmpty()) {
                 startButton.text = getString(R.string.testpress_start)
             } else {
@@ -155,7 +155,7 @@ open class BaseExamWidgetFragment : Fragment() {
             return
         }
 
-        if (pausedAttempt == null && exam.canBeAttempted()) {
+        if (pausedAttempt == null && content.canExamAttempted()) {
             if (contentAttempts.isEmpty()) {
                 startButton.text = getString(R.string.testpress_start)
             } else {

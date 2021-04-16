@@ -78,6 +78,21 @@ data class DomainContent(
     fun hasAttempted(): Boolean {
         return (attemptsCount ?: 0) > 0
     }
+
+    fun hasNotAttempted() = !hasAttempted()
+
+    private fun canBeRetaken(): Boolean {
+        return exam!!.allowRetake!! &&
+                (attemptsCount!! <= exam!!.maxRetakes!! || exam!!.maxRetakes!! < 0)
+    }
+
+    fun canExamAttempted(): Boolean {
+        if (exam == null) {
+            return false
+        }
+
+        return exam!!.isNotEnded() && (canBeRetaken() || hasNotAttempted()) && !exam!!.isWebOnly()
+    }
 }
 
 fun createDomainContent(contentEntity: ContentEntity): DomainContent {
