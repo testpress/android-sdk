@@ -23,6 +23,7 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 import androidx.appcompat.app.AlertDialog;
 
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -846,6 +847,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         final AttemptItem attemptItem = attemptItemList.get(position);
         final int currentSectionPosition = attempt.getCurrentSectionPosition();
 
+        Log.d("TestFragment", "saveResult: " + attemptItem.getGapFillResponses());
         if (attemptItem.hasChanged()) {
             if (action != Action.UPDATE_ANSWER) {
                 showProgress(R.string.testpress_saving_last_change);

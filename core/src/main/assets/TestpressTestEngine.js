@@ -95,6 +95,10 @@ function onValueChange(element) {
    OptionsSelectionListener.onTextValueChange(element.value)
 }
 
+function onGapValueChange(element) {
+    OptionsSelectionListener.onGapValueChange(Number(element.dataset.order), element.value)
+}
+
 // Common functions
 
 function getWidget(layout) {

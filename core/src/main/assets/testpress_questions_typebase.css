@@ -428,3 +428,21 @@ body.watermark::before {
 video {
     width: 100%
 }
+
+.gap_box {
+    font-family: 'Rubik-Regular', serif;
+    font-size: 14px;
+    border:0;
+    border-bottom: solid 2px #cccccc;
+    padding: 5px;
+    min-height: 20px;
+    margin: 20px 20px 20px 10px;
+    vertical-align: middle;
+    word-wrap: break-word;
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+.gap_box:focus, .gap_box:active, .gap_box:hover {
+  outline: none;
+}

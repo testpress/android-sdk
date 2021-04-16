@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 
 import in.testpress.models.greendao.AttemptSection;
-import in.testpress.util.CommonUtils;
 
 public class AttemptItem implements Parcelable {
 
@@ -24,6 +23,7 @@ public class AttemptItem implements Parcelable {
     private String shortText;
     private String currentShortText;
     private AttemptSection attemptSection;
+    private List<GapFillResponse> gapFillResponses = new ArrayList<>();
 
     AttemptItem() {
         selectedAnswers = new ArrayList<Integer>();
@@ -48,6 +48,7 @@ public class AttemptItem implements Parcelable {
         attemptSection = in.readParcelable(AttemptSection.class.getClassLoader());
         in.readList(selectedAnswers, Integer.class.getClassLoader());
         in.readList(savedAnswers, Integer.class.getClassLoader());
+        in.readList(gapFillResponses, GapFillResponse.class.getClassLoader());
     }
 
     @Override
@@ -67,6 +68,7 @@ public class AttemptItem implements Parcelable {
         dest.writeParcelable(attemptSection, flags);
         dest.writeList(selectedAnswers);
         dest.writeList(savedAnswers);
+        dest.writeList(gapFillResponses);
     }
 
     @Override
@@ -245,5 +247,14 @@ public class AttemptItem implements Parcelable {
 
     public void setAttemptSection(AttemptSection attemptSection) {
         this.attemptSection = attemptSection;
+    }
+
+    public void saveGapFillResponses(List<GapFillResponse> responses) {
+        this.gapFillResponses = gapFillResponses;
+    }
+
+    public List<GapFillResponse> getGapFillResponses() {
+
+        return gapFillResponses;
     }
 }

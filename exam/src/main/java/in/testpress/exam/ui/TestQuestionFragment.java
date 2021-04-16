@@ -4,19 +4,29 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptAnswer;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.AttemptQuestion;
+import in.testpress.exam.models.GapFillResponse;
 import in.testpress.exam.ui.view.WebView;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Language;
@@ -35,6 +45,7 @@ public class TestQuestionFragment extends Fragment {
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
     private InstituteSettings instituteSettings;
+    private HashMap<Integer, String> gapFillResponse = new HashMap<>();
 
     static TestQuestionFragment getInstance(AttemptItem attemptItem, int questionIndex,
                                             Language selectedLanguage) {
@@ -150,6 +161,15 @@ public class TestQuestionFragment extends Fragment {
                 }
             }
             htmlContent += "</table>";
+        } else if (attemptQuestion.getType().equals("G")) {
+            // No Op
+            Document doc = Jsoup.parse(htmlContent);
+            Elements inputs = doc.select("input");
+            for(Element element: inputs){
+                element.attr("oninput", "onGapValueChange(this)");
+                element.addClass("gap_box ");
+            }
+            htmlContent = doc.outerHtml();
         } else {
             boolean numberType = attemptQuestion.getType().equals("N");
             questionsView.setNumberType(numberType);
@@ -181,6 +201,17 @@ public class TestQuestionFragment extends Fragment {
                 selectedOptions.remove((Integer) Integer.parseInt(id));
             }
             attemptItem.saveAnswers(selectedOptions);
+        }
+
+        @JavascriptInterface
+        public void onGapValueChange(int order, String answer) {
+            gapFillResponse.put(order, answer);
+            ArrayList<GapFillResponse> gapFillResponses = new ArrayList<>();
+            for(Map.Entry<Integer, String> entry: gapFillResponse.entrySet()) {
+                gapFillResponses.add(new GapFillResponse(entry.getKey(), entry.getValue()));
+            }
+            attemptItem.saveGapFillResponses(gapFillResponses);
+            Log.d("TestQuestionFragment", "onGapValueChange: " + attemptItem.getGapFillResponses());
         }
 
         @JavascriptInterface
