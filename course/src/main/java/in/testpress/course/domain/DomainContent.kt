@@ -82,8 +82,11 @@ data class DomainContent(
     fun hasNotAttempted() = !hasAttempted()
 
     private fun canBeRetaken(): Boolean {
-        return exam!!.allowRetake!! &&
-                (attemptsCount!! <= exam!!.maxRetakes!! || exam!!.maxRetakes!! < 0)
+        if (exam?.allowRetake == true) {
+            return attemptsCount!! <= exam!!.maxRetakes!!
+        }
+
+        return false
     }
 
     fun canAttemptExam(): Boolean {
