@@ -10,8 +10,6 @@ import `in`.testpress.models.greendao.CourseAttemptDao
 import `in`.testpress.util.FormatDate
 import android.content.Context
 import android.text.format.DateUtils
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.util.Util
 
 data class DomainContent(
     val id: Long,
@@ -81,7 +79,7 @@ data class DomainContent(
 
     fun hasNotAttempted() = !hasAttempted()
 
-    private fun canBeRetaken(): Boolean {
+    private fun canRetakeExam(): Boolean {
         if (exam?.allowRetake == true) {
             return attemptsCount!! <= exam!!.maxRetakes!!
         }
@@ -98,7 +96,7 @@ data class DomainContent(
             return false
         }
 
-        return canBeRetaken() || hasNotAttempted()
+        return canRetakeExam() || hasNotAttempted()
     }
 }
 
