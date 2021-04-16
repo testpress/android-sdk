@@ -86,12 +86,16 @@ data class DomainContent(
                 (attemptsCount!! <= exam!!.maxRetakes!! || exam!!.maxRetakes!! < 0)
     }
 
-    fun canExamAttempted(): Boolean {
+    fun canAttemptExam(): Boolean {
         if (exam == null) {
             return false
         }
 
-        return exam!!.isNotEnded() && (canBeRetaken() || hasNotAttempted()) && !exam!!.isWebOnly()
+        if (exam!!.isEnded() || exam!!.isWebOnly()) {
+            return false
+        }
+
+        return canBeRetaken() || hasNotAttempted()
     }
 }
 

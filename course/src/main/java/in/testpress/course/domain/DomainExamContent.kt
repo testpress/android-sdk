@@ -77,17 +77,6 @@ data class DomainExamContent(
         return false
     }
 
-    fun isNotEnded() = !isEnded()
-
-    fun canBeAttempted(): Boolean {
-        if (isEnded()) {
-            return false
-        }
-        return if (attemptsCount == 0) {
-            !isWebOnly()
-        } else false
-    }
-
     fun hasMultipleLanguages() = languages.size > 1
 }
 
