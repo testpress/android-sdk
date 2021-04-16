@@ -23,7 +23,6 @@ import `in`.testpress.exam.util.RetakeExamUtil
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.fragment.app.Fragment
@@ -127,7 +126,7 @@ open class BaseExamWidgetFragment : Fragment() {
     }
 
     private fun updateStartButtonTextAndVisibility(exam: DomainExamContent, pausedAttempt: DomainContentAttempt?) {
-        if (pausedAttempt == null && exam.canBeAttempted()) {
+        if (pausedAttempt == null && content.canAttemptExam()) {
             if (contentAttempts.isEmpty()) {
                 startButton.text = getString(R.string.testpress_start)
             } else {
@@ -155,7 +154,7 @@ open class BaseExamWidgetFragment : Fragment() {
             return
         }
 
-        if (pausedAttempt == null && exam.canBeAttempted()) {
+        if (pausedAttempt == null && content.canAttemptExam()) {
             if (contentAttempts.isEmpty()) {
                 startButton.text = getString(R.string.testpress_start)
             } else {

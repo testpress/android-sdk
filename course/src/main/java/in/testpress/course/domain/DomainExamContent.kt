@@ -64,12 +64,7 @@ data class DomainExamContent(
         return deviceAccessControl != null && deviceAccessControl == "web"
     }
 
-    private fun canRetake(): Boolean {
-        return allowRetake!! &&
-            (attemptsCount!! <= maxRetakes!! || maxRetakes < 0)
-    }
-
-    private fun isEnded(): Boolean {
+    fun isEnded(): Boolean {
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
         simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
         try {
@@ -80,15 +75,6 @@ data class DomainExamContent(
             e.printStackTrace()
         }
         return false
-    }
-
-    fun canBeAttempted(): Boolean {
-        if (isEnded()) {
-            return false
-        }
-        return if (attemptsCount == 0 || canRetake()) {
-            !isWebOnly()
-        } else false
     }
 
     fun hasMultipleLanguages() = languages.size > 1
