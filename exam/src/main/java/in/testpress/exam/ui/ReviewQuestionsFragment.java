@@ -442,7 +442,11 @@ public class ReviewQuestionsFragment extends Fragment {
                     reviewItem.getShortText() +
                     "</div>";
         } else if (isSingleMCQType || isMultipleMCQType ) {
-            html = getAttemptedAnswer(html, reviewAnswers);
+            String language = null;
+            if (selectedLanguage != null) {
+                language = selectedLanguage.getCode();
+            }
+            html += reviewItem.getAttemptedAnswersHtml(language);
         }
 
         if (isSingleMCQType || isMultipleMCQType || isNumericalType) {
@@ -477,33 +481,6 @@ public class ReviewQuestionsFragment extends Fragment {
                     "</div>";
         }
         return html + "</div>";
-    }
-
-    @NotNull
-    private String getAttemptedAnswer(String html, List<Object> reviewAnswers) {
-        html += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
-                WebViewUtils.getHeadingTags(getString(R.string.testpress_your_answer));
-
-        for (int j = 0; j < reviewAnswers.size(); j++) {
-            ReviewAnswer attemptAnswer;
-            if (reviewAnswers.get(j) instanceof ReviewAnswer) {
-                attemptAnswer = (ReviewAnswer) reviewAnswers.get(j);
-            } else {
-                ReviewAnswerTranslation answerTranslation = (ReviewAnswerTranslation) reviewAnswers.get(j);
-                attemptAnswer = new ReviewAnswer(
-                        answerTranslation.getId(),
-                        answerTranslation.getTextHtml(),
-                        answerTranslation.getIsCorrect(),
-                        answerTranslation.getMarks(),
-                        null
-                );
-            }
-            if (reviewItem.getSelectedAnswers().contains(attemptAnswer.getId().intValue())) {
-                html += "\n" + WebViewUtils.getCorrectAnswerIndexWithTags(j);
-            }
-        }
-        html += "</div>";
-        return html;
     }
 
     private class BookmarkListener {
