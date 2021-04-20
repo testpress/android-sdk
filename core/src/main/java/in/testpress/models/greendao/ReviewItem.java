@@ -346,45 +346,20 @@ public class ReviewItem {
         }
     }
 
-    public String getAttemptedAnswersHtml(String language) {
+    public String getAttemptedAnswersDisplayHtml() {
         String html = "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
                 WebViewUtils.getHeadingTags("Your Answer");
 
-        List<ReviewAnswer> answers = getReviewAnswers(language);
+        List<ReviewAnswer> answers = question.getAnswers();
         for (int j = 0; j < answers.size(); j++) {
             ReviewAnswer attemptAnswer = answers.get(j);
-            if (getSelectedAnswers().contains(attemptAnswer.getId().intValue())) {
+            if (selectedAnswers.contains(attemptAnswer.getId().intValue())) {
                 html += "\n" + WebViewUtils.getCorrectAnswerIndexWithTags(j);
             }
         }
         html += "</div>";
 
         return html;
-    }
-
-    private List<ReviewAnswer> getReviewAnswers(String selectedLanguage) {
-        List<ReviewAnswer> answers = new ArrayList<>();
-        if(selectedLanguage != null && question.getLanguage() != null && !question.getLanguage().equals(selectedLanguage)) {
-            List<ReviewQuestionTranslation> translations = question.getTranslations();
-            for (ReviewQuestionTranslation translation : translations) {
-                if (translation.getLanguage().equals(selectedLanguage)) {
-                    List<ReviewAnswerTranslation> answerTranslations = translation.getAnswers();
-                    for (ReviewAnswerTranslation answerTranslation: answerTranslations) {
-                        answers.add(new ReviewAnswer(
-                                answerTranslation.getId(),
-                                answerTranslation.getTextHtml(),
-                                answerTranslation.getIsCorrect(),
-                                answerTranslation.getMarks(),
-                                null
-                        ));
-                    }
-                }
-            }
-        } else {
-            answers = question.getAnswers();
-        }
-
-        return answers;
     }
     // KEEP METHODS END
 

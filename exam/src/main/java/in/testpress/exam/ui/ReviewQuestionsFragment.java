@@ -31,8 +31,6 @@ import com.theartofdev.edmodo.cropper.CropImage;
 
 import junit.framework.Assert;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -442,11 +440,7 @@ public class ReviewQuestionsFragment extends Fragment {
                     reviewItem.getShortText() +
                     "</div>";
         } else if (isSingleMCQType || isMultipleMCQType ) {
-            String language = null;
-            if (selectedLanguage != null) {
-                language = selectedLanguage.getCode();
-            }
-            html += reviewItem.getAttemptedAnswersHtml(language);
+            html += reviewItem.getAttemptedAnswersDisplayHtml();
         }
 
         if (isSingleMCQType || isMultipleMCQType || isNumericalType) {
