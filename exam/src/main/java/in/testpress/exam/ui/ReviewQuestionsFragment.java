@@ -439,6 +439,8 @@ public class ReviewQuestionsFragment extends Fragment {
                     WebViewUtils.getHeadingTags(getString(R.string.testpress_your_answer)) +
                     reviewItem.getShortText() +
                     "</div>";
+        } else if (isSingleMCQType || isMultipleMCQType ) {
+            html += reviewItem.getAttemptedAnswersDisplayHtml();
         }
 
         if (isSingleMCQType || isMultipleMCQType || isNumericalType) {
@@ -449,12 +451,10 @@ public class ReviewQuestionsFragment extends Fragment {
                     "</div>";
         }
 
-        if (isShortAnswerType || isNumericalType) {
-            html += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
-                    WebViewUtils.getHeadingTags(getString(R.string.testpress_marks_awarded)) +
-                    reviewItem.getMarks() +
-                    "</div>";
-        }
+        html += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
+                WebViewUtils.getHeadingTags(getString(R.string.testpress_marks_awarded)) +
+                reviewItem.getMarks() +
+                "</div>";
 
         // Add explanation with watermark
         String watermark = new Watermark().get(getActivity());
