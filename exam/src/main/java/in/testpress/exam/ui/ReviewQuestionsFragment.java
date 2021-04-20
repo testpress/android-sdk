@@ -31,6 +31,8 @@ import com.theartofdev.edmodo.cropper.CropImage;
 
 import junit.framework.Assert;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -439,6 +441,8 @@ public class ReviewQuestionsFragment extends Fragment {
                     WebViewUtils.getHeadingTags(getString(R.string.testpress_your_answer)) +
                     reviewItem.getShortText() +
                     "</div>";
+        } else if (isSingleMCQType || isMultipleMCQType ) {
+            html = getAttemptedAnswer(html, reviewAnswers);
         }
 
         if (isSingleMCQType || isMultipleMCQType || isNumericalType) {
@@ -449,12 +453,10 @@ public class ReviewQuestionsFragment extends Fragment {
                     "</div>";
         }
 
-        if (isShortAnswerType || isNumericalType) {
-            html += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
-                    WebViewUtils.getHeadingTags(getString(R.string.testpress_marks_awarded)) +
-                    reviewItem.getMarks() +
-                    "</div>";
-        }
+        html += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
+                WebViewUtils.getHeadingTags(getString(R.string.testpress_marks_awarded)) +
+                reviewItem.getMarks() +
+                "</div>";
 
         // Add explanation with watermark
         String watermark = new Watermark().get(getActivity());
@@ -475,6 +477,33 @@ public class ReviewQuestionsFragment extends Fragment {
                     "</div>";
         }
         return html + "</div>";
+    }
+
+    @NotNull
+    private String getAttemptedAnswer(String html, List<Object> reviewAnswers) {
+        html += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
+                WebViewUtils.getHeadingTags(getString(R.string.testpress_your_answer));
+
+        for (int j = 0; j < reviewAnswers.size(); j++) {
+            ReviewAnswer attemptAnswer;
+            if (reviewAnswers.get(j) instanceof ReviewAnswer) {
+                attemptAnswer = (ReviewAnswer) reviewAnswers.get(j);
+            } else {
+                ReviewAnswerTranslation answerTranslation = (ReviewAnswerTranslation) reviewAnswers.get(j);
+                attemptAnswer = new ReviewAnswer(
+                        answerTranslation.getId(),
+                        answerTranslation.getTextHtml(),
+                        answerTranslation.getIsCorrect(),
+                        answerTranslation.getMarks(),
+                        null
+                );
+            }
+            if (reviewItem.getSelectedAnswers().contains(attemptAnswer.getId().intValue())) {
+                html += "\n" + WebViewUtils.getCorrectAnswerIndexWithTags(j);
+            }
+        }
+        html += "</div>";
+        return html;
     }
 
     private class BookmarkListener {
