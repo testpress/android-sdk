@@ -366,19 +366,17 @@ public class ReviewItem {
         List<ReviewAnswer> answers = new ArrayList<>();
         if(selectedLanguage != null && question.getLanguage() != null && !question.getLanguage().equals(selectedLanguage)) {
             List<ReviewQuestionTranslation> translations = question.getTranslations();
-            if (translations.size() > 0 && selectedLanguage != null) {
-                for (ReviewQuestionTranslation translation : translations) {
-                    if (translation.getLanguage().equals(selectedLanguage)) {
-                        List<ReviewAnswerTranslation> answerTranslations = translation.getAnswers();
-                        for (ReviewAnswerTranslation answerTranslation: answerTranslations) {
-                            answers.add(new ReviewAnswer(
-                                    answerTranslation.getId(),
-                                    answerTranslation.getTextHtml(),
-                                    answerTranslation.getIsCorrect(),
-                                    answerTranslation.getMarks(),
-                                    null
-                            ));
-                        }
+            for (ReviewQuestionTranslation translation : translations) {
+                if (translation.getLanguage().equals(selectedLanguage)) {
+                    List<ReviewAnswerTranslation> answerTranslations = translation.getAnswers();
+                    for (ReviewAnswerTranslation answerTranslation: answerTranslations) {
+                        answers.add(new ReviewAnswer(
+                                answerTranslation.getId(),
+                                answerTranslation.getTextHtml(),
+                                answerTranslation.getIsCorrect(),
+                                answerTranslation.getMarks(),
+                                null
+                        ));
                     }
                 }
             }
