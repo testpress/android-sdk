@@ -7,11 +7,13 @@ import `in`.testpress.course.domain.getGreenDaoContentAttempt
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.exam.api.TestpressExamApiClient.STATE_PAUSED
 import `in`.testpress.util.ViewUtils
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 
@@ -30,6 +32,8 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
     private lateinit var negativeMarkLabel: TextView
     private lateinit var dateLabel: TextView
     private lateinit var languageLabel: TextView
+    private lateinit var examStatusDescription: TextView
+    private lateinit var examStatusIcon: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,6 +64,8 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         negativeMarkLabel = view.findViewById(R.id.negative_marks_label)
         dateLabel = view.findViewById(R.id.date_label)
         languageLabel = view.findViewById(R.id.language_label)
+        examStatusDescription = view.findViewById(R.id.exam_status_description)
+        examStatusIcon = view.findViewById(R.id.exam_status_icon)
 
         ViewUtils.setTypeface(
             arrayOf(
@@ -92,6 +98,7 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         showDescription()
         showOrHideExamDate(exam)
         showExamDuration(exam)
+        showExamStatusViews(exam)
     }
 
     private fun showDescription() {
@@ -119,5 +126,32 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
                 examDuration.text = greendaoContentAttempt.assessment.remainingTime
             }
         }
+    }
+
+    private fun showExamStatusViews(exam: DomainExamContent) {
+        if (exam.isEnded()){
+            displayExamEndedView()
+        }
+        else {
+            displayAllTheBestView()
+        }
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun displayExamEndedView(){
+        examStatusDescription.text = getString(R.string.testpress_exam_ended)
+        examStatusDescription.setTextColor(resources.getColor(R.color.testpress_red))
+
+        examStatusIcon.setImageDrawable(resources.getDrawable(R.drawable.ic_baseline_info_24))
+        examStatusIcon.setColorFilter(resources.getColor(R.color.testpress_red))
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun displayAllTheBestView(){
+        examStatusDescription.text = getString(R.string.testpress_all_the_best)
+        examStatusDescription.setTextColor(resources.getColor(R.color.testpress_black))
+
+        examStatusIcon.setImageDrawable(resources.getDrawable(R.drawable.ic_baseline_info_24))
+        examStatusIcon.setColorFilter(resources.getColor(R.color.testpress_black))
     }
 }
