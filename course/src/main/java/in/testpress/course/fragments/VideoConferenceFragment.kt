@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 
 class VideoConferenceFragment : BaseContentDetailFragment() {
     private lateinit var titleView: TextView
@@ -75,8 +76,14 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     }
 
     private fun initializeVideoConferenceHandler(videoConference: DomainVideoConferenceContent?) {
-        videoConferenceHandler =  VideoConferenceHandler(requireContext(), videoConference!!, profileDetails)
-        videoConferenceHandler?.init()
+        try {
+            videoConferenceHandler =  VideoConferenceHandler(requireContext(), videoConference!!, profileDetails)
+            videoConferenceHandler?.init()
+        }
+        catch(e: NoClassDefFoundError){
+            Toast.makeText(context, "Zoom integration is not enabled in the app, please contact admin", Toast.LENGTH_LONG).show()
+        }
+
     }
 
     override fun onDestroy() {
