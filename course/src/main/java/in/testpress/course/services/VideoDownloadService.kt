@@ -5,15 +5,10 @@ import `in`.testpress.course.helpers.VideoDownloadManager
 import `in`.testpress.course.helpers.VideoDownloadMonitor
 import `in`.testpress.course.repository.OfflineVideoRepository
 import `in`.testpress.course.ui.DownloadsActivity
-import android.app.DownloadManager.ACTION_NOTIFICATION_CLICKED
 import android.app.Notification
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.util.Log
-import android.widget.Toast
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
 import com.google.android.exoplayer2.offline.DownloadService
@@ -60,12 +55,12 @@ class VideoDownloadService : DownloadService(
 
     override fun getForegroundNotification(downloads: MutableList<Download>): Notification {
 
-        val notifyPendingIntent = getNotifyPendingIntent()
+        val pendingIntentForNotificationClickAction = getPendingIntentForNotificationClickAction()
 
         return notificationHelper.buildProgressNotification(
                 applicationContext,
                 R.drawable.ic_download,
-                notifyPendingIntent,
+                pendingIntentForNotificationClickAction,
                 null,
                 downloads
         )
@@ -94,18 +89,17 @@ class VideoDownloadService : DownloadService(
             Download.STATE_REMOVING -> downloadMonitor.deleteVideo(download)
         }
 
-        notification?.contentIntent = getNotifyPendingIntent()
+        notification?.contentIntent = getPendingIntentForNotificationClickAction()
         NotificationUtil.setNotification(this, nextNotificationId, notification)
     }
 
-    private fun getNotifyPendingIntent(): PendingIntent{
-        val notifyIntent = Intent(this, DownloadsActivity::class.java).apply {
+    private fun getPendingIntentForNotificationClickAction(): PendingIntent{
+        val intentForNotificationClickAction = Intent(this, DownloadsActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        val notifyPendingIntent = PendingIntent.getActivity(
-                this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
+        return PendingIntent.getActivity(
+                this, 0, intentForNotificationClickAction, PendingIntent.FLAG_UPDATE_CURRENT
         )
-        return notifyPendingIntent
     }
 
     private fun getFailedNotification(): Notification {
