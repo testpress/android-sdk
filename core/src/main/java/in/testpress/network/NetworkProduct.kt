@@ -1,4 +1,4 @@
-package `in`.testpress.store.network
+package `in`.testpress.network
 
 import `in`.testpress.database.CourseEntity
 import `in`.testpress.database.PriceEntity
