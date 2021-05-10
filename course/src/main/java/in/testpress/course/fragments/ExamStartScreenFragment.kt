@@ -151,7 +151,7 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         examStatusDescription.text = getString(R.string.testpress_all_the_best)
         examStatusDescription.setTextColor(resources.getColor(R.color.testpress_black))
 
-        examStatusIcon.setImageDrawable(resources.getDrawable(R.drawable.ic_baseline_info_24))
+        examStatusIcon.setImageDrawable(resources.getDrawable(R.drawable.ic_thumb_up_black_18dp))
         examStatusIcon.setColorFilter(resources.getColor(R.color.testpress_black))
     }
 }
