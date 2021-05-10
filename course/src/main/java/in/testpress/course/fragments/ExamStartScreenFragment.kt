@@ -98,7 +98,7 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         showDescription()
         showOrHideExamDate(exam)
         showExamDuration(exam)
-        showExamStatusViews(exam)
+        showExamStatus(exam)
     }
 
     private fun showDescription() {
@@ -128,17 +128,17 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         }
     }
 
-    private fun showExamStatusViews(exam: DomainExamContent) {
+    private fun showExamStatus(exam: DomainExamContent) {
         if (exam.isEnded()){
-            displayExamEndedView()
+            displayExamEndedMessage()
         }
         else {
-            displayAllTheBestView()
+            displayAllTheBestMessage()
         }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun displayExamEndedView(){
+    private fun displayExamEndedMessage(){
         examStatusDescription.text = getString(R.string.testpress_exam_ended)
         examStatusDescription.setTextColor(resources.getColor(R.color.testpress_red))
 
@@ -147,7 +147,7 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun displayAllTheBestView(){
+    private fun displayAllTheBestMessage(){
         examStatusDescription.text = getString(R.string.testpress_all_the_best)
         examStatusDescription.setTextColor(resources.getColor(R.color.testpress_black))
 
