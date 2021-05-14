@@ -41,6 +41,9 @@ ext {
     exoPlayer = '2.12.3'
     powermock = '2.0.5'
 
+    pomVersion = '1.0.0'
+    pomGroupID = "in.testpress"
+
     junit = 'junit:junit:4.12'
     mockito = 'org.mockito:mockito-core:2.23.4'
     powermockJunit = 'org.powermock:powermock-module-junit4:' + powermock
