@@ -5,21 +5,9 @@ import `in`.testpress.models.ProfileDetails
 import `in`.testpress.util.isEmailValid
 import android.content.Context
 import android.widget.Toast
-import us.zoom.sdk.InMeetingAudioController
-import us.zoom.sdk.InMeetingChatMessage
-import us.zoom.sdk.InMeetingEventHandler
-import us.zoom.sdk.InMeetingServiceListener
-import us.zoom.sdk.JoinMeetingOptions
-import us.zoom.sdk.JoinMeetingParams
-import us.zoom.sdk.MeetingError
-import us.zoom.sdk.MeetingServiceListener
-import us.zoom.sdk.MeetingStatus
+import us.zoom.sdk.*
 import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_MEETING_ID
 import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_PASSWORD
-import us.zoom.sdk.ZoomError
-import us.zoom.sdk.ZoomSDK
-import us.zoom.sdk.ZoomSDKInitParams
-import us.zoom.sdk.ZoomSDKInitializeListener
 
 class ZoomMeetHandler(
     val context: Context,
@@ -173,19 +161,43 @@ class ZoomMeetHandler(
     override fun onMeetingUserJoin(p0: MutableList<Long>?) {
     }
 
+    override fun onRecordingStatus(p0: InMeetingServiceListener.RecordingStatus?) {
+         
+    }
+
     override fun onMeetingUserLeave(p0: MutableList<Long>?) {
     }
 
     override fun onMeetingFail(p0: Int, p1: Int) {
     }
 
+    override fun onFreeMeetingUpgradeToProMeeting() {
+         
+    }
+
+    override fun onClosedCaptionReceived(p0: String?) {
+         
+    }
+
+    override fun onFreeMeetingNeedToUpgrade(p0: FreeMeetingNeedUpgradeType?, p1: String?) {
+         
+    }
+
     override fun onUserAudioTypeChanged(p0: Long) {
+    }
+
+    override fun onFreeMeetingUpgradeToGiftFreeTrialStop() {
+         
     }
 
     override fun onMyAudioSourceTypeChanged(p0: Int) {
     }
 
     override fun onSilentModeChanged(p0: Boolean) {
+    }
+
+    override fun onFreeMeetingUpgradeToGiftFreeTrialStart() {
+         
     }
 
     override fun onMeetingCoHostChanged(p0: Long) {
@@ -234,6 +246,10 @@ class ZoomMeetHandler(
     override fun onUserAudioStatusChanged(p0: Long) {
     }
 
+    override fun onUserAudioStatusChanged(p0: Long, p1: InMeetingServiceListener.AudioStatus?) {
+         
+    }
+
     override fun onUserNameChanged(p0: Long, p1: String?) {
     }
 
@@ -245,5 +261,9 @@ class ZoomMeetHandler(
     }
 
     override fun onUserVideoStatusChanged(p0: Long) {
+    }
+
+    override fun onUserVideoStatusChanged(p0: Long, p1: InMeetingServiceListener.VideoStatus?) {
+         
     }
 }
