@@ -55,12 +55,12 @@ class VideoDownloadService : DownloadService(
 
     override fun getForegroundNotification(downloads: MutableList<Download>): Notification {
 
-        val pendingIntentForNotificationClickAction = getPendingIntentForNotificationClickAction()
+        val navigateToDownloadsActivity = getIntentForNavigateToDownloadsActivity()
 
         return notificationHelper.buildProgressNotification(
                 applicationContext,
                 R.drawable.ic_download,
-                pendingIntentForNotificationClickAction,
+                navigateToDownloadsActivity,
                 null,
                 downloads
         )
@@ -89,16 +89,16 @@ class VideoDownloadService : DownloadService(
             Download.STATE_REMOVING -> downloadMonitor.deleteVideo(download)
         }
 
-        notification?.contentIntent = getPendingIntentForNotificationClickAction()
+        notification?.contentIntent = getIntentForNavigateToDownloadsActivity()
         NotificationUtil.setNotification(this, nextNotificationId, notification)
     }
 
-    private fun getPendingIntentForNotificationClickAction(): PendingIntent{
-        val intentForNotificationClickAction = Intent(this, DownloadsActivity::class.java).apply {
+    private fun getIntentForNavigateToDownloadsActivity(): PendingIntent{
+        val navigateToDownloadsActivity = Intent(this, DownloadsActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         return PendingIntent.getActivity(
-                this, 0, intentForNotificationClickAction, PendingIntent.FLAG_UPDATE_CURRENT
+                this, 0, navigateToDownloadsActivity, PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
 
