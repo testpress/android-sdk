@@ -223,6 +223,7 @@
         tools:ignore="UseCompoundDrawables">
 
         <ImageView
+            android:id="@+id/exam_status_icon"
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:tint="@color/testpress_black"
@@ -231,6 +232,7 @@
             android:src="@drawable/ic_thumb_up_black_18dp" />
 
         <TextView
+            android:id="@+id/exam_status_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/testpress_black"
