@@ -156,7 +156,7 @@ fun ProductWithCoursesAndPrices.asDomainContent(): DomainProductWithCoursesAndPr
     return createDomainProductWithCourse(this)
 }
 
-fun List<ProductWithCoursesAndPrices>.asDomainContent(): List<DomainProductWithCoursesAndPrices> {
+fun List<ProductWithCoursesAndPrices>.asDomainProductWithCoursesAndPrices(): List<DomainProductWithCoursesAndPrices> {
     return this.map {
         createDomainProductWithCourse(it)
     }
