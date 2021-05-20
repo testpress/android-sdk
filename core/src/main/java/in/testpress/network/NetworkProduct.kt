@@ -80,6 +80,35 @@ fun NetworkCourse.asDatabaseModel(): CourseEntity {
     )
 }
 
+fun List<NetworkCourse>.asCourseDatabaseModel(): List<CourseEntity> {
+    return this.map {
+        CourseEntity(
+                image = it.image,
+                examsCount = it.examsCount,
+                created = it.created,
+                description = it.description,
+                title = it.title,
+                chaptersCount = it.chaptersCount,
+                deviceAccessControl = it.deviceAccessControl,
+                createdBy = it.createdBy,
+                enableDiscussions = it.enableDiscussions,
+                url = it.url,
+                contentsCount = it.contentsCount,
+                contentsUrl = it.contentsUrl,
+                chaptersUrl = it.chaptersUrl,
+                modified = it.modified,
+                videosCount = it.videosCount,
+                externalContentLink = it.externalContentLink,
+                id = it.id,
+                attachmentsCount = it.attachmentsCount,
+                slug = it.slug,
+                htmlContentsCount = it.htmlContentsCount,
+                order = it.order,
+                externalLinkLabel = it.externalLinkLabel
+        )
+    }
+}
+
 fun NetworkProduct.asDatabaseModel(): ProductEntity {
     return ProductEntity(
         endDate         = this.endDate,
@@ -95,6 +124,25 @@ fun NetworkProduct.asDatabaseModel(): ProductEntity {
         slug            = this.slug,
         startDate       = this.startDate
     )
+}
+
+fun List<NetworkProduct>.asProductDatabaseModel(): List<ProductEntity> {
+    return this.map {
+        ProductEntity(
+                endDate         = it.endDate,
+                image           = it.image,
+                surl            = it.surl,
+                title           = it.title,
+                paymentLink     = it.paymentLink,
+                buyNowText      = it.buyNowText,
+                furl            = it.furl,
+                id              = it.id,
+                descriptionHtml = it.descriptionHtml,
+                currentPrice    = it.currentPrice,
+                slug            = it.slug,
+                startDate       = it.startDate
+        )
+    }
 }
 
 
@@ -117,4 +165,17 @@ fun NetworkPrice.asDatabaseModel(): PriceEntity {
         endDate   = this.endDate,
         startDate = this.startDate
     )
+}
+
+fun List<NetworkPrice>.asPriceDatabaseModel(): List<PriceEntity> {
+    return this.map {
+        PriceEntity(
+                id        = it.id,
+                name      = it.name,
+                price     = it.price,
+                validity  = it.validity,
+                endDate   = it.endDate,
+                startDate = it.startDate
+        )
+    }
 }
