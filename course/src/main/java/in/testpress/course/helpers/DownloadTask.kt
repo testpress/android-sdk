@@ -31,8 +31,8 @@ class DownloadTask(val url: String, val context: Context) {
         val offlineVideo = OfflineVideo(
             title = content.title,
             description = content.description,
-            duration = content.video!!.duration!!,
-            url = content.video.hlsUrl(),
+            duration = content.video?.duration ?: "0",
+            url = content.video?.hlsUrl(),
             contentId = content.id,
             remoteThumbnail = content.coverImageMedium,
             courseId = content.courseId
