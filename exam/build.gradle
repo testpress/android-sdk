@@ -34,6 +34,7 @@ dependencies {
     api rootProject.chart
     api rootProject.imageCropper
     api rootProject.lottie
+    implementation 'com.github.hedzr:android-file-chooser:1.2.0-SNAPSHOT'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     testImplementation rootProject.junit
     testImplementation rootProject.mockito

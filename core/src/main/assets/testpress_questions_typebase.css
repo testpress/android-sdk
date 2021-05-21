@@ -164,7 +164,8 @@ p {
     margin-right: 10px;
 }
 
-.mark-button {
+
+.mark-button, .upload-button {
     color: #ffffff;
     border: 0px;
     border-radius: 100px;
@@ -176,7 +177,7 @@ p {
     outline: 0;
  }
 
- .unmark-button {
+ .unmark-button, .clear-upload-button {
     color: #ffa31a;
     border: 1px solid #ffa319;
     border-radius: 100px;
@@ -422,4 +423,8 @@ body.watermark::before {
 
 video {
     width: 100%
+}
+
+.upload-button, .clear-upload-button {
+    margin-top: 10px;
 }

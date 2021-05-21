@@ -851,7 +851,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                 showProgress(R.string.testpress_saving_last_change);
             }
             apiClient.postAnswer(attemptItem.getUrlFrag(), attemptItem.getSavedAnswers(),
-                    attemptItem.getCurrentShortText(), attemptItem.getCurrentReview())
+                    attemptItem.getCurrentShortText(), attemptItem.getCurrentReview(), attemptItem.getUnSyncedFiles())
                     .enqueue(new TestpressCallback<AttemptItem>() {
                         @Override
                         public void onSuccess(AttemptItem newAttemptItem) {
@@ -861,6 +861,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             attemptItem.setSelectedAnswers(newAttemptItem.getSelectedAnswers());
                             attemptItem.setShortText(newAttemptItem.getShortText());
                             attemptItem.setReview(newAttemptItem.getReview());
+                            attemptItem.setFiles(newAttemptItem.getFiles());
 
                             if (isNonSectionalOrIBPSExam() || (attempt.hasSectionalLock() && sections.get(currentSectionPosition).equals("Running"))) {
                                 attemptItemList.set(position, attemptItem);
