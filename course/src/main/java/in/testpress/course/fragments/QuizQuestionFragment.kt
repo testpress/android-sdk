@@ -72,7 +72,7 @@ class QuizQuestionFragment : Fragment() {
         viewModel.getUserSelectedAnswers(attemptId).observe(viewLifecycleOwner, Observer {
             when(it.status) {
                 Status.SUCCESS -> {
-                    userSelectedAnswer = it.data?.get(position)!!
+                    userSelectedAnswer = it.data?.sortedBy { it.order }?.get(position)!!
                     initWebview()
                 }
             }
