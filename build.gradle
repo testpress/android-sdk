@@ -49,8 +49,8 @@ ext {
     uiautomator = 'androidx.test.uiautomator:uiautomator:2.2.0'
     espressoCore = 'androidx.test.espresso:espresso-core:3.1.0'
     appcompat = 'com.android.support:appcompat-v7:' + supportLib
-    retrofit2 = 'com.squareup.retrofit2:retrofit:2.1.0'
-    gsonConverter = 'com.squareup.retrofit2:converter-gson:2.1.0'
+    retrofit2 = 'com.squareup.retrofit2:retrofit:2.9.0'
+    gsonConverter = 'com.squareup.retrofit2:converter-gson:2.9.0'
     httpLogInterceptor = 'com.squareup.okhttp3:logging-interceptor:3.4.1'
     design = 'com.google.android.material:material:1.1.0'
     constraintLayout = 'androidx.constraintlayout:constraintlayout:1.1.3'
