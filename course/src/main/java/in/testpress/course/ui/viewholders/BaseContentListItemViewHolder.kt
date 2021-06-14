@@ -62,6 +62,16 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
         contentDetailsContainer.visibility = View.GONE
     }
 
+    private fun showEndedInfo(content: DomainContent) {
+        if (content.getFormattedStart() != null) {
+            scheduledInfo.text = "This content " + content.getFormattedStart()
+        } else {
+            scheduledInfo.text = "Coming soon"
+        }
+        scheduledInfoContainer.visibility = View.VISIBLE
+        contentDetailsContainer.visibility = View.GONE
+    }
+
     private fun showLockIcon() {
         lockContainer.visibility = View.VISIBLE
     }
@@ -86,6 +96,9 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
         itemView.isClickable = false
 
         if (content.isScheduled == true) {
+            showClockIcon()
+            showScheduledInfo(content)
+        } else if (content.hasEnded == true) {
             showClockIcon()
             showScheduledInfo(content)
         } else if (content.isLocked == true) {

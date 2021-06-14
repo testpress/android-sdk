@@ -38,5 +38,6 @@ data class ContentEntity(
     var coverImageSmall: String? = null,
     var coverImageMedium: String? = null,
     var coverImage: String? = null,
-    var nextContentId: Long? = null
+    var nextContentId: Long? = null,
+    var hasEnded: Boolean? = null
 )
