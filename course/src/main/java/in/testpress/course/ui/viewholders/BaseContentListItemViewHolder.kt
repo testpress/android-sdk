@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.util.ImageUtils
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -64,7 +65,7 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
 
     private fun showEndedInfo(content: DomainContent) {
         if (content.getFormattedStart() != null) {
-            scheduledInfo.text = "This content " + content.getFormattedStart()
+            scheduledInfo.text = "This content expired on " + content.getFormattedStart()
         } else {
             scheduledInfo.text = "Coming soon"
         }
@@ -100,7 +101,7 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
             showScheduledInfo(content)
         } else if (content.hasEnded == true) {
             showClockIcon()
-            showScheduledInfo(content)
+            showEndedInfo(content)
         } else if (content.isLocked == true) {
             showLockIcon()
         } else {
