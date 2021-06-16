@@ -57,7 +57,8 @@ data class DomainContent(
     val isCourseAvailable: Boolean?,
     val coverImageSmall: String? = null,
     val coverImageMedium: String? = null,
-    var nextContentId: Long? = null
+    var nextContentId: Long? = null,
+    val hasEnded: Boolean?
 ) {
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
@@ -137,7 +138,8 @@ fun createDomainContent(contentEntity: ContentEntity): DomainContent {
         coverImage = contentEntity.coverImage,
         coverImageSmall = contentEntity.coverImageSmall,
         coverImageMedium = contentEntity.coverImageMedium,
-        nextContentId = contentEntity.nextContentId
+        nextContentId = contentEntity.nextContentId,
+        hasEnded = contentEntity.hasEnded
     )
 }
 
@@ -184,7 +186,8 @@ fun createDomainContent(content: Content): DomainContent {
         coverImageMedium = content.coverImageMedium,
         coverImage = content.coverImage,
         coverImageSmall = content.coverImageSmall,
-        nextContentId = content.nextContentId
+        nextContentId = content.nextContentId,
+        hasEnded = content.hasEnded
     )
 }
 

@@ -68,7 +68,7 @@ class ContentListAdapter(val chapterId: Long,
                 val intent = Intent(context, AvailableCoursesListActivity::class.java)
                 (context as Activity).startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE)
             }
-        } else if (content.isLocked != true && content.isScheduled != true) {
+        } else if (content.isLocked != true && content.isScheduled != true && content.hasEnded != true) {
             context.startActivity(ContentActivity.createIntent(
                     content.id,
                     context,
