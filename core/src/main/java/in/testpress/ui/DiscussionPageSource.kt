@@ -18,15 +18,13 @@ class DiscussionPageSource(private val apiClient: APIClient): PagingSource<Int, 
             val queryParams = hashMapOf<String, Any>("page" to nextPage)
             val response = apiClient.getPosts(queryParams).body()
             val results:List<NetworkForum> = response?.results as List<NetworkForum>
-            Log.d("TAG", "load: ${nextPage}")
             return LoadResult.Page(
-                    data = results,
-                    prevKey = if (nextPage == 1) null else nextPage - 1,
-                    nextKey = if (response?.next != null) nextPage + 1 else null
+                data = results,
+                prevKey = if (nextPage == 1) null else nextPage - 1,
+                nextKey = if (response?.next != null) nextPage + 1 else null
             )
         } catch (e: Exception) {
             e.stackTrace
-            Log.d("TAG", "Error: ${e}")
             return LoadResult.Error(e)
         }
     }

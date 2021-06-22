@@ -27,7 +27,6 @@ open class DiscussionsAdapter(private val onItemClicked: (NetworkForum) -> Unit)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DiscussionViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.forum_list_item, parent, false)
         return DiscussionViewHolder(view) {
-            Log.d("TAG", "onCreateViewHolder: ${getItem(it)?.title}")
             onItemClicked(getItem(it)!!)
         }
     }
@@ -65,7 +64,6 @@ class DiscussionViewHolder(itemView: View, onItemClicked: (Int) -> Unit) : Recyc
         imageLoader = ImageUtils.initImageLoader(itemView.context)
         imageOptions = ImageUtils.getAvatarPlaceholdersOption()
         itemView.setOnClickListener {
-            Log.d("TAG", "Viewholder: ")
             onItemClicked(bindingAdapterPosition)
         }
     }

@@ -11,12 +11,15 @@ import kotlinx.coroutines.flow.Flow
 
 class DiscussionRepository(private val testpressService: APIClient) {
 
-    fun fetchDiscussions(): Flow<PagingData<NetworkForum>> {
-        Log.d("TAG", "fetchDiscussions: ")
+    fun fetchDiscussions(pagingConfig: PagingConfig = getDefaultPageConfig()): Flow<PagingData<NetworkForum>> {
         return Pager(
-                PagingConfig(pageSize = 40, enablePlaceholders = true)
+                pagingConfig
         ) {
             DiscussionPageSource(testpressService)
         }.flow
+    }
+
+    fun getDefaultPageConfig(): PagingConfig {
+        return PagingConfig(pageSize = 40, enablePlaceholders = false)
     }
 }
