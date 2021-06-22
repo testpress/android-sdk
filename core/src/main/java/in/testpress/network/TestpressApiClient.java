@@ -43,7 +43,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class TestpressApiClient {
 
     public static final String SOCIAL_AUTH_PATH= "api/v2.2/social-auth/";
-    public static final String TESTPRESS_AUTH_PATH= "api/v2.2/auth-token/";
+    public static final String TESTPRESS_AUTH_PATH= "api/v2.3/auth-token/";
 
     public static final String PROFILE_DETAILS_PATH= "api/v2.2/me/";
     public static final String ACCOUNT_ACTIVITY_PATH = "api/v2.3/me/login_activity/";
