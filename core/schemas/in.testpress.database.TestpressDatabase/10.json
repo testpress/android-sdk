@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 10,
-    "identityHash": "045deec2a3885f762e501d995aa374d4",
+    "identityHash": "af045d8fe0a7513c35fe6a306e78acb0",
     "entities": [
       {
         "tableName": "ContentEntity",
@@ -864,7 +864,7 @@
       },
       {
         "tableName": "ForumEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `shortWebUrl` TEXT, `shortUrl` TEXT, `webUrl` TEXT, `created` TEXT, `commentsUrl` TEXT, `url` TEXT, `modified` TEXT, `upvotes` INTEGER, `downvotes` INTEGER, `title` TEXT, `summary` TEXT, `isActive` INTEGER, `publishedDate` TEXT, `commentsCount` INTEGER, `isLocked` INTEGER, `subject` INTEGER, `viewsCount` INTEGER, `participantsCount` INTEGER, `lastCommentedTime` TEXT, `contentHtml` TEXT, `isPublic` INTEGER, `shortLink` TEXT, `institute` INTEGER, `slug` TEXT, `isPublished` INTEGER, `isApproved` INTEGER, `forum` INTEGER, `ipAddress` TEXT, `voteId` INTEGER, `typeOfVote` INTEGER, `published` INTEGER, `modifiedDate` INTEGER, `creatorId` INTEGER, `commentorId` INTEGER, `categoryId` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `shortWebUrl` TEXT, `shortUrl` TEXT, `webUrl` TEXT, `created` TEXT, `commentsUrl` TEXT, `url` TEXT, `modified` TEXT, `upvotes` INTEGER, `downvotes` INTEGER, `title` TEXT, `summary` TEXT, `isActive` INTEGER, `publishedDate` TEXT, `commentsCount` INTEGER, `isLocked` INTEGER, `subject` INTEGER, `viewsCount` INTEGER, `participantsCount` INTEGER, `lastCommentedTime` TEXT, `contentHtml` TEXT, `isPublic` INTEGER, `shortLink` TEXT, `institute` INTEGER, `slug` TEXT, `isPublished` INTEGER, `isApproved` INTEGER, `forum` INTEGER, `ipAddress` TEXT, `voteId` INTEGER, `typeOfVote` INTEGER, `published` INTEGER, `modifiedDate` INTEGER, `creatorId` INTEGER, `commentorId` INTEGER, `categoryId` INTEGER, `created_by_id` INTEGER, `created_by_url` TEXT, `created_by_username` TEXT, `created_by_firstName` TEXT, `created_by_lastName` TEXT, `created_by_displayName` TEXT, `created_by_photo` TEXT, `created_by_largeImage` TEXT, `created_by_mediumImage` TEXT, `created_by_mediumSmallImage` TEXT, `created_by_smallImage` TEXT, `created_by_xSmallImage` TEXT, `created_by_miniImage` TEXT, `last_commented_by_id` INTEGER, `last_commented_by_url` TEXT, `last_commented_by_username` TEXT, `last_commented_by_firstName` TEXT, `last_commented_by_lastName` TEXT, `last_commented_by_displayName` TEXT, `last_commented_by_photo` TEXT, `last_commented_by_largeImage` TEXT, `last_commented_by_mediumImage` TEXT, `last_commented_by_mediumSmallImage` TEXT, `last_commented_by_smallImage` TEXT, `last_commented_by_xSmallImage` TEXT, `last_commented_by_miniImage` TEXT, `category_id` INTEGER, `category_name` TEXT, `category_color` TEXT, `category_slug` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -1081,6 +1081,186 @@
             "columnName": "categoryId",
             "affinity": "INTEGER",
             "notNull": false
+          },
+          {
+            "fieldPath": "createdBy.id",
+            "columnName": "created_by_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdBy.url",
+            "columnName": "created_by_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdBy.username",
+            "columnName": "created_by_username",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdBy.firstName",
+            "columnName": "created_by_firstName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdBy.lastName",
+            "columnName": "created_by_lastName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdBy.displayName",
+            "columnName": "created_by_displayName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdBy.photo",
+            "columnName": "created_by_photo",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdBy.largeImage",
+            "columnName": "created_by_largeImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdBy.mediumImage",
+            "columnName": "created_by_mediumImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdBy.mediumSmallImage",
+            "columnName": "created_by_mediumSmallImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdBy.smallImage",
+            "columnName": "created_by_smallImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdBy.xSmallImage",
+            "columnName": "created_by_xSmallImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdBy.miniImage",
+            "columnName": "created_by_miniImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastCommentedBy.id",
+            "columnName": "last_commented_by_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastCommentedBy.url",
+            "columnName": "last_commented_by_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastCommentedBy.username",
+            "columnName": "last_commented_by_username",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastCommentedBy.firstName",
+            "columnName": "last_commented_by_firstName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastCommentedBy.lastName",
+            "columnName": "last_commented_by_lastName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastCommentedBy.displayName",
+            "columnName": "last_commented_by_displayName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastCommentedBy.photo",
+            "columnName": "last_commented_by_photo",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastCommentedBy.largeImage",
+            "columnName": "last_commented_by_largeImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastCommentedBy.mediumImage",
+            "columnName": "last_commented_by_mediumImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastCommentedBy.mediumSmallImage",
+            "columnName": "last_commented_by_mediumSmallImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastCommentedBy.smallImage",
+            "columnName": "last_commented_by_smallImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastCommentedBy.xSmallImage",
+            "columnName": "last_commented_by_xSmallImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastCommentedBy.miniImage",
+            "columnName": "last_commented_by_miniImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "category.id",
+            "columnName": "category_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "category.name",
+            "columnName": "category_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "category.color",
+            "columnName": "category_color",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "category.slug",
+            "columnName": "category_slug",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -1123,12 +1303,142 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "UserEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `url` TEXT, `username` TEXT, `firstName` TEXT, `lastName` TEXT, `displayName` TEXT, `photo` TEXT, `largeImage` TEXT, `mediumImage` TEXT, `mediumSmallImage` TEXT, `smallImage` TEXT, `xSmallImage` TEXT, `miniImage` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "username",
+            "columnName": "username",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "firstName",
+            "columnName": "firstName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastName",
+            "columnName": "lastName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "displayName",
+            "columnName": "displayName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "photo",
+            "columnName": "photo",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "largeImage",
+            "columnName": "largeImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mediumImage",
+            "columnName": "mediumImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mediumSmallImage",
+            "columnName": "mediumSmallImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "smallImage",
+            "columnName": "smallImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "xSmallImage",
+            "columnName": "xSmallImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "miniImage",
+            "columnName": "miniImage",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "CategoryEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `name` TEXT, `color` TEXT, `slug` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "color",
+            "columnName": "color",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "slug",
+            "columnName": "slug",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '045deec2a3885f762e501d995aa374d4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'af045d8fe0a7513c35fe6a306e78acb0')"
     ]
   }
 }

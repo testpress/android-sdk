@@ -1,5 +1,6 @@
 package `in`.testpress.database.entities
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -42,5 +43,11 @@ data class ForumEntity(
     val modifiedDate: Long? = null,
     val creatorId: Long? = null,
     val commentorId: Long? = null,
-    val categoryId: Long? = null
+    val categoryId: Long? = null,
+    @Embedded(prefix = "created_by_")
+    val createdBy: UserEntity? = null,
+    @Embedded(prefix = "last_commented_by_")
+    val lastCommentedBy: UserEntity? = null,
+    @Embedded(prefix = "category_")
+    val category: CategoryEntity? = null
 )

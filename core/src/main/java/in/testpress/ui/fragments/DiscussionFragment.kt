@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.ExperimentalPagingApi
 import androidx.recyclerview.widget.DividerItemDecoration
 import kotlinx.android.synthetic.main.discussion_list.*
 import kotlinx.coroutines.flow.collectLatest
@@ -21,7 +22,6 @@ import kotlinx.coroutines.launch
 
 open class DiscussionFragment: Fragment() {
     open val adapter = DiscussionsAdapter() { forum ->
-        Log.d("TAG", "Clicked forum ${forum.title}")
     }
 
     val viewModel: DiscussionViewModel by viewModels {
@@ -32,12 +32,14 @@ open class DiscussionFragment: Fragment() {
         return inflater.inflate(R.layout.discussion_list, container, false)
     }
 
+    @ExperimentalPagingApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
         fetchPosts()
     }
 
+    @ExperimentalPagingApi
     private fun fetchPosts() {
         lifecycleScope.launch {
             viewModel.fetchPosts().collectLatest { pagingData ->

@@ -1,10 +1,12 @@
-package `in`.testpress.models
+package `in`.testpress.database.entities
 
-import `in`.testpress.database.entities.ForumEntity
-import `in`.testpress.database.entities.UserEntity
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-data class User(
-    val id: Long? = null,
+@Entity
+data class UserEntity(
+    @PrimaryKey
+    var id: Long? = null,
     val url: String? = null,
     val username: String? = null,
     val firstName: String? = null,
@@ -18,8 +20,3 @@ data class User(
     val xSmallImage: String? = null,
     val miniImage: String? = null
 )
-
-
-fun User.asDatabaseModel(): UserEntity {
-    return UserEntity(id, url, username, firstName, lastName, displayName, photo, largeImage, mediumImage, mediumSmallImage, smallImage, xSmallImage, miniImage)
-}

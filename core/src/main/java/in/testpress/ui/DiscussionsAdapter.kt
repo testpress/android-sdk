@@ -2,6 +2,7 @@ package `in`.testpress.ui
 
 import `in`.testpress.R
 import `in`.testpress.core.TestpressSdk
+import `in`.testpress.database.entities.ForumEntity
 import `in`.testpress.models.NetworkForum
 import `in`.testpress.ui.view.RoundedImageView
 import `in`.testpress.util.FormatDate
@@ -21,8 +22,8 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 
 
-open class DiscussionsAdapter(private val onItemClicked: (NetworkForum) -> Unit) :
-        PagingDataAdapter<NetworkForum, DiscussionViewHolder>(COMPARATOR) {
+open class DiscussionsAdapter(private val onItemClicked: (ForumEntity) -> Unit) :
+        PagingDataAdapter<ForumEntity, DiscussionViewHolder>(COMPARATOR) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DiscussionViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.forum_list_item, parent, false)
@@ -38,10 +39,10 @@ open class DiscussionsAdapter(private val onItemClicked: (NetworkForum) -> Unit)
     companion object {
         const val TAG = "DownloadsAdapter"
 
-        private val COMPARATOR = object : DiffUtil.ItemCallback<NetworkForum>() {
-            override fun  areItemsTheSame(oldItem: NetworkForum, newItem: NetworkForum): Boolean = oldItem == newItem
+        private val COMPARATOR = object : DiffUtil.ItemCallback<ForumEntity>() {
+            override fun  areItemsTheSame(oldItem: ForumEntity, newItem: ForumEntity): Boolean = oldItem == newItem
 
-            override fun areContentsTheSame(oldItem: NetworkForum, newItem: NetworkForum): Boolean = oldItem.contentHtml == newItem.contentHtml
+            override fun areContentsTheSame(oldItem: ForumEntity, newItem: ForumEntity): Boolean = oldItem.contentHtml == newItem.contentHtml
                     && oldItem.commentsCount == newItem.commentsCount
         }
     }
@@ -68,14 +69,13 @@ class DiscussionViewHolder(itemView: View, onItemClicked: (Int) -> Unit) : Recyc
         }
     }
 
-    fun bindPost(forumPost: NetworkForum) {
+    fun bindPost(forumPost: ForumEntity) {
         with(forumPost) {
             titleText.text = title
             date.text = FormatDate.getAbbreviatedTimeSpan(simpleDateFormat.parse(created).time)
             viewsCountView.text = viewsCount.toString() + " views"
             ViewUtils.setTypeface(arrayOf(titleText, statusText), TestpressSdk.getRubikMediumFont(itemView.context))
             ViewUtils.setTypeface(arrayOf(date, viewsCountView), TestpressSdk.getRubikRegularFont(itemView.context))
-
             imageLoader.displayImage(createdBy?.mediumImage, roundedImageView, imageOptions)
 
             if (commentsCount === 0 || lastCommentedBy == null) {

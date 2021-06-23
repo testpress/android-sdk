@@ -22,7 +22,7 @@ interface TestpressAPIService {
 class APIClient(context: Context): TestpressApiClient(context, TestpressSdk.getTestpressSession(context)) {
     private fun getService() = retrofit.create(TestpressAPIService::class.java)
 
-    suspend fun getPosts(queryParams: Map<String, Any>): Response<TestpressApiResponse<NetworkForum>> {
+    suspend fun getDiscussions(queryParams: Map<String, Any>): Response<TestpressApiResponse<NetworkForum>> {
         return getService().fetchPosts(queryParams)
     }
 }

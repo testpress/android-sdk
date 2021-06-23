@@ -1,8 +1,16 @@
 package `in`.testpress.models
 
+import `in`.testpress.database.entities.CategoryEntity
+import `in`.testpress.database.entities.ForumEntity
+
 data class NetworkCategory (
     val id: Long? = null,
     val name: String? = null,
     val color: String? = null,
     val slug: String? = null
 )
+
+
+fun NetworkCategory.asDatabaseModel(): CategoryEntity {
+    return CategoryEntity(id, name, color, slug)
+}

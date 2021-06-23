@@ -3,9 +3,7 @@ package `in`.testpress.database
 import `in`.testpress.database.dao.CommentDao
 import `in`.testpress.database.dao.ForumDao
 import `in`.testpress.database.dao.RemoteKeysDao
-import `in`.testpress.database.entities.CommentEntity
-import `in`.testpress.database.entities.ForumEntity
-import `in`.testpress.database.entities.RemoteKeys
+import `in`.testpress.database.entities.*
 import `in`.testpress.database.roommigration.RoomMigration4To5.MIGRATION_4_5
 import `in`.testpress.database.roommigration.RoomMigration5To6.MIGRATION_5_6
 import `in`.testpress.database.roommigration.RoomMigration3To4.MIGRATION_3_4
@@ -28,7 +26,9 @@ import androidx.room.RoomDatabase
             ProductPriceEntity::class,
             CommentEntity::class,
             ForumEntity::class,
-            RemoteKeys::class
+            RemoteKeys::class,
+            UserEntity::class,
+            CategoryEntity::class
         ], exportSchema = true)
 abstract class TestpressDatabase : RoomDatabase() {
     abstract fun contentDao(): ContentDao

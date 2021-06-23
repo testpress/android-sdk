@@ -12,7 +12,6 @@ class DiscussionActivity: BaseToolBarActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.testpress_container_layout)
-        Log.d("TAG", "onCreate: DiscussionActivity")
         val fragment = DiscussionFragment()
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment).commitAllowingStateLoss()
