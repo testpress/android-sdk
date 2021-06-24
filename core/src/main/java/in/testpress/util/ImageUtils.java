@@ -51,4 +51,12 @@ public class ImageUtils {
                 .showImageOnFail(R.drawable.testpress_placeholder_icon)
                 .showImageOnLoading(R.drawable.testpress_placeholder_icon).build();
     }
+
+    public static DisplayImageOptions getAvatarPlaceholdersOption() {
+        return new DisplayImageOptions.Builder().cacheInMemory(true)
+                .cacheOnDisk(true).resetViewBeforeLoading(true)
+                .showImageForEmptyUri(R.drawable.profile_image_place_holder)
+                .showImageOnFail(R.drawable.profile_image_place_holder)
+                .showImageOnLoading(R.drawable.profile_image_place_holder).build();
+    }
 }
