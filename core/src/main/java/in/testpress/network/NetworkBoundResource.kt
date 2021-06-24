@@ -59,7 +59,7 @@ abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
 
     private suspend fun handleResponse(response: Response<NetworkDataType>) {
         if (response.isSuccessful) {
-            saveNetworkResponseToDB(processNetworkResponse(response.body()))
+            saveNetworkResponseToDB(processNetworkResponse(response.body()!!))
             refreshDBSource()
             withContext(Dispatchers.Main) {
                 loadFreshData()
