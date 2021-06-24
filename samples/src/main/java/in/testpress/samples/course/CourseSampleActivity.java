@@ -11,6 +11,7 @@ import in.testpress.course.TestpressCourse;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
+import in.testpress.ui.DiscussionActivity;
 import in.testpress.util.ViewUtils;
 
 import static in.testpress.core.TestpressSdk.COURSE_CHAPTER_REQUEST_CODE;
@@ -36,6 +37,18 @@ public class CourseSampleActivity extends BaseToolBarActivity {
             @Override
             public void onClick(View view) {
                 showSDK(R.id.simple_course);
+            }
+        });
+        findViewById(R.id.discussions_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (TestpressSdk.hasActiveSession(CourseSampleActivity.this)) {
+                    Intent intent = DiscussionActivity.createIntent(CourseSampleActivity.this);
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(CourseSampleActivity.this, TestpressCoreSampleActivity.class);
+                    startActivity(intent);
+                }
             }
         });
         findViewById(R.id.gamified_course).setOnClickListener(new View.OnClickListener() {
