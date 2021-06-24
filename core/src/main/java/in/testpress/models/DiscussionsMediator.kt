@@ -82,7 +82,6 @@ class DiscussionsMediator(val apiClient: APIClient, val database: TestpressDatab
             LoadType.PREPEND -> {
                 val remoteKeys = getFirstRemoteKey(state)
                         ?: throw InvalidObjectException("Invalid state, key should not be null")
-//                end of list condition reached
                 remoteKeys.prevKey ?: return MediatorResult.Success(endOfPaginationReached = true)
                 remoteKeys.prevKey
             }

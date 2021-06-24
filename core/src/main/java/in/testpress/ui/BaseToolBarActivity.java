@@ -45,6 +45,10 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    public Toolbar getActionBarToolbar() {
+        return toolbar;
+    }
+
     public void setActionBarTitle(@StringRes int titleId) {
         //noinspection ConstantConditions
         getSupportActionBar().setTitle(titleId);
