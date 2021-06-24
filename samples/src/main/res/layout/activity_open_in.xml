@@ -54,6 +54,11 @@
 
         <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
+            android:text="Discussions"
+            android:id="@+id/discussions_button" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/Button"
             android:text="Fragment"
             android:id="@+id/fragment_button" />
 

@@ -16,6 +16,9 @@
         <activity
             android:name=".ui.ZoomableImageActivity"
             android:theme="@style/TestpressTheme" />
+        <activity
+            android:name=".ui.DiscussionActivity"
+            android:theme="@style/TestpressTheme" />
     </application>
 
 </manifest>
