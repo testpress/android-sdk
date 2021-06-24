@@ -19,10 +19,10 @@ interface TestpressAPIService {
     ): Response<TestpressApiResponse<NetworkForum>>
 }
 
-class APIClient(context: Context): TestpressApiClient(context, TestpressSdk.getTestpressSession(context)) {
+open class APIClient(context: Context): TestpressApiClient(context, TestpressSdk.getTestpressSession(context)) {
     private fun getService() = retrofit.create(TestpressAPIService::class.java)
 
-    suspend fun getDiscussions(queryParams: Map<String, Any>): Response<TestpressApiResponse<NetworkForum>> {
+    open suspend fun getDiscussions(queryParams: Map<String, Any>): Response<TestpressApiResponse<NetworkForum>> {
         return getService().fetchDiscussions(queryParams)
     }
 }
