@@ -7,16 +7,23 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+
+import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 
 import in.testpress.ui.ZoomableImageActivity;
@@ -77,6 +84,29 @@ public class WebViewUtils {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 return WebViewUtils.this.shouldOverrideUrlLoading(activity, url);
+            }
+
+            @Nullable
+            @Override
+            public WebResourceResponse shouldInterceptRequest(
+                    WebView view, WebResourceRequest request) {
+                Uri source = null;
+                String url = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    source = request.getUrl();
+                    url = request.getUrl().toString();
+                }
+                if (source != null && source.getPath() != null) {
+                    try {
+                        if (ImageUtils.isImage(url)) {
+                            FileInputStream image = ImageUtils.readImageFromCache(url, activity);
+                            return new WebResourceResponse("image/jpeg", "utf-8", image);
+                        }
+                    } catch (IOException e) {
+                        Log.d("WebviewUtils", "Unknown IO-error occurred! Try again...");
+                    }
+                }
+                return null;
             }
 
             @Override
