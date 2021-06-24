@@ -78,6 +78,7 @@ dependencies {
     api 'androidx.paging:paging-runtime-ktx:3.0.0'
     api "androidx.fragment:fragment-ktx:$fragment_version"
     api "androidx.room:room-ktx:2.3.0"
+    api "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
 
     api 'org.jsoup:jsoup:1.13.1'
     testImplementation rootProject.junit
