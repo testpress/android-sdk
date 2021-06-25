@@ -8,6 +8,7 @@ import `in`.testpress.ui.DiscussionsFilterFragment
 import android.app.SearchManager
 import android.content.Context.SEARCH_SERVICE
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.SearchView
@@ -97,6 +98,7 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
         setupViews()
         fetchPosts()
         initializeFilterFragment()
+        setCreateButtonClickListener()
     }
 
 
@@ -123,6 +125,12 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
         rvPosts.adapter = adapter
         val itemDecor = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         rvPosts.addItemDecoration(itemDecor)
+    }
+
+    open fun setCreateButtonClickListener() {
+        create_button.setOnClickListener {
+
+        }
     }
 
     override fun onApplyFilterClick(sortBy: String, category: String) {
