@@ -11,7 +11,7 @@ import retrofit2.HttpException
 import java.io.IOException
 
 @ExperimentalPagingApi
-class DiscussionsMediator(val apiClient: APIClient, val database: TestpressDatabase): RemoteMediator<Int, DiscussionPostEntity>() {
+class DiscussionsMediator(val apiClient: APIClient, val database: TestpressDatabase, val params: HashMap<String, String>): RemoteMediator<Int, DiscussionPostEntity>() {
     private val discussionPostDao = database.forumDao()
     private val remoteKeysDao = database.remoteKeysDao()
 
@@ -28,7 +28,7 @@ class DiscussionsMediator(val apiClient: APIClient, val database: TestpressDatab
         }
 
         try {
-            val queryParams = hashMapOf<String, Any>("page" to page)
+            val queryParams = getQueryParams(page)
             val response = apiClient.getDiscussions(queryParams)
             val responseBody = response.body()
 
@@ -54,6 +54,19 @@ class DiscussionsMediator(val apiClient: APIClient, val database: TestpressDatab
     private suspend fun getNextPageNumber(): Int {
         val remoteKeys = remoteKeysDao.findPageDataForResource("discussions")
         return remoteKeys?.nextKey ?: 1
+    }
+
+    private fun getQueryParams(page: Int): HashMap<String, Any> {
+        val sort = params["sortBy"]
+        val category = params["category"]
+        val queryParams = hashMapOf<String, Any>("page" to page)
+        if (!sort.isNullOrEmpty()) {
+            queryParams["sort"] = sort
+        }
+        if (!category.isNullOrEmpty()) {
+            queryParams["category"] = category
+        }
+        return queryParams
     }
 
     private suspend fun saveData(page: Int, response: TestpressApiResponse<NetworkForum>?) {

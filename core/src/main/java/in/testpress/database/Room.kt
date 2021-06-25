@@ -1,5 +1,6 @@
 package `in`.testpress.database
 
+import `in`.testpress.database.dao.CategoryDao
 import `in`.testpress.database.dao.CommentDao
 import `in`.testpress.database.dao.DiscussionPostDao
 import `in`.testpress.database.dao.RemoteKeysDao
@@ -38,6 +39,7 @@ abstract class TestpressDatabase : RoomDatabase() {
     abstract fun commentDao(): CommentDao
     abstract fun forumDao(): DiscussionPostDao
     abstract fun remoteKeysDao(): RemoteKeysDao
+    abstract fun categoryDao(): CategoryDao
 
     companion object {
         private lateinit var INSTANCE: TestpressDatabase
