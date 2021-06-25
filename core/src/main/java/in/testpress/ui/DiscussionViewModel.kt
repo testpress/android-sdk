@@ -45,8 +45,8 @@ class DiscussionViewModel(
     ).flattenMerge(2)
 
 
-    fun sortAndFilter(sortBy: String, category: String = "") {
-        val data = hashMapOf("sortBy" to sortBy, "category" to category)
+    fun sortAndFilter(sortBy: String, category: String = "", search_query: String = "") {
+        val data = hashMapOf("sortBy" to sortBy, "category" to category, "search" to search_query)
         savedStateHandle.set("params", data)
         clearListChannel.offer(Unit)
     }

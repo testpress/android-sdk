@@ -59,12 +59,16 @@ class DiscussionsMediator(val apiClient: APIClient, val database: TestpressDatab
     private fun getQueryParams(page: Int): HashMap<String, Any> {
         val sort = params["sortBy"]
         val category = params["category"]
+        val searchQuery = params["search"]
         val queryParams = hashMapOf<String, Any>("page" to page)
         if (!sort.isNullOrEmpty()) {
             queryParams["sort"] = sort
         }
         if (!category.isNullOrEmpty()) {
             queryParams["category"] = category
+        }
+        if (!searchQuery.isNullOrEmpty()) {
+            queryParams["search"] = searchQuery
         }
         return queryParams
     }
