@@ -1,33 +1,65 @@
 package `in`.testpress.ui
 
+import `in`.testpress.core.TestpressException
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.DiscussionPostEntity
 import `in`.testpress.models.DiscussionRepository
 import `in`.testpress.network.APIClient
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
-class DiscussionViewModel(application: Application) : AndroidViewModel(application) {
+class DiscussionViewModel(
+        application: Application,
+        private val savedStateHandle: SavedStateHandle
+) : AndroidViewModel(application) {
     private val service = APIClient(application)
     private val database = TestpressDatabase(application)
     private val repository = DiscussionRepository(service, database)
+    val categories = repository.categories
+
+    private val clearListChannel = Channel<Unit>(Channel.CONFLATED)
+    private var _categoriesNetworkError = MutableLiveData<Boolean>(false)
+    val categoriesNetworkError: LiveData<Boolean>
+        get() = _categoriesNetworkError
+
+    init {
+        refreshCategoriesFromRepository()
+    }
 
     @ExperimentalPagingApi
-    fun fetchPosts(): Flow<PagingData<DiscussionPostEntity>> {
-        return repository.discussionsFlow().cachedIn(viewModelScope)
-    }
-}
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val discussions = flowOf(
+            clearListChannel.receiveAsFlow().map { PagingData.empty<DiscussionPostEntity>() },
+            savedStateHandle.getLiveData<HashMap<String, String>>("params")
+                    .asFlow()
+                    .flatMapLatest { repository.discussionsFlow(it) }
+                    .cachedIn(viewModelScope)
+    ).flattenMerge(2)
 
-class DiscussionViewModelFactory(
-        private val application: Application
-): ViewModelProvider.NewInstanceFactory() {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-            DiscussionViewModel(application) as T
+
+    fun sortAndFilter(sortBy: String, category: String = "") {
+        val data = hashMapOf("sortBy" to sortBy, "category" to category)
+        savedStateHandle.set("params", data)
+        clearListChannel.offer(Unit)
+    }
+
+    private fun refreshCategoriesFromRepository() {
+        viewModelScope.launch {
+            try {
+                repository.refreshCategories()
+                _categoriesNetworkError.value = false
+            } catch (networkError: TestpressException) {
+                if(categories.value.isNullOrEmpty())
+                    _categoriesNetworkError.value = true
+            }
+        }
+    }
 }
