@@ -29,6 +29,11 @@
                 tools:itemCount="10"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
+            <include
+                layout="@layout/testpress_empty_view_with_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
         </in.testpress.ui.view.SlidingPaneLayout>
 
     </RelativeLayout>

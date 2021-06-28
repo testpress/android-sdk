@@ -1,16 +1,14 @@
 package `in`.testpress.ui.fragments
 
 import `in`.testpress.R
-import `in`.testpress.ui.DiscussionFilterListener
-import `in`.testpress.ui.DiscussionViewModel
-import `in`.testpress.ui.DiscussionsAdapter
-import `in`.testpress.ui.DiscussionsFilterFragment
-import android.app.SearchManager
-import android.content.Context.SEARCH_SERVICE
+import `in`.testpress.ui.*
 import android.os.Bundle
 import android.view.*
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.SearchView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
@@ -18,6 +16,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import kotlinx.android.synthetic.main.discussion_list.*
@@ -29,7 +28,11 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
     open val adapter = DiscussionsAdapter() { forum ->
     }
     lateinit var slidingPaneLayout: SlidingPaneLayout
-
+    lateinit var emptyTitleView: TextView
+    lateinit var emptyDescView: TextView
+    lateinit var emptyContainer: LinearLayout
+    lateinit var retryButton: Button
+    private lateinit var image: ImageView
 
     private val viewModel: DiscussionViewModel by viewModels {
         object : AbstractSavedStateViewModelFactory(this, null) {
@@ -94,6 +97,7 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         slidingPaneLayout = view.findViewById(R.id.sliding_layout)
+        initializeEmptyViewFragment(view)
         setupViews()
         fetchPosts()
         setCreateButtonClickListener()
@@ -106,6 +110,13 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
         )
         discussions.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         initializeFilterFragment()
+        adapter.addLoadStateListener { loadState ->
+            if (loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && adapter.itemCount < 1) {
+                showEmptyScreen()
+            } else {
+                hideEmptyScreen()
+            }
+        }
     }
 
 
@@ -116,6 +127,29 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
         transaction.replace(R.id.filter_fragment_layout, fragment)
         transaction.commit()
     }
+
+    private fun initializeEmptyViewFragment(view: View) {
+        emptyContainer = view.findViewById(R.id.empty_container)
+        emptyTitleView = view.findViewById(R.id.empty_title)
+        emptyDescView = view.findViewById(R.id.empty_description)
+        image = view.findViewById(R.id.image_view)
+        retryButton = view.findViewById(R.id.retry_button)
+    }
+
+    private fun hideEmptyScreen() {
+        emptyContainer.visibility = View.GONE
+        discussions.visibility = View.VISIBLE
+    }
+
+    private fun showEmptyScreen() {
+        emptyContainer.visibility = View.VISIBLE
+        discussions.visibility = View.GONE
+        emptyTitleView.setText(R.string.no_discussion)
+        emptyDescView.setText(R.string.no_discussion_description)
+        image.setImageResource(R.drawable.inbox)
+        retryButton.visibility = View.GONE
+    }
+
 
     @ExperimentalPagingApi
     private fun fetchPosts() {

@@ -48,5 +48,7 @@
     <string name="lockout_limit_info">Note : Admin has restricted login attempts to %d</string>
 
     <string name="failed_loading_pdf"> Failed to load the PDF </string>
+    <string name="no_discussion"> No discussions yet </string>
+    <string name="no_discussion_description">You can create a discussion by clicking plus button </string>
 
 </resources>
