@@ -13,3 +13,9 @@ data class NetworkCategory (
 fun NetworkCategory.asDatabaseModel(): CategoryEntity {
     return CategoryEntity(id, name, color, slug)
 }
+
+fun List<NetworkCategory>.asDatabaseModels(): List<CategoryEntity> {
+    return this.map {
+        it.asDatabaseModel()
+    }
+}
