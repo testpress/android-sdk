@@ -8,6 +8,7 @@ import androidx.test.core.app.ApplicationProvider
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
+import java.util.concurrent.Executors
 
 
 abstract class DbTestMixin {
@@ -22,7 +23,9 @@ abstract class DbTestMixin {
         _db = Room.inMemoryDatabaseBuilder(
                 ApplicationProvider.getApplicationContext(),
                 TestpressDatabase::class.java
-        ).build()
+        )
+                .setTransactionExecutor(Executors.newSingleThreadExecutor())
+                .build()
     }
 
     @After

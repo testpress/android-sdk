@@ -10,6 +10,6 @@ interface LastLoadedPageDataDao: BaseDao<LastLoadedPageData> {
     @Query("SELECT * FROM LastLoadedPageData WHERE resourceType = :name")
     suspend fun findPageDataForResource(name: String): LastLoadedPageData?
 
-    @Query("DELETE FROM LastLoadedPageData")
-    suspend fun deleteAll()
+    @Query("DELETE FROM LastLoadedPageData WHERE resourceType = :name")
+    suspend fun deleteForResource(name: String)
 }
