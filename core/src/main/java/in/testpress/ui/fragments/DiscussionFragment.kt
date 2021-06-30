@@ -2,12 +2,18 @@ package `in`.testpress.ui.fragments
 
 import `in`.testpress.R
 import `in`.testpress.ui.*
+import android.app.SearchManager
+import android.content.Context.SEARCH_SERVICE
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
+import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.ExperimentalPagingApi
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
@@ -44,14 +50,33 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.testpress_time_analytics_filter, menu)
+        inflater.inflate(R.menu.discussions_menu, menu)
         val filterMenu = menu.findItem(R.id.options)
         val actionView = filterMenu.actionView
         val filterIcon = actionView.findViewById<ImageView>(R.id.filter)
         filterIcon.setOnClickListener {
             toggledSideBar()
         }
+        initializeSearchView(menu)
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    private fun initializeSearchView(menu: Menu) {
+        val searchView = menu.findItem(R.id.search).actionView as SearchView
+        searchView.queryHint = "Type text "
+        searchView.isSubmitButtonEnabled = true
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let {
+                    viewModel.sortAndFilter("recent", search_query = query)
+                }
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+        })
     }
 
     private fun toggledSideBar() {
