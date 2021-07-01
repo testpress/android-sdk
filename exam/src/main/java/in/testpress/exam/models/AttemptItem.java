@@ -24,6 +24,8 @@ public class AttemptItem implements Parcelable {
     private String shortText;
     private String currentShortText;
     private AttemptSection attemptSection;
+    private List<String> files = new ArrayList<String>();
+    private List<String> unSyncedFiles = new ArrayList<String>();
 
     AttemptItem() {
         selectedAnswers = new ArrayList<Integer>();
@@ -48,6 +50,8 @@ public class AttemptItem implements Parcelable {
         attemptSection = in.readParcelable(AttemptSection.class.getClassLoader());
         in.readList(selectedAnswers, Integer.class.getClassLoader());
         in.readList(savedAnswers, Integer.class.getClassLoader());
+        in.readList(files, String.class.getClassLoader());
+        in.readList(unSyncedFiles, String.class.getClassLoader());
     }
 
     @Override
@@ -67,6 +71,8 @@ public class AttemptItem implements Parcelable {
         dest.writeParcelable(attemptSection, flags);
         dest.writeList(selectedAnswers);
         dest.writeList(savedAnswers);
+        dest.writeList(files);
+        dest.writeList(unSyncedFiles);
     }
 
     @Override
@@ -245,5 +251,33 @@ public class AttemptItem implements Parcelable {
 
     public void setAttemptSection(AttemptSection attemptSection) {
         this.attemptSection = attemptSection;
+    }
+
+    public List<String> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<String> files) {
+        this.files = files;
+    }
+
+    public List<String> getUnSyncedFiles() {
+        return unSyncedFiles;
+    }
+
+    public void setUnSyncedFiles(List<String> files) {
+        this.unSyncedFiles = files;
+    }
+
+    public String getFiletypeDisplayHtml() {
+        String htmlContent = "";
+        for (int i=0; i<getUnSyncedFiles().size(); i++) {
+            htmlContent += String.format("<li> File %d</li>", i + 1);
+        }
+        htmlContent += "<div class='review_later_button_layout'>" +
+                "<button class='upload-button' onClick='onFileUploadClick(this)'> Upload File </button>" +
+                "<button class='clear-upload-button' onClick='onClearUploadsClick(this)'> Clear Uploads </button>" +
+                "</div>";
+        return htmlContent;
     }
 }

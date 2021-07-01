@@ -1,25 +1,42 @@
 package in.testpress.exam.ui;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.obsez.android.lib.filechooser.ChooserDialog;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import in.testpress.core.TestpressCallback;
+import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.models.AttemptAnswer;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.AttemptQuestion;
 import in.testpress.exam.ui.view.WebView;
+import in.testpress.models.FileDetails;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Language;
+import in.testpress.util.ProgressDialog;
 import in.testpress.util.WebViewUtils;
 
 public class TestQuestionFragment extends Fragment {
@@ -35,6 +52,7 @@ public class TestQuestionFragment extends Fragment {
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
     private InstituteSettings instituteSettings;
+    private TestpressExamApiClient apiClient;
 
     static TestQuestionFragment getInstance(AttemptItem attemptItem, int questionIndex,
                                             Language selectedLanguage) {
@@ -56,6 +74,7 @@ public class TestQuestionFragment extends Fragment {
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
         selectedOptions = new ArrayList<>(attemptItem.getSelectedAnswers());
         instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
+        apiClient = new TestpressExamApiClient(getContext());
     }
 
     @SuppressLint({"SetTextI18n", "AddJavascriptInterface"})
@@ -71,6 +90,7 @@ public class TestQuestionFragment extends Fragment {
             attemptItem.saveAnswers(attemptItem.getSelectedAnswers());
             attemptItem.setCurrentShortText(attemptItem.getShortText());
             attemptItem.setCurrentReview(attemptItem.getReview());
+            attemptItem.setUnSyncedFiles(attemptItem.getFiles());
             webViewUtils = new WebViewUtils(questionsView) {
                 @Override
                 public String getHeader() {
@@ -150,6 +170,8 @@ public class TestQuestionFragment extends Fragment {
                 }
             }
             htmlContent += "</table>";
+        } else if(attemptQuestion.getType().equals("F")) {
+            htmlContent += attemptItem.getFiletypeDisplayHtml();
         } else {
             boolean numberType = attemptQuestion.getType().equals("N");
             questionsView.setNumberType(numberType);
@@ -189,9 +211,64 @@ public class TestQuestionFragment extends Fragment {
         }
 
         @JavascriptInterface
+        public void onClearUploadsClick() {
+            attemptItem.setUnSyncedFiles(new ArrayList<String>());
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    update();
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void onFileUploadClick() {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    new ChooserDialog(getActivity())
+                            .withChosenListener(new ChooserDialog.Result() {
+                                @Override
+                                public void onChoosePath(String path, File pathFile) {
+                                uploadFile(path);
+                                }
+                            })
+                            .withOnCancelListener(new DialogInterface.OnCancelListener() {
+                                public void onCancel(DialogInterface dialog) {
+                                dialog.cancel(); // MUST have
+                                }
+                            })
+                            .build()
+                            .show();
+                }
+            });
+        }
+
+        @JavascriptInterface
         public void onTextValueChange(String value) {
             attemptItem.setCurrentShortText(value.trim());
         }
+    }
+
+    private void uploadFile(final String path) {
+        final AlertDialog progressDialog = new ProgressDialog().showProgressDialog(getContext(), "Uploading");
+        apiClient.upload(path)
+                .enqueue(new TestpressCallback<FileDetails>() {
+                    @Override
+                    public void onSuccess(FileDetails fileDetails) {
+                        ArrayList<String> fileURLs = new ArrayList<>(attemptItem.getUnSyncedFiles());
+                        fileURLs.add(fileDetails.getId());
+                        attemptItem.setUnSyncedFiles(fileURLs);
+                        progressDialog.hide();
+                        Toast.makeText(getContext(), "Uploaded files successfully", Toast.LENGTH_LONG).show();
+                        update();
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        progressDialog.hide();
+                    }
+                });
     }
 
     @Override
@@ -208,5 +285,4 @@ public class TestQuestionFragment extends Fragment {
     public void update() {
         webViewUtils.loadHtml(getQuestionItemHtml());
     }
-
 }

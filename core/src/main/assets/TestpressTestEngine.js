@@ -74,6 +74,14 @@ function reviewButtonClick(button) {
     }
 }
 
+function onFileUploadClick(button) {
+    OptionsSelectionListener.onFileUploadClick();
+}
+
+function onClearUploadsClick(button) {
+    OptionsSelectionListener.onClearUploadsClick();
+}
+
 function setCheckboxState(option, check) {
     checkBox = getWidget(option);
     if (check) {
