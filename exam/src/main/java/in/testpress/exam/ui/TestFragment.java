@@ -850,8 +850,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             if (action != Action.UPDATE_ANSWER) {
                 showProgress(R.string.testpress_saving_last_change);
             }
-            apiClient.postAnswer(attemptItem.getUrlFrag(), attemptItem.getSavedAnswers(),
-                    attemptItem.getCurrentShortText(), attemptItem.getCurrentReview())
+            apiClient.postAnswer(attemptItem)
                     .enqueue(new TestpressCallback<AttemptItem>() {
                         @Override
                         public void onSuccess(AttemptItem newAttemptItem) {

@@ -160,13 +160,12 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getExamService().getReviewItems(urlFrag, queryParams);
     }
 
-    public RetrofitCall<AttemptItem> postAnswer(String answerUrlFrag, List<Integer> savedAnswers,
-                                                String shortAnswer, Boolean review) {
+    public RetrofitCall<AttemptItem> postAnswer(AttemptItem attemptItem) {
         HashMap<String, Object> answer = new HashMap<String, Object>();
-        answer.put("selected_answers", savedAnswers);
-        answer.put("short_text", shortAnswer);
-        answer.put("review", review);
-        return getExamService().postAnswer(answerUrlFrag, answer);
+        answer.put("selected_answers", attemptItem.getSavedAnswers());
+        answer.put("short_text", attemptItem.getCurrentShortText());
+        answer.put("review", attemptItem.getCurrentReview());
+        return getExamService().postAnswer(attemptItem.getUrlFrag(), answer);
     }
 
     public RetrofitCall<Attempt> heartbeat(String heartbeatUrlFrag) {
