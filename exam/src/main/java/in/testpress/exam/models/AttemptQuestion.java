@@ -17,6 +17,7 @@ public class AttemptQuestion implements Parcelable {
     private ArrayList<AttemptQuestion> translations = new ArrayList<>();
     private String marks;
     private String negativeMarks;
+    private ArrayList<EssayTopic> essayTopics = new ArrayList<>();
 
     // Parcelling part
     public AttemptQuestion(Parcel parcel){
@@ -29,6 +30,7 @@ public class AttemptQuestion implements Parcelable {
         parcel.readTypedList(translations, AttemptQuestion.CREATOR);
         marks = parcel.readString();
         negativeMarks = parcel.readString();
+        parcel.readTypedList(essayTopics, EssayTopic.CREATOR);
     }
 
     @Override
@@ -178,5 +180,10 @@ public class AttemptQuestion implements Parcelable {
     public boolean hasPositiveMarks(){
         return !this.marks.equals("0.00") && !this.marks.isEmpty();
     }
+    
+    public ArrayList<EssayTopic> getEssayTopics() {
+        return essayTopics;
+    }
+
 
 }

@@ -1,6 +1,7 @@
 package in.testpress.exam.api;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.List;
@@ -162,8 +163,13 @@ public class TestpressExamApiClient extends TestpressApiClient {
 
     public RetrofitCall<AttemptItem> postAnswer(AttemptItem attemptItem) {
         HashMap<String, Object> answer = new HashMap<String, Object>();
-        answer.put("selected_answers", attemptItem.getSavedAnswers());
-        answer.put("short_text", attemptItem.getCurrentShortText());
+        if (attemptItem.getAttemptQuestion().getType().equals("E")) {
+            answer.put("essay_text", attemptItem.getLocalEssayText());
+            answer.put("essay_topic", attemptItem.getLocalEssayTopic());
+        } else {
+            answer.put("selected_answers", attemptItem.getSavedAnswers());
+            answer.put("short_text", attemptItem.getCurrentShortText());
+        }
         answer.put("review", attemptItem.getCurrentReview());
         return getExamService().postAnswer(attemptItem.getUrlFrag(), answer);
     }
