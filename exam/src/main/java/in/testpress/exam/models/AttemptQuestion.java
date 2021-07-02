@@ -15,6 +15,7 @@ public class AttemptQuestion implements Parcelable {
     private String type;
     private String language;
     private ArrayList<AttemptQuestion> translations = new ArrayList<>();
+    private ArrayList<EssayTopic> essayTopics = new ArrayList<>();
 
     // Parcelling part
     public AttemptQuestion(Parcel parcel){
@@ -25,6 +26,7 @@ public class AttemptQuestion implements Parcelable {
         type = parcel.readString();
         language = parcel.readString();
         parcel.readTypedList(translations, AttemptQuestion.CREATOR);
+        parcel.readTypedList(essayTopics, EssayTopic.CREATOR);
     }
 
     @Override
@@ -148,4 +150,10 @@ public class AttemptQuestion implements Parcelable {
     public void setTranslations(ArrayList<AttemptQuestion> translations) {
         this.translations = translations;
     }
+
+    public ArrayList<EssayTopic> getEssayTopics() {
+        return essayTopics;
+    }
+
+
 }
