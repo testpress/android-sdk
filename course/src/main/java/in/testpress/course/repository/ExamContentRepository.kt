@@ -77,7 +77,8 @@ class ExamContentRepository(
             resourceContentAttempt.postValue(Resource.success(domainContentAttempts))
         } else if (!isAttemptsBeingFetched) {
             isAttemptsBeingFetched = true
-            fetchAttemptFromNetwork(url, contentId)
+            val attemptsURL = url.replace("2.3", "2.2.1")
+            fetchAttemptFromNetwork(attemptsURL, contentId)
         }
         return resourceContentAttempt
     }
