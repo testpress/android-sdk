@@ -504,7 +504,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             cursor.isNull(offset + 29) ? null : cursor.getShort(offset + 29) != 0, // isDetailsFetched
             cursor.isNull(offset + 30) ? null : cursor.getShort(offset + 30) != 0, // isGrowthHackEnabled
             cursor.isNull(offset + 31) ? null : cursor.getString(offset + 31), // shareTextForSolutionUnlock
-            cursor.isNull(offset + 32) ? null : cursor.getShort(offset + 32) != 0 // showAnalytics
+            cursor.isNull(offset + 32) ? null : cursor.getShort(offset + 32) != 0, // showAnalytics
+            cursor.isNull(offset + 33) ? null : cursor.getString(offset + 33) // instructions
         );
         return entity;
     }
