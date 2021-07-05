@@ -9,6 +9,7 @@ import androidx.annotation.StringRes;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -579,10 +580,29 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        if (examInstructionExists()){
+            displayExamInstruction(arguments);
+            return;
+        }
+
         TestFragment testFragment = new TestFragment();
         testFragment.setArguments(arguments);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, testFragment).commitAllowingStateLoss();
+    }
+
+    private void displayExamInstruction(Bundle arguments){
+        TestInstructions instructions = new TestInstructions();
+        arguments.putString(TestInstructions.Companion.getINSTRUCTIONFLAG(), exam.getInstructions());
+        instructions.setArguments(arguments);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, instructions).commitAllowingStateLoss();
+    }
+
+    private boolean examInstructionExists(){
+        return !TextUtils.isEmpty(exam.getInstructions());
     }
 
     @Override
