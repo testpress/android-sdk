@@ -11,10 +11,10 @@ import android.widget.Button
 import android.widget.TextView
 
 
-class TestInstructions : BaseFragment() {
+class TestInstructions(val startExam: () -> Unit) : BaseFragment() {
 
     companion object {
-        public val INSTRUCTIONFLAG = "exam_instructions"
+        val INSTRUCTIONFLAG = "exam_instructions"
     }
 
     private lateinit var instructionsView: TextView;
@@ -38,14 +38,7 @@ class TestInstructions : BaseFragment() {
 
         confirmButton = view.findViewById(R.id.confirm_button)
         confirmButton.setOnClickListener {
-            startTest()
+            startExam()
         }
-    }
-
-    private fun startTest(){
-        val testFragment = TestFragment()
-        testFragment.arguments = arguments
-        parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, testFragment).commitAllowingStateLoss()
     }
 }

@@ -586,19 +586,28 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
             return;
         }
 
+        startExam(arguments);
+    }
+
+    private void displayExamInstruction(Bundle arguments){
+        TestInstructions instructions = new TestInstructions(() -> {
+            startExam(arguments);
+            return null;
+        });
+
+        Bundle instructionArguments = new Bundle();
+        instructionArguments.putString(TestInstructions.Companion.getINSTRUCTIONFLAG(), exam.getInstructions());
+        instructions.setArguments(instructionArguments);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, instructions).commitAllowingStateLoss();
+    }
+
+    private void startExam(Bundle arguments){
         TestFragment testFragment = new TestFragment();
         testFragment.setArguments(arguments);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, testFragment).commitAllowingStateLoss();
-    }
-
-    private void displayExamInstruction(Bundle arguments){
-        TestInstructions instructions = new TestInstructions();
-        arguments.putString(TestInstructions.Companion.getINSTRUCTIONFLAG(), exam.getInstructions());
-        instructions.setArguments(arguments);
-
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, instructions).commitAllowingStateLoss();
     }
 
     private boolean examInstructionExists(){
