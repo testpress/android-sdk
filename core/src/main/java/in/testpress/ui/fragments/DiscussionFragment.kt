@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.ExperimentalPagingApi
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.discussion_list.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -26,6 +27,7 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
     open val adapter = DiscussionsAdapter() { forum ->
     }
     lateinit var slidingPaneLayout: SlidingPaneLayout
+    open lateinit var createButton: FloatingActionButton
 
 
     private val viewModel: DiscussionViewModel by viewModels {
@@ -91,6 +93,7 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         slidingPaneLayout = view.findViewById(R.id.sliding_layout)
+        createButton = view.findViewById(R.id.create_button)
         setupViews()
         fetchPosts()
         setCreateButtonClickListener()
@@ -126,7 +129,7 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
     }
 
     open fun setCreateButtonClickListener() {
-        create_button.setOnClickListener {
+        createButton.setOnClickListener {
 
         }
     }
