@@ -1,5 +1,6 @@
 package in.testpress.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +13,8 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.network.TestpressApiClient;
+
+import static in.testpress.network.TestpressApiClient.PARAM_SHOW_PARALLEL_LOGIN_INFO;
 
 public class UserDevicesActivity extends BaseToolBarActivity {
 
@@ -72,6 +75,21 @@ public class UserDevicesActivity extends BaseToolBarActivity {
         parallelLoginRestrictionInfo = (TextView) findViewById(R.id.parallel_login_restriction_note);
         TestpressSession session = TestpressSdk.getTestpressSession(this);
         String info = getString(R.string.lockout_limit_info);
+
+        Intent intent = getIntent();
+
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            if (extras.containsKey(PARAM_SHOW_PARALLEL_LOGIN_INFO)) {
+                boolean showParallelLoginRestrictionInfo = extras.getBoolean("isNewItem", false);
+                if (showParallelLoginRestrictionInfo) {
+                    info = getString(R.string.parallel_login_restriction_message);
+                    parallelLoginRestrictionInfo.setVisibility(View.VISIBLE);
+                    parallelLoginRestrictionInfo.setText(info);
+                }
+            }
+        }
+
 
         if (session.getInstituteSettings().getLockoutLimit() != null) {
             parallelLoginRestrictionInfo.setVisibility(View.VISIBLE);

@@ -46,6 +46,7 @@
     <string name="no_devices_found">No devices found</string>
     <string name="session_cleared_message">Your session has been cleared. Please log out and login again.</string>
     <string name="lockout_limit_info">Note : Admin has restricted login attempts to %d</string>
+    <string name="parallel_login_restriction_message">Multiple devices cannot be logged in simultaneously, please logout other devices to continue.</string>
 
     <string name="failed_loading_pdf"> Failed to load the PDF </string>
 
