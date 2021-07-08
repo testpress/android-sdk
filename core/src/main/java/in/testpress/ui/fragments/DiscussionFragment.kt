@@ -30,7 +30,7 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
     open lateinit var createButton: FloatingActionButton
 
 
-    private val viewModel: DiscussionViewModel by viewModels {
+    open val viewModel: DiscussionViewModel by viewModels {
         object : AbstractSavedStateViewModelFactory(this, null) {
             override fun <T : ViewModel?> create(
                     key: String,
