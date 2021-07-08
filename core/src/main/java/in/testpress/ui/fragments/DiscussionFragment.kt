@@ -136,6 +136,7 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
 
     override fun onApplyFilterClick(sortBy: String, category: String) {
         viewModel.sortAndFilter(sortBy, category)
+        slidingPaneLayout.closePane()
     }
 
     override fun onClearFilterClick() {
