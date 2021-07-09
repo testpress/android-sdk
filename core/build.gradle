@@ -113,7 +113,8 @@ dependencies {
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutine_version"
 }
 
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply from: "${rootProject.projectDir}/gradle/publish-module.gradle"
+//apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 repositories {
     mavenCentral()
 }

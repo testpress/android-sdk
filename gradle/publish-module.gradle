@@ -1,0 +1,60 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+task androidSourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    if (project.plugins.findPlugin("com.android.library")) {
+        from android.sourceSets.main.java.srcDirs
+        from android.sourceSets.main.kotlin.srcDirs
+    } else {
+        from sourceSets.main.java.srcDirs
+        from sourceSets.main.kotlin.srcDirs
+    }
+}
+
+
+artifacts {
+    archives androidSourcesJar
+}
+
+group = pomGroupID
+version = pomVersion
+
+afterEvaluate { project ->
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId group
+                artifactId project.name
+                version version
+                if (project.plugins.findPlugin("com.android.library")) {
+                    from components.release
+                } else {
+                    from components.java
+                }
+
+                artifact androidSourcesJar
+
+                pom {
+                    name = project.name
+                    description = 'Testpress Android SDK'
+                    url = 'https://github.com/testpress/android-sdk'
+                    scm {
+                        connection = 'scm:git:github.com/testpress/android-sdk.git'
+                        developerConnection = 'scm:git:ssh://github.com/testpress/android-sdk.git'
+                        url = 'https://github.com/testpress/android-sdk'
+                    }
+                }
+            }
+        }
+    }
+}
+
+signing {
+    useInMemoryPgpKeys(
+        rootProject.ext["signing.keyId"],
+        rootProject.ext["signing.key"],
+        rootProject.ext["signing.password"],
+    )
+    sign publishing.publications
+}

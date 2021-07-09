@@ -89,7 +89,8 @@ dependencies {
     debugImplementation "androidx.fragment:fragment-testing:$fragment_version"
 }
 
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+//apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply from: "${rootProject.projectDir}/gradle/publish-module.gradle"
 repositories {
     mavenCentral()
 }
