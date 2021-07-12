@@ -86,7 +86,7 @@ public class TestpressException extends RuntimeException {
         try {
             String json = response.errorBody().string();
             return gson.fromJson(json, type);
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
         return null;
