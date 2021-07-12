@@ -124,7 +124,7 @@ p {
     font-family: 'Rubik-Medium', sans-serif;
 }
 
-.question-index {
+.pill {
     display: inline-block;
     min-width: 10px;
     margin-top: 15px;
@@ -133,13 +133,28 @@ p {
     padding-bottom: 4px;
     padding-right: 13px;
     padding-left: 13px;
-    border: 1px solid #00ccaa;
     border-radius: 15px;
     font-size: 14dp;
-    color: #ffffff;
-    background: #00ccaa;
     text-align: center;
     font-family: 'Rubik-Medium', sans-serif;
+}
+
+.question-index {
+    border: 1px solid hsl(217, 89%, 61%);
+    background: hsl(217, 89%, 61%);
+    color: #ffffff;
+}
+
+.marks {
+    border: 1px solid hsl(151, 83%, 34%);
+    background: hsl(151, 40%, 90%);
+    color: hsl(151, 90%, 30%);
+}
+
+.negative-marks {
+    border: 1px solid hsl(5, 69%, 54%);
+    background: hsl(5, 50%, 90%);
+    color: hsl(5, 90%, 50%);
 }
 
 .question {

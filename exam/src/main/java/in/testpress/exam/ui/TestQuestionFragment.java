@@ -121,7 +121,15 @@ public class TestQuestionFragment extends Fragment {
 
         // Add index
         htmlContent += "<div style='padding-right:10px; padding-left:10px;'>" +
-                            "<div class='question-index'>" + index + "</div>";
+                            "<div class='pill question-index'>" + index + "</div>";
+
+        if (attemptQuestion.hasPositiveMarks()){
+            htmlContent += "<div class='pill marks'>" + "+ " + attemptQuestion.getMarks() + "</div>";
+        }
+
+        if (attemptQuestion.hasNegativeMarks()){
+            htmlContent += "<div class='pill negative-marks'>" + "- " + attemptQuestion.getNegativeMarks() + "</div>";
+        }
 
         // Add direction if present
         if (attemptQuestion.getDirection() != null && !attemptQuestion.getDirection().isEmpty()) {
