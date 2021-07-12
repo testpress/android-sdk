@@ -3,24 +3,45 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    tools:context=".ui.ExamInstructions"
-    android:padding="12dp"
-    >
+    tools:context=".ui.ExamInstructions">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/testpress_color_primary"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
+
+        <TextView
+            android:id="@+id/exam_name"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Fragment title"
+            android:textSize="20sp"
+            android:textColor="@color/testpress_white"
+            android:gravity="center_vertical"
+            android:textStyle="bold"
+            />
+
+    </androidx.appcompat.widget.Toolbar>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Instructions"
+        android:textAlignment="center"
         android:textSize="24sp"
         android:textColor="@color/testpress_black"
         android:textStyle="bold"
-        android:layout_marginBottom="12dp"
+        android:layout_margin="12dp"
         />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginHorizontal="12dp"
         android:layout_weight="1">
 
         <TextView
@@ -30,6 +51,8 @@
     </ScrollView>
 
     <Button
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="12dp"
         android:id="@+id/confirm_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

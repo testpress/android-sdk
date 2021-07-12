@@ -590,7 +590,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
 
     private void displayExamInstruction(Bundle arguments){
 
-        ExamInstructions instructions = ExamInstructions.Companion.createInstance(exam.getInstructions(), () -> {
+        ExamInstructions instructions = ExamInstructions.Companion.createInstance(exam.getInstructions(), exam.getTitle(), () -> {
             startExam(arguments);
             return null;
         });
