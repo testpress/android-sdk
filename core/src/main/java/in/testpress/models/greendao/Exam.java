@@ -14,6 +14,8 @@ import in.testpress.util.StringList;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Parcel;
+import android.text.TextUtils;
+
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -763,6 +765,10 @@ public class Exam implements android.os.Parcelable {
             return isGrowthHackEnabled;
         }
         return false;
+    }
+
+    public boolean hasInstructions(){
+        return !TextUtils.isEmpty(this.getInstructions());
     }
 
     public boolean showAnalytics() {

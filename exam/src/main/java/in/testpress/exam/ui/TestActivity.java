@@ -9,7 +9,6 @@ import androidx.annotation.StringRes;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -581,7 +580,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
             getSupportActionBar().hide();
         }
 
-        if (examInstructionExists()){
+        if (exam.hasInstructions()){
             displayExamInstruction(arguments);
             return;
         }
@@ -590,15 +589,11 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     }
 
     private void displayExamInstruction(Bundle arguments){
-        TestInstructions instructions = new TestInstructions(() -> {
+
+        ExamInstructions instructions = ExamInstructions.Companion.createInstance(exam.getInstructions(), () -> {
             startExam(arguments);
             return null;
         });
-
-        Bundle instructionArguments = new Bundle();
-        instructionArguments.putString(TestInstructions.Companion.getINSTRUCTIONFLAG(), exam.getInstructions());
-        instructions.setArguments(instructionArguments);
-
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, instructions).commitAllowingStateLoss();
     }
@@ -608,10 +603,6 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         testFragment.setArguments(arguments);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, testFragment).commitAllowingStateLoss();
-    }
-
-    private boolean examInstructionExists(){
-        return !TextUtils.isEmpty(exam.getInstructions());
     }
 
     @Override
