@@ -95,6 +95,10 @@ function onValueChange(element) {
    OptionsSelectionListener.onTextValueChange(element.value)
 }
 
+function onEssayValueChange(element) {
+   OptionsSelectionListener.onEssayValueChange(element.value)
+}
+
 // Common functions
 
 function getWidget(layout) {
