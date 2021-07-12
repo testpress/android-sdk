@@ -165,7 +165,6 @@ public class TestpressExamApiClient extends TestpressApiClient {
         HashMap<String, Object> answer = new HashMap<String, Object>();
         if (attemptItem.getAttemptQuestion().getType().equals("E")) {
             answer.put("essay_text", attemptItem.getLocalEssayText());
-            answer.put("essay_topic", attemptItem.getLocalEssayTopic());
         } else {
             answer.put("selected_answers", attemptItem.getSavedAnswers());
             answer.put("short_text", attemptItem.getCurrentShortText());
