@@ -25,10 +25,8 @@ public class AttemptItem implements Parcelable {
     private String shortText;
     private String currentShortText;
     private AttemptSection attemptSection;
-    private String essayTopic;
     private String essayText;
     private String localEssayText;
-    private String localEssayTopic;
 
     AttemptItem() {
         selectedAnswers = new ArrayList<Integer>();
@@ -120,11 +118,11 @@ public class AttemptItem implements Parcelable {
     }
 
     private boolean isEssaySynced() {
-        if (essayText != null && essayTopic != null) {
+        if (essayText != null) {
             return essayText.equals(localEssayText);
         }
 
-        return essayText == localEssayText & essayTopic == localEssayTopic;
+        return essayText == localEssayText;
     }
 
     public Boolean hasChanged() {
@@ -269,14 +267,6 @@ public class AttemptItem implements Parcelable {
     public void setId(Integer id) {
         this.id = id;
     }
-    
-    public String getEssayTopic() {
-        return essayTopic;
-    }
-
-    public void setEssayTopic(String essayTopic) {
-        this.essayTopic = essayTopic;
-    }
 
     public String getEssayText() {
         return essayText;
@@ -290,15 +280,7 @@ public class AttemptItem implements Parcelable {
         this.localEssayText = localEssayText;
     }
 
-    public void setLocalEssayTopic(String localEssayTopic) {
-        this.localEssayTopic = localEssayTopic;
-    }
-
     public String getLocalEssayText() {
         return localEssayText;
-    }
-
-    public String getLocalEssayTopic() {
-        return localEssayTopic;
     }
 }

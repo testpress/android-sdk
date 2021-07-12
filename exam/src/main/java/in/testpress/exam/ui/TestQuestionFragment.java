@@ -19,7 +19,6 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptAnswer;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.AttemptQuestion;
-import in.testpress.exam.models.EssayTopic;
 import in.testpress.exam.ui.view.WebView;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Language;
@@ -75,7 +74,6 @@ public class TestQuestionFragment extends Fragment {
             attemptItem.setCurrentShortText(attemptItem.getShortText());
             attemptItem.setCurrentReview(attemptItem.getReview());
             attemptItem.setLocalEssayText(attemptItem.getEssayText());
-            attemptItem.setLocalEssayTopic(attemptItem.getEssayTopic());
             webViewUtils = new WebViewUtils(questionsView) {
                 @Override
                 public String getHeader() {
@@ -94,9 +92,6 @@ public class TestQuestionFragment extends Fragment {
                         }
                     }
 
-                    if (attemptItem.getEssayTopic() != null) {
-                        javascript += getRadioButtonInitializer(Integer.parseInt(attemptItem.getEssayTopic()));
-                    }
                     return javascript;
                 }
 
@@ -163,7 +158,7 @@ public class TestQuestionFragment extends Fragment {
             }
             htmlContent += "</table>";
         } else if (attemptQuestion.getType().equals("E")) {
-            htmlContent += getEssayQuestionHtml(attemptQuestion);
+            htmlContent += getEssayQuestionHtml();
         } else {
             boolean numberType = attemptQuestion.getType().equals("N");
             questionsView.setNumberType(numberType);
@@ -203,15 +198,9 @@ public class TestQuestionFragment extends Fragment {
     }
     
     @NotNull
-    private String getEssayQuestionHtml(AttemptQuestion attemptQuestion) {
-        String htmlContent = "";
-        htmlContent += "<hr><table width='100%' style='margin-top:0px; margin-bottom:20px;'>";
-        for (int i = 0; i < attemptQuestion.getEssayTopics().size(); i++) {
-            EssayTopic essayTopic = attemptQuestion.getEssayTopics().get(i);
-            htmlContent += "\n" + WebViewUtils.getRadioButtonOptionWithTags(essayTopic.getTitle(), essayTopic.getId().intValue());
-        }
+    private String getEssayQuestionHtml() {
+        String htmlContent = "<textarea class='essay_topic'  oninput='onEssayValueChange(this)' rows='10'>";
 
-        htmlContent += "</table> <textarea class='essay_topic'  oninput='onEssayValueChange(this)' rows='10'>";
         if (attemptItem.getLocalEssayText() != null) {
             htmlContent += attemptItem.getLocalEssayText();
         }
@@ -230,10 +219,6 @@ public class TestQuestionFragment extends Fragment {
                 selectedOptions.add(Integer.parseInt(id));
             } else {
                 selectedOptions.remove((Integer) Integer.parseInt(id));
-            }
-
-            if (attemptItem.getAttemptQuestion().getType().equals("E")) {
-                attemptItem.setLocalEssayTopic(id);
             }
             attemptItem.saveAnswers(selectedOptions);
         }
