@@ -123,26 +123,8 @@ public class TestQuestionFragment extends Fragment {
         htmlContent += "<div style='padding-right:10px; padding-left:10px;'>";
 
         htmlContent += "<div class='header'>";
-        htmlContent += "<div class='question-index'>" + index + "</div>";
-
-        htmlContent += "<div class='marks-wrapper'>";
-        if (attemptQuestion.hasPositiveMarks()){
-            htmlContent +=  "<div class='positive-marks'>" +
-                                "<div class='label'>Marks</div>" +
-                                "<div class='value'>" + attemptQuestion.getMarks() + "</div>" +
-                            "</div>";
-        }
-
-        if (attemptQuestion.hasNegativeMarks()){
-            htmlContent +=  "<div class='negative-marks'>" +
-                                "<div class='label'>Negative Marks</div>" +
-                                "<div class='value'>- " + attemptQuestion.getNegativeMarks() + "</div>" +
-                            "</div>";
-        }
-
-        htmlContent += "</div>"+
-                    "</div>";
-
+        htmlContent += generateHeaderHtml(attemptQuestion);
+        htmlContent += "</div>";
         // Add direction if present
         if (attemptQuestion.getDirection() != null && !attemptQuestion.getDirection().isEmpty()) {
             htmlContent += "" +
@@ -186,6 +168,29 @@ public class TestQuestionFragment extends Fragment {
                 "</button></div>";
 
         return htmlContent;
+    }
+
+    private String generateHeaderHtml(AttemptQuestion attemptQuestion){
+        String headerHtml = "<div class='question-index'>" + index + "</div>";
+
+        headerHtml += "<div class='marks-wrapper'>";
+        if (attemptQuestion.hasPositiveMarks()){
+            headerHtml +=  "<div class='positive-marks'>" +
+                    "<div class='label'>Marks</div>" +
+                    "<div class='value'>" + attemptQuestion.getMarks() + "</div>" +
+                    "</div>";
+        }
+
+        if (attemptQuestion.hasNegativeMarks()){
+            headerHtml +=  "<div class='negative-marks'>" +
+                    "<div class='label'>Negative Marks</div>" +
+                    "<div class='value'>- " + attemptQuestion.getNegativeMarks() + "</div>" +
+                    "</div>";
+        }
+
+        headerHtml += "</div>";
+
+        return headerHtml;
     }
 
     private class OptionsSelectionListener {
