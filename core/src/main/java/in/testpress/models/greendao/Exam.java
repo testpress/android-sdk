@@ -14,6 +14,8 @@ import in.testpress.util.StringList;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Parcel;
+import android.text.TextUtils;
+
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -67,6 +69,7 @@ public class Exam implements android.os.Parcelable {
     private Boolean isGrowthHackEnabled;
     private String shareTextForSolutionUnlock;
     private Boolean showAnalytics;
+    private String instructions;
 
     /** Used to resolve relations */
     @Generated
@@ -94,7 +97,7 @@ public class Exam implements android.os.Parcelable {
     }
 
     @Generated
-    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock, Boolean showAnalytics) {
+    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock, Boolean showAnalytics, String instructions) {
         this.totalMarks = totalMarks;
         this.url = url;
         this.id = id;
@@ -128,6 +131,7 @@ public class Exam implements android.os.Parcelable {
         this.isGrowthHackEnabled = isGrowthHackEnabled;
         this.shareTextForSolutionUnlock = shareTextForSolutionUnlock;
         this.showAnalytics = showAnalytics;
+        this.instructions = instructions;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -401,6 +405,14 @@ public class Exam implements android.os.Parcelable {
         this.showAnalytics = showAnalytics;
     }
 
+    public String getInstructions() {
+        return instructions;
+    }
+
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
+    }
+
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
     @Generated
     public List<Language> getLanguages() {
@@ -537,6 +549,7 @@ public class Exam implements android.os.Parcelable {
         shareTextForSolutionUnlock = in.readString();
         byte tmpshowAnalytics = in.readByte();
         showAnalytics = tmpshowAnalytics == 0 ? null : tmpshowAnalytics == 1;
+        instructions = in.readString();
     }
 
     @Override
@@ -615,6 +628,7 @@ public class Exam implements android.os.Parcelable {
         dest.writeByte((byte) (isGrowthHackEnabled == null ? 0 : isGrowthHackEnabled ? 1 : 2));
         dest.writeString(shareTextForSolutionUnlock);
         dest.writeByte((byte) (showAnalytics == null ? 0 : showAnalytics ? 1 : 2));
+        dest.writeString(instructions);
     }
 
     @Override
@@ -751,6 +765,10 @@ public class Exam implements android.os.Parcelable {
             return isGrowthHackEnabled;
         }
         return false;
+    }
+
+    public boolean hasInstructions(){
+        return !TextUtils.isEmpty(this.getInstructions());
     }
 
     public boolean showAnalytics() {

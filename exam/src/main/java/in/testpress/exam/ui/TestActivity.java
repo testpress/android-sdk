@@ -579,6 +579,26 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        if (exam.hasInstructions()){
+            displayExamInstruction(arguments);
+            return;
+        }
+
+        startExam(arguments);
+    }
+
+    private void displayExamInstruction(Bundle arguments){
+
+        ExamInstructions instructions = ExamInstructions.Companion.createInstance(exam.getInstructions(), exam.getTitle(), () -> {
+            startExam(arguments);
+            return null;
+        });
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, instructions).commitAllowingStateLoss();
+    }
+
+    private void startExam(Bundle arguments){
         TestFragment testFragment = new TestFragment();
         testFragment.setArguments(arguments);
         getSupportFragmentManager().beginTransaction()

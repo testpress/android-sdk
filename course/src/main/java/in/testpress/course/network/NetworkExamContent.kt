@@ -82,6 +82,7 @@ fun NetworkExamContent.asGreenDaoModel(): Exam {
         null,
         this.isGrowthHackEnabled,
         this.shareTextForSolutionUnlock,
-        this.showAnalytics
+        this.showAnalytics,
+        this.instructions
     )
 }
