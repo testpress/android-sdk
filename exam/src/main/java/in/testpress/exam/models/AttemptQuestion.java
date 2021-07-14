@@ -15,6 +15,8 @@ public class AttemptQuestion implements Parcelable {
     private String type;
     private String language;
     private ArrayList<AttemptQuestion> translations = new ArrayList<>();
+    private String marks;
+    private String negativeMarks;
 
     // Parcelling part
     public AttemptQuestion(Parcel parcel){
@@ -25,6 +27,8 @@ public class AttemptQuestion implements Parcelable {
         type = parcel.readString();
         language = parcel.readString();
         parcel.readTypedList(translations, AttemptQuestion.CREATOR);
+        marks = parcel.readString();
+        negativeMarks = parcel.readString();
     }
 
     @Override
@@ -40,6 +44,8 @@ public class AttemptQuestion implements Parcelable {
         parcel.writeString(type);
         parcel.writeString(language);
         parcel.writeTypedList(translations);
+        parcel.writeString(marks);
+        parcel.writeString(negativeMarks);
     }
 
     public static final Creator<AttemptQuestion> CREATOR = new Creator<AttemptQuestion>() {
@@ -148,4 +154,29 @@ public class AttemptQuestion implements Parcelable {
     public void setTranslations(ArrayList<AttemptQuestion> translations) {
         this.translations = translations;
     }
+
+    public String getMarks() {
+        return marks;
+    }
+
+    public void setMarks(String marks) {
+        this.marks = marks;
+    }
+
+    public String getNegativeMarks() {
+        return negativeMarks;
+    }
+
+    public void setNegativeMarks(String negativeMarks) {
+        this.negativeMarks = negativeMarks;
+    }
+
+    public boolean hasNegativeMarks(){
+        return !this.negativeMarks.equals("0.00") && !this.negativeMarks.isEmpty();
+    }
+
+    public boolean hasPositiveMarks(){
+        return !this.marks.equals("0.00") && !this.marks.isEmpty();
+    }
+
 }
