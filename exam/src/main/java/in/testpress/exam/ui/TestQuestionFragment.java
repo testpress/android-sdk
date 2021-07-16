@@ -120,9 +120,12 @@ public class TestQuestionFragment extends Fragment {
         String htmlContent = "<div class='question_container' style='font-size:calc(12px + 1.5vw);'>";
 
         // Add index
-        htmlContent += "<div style='padding-right:10px; padding-left:10px;'>" +
-                            "<div class='question-index'>" + index + "</div>";
+        htmlContent += "<div style='padding-right:10px; padding-left:10px;'>";
 
+        htmlContent += "<div class='header'>";
+        htmlContent += "<div class='question-index'>" + index + "</div>";
+        htmlContent += getMarksHtml(attemptQuestion);
+        htmlContent += "</div>";
         // Add direction if present
         if (attemptQuestion.getDirection() != null && !attemptQuestion.getDirection().isEmpty()) {
             htmlContent += "" +
@@ -166,6 +169,26 @@ public class TestQuestionFragment extends Fragment {
                 "</button></div>";
 
         return htmlContent;
+    }
+
+    private String getMarksHtml(AttemptQuestion attemptQuestion){
+        String marksHtml = "<div class='marks-wrapper'>";
+        if (attemptQuestion.hasPositiveMarks()){
+            marksHtml +=  "<div class='positive-marks'>" +
+                    "<div class='label'>Marks</div>" +
+                    "<div class='value'>" + attemptQuestion.getMarks() + "</div>" +
+                    "</div>";
+        }
+
+        if (attemptQuestion.hasNegativeMarks()){
+            marksHtml +=  "<div class='negative-marks'>" +
+                    "<div class='label'>Negative Marks</div>" +
+                    "<div class='value'>- " + attemptQuestion.getNegativeMarks() + "</div>" +
+                    "</div>";
+        }
+
+        marksHtml += "</div>";
+        return marksHtml;
     }
 
     private class OptionsSelectionListener {
