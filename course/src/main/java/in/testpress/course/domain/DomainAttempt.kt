@@ -27,7 +27,8 @@ data class DomainAttempt(
     val rankEnabled : Boolean? = null,
     val sections : List<String>? = null,
     val speed : Int? = null,
-    val accuracy : Int? = null
+    val accuracy : Int? = null,
+    val lastViewedQuestion: Int? = null
 ) {
     val endUrl = url + "end/"
 }
@@ -52,6 +53,7 @@ fun Attempt.asDomainModel(): DomainAttempt {
         percentile = percentile,
         speed = speed,
         accuracy = accuracy,
-        percentage = percentage
+        percentage = percentage,
+        lastViewedQuestion = lastViewedQuestion
     )
 }
