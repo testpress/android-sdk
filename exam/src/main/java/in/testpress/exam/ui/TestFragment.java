@@ -801,8 +801,23 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         } else {
             goToQuestion(0, false);
         }
+
+        if (attempt.getLastViewedQuestionId() != null){
+            Integer position = getLastViewedQuestionIndex();
+            viewPager.setCurrentItem(position);
+        }
+
         questionsListProgressBar.setVisibility(View.GONE);
         isNextPageQuestionsBeingFetched = false;
+    }
+
+    private Integer getLastViewedQuestionIndex(){
+        for (AttemptItem attemptItem: attemptItemList) {
+            if (attemptItem.getId().equals(attempt.getLastViewedQuestionId())){
+                return attemptItemList.indexOf(attemptItem);
+            }
+        }
+        return 0;
     }
 
     void groupAttemptItems(String spinnerItem, AttemptItem attemptItem, List<String> spinnerItemsList,

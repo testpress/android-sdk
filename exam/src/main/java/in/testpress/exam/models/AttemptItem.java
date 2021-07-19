@@ -14,6 +14,7 @@ import in.testpress.util.CommonUtils;
 
 public class AttemptItem implements Parcelable {
 
+    private Integer id;
     private String url;
     private AttemptQuestion question;
     private List<Integer> selectedAnswers = new ArrayList<Integer>();
@@ -32,6 +33,7 @@ public class AttemptItem implements Parcelable {
 
     // Parcelling part
     protected AttemptItem(Parcel in) {
+        id = in.readInt();
         url = in.readString();
         question = in.readParcelable(AttemptQuestion.class.getClassLoader());
         byte tmpReview = in.readByte();
@@ -52,6 +54,7 @@ public class AttemptItem implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
         dest.writeString(url);
         dest.writeParcelable(question, flags);
         dest.writeByte((byte) (review == null ? 0 : review ? 1 : 2));
@@ -245,5 +248,13 @@ public class AttemptItem implements Parcelable {
 
     public void setAttemptSection(AttemptSection attemptSection) {
         this.attemptSection = attemptSection;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }

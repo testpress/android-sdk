@@ -47,6 +47,7 @@ public class Attempt implements android.os.Parcelable {
     private Integer speed;
     private Integer accuracy;
     private String percentage;
+    private Integer lastViewedQuestionId;
 
     /** Used to resolve relations */
     @Generated
@@ -76,7 +77,7 @@ public class Attempt implements android.os.Parcelable {
     }
 
     @Generated
-    public Attempt(String url, Long id, String date, Integer totalQuestions, String score, String rank, String maxRank, String reviewUrl, String questionsUrl, Integer correctCount, Integer incorrectCount, String lastStartedTime, String remainingTime, String timeTaken, String state, String percentile, Integer speed, Integer accuracy, String percentage) {
+    public Attempt(String url, Long id, String date, Integer totalQuestions, String score, String rank, String maxRank, String reviewUrl, String questionsUrl, Integer correctCount, Integer incorrectCount, String lastStartedTime, String remainingTime, String timeTaken, String state, String percentile, Integer speed, Integer accuracy, String percentage, Integer lastViewedQuestionId) {
         this.url = url;
         this.id = id;
         this.date = date;
@@ -96,6 +97,7 @@ public class Attempt implements android.os.Parcelable {
         this.speed = speed;
         this.accuracy = accuracy;
         this.percentage = percentage;
+        this.lastViewedQuestionId = lastViewedQuestionId;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -257,6 +259,14 @@ public class Attempt implements android.os.Parcelable {
         this.percentage = percentage;
     }
 
+    public Integer getLastViewedQuestionId() {
+        return lastViewedQuestionId;
+    }
+
+    public void setLastViewedQuestionId(Integer lastViewedQuestionId) {
+        this.lastViewedQuestionId = lastViewedQuestionId;
+    }
+
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
     @Generated
     public List<AttemptSection> getSections() {
@@ -362,6 +372,7 @@ public class Attempt implements android.os.Parcelable {
         }
         percentage = in.readString();
         sections = in.createTypedArrayList(AttemptSection.CREATOR);
+        lastViewedQuestionId = in.readInt();
     }
 
     @Override
@@ -416,6 +427,7 @@ public class Attempt implements android.os.Parcelable {
         }
         dest.writeString(percentage);
         dest.writeTypedList(getRawSections());
+        dest.writeInt(lastViewedQuestionId);
     }
 
     @Override
