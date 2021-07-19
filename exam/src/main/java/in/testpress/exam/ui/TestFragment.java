@@ -802,7 +802,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             goToQuestion(0, false);
         }
 
-        if (attempt.getLastViewedQuestion() != null){
+        if (attempt.getLastViewedQuestionId() != null){
             Integer position = getLastViewedQuestionIndex();
             viewPager.setCurrentItem(position);
         }
@@ -813,7 +813,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
     private Integer getLastViewedQuestionIndex(){
         for (AttemptItem attemptItem: attemptItemList) {
-            if (attemptItem.getId().equals(attempt.getLastViewedQuestion())){
+            if (attemptItem.getId().equals(attempt.getLastViewedQuestionId())){
                 return attemptItemList.indexOf(attemptItem);
             }
         }

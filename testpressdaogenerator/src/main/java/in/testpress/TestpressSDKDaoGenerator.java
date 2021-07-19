@@ -238,7 +238,7 @@ public class TestpressSDKDaoGenerator {
         attempt.addIntProperty("speed");
         attempt.addIntProperty("accuracy");
         attempt.addStringProperty("percentage");
-        attempt.addIntProperty("lastViewedQuestion");
+        attempt.addIntProperty("lastViewedQuestionId");
         attempt.implementsInterface("android.os.Parcelable");
         return attempt;
 

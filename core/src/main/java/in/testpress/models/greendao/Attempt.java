@@ -47,7 +47,7 @@ public class Attempt implements android.os.Parcelable {
     private Integer speed;
     private Integer accuracy;
     private String percentage;
-    private Integer lastViewedQuestion;
+    private Integer lastViewedQuestionId;
 
     /** Used to resolve relations */
     @Generated
@@ -77,7 +77,7 @@ public class Attempt implements android.os.Parcelable {
     }
 
     @Generated
-    public Attempt(String url, Long id, String date, Integer totalQuestions, String score, String rank, String maxRank, String reviewUrl, String questionsUrl, Integer correctCount, Integer incorrectCount, String lastStartedTime, String remainingTime, String timeTaken, String state, String percentile, Integer speed, Integer accuracy, String percentage, Integer lastViewedQuestion) {
+    public Attempt(String url, Long id, String date, Integer totalQuestions, String score, String rank, String maxRank, String reviewUrl, String questionsUrl, Integer correctCount, Integer incorrectCount, String lastStartedTime, String remainingTime, String timeTaken, String state, String percentile, Integer speed, Integer accuracy, String percentage, Integer lastViewedQuestionId) {
         this.url = url;
         this.id = id;
         this.date = date;
@@ -97,7 +97,7 @@ public class Attempt implements android.os.Parcelable {
         this.speed = speed;
         this.accuracy = accuracy;
         this.percentage = percentage;
-        this.lastViewedQuestion = lastViewedQuestion;
+        this.lastViewedQuestionId = lastViewedQuestionId;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -259,12 +259,12 @@ public class Attempt implements android.os.Parcelable {
         this.percentage = percentage;
     }
 
-    public Integer getLastViewedQuestion() {
-        return lastViewedQuestion;
+    public Integer getLastViewedQuestionId() {
+        return lastViewedQuestionId;
     }
 
-    public void setLastViewedQuestion(Integer lastViewedQuestion) {
-        this.lastViewedQuestion = lastViewedQuestion;
+    public void setLastViewedQuestionId(Integer lastViewedQuestionId) {
+        this.lastViewedQuestionId = lastViewedQuestionId;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
@@ -372,7 +372,7 @@ public class Attempt implements android.os.Parcelable {
         }
         percentage = in.readString();
         sections = in.createTypedArrayList(AttemptSection.CREATOR);
-        lastViewedQuestion = in.readInt();
+        lastViewedQuestionId = in.readInt();
     }
 
     @Override
@@ -427,7 +427,7 @@ public class Attempt implements android.os.Parcelable {
         }
         dest.writeString(percentage);
         dest.writeTypedList(getRawSections());
-        dest.writeInt(lastViewedQuestion);
+        dest.writeInt(lastViewedQuestionId);
     }
 
     @Override
