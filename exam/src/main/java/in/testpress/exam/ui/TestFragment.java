@@ -912,7 +912,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             if (exception.isForbidden() && isMaxQuestionsAttemptedError(errorDetails)) {
                                 clearAndLoadSameQuestion(position);
                                 saveAnswerAlertDialog = showMaxQuestionsAttemptedError(errorDetails);
-
+                                progressDialog.dismiss();
                             } else {
                                 stopTimer();
                                 progressDialog.dismiss();
