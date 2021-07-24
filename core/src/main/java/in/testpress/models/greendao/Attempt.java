@@ -427,7 +427,13 @@ public class Attempt implements android.os.Parcelable {
         }
         dest.writeString(percentage);
         dest.writeTypedList(getRawSections());
-        dest.writeInt(lastViewedQuestionId);
+
+        if(lastViewedQuestionId != null){
+            dest.writeInt(lastViewedQuestionId);
+        } else {
+            dest.writeInt(0);
+        }
+
     }
 
     @Override
