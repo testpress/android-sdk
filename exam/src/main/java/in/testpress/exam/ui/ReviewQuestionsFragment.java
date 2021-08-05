@@ -640,6 +640,7 @@ public class ReviewQuestionsFragment extends Fragment {
     public void pauseWebview() {
         if (webView != null) {
             webView.onPause();
+            webView.loadUrl("javascript:stopAudio()");
         }
     }
 

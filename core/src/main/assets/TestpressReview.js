@@ -51,3 +51,10 @@ function addWatermark(logoUrl) {
     document.body.pseudoStyle("before", "background-image", `url(${logoUrl})`);
     document.body.classList.add("watermark");
 }
+
+function stopAudio(){
+  audios=document.querySelectorAll('audio');
+  for(i=0;i<audios.length;i++){
+   audios[i].pause();
+  }
+}
