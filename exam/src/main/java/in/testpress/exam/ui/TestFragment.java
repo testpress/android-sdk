@@ -1499,7 +1499,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
     @Override
     public void showInfo() {
-        AttemptSection section = sections.get(attempt.getCurrentSectionPosition());
+        AttemptSection section = sections.get(sectionsFilter.getSelectedItemPosition());
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
                 R.style.TestpressAppCompatAlertDialogStyle);
         builder.setTitle("Instructions");
