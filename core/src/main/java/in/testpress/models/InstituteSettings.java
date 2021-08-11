@@ -1,3 +1,4 @@
+
 package in.testpress.models;
 
 import android.content.Context;
@@ -33,6 +34,7 @@ public class InstituteSettings {
     private long serverTime;
     private String leaderboardLabel;
     private String threatsAndTargetsLabel;
+    private boolean isVideoDownloadEnabled;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -290,6 +292,15 @@ public class InstituteSettings {
 
     public InstituteSettings setThreatsAndTargetsLabel(String threatsAndTargetsLabel) {
         this.threatsAndTargetsLabel = threatsAndTargetsLabel;
+        return this;
+    }
+
+    public boolean isVideoDownloadEnabled() {
+        return isVideoDownloadEnabled;
+    }
+
+    public InstituteSettings setVideoDownloadEnabled(boolean isVideoDownloadEnabled) {
+        this.isVideoDownloadEnabled = isVideoDownloadEnabled;
         return this;
     }
 }

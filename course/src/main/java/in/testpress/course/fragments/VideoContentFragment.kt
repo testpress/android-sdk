@@ -1,5 +1,6 @@
 package `in`.testpress.course.fragments
 
+import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainVideoContent
 import `in`.testpress.course.helpers.DownloadTask
@@ -9,6 +10,7 @@ import `in`.testpress.course.ui.DownloadsActivity
 import `in`.testpress.course.ui.VideoDownloadQualityChooserDialog
 import `in`.testpress.course.util.PatternEditableBuilder
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
+import `in`.testpress.models.InstituteSettings
 import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
@@ -40,6 +42,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
     private lateinit var offlineVideoViewModel: OfflineVideoViewModel
     private lateinit var videoDownloadProgress: RingProgressBar
     private lateinit var menu: Menu
+    private lateinit var instituteSettings: InstituteSettings;
 
     override var isBookmarkEnabled: Boolean
         get() = false
@@ -69,17 +72,22 @@ class VideoContentFragment : BaseContentDetailFragment() {
         description = view.findViewById(R.id.description)
         titleLayout = view.findViewById(R.id.title_layout)
         initializeListeners()
+        instituteSettings = TestpressSdk.getTestpressSession(requireContext())!!.instituteSettings;
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.video_content_menu, menu)
+        if (instituteSettings.isVideoDownloadEnabled) {
+            inflater.inflate(R.menu.video_content_menu, menu)
+        }
         this.menu = menu
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        setProgressBarInMenuItem()
+        if (instituteSettings.isVideoDownloadEnabled) {
+            setProgressBarInMenuItem()
+        }
     }
 
     private fun setProgressBarInMenuItem() {
@@ -156,7 +164,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
         videoWidgetFragment = VideoWidgetFragmentFactory.getWidget(content.video!!)
         videoWidgetFragment.arguments = arguments
         parseVideoDescription()
-        if (content.video!!.isDownloadable()) {
+        if (content.video!!.isDownloadable() && instituteSettings.isVideoDownloadEnabled) {
             showDownloadStatus()
         } else if (::menu.isInitialized) {
             menu.clear()
@@ -168,7 +176,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
 
     override fun onResume() {
         super.onResume()
-        if(isContentInitialized() && content.video!!.isDownloadable()) {
+        if(isContentInitialized() && instituteSettings.isVideoDownloadEnabled && content.video!!.isDownloadable()) {
             showDownloadStatus()
         }
     }
