@@ -71,6 +71,7 @@ import in.testpress.course.R;
 import in.testpress.course.api.TestpressCourseApiClient;
 import in.testpress.course.helpers.DownloadTask;
 import in.testpress.course.helpers.VideoDownload;
+import in.testpress.course.repository.VideoWatchDataRepository;
 import in.testpress.models.ProfileDetails;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.VideoAttempt;
@@ -143,6 +144,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
     AudioManager.OnAudioFocusChangeListener audioFocusChangeListener;
     private DefaultTrackSelector trackSelector;
     private DialogInterface.OnClickListener dialogOnClickListener;
+    private VideoWatchDataRepository videoWatchDataRepository;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition) {
@@ -515,6 +517,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
     public void setVideoAttemptParameters(long videoAttemptId, Content content) {
         this.videoAttemptId = videoAttemptId;
         this.content = content;
+        videoWatchDataRepository = new VideoWatchDataRepository(activity);
     }
 
     public void onStart() {
@@ -633,8 +636,12 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
         return parameters;
     }
 
+    private String TAG = "ExoPlayerUtil";
+
     public void updateVideoAttempt() {
-        if (videoAttemptId == -1) {
+        android.util.Log.d(TAG, "updateVideoAttempt: " + content + getVideoAttemptParameters());
+        if (videoAttemptId == -1 && videoWatchDataRepository != null) {
+            videoWatchDataRepository.saveData(content, getVideoAttemptParameters());
             return;
         }
 
@@ -651,6 +658,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
 
                     @Override
                     public void onException(TestpressException exception) {
+                        if (videoWatchDataRepository != null) {
+                            videoWatchDataRepository.saveData(content, getVideoAttemptParameters());
+                        }
+                        android.util.Log.d(TAG, "onException: " + watchedTimeRanges.toString());
                         errorOnVideoAttemptUpdate = true;
                     }
                 });

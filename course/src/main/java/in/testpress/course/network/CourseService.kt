@@ -2,6 +2,7 @@ package `in`.testpress.course.network
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.api.TestpressCourseApiClient
+import `in`.testpress.database.entities.VideoWatchDataEntity
 import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Course
@@ -10,12 +11,7 @@ import `in`.testpress.network.TestpressApiClient
 import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.ContentsListResponse
 import android.content.Context
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Path
-import retrofit2.http.QueryMap
-import retrofit2.http.Url
+import retrofit2.http.*
 import java.util.HashMap
 
 interface CourseService {
@@ -45,6 +41,11 @@ interface CourseService {
 
     @GET(TestpressCourseApiClient.COURSE_LIST_PATH)
     fun getCourses(@QueryMap queryParams: HashMap<String, Any>): RetrofitCall<TestpressApiResponse<Course>>
+
+    @POST(TestpressCourseApiClient.CONTENTS_PATH)
+    fun syncVideoWatchData(
+        @Body arguments: List<VideoWatchDataEntity>
+    ): RetrofitCall<Void>
 }
 
 
@@ -73,5 +74,9 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     fun getCourses(arguments: HashMap<String, Any>): RetrofitCall<TestpressApiResponse<Course>> {
         return getCourseService().getCourses(arguments)
+    }
+
+    fun syncVideoWatchData(data: List<VideoWatchDataEntity>): RetrofitCall<Void> {
+        return getCourseService().syncVideoWatchData(data)
     }
 }

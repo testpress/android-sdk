@@ -1,9 +1,6 @@
 package `in`.testpress.database
 
-import `in`.testpress.database.dao.CategoryDao
-import `in`.testpress.database.dao.CommentDao
-import `in`.testpress.database.dao.DiscussionPostDao
-import `in`.testpress.database.dao.LastLoadedPageDataDao
+import `in`.testpress.database.dao.*
 import `in`.testpress.database.entities.*
 import `in`.testpress.database.roommigration.RoomMigration10To11.MIGRATION_10_11
 import `in`.testpress.database.roommigration.RoomMigration4To5.MIGRATION_4_5
@@ -13,12 +10,14 @@ import `in`.testpress.database.roommigration.RoomMigration6To7.MIGRATION_6_7
 import `in`.testpress.database.roommigration.RoomMigration7To8.MIGRATION_7_8
 import `in`.testpress.database.roommigration.RoomMigration8To9.MIGRATION_8_9
 import `in`.testpress.database.roommigration.RoomMigration9To10.MIGRATION_9_10
+import `in`.testpress.util.Converters
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 
-@Database(version = 11,
+@Database(version = 12,
         entities = [
             ContentEntity::class,
             OfflineVideo::class,
@@ -31,8 +30,10 @@ import androidx.room.RoomDatabase
             DiscussionPostEntity::class,
             LastLoadedPageData::class,
             UserEntity::class,
-            CategoryEntity::class
+            CategoryEntity::class,
+            VideoWatchDataEntity::class
         ], exportSchema = true)
+@TypeConverters(Converters::class)
 abstract class TestpressDatabase : RoomDatabase() {
     abstract fun contentDao(): ContentDao
     abstract fun offlineVideoDao(): OfflineVideoDao
@@ -41,6 +42,7 @@ abstract class TestpressDatabase : RoomDatabase() {
     abstract fun forumDao(): DiscussionPostDao
     abstract fun lastLoadedPageDataDao(): LastLoadedPageDataDao
     abstract fun categoryDao(): CategoryDao
+    abstract fun videoWatchDataDao(): VideoWatchDataDao
 
     companion object {
         private lateinit var INSTANCE: TestpressDatabase

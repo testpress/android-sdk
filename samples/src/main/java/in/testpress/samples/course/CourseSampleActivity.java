@@ -8,6 +8,7 @@ import android.view.View;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.course.TestpressCourse;
+import in.testpress.course.services.VideoWatchDataSyncService;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
@@ -51,6 +52,8 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                 }
             }
         });
+        Intent i = new Intent(CourseSampleActivity.this, VideoWatchDataSyncService.class);
+        startService(i);
         findViewById(R.id.gamified_course).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

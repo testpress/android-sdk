@@ -68,7 +68,10 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
                         exoPlayerUtil?.setVideoAttemptParameters(contentAttempt.objectId!!.toLong(), greenDaoContent!!)
                         exoPlayerUtil?.initializePlayer()
                     }
-                    else -> exoPlayerUtil?.initializePlayer()
+                    else -> {
+                        exoPlayerUtil?.setVideoAttemptParameters(-1, greenDaoContent!!)
+                        exoPlayerUtil?.initializePlayer()
+                    }
                 }
 
             })
