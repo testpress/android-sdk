@@ -31,6 +31,8 @@ import com.theartofdev.edmodo.cropper.CropImage;
 
 import junit.framework.Assert;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -434,6 +436,10 @@ public class ReviewQuestionsFragment extends Fragment {
             }
         }
 
+        if ((reviewItem.getQuestion().getType().equals("E"))) {
+            html += getUserEssayAnswerHtml();
+        }
+
         if (isShortAnswerType || isNumericalType) {
             html += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
                     WebViewUtils.getHeadingTags(getString(R.string.testpress_your_answer)) +
@@ -475,6 +481,14 @@ public class ReviewQuestionsFragment extends Fragment {
                     "</div>";
         }
         return html + "</div>";
+    }
+
+    @NotNull
+    private String getUserEssayAnswerHtml() {
+        return "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
+                WebViewUtils.getHeadingTags(getString(R.string.testpress_your_answer)) +
+                reviewItem.getEssayText() +
+                "</div>";
     }
 
     private class BookmarkListener {

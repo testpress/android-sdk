@@ -178,5 +178,4 @@ public class AttemptQuestion implements Parcelable {
     public boolean hasPositiveMarks(){
         return !this.marks.equals("0.00") && !this.marks.isEmpty();
     }
-
 }

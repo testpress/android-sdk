@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +73,7 @@ public class TestQuestionFragment extends Fragment {
             attemptItem.saveAnswers(attemptItem.getSelectedAnswers());
             attemptItem.setCurrentShortText(attemptItem.getShortText());
             attemptItem.setCurrentReview(attemptItem.getReview());
+            attemptItem.setLocalEssayText(attemptItem.getEssayText());
             webViewUtils = new WebViewUtils(questionsView) {
                 @Override
                 public String getHeader() {
@@ -88,6 +91,7 @@ public class TestQuestionFragment extends Fragment {
                             javascript += getCheckBoxInitializer(selectedAnswers);
                         }
                     }
+
                     return javascript;
                 }
 
@@ -153,6 +157,8 @@ public class TestQuestionFragment extends Fragment {
                 }
             }
             htmlContent += "</table>";
+        } else if (attemptQuestion.getType().equals("E")) {
+            htmlContent += getEssayQuestionHtml();
         } else {
             boolean numberType = attemptQuestion.getType().equals("N");
             questionsView.setNumberType(numberType);
@@ -190,6 +196,17 @@ public class TestQuestionFragment extends Fragment {
         marksHtml += "</div>";
         return marksHtml;
     }
+    
+    @NotNull
+    private String getEssayQuestionHtml() {
+        String htmlContent = "<textarea class='essay_topic'  oninput='onEssayValueChange(this)' rows='10'>";
+
+        if (attemptItem.getLocalEssayText() != null) {
+            htmlContent += attemptItem.getLocalEssayText();
+        }
+        htmlContent += "</textarea>";
+        return htmlContent;
+    }
 
     private class OptionsSelectionListener {
 
@@ -214,6 +231,11 @@ public class TestQuestionFragment extends Fragment {
         @JavascriptInterface
         public void onTextValueChange(String value) {
             attemptItem.setCurrentShortText(value.trim());
+        }
+
+        @JavascriptInterface
+        public void onEssayValueChange(String value) {
+            attemptItem.setLocalEssayText(value.trim());
         }
     }
 
