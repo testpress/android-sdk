@@ -1,0 +1,115 @@
+apply from: rootProject.file("github.properties")
+apply plugin: 'maven-publish'
+
+version = VERSION_NAME
+group = GROUP
+
+task androidJavadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    android.libraryVariants.all { variant ->
+        if (variant.name == 'release') {
+            owner.classpath += variant.javaCompileProvider.get().classpath
+        }
+    }
+
+    exclude '**/R.html', '**/R.*.html', '**/index.html'
+    options.encoding 'utf-8'
+    options {
+        addStringOption 'docencoding', 'utf-8'
+        addStringOption 'charset', 'utf-8'
+        links 'https://docs.oracle.com/javase/7/docs/api/'
+        links 'https://d.android.com/reference'
+        links 'https://developer.android.com/reference/androidx/'
+    }
+}
+
+task androidJavadocJar(type: Jar, dependsOn: androidJavadoc) {
+    archiveClassifier.set('javadoc')
+    from androidJavadoc.destinationDir
+
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+
+task javaSourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    from android.sourceSets.main.java.srcDirs
+
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+
+afterEvaluate { project ->
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId GROUP
+                artifactId POM_ARTIFACT_ID
+                version VERSION_NAME
+                artifact androidJavadocJar
+                artifact javaSourcesJar
+                artifact "$buildDir/outputs/aar/$project.name-release.aar"
+
+                pom {
+
+                    name = POM_NAME
+                    packaging = POM_PACKAGING
+                    description = POM_DESCRIPTION
+                    url = POM_URL
+                    groupId = GROUP
+                    artifactId = POM_ARTIFACT_ID
+                    version = VERSION_NAME
+
+                    scm {
+                        url = POM_SCM_URL
+                        connection = POM_SCM_CONNECTION
+                        developerConnection = POM_SCM_DEV_CONNECTION
+                    }
+
+                    licenses {
+                        license {
+                            name = POM_LICENCE_NAME
+                            url = POM_LICENCE_URL
+                            distribution = POM_LICENCE_DIST
+                        }
+                    }
+                }
+
+                pom.withXml {
+                    def dependenciesNode = asNode().appendNode('dependencies')
+                    // Iterate over the api dependencies (we don't want the test ones), adding a <dependency> node for each
+                    configurations.api.allDependencies.each {
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', it.group)
+                        dependencyNode.appendNode('artifactId', it.name)
+                        dependencyNode.appendNode('version', it.version)
+                    }
+                }
+
+
+            }
+        }
+
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                
+                url = uri("https://maven.pkg.github.com/testpress/android-sdk")
+
+                credentials {
+                    username=GITHUB_USERNAME
+                    password=GITHUB_ACCESS_KEY
+                }
+            }
+        }
+    }
+}
+
+task cleanBuildPublishLocal(type: GradleBuild) {
+    tasks = ['clean', 'build', 'publishToMavenLocal']
+}
+
+task cleanBuildPublish(type: GradleBuild) {
+    tasks = ['clean', 'build', 'publish']
+}
