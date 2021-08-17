@@ -12,6 +12,9 @@ interface OfflineVideoDao: BaseDao<OfflineVideo> {
     @Query("SELECT * FROM offlinevideo WHERE url=:url")
     fun getByUrl(url: String): OfflineVideo?
 
+    @Query("SELECT * FROM offlinevideo WHERE contentId=:contentId")
+    fun getByContentId(contentId: Long): OfflineVideo?
+
     @Query("SELECT * FROM offlinevideo WHERE url=:url")
     fun get(url: String): LiveData<OfflineVideo?>
 

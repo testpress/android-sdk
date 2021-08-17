@@ -52,8 +52,6 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                 }
             }
         });
-        Intent i = new Intent(CourseSampleActivity.this, VideoWatchDataSyncService.class);
-        startService(i);
         findViewById(R.id.gamified_course).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -146,6 +144,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                     break;
             }
             session.getInstituteSettings().setDisplayUserEmailOnVideo(true);
+            session.getInstituteSettings().setVideoDownloadEnabled(true);
             session.getInstituteSettings().setScreenshotDisabled(false);
             session.getInstituteSettings().setDisableStudentAnalytics(false);
             session.getInstituteSettings().setStoreLabel("Available Courses");

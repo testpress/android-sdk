@@ -17,7 +17,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(version = 12,
+@Database(version = 13,
         entities = [
             ContentEntity::class,
             OfflineVideo::class,
@@ -58,6 +58,7 @@ abstract class TestpressDatabase : RoomDatabase() {
                     INSTANCE = Room.databaseBuilder(context.applicationContext,
                             TestpressDatabase::class.java, "testpress-database")
                             .addMigrations(*MIGRATIONS)
+                            .fallbackToDestructiveMigration()
                             .build()
                 }
             }

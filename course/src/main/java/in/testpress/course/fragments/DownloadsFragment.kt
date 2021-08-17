@@ -6,6 +6,7 @@ import `in`.testpress.course.helpers.DownloadedVideoRemoveHandler
 import `in`.testpress.course.repository.CourseRepository
 import `in`.testpress.course.repository.OfflineVideoRepository
 import `in`.testpress.course.services.VideoDownloadService
+import `in`.testpress.course.services.VideoWatchDataSyncService
 import `in`.testpress.course.ui.OfflineVideoListAdapter
 import `in`.testpress.course.util.DateUtils
 import `in`.testpress.course.viewmodels.CourseViewModel
@@ -13,10 +14,9 @@ import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -53,12 +53,20 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
         super.onCreate(savedInstanceState)
         VideoDownloadService.start(requireContext())
         courseLastSyncedDate = CourseLastSyncedDate(requireContext())
+        setHasOptionsMenu(true)
+
+        val i = Intent(requireActivity(), VideoWatchDataSyncService::class.java)
+        requireActivity().startService(i)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.downloads_fragment_menu, menu)
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.base_list_layout, container, false)
     }
@@ -123,9 +131,9 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
                 Status.ERROR -> {
                     showRefreshScreen()
                     Toast.makeText(
-                        requireContext(),
-                        "Network Error. Please try again",
-                        Toast.LENGTH_LONG
+                            requireContext(),
+                            "Network Error. Please try again",
+                            Toast.LENGTH_LONG
                     ).show()
                 }
                 Status.SUCCESS -> checkCourseRefreshDateAndDisplay()
@@ -169,9 +177,9 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
 
     private fun showEnableAutoTimeUpdateScreen() {
         emptyViewFragment.setEmptyText(
-            R.string.auto_time_disabled,
-            R.string.enable_auto_time_description,
-            null
+                R.string.auto_time_disabled,
+                R.string.enable_auto_time_description,
+                null
         )
         emptyViewFragment.setImage(R.drawable.ic_empty_video)
         emptyViewFragment.showOrHideButton(false)

@@ -1,6 +1,7 @@
 package `in`.testpress.course.domain
 
 import `in`.testpress.database.OfflineVideo
+import `in`.testpress.database.VideoSyncStatus
 
 data class DomainOfflineVideo(
     val id: Long? = null,
@@ -14,7 +15,8 @@ data class DomainOfflineVideo(
     val percentageDownloaded: Int = 0,
     val bytesDownloaded: Long = 0,
     val totalSize: Long = 0,
-    val courseId: Long = -1
+    val courseId: Long = -1,
+    val syncState: VideoSyncStatus = VideoSyncStatus.NOT_SYNCED
 ) {
     val isDownloadCompleted = percentageDownloaded == 100
 }
@@ -38,6 +40,7 @@ fun OfflineVideo.asDomainModel(): DomainOfflineVideo {
         percentageDownloaded = percentageDownloaded,
         bytesDownloaded = bytesDownloaded,
         totalSize = totalSize,
-        courseId = courseId!!
+        courseId = courseId!!,
+        syncState = syncState
     )
 }
