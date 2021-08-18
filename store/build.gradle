@@ -42,5 +42,4 @@ dependencies {
     testImplementation "androidx.arch.core:core-testing:2.1.0"
 }
 
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 apply from: rootProject.file('gradle/gradle-mvn-github-packages.gradle')
