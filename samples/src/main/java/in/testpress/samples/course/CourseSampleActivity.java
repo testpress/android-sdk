@@ -143,6 +143,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                     break;
             }
             session.getInstituteSettings().setDisplayUserEmailOnVideo(true);
+            session.getInstituteSettings().setVideoDownloadEnabled(true);
             session.getInstituteSettings().setScreenshotDisabled(false);
             session.getInstituteSettings().setDisableStudentAnalytics(false);
             session.getInstituteSettings().setStoreLabel("Available Courses");
