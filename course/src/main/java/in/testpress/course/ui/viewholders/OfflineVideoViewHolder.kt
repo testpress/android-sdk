@@ -5,6 +5,7 @@ import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainOfflineVideo
 import `in`.testpress.course.ui.DownloadedVideoClickListener
 import `in`.testpress.database.VideoSyncStatus
+import `in`.testpress.util.Extensions.startRotation
 import `in`.testpress.util.ImageUtils
 import android.animation.ObjectAnimator
 import android.content.Context
@@ -72,22 +73,14 @@ class OfflineVideoViewHolder(val view: View) : RecyclerView.ViewHolder(view),
     }
 
     private fun showSyncStatus() {
+        syncIcon.visibility = View.GONE
         syncIcon.clearAnimation()
-//        val rotate = ObjectAnimator.ofFloat(syncIcon, "rotation", 180f, 0f)
         when(offlineVideo.syncState) {
             VideoSyncStatus.NOT_SYNCED -> {}
             VideoSyncStatus.SYNCING -> {
-                val rotate = RotateAnimation(0F, 360F, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
-                rotate.duration = 2000
-//                rotate.interpolator = LinearInterpolator()
-                rotate.repeatCount = Animation.INFINITE
-                syncIcon.startAnimation(rotate)
-            }
-            VideoSyncStatus.SUCCESS -> {
-                syncIcon.setImageResource(R.drawable.ic_tick)
-            }
-            VideoSyncStatus.FAILURE -> {
-                syncIcon.setImageResource(R.drawable.ic_error_outline_black_18dp)
+                syncIcon.visibility = View.VISIBLE
+                syncIcon.setImageResource(R.drawable.sync)
+                syncIcon.startRotation()
             }
         }
 

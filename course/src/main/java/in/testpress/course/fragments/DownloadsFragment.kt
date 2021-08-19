@@ -5,8 +5,8 @@ import `in`.testpress.course.helpers.CourseLastSyncedDate
 import `in`.testpress.course.helpers.DownloadedVideoRemoveHandler
 import `in`.testpress.course.repository.CourseRepository
 import `in`.testpress.course.repository.OfflineVideoRepository
+import `in`.testpress.course.repository.VideoWatchDataRepository
 import `in`.testpress.course.services.VideoDownloadService
-import `in`.testpress.course.services.VideoWatchDataSyncService
 import `in`.testpress.course.ui.OfflineVideoListAdapter
 import `in`.testpress.course.util.DateUtils
 import `in`.testpress.course.viewmodels.CourseViewModel
@@ -14,7 +14,9 @@ import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
-import android.content.Intent
+import `in`.testpress.util.Extensions.startRotation
+import `in`.testpress.util.Misc.hasNetworkAvailable
+import `in`.testpress.util.UIUtils.showAlert
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -26,6 +28,10 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
+import kotlinx.coroutines.*
+import java.util.*
+import kotlin.concurrent.schedule
+
 
 class DownloadsFragment : Fragment(), EmptyViewListener {
     private val TAG = "DownloadsFragment"
@@ -48,19 +54,32 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var loadingPlaceholder: ShimmerFrameLayout
     private lateinit var adapter: OfflineVideoListAdapter
+    private lateinit var menu: Menu
+    private lateinit var job: Job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         VideoDownloadService.start(requireContext())
         courseLastSyncedDate = CourseLastSyncedDate(requireContext())
         setHasOptionsMenu(true)
-
-        val i = Intent(requireActivity(), VideoWatchDataSyncService::class.java)
-        requireActivity().startService(i)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.downloads_fragment_menu, menu)
+        this.menu = menu
+
+        if (hasNetworkAvailable(requireContext())) {
+            menu.findItem(R.id.sync).isVisible = true
+        }
+
+        menu.findItem(R.id.sync).actionView.setOnClickListener {
+            if (job.isActive) {
+                showAlert(requireContext(), "Syncing Video", "Video data is being synced with server.")
+            } else {
+                syncVideoWatchData()
+            }
+        }
     }
 
     override fun onCreateView(
@@ -77,6 +96,9 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
         initializeRecyclerView()
         initializeObservers()
         initializeCourseRefreshStatusObserver()
+        Timer().schedule(1000) {
+            syncVideoWatchData()
+        }
     }
 
     private fun bindViews(view: View) {
@@ -193,6 +215,18 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
     private fun hideLoadingPlaceholder() {
         loadingPlaceholder.stopShimmer()
         loadingPlaceholder.visibility = View.GONE
+    }
+
+    private fun syncVideoWatchData() {
+        job = GlobalScope.async {
+            val refreshItem = menu.findItem(R.id.sync)
+            refreshItem.actionView.startRotation()
+
+            VideoWatchDataRepository(requireContext()).syncData()
+            launch(Dispatchers.Main) {
+                refreshItem.actionView.clearAnimation()
+            }
+        }
     }
 
     override fun onRetryClick() {

@@ -2,7 +2,6 @@ package `in`.testpress.course.network
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.api.TestpressCourseApiClient
-import `in`.testpress.database.entities.VideoWatchDataEntity
 import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Course
@@ -44,7 +43,7 @@ interface CourseService {
 
     @POST(TestpressCourseApiClient.CONTENTS_PATH)
     fun syncVideoWatchData(
-        @Body arguments: List<VideoWatchDataEntity>
+        @Body arguments: HashMap<String, Any>
     ): RetrofitCall<Void>
 }
 
@@ -76,7 +75,7 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         return getCourseService().getCourses(arguments)
     }
 
-    fun syncVideoWatchData(data: List<VideoWatchDataEntity>): RetrofitCall<Void> {
-        return getCourseService().syncVideoWatchData(data)
+    fun syncVideoWatchData(arguments: HashMap<String, Any>): RetrofitCall<Void> {
+        return getCourseService().syncVideoWatchData(arguments)
     }
 }
