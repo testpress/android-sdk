@@ -10,7 +10,6 @@ import android.os.AsyncTask
 
 class VideoWatchDataRepository(val context: Context) {
     private val offlineVideoDao = TestpressDatabase(context).offlineVideoDao()
-    val TAG = "VideoWatchDataRepositor"
 
     fun saveData(content: Content, videoAttemptParameters: MutableMap<String, Any>) {
         val lastWatchPosition = videoAttemptParameters[TestpressCourseApiClient.LAST_POSITION] as? String
@@ -27,19 +26,22 @@ class VideoWatchDataRepository(val context: Context) {
         }
     }
 
-    suspend fun syncData() {
+    fun syncData() {
         val courseNetwork = CourseNetwork(context)
-        val videoWatchData = offlineVideoDao.getAllSync()
-            videoWatchData.forEach {
-                it.syncState = VideoSyncStatus.SYNCING
-                offlineVideoDao.update(it)
+        offlineVideoDao.getAllSync().forEach {
+            it.syncState = VideoSyncStatus.SYNCING
+            offlineVideoDao.update(it)
 
-//                val queryParams = hashMapOf<String, Any>("page" to )
-                val response = courseNetwork.syncVideoWatchData(hashMapOf()).execute()
-                if (response.isSuccessful) {
-                    it.syncState = VideoSyncStatus.SUCCESS
-                    offlineVideoDao.update(it)
-                }
+            val queryParams = hashMapOf(
+                "watched_time_ranges" to it.watchedTimeRanges,
+                "chapter_content_id" to it.contentId!!,
+                "last_watch_position" to it.lastWatchPosition!!
+            )
+            val response = courseNetwork.syncVideoWatchData(it.contentId!!, queryParams).execute()
+            if (response.isSuccessful) {
+                it.syncState = VideoSyncStatus.SUCCESS
+                offlineVideoDao.update(it)
             }
+        }
     }
 }

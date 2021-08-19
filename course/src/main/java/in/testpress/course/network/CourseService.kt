@@ -41,8 +41,9 @@ interface CourseService {
     @GET(TestpressCourseApiClient.COURSE_LIST_PATH)
     fun getCourses(@QueryMap queryParams: HashMap<String, Any>): RetrofitCall<TestpressApiResponse<Course>>
 
-    @POST(TestpressCourseApiClient.CONTENTS_PATH)
+    @POST(TestpressCourseApiClient.VIDEO_CONTENT_ATTEMPT_UPDATE_PATH)
     fun syncVideoWatchData(
+        @Path(value = "content_id", encoded = true) contentId: Long,
         @Body arguments: HashMap<String, Any>
     ): RetrofitCall<Void>
 }
@@ -75,7 +76,7 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         return getCourseService().getCourses(arguments)
     }
 
-    fun syncVideoWatchData(arguments: HashMap<String, Any>): RetrofitCall<Void> {
-        return getCourseService().syncVideoWatchData(arguments)
+    fun syncVideoWatchData(contentId: Long, arguments: HashMap<String, Any>): RetrofitCall<Void> {
+        return getCourseService().syncVideoWatchData(contentId, arguments)
     }
 }

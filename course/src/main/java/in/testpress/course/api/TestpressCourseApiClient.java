@@ -54,6 +54,8 @@ public class TestpressCourseApiClient extends TestpressApiClient {
 
     public static final String EMBED_DOMAIN_RESTRICTED_VIDEO_PATH =  "embed/domain-restricted-video/";
 
+    public static final String VIDEO_CONTENT_ATTEMPT_UPDATE_PATH =  "/api/v2.5/chapter_content_attempts/videos/update";
+
     public TestpressCourseApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
     }
