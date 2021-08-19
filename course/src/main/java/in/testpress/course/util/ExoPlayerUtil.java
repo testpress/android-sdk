@@ -636,10 +636,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
         return parameters;
     }
 
-    private String TAG = "ExoPlayerUtil";
-
     public void updateVideoAttempt() {
-        android.util.Log.d(TAG, "updateVideoAttempt: " + content + getVideoAttemptParameters());
         if (videoAttemptId == -1 && videoWatchDataRepository != null) {
             videoWatchDataRepository.saveData(content, getVideoAttemptParameters());
             return;
@@ -661,7 +658,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
                         if (videoWatchDataRepository != null) {
                             videoWatchDataRepository.saveData(content, getVideoAttemptParameters());
                         }
-                        android.util.Log.d(TAG, "onException: " + watchedTimeRanges.toString());
                         errorOnVideoAttemptUpdate = true;
                     }
                 });

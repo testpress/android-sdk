@@ -83,9 +83,9 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.base_list_layout, container, false)
     }
@@ -153,9 +153,9 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
                 Status.ERROR -> {
                     showRefreshScreen()
                     Toast.makeText(
-                            requireContext(),
-                            "Network Error. Please try again",
-                            Toast.LENGTH_LONG
+                        requireContext(),
+                        "Network Error. Please try again",
+                        Toast.LENGTH_LONG
                     ).show()
                 }
                 Status.SUCCESS -> checkCourseRefreshDateAndDisplay()
@@ -199,9 +199,9 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
 
     private fun showEnableAutoTimeUpdateScreen() {
         emptyViewFragment.setEmptyText(
-                R.string.auto_time_disabled,
-                R.string.enable_auto_time_description,
-                null
+            R.string.auto_time_disabled,
+            R.string.enable_auto_time_description,
+            null
         )
         emptyViewFragment.setImage(R.drawable.ic_empty_video)
         emptyViewFragment.showOrHideButton(false)

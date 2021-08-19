@@ -37,7 +37,6 @@ import in.testpress.models.greendao.SelectedAnswerDao;
 import in.testpress.models.greendao.StreamDao;
 import in.testpress.models.greendao.SubjectDao;
 import in.testpress.models.greendao.UserSelectedAnswerDao;
-import in.testpress.models.greendao.VideoAttemptDao;
 import in.testpress.models.greendao.VideoConferenceDao;
 import in.testpress.models.greendao.VideoDao;
 
@@ -198,7 +197,4 @@ public class TestpressSDKDatabase {
         return getDaoSession(context).getUserSelectedAnswerDao();
     }
 
-    public static VideoAttemptDao getVideoAttemptDao(Context context) {
-        return getDaoSession(context).getVideoAttemptDao();
-    }
 }

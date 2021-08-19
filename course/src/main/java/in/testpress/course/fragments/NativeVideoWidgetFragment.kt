@@ -63,7 +63,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
 
         viewModel.createContentAttempt(content.id)
             .observe(viewLifecycleOwner, Observer { resource ->
-                when (resource.status) {
+                when(resource.status) {
                     Status.SUCCESS -> {
                         val contentAttempt = resource.data!!
                         val videoStartPosition = contentAttempt.video?.lastPosition?.toFloat() ?: 0F
@@ -72,11 +72,6 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
                         exoPlayerUtil?.initializePlayer()
                     }
                     else -> {
-                        val videoAttempts = TestpressSDKDatabase.getVideoAttemptDao(requireContext()).queryBuilder().where(VideoAttemptDao.Properties.VideoContentId.eq(content.id)).list()
-                        Log.d("TAG", "createAttemptAndInitializeExoplayer: $videoAttempts")
-                        if (videoAttempts.isNotEmpty()) {
-                            exoPlayerUtil?.setVideoAttemptParameters(videoAttempts[0].id, greenDaoContent!!)
-                        }
                         exoPlayerUtil?.setVideoAttemptParameters(-1, greenDaoContent!!)
                         exoPlayerUtil?.initializePlayer()
                     }

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 12,
-    "identityHash": "feb6bfe5f0baff9418a211a55eaf2bad",
+    "identityHash": "4b40235ba51774756714edf1b84e7221",
     "entities": [
       {
         "tableName": "ContentEntity",
@@ -1457,56 +1457,12 @@
         },
         "indices": [],
         "foreignKeys": []
-      },
-      {
-        "tableName": "VideoWatchDataEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `lastWatchPosition` TEXT, `watchedTimeRanges` TEXT NOT NULL, `chapterContentId` INTEGER NOT NULL, `videoContentId` INTEGER NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
-            "fieldPath": "lastWatchPosition",
-            "columnName": "lastWatchPosition",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "watchedTimeRanges",
-            "columnName": "watchedTimeRanges",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "chapterContentId",
-            "columnName": "chapterContentId",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "videoContentId",
-            "columnName": "videoContentId",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "id"
-          ],
-          "autoGenerate": true
-        },
-        "indices": [],
-        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'feb6bfe5f0baff9418a211a55eaf2bad')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4b40235ba51774756714edf1b84e7221')"
     ]
   }
 }

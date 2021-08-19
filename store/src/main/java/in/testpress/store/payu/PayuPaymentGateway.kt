@@ -73,6 +73,7 @@ class PayuPaymentGateway(order: Order, context: Activity): PaymentGateway(order,
     private fun addAdditionalPaymentModes() {
         val checkoutOrderList = ArrayList<PaymentMode>()
         checkoutOrderList.add(PaymentMode(PaymentType.UPI, PayUCheckoutProConstants.CP_GOOGLE_PAY))
+        checkoutOrderList.add(PaymentMode(PaymentType.WALLET, PayUCheckoutProConstants.CP_PHONEPE))
         checkoutOrderList.add(PaymentMode(PaymentType.WALLET, PayUCheckoutProConstants.CP_PAYTM))
         payuConfig.paymentModesOrder = checkoutOrderList
     }

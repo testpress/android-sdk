@@ -74,7 +74,6 @@ class OfflineVideoViewHolder(val view: View) : RecyclerView.ViewHolder(view),
 
     private fun showSyncStatus() {
         syncIcon.visibility = View.GONE
-        syncIcon.clearAnimation()
         when(offlineVideo.syncState) {
             VideoSyncStatus.NOT_SYNCED -> {}
             VideoSyncStatus.SYNCING -> {
@@ -82,6 +81,7 @@ class OfflineVideoViewHolder(val view: View) : RecyclerView.ViewHolder(view),
                 syncIcon.setImageResource(R.drawable.sync)
                 syncIcon.startRotation()
             }
+            else -> {syncIcon.clearAnimation()}
         }
 
     }
