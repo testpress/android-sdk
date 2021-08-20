@@ -71,6 +71,9 @@ import in.testpress.course.R;
 import in.testpress.course.api.TestpressCourseApiClient;
 import in.testpress.course.helpers.DownloadTask;
 import in.testpress.course.helpers.VideoDownload;
+import in.testpress.course.repository.VideoWatchDataRepository;
+import in.testpress.database.OfflineVideoDao;
+import in.testpress.database.TestpressDatabase;
 import in.testpress.models.ProfileDetails;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.VideoAttempt;
@@ -143,6 +146,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
     AudioManager.OnAudioFocusChangeListener audioFocusChangeListener;
     private DefaultTrackSelector trackSelector;
     private DialogInterface.OnClickListener dialogOnClickListener;
+    private VideoWatchDataRepository videoWatchDataRepository;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition) {
@@ -515,6 +519,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
     public void setVideoAttemptParameters(long videoAttemptId, Content content) {
         this.videoAttemptId = videoAttemptId;
         this.content = content;
+        OfflineVideoDao offlineVideoDao = TestpressDatabase.Companion.invoke(activity).offlineVideoDao();
+        videoWatchDataRepository = new VideoWatchDataRepository(activity, offlineVideoDao);
     }
 
     public void onStart() {
@@ -634,7 +640,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
     }
 
     public void updateVideoAttempt() {
-        if (videoAttemptId == -1) {
+        if (videoAttemptId == -1 && videoWatchDataRepository != null) {
+            videoWatchDataRepository.save(content, getVideoAttemptParameters());
             return;
         }
 
@@ -651,6 +658,9 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
 
                     @Override
                     public void onException(TestpressException exception) {
+                        if (videoWatchDataRepository != null) {
+                            videoWatchDataRepository.save(content, getVideoAttemptParameters());
+                        }
                         errorOnVideoAttemptUpdate = true;
                     }
                 });

@@ -4,25 +4,28 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainOfflineVideo
 import `in`.testpress.course.ui.DownloadedVideoClickListener
+import `in`.testpress.database.VideoSyncStatus
+import `in`.testpress.util.Extensions.startRotation
 import `in`.testpress.util.ImageUtils
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.PopupMenu
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.view.animation.Animation
+import android.view.animation.LinearInterpolator
+import android.view.animation.RotateAnimation
+import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 
+
 class OfflineVideoViewHolder(val view: View) : RecyclerView.ViewHolder(view),
     PopupMenu.OnMenuItemClickListener {
     private val image: ImageView = view.findViewById(R.id.image)
+    private val syncIcon: ImageView = view.findViewById(R.id.sync_state)
     private val title: TextView = view.findViewById(R.id.title)
     private val size: TextView = view.findViewById(R.id.size)
     private val duration: TextView = view.findViewById(R.id.duration)
@@ -66,6 +69,21 @@ class OfflineVideoViewHolder(val view: View) : RecyclerView.ViewHolder(view),
             showDownloadProgress()
             showPauseCancelButtons()
         }
+        showSyncStatus()
+    }
+
+    private fun showSyncStatus() {
+        syncIcon.visibility = View.GONE
+        when(offlineVideo.syncState) {
+            VideoSyncStatus.NOT_SYNCED -> {}
+            VideoSyncStatus.SYNCING -> {
+                syncIcon.visibility = View.VISIBLE
+                syncIcon.setImageResource(R.drawable.sync)
+                syncIcon.startRotation()
+            }
+            else -> {syncIcon.clearAnimation()}
+        }
+
     }
 
     private fun showDownloadProgress() {

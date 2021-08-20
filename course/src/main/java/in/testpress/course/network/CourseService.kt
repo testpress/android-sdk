@@ -10,12 +10,8 @@ import `in`.testpress.network.TestpressApiClient
 import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.ContentsListResponse
 import android.content.Context
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Path
-import retrofit2.http.QueryMap
-import retrofit2.http.Url
+import android.util.Log
+import retrofit2.http.*
 import java.util.HashMap
 
 interface CourseService {
@@ -45,6 +41,11 @@ interface CourseService {
 
     @GET(TestpressCourseApiClient.COURSE_LIST_PATH)
     fun getCourses(@QueryMap queryParams: HashMap<String, Any>): RetrofitCall<TestpressApiResponse<Course>>
+
+    @POST(TestpressCourseApiClient.VIDEO_CONTENT_ATTEMPT_UPDATE_PATH)
+    fun syncVideoWatchData(
+        @Body arguments: HashMap<String, Any>
+    ): RetrofitCall<Void>
 }
 
 
@@ -73,5 +74,9 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     fun getCourses(arguments: HashMap<String, Any>): RetrofitCall<TestpressApiResponse<Course>> {
         return getCourseService().getCourses(arguments)
+    }
+
+    fun syncVideoWatchData(arguments: HashMap<String, Any>): RetrofitCall<Void> {
+        return getCourseService().syncVideoWatchData(arguments)
     }
 }
