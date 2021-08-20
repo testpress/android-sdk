@@ -64,7 +64,6 @@ import java.util.Random;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
-import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.core.TestpressUserDetails;
@@ -642,7 +641,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
 
     public void updateVideoAttempt() {
         if (videoAttemptId == -1 && videoWatchDataRepository != null) {
-            videoWatchDataRepository.saveData(content, getVideoAttemptParameters());
+            videoWatchDataRepository.save(content, getVideoAttemptParameters());
             return;
         }
 
@@ -660,7 +659,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
                     @Override
                     public void onException(TestpressException exception) {
                         if (videoWatchDataRepository != null) {
-                            videoWatchDataRepository.saveData(content, getVideoAttemptParameters());
+                            videoWatchDataRepository.save(content, getVideoAttemptParameters());
                         }
                         errorOnVideoAttemptUpdate = true;
                     }

@@ -10,7 +10,7 @@ import android.os.AsyncTask
 
 class VideoWatchDataRepository(val context: Context, private val offlineVideoDao: OfflineVideoDao) {
 
-    fun saveData(content: Content, videoAttemptParameters: MutableMap<String, Any>) {
+    fun save(content: Content, videoAttemptParameters: MutableMap<String, Any>) {
         val lastWatchPosition = videoAttemptParameters[TestpressCourseApiClient.LAST_POSITION] as? String
         val timeRanges = videoAttemptParameters[TestpressCourseApiClient.TIME_RANGES] as? ArrayList<Array<String>> ?: arrayListOf()
 
@@ -25,7 +25,7 @@ class VideoWatchDataRepository(val context: Context, private val offlineVideoDao
         }
     }
 
-    fun syncData() {
+    fun sync() {
         val courseNetwork = CourseNetwork(context)
         offlineVideoDao.getAllSync().forEach {
             it.syncState = VideoSyncStatus.SYNCING
