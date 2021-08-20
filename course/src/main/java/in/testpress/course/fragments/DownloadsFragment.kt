@@ -11,6 +11,7 @@ import `in`.testpress.course.ui.OfflineVideoListAdapter
 import `in`.testpress.course.util.DateUtils
 import `in`.testpress.course.viewmodels.CourseViewModel
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
+import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
@@ -222,7 +223,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
             val refreshItem = menu.findItem(R.id.sync)
             refreshItem.actionView.startRotation()
 
-            VideoWatchDataRepository(requireContext()).syncData()
+            VideoWatchDataRepository(requireContext(), TestpressDatabase(requireContext()).offlineVideoDao()).syncData()
             launch(Dispatchers.Main) {
                 refreshItem.actionView.clearAnimation()
             }

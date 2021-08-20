@@ -64,6 +64,7 @@ import java.util.Random;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
+import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.core.TestpressUserDetails;
@@ -72,6 +73,8 @@ import in.testpress.course.api.TestpressCourseApiClient;
 import in.testpress.course.helpers.DownloadTask;
 import in.testpress.course.helpers.VideoDownload;
 import in.testpress.course.repository.VideoWatchDataRepository;
+import in.testpress.database.OfflineVideoDao;
+import in.testpress.database.TestpressDatabase;
 import in.testpress.models.ProfileDetails;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.VideoAttempt;
@@ -517,7 +520,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
     public void setVideoAttemptParameters(long videoAttemptId, Content content) {
         this.videoAttemptId = videoAttemptId;
         this.content = content;
-        videoWatchDataRepository = new VideoWatchDataRepository(activity);
+        OfflineVideoDao offlineVideoDao = TestpressDatabase.Companion.invoke(activity).offlineVideoDao();
+        videoWatchDataRepository = new VideoWatchDataRepository(activity, offlineVideoDao);
     }
 
     public void onStart() {
