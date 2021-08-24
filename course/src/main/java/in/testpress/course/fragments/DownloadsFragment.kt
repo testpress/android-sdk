@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -219,7 +220,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
     }
 
     private fun syncVideoWatchData() {
-        job = GlobalScope.async {
+        job = viewModel.viewModelScope.launch(Dispatchers.IO) {
             val refreshItem = menu.findItem(R.id.sync)
             refreshItem.actionView.startRotation()
 
