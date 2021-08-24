@@ -82,6 +82,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
                 syncVideoWatchData()
             }
         }
+        syncVideoWatchData()
     }
 
     override fun onCreateView(
@@ -98,9 +99,6 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
         initializeRecyclerView()
         initializeObservers()
         initializeCourseRefreshStatusObserver()
-        Timer().schedule(1000) {
-            syncVideoWatchData()
-        }
     }
 
     private fun bindViews(view: View) {
