@@ -28,6 +28,10 @@ class VideoWatchDataRepository(val context: Context, private val offlineVideoDao
     fun sync() {
         val courseNetwork = CourseNetwork(context)
         offlineVideoDao.getAllSync().forEach {
+            if (it.watchedTimeRanges.isEmpty()) {
+                return@forEach
+            }
+
             it.syncState = VideoSyncStatus.SYNCING
             offlineVideoDao.update(it)
 
