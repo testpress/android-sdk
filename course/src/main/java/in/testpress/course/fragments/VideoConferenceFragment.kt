@@ -83,29 +83,29 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         }
     }
 
-    private fun enableStartButton() {
+    private fun showLoadingAndEnableStartButton() {
         startButton.isEnabled = true
         startButton.text = "START"
         startButton.setBackgroundResource(R.drawable.testpress_curved_blue_background)
     }
 
-    private fun disableStartButton() {
+    private fun hideLoadingAndDisableStartButton() {
         startButton.isEnabled = false
         startButton.text = "LOADING...."
         startButton.setBackgroundResource(R.drawable.testpress_curved_gray_background)
     }
 
     private fun initializeVideoConferenceHandler(videoConference: DomainVideoConferenceContent?) {
-        disableStartButton()
+        hideLoadingAndDisableStartButton()
         try {
             videoConferenceHandler =  VideoConferenceHandler(requireContext(), videoConference!!, profileDetails)
             videoConferenceHandler?.init(object: VideoConferenceInitializeListener {
                 override fun onSuccess() {
-                    enableStartButton()
+                    showLoadingAndEnableStartButton()
                 }
 
                 override fun onFailure() {
-                    enableStartButton()
+                    showLoadingAndEnableStartButton()
                 }
             })
         }
