@@ -79,6 +79,10 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
 
     override fun onResume() {
         super.onResume()
+        stopStartButtonAnimation()
+    }
+
+    private fun stopStartButtonAnimation() {
         startButton.revertAnimation()
         startButton.setBackgroundResource(R.drawable.testpress_curved_blue_background)
     }
