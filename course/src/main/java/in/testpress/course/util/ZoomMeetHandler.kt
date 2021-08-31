@@ -18,9 +18,9 @@ class ZoomMeetHandler(
 
     private lateinit var zoomSDK: ZoomSDK
 
-    fun init() {
+    fun init(onInitializeCallback: ZoomSDKInitializeListener? = null) {
         zoomSDK = ZoomSDK.getInstance()
-        zoomSDK.initialize(context, this, getInitializationParams())
+        zoomSDK.initialize(context, onInitializeCallback ?: this, getInitializationParams())
 
         if (zoomSDK.isInitialized) {
             registerMeetingServiceListener()
@@ -38,12 +38,23 @@ class ZoomMeetHandler(
 
     fun goToMeet() {
         if (!zoomSDK.isInitialized) {
-            val errorMessage =
-                "Zoom Meet has not been initialized yet. Please click start class button after a minute"
-            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
-            return
+            val callback = object: ZoomSDKInitializeListener {
+                override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
+                    if (errorCode == ZoomError.ZOOM_ERROR_SUCCESS) {
+                        registerMeetingServiceListener()
+                        joinMeeting()
+                    }
+                }
+
+                override fun onZoomAuthIdentityExpired() {}
+            }
+            init(callback)
         }
 
+        joinMeeting()
+    }
+
+    private fun joinMeeting() {
         zoomSDK.meetingService?.let { meetingService ->
             if (meetingService.meetingStatus == MeetingStatus.MEETING_STATUS_IDLE) {
                 startMeeting()

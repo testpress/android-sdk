@@ -17,11 +17,12 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import br.com.simplepass.loadingbutton.customViews.CircularProgressButton
 
 class VideoConferenceFragment : BaseContentDetailFragment() {
     private lateinit var titleView: TextView
     private lateinit var titleLayout: LinearLayout
-    private lateinit var startButton: Button
+    private lateinit var startButton: CircularProgressButton
     private lateinit var duration: TextView
     private lateinit var startTime: TextView
     private var videoConferenceHandler: VideoConferenceHandler? = null
@@ -71,8 +72,15 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
             startTime.text = it.formattedStartDate()
         }
         startButton.setOnClickListener {
+            startButton.startAnimation()
             joinMeeting()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        startButton.revertAnimation()
+        startButton.setBackgroundResource(R.drawable.testpress_curved_blue_background)
     }
 
     private fun initializeVideoConferenceHandler(videoConference: DomainVideoConferenceContent?) {

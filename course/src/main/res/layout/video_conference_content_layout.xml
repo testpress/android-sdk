@@ -145,21 +145,19 @@
 
                 </LinearLayout>
 
-                <com.google.android.material.button.MaterialButton
+                <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
                     android:id="@+id/start_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/testpress_curved_blue_background"
                     android:layout_marginLeft="20dp"
                     android:layout_marginTop="35dp"
                     android:layout_marginRight="20dp"
-                    android:layout_marginBottom="15dp"
-                    android:backgroundTint="@color/testpress_color_primary"
-                    android:gravity="center"
                     android:padding="15dp"
+                    android:layout_gravity="center_horizontal"
                     android:text="Start Class"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
-                    android:visibility="visible"
-                    app:cornerRadius="5dp" />
+                    app:spinning_bar_color="#FFF"
+                    android:layout_marginBottom="15dp" />
                 </LinearLayout>
 
 
