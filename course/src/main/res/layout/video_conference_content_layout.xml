@@ -156,6 +156,8 @@
                     android:padding="15dp"
                     android:layout_gravity="center_horizontal"
                     android:text="Start Class"
+                    android:visibility="gone"
+                    app:spinning_bar_padding="6dp"
                     app:spinning_bar_color="#FFF"
                     android:layout_marginBottom="15dp" />
                 </LinearLayout>

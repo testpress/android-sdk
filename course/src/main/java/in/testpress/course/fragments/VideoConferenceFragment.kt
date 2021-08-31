@@ -4,16 +4,14 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.core.TestpressUserDetails
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainVideoConferenceContent
-import `in`.testpress.course.ui.WebViewActivity
 import `in`.testpress.course.util.VideoConferenceHandler
+import `in`.testpress.course.util.VideoConferenceInitializeListener
 import `in`.testpress.models.ProfileDetails
 import `in`.testpress.util.ViewUtils
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -71,26 +69,45 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
             duration.text = it.duration.toString()
             startTime.text = it.formattedStartDate()
         }
+        startButton.visibility = View.VISIBLE
         startButton.setOnClickListener {
             startButton.startAnimation()
             joinMeeting()
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        stopStartButtonAnimation()
+    private fun stopStartButtonAnimation() {
+        startButton.revertAnimation {
+            startButton.text = "START"
+            startButton.setBackgroundResource(R.drawable.testpress_curved_blue_background)
+        }
     }
 
-    private fun stopStartButtonAnimation() {
-        startButton.revertAnimation()
+    private fun enableStartButton() {
+        startButton.isEnabled = true
+        startButton.text = "START"
         startButton.setBackgroundResource(R.drawable.testpress_curved_blue_background)
     }
 
+    private fun disableStartButton() {
+        startButton.isEnabled = false
+        startButton.text = "LOADING...."
+        startButton.setBackgroundResource(R.drawable.testpress_curved_gray_background)
+    }
+
     private fun initializeVideoConferenceHandler(videoConference: DomainVideoConferenceContent?) {
+        disableStartButton()
         try {
             videoConferenceHandler =  VideoConferenceHandler(requireContext(), videoConference!!, profileDetails)
-            videoConferenceHandler?.init()
+            videoConferenceHandler?.init(object: VideoConferenceInitializeListener {
+                override fun onSuccess() {
+                    enableStartButton()
+                }
+
+                override fun onFailure() {
+                    enableStartButton()
+                }
+            })
         }
         catch(e: NoClassDefFoundError){
             Toast.makeText(context, "Zoom integration is not enabled in the app, please contact admin", Toast.LENGTH_LONG).show()
@@ -104,6 +121,14 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     }
 
     private fun joinMeeting() {
-        videoConferenceHandler?.joinMeet()
+        videoConferenceHandler?.joinMeet(object: VideoConferenceInitializeListener {
+            override fun onSuccess() {
+                stopStartButtonAnimation()
+            }
+
+            override fun onFailure() {
+                stopStartButtonAnimation()
+            }
+        })
     }
 }

@@ -13,14 +13,14 @@ class ZoomMeetHandler(
     val context: Context,
     val videoConference: DomainVideoConferenceContent,
     val profileDetails: ProfileDetails?
-) : MeetingServiceListener,
-    ZoomSDKInitializeListener, InMeetingServiceListener {
+) : MeetingServiceListener, InMeetingServiceListener {
 
     private lateinit var zoomSDK: ZoomSDK
 
-    fun init(onInitializeCallback: ZoomSDKInitializeListener? = null) {
+    fun init(onInitializeCallback: VideoConferenceInitializeListener) {
         zoomSDK = ZoomSDK.getInstance()
-        zoomSDK.initialize(context, onInitializeCallback ?: this, getInitializationParams())
+        val callback = ZoomSDKListener(onInitializeCallback)
+        zoomSDK.initialize(context, callback, getInitializationParams())
 
         if (zoomSDK.isInitialized) {
             registerMeetingServiceListener()
@@ -36,17 +36,17 @@ class ZoomMeetHandler(
         return initParams
     }
 
-    fun goToMeet() {
+    fun goToMeet(onInitializeCallback: VideoConferenceInitializeListener) {
         if (!zoomSDK.isInitialized) {
-            val callback = object: ZoomSDKInitializeListener {
-                override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
-                    if (errorCode == ZoomError.ZOOM_ERROR_SUCCESS) {
-                        registerMeetingServiceListener()
-                        joinMeeting()
-                    }
+            val callback = object: VideoConferenceInitializeListener {
+                override fun onSuccess() {
+                    onInitializeCallback.onSuccess()
+                    joinMeeting()
                 }
 
-                override fun onZoomAuthIdentityExpired() {}
+                override fun onFailure() {
+                    onInitializeCallback.onFailure()
+                }
             }
             init(callback)
         }
@@ -86,27 +86,6 @@ class ZoomMeetHandler(
                 Toast.LENGTH_LONG
             ).show()
         }
-    }
-
-    override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
-        if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
-            Toast.makeText(
-                context,
-                "Failed to initialize Zoom Meeting. Error: $errorCode, internalErrorCode=$internalErrorCode",
-                Toast.LENGTH_LONG
-            ).show()
-        } else {
-            registerMeetingServiceListener()
-        }
-    }
-
-    override fun onZoomAuthIdentityExpired() {
-        Toast.makeText(
-            context,
-            "Please refresh the page(By touching and pulling down in the screen) and again click start class",
-            Toast.LENGTH_LONG
-        ).show()
-        return
     }
 
     fun removeListeners() {
@@ -276,5 +255,30 @@ class ZoomMeetHandler(
 
     override fun onUserVideoStatusChanged(p0: Long, p1: InMeetingServiceListener.VideoStatus?) {
          
+    }
+
+    inner class ZoomSDKListener(val onInitializeCallback: VideoConferenceInitializeListener): ZoomSDKInitializeListener {
+        override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
+            if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
+                Toast.makeText(
+                    context,
+                    "Failed to initialize Zoom Meeting. Error: $errorCode, internalErrorCode=$internalErrorCode",
+                    Toast.LENGTH_LONG
+                ).show()
+                onInitializeCallback?.onFailure()
+            } else {
+                registerMeetingServiceListener()
+                onInitializeCallback?.onSuccess()
+            }
+        }
+
+        override fun onZoomAuthIdentityExpired() {
+            onInitializeCallback?.onFailure()
+            Toast.makeText(
+                context,
+                "Please refresh the page (By touching and pulling down in the screen) and again click start class",
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 }

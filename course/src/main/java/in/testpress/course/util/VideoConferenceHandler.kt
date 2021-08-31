@@ -16,15 +16,21 @@ class VideoConferenceHandler(
         profileDetails
     )
 
-    fun init() {
-        zoomMeetHandler.init()
+    fun init(callback: VideoConferenceInitializeListener) {
+        zoomMeetHandler.init(callback)
     }
 
-    fun joinMeet() {
-        zoomMeetHandler.goToMeet()
+    fun joinMeet(callback: VideoConferenceInitializeListener) {
+        zoomMeetHandler.goToMeet(callback)
     }
 
     fun destroy() {
         zoomMeetHandler.removeListeners()
     }
+}
+
+
+interface VideoConferenceInitializeListener {
+    fun onSuccess()
+    fun onFailure()
 }
