@@ -12,15 +12,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import br.com.simplepass.loadingbutton.customViews.CircularProgressButton
 
 class VideoConferenceFragment : BaseContentDetailFragment() {
     private lateinit var titleView: TextView
     private lateinit var titleLayout: LinearLayout
-    private lateinit var startButton: CircularProgressButton
+    private lateinit var startButton: Button
     private lateinit var duration: TextView
     private lateinit var startTime: TextView
     private var videoConferenceHandler: VideoConferenceHandler? = null
@@ -71,41 +71,34 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         }
         startButton.visibility = View.VISIBLE
         startButton.setOnClickListener {
-            startButton.startAnimation()
+            showLoadingAndDisableStartButton("JOINING")
             joinMeeting()
         }
     }
 
-    private fun stopStartButtonAnimation() {
-        startButton.revertAnimation {
-            startButton.text = "START"
-            startButton.setBackgroundResource(R.drawable.testpress_curved_blue_background)
-        }
-    }
-
-    private fun showLoadingAndEnableStartButton() {
+    private fun hideLoadingAndEnableStartButton() {
         startButton.isEnabled = true
         startButton.text = "START"
         startButton.setBackgroundResource(R.drawable.testpress_curved_blue_background)
     }
 
-    private fun hideLoadingAndDisableStartButton() {
+    private fun showLoadingAndDisableStartButton(loadingText: String="LOADING") {
         startButton.isEnabled = false
-        startButton.text = "LOADING...."
+        startButton.text = loadingText
         startButton.setBackgroundResource(R.drawable.testpress_curved_gray_background)
     }
 
     private fun initializeVideoConferenceHandler(videoConference: DomainVideoConferenceContent?) {
-        hideLoadingAndDisableStartButton()
+        showLoadingAndDisableStartButton()
         try {
             videoConferenceHandler =  VideoConferenceHandler(requireContext(), videoConference!!, profileDetails)
             videoConferenceHandler?.init(object: VideoConferenceInitializeListener {
                 override fun onSuccess() {
-                    showLoadingAndEnableStartButton()
+                    hideLoadingAndEnableStartButton()
                 }
 
                 override fun onFailure() {
-                    showLoadingAndEnableStartButton()
+                    hideLoadingAndEnableStartButton()
                 }
             })
         }
@@ -123,11 +116,11 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     private fun joinMeeting() {
         videoConferenceHandler?.joinMeet(object: VideoConferenceInitializeListener {
             override fun onSuccess() {
-                stopStartButtonAnimation()
+                hideLoadingAndEnableStartButton()
             }
 
             override fun onFailure() {
-                stopStartButtonAnimation()
+                hideLoadingAndEnableStartButton()
             }
         })
     }
