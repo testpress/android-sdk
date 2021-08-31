@@ -17,9 +17,11 @@ class ZoomMeetHandler(
     ZoomSDKInitializeListener, InMeetingServiceListener {
 
     private lateinit var zoomSDK: ZoomSDK
+    private var onInitializeCallback: VideoConferenceInitializeListener? = null
 
-    fun init() {
+    fun init(callback: VideoConferenceInitializeListener) {
         zoomSDK = ZoomSDK.getInstance()
+        this.onInitializeCallback = callback
         zoomSDK.initialize(context, this, getInitializationParams())
 
         if (zoomSDK.isInitialized) {
@@ -36,14 +38,24 @@ class ZoomMeetHandler(
         return initParams
     }
 
-    fun goToMeet() {
+    fun goToMeet(onInitializeCallback: VideoConferenceInitializeListener) {
         if (!zoomSDK.isInitialized) {
-            val errorMessage =
-                "Zoom Meet has not been initialized yet. Please click start class button after a minute"
-            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
-            return
+            init(object: VideoConferenceInitializeListener {
+                override fun onSuccess() {
+                    onInitializeCallback.onSuccess()
+                    joinMeeting()
+                }
+
+                override fun onFailure() {
+                    onInitializeCallback.onFailure()
+                }
+            })
         }
 
+        joinMeeting()
+    }
+
+    private fun joinMeeting() {
         zoomSDK.meetingService?.let { meetingService ->
             if (meetingService.meetingStatus == MeetingStatus.MEETING_STATUS_IDLE) {
                 startMeeting()
@@ -84,8 +96,10 @@ class ZoomMeetHandler(
                 "Failed to initialize Zoom Meeting. Error: $errorCode, internalErrorCode=$internalErrorCode",
                 Toast.LENGTH_LONG
             ).show()
+            onInitializeCallback?.onFailure()
         } else {
             registerMeetingServiceListener()
+            onInitializeCallback?.onSuccess()
         }
     }
 
@@ -95,6 +109,7 @@ class ZoomMeetHandler(
             "Please refresh the page(By touching and pulling down in the screen) and again click start class",
             Toast.LENGTH_LONG
         ).show()
+        onInitializeCallback?.onFailure()
         return
     }
 
