@@ -47,8 +47,6 @@ afterEvaluate { project ->
                 groupId GROUP
                 artifactId POM_ARTIFACT_ID
                 version VERSION_NAME
-                artifact androidJavadocJar
-                artifact javaSourcesJar
                 artifact "$buildDir/outputs/aar/$project.name-release.aar"
 
                 pom {
