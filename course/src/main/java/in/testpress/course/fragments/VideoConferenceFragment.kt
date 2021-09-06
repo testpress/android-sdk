@@ -16,6 +16,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 
 class VideoConferenceFragment : BaseContentDetailFragment() {
     private lateinit var titleView: TextView
@@ -79,13 +80,13 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     private fun hideLoadingAndEnableStartButton() {
         startButton.isEnabled = true
         startButton.text = "START"
-        startButton.setBackgroundResource(R.drawable.testpress_curved_blue_background)
+        startButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.testpress_color_primary))
     }
 
     private fun showLoadingAndDisableStartButton(loadingText: String="LOADING") {
         startButton.isEnabled = false
         startButton.text = loadingText
-        startButton.setBackgroundResource(R.drawable.testpress_curved_gray_background)
+        startButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.testpress_text_gray))
     }
 
     private fun initializeVideoConferenceHandler(videoConference: DomainVideoConferenceContent?) {
@@ -106,6 +107,11 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
             Toast.makeText(context, "Zoom integration is not enabled in the app, please contact admin", Toast.LENGTH_LONG).show()
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        hideLoadingAndEnableStartButton()
     }
 
     override fun onDestroy() {
