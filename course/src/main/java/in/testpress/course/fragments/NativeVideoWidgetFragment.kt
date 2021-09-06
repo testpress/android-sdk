@@ -1,6 +1,5 @@
 package `in`.testpress.course.fragments
 
-import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainContent
@@ -9,9 +8,7 @@ import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
-import `in`.testpress.models.greendao.VideoAttemptDao
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -58,7 +55,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
     private fun createAttemptAndInitializeExoplayer(content: DomainContent) {
         val greenDaoContent = content.getGreenDaoContent(requireContext())
         val video = content.video
-        exoPlayerUtil = ExoPlayerUtil(activity, exoPlayerMainFrame, video?.hlsUrl(), 0F)
+        exoPlayerUtil = ExoPlayerUtil(activity, exoPlayerMainFrame, video?.getPlaybackURL(), 0F)
         exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil)
 
         viewModel.createContentAttempt(content.id)

@@ -20,7 +20,7 @@ data class DomainVideoContent(
     val stream: DomainVideoStream? = null,
     val streams: List<DomainVideoStream>? = arrayListOf<DomainVideoStream>()
 ) {
-    fun hlsUrl(): String? {
+    fun getPlaybackURL(): String? {
         if (stream != null) {
             if (stream.format == "HLS") {
                 return stream.url
@@ -40,7 +40,7 @@ data class DomainVideoContent(
     }
 
     fun isDownloadable(): Boolean {
-        val type = hlsUrl()?.let { Util.inferContentType(it) }
+        val type = getPlaybackURL()?.let { Util.inferContentType(it) }
         return type == C.TYPE_HLS
     }
 

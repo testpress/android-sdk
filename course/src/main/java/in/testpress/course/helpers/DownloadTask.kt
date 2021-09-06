@@ -32,7 +32,7 @@ class DownloadTask(val url: String, val context: Context) {
             title = content.title,
             description = content.description,
             duration = content.video?.duration ?: "0",
-            url = content.video?.hlsUrl(),
+            url = content.video?.getPlaybackURL(),
             contentId = content.id,
             remoteThumbnail = content.coverImageMedium,
             courseId = content.courseId

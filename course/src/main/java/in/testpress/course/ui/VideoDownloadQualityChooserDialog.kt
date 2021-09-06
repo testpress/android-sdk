@@ -35,7 +35,7 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
         videoDownloadRequestCreateHandler =
             VideoDownloadRequestCreationHandler(
                 requireContext(),
-                content.video!!.hlsUrl()!!, content.title!!
+                content.video!!.getPlaybackURL()!!, content.title!!
             )
         videoDownloadRequestCreateHandler.listener = this
     }

@@ -182,7 +182,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
     }
 
     private fun showDownloadStatus() {
-        offlineVideoViewModel.get(content.video!!.hlsUrl()!!).observe(viewLifecycleOwner, Observer {
+        offlineVideoViewModel.get(content.video!!.getPlaybackURL()!!).observe(viewLifecycleOwner, Observer {
             if (::menu.isInitialized) {
                 if(it != null && !it.isDownloadCompleted) {
                     showProgress(it.percentageDownloaded)
