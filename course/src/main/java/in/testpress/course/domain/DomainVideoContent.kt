@@ -22,14 +22,10 @@ data class DomainVideoContent(
 ) {
     fun getPlaybackURL(): String? {
         if (stream != null) {
-            if (stream.format == "HLS") {
-                return stream.url
-            }
+            return stream.dashUrl ?: stream.url
         } else if (streams != null) {
             for (stream in streams) {
-                if (stream.format == "HLS") {
-                    return stream.url
-                }
+                return stream.dashUrl ?: stream.url
             }
         }
         return url
@@ -41,7 +37,7 @@ data class DomainVideoContent(
 
     fun isDownloadable(): Boolean {
         val type = getPlaybackURL()?.let { Util.inferContentType(it) }
-        return type == C.TYPE_HLS
+        return type in arrayOf(C.TYPE_HLS, C.TYPE_DASH)
     }
 
 }
@@ -50,7 +46,9 @@ data class DomainVideoStream(
     val id: Long,
     val url: String? = null,
     val format: String? = null,
-    val videoId: Long? = null
+    val videoId: Long? = null,
+    val hlsUrl: String? = null,
+    val dashUrl: String? = null
 )
 
 fun createDomainVideoContent(video: Video): DomainVideoContent {
@@ -74,7 +72,9 @@ fun createDomainVideoStream(stream: Stream): DomainVideoStream {
         id = stream.id,
         url = stream.url,
         format = stream.format,
-        videoId = stream.videoId
+        videoId = stream.videoId,
+        hlsUrl = stream.hlsUrl,
+        dashUrl = stream.dashUrl
     )
 }
 

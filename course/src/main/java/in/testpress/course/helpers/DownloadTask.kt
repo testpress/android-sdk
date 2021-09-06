@@ -115,4 +115,11 @@ object VideoDownload {
         val download = downloadIndex.getDownload(url)
         return if (download != null && download.state != Download.STATE_FAILED) download.request else null
     }
+
+    @JvmStatic
+    fun getDownload(url: String, context: Context): Download? {
+        val downloadManager = VideoDownloadManager(context).get()
+        val downloadIndex = downloadManager.downloadIndex
+        return downloadIndex.getDownload(url)
+    }
 }
