@@ -172,10 +172,10 @@ public class AttemptQuestion implements Parcelable {
     }
 
     public boolean hasNegativeMarks(){
-        return !this.negativeMarks.equals("0.00") && !this.negativeMarks.isEmpty();
+        return this.negativeMarks != null && !this.negativeMarks.equals("0.00") && !this.negativeMarks.isEmpty();
     }
 
     public boolean hasPositiveMarks(){
-        return !this.marks.equals("0.00") && !this.marks.isEmpty();
+        return this.marks != null && !this.marks.equals("0.00") && !this.marks.isEmpty();
     }
 }
