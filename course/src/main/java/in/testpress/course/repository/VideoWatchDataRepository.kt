@@ -7,6 +7,7 @@ import `in`.testpress.database.VideoSyncStatus
 import `in`.testpress.models.greendao.Content
 import android.content.Context
 import android.os.AsyncTask
+import java.io.IOException
 
 class VideoWatchDataRepository(val context: Context, private val offlineVideoDao: OfflineVideoDao) {
 
@@ -50,7 +51,10 @@ class VideoWatchDataRepository(val context: Context, private val offlineVideoDao
                     it.syncState = VideoSyncStatus.FAILURE
                     offlineVideoDao.update(it)
                 }
-            } catch (e: Exception) {}
+            } catch (e: IOException) {
+                it.syncState = VideoSyncStatus.FAILURE
+                offlineVideoDao.update(it)
+            }
         }
     }
 }
