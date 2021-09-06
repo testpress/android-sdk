@@ -488,6 +488,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
     }
 
     public float getCurrentPosition() {
+        if (player == null) return 0;
         // Convert milliseconds to seconds
         return ((float) Math.max(0, player.getContentPosition())) / 1000;
     }
