@@ -40,15 +40,17 @@ class VideoWatchDataRepository(val context: Context, private val offlineVideoDao
                 "chapter_content_id" to it.contentId!!,
                 "last_watch_position" to (it.lastWatchPosition ?: "0")
             )
-            val response = courseNetwork.syncVideoWatchData(queryParams).execute()
-            if (response.isSuccessful) {
-                it.syncState = VideoSyncStatus.SUCCESS
-                it.watchedTimeRanges = arrayListOf()
-                offlineVideoDao.update(it)
-            } else {
-                it.syncState = VideoSyncStatus.FAILURE
-                offlineVideoDao.update(it)
-            }
+            try {
+                val response = courseNetwork.syncVideoWatchData(queryParams).execute()
+                if (response.isSuccessful) {
+                    it.syncState = VideoSyncStatus.SUCCESS
+                    it.watchedTimeRanges = arrayListOf()
+                    offlineVideoDao.update(it)
+                } else {
+                    it.syncState = VideoSyncStatus.FAILURE
+                    offlineVideoDao.update(it)
+                }
+            } catch (e: Exception) {}
         }
     }
 }
