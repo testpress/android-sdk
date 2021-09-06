@@ -45,7 +45,9 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.offline.DownloadHelper;
 import com.google.android.exoplayer2.offline.DownloadRequest;
+import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.MediaSourceFactory;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
@@ -299,8 +301,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
     }
 
     private void buildPlayer() {
-        MediaItem mediaItem = MediaItem.fromUri(url);
+        MediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(new ExoPlayerDataSourceFactory(activity).build());
+        MediaItem mediaItem = getMediaItem();
         player = new SimpleExoPlayer.Builder(activity, new DefaultRenderersFactory(activity))
+                .setMediaSourceFactory(mediaSourceFactory)
                 .setTrackSelector(trackSelector).build();
 
         player.addListener(new PlayerEventListener());
@@ -311,6 +315,15 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
         player.setMediaItem(mediaItem);
         youtubeOverlay.player(player);
         playerView.controller(youtubeOverlay);
+    }
+
+    public MediaItem getMediaItem() {
+        MediaItem mediaItem = new MediaItem.Builder()
+                .setUri(url)
+                .setDrmUuid(C.WIDEVINE_UUID)
+                .setDrmMultiSession(true).build();
+
+        return mediaItem;
     }
 
     private long getStartPositionInMilliSeconds() {
@@ -357,7 +370,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
     }
 
     private void preparePlayer() {
-        player.setMediaSource(getMediaSource());
         player.prepare();
     }
 
@@ -415,21 +427,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
         return dialogOnClickListener;
     }
 
-    private MediaSource getMediaSource() {
-        DownloadTask downloadTask = new DownloadTask(url, activity);
-        DownloadRequest downloadRequest = VideoDownload.getDownloadRequest(url, activity);
-        if (downloadTask.isDownloaded()) {
-            return DownloadHelper.createMediaSource(downloadRequest, buildDataSourceFactory());
-        } else {
-            return buildNetworkMediaSource(Uri.parse(url));
-        }
-    }
-
-
-    private DataSource.Factory buildDataSourceFactory() {
-        return new ExoPlayerDataSourceFactory(activity).build();
-    }
-
     public void releasePlayer() {
         if (audioManager != null) {
             audioManager.abandonAudioFocus(audioFocusChangeListener);
@@ -471,20 +468,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
         mediaRouteSelector = new MediaRouteSelector.Builder()
                 .addControlCategory(MediaControlIntent.CATEGORY_LIVE_VIDEO)
                 .build();
-    }
-
-    private MediaSource buildNetworkMediaSource(Uri uri) {
-        DataSource.Factory dataSourceFactory = buildDataSourceFactory();
-
-        int type = Util.inferContentType(uri);
-        switch (type) {
-            case C.TYPE_HLS:
-                return new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
-            case C.TYPE_OTHER:
-                return new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
-            default:
-                throw new IllegalStateException("Unsupported type: " + type);
-        }
     }
 
     public float getCurrentPosition() {
