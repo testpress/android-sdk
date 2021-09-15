@@ -1,5 +1,7 @@
 package `in`.testpress.course.util
 
+import `in`.testpress.core.TestpressSdk
+import `in`.testpress.models.InstituteSettings
 import `in`.testpress.util.CommonUtils.getUserName
 import android.content.Context
 import android.graphics.Canvas
@@ -22,6 +24,7 @@ class PDFViewer(
 
     private val randomX = (0..10).random()
     private val randomY = (0..10).random()
+    val instituteSettings: InstituteSettings? = TestpressSdk.getTestpressSession(context)?.instituteSettings;
 
     fun display(pageNumber: Int = 0, file: File, pdfView: PDFView) {
         pdfView.fromFile(file)
@@ -48,7 +51,7 @@ class PDFViewer(
                 .defaultPage(pageNumber)
                 .onDraw(this)
                 .load()
-        pdfView.isSwipeVertical = true
+        pdfView.isSwipeVertical = instituteSettings?.shouldShowPDFVertically() == true
     }
 
     override fun onPageChanged(page: Int, pageCount: Int) {
