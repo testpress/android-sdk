@@ -466,13 +466,13 @@ video {
     font-family: 'Rubik-Regular', serif;
     display: block;
     font-size: 14px;
-    line-height: 20px;
     border: solid 1px #cccccc;
-    padding: 10px;
     min-height: 20px;
     border-radius: 5px;
     word-wrap: break-word;
     -webkit-user-select: text;
     user-select: text;
-    width: 100%;
+    width: 95%;
+    margin-left: 10px;
+    margin-right: 10px;
 }
