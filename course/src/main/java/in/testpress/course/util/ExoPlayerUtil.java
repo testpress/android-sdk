@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
-import android.net.Uri;
+import android.media.MediaCodec;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,19 +43,17 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.offline.DownloadHelper;
+import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
+import com.google.android.exoplayer2.drm.DrmSession;
+import com.google.android.exoplayer2.drm.DrmSessionManager;
+import com.google.android.exoplayer2.drm.DrmSessionManagerProvider;
 import com.google.android.exoplayer2.offline.DownloadRequest;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
-import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.MediaSourceFactory;
-import com.google.android.exoplayer2.source.ProgressiveMediaSource;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.ExoTrackSelection;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
 
@@ -72,6 +70,7 @@ import in.testpress.core.TestpressSession;
 import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
 import in.testpress.course.api.TestpressCourseApiClient;
+import in.testpress.course.helpers.CustomHttpDrmMediaCallback;
 import in.testpress.course.helpers.DownloadTask;
 import in.testpress.course.helpers.VideoDownload;
 import in.testpress.course.repository.VideoWatchDataRepository;
@@ -90,7 +89,9 @@ import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 import static in.testpress.course.api.TestpressCourseApiClient.LAST_POSITION;
 import static in.testpress.course.api.TestpressCourseApiClient.TIME_RANGES;
 
-public class ExoPlayerUtil implements VideoTimeRangeListener {
+import org.jetbrains.annotations.NotNull;
+
+public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerProvider {
 
     private static final int OVERLAY_POSITION_CHANGE_INTERVAL = 15000; // 15s
 
@@ -302,6 +303,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
 
     private void buildPlayer() {
         MediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(new ExoPlayerDataSourceFactory(activity).build());
+        mediaSourceFactory.setDrmSessionManagerProvider(this);
         MediaItem mediaItem = getMediaItem();
         player = new SimpleExoPlayer.Builder(activity, new DefaultRenderersFactory(activity))
                 .setMediaSourceFactory(mediaSourceFactory)
@@ -712,6 +714,11 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
     @Override
     public void onTimeRangeChange(long startTime, long endTime) {
         watchedTimeRanges.add(new String[]{String.valueOf(startTime), String.valueOf(endTime)});
+    }
+
+    @Override
+    public DrmSessionManager get(MediaItem mediaItem) {
+        return new DefaultDrmSessionManager.Builder().build(new CustomHttpDrmMediaCallback(activity, content.getId()));
     }
 
     private class PlayerEventListener implements Player.EventListener {
