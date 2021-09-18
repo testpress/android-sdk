@@ -61,6 +61,8 @@
     <string name="download">Download</string>
     <string name="download_description">Download Descrition</string>
     <string name="download_start_error">Failed to start download</string>
+    <string name="syncing_video">Please wait... We are syncing video</string>
+    <string name="license_error">Error in fetching video license. Please try again</string>
 
     <string-array name="exo_speed_values">
         <item>0.5</item>

@@ -28,7 +28,9 @@ public class StreamDao extends AbstractDao<Stream, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Format = new Property(1, String.class, "format", false, "FORMAT");
         public final static Property Url = new Property(2, String.class, "url", false, "URL");
-        public final static Property VideoId = new Property(3, Long.class, "videoId", false, "VIDEO_ID");
+        public final static Property HlsUrl = new Property(3, String.class, "hlsUrl", false, "HLS_URL");
+        public final static Property DashUrl = new Property(4, String.class, "dashUrl", false, "DASH_URL");
+        public final static Property VideoId = new Property(5, Long.class, "videoId", false, "VIDEO_ID");
     }
 
     private Query<Stream> video_StreamsQuery;
@@ -48,7 +50,9 @@ public class StreamDao extends AbstractDao<Stream, Long> {
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"FORMAT\" TEXT," + // 1: format
                 "\"URL\" TEXT," + // 2: url
-                "\"VIDEO_ID\" INTEGER);"); // 3: videoId
+                "\"HLS_URL\" TEXT," + // 3: hlsUrl
+                "\"DASH_URL\" TEXT," + // 4: dashUrl
+                "\"VIDEO_ID\" INTEGER);"); // 5: videoId
     }
 
     /** Drops the underlying database table. */
@@ -76,9 +80,19 @@ public class StreamDao extends AbstractDao<Stream, Long> {
             stmt.bindString(3, url);
         }
  
+        String hlsUrl = entity.getHlsUrl();
+        if (hlsUrl != null) {
+            stmt.bindString(4, hlsUrl);
+        }
+ 
+        String dashUrl = entity.getDashUrl();
+        if (dashUrl != null) {
+            stmt.bindString(5, dashUrl);
+        }
+ 
         Long videoId = entity.getVideoId();
         if (videoId != null) {
-            stmt.bindLong(4, videoId);
+            stmt.bindLong(6, videoId);
         }
     }
 
@@ -101,9 +115,19 @@ public class StreamDao extends AbstractDao<Stream, Long> {
             stmt.bindString(3, url);
         }
  
+        String hlsUrl = entity.getHlsUrl();
+        if (hlsUrl != null) {
+            stmt.bindString(4, hlsUrl);
+        }
+ 
+        String dashUrl = entity.getDashUrl();
+        if (dashUrl != null) {
+            stmt.bindString(5, dashUrl);
+        }
+ 
         Long videoId = entity.getVideoId();
         if (videoId != null) {
-            stmt.bindLong(4, videoId);
+            stmt.bindLong(6, videoId);
         }
     }
 
@@ -118,7 +142,9 @@ public class StreamDao extends AbstractDao<Stream, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // format
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // url
-            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3) // videoId
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // hlsUrl
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // dashUrl
+            cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5) // videoId
         );
         return entity;
     }
@@ -128,7 +154,9 @@ public class StreamDao extends AbstractDao<Stream, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setFormat(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setUrl(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setVideoId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
+        entity.setHlsUrl(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setDashUrl(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setVideoId(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
      }
     
     @Override

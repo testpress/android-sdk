@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
-import android.net.Uri;
+import android.media.MediaCodec;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,19 +43,17 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.offline.DownloadHelper;
+import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
+import com.google.android.exoplayer2.drm.DrmSession;
+import com.google.android.exoplayer2.drm.DrmSessionManager;
+import com.google.android.exoplayer2.drm.DrmSessionManagerProvider;
 import com.google.android.exoplayer2.offline.DownloadRequest;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
-import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.MediaSourceFactory;
-import com.google.android.exoplayer2.source.ProgressiveMediaSource;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.ExoTrackSelection;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
 
@@ -72,6 +70,7 @@ import in.testpress.core.TestpressSession;
 import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
 import in.testpress.course.api.TestpressCourseApiClient;
+import in.testpress.course.helpers.CustomHttpDrmMediaCallback;
 import in.testpress.course.helpers.DownloadTask;
 import in.testpress.course.helpers.VideoDownload;
 import in.testpress.course.repository.VideoWatchDataRepository;
@@ -90,7 +89,9 @@ import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 import static in.testpress.course.api.TestpressCourseApiClient.LAST_POSITION;
 import static in.testpress.course.api.TestpressCourseApiClient.TIME_RANGES;
 
-public class ExoPlayerUtil implements VideoTimeRangeListener {
+import org.jetbrains.annotations.NotNull;
+
+public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerProvider {
 
     private static final int OVERLAY_POSITION_CHANGE_INTERVAL = 15000; // 15s
 
@@ -302,7 +303,12 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
 
     private void buildPlayer() {
         MediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(new ExoPlayerDataSourceFactory(activity).build());
-        MediaItem mediaItem = getMediaItem();
+        DownloadTask downloadTask = new DownloadTask(url, activity);
+        MediaItem mediaItem = getMediaItem(downloadTask.isDownloaded());
+        if (!downloadTask.isDownloaded()) {
+            mediaSourceFactory.setDrmSessionManagerProvider(this);
+        }
+
         player = new SimpleExoPlayer.Builder(activity, new DefaultRenderersFactory(activity))
                 .setMediaSourceFactory(mediaSourceFactory)
                 .setTrackSelector(trackSelector).build();
@@ -317,12 +323,24 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
         playerView.controller(youtubeOverlay);
     }
 
-    public MediaItem getMediaItem() {
+    public MediaItem getMediaItem(boolean isDownloaded) {
         MediaItem mediaItem = new MediaItem.Builder()
                 .setUri(url)
                 .setDrmUuid(C.WIDEVINE_UUID)
                 .setDrmMultiSession(true).build();
 
+        DownloadRequest downloadRequest = VideoDownload.getDownloadRequest(url, activity);
+        if (isDownloaded) {
+            MediaItem.Builder builder = mediaItem.buildUpon();
+            builder
+                    .setMediaId(downloadRequest.id)
+                    .setUri(downloadRequest.uri)
+                    .setCustomCacheKey(downloadRequest.customCacheKey)
+                    .setMimeType(downloadRequest.mimeType)
+                    .setStreamKeys(downloadRequest.streamKeys)
+                    .setDrmKeySetId(downloadRequest.keySetId);
+            mediaItem = builder.build();
+        }
         return mediaItem;
     }
 
@@ -714,7 +732,12 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
         watchedTimeRanges.add(new String[]{String.valueOf(startTime), String.valueOf(endTime)});
     }
 
-    private class PlayerEventListener implements Player.EventListener {
+    @Override
+    public DrmSessionManager get(MediaItem mediaItem) {
+        return new DefaultDrmSessionManager.Builder().build(new CustomHttpDrmMediaCallback(activity, content.getId()));
+    }
+
+    private class PlayerEventListener implements Player.EventListener, DRMLicenseFetchCallback {
         @Override
         public void onPlaybackStateChanged(int playbackState) {
             if (usbConnectionStateReceiver != null && !isScreenCasted() &&
@@ -741,7 +764,13 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
 
         @Override
         public void onPlayerError(ExoPlaybackException exception) {
-            handleError(exception.type == TYPE_SOURCE);
+            Throwable cause = exception.getCause();
+            if (cause instanceof DrmSession.DrmSessionException || cause instanceof MediaCodec.CryptoException) {
+                OfflineDRMLicenseHelper.renewLicense(url, content.getId(), activity, this);
+                displayError(R.string.syncing_video);
+            } else {
+                handleError(exception.type == TYPE_SOURCE);
+            }
         }
 
         @Override
@@ -752,6 +781,24 @@ public class ExoPlayerUtil implements VideoTimeRangeListener {
         @Override
         public void onSeekProcessed() {
             updateVideoAttempt();
+        }
+
+        @Override
+        public void onLicenseFetchSuccess(@NotNull byte[] keySetId) {
+            activity.runOnUiThread(() -> {
+                float currentPosition = getCurrentPosition();
+                MediaItem mediaItem = getMediaItem(true);
+                player.setMediaItem(mediaItem);
+                errorMessageTextView.setVisibility(View.GONE);
+                preparePlayer();
+                player.setPlayWhenReady(true);
+                player.seekTo((long) (currentPosition * 1000));
+            });
+        }
+
+        @Override
+        public void onLicenseFetchFailure() {
+            displayError(R.string.license_error);
         }
     }
 
