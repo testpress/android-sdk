@@ -46,6 +46,9 @@ interface CourseService {
     fun syncVideoWatchData(
         @Body arguments: HashMap<String, Any>
     ): RetrofitCall<Void>
+
+    @POST("/api/v2.5/chapter_contents/{content_id}/drm_license/?download=true")
+    fun getDRMLicenseURL(@Path(value = "content_id", encoded = true) contentId: Long, @Body arguments: HashMap<String, Any>): RetrofitCall<NetworkDRMLicenseAPIResult>
 }
 
 
@@ -78,5 +81,10 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     fun syncVideoWatchData(arguments: HashMap<String, Any>): RetrofitCall<Void> {
         return getCourseService().syncVideoWatchData(arguments)
+    }
+
+    fun getDRMLicenseURL(contentId: Long): RetrofitCall<NetworkDRMLicenseAPIResult> {
+        val args = hashMapOf<String, Any>("download" to true)
+        return getCourseService().getDRMLicenseURL(contentId, args)
     }
 }

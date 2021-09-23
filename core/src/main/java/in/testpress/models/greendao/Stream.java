@@ -17,6 +17,8 @@ public class Stream {
     private Long id;
     private String format;
     private String url;
+    private String hlsUrl;
+    private String dashUrl;
     private Long videoId;
 
     // KEEP FIELDS - put your custom fields here
@@ -31,10 +33,12 @@ public class Stream {
     }
 
     @Generated
-    public Stream(Long id, String format, String url, Long videoId) {
+    public Stream(Long id, String format, String url, String hlsUrl, String dashUrl, Long videoId) {
         this.id = id;
         this.format = format;
         this.url = url;
+        this.hlsUrl = hlsUrl;
+        this.dashUrl = dashUrl;
         this.videoId = videoId;
     }
 
@@ -60,6 +64,22 @@ public class Stream {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getHlsUrl() {
+        return hlsUrl;
+    }
+
+    public void setHlsUrl(String hlsUrl) {
+        this.hlsUrl = hlsUrl;
+    }
+
+    public String getDashUrl() {
+        return dashUrl;
+    }
+
+    public void setDashUrl(String dashUrl) {
+        this.dashUrl = dashUrl;
     }
 
     public Long getVideoId() {
