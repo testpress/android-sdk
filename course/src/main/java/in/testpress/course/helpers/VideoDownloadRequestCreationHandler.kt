@@ -6,6 +6,7 @@ import android.content.Context
 import android.net.Uri
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.DefaultRenderersFactory
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.offline.DownloadHelper
 import com.google.android.exoplayer2.offline.DownloadRequest
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
@@ -18,22 +19,23 @@ class VideoDownloadRequestCreationHandler(val context: Context, val url: String,
     private val downloadHelper: DownloadHelper
     private val trackSelectionParameters: DefaultTrackSelector.Parameters
     var listener: Listener? = null
+    private val mediaItem: MediaItem
 
     init {
-        val uri = Uri.parse(url)
-        downloadHelper = getDownloadHelper(uri)
-        downloadHelper.prepare(this)
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
+        mediaItem = MediaItem.Builder()
+            .setUri(url)
+            .setDrmUuid(C.WIDEVINE_UUID)
+            .setDrmMultiSession(true)
+            .build()
+        downloadHelper = getDownloadHelper()
+        downloadHelper.prepare(this)
     }
 
-    private fun getDownloadHelper(uri: Uri): DownloadHelper {
+    private fun getDownloadHelper(): DownloadHelper {
         val dataSourceFactory = ExoPlayerDataSourceFactory(context).build()
         val renderersFactory = DefaultRenderersFactory(context)
-        return when (val type = Util.inferContentType(uri)) {
-            C.TYPE_HLS -> DownloadHelper.forHls(context, uri, dataSourceFactory, renderersFactory)
-            C.TYPE_OTHER -> DownloadHelper.forProgressive(context, uri)
-            else -> throw IllegalStateException("Video type not supported for download $type")
-        }
+        return DownloadHelper.forMediaItem(mediaItem, trackSelectionParameters, renderersFactory, dataSourceFactory)
     }
 
     override fun onPrepared(helper: DownloadHelper) {
