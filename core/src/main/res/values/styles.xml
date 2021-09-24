@@ -16,6 +16,11 @@
     </style>
 
 
+    <style name="ThemeWithBlackText" parent="TestpressTheme">
+        <item name="android:textColorHint">@color/testpress_gray_light</item>
+        <item name="android:textColor">@color/testpress_black</item>
+    </style>
+
     <style name="myPopupMenuTextAppearanceLarge" parent="@android:style/TextAppearance.DeviceDefault.Widget.PopupMenu.Large">
         <item name="android:textColor">@color/testpress_black</item>
     </style>

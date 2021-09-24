@@ -71,7 +71,7 @@
             android:name=".ui.ZoomMeetActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="Zoom Meet"
-            android:theme="@style/ZMTheme.SubWindow"/>
+            android:theme="@style/ThemeWithBlackText"/>
 
         <activity android:name=".ui.PdfViewerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
