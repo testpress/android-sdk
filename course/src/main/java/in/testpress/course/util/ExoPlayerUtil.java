@@ -320,10 +320,23 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     public MediaItem getMediaItem() {
+        DownloadRequest downloadRequest = VideoDownload.getDownloadRequest(url, activity);
         MediaItem mediaItem = new MediaItem.Builder()
                 .setUri(url)
                 .setDrmUuid(C.WIDEVINE_UUID)
                 .setDrmMultiSession(true).build();
+
+        if (downloadRequest != null) {
+            MediaItem.Builder builder = mediaItem.buildUpon();
+            builder
+                .setMediaId(downloadRequest.id)
+                .setUri(downloadRequest.uri)
+                .setCustomCacheKey(downloadRequest.customCacheKey)
+                .setMimeType(downloadRequest.mimeType)
+                .setStreamKeys(downloadRequest.streamKeys)
+                .setDrmKeySetId(downloadRequest.keySetId);
+            mediaItem = builder.build();
+        }
 
         return mediaItem;
     }
