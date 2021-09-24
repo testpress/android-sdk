@@ -743,6 +743,11 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 progressBar.setVisibility(View.GONE);
             }
 
+            if (playbackState == Player.STATE_ENDED) {
+                onTimeRangeChange((long)startPosition, (long)getCurrentPosition());
+                updateVideoAttempt();
+            }
+
             playerView.setKeepScreenOn(playbackState != Player.STATE_IDLE && playbackState != Player.STATE_ENDED);
         }
 
