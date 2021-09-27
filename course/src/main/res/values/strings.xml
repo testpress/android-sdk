@@ -63,6 +63,7 @@
     <string name="download_start_error">Failed to start download</string>
     <string name="syncing_video">Please wait... We are syncing video</string>
     <string name="license_error">Error in fetching video license. Please try again</string>
+    <string name="license_request_failed">Couldn\'t fetch decryption key. Please try again</string>
 
     <string-array name="exo_speed_values">
         <item>0.5</item>

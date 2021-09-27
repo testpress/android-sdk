@@ -47,6 +47,7 @@ import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
 import com.google.android.exoplayer2.drm.DrmSession;
 import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.drm.DrmSessionManagerProvider;
+import com.google.android.exoplayer2.drm.MediaDrmCallbackException;
 import com.google.android.exoplayer2.offline.DownloadRequest;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.MediaSourceFactory;
@@ -139,6 +140,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     };
     private boolean fullscreen = false;
     private boolean errorOnVideoAttemptUpdate;
+    private int drmLicenseRetries = 0;
     private Handler videoAttemptUpdateHandler;
     private Runnable videoAttemptUpdateTask = new Runnable() {
         @Override
@@ -783,9 +785,16 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         @Override
         public void onPlayerError(ExoPlaybackException exception) {
             Throwable cause = exception.getCause();
-            if (cause instanceof DrmSession.DrmSessionException || cause instanceof MediaCodec.CryptoException) {
-                OfflineDRMLicenseHelper.renewLicense(url, content.getId(), activity, this);
-                displayError(R.string.syncing_video);
+
+            if (isDRMException(cause)) {
+                DownloadTask downloadTask = new DownloadTask(url, activity);
+                drmLicenseRetries += 1;
+                if (drmLicenseRetries < 2 && downloadTask.isDownloaded()) {
+                    OfflineDRMLicenseHelper.renewLicense(url, content.getId(), activity, this);
+                    displayError(R.string.syncing_video);
+                } else {
+                    displayError(R.string.license_request_failed);
+                }
             } else {
                 handleError(exception.type == TYPE_SOURCE);
             }
@@ -832,6 +841,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                     .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), override);
             trackSelector.setParameters(parametersBuilder.build());
         }
+    }
+    
+    private boolean isDRMException(Throwable cause) {
+        return cause instanceof DrmSession.DrmSessionException || cause instanceof MediaCodec.CryptoException || cause instanceof MediaDrmCallbackException;
     }
 
     public static int getRendererIndex(int trackType, MappingTrackSelector.MappedTrackInfo mappedTrackInfo) {
