@@ -49,13 +49,4 @@
 
     <string name="failed_loading_pdf"> Failed to load the PDF </string>
 
-
-
-    <string-array name="discussions_sorting">
-        <item>Choose A Filter</item>
-        <item>Recently Added</item>
-        <item>Most Viewed</item>
-        <item>Most Upvoted</item>
-        <item>Old to New</item>
-    </string-array>
 </resources>
