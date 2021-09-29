@@ -1,6 +1,7 @@
 package `in`.testpress.ui
 
 import `in`.testpress.R
+import `in`.testpress.util.Extensions.dismissOnOutsideClick
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
@@ -77,13 +78,14 @@ class DiscussionsFilterFragment: Fragment() {
         sortSpinner = view.findViewById(R.id.sort_spinner) as PowerSpinnerView
         sortSpinner.setItems(DiscussionsSort.getValues())
         sortSpinner.selectItemByIndex(0)
-        sortSpinner.setOnSpinnerOutsideTouchListener { view, motionEvent -> sortSpinner.dismiss() }
+        sortSpinner.dismissOnOutsideClick()
     }
 
     private fun initializeCategoryDropdown(view: View) {
         categorySpinner = view.findViewById(R.id.category_spinner) as PowerSpinnerView
         categorySpinner.setItems(categories.values.toList())
         categorySpinner.selectItemByIndex(0)
+        categorySpinner.dismissOnOutsideClick()
         populateCategories()
     }
 
