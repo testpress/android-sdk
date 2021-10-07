@@ -3,6 +3,7 @@ package `in`.testpress.util
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
+import com.skydoves.powerspinner.PowerSpinnerView
 
 object Extensions {
 
@@ -11,5 +12,9 @@ object Extensions {
         rotate.duration = 1000
         rotate.repeatCount = Animation.INFINITE
         startAnimation(rotate)
+    }
+
+    fun PowerSpinnerView.dismissOnOutsideClick() {
+        setOnSpinnerOutsideTouchListener { view, motionEvent -> this.dismiss() }
     }
 }

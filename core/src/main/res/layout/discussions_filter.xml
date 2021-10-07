@@ -1,52 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="20dp"
     android:background="#fff"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <TextView
-        android:id="@+id/filter_by"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Filter by"
-        android:textSize="12sp"
-        android:textAllCaps="true"
-        android:layout_alignParentTop="true"/>
 
-    <Spinner
-        style="@style/Widget.Testpress.HeaderBar.Spinner.Base"
-        android:id="@+id/category_spinner"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="visible"
-        android:layout_below="@+id/filter_by"
-        android:paddingBottom="30dp"/>
+        android:orientation="vertical"
+        android:id="@+id/category_spinner_layout"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:layout_alignParentTop="true">
 
-    <TextView
-        android:id="@+id/sort_by"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Sort By"
-        android:textSize="12sp"
-        android:textAllCaps="true"
-        android:layout_below="@+id/category_spinner"/>
+        <TextView
+            android:id="@+id/category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Filter By"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"
+            android:textAllCaps="true" />
 
-    <Spinner
-        style="@style/Widget.Testpress.HeaderBar.Spinner.Base"
-        android:id="@+id/sort_spinner"
+
+        <com.skydoves.powerspinner.PowerSpinnerView
+            android:id="@+id/category_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border_bottom_background"
+            android:padding="10dp"
+            android:textColor="@color/testpress_black"
+            android:textColorHint="@color/testpress_black"
+            android:textSize="14.5sp"
+            app:spinner_arrow_tint="@color/testpress_black"
+            app:spinner_arrow_gravity="end"
+            app:spinner_arrow_padding="8dp"
+            app:spinner_popup_background="@color/testpress_white"
+            />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="visible"
-        android:layout_below="@id/sort_by"
-        android:paddingBottom="30dp"/>
+        android:orientation="vertical"
+        android:id="@+id/sort_spinner_layout"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:layout_below="@id/category_spinner_layout">
+
+        <TextView
+            android:id="@+id/sort_by"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sort By"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"
+            android:textAllCaps="true" />
+
+
+        <com.skydoves.powerspinner.PowerSpinnerView
+            android:id="@+id/sort_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border_bottom_background"
+            android:padding="10dp"
+            android:textColor="@color/testpress_black"
+            android:textColorHint="@color/testpress_black"
+            android:textSize="14.5sp"
+            app:spinner_arrow_tint="@color/testpress_black"
+            app:spinner_arrow_gravity="end"
+            app:spinner_arrow_padding="8dp"
+            app:spinner_popup_background="@color/testpress_white"
+            />
+    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_below="@+id/sort_spinner">
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/sort_spinner_layout">
 
         <Button
             android:id="@+id/apply_filter"
