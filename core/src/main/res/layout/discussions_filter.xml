@@ -85,7 +85,9 @@
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:layout_height="wrap_content"
-        android:layout_below="@id/sort_spinner"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:layout_below="@id/sort_spinner_layout"
         android:id="@+id/author_spinner_layout">
 
         <TextView
@@ -124,6 +126,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/author_spinner_layout"
         android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
         android:id="@+id/commented_thread_filter_layout"
         android:orientation="vertical">
 
@@ -164,6 +167,7 @@
         android:orientation="vertical"
         android:id="@+id/upvoted_filter_layout"
         android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
         android:layout_below="@id/commented_thread_filter_layout">
         <TextView
             android:id="@+id/upvoted_by_me"
@@ -185,6 +189,7 @@
             android:textColor="@color/testpress_black"
             android:textColorHint="@color/testpress_black"
             android:textSize="14.5sp"
+            android:layout_marginTop="5dp"
             app:spinner_arrow_tint="@color/testpress_black"
             app:spinner_arrow_gravity="end"
             app:spinner_arrow_padding="8dp"
@@ -197,7 +202,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
         android:layout_below="@+id/upvoted_filter_layout">
 
         <Button

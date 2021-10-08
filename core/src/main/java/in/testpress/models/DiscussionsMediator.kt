@@ -5,6 +5,7 @@ import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.DiscussionPostEntity
 import `in`.testpress.database.entities.LastLoadedPageData
 import `in`.testpress.network.APIClient
+import android.util.Log
 import androidx.paging.*
 import androidx.room.withTransaction
 import retrofit2.HttpException
@@ -64,6 +65,9 @@ class DiscussionsMediator(val apiClient: APIClient, val database: TestpressDatab
         val sort = params["sortBy"]
         val category = params["category"]
         val searchQuery = params["search"]
+        val upvotedByMe = params["upvotedByMe"]
+        val postedByMe = params["postedByMe"]
+        val commentedByMe = params["commentedByMe"]
         val queryParams = hashMapOf<String, Any>("page" to page)
         if (!sort.isNullOrEmpty()) {
             queryParams["sort"] = sort
@@ -73,6 +77,15 @@ class DiscussionsMediator(val apiClient: APIClient, val database: TestpressDatab
         }
         if (!searchQuery.isNullOrEmpty()) {
             queryParams["search"] = searchQuery
+        }
+        if (!upvotedByMe.isNullOrEmpty()) {
+            queryParams["upvoted_by_me"] = upvotedByMe
+        }
+        if (!postedByMe.isNullOrEmpty()) {
+            queryParams["posted_by_me"] = postedByMe
+        }
+        if (!commentedByMe.isNullOrEmpty()) {
+            queryParams["commented_by_me"] = commentedByMe
         }
         return queryParams
     }

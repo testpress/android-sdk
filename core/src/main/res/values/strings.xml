@@ -51,7 +51,7 @@
 
 
     <string-array name="discussions_author_filter">
-        <item>All threads</item>
+        <item>All</item>
         <item>My threads</item>
     </string-array>
 
