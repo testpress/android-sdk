@@ -49,4 +49,19 @@
 
     <string name="failed_loading_pdf"> Failed to load the PDF </string>
 
+
+    <string-array name="discussions_author_filter">
+        <item>All</item>
+        <item>My threads</item>
+    </string-array>
+
+    <string-array name="discussions_upvotes_filter">
+        <item>All</item>
+        <item>Upvoted By me</item>
+    </string-array>
+
+    <string-array name="discussions_comments_filter">
+        <item>All</item>
+        <item>Commented By me</item>
+    </string-array>
 </resources>

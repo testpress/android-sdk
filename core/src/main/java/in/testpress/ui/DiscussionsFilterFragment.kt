@@ -30,6 +30,9 @@ import com.skydoves.powerspinner.OnSpinnerItemSelectedListener
 class DiscussionsFilterFragment: Fragment() {
     lateinit var categorySpinner: PowerSpinnerView
     lateinit var sortSpinner: PowerSpinnerView
+    lateinit var authorSpinner: PowerSpinnerView
+    lateinit var commentedBySpinner: PowerSpinnerView
+    lateinit var upvotedBySpinner: PowerSpinnerView
     lateinit var applyFilterButton: Button
     lateinit var clearFilterButton: Button
 
@@ -72,6 +75,17 @@ class DiscussionsFilterFragment: Fragment() {
         initializeSortByDropdown(view)
         initializeCategoryDropdown(view)
         setButtonClickListeners()
+        initializeFilters()
+    }
+
+    private fun initializeFilters() {
+        authorSpinner = view!!.findViewById(R.id.author_spinner) as PowerSpinnerView
+        commentedBySpinner = view!!.findViewById(R.id.commented_thread_spinner) as PowerSpinnerView
+        upvotedBySpinner = view!!.findViewById(R.id.upvoted_spinner) as PowerSpinnerView
+
+        authorSpinner.selectItemByIndex(0)
+        commentedBySpinner.selectItemByIndex(0)
+        upvotedBySpinner.selectItemByIndex(0)
     }
 
     private fun initializeSortByDropdown(view: View) {
@@ -103,7 +117,18 @@ class DiscussionsFilterFragment: Fragment() {
             val sortBy: String = DiscussionsSort.getTag(sortSpinner.selectedIndex)
             var categoryKey = categories.keys.elementAt(categorySpinner.selectedIndex).toString()
             if (categoryKey == "-1") categoryKey = ""
-            discussionFilterListener?.onApplyFilterClick(sortBy, categoryKey)
+            val data = hashMapOf("sortBy" to sortBy, "category" to categoryKey)
+
+            if (authorSpinner.selectedIndex == 1) {
+                data["postedByMe"] = "true"
+            }
+            if (upvotedBySpinner.selectedIndex == 1) {
+                data["upvotedByMe"] = "true"
+            }
+            if (commentedBySpinner.selectedIndex == 1) {
+                data["commentedByMe"] = "true"
+            }
+            discussionFilterListener?.onApplyFilterClick(data)
         }
 
         clearFilterButton.setOnClickListener {
@@ -115,7 +140,7 @@ class DiscussionsFilterFragment: Fragment() {
 }
 
 interface DiscussionFilterListener {
-    fun onApplyFilterClick(sortBy: String, category: String)
+    fun onApplyFilterClick(filters:HashMap<String, String>)
     fun onClearFilterClick()
 }
 

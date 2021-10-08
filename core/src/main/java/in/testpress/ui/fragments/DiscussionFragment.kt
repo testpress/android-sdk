@@ -2,8 +2,6 @@ package `in`.testpress.ui.fragments
 
 import `in`.testpress.R
 import `in`.testpress.ui.*
-import android.app.SearchManager
-import android.content.Context.SEARCH_SERVICE
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
@@ -70,7 +68,8 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
-                    viewModel.sortAndFilter("-created", search_query = query)
+                    val data = hashMapOf("sortBy" to "-created")
+                    viewModel.sortAndFilter(data, search_query = query)
                 }
                 return false
             }
@@ -125,7 +124,8 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
             }
         }
 
-        viewModel.sortAndFilter("-created")
+        val data = hashMapOf("sortBy" to "-created")
+        viewModel.sortAndFilter(data)
     }
 
     open fun setCreateButtonClickListener() {
@@ -134,13 +134,14 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
         }
     }
 
-    override fun onApplyFilterClick(sortBy: String, category: String) {
-        viewModel.sortAndFilter(sortBy, category)
+    override fun onApplyFilterClick(filters: HashMap<String, String>) {
+        viewModel.sortAndFilter(filters)
         slidingPaneLayout.closePane()
     }
 
     override fun onClearFilterClick() {
-        viewModel.sortAndFilter("-created")
+        val data = hashMapOf("sortBy" to "-created")
+        viewModel.sortAndFilter(data)
         slidingPaneLayout.closePane()
     }
 }

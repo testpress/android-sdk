@@ -6,6 +6,7 @@ import `in`.testpress.database.entities.DiscussionPostEntity
 import `in`.testpress.models.DiscussionRepository
 import `in`.testpress.network.APIClient
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingData
@@ -45,9 +46,9 @@ class DiscussionViewModel(
     ).flattenMerge(2)
 
 
-    fun sortAndFilter(sortBy: String, category: String = "", search_query: String = "") {
-        val data = hashMapOf("sortBy" to sortBy, "category" to category, "search" to search_query)
-        savedStateHandle.set("params", data)
+    fun sortAndFilter(filters: HashMap<String, String>, search_query: String = "") {
+        filters["search"] = search_query
+        savedStateHandle.set("params", filters)
         clearListChannel.offer(Unit)
     }
 
