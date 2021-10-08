@@ -70,7 +70,7 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
-                    viewModel.sortAndFilter("recent", search_query = query)
+                    viewModel.sortAndFilter("-created", search_query = query)
                 }
                 return false
             }
@@ -125,7 +125,7 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
             }
         }
 
-        viewModel.sortAndFilter("recent")
+        viewModel.sortAndFilter("-created")
     }
 
     open fun setCreateButtonClickListener() {
@@ -140,7 +140,7 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
     }
 
     override fun onClearFilterClick() {
-        viewModel.sortAndFilter("recent")
+        viewModel.sortAndFilter("-created")
         slidingPaneLayout.closePane()
     }
 }

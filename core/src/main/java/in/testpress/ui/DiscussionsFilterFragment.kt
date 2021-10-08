@@ -101,8 +101,9 @@ class DiscussionsFilterFragment: Fragment() {
     private fun setButtonClickListeners() {
         applyFilterButton.setOnClickListener {
             val sortBy: String = DiscussionsSort.getTag(sortSpinner.selectedIndex)
-            val categoryKey = categories.keys.elementAt(categorySpinner.selectedIndex)
-            discussionFilterListener?.onApplyFilterClick(sortBy, categoryKey.toString())
+            var categoryKey = categories.keys.elementAt(categorySpinner.selectedIndex).toString()
+            if (categoryKey == "-1") categoryKey = ""
+            discussionFilterListener?.onApplyFilterClick(sortBy, categoryKey)
         }
 
         clearFilterButton.setOnClickListener {
@@ -121,10 +122,10 @@ interface DiscussionFilterListener {
 
 enum class DiscussionsSort(val displayName: String, val tag: String) {
     CHOOSE_A_FILTER("Choose A Filter", ""),
-    RECENTLY_ADDED("Recently Added", "recent"),
-    MOST_VIEWED("Most Viewed", "views"),
-    MOST_UPVOTED("Most Upvoted", "upvotes"),
-    OLD_TO_NEW("Old to New", "old");
+    RECENTLY_ADDED("Recently Added", "-created"),
+    MOST_VIEWED("Most Viewed", "views_count"),
+    MOST_UPVOTED("Most Upvoted", "-upvotes"),
+    OLD_TO_NEW("Old to New", "created");
 
     companion object {
         fun getValues() = values().map { it.displayName }

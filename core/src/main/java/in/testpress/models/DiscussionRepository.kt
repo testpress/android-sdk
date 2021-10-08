@@ -28,9 +28,9 @@ class DiscussionRepository(val apiClient: APIClient, val database: TestpressData
     @ExperimentalPagingApi
     fun discussionsFlow(query: HashMap<String, String>, pagingConfig: PagingConfig = getDefaultPageConfig()): Flow<PagingData<DiscussionPostEntity>> {
         val pagingSourceFactory = { when(query.get("sortBy")) {
-            "upvotes" -> database.forumDao().getDiscussionsOrderedByUpvotes()
-            "views" -> database.forumDao().getDiscussionsOrderedByViews()
-            "old" -> database.forumDao().getOldestDiscussions()
+            "-upvotes" -> database.forumDao().getDiscussionsOrderedByUpvotes()
+            "views_count" -> database.forumDao().getDiscussionsOrderedByViews()
+            "created" -> database.forumDao().getOldestDiscussions()
             else -> database.forumDao().getDiscussionsOrderedByLatest()
         }}
 

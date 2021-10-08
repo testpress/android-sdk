@@ -11,7 +11,7 @@ import retrofit2.http.Path
 import retrofit2.http.QueryMap
 
 
-const val URL_FORUMS_FRAG = "api/v2.3/forum/"
+const val URL_FORUMS_FRAG = "api/v2.5/discussions/"
 const val FORUM_CATEGORIES_URL = "api/v2.3/posts/categories/"
 
 @JvmSuppressWildcards
