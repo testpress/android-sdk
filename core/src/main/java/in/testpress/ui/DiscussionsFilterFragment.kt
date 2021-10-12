@@ -137,6 +137,9 @@ class DiscussionsFilterFragment: Fragment() {
         clearFilterButton.setOnClickListener {
             categorySpinner.selectItemByIndex(0)
             sortSpinner.selectItemByIndex(0)
+            commentedBySpinner.selectItemByIndex(0)
+            upvotedBySpinner.selectItemByIndex(0)
+            authorSpinner.selectItemByIndex(0)
             discussionFilterListener?.onClearFilterClick()
         }
     }
