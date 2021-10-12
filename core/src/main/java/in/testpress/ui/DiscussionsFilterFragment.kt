@@ -84,6 +84,9 @@ class DiscussionsFilterFragment: Fragment() {
         upvotedBySpinner = view!!.findViewById(R.id.upvoted_spinner) as PowerSpinnerView
 
         authorSpinner.selectItemByIndex(0)
+        authorSpinner.dismissOnOutsideClick()
+        commentedBySpinner.dismissOnOutsideClick()
+        upvotedBySpinner.dismissOnOutsideClick()
         commentedBySpinner.selectItemByIndex(0)
         upvotedBySpinner.selectItemByIndex(0)
     }
