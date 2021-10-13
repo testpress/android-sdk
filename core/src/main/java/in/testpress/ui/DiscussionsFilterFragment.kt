@@ -120,16 +120,16 @@ class DiscussionsFilterFragment: Fragment() {
             val sortBy: String = DiscussionsSort.getTag(sortSpinner.selectedIndex)
             var categoryKey = categories.keys.elementAt(categorySpinner.selectedIndex).toString()
             if (categoryKey == "-1") categoryKey = ""
-            val data = hashMapOf("sortBy" to sortBy, "category" to categoryKey)
+            val data = hashMapOf("sort" to sortBy, "category" to categoryKey)
 
             if (authorSpinner.selectedIndex == 1) {
-                data["postedByMe"] = "true"
+                data["posted_by_me"] = "true"
             }
             if (upvotedBySpinner.selectedIndex == 1) {
-                data["upvotedByMe"] = "true"
+                data["upvoted_by_me"] = "true"
             }
             if (commentedBySpinner.selectedIndex == 1) {
-                data["commentedByMe"] = "true"
+                data["commented_by_me"] = "true"
             }
             discussionFilterListener?.onApplyFilterClick(data)
         }

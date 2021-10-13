@@ -68,7 +68,7 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
-                    val data = hashMapOf("sortBy" to "-created")
+                    val data = hashMapOf("sort" to "-created")
                     viewModel.sortAndFilter(data, search_query = query)
                 }
                 return false
@@ -124,7 +124,7 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
             }
         }
 
-        val data = hashMapOf("sortBy" to "-created")
+        val data = hashMapOf("sort" to "-created")
         viewModel.sortAndFilter(data)
     }
 
