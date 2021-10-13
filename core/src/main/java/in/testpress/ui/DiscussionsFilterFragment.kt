@@ -2,29 +2,25 @@ package `in`.testpress.ui
 
 import `in`.testpress.R
 import `in`.testpress.util.Extensions.dismissOnOutsideClick
+import `in`.testpress.util.Misc.addDaysToMilliSeconds
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.Button
-import android.widget.Spinner
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.skydoves.powerspinner.PowerSpinnerView
-import com.skydoves.powerspinner.createPowerSpinnerView
-import `in`.testpress.util.ViewUtils.toast
-import android.util.Log
-
-import com.skydoves.powerspinner.OnSpinnerItemSelectedListener
-
-
+import java.text.SimpleDateFormat
+import kotlin.collections.HashMap
 
 
 class DiscussionsFilterFragment: Fragment() {
@@ -35,6 +31,10 @@ class DiscussionsFilterFragment: Fragment() {
     lateinit var upvotedBySpinner: PowerSpinnerView
     lateinit var applyFilterButton: Button
     lateinit var clearFilterButton: Button
+    lateinit var dateRange: EditText
+    lateinit var dateRangePicker: MaterialDatePicker<androidx.core.util.Pair<Long, Long>>
+    var publishedAfter: String? = null
+    var publishedBefore: String? = null
 
     val categories = linkedMapOf(-1L to "All Discussions")
     var discussionFilterListener: DiscussionFilterListener? = null
@@ -76,8 +76,8 @@ class DiscussionsFilterFragment: Fragment() {
         initializeCategoryDropdown(view)
         setButtonClickListeners()
         initializeFilters()
+        initializeDateRangeFilter()
     }
-
     private fun initializeFilters() {
         authorSpinner = view!!.findViewById(R.id.author_spinner) as PowerSpinnerView
         commentedBySpinner = view!!.findViewById(R.id.commented_thread_spinner) as PowerSpinnerView
@@ -115,6 +115,31 @@ class DiscussionsFilterFragment: Fragment() {
         })
     }
 
+
+    private fun initializeDateRangeFilter() {
+        dateRange = requireView().findViewById<EditText>(R.id.date_range)
+        dateRangePicker =
+            MaterialDatePicker.Builder.dateRangePicker()
+                .setTitleText("Select dates")
+                .setTheme(R.style.ThemeOverlay_MaterialComponents_MaterialCalendar)
+                .build()
+
+        dateRange.setOnClickListener {
+            dateRangePicker.show(requireActivity().supportFragmentManager, dateRangePicker.toString())
+        }
+        dateRangePicker.addOnPositiveButtonClickListener {
+            val df = SimpleDateFormat("dd MMM yyyy")
+            publishedAfter = SimpleDateFormat("yyyy-MM-dd").format(it.first)
+            publishedBefore = SimpleDateFormat("yyyy-MM-dd").format(addDaysToMilliSeconds(it.second, noOfDays=1))
+
+            if (df.format(it.first).equals(df.format(it.second))) {
+                dateRange.setText("${df.format(it.first)}")
+            } else {
+                dateRange.setText("${df.format(it.first)} - ${df.format(it.second)}")
+            }
+        }
+    }
+
     private fun setButtonClickListeners() {
         applyFilterButton.setOnClickListener {
             val sortBy: String = DiscussionsSort.getTag(sortSpinner.selectedIndex)
@@ -131,6 +156,9 @@ class DiscussionsFilterFragment: Fragment() {
             if (commentedBySpinner.selectedIndex == 1) {
                 data["commented_by_me"] = "true"
             }
+
+            publishedAfter?.let {data["posted_after"] = it}
+            publishedBefore?.let {data["posted_before"] = it}
             discussionFilterListener?.onApplyFilterClick(data)
         }
 
@@ -140,6 +168,9 @@ class DiscussionsFilterFragment: Fragment() {
             commentedBySpinner.selectItemByIndex(0)
             upvotedBySpinner.selectItemByIndex(0)
             authorSpinner.selectItemByIndex(0)
+            publishedBefore = null
+            publishedAfter = null
+            dateRange.text.clear()
             discussionFilterListener?.onClearFilterClick()
         }
     }
