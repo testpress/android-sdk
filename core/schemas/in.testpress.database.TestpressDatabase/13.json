@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 13,
-    "identityHash": "1f6a491d378b27298301c6901783afa2",
+    "identityHash": "2fa0d7dcef7fddec6ab46323115ddc7d",
     "entities": [
       {
         "tableName": "ContentEntity",
@@ -1471,7 +1471,7 @@
         "foreignKeys": []
       },
       {
-        "tableName": "DiscussionAnswerEntity",
+        "tableName": "DiscussionThreadAnswerEntity",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `forumThreadId` INTEGER, `approved_by_id` INTEGER, `approved_by_url` TEXT, `approved_by_username` TEXT, `approved_by_firstName` TEXT, `approved_by_lastName` TEXT, `approved_by_displayName` TEXT, `approved_by_photo` TEXT, `approved_by_largeImage` TEXT, `approved_by_mediumImage` TEXT, `approved_by_mediumSmallImage` TEXT, `approved_by_smallImage` TEXT, `approved_by_xSmallImage` TEXT, `approved_by_miniImage` TEXT, `comment_id` INTEGER, `comment_url` TEXT, `comment_userEmail` TEXT, `comment_userUrl` TEXT, `comment_comment` TEXT, `comment_submitDate` TEXT, `comment_upvotes` INTEGER, `comment_downvotes` INTEGER, `comment_typeOfVote` INTEGER, `comment_voteId` INTEGER, `comment_created` TEXT, `comment_modified` TEXT, `comment_contentId` INTEGER, `comment_contentUrl` TEXT, `comment_profileId` INTEGER, `comment_profileUrl` TEXT, `comment_username` TEXT, `comment_displayName` TEXT, `comment_firstName` TEXT, `comment_lastName` TEXT, `comment_email` TEXT, `comment_photo` TEXT, `comment_largeImage` TEXT, `comment_mediumImage` TEXT, `comment_smallImage` TEXT, `comment_xSmallImage` TEXT, `comment_miniImage` TEXT, `comment_birthDate` TEXT, `comment_gender` TEXT, `comment_address1` TEXT, `comment_address2` TEXT, `comment_city` TEXT, `comment_zip` TEXT, `comment_state` TEXT, `comment_stateChoices` TEXT, `comment_phone` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
@@ -1794,7 +1794,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1f6a491d378b27298301c6901783afa2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2fa0d7dcef7fddec6ab46323115ddc7d')"
     ]
   }
 }

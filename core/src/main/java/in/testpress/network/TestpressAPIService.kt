@@ -2,7 +2,7 @@ package `in`.testpress.network
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.models.NetworkCategory
-import `in`.testpress.models.NetworkDiscussionAnswer
+import `in`.testpress.models.NetworkDiscussionThreadAnswer
 import `in`.testpress.models.NetworkForum
 import `in`.testpress.models.TestpressApiResponse
 import android.content.Context
@@ -30,7 +30,7 @@ interface TestpressAPIService {
     @GET("$URL_FORUMS_FRAG{discussion_id}/answer/")
     fun getDiscussionAnswer(
         @Path(value = "discussion_id", encoded = true) discussionId: Long
-    ): RetrofitCall<NetworkDiscussionAnswer>
+    ): RetrofitCall<NetworkDiscussionThreadAnswer>
 }
 
 open class APIClient(context: Context): TestpressApiClient(context, TestpressSdk.getTestpressSession(context)) {
@@ -45,7 +45,7 @@ open class APIClient(context: Context): TestpressApiClient(context, TestpressSdk
         return getService().fetchCategories(apiURL)
     }
 
-    fun getDiscussionAnswer(discussionId: Long): RetrofitCall<NetworkDiscussionAnswer> {
+    fun getDiscussionAnswer(discussionId: Long): RetrofitCall<NetworkDiscussionThreadAnswer> {
         return getService().getDiscussionAnswer(discussionId)
     }
 }

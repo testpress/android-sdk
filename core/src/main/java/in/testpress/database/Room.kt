@@ -33,7 +33,7 @@ import androidx.room.TypeConverters
             LastLoadedPageData::class,
             UserEntity::class,
             CategoryEntity::class,
-            DiscussionAnswerEntity::class
+            DiscussionThreadAnswerEntity::class
         ], exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class TestpressDatabase : RoomDatabase() {

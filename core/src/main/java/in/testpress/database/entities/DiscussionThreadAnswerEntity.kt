@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class DiscussionAnswerEntity (
+data class DiscussionThreadAnswerEntity (
     @PrimaryKey
     var id: Long? = null,
     var forumThreadId: Long? = null,
