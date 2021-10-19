@@ -21,7 +21,9 @@ data class CommentEntity(
     var upvotes: Long? = null,
     var downvotes: Long? = null,
     var typeOfVote: Long? = null,
-    var voteId: Long? = null
+    var voteId: Long? = null,
+    var created: String? =null,
+    var modified: String? =null
 )
 
 data class ContentObject (
