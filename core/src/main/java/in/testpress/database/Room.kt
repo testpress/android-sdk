@@ -4,6 +4,7 @@ import `in`.testpress.database.dao.*
 import `in`.testpress.database.entities.*
 import `in`.testpress.database.roommigration.RoomMigration10To11.MIGRATION_10_11
 import `in`.testpress.database.roommigration.RoomMigration11To12.MIGRATION_11_12
+import `in`.testpress.database.roommigration.RoomMigration12To13.MIGRATION_12_13
 import `in`.testpress.database.roommigration.RoomMigration4To5.MIGRATION_4_5
 import `in`.testpress.database.roommigration.RoomMigration5To6.MIGRATION_5_6
 import `in`.testpress.database.roommigration.RoomMigration3To4.MIGRATION_3_4
@@ -18,7 +19,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(version = 12,
+@Database(version = 13,
         entities = [
             ContentEntity::class,
             OfflineVideo::class,
@@ -31,7 +32,8 @@ import androidx.room.TypeConverters
             DiscussionPostEntity::class,
             LastLoadedPageData::class,
             UserEntity::class,
-            CategoryEntity::class
+            CategoryEntity::class,
+            DiscussionAnswerEntity::class
         ], exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class TestpressDatabase : RoomDatabase() {
@@ -42,13 +44,14 @@ abstract class TestpressDatabase : RoomDatabase() {
     abstract fun forumDao(): DiscussionPostDao
     abstract fun lastLoadedPageDataDao(): LastLoadedPageDataDao
     abstract fun categoryDao(): CategoryDao
+    abstract fun discussionAnswerDao(): DiscussionAnswerDao
 
     companion object {
         private lateinit var INSTANCE: TestpressDatabase
 
         val MIGRATIONS = arrayOf(
                 MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9,
-                MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12
+                MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13
         )
 
         operator fun invoke(context: Context): TestpressDatabase {

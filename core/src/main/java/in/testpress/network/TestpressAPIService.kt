@@ -2,6 +2,7 @@ package `in`.testpress.network
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.models.NetworkCategory
+import `in`.testpress.models.NetworkDiscussionAnswer
 import `in`.testpress.models.NetworkForum
 import `in`.testpress.models.TestpressApiResponse
 import android.content.Context
@@ -25,6 +26,11 @@ interface TestpressAPIService {
     suspend fun fetchCategories(
             @Path(value="categories_url", encoded = true) categoriesUrl: String?
     ): Response<TestpressApiResponse<NetworkCategory>>
+
+    @GET("$URL_FORUMS_FRAG{discussion_id}/answer/")
+    fun getDiscussionAnswer(
+        @Path(value = "discussion_id", encoded = true) discussionId: Long
+    ): RetrofitCall<NetworkDiscussionAnswer>
 }
 
 open class APIClient(context: Context): TestpressApiClient(context, TestpressSdk.getTestpressSession(context)) {
@@ -37,5 +43,9 @@ open class APIClient(context: Context): TestpressApiClient(context, TestpressSdk
     suspend fun getCategories(url: String? = null): Response<TestpressApiResponse<NetworkCategory>> {
         val apiURL = url ?: FORUM_CATEGORIES_URL
         return getService().fetchCategories(apiURL)
+    }
+
+    fun getDiscussionAnswer(discussionId: Long): RetrofitCall<NetworkDiscussionAnswer> {
+        return getService().getDiscussionAnswer(discussionId)
     }
 }
