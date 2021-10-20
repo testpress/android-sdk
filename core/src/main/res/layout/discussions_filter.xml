@@ -198,13 +198,52 @@
             />
     </LinearLayout>
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/date_range_filter"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:layout_below="@id/upvoted_filter_layout">
+        <TextView
+            android:id="@+id/published_on"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Date range"
+            android:letterSpacing="0.1"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:textAllCaps="true"
+            android:layout_marginBottom="5dp" />
+
+        <EditText
+            android:id="@+id/date_range"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:layout_marginTop="5dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:textColor="@color/testpress_black"
+            android:textSize="14.5sp"
+            android:background="@drawable/border_bottom_background"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:drawablePadding="5dp"
+            android:drawableTint="@color/testpress_color_primary"
+            android:drawableLeft="@drawable/ic_baseline_calendar"
+            android:hint="Select date" />
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="20dp"
-        android:layout_below="@+id/upvoted_filter_layout">
+        android:layout_below="@+id/date_range_filter">
 
         <Button
             android:id="@+id/apply_filter"
