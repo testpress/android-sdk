@@ -134,7 +134,7 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks {
         attemptItem.setCurrentShortText(attemptItem.getShortText());
         attemptItem.setCurrentReview(attemptItem.getReview());
         attemptItem.setLocalEssayText(attemptItem.getEssayText());
-        attemptItem.setUnSyncedFiles(attemptItem.getFiles());
+        attemptItem.setUnSyncedFiles(attemptItem.getFileURLs());
     }
 
     private String getQuestionItemHtml() {
