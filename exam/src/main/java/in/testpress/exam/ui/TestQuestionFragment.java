@@ -1,27 +1,43 @@
 package in.testpress.exam.ui;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
+import android.widget.Toast;
+
+import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import in.testpress.core.TestpressCallback;
+import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
+import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.models.AttemptAnswer;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.AttemptQuestion;
 import in.testpress.exam.ui.view.WebView;
+import in.testpress.models.FileDetails;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Language;
+import in.testpress.util.ProgressDialog;
 import in.testpress.util.WebViewUtils;
 
 public class TestQuestionFragment extends Fragment {
@@ -37,6 +53,7 @@ public class TestQuestionFragment extends Fragment {
     private WebViewUtils webViewUtils;
     private Language selectedLanguage;
     private InstituteSettings instituteSettings;
+    private TestpressExamApiClient apiClient;
 
     static TestQuestionFragment getInstance(AttemptItem attemptItem, int questionIndex,
                                             Language selectedLanguage) {
@@ -58,6 +75,7 @@ public class TestQuestionFragment extends Fragment {
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
         selectedOptions = new ArrayList<>(attemptItem.getSelectedAnswers());
         instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
+        apiClient = new TestpressExamApiClient(getContext());
     }
 
     @SuppressLint({"SetTextI18n", "AddJavascriptInterface"})
@@ -110,6 +128,7 @@ public class TestQuestionFragment extends Fragment {
         attemptItem.setCurrentShortText(attemptItem.getShortText());
         attemptItem.setCurrentReview(attemptItem.getReview());
         attemptItem.setLocalEssayText(attemptItem.getEssayText());
+        attemptItem.setUnSyncedFiles(attemptItem.getFiles());
     }
 
     private String getQuestionItemHtml() {
@@ -161,6 +180,8 @@ public class TestQuestionFragment extends Fragment {
                 }
             }
             htmlContent += "</table>";
+        } else if(attemptQuestion.getType().equals("F")) {
+            htmlContent += attemptItem.getFiletypeDisplayHtml();
         } else if (attemptQuestion.getType().equals("E")) {
             htmlContent += getEssayQuestionHtml();
         } else {
@@ -228,6 +249,17 @@ public class TestQuestionFragment extends Fragment {
         }
 
         @JavascriptInterface
+        public void onClearUploadsClick() {
+            attemptItem.setUnSyncedFiles(new ArrayList<String>());
+        }
+
+        @JavascriptInterface
+        public void onFileUploadClick() {
+            pickFile();
+            Toast.makeText(requireContext(), "Hello", Toast.LENGTH_LONG).show();
+        }
+
+        @JavascriptInterface
         public void onMarkStateChange() {
             attemptItem.setCurrentReview(!attemptItem.getCurrentReview());
         }
@@ -242,6 +274,57 @@ public class TestQuestionFragment extends Fragment {
             attemptItem.setLocalEssayText(value.trim());
         }
     }
+
+    void pickFile() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+       if(getParentFragment() != null) {
+           getParentFragment().startActivityForResult(intent, 42);
+       } else {
+           startActivityForResult(intent, 42);
+       }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        Log.d("TAG", "onActivityResult: " + resultCode + requestCode + data.toString());
+        if (requestCode == 42 && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                onFilePicked(data.getData().getPath());
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void onFilePicked(String filePath) {
+        Log.d("TAG", "onFilePicked: 1" + filePath);
+        final AlertDialog progressDialog = new ProgressDialog().showProgressDialog(getContext(), "Uploading");
+        progressDialog.show();
+        apiClient.upload(filePath)
+                .enqueue(new TestpressCallback<FileDetails>() {
+                    @Override
+                    public void onSuccess(FileDetails fileDetails) {
+                        Log.d("TAG", "onSuccess: " + fileDetails.getUrl());
+                        ArrayList<String> fileURLs = new ArrayList<>(attemptItem.getUnSyncedFiles());
+                        fileURLs.add(fileDetails.getId());
+                        attemptItem.setUnSyncedFiles(fileURLs);
+                        progressDialog.hide();
+                        Toast.makeText(getContext(), "Uploaded files successfully", Toast.LENGTH_LONG).show();
+                        update();
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
+                        Log.d("TAG", "onException: " + exception.getMessage());
+                        progressDialog.hide();
+                    }
+                });
+    }
+
 
     @Override
     public void onDestroyView() {

@@ -63,6 +63,14 @@ function onCheckBoxOptionClick(option) {
     }
 }
 
+function onFileUploadClick(button) {
+    OptionsSelectionListener.onFileUploadClick();
+}
+
+function onClearUploadsClick(button) {
+    OptionsSelectionListener.onClearUploadsClick();
+}
+
 function reviewButtonClick(button) {
     OptionsSelectionListener.onMarkStateChange();
     if(button.innerHTML == "MARKED") {

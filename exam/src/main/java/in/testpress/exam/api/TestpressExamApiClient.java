@@ -169,6 +169,7 @@ public class TestpressExamApiClient extends TestpressApiClient {
             answer.put("selected_answers", attemptItem.getSavedAnswers());
             answer.put("short_text", attemptItem.getCurrentShortText());
         }
+        answer.put("files", attemptItem.getUnSyncedFiles());
         answer.put("review", attemptItem.getCurrentReview());
         return getExamService().postAnswer(attemptItem.getUrlFrag(), answer);
     }
