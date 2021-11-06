@@ -70,10 +70,7 @@ public class TestQuestionFragment extends Fragment {
             questionsView.addJavascriptInterface(new OptionsSelectionListener(),
                     "OptionsSelectionListener");
 
-            attemptItem.saveAnswers(attemptItem.getSelectedAnswers());
-            attemptItem.setCurrentShortText(attemptItem.getShortText());
-            attemptItem.setCurrentReview(attemptItem.getReview());
-            attemptItem.setLocalEssayText(attemptItem.getEssayText());
+            setInitialDataToAttemptItem();
             webViewUtils = new WebViewUtils(questionsView) {
                 @Override
                 public String getHeader() {
@@ -106,6 +103,13 @@ public class TestQuestionFragment extends Fragment {
             webViewUtils.initWebView(getQuestionItemHtml(), getActivity());
         }
         return view;
+    }
+
+    private void setInitialDataToAttemptItem() {
+        attemptItem.saveAnswers(attemptItem.getSelectedAnswers());
+        attemptItem.setCurrentShortText(attemptItem.getShortText());
+        attemptItem.setCurrentReview(attemptItem.getReview());
+        attemptItem.setLocalEssayText(attemptItem.getEssayText());
     }
 
     private String getQuestionItemHtml() {
