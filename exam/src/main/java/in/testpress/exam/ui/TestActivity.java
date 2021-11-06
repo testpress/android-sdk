@@ -644,6 +644,8 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         if ((requestCode == CarouselFragment.TEST_TAKEN_REQUEST_CODE) && (Activity.RESULT_OK == resultCode)) {
             setResult(resultCode);
             finish();
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
