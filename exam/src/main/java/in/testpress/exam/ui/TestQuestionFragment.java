@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -17,11 +18,12 @@ import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.widget.Toast;
 
-import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest;
+
+import com.hbisoft.pickit.PickiT;
+import com.hbisoft.pickit.PickiTCallbacks;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +42,7 @@ import in.testpress.models.greendao.Language;
 import in.testpress.util.ProgressDialog;
 import in.testpress.util.WebViewUtils;
 
-public class TestQuestionFragment extends Fragment {
+public class TestQuestionFragment extends Fragment implements PickiTCallbacks {
 
     static final String PARAM_ATTEMPT_ITEM = "attemptItem";
     static final String PARAM_QUESTION_INDEX = "questionIndex";
@@ -54,6 +56,8 @@ public class TestQuestionFragment extends Fragment {
     private Language selectedLanguage;
     private InstituteSettings instituteSettings;
     private TestpressExamApiClient apiClient;
+    private AlertDialog progressDialog;
+    PickiT pickiT;
 
     static TestQuestionFragment getInstance(AttemptItem attemptItem, int questionIndex,
                                             Language selectedLanguage) {
@@ -76,6 +80,7 @@ public class TestQuestionFragment extends Fragment {
         selectedOptions = new ArrayList<>(attemptItem.getSelectedAnswers());
         instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
         apiClient = new TestpressExamApiClient(getContext());
+        pickiT = new PickiT(requireContext(), this, requireActivity());
     }
 
     @SuppressLint({"SetTextI18n", "AddJavascriptInterface"})
@@ -89,6 +94,7 @@ public class TestQuestionFragment extends Fragment {
                     "OptionsSelectionListener");
 
             setInitialDataToAttemptItem();
+            progressDialog = new ProgressDialog().showProgressDialog(getContext(), "Uploading");
             webViewUtils = new WebViewUtils(questionsView) {
                 @Override
                 public String getHeader() {
@@ -233,6 +239,24 @@ public class TestQuestionFragment extends Fragment {
         return htmlContent;
     }
 
+    @Override
+    public void PickiTonUriReturned() {
+    }
+
+    @Override
+    public void PickiTonStartListener() {
+        progressDialog.show();
+    }
+
+    @Override
+    public void PickiTonProgressUpdate(int progress) {
+    }
+
+    @Override
+    public void PickiTonCompleteListener(String path, boolean wasDriveFile, boolean wasUnknownProvider, boolean wasSuccessful, String Reason) {
+        uploadFileAndSaveURL(path);
+    }
+
     private class OptionsSelectionListener {
 
         @JavascriptInterface
@@ -251,6 +275,12 @@ public class TestQuestionFragment extends Fragment {
         @JavascriptInterface
         public void onClearUploadsClick() {
             attemptItem.setUnSyncedFiles(new ArrayList<String>());
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    update();
+                }
+            });
         }
 
         @JavascriptInterface
@@ -292,25 +322,20 @@ public class TestQuestionFragment extends Fragment {
         Log.d("TAG", "onActivityResult: " + resultCode + requestCode + data.toString());
         if (requestCode == 42 && resultCode == Activity.RESULT_OK) {
             if (data != null) {
-                onFilePicked(data.getData().getPath());
+                Log.d("TAG", "onActivityResult: ");
+                pickiT.getPath(data.getData(), Build.VERSION.SDK_INT);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
-
-    private void onFilePicked(String filePath) {
-        Log.d("TAG", "onFilePicked: 1" + filePath);
-        final AlertDialog progressDialog = new ProgressDialog().showProgressDialog(getContext(), "Uploading");
+    private void uploadFileAndSaveURL(String filePath) {
         progressDialog.show();
         apiClient.upload(filePath)
                 .enqueue(new TestpressCallback<FileDetails>() {
                     @Override
                     public void onSuccess(FileDetails fileDetails) {
-                        Log.d("TAG", "onSuccess: " + fileDetails.getUrl());
-                        ArrayList<String> fileURLs = new ArrayList<>(attemptItem.getUnSyncedFiles());
-                        fileURLs.add(fileDetails.getId());
-                        attemptItem.setUnSyncedFiles(fileURLs);
+                        saveUploadedFileURL(fileDetails);
                         progressDialog.hide();
                         Toast.makeText(getContext(), "Uploaded files successfully", Toast.LENGTH_LONG).show();
                         update();
@@ -319,10 +344,15 @@ public class TestQuestionFragment extends Fragment {
                     @Override
                     public void onException(TestpressException exception) {
                         Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
-                        Log.d("TAG", "onException: " + exception.getMessage());
                         progressDialog.hide();
                     }
                 });
+    }
+
+    private void saveUploadedFileURL(FileDetails fileDetails) {
+        ArrayList<String> fileURLs = new ArrayList<>(attemptItem.getUnSyncedFiles());
+        fileURLs.add(fileDetails.getId());
+        attemptItem.setUnSyncedFiles(fileURLs);
     }
 
 

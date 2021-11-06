@@ -24,7 +24,6 @@ class ProgressDialog {
 
     fun showProgressDialog(context: Context, message: String): AlertDialog {
         val dialog = getAlertDialog(context, R.layout.custom_progress_dialog, setCancellationOnTouchOutside = false)
-        dialog.show()
         dialog.findViewById<TextView>(R.id.text_progress_bar)?.text = message
         return dialog
     }

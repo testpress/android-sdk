@@ -2,6 +2,7 @@ package in.testpress.exam.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,7 +11,6 @@ import java.util.Collections;
 import java.util.List;
 
 import in.testpress.models.greendao.AttemptSection;
-import in.testpress.util.CommonUtils;
 
 public class AttemptItem implements Parcelable {
 
@@ -27,7 +27,7 @@ public class AttemptItem implements Parcelable {
     private AttemptSection attemptSection;
     private String essayText;
     private String localEssayText;
-    private List<String> files = new ArrayList<String>();
+    private List<UserUploadedFile> files = new ArrayList<UserUploadedFile>();
     private List<String> unSyncedFiles = new ArrayList<String>();
 
     AttemptItem() {
@@ -54,7 +54,7 @@ public class AttemptItem implements Parcelable {
         attemptSection = in.readParcelable(AttemptSection.class.getClassLoader());
         in.readList(selectedAnswers, Integer.class.getClassLoader());
         in.readList(savedAnswers, Integer.class.getClassLoader());
-        in.readList(files, String.class.getClassLoader());
+        in.createTypedArrayList(UserUploadedFile.CREATOR);
         in.readList(unSyncedFiles, String.class.getClassLoader());
     }
 
@@ -76,7 +76,7 @@ public class AttemptItem implements Parcelable {
         dest.writeParcelable(attemptSection, flags);
         dest.writeList(selectedAnswers);
         dest.writeList(savedAnswers);
-        dest.writeList(files);
+        dest.writeTypedList(files);
         dest.writeList(unSyncedFiles);
     }
 
@@ -132,7 +132,19 @@ public class AttemptItem implements Parcelable {
     }
 
     public Boolean hasChanged() {
-        return !isSelectedAnswersSynced() || !isMarkForReviewSynced() || !isShortTextSynced() || !isEssaySynced();
+        return !isSelectedAnswersSynced() || !isMarkForReviewSynced() || !isShortTextSynced() || !isEssaySynced()
+    || !isFilesSynced();
+    }
+
+    private boolean isFilesSynced() {
+        List<String> fileURLs = new ArrayList<>(files.size());
+        for (UserUploadedFile file : files) {
+            fileURLs.add(file.getPath());
+        }
+
+        Collections.sort(fileURLs);
+        Collections.sort(unSyncedFiles);
+        return unSyncedFiles.equals(fileURLs);
     }
 
     /**
@@ -290,11 +302,19 @@ public class AttemptItem implements Parcelable {
         return localEssayText;
     }
 
-    public List<String> getFiles() {
+    public List<UserUploadedFile> getFiles() {
         return files;
     }
 
-    public void setFiles(List<String> files) {
+    public List<String> getFileURLs() {
+        List<String> fileURLs = new ArrayList<>(files.size());
+        for (UserUploadedFile file : files) {
+            fileURLs.add(file.getPath());
+        }
+        return fileURLs;
+    }
+
+    public void setFiles(List<UserUploadedFile> files) {
         this.files = files;
     }
 

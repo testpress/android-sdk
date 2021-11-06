@@ -2,6 +2,7 @@ package `in`.testpress.util
 
 import android.content.Context
 import android.net.ConnectivityManager
+import java.net.URL
 import java.util.*
 
 object Misc {
@@ -17,5 +18,9 @@ object Misc {
         c.timeInMillis = milliSeconds
         c.add(Calendar.DAY_OF_MONTH, noOfDays)
         return c.timeInMillis
+    }
+
+    fun getPathFromURL(url: String) {
+        URL(url).path.replaceFirst("/", "")
     }
 }
