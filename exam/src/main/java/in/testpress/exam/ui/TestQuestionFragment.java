@@ -286,7 +286,6 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks {
         @JavascriptInterface
         public void onFileUploadClick() {
             pickFile();
-            Toast.makeText(requireContext(), "Hello", Toast.LENGTH_LONG).show();
         }
 
         @JavascriptInterface
@@ -319,10 +318,8 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        Log.d("TAG", "onActivityResult: " + resultCode + requestCode + data.toString());
         if (requestCode == 42 && resultCode == Activity.RESULT_OK) {
             if (data != null) {
-                Log.d("TAG", "onActivityResult: ");
                 pickiT.getPath(data.getData(), Build.VERSION.SDK_INT);
             }
         } else {
@@ -337,7 +334,6 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks {
                     public void onSuccess(FileDetails fileDetails) {
                         saveUploadedFileURL(fileDetails);
                         progressDialog.hide();
-                        Toast.makeText(getContext(), "Uploaded files successfully", Toast.LENGTH_LONG).show();
                         update();
                     }
 
