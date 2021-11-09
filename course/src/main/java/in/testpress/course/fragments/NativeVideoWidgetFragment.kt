@@ -56,6 +56,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         val greenDaoContent = content.getGreenDaoContent(requireContext())
         val video = content.video
         exoPlayerUtil = ExoPlayerUtil(activity, exoPlayerMainFrame, video?.getPlaybackURL(), 0F)
+        exoPlayerUtil?.setContent(greenDaoContent!!)
         exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil)
 
         viewModel.createContentAttempt(content.id)

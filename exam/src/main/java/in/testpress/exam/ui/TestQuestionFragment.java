@@ -1,5 +1,9 @@
 package in.testpress.exam.ui;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -7,6 +11,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
@@ -41,8 +46,11 @@ import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Language;
 import in.testpress.util.ProgressDialog;
 import in.testpress.util.WebViewUtils;
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
+import pub.devrel.easypermissions.PermissionRequest;
 
-public class TestQuestionFragment extends Fragment implements PickiTCallbacks {
+public class TestQuestionFragment extends Fragment implements PickiTCallbacks, EasyPermissions.PermissionCallbacks {
 
     static final String PARAM_ATTEMPT_ITEM = "attemptItem";
     static final String PARAM_QUESTION_INDEX = "questionIndex";
@@ -58,6 +66,9 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks {
     private TestpressExamApiClient apiClient;
     private AlertDialog progressDialog;
     PickiT pickiT;
+    private static final String[] FILE_PERMISSIONS = new String[] {
+            READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE
+    };
 
     static TestQuestionFragment getInstance(AttemptItem attemptItem, int questionIndex,
                                             Language selectedLanguage) {
@@ -208,6 +219,23 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks {
         return htmlContent;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            new AppSettingsDialog.Builder(requireActivity()).build().show();
+        }
+    }
+
     private String getMarksHtml(AttemptQuestion attemptQuestion){
         String marksHtml = "<div class='marks-wrapper'>";
         if (attemptQuestion.hasPositiveMarks()){
@@ -285,7 +313,20 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks {
 
         @JavascriptInterface
         public void onFileUploadClick() {
-            pickFile();
+            Log.d("TAG", "onFileUploadClick: ");
+            if (hasStoragePermission()) {
+                pickFile();
+            } else {
+                EasyPermissions.requestPermissions(
+                        new PermissionRequest.Builder(requireActivity(), 200, FILE_PERMISSIONS)
+                                .setRationale("This app needs access to your storage to upload files.")
+                                .setPositiveButtonText("Ok")
+                                .setNegativeButtonText("Cancel")
+                                .setTheme(R.style.TestpressAppCompatAlertDialogStyle)
+                                .build()
+                        );
+            }
+
         }
 
         @JavascriptInterface
@@ -302,6 +343,10 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks {
         public void onEssayValueChange(String value) {
             attemptItem.setLocalEssayText(value.trim());
         }
+    }
+
+    private boolean hasStoragePermission() {
+        return EasyPermissions.hasPermissions(requireContext(), FILE_PERMISSIONS);
     }
 
     void pickFile() {
