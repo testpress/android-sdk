@@ -115,21 +115,15 @@ public class CommentsUtil implements LoaderManager.LoaderCallbacks<List<Comment>
         this.commentsUrl = commentsUrl;
         this.rootLayout = rootLayout;
         this.bottomNavigationBarLayout = bottomNavigationBarLayout;
-        previousCommentsLoadingLayout = rootLayout.findViewById(R.id.loading_previous_comments_layout);
-        newCommentsLoadingLayout = rootLayout.findViewById(R.id.loading_new_comments_layout);
+        previousCommentsLoadingLayout = rootLayout.findViewById(R.id.loadingPreviousCommentsLayout);
+        newCommentsLoadingLayout = rootLayout.findViewById(R.id.loadingNewCommentsLayout);
 
-        loadPreviousCommentsLayout = rootLayout.findViewById(R.id.load_previous_comments_layout);
-        loadPreviousCommentsText = rootLayout.findViewById(R.id.load_previous_comments);
-        loadNewCommentsLayout = rootLayout.findViewById(R.id.load_new_comments_layout);
-        loadNewCommentsText = rootLayout.findViewById(R.id.load_new_comments_text);
-        commentsEditText = rootLayout.findViewById(R.id.comment_box);
-        commentBoxLayout = rootLayout.findViewById(R.id.comment_box_layout);
-        TextView commentsLabel = rootLayout.findViewById(R.id.comments_label);
-
-        ViewUtils.setTypeface(
-                new TextView[] { loadPreviousCommentsText, commentsLabel, loadNewCommentsText },
-                TestpressSdk.getRubikMediumFont(activity)
-        );
+        loadPreviousCommentsLayout = rootLayout.findViewById(R.id.loadPreviousCommentsLayout);
+        loadPreviousCommentsText = rootLayout.findViewById(R.id.loadPreviousComments);
+        loadNewCommentsLayout = rootLayout.findViewById(R.id.loadNewCommentsLayout);
+        loadNewCommentsText = rootLayout.findViewById(R.id.loadNewCommentsText);
+        commentsEditText = rootLayout.findViewById(R.id.commentBox);
+        commentBoxLayout = rootLayout.findViewById(R.id.commentBoxLayout);
 
         commentsEditText.setTypeface(TestpressSdk.getRubikRegularFont(activity));
 
@@ -218,18 +212,18 @@ public class CommentsUtil implements LoaderManager.LoaderCallbacks<List<Comment>
 
     public void displayComments() {
         commentsAdapter = new CommentsListAdapter(activity, apiClient);
-        RecyclerView commentsListView = rootLayout.findViewById(R.id.comments_list_view);
+        RecyclerView commentsListView = rootLayout.findViewById(R.id.commentsListView);
         commentsListView.setNestedScrollingEnabled(false);
         commentsListView.setLayoutManager(new LinearLayoutManager(activity));
         commentsListView.setAdapter(commentsAdapter);
-        View postCommentButton = rootLayout.findViewById(R.id.post_comment_button);
+        View postCommentButton = rootLayout.findViewById(R.id.postCommentButton);
         postCommentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onClickSendCommentButton();
             }
         });
-        View imageCommentButton = rootLayout.findViewById(R.id.image_comment_button);
+        View imageCommentButton = rootLayout.findViewById(R.id.imageCommentButton);
         imageCommentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
