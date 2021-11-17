@@ -58,7 +58,7 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
     private fun initializeTrackSelectionView(view: View) {
         trackSelectionView = view.findViewById(R.id.exo_track_selection_view)
         trackSelectionView.setShowDisableOption(false)
-        trackSelectionView.setAllowAdaptiveSelections(true)
+        trackSelectionView.setAllowAdaptiveSelections(false)
         trackSelectionView.setAllowMultipleOverrides(false)
         trackSelectionView.visibility = View.GONE
         trackSelectionView.setTrackNameProvider(ExoPlayerTrackNameProvider())
