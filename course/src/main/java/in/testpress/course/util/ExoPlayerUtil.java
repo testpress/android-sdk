@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
-import android.media.MediaCodec;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,12 +43,12 @@ import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
-import com.google.android.exoplayer2.drm.DrmSession;
 import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.drm.DrmSessionManagerProvider;
 import com.google.android.exoplayer2.offline.DownloadRequest;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.MediaSourceFactory;
+import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.ExoTrackSelection;
@@ -71,7 +70,6 @@ import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
 import in.testpress.course.api.TestpressCourseApiClient;
 import in.testpress.course.helpers.CustomHttpDrmMediaCallback;
-import in.testpress.course.helpers.DownloadTask;
 import in.testpress.course.helpers.VideoDownload;
 import in.testpress.course.repository.VideoWatchDataRepository;
 import in.testpress.database.OfflineVideoDao;
@@ -81,6 +79,7 @@ import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
+import kotlin.Pair;
 
 import static android.content.Context.AUDIO_SERVICE;
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
@@ -88,8 +87,6 @@ import static androidx.mediarouter.media.MediaRouter.RouteInfo.CONNECTION_STATE_
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 import static in.testpress.course.api.TestpressCourseApiClient.LAST_POSITION;
 import static in.testpress.course.api.TestpressCourseApiClient.TIME_RANGES;
-
-import org.jetbrains.annotations.NotNull;
 
 public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerProvider {
 
@@ -119,6 +116,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private boolean iscloseFullscreenDialogCalled;
     private float startPosition;
     private boolean playWhenReady = true;
+    boolean isPreparing = false;
     private float speedRate = 1;
     private Spinner speedRateSpinner;
     private ExploreSpinnerAdapter speedSpinnerAdapter;
@@ -385,6 +383,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void preparePlayer() {
+        isPreparing = true;
         player.prepare();
     }
 
@@ -514,6 +513,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 String.valueOf(speedRate).replace(".0", ""));
 
         speedRateSpinner.setSelection(itemPosition);
+    }
+
+    public void setContent(Content content) {
+        this.content = content;
     }
 
     public void setVideoAttemptParameters(long videoAttemptId, Content content) {
@@ -735,8 +738,24 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private class PlayerEventListener implements Player.EventListener {
+
         @Override
         public void onPlaybackStateChanged(int playbackState) {
+            if(isPreparing && playbackState == Player.STATE_READY){
+                MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
+                if (mappedTrackInfo != null) {
+                    int rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo);
+                    TrackGroupArray trackGroups = mappedTrackInfo.getTrackGroups(rendererIndex);
+                    Pair<Integer, Integer> pair = VideoUtils.getLowBitrateTrackIndex(trackGroups);
+                    DefaultTrackSelector.SelectionOverride override = new DefaultTrackSelector.SelectionOverride(pair.getSecond(), pair.getFirst());
+                    DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
+                    parametersBuilder.clearSelectionOverrides(rendererIndex)
+                            .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), override);
+                    trackSelector.setParameters(parametersBuilder.build());
+                }
+                isPreparing = false;
+            }
+
             if (usbConnectionStateReceiver != null && !isScreenCasted() &&
                     CommonUtils.isUsbConnected(activity)) {
                 
@@ -778,6 +797,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         public void onSeekProcessed() {
             updateVideoAttempt();
         }
+    }
+
+    private void playLowBitrateTrack() {
+
     }
 
     public static int getRendererIndex(int trackType, MappingTrackSelector.MappedTrackInfo mappedTrackInfo) {

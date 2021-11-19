@@ -2,6 +2,7 @@ package `in`.testpress.course.helpers
 
 import `in`.testpress.course.util.ExoPlayerDataSourceFactory
 import `in`.testpress.course.util.ExoPlayerUtil
+import `in`.testpress.course.util.VideoUtils.getLowBitrateTrackIndex
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -64,25 +65,6 @@ class VideoDownloadRequestCreationHandler(val context: Context, val url: String,
         }
         val (lowBandwithTrackIndex, lowBandwithGroupIndex) = getLowBitrateTrackIndex(trackGroups)
         return listOf(DefaultTrackSelector.SelectionOverride(lowBandwithGroupIndex, lowBandwithTrackIndex))
-    }
-
-    private fun getLowBitrateTrackIndex(trackGroups: TrackGroupArray): Pair<Int, Int> {
-        var lowBandwithTrackIndex = 0
-        var lowBandwithGroupIndex = 0
-        var lowestBitrate: Int = Integer.MAX_VALUE
-
-        for (groupIndex in 0 until trackGroups.length) {
-            val group: TrackGroup = trackGroups.get(groupIndex)
-            for (trackIndex in 0 until group.length) {
-                val trackInfo = group.getFormat(trackIndex)
-                lowestBitrate = minOf(trackInfo.bitrate, lowestBitrate)
-                if (trackInfo.bitrate == lowestBitrate) {
-                    lowBandwithTrackIndex = trackIndex
-                    lowBandwithGroupIndex = groupIndex
-                }
-            }
-        }
-        return Pair(lowBandwithTrackIndex, lowBandwithGroupIndex)
     }
 
     override fun onPrepareError(helper: DownloadHelper, e: IOException) {
