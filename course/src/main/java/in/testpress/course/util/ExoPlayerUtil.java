@@ -742,17 +742,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         @Override
         public void onPlaybackStateChanged(int playbackState) {
             if(isPreparing && playbackState == Player.STATE_READY){
-                MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
-                if (mappedTrackInfo != null) {
-                    int rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo);
-                    TrackGroupArray trackGroups = mappedTrackInfo.getTrackGroups(rendererIndex);
-                    Pair<Integer, Integer> pair = VideoUtils.getLowBitrateTrackIndex(trackGroups);
-                    DefaultTrackSelector.SelectionOverride override = new DefaultTrackSelector.SelectionOverride(pair.getSecond(), pair.getFirst());
-                    DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
-                    parametersBuilder.clearSelectionOverrides(rendererIndex)
-                            .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), override);
-                    trackSelector.setParameters(parametersBuilder.build());
-                }
+                playLowBitrateTrack();
                 isPreparing = false;
             }
 
@@ -800,7 +790,17 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void playLowBitrateTrack() {
-
+        MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
+        if (mappedTrackInfo != null) {
+            int rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo);
+            TrackGroupArray trackGroups = mappedTrackInfo.getTrackGroups(rendererIndex);
+            Pair<Integer, Integer> pair = VideoUtils.getLowBitrateTrackIndex(trackGroups);
+            DefaultTrackSelector.SelectionOverride override = new DefaultTrackSelector.SelectionOverride(pair.getSecond(), pair.getFirst());
+            DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
+            parametersBuilder.clearSelectionOverrides(rendererIndex)
+                    .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), override);
+            trackSelector.setParameters(parametersBuilder.build());
+        }
     }
 
     public static int getRendererIndex(int trackType, MappingTrackSelector.MappedTrackInfo mappedTrackInfo) {
