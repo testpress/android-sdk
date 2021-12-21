@@ -146,6 +146,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
         setContentView(R.layout.testpress_activity_review_question);
         parseArguments();
         setTitle(exam.getTitle() + " Solutions");
+        apiClient = new TestpressExamApiClient(this);
         bindViews();
         initializeQuestionsListSidebar();
         initializeQuestionPager();
@@ -412,7 +413,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
         isNetworkRequestLoading = true;
 
         questionsListProgressBar.setVisibility(View.VISIBLE);
-        apiClient = new TestpressExamApiClient(this);
         reviewItemsLoader = apiClient.getReviewItems(url, new HashMap<String, Object>())
                 .enqueue(new TestpressCallback<TestpressApiResponse<ReviewItem>>() {
                     @Override
