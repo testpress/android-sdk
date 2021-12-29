@@ -4,12 +4,10 @@ import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.util.DRMLicenseFetchCallback
 import `in`.testpress.course.util.ExoPlayerDataSourceFactory
 import `in`.testpress.course.util.ExoPlayerUtil
-import `in`.testpress.course.util.VideoUtils.getLowBitrateTrackIndex
-import android.content.Context
-import android.net.Uri
-import android.util.Log
 import `in`.testpress.course.util.OfflineDRMLicenseHelper
 import `in`.testpress.course.util.VideoUtils.getAudioOrVideoInfoWithDrmInitData
+import `in`.testpress.course.util.VideoUtils.getLowBitrateTrackIndex
+import android.content.Context
 import android.widget.Toast
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.DefaultRenderersFactory
@@ -39,7 +37,6 @@ class VideoDownloadRequestCreationHandler(
 
     init {
         val url = content.video!!.getPlaybackURL()!!
-        val uri = Uri.parse(url)
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
         mediaItem = MediaItem.Builder()
             .setUri(url)
@@ -60,29 +57,29 @@ class VideoDownloadRequestCreationHandler(
     }
 
     override fun onPrepared(helper: DownloadHelper) {
-        val format = getAudioOrVideoInfoWithDrmInitData(helper)
-        if (format == null) {
-            listener?.onDownloadRequestHandlerPrepared(
-                getMappedTrackInfo(),
-                getRendererIndex(),
-                getTrackSelectionOverrides()
-            )
+        val videoOrAudioData = getAudioOrVideoInfoWithDrmInitData(helper)
+        val isDRMProtectedVideo = videoOrAudioData != null
+        if (isDRMProtectedVideo) {
+            if (hasDRMSchemaData(videoOrAudioData!!.drmInitData!!)) {
+                OfflineDRMLicenseHelper.fetchLicense(context, content.id, downloadHelper, this)
+            } else {
+                Toast.makeText(
+                    context,
+                    "Error in downloading video",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
             return
         }
 
-        if (!hasSchemaData(format.drmInitData!!)) {
-            Toast.makeText(
-                context,
-                "Download Start Error",
-                Toast.LENGTH_LONG
-            ).show()
-            return
-        }
-
-        OfflineDRMLicenseHelper.fetchLicense(context, content.id, downloadHelper, this)
+        listener?.onDownloadRequestHandlerPrepared(
+            getMappedTrackInfo(),
+            getRendererIndex(),
+            getTrackSelectionOverrides()
+        )
     }
 
-    private fun hasSchemaData(drmInitData: DrmInitData): Boolean {
+    private fun hasDRMSchemaData(drmInitData: DrmInitData): Boolean {
         for (i in 0 until drmInitData.schemeDataCount) {
             if (drmInitData[i].hasData()) {
                 return true
