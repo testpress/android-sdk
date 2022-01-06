@@ -10,7 +10,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="100dp"
         android:fillViewport="true">
 
         <LinearLayout
@@ -28,13 +28,13 @@
                 android:id="@+id/difficulty_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="15dp"
                 android:layout_marginLeft="13dp"
+                android:layout_marginTop="15dp"
                 android:layout_marginRight="15dp"
                 android:layout_marginBottom="50dp"
-                android:visibility="gone"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/difficulty_title"
@@ -42,15 +42,15 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:text="Difficulty Level:"
-                    android:textSize="16sp"
                     android:textAllCaps="true"
-                    android:textColor="@color/testpress_black"/>
+                    android:textColor="@color/testpress_black"
+                    android:textSize="16sp" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginLeft="10dp">
+                    android:layout_marginLeft="10dp"
+                    android:orientation="vertical">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -61,65 +61,65 @@
                             android:id="@+id/difficulty1"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
+                            android:layout_gravity="right"
                             android:layout_marginRight="2dp"
-                            android:background="@drawable/testpress_difficulty_left_off"
-                            android:layout_gravity="right"/>
+                            android:background="@drawable/testpress_difficulty_left_off" />
 
                         <ImageView
                             android:id="@+id/difficulty2"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
+                            android:layout_gravity="right"
                             android:layout_marginRight="2dp"
-                            android:background="@color/testpress_text_gray_light"
-                            android:layout_gravity="right"/>
+                            android:background="@color/testpress_text_gray_light" />
 
                         <ImageView
                             android:id="@+id/difficulty3"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
+                            android:layout_gravity="right"
                             android:layout_marginRight="2dp"
-                            android:background="@color/testpress_text_gray_light"
-                            android:layout_gravity="right"/>
+                            android:background="@color/testpress_text_gray_light" />
 
                         <ImageView
                             android:id="@+id/difficulty4"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
+                            android:layout_gravity="right"
                             android:layout_marginRight="2dp"
-                            android:background="@color/testpress_text_gray_light"
-                            android:layout_gravity="right"/>
+                            android:background="@color/testpress_text_gray_light" />
 
                         <ImageView
                             android:id="@+id/difficulty5"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:background="@drawable/testpress_difficulty_right_off"
-                            android:layout_gravity="right"/>
+                            android:layout_gravity="right"
+                            android:background="@drawable/testpress_difficulty_right_off" />
 
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="5dp">
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal">
 
                         <TextView
                             android:id="@+id/difficulty_percentage"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="14sp"
                             android:text="0%"
-                            android:textColor="@color/testpress_difficulty_percentage_gray"/>
+                            android:textColor="@color/testpress_difficulty_percentage_gray"
+                            android:textSize="14sp" />
 
                         <TextView
                             android:id="@+id/users_answered_right"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="14sp"
                             android:layout_marginLeft="5dp"
+                            android:text="@string/testpress_users_answered_right"
                             android:textColor="@color/testpress_difficulty_percentage_gray"
-                            android:text="@string/testpress_users_answered_right"/>
+                            android:textSize="14sp" />
 
                     </LinearLayout>
 
