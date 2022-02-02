@@ -52,6 +52,7 @@ class PayuPaymentGateway(order: Order, context: Activity): PaymentGateway(order,
                 .setKey(order.apikey)
                 .setTransactionId(order.orderId)
                 .setFirstName(order.name)
+                .setPhone(order.phone)
                 .setEmail(order.email)
                 .setSurl(redirectURL)
                 .setFurl(redirectURL)
