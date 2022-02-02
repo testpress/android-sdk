@@ -138,9 +138,6 @@ class ZoomMeetHandler(
         options.no_bottom_toolbar = false
         options.no_webinar_register_dialog = profileDetails != null && profileDetails.email.isEmailValid()
         options.no_invite = true
-        if (profileDetails != null) {
-            options.customer_key = profileDetails.username
-        }
         return options
     }
 
