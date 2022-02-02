@@ -10,7 +10,7 @@ class VideoPlayerInterceptor (val context: Context) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
 
-        if(request.url().toString().contains("encryption_key")) {
+        if(request.url.toString().contains("encryption_key")) {
             val session = TestpressSdk.getTestpressSession(context)
             request = request.newBuilder().addHeader("Authorization", "JWT " + session?.token).build()
         }
