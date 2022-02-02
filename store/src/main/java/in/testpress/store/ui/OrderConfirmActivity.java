@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 
-import com.payu.india.Payu.PayuConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -254,19 +253,6 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         //noinspection ConstantConditions
         intent.putExtras(getIntent().getExtras());
         startActivityForResult(intent, STORE_REQUEST_CODE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PayuConstants.PAYU_REQUEST_CODE && resultCode == RESULT_OK) {
-            showPaymentStatus();
-        } else {
-            // requestCode = PAYU_REQUEST_CODE & payment failed, RESULT_CANCELED
-            // or
-            // requestCode = STORE_REQUEST_CODE & payment success, RESULT_OK
-            setResult(resultCode, data);
-            finish();
-        }
     }
 
     @Override
