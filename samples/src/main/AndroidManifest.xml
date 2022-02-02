@@ -73,27 +73,6 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name="com.payu.custombrowser.PreLollipopPaymentsActivity"
-            android:exported="true">
-            <intent-filter>
-                <data android:scheme="in.testpress.samples.success" />
-
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter>
-                <data android:scheme="in.testpress.samples.failure" />
-
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>
