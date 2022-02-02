@@ -138,6 +138,9 @@ class ZoomMeetHandler(
         options.no_bottom_toolbar = false
         options.no_webinar_register_dialog = profileDetails != null && profileDetails.email.isEmailValid()
         options.no_invite = true
+        if (profileDetails != null) {
+            options.customer_key = profileDetails.username
+        }
         return options
     }
 
@@ -161,10 +164,22 @@ class ZoomMeetHandler(
         }
     }
 
+    override fun onMeetingNeedCloseOtherMeeting(p0: InMeetingEventHandler?) {
+        
+    }
+
     override fun onActiveVideoUserChanged(p0: Long) {
     }
 
     override fun onActiveSpeakerVideoUserChanged(p0: Long) {
+    }
+
+    override fun onVideoOrderUpdated(p0: MutableList<Long>?) {
+        
+    }
+
+    override fun onFollowHostVideoOrderChanged(p0: Boolean) {
+        
     }
 
     override fun onChatMessageReceived(p0: InMeetingChatMessage?) {
@@ -178,6 +193,14 @@ class ZoomMeetHandler(
 
     override fun onRecordingStatus(p0: InMeetingServiceListener.RecordingStatus?) {
          
+    }
+
+    override fun onLocalRecordingStatus(p0: InMeetingServiceListener.RecordingStatus?) {
+        
+    }
+
+    override fun onInvalidReclaimHostkey() {
+        
     }
 
     override fun onMeetingUserLeave(p0: MutableList<Long>?) {
@@ -227,12 +250,6 @@ class ZoomMeetHandler(
     override fun onMeetingUserUpdated(p0: Long) {
     }
 
-    override fun onMeetingSecureKeyNotification(p0: ByteArray?) {
-    }
-
-    override fun onMeetingNeedColseOtherMeeting(p0: InMeetingEventHandler?) {
-    }
-
     override fun onMicrophoneStatusError(p0: InMeetingAudioController.MobileRTCMicrophoneError?) {
     }
 
@@ -242,9 +259,6 @@ class ZoomMeetHandler(
     override fun onSinkAllowAttendeeChatNotification(p0: Int) {
     }
 
-    override fun onWebinarNeedRegister() {
-
-    }
 
     override fun onSpotlightVideoChanged(p0: Boolean) {
     }
@@ -256,9 +270,6 @@ class ZoomMeetHandler(
     }
 
     override fun onHostAskUnMute(p0: Long) {
-    }
-
-    override fun onUserAudioStatusChanged(p0: Long) {
     }
 
     override fun onUserAudioStatusChanged(p0: Long, p1: InMeetingServiceListener.AudioStatus?) {
@@ -275,7 +286,8 @@ class ZoomMeetHandler(
     ) {
     }
 
-    override fun onUserVideoStatusChanged(p0: Long) {
+    override fun onWebinarNeedRegister(p0: String?) {
+        
     }
 
     override fun onUserVideoStatusChanged(p0: Long, p1: InMeetingServiceListener.VideoStatus?) {

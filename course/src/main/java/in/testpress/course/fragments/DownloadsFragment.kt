@@ -39,14 +39,14 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
     private val TAG = "DownloadsFragment"
     private val viewModel by lazy {
         ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return OfflineVideoViewModel(OfflineVideoRepository(requireContext())) as T
             }
         }).get(OfflineVideoViewModel::class.java)
     }
     private val courseViewModel by lazy {
         ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return CourseViewModel(CourseRepository(requireContext())) as T
             }
         }).get(CourseViewModel::class.java)
