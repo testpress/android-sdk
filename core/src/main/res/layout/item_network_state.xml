@@ -27,7 +27,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/error_msg" />
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/retry_button"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
