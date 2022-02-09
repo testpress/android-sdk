@@ -1,5 +1,9 @@
 package in.testpress.exam.ui;
 
+import static in.testpress.models.greendao.ReviewItem.ANSWERED_CORRECT;
+import static in.testpress.models.greendao.ReviewItem.ANSWERED_INCORRECT;
+import static in.testpress.models.greendao.ReviewItem.UNANSWERED;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -7,23 +11,22 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import androidx.annotation.StringRes;
-import androidx.core.content.ContextCompat;
-import androidx.viewpager.widget.ViewPager;
-import androidx.slidingpanelayout.widget.SlidingPaneLayout;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.slidingpanelayout.widget.SlidingPaneLayout;
+import androidx.viewpager.widget.ViewPager;
 
 import junit.framework.Assert;
 
@@ -67,11 +70,7 @@ import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 
-import static in.testpress.models.greendao.ReviewItem.ANSWERED_CORRECT;
-import static in.testpress.models.greendao.ReviewItem.ANSWERED_INCORRECT;
-import static in.testpress.models.greendao.ReviewItem.UNANSWERED;
-
-public class ReviewQuestionsActivity extends BaseToolBarActivity implements ReviewPanelListAdapter.ListItemClickListener {
+public class ReviewQuestionsActivity extends BaseToolBarActivity  {
 
     static final String PARAM_ATTEMPT = "attempt";
     static final String PARAM_EXAM = "exam";
@@ -89,12 +88,12 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
     SlidingPaneLayout slidingPaneLayout;
     private NonSwipeableViewPager pager;
     private ReviewQuestionsPagerAdapter pagerAdapter;
-    private ReviewPanelListAdapter panelListAdapter;
+    private ReviewPanelAdapter panelListAdapter;
     private Spinner spinner;
     private Spinner languageSpinner;
     private View questionLayout;
     View buttonLayout;
-    private ListView questionsListView;
+    private RecyclerView questionsListView;
     private View emptyView;
     private TextView emptyTitleView;
     private TextView emptyDescView;
@@ -182,10 +181,12 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
     }
 
     private void initializeQuestionsListSidebar() {
-        panelListAdapter = new ReviewPanelListAdapter(reviewItems,
-                R.layout.testpress_test_panel_list_item, this, this);
+        panelListAdapter = new ReviewPanelAdapter(reviewItems, position -> {
+            goToQuestion(position);
+            setPanelOpen(false);
+        });
         questionsListView.setAdapter(panelListAdapter);
-        questionsListView.addFooterView(questionsListProgressBar);
+        questionsListView.setLayoutManager(new GridLayoutManager(this, 4, GridLayoutManager.VERTICAL, false));
     }
 
     private void initializeQuestionPager() {
@@ -225,7 +226,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
 
 
     private void bindViews() {
-        questionsListView = (ListView) findViewById(R.id.questions_list_view);
+        questionsListView = (RecyclerView) findViewById(R.id.questions_list_view);
         emptyView = findViewById(R.id.empty_container);
         emptyTitleView = (TextView) findViewById(R.id.empty_title);
         emptyDescView = (TextView) findViewById(R.id.empty_description);
@@ -260,23 +261,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
     }
 
     private void addListeners() {
-        questionsListView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView absListView, int i) {
-            }
-
-            @Override
-            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItems, int totalItems) {
-                if (totalItems == totalQuestions || totalItems == 0) {
-                    return;
-                }
-                if ((totalItems - firstVisibleItem) == visibleItems) {
-                    if (totalItems < totalQuestions) {
-                        loadReviewItemsFromServer(reviewUrl);
-                    }
-                }
-            }
-        });
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -295,15 +279,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
                 setPanelOpen(!slidingPaneLayout.isOpen());
             }
         });
-        ((ListView) findViewById(R.id.questions_list_view)).setOnItemClickListener(
-                new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int position,
-                                            long id) {
-                        goToQuestion(position);
-                        setPanelOpen(false);
-                    }
-                });
     }
 
     @Override
@@ -418,13 +393,13 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
                     @Override
                     public void onSuccess(TestpressApiResponse<ReviewItem> response) {
                         reviewItems.addAll(response.getResults());
-                        reviewUrl = response.getNext();
-                        totalQuestions = response.getCount();
-                        saveReviewItems();
-                        displayReviewItems();
-                        goToQuestion(pager.getCurrentItem());
-                        isNetworkRequestLoading = false;
-                        questionsListProgressBar.setVisibility(View.GONE);
+
+                        if (response.getNext() != null) {
+                            loadReviewItemsFromServer(response.getNext());
+                        } else {
+                            saveReviewItems();
+                            displayReviewItems();
+                        }
                     }
 
                     @Override
@@ -668,7 +643,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
         nextButton.setVisibility(View.INVISIBLE);
         panelListAdapter.notifyDataSetChanged();
         questionsListButton.setText(getString(R.string.testpress_question));
-        questionsListView.setSelection(pager.getCurrentItem());
     }
 
     private void onClosePanel() {
@@ -695,14 +669,11 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
             return;
         }
 
-        if ((pagerAdapter.getCount() < totalQuestions) && ((pagerAdapter.getCount() - position) <= 4)) {
-            loadReviewItemsFromServer(reviewUrl);
-        }
 
         if (pager.getCurrentItem() != position) {
             pager.setCurrentItem(position);
         }
-        panelListAdapter.setCurrentItemPosition(position);
+        questionsListView.scrollToPosition(position);
 
         // Validate navigation buttons
         if (position == 0) {
@@ -767,7 +738,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
             // Create new object so that we can update it without affecting original language list
             selectedLanguage = new Language(languages.get(selectedPosition));
             pagerAdapter.setSelectedLanguage(selectedLanguage);
-            panelListAdapter.setSelectedLanguage(selectedLanguage);
         }
         languageSpinner.setSelection(selectedPosition);
         selectLanguageMenu.setVisible(true);
@@ -803,11 +773,5 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity implements Revi
         return new RetrofitCall[] {
                 reviewItemsLoader, languageApiRequest
         };
-    }
-
-    @Override
-    public void onItemClicked(int position) {
-        goToQuestion(position);
-        setPanelOpen(false);
     }
 }
