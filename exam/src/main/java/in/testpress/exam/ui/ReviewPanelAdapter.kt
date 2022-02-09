@@ -2,6 +2,9 @@ package `in`.testpress.exam.ui
 
 import `in`.testpress.exam.R
 import `in`.testpress.models.greendao.ReviewItem
+import android.content.Context
+import android.graphics.PorterDuff
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,14 +40,25 @@ class ReviewPanelAdapter(var questions: List<ReviewItem>, val listener: ListItem
         questions = items
     }
 
-    private fun setBackgroundColor(view: View, reviewItem: ReviewItem) {
-        var backgroundColor = R.color.testpress_text_gray
+    private fun setBackgroundColor(view: TextView, reviewItem: ReviewItem) {
         if (reviewItem.result == null || reviewItem.result == ReviewItem.UNANSWERED) {
-            backgroundColor = R.color.testpress_text_gray
+            view.background = view.resources.getDrawable(R.drawable.rounded_corner_with_transparent_bg, null)
+            view.setTextColor(view.context.resources.getColor(R.color.testpress_color_primary))
         } else if (reviewItem.result == ReviewItem.ANSWERED_INCORRECT) {
-            backgroundColor = R.color.testpress_red
+            view.setTextColor(view.context.resources.getColor(R.color.testpress_white))
+            view.background = getDrawableWithBGColor(R.color.testpress_red, view.context)
+        } else {
+            view.setTextColor(view.context.resources.getColor(R.color.testpress_white))
+            view.background = getDrawableWithBGColor(R.color.testpress_green, view.context)
         }
-        view.setBackgroundColor(ContextCompat.getColor(view.context, backgroundColor))
+    }
+
+    private fun getDrawableWithBGColor(color: Int, context: Context): Drawable? {
+        val drawable = context.resources.getDrawable(R.drawable.rounded_corner, null)
+        drawable.mutate().setColorFilter(
+            ContextCompat.getColor(context, color), PorterDuff.Mode.SRC_IN
+        )
+        return drawable
     }
 
     override fun getItemCount(): Int = questions.size
