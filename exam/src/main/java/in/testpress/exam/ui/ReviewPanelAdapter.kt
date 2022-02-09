@@ -43,7 +43,7 @@ class ReviewPanelAdapter(var questions: List<ReviewItem>, val listener: ListItem
     private fun setBackgroundColor(view: TextView, reviewItem: ReviewItem) {
         if (reviewItem.result == null || reviewItem.result == ReviewItem.UNANSWERED) {
             view.background = view.resources.getDrawable(R.drawable.rounded_corner_with_transparent_bg, null)
-            view.setTextColor(view.context.resources.getColor(R.color.testpress_color_primary))
+            view.setTextColor(view.context.resources.getColor(R.color.testpress_text_gray_dark))
         } else if (reviewItem.result == ReviewItem.ANSWERED_INCORRECT) {
             view.setTextColor(view.context.resources.getColor(R.color.testpress_white))
             view.background = getDrawableWithBGColor(R.color.testpress_red, view.context)
