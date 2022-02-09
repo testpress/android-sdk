@@ -23,30 +23,6 @@
             android:configChanges="orientation|keyboardHidden|screenSize" />
 
         <activity
-            android:name=".payu.PaymentModeActivity"
-            android:theme="@style/TestpressTheme"
-            android:label="@string/testpress_payment_method"
-            android:configChanges="orientation|keyboardHidden|screenSize" />
-
-        <activity
-            android:name=".payu.MakePaymentActivity"
-            android:theme="@style/TestpressTheme"
-            android:label="@string/testpress_complete_payment"
-            android:configChanges="keyboardHidden|screenSize" />
-
-        <activity
-            android:name=".payu.CreditCardActivity"
-            android:theme="@style/TestpressTheme"
-            android:label="@string/testpress_enter_details"
-            android:configChanges="orientation|keyboardHidden|screenSize"/>
-
-        <activity
-            android:name=".payu.NetBankingActivity"
-            android:theme="@style/TestpressTheme"
-            android:label="@string/testpress_select_bank"
-            android:configChanges="orientation|keyboardHidden|screenSize" />
-
-        <activity
             android:name=".ui.PaymentSuccessActivity"
             android:theme="@style/TestpressTheme"
             android:label="@string/testpress_payment_status"
