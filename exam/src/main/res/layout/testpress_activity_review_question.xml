@@ -29,12 +29,12 @@
             android:layout_height="match_parent"
             android:id="@+id/sliding_layout" >
 
-            <ListView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/questions_list_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:divider="#ccc"
-                android:dividerHeight="1dp"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="10dp"
                 android:background="#fff" />
 
             <in.testpress.exam.ui.view.NonSwipeableViewPager
