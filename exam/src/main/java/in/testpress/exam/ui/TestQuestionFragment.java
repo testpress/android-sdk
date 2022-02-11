@@ -43,6 +43,7 @@ import in.testpress.exam.models.AttemptQuestion;
 import in.testpress.exam.ui.view.WebView;
 import in.testpress.models.FileDetails;
 import in.testpress.models.InstituteSettings;
+import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Language;
 import in.testpress.util.ProgressDialog;
 import in.testpress.util.WebViewUtils;
@@ -55,6 +56,8 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
     static final String PARAM_ATTEMPT_ITEM = "attemptItem";
     static final String PARAM_QUESTION_INDEX = "questionIndex";
     static final String PARAM_SELECTED_LANGUAGE = "selectedLanguage";
+    static final String PARAM_EXAM = "exam";
+    private Exam exam;
     private AttemptItem attemptItem;
     private Integer index;
     private List<Integer> selectedOptions;
@@ -71,13 +74,14 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
     };
 
     static TestQuestionFragment getInstance(AttemptItem attemptItem, int questionIndex,
-                                            Language selectedLanguage) {
+                                            Language selectedLanguage, Exam exam) {
 
         TestQuestionFragment testQuestionFragment = new TestQuestionFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(TestQuestionFragment.PARAM_ATTEMPT_ITEM, attemptItem);
         bundle.putInt(TestQuestionFragment.PARAM_QUESTION_INDEX, questionIndex);
         bundle.putParcelable(TestQuestionFragment.PARAM_SELECTED_LANGUAGE, selectedLanguage);
+        bundle.putParcelable(TestQuestionFragment.PARAM_EXAM, exam);
         testQuestionFragment.setArguments(bundle);
         return testQuestionFragment;
     }
@@ -86,6 +90,7 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         attemptItem = getArguments().getParcelable(PARAM_ATTEMPT_ITEM);
+        exam = getArguments().getParcelable(PARAM_EXAM);
         index = getArguments().getInt(PARAM_QUESTION_INDEX);
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
         selectedOptions = new ArrayList<>(attemptItem.getSelectedAnswers());
@@ -238,17 +243,21 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
 
     private String getMarksHtml(AttemptQuestion attemptQuestion){
         String marksHtml = "<div class='marks-wrapper'>";
-        if (attemptQuestion.hasPositiveMarks()){
+        String marks = exam.getVariableMarkPerQuestion() ? exam.getMarkPerQuestion() : attemptQuestion.getMarks();
+        if (marks != null && !marks.equals("0.00")){
             marksHtml +=  "<div class='positive-marks'>" +
                     "<div class='label'>Marks</div>" +
-                    "<div class='value'>" + attemptQuestion.getMarks() + "</div>" +
+                    "<div class='value'>" +
+                    marks + "</div>" +
                     "</div>";
         }
 
-        if (attemptQuestion.hasNegativeMarks()){
+        String negativeMarks = exam.getVariableMarkPerQuestion() ? exam.getNegativeMarks() : attemptQuestion.getNegativeMarks();
+
+        if (negativeMarks != null && !negativeMarks.equals("0.00")){
             marksHtml +=  "<div class='negative-marks'>" +
                     "<div class='label'>Negative Marks</div>" +
-                    "<div class='value'>- " + attemptQuestion.getNegativeMarks() + "</div>" +
+                    "<div class='value'>- " + negativeMarks + "</div>" +
                     "</div>";
         }
 
