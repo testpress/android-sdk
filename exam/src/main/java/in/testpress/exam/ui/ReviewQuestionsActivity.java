@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -109,7 +110,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
     private Language selectedLanguage;
     private ExploreSpinnerAdapter languageSpinnerAdapter;
     protected ExploreSpinnerAdapter spinnerAdapter;
-    private View questionsListProgressBar;
     /**
      * When spinnerAdapter is set to spinner, the spinner itself select first item as default,
      * so onItemSelected callback will be called with position 0, we need to omit this callback
@@ -122,7 +122,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
     private Menu optionsMenu;
     String reviewUrl;
     int totalQuestions = 0;
-    private boolean isNetworkRequestLoading = false;
 
     public static Intent createIntent(Activity activity, Exam exam, Attempt attempt) {
         Intent intent = new Intent(activity, ReviewQuestionsActivity.class);
@@ -235,7 +234,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
         nextButton = (Button) findViewById(R.id.next);
         questionsListButton = (Button) findViewById(R.id.question_list_button);
         progressBar = (ProgressBar) findViewById(R.id.pb_loading);
-        questionsListProgressBar = (View) LayoutInflater.from(this).inflate(R.layout.progress_bar, null);
         UIUtils.setIndeterminateDrawable(this, progressBar, 4);
         questionLayout = findViewById(R.id.question_layout);
         buttonLayout = findViewById(R.id.button_layout);
@@ -382,18 +380,11 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
     }
 
     private void loadReviewItemsFromServer(final String url) {
-        if (isNetworkRequestLoading) {
-            return;
-        }
-        isNetworkRequestLoading = true;
-
-        questionsListProgressBar.setVisibility(View.VISIBLE);
         reviewItemsLoader = apiClient.getReviewItems(url, new HashMap<String, Object>())
                 .enqueue(new TestpressCallback<TestpressApiResponse<ReviewItem>>() {
                     @Override
                     public void onSuccess(TestpressApiResponse<ReviewItem> response) {
                         reviewItems.addAll(response.getResults());
-
                         if (response.getNext() != null) {
                             loadReviewItemsFromServer(response.getNext());
                         } else {
@@ -405,8 +396,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
                     @Override
                     public void onException(TestpressException exception) {
                         handleError(exception, R.string.testpress_error_loading_questions);
-                        isNetworkRequestLoading = false;
-                        questionsListProgressBar.setVisibility(View.GONE);
                         retryButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
