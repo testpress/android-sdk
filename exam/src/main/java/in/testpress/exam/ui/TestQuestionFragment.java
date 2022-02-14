@@ -243,7 +243,7 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
 
     private String getMarksHtml(AttemptQuestion attemptQuestion){
         String marksHtml = "<div class='marks-wrapper'>";
-        String marks = exam.getVariableMarkPerQuestion() ? exam.getMarkPerQuestion() : attemptQuestion.getMarks();
+        String marks = exam.getVariableMarkPerQuestion() ? attemptQuestion.getMarks() : exam.getMarkPerQuestion();
         if (marks != null && !marks.equals("0.00")){
             marksHtml +=  "<div class='positive-marks'>" +
                     "<div class='label'>Marks</div>" +
@@ -252,7 +252,7 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
                     "</div>";
         }
 
-        String negativeMarks = exam.getVariableMarkPerQuestion() ? exam.getNegativeMarks() : attemptQuestion.getNegativeMarks();
+        String negativeMarks = exam.getVariableMarkPerQuestion() ? attemptQuestion.getNegativeMarks() : exam.getNegativeMarks();
 
         if (negativeMarks != null && !negativeMarks.equals("0.00")){
             marksHtml +=  "<div class='negative-marks'>" +
