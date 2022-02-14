@@ -3,7 +3,6 @@ package `in`.testpress.course.fragments
 import `in`.testpress.course.R
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.PdfViewerActivity
-import `in`.testpress.course.util.PDFViewer
 import `in`.testpress.course.util.DisplayPDFListener
 import `in`.testpress.course.util.PDFDownloadManager
 import `in`.testpress.course.util.PdfDownloadListener
@@ -13,8 +12,8 @@ import android.os.Bundle
 import android.view.*
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
+import es.voghdev.pdfviewpager.library.adapter.PDFPagerAdapter
 import kotlinx.android.synthetic.main.layout_document_viewer.*
-import kotlinx.android.synthetic.main.layout_document_viewer.pdfView
 import java.net.URI
 
 class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
@@ -104,11 +103,13 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     private fun displayPDF() {
-        encryptionProgress.visibility = View.VISIBLE
-        PDFViewer(requireContext(),displayPDFListener = this).display(
-                file = pdfDownloadManager.get(),
-                pdfView = pdfView
-        )
+        encryptionProgress.visibility = View.GONE
+//        PDFViewer(requireContext(),displayPDFListener = this).display(
+//                file = pdfDownloadManager.get(),
+//                pdfView = pdfView
+//        )
+        val adapter = PDFPagerAdapter(context, pdfDownloadManager.get().absolutePath)
+        pdfView.adapter = adapter
     }
 
     override fun onDownloadFailed() {

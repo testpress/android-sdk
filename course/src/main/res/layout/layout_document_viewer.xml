@@ -6,11 +6,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.github.barteksc.pdfviewer.PDFView
+<!--    <com.github.barteksc.pdfviewer.PDFView-->
+<!--        android:id="@+id/pdfView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_marginBottom="50dp" />-->
+    <es.voghdev.pdfviewpager.library.PDFViewPager
         android:id="@+id/pdfView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="50dp" />
+        android:layout_height="match_parent"/>
 
         <ProgressBar
             android:id="@+id/encryptionProgress"
