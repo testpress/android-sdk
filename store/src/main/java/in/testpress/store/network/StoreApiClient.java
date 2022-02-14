@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import in.testpress.core.TestpressSdk;
 import in.testpress.models.TestpressApiResponse;
+import in.testpress.network.NetworkProductResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
 import in.testpress.store.models.NetworkHash;
