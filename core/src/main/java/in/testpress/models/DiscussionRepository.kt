@@ -53,7 +53,11 @@ class DiscussionRepository(val apiClient: APIClient, val database: TestpressData
                     refreshCategories(responseBody.next)
                 }
             } else {
-                throw TestpressException.networkError(response.errorBody() as IOException?)
+                if (response.errorBody() is IOException) {
+                    throw TestpressException.networkError(response.errorBody() as IOException?)
+                } else {
+                    throw TestpressException.unexpectedError(IOException())
+                }
             }
         }
     }
