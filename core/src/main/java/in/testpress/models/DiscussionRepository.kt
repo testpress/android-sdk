@@ -44,20 +44,25 @@ class DiscussionRepository(val apiClient: APIClient, val database: TestpressData
 
     suspend fun refreshCategories(url: String = FORUM_CATEGORIES_URL) {
         withContext(Dispatchers.IO) {
-            val response = apiClient.getCategories(url)
 
-            if (response.isSuccessful) {
-                val responseBody = saveCategories(response)
+            try {
+                val response = apiClient.getCategories(url)
 
-                if (responseBody?.hasMore() == true) {
-                    refreshCategories(responseBody.next)
-                }
-            } else {
-                if (response.errorBody() is IOException) {
-                    throw TestpressException.networkError(response.errorBody() as IOException?)
+                if (response.isSuccessful) {
+                    val responseBody = saveCategories(response)
+
+                    if (responseBody?.hasMore() == true) {
+                        refreshCategories(responseBody.next)
+                    }
                 } else {
-                    throw TestpressException.unexpectedError(IOException())
+                    if (response.errorBody() is IOException) {
+                        throw TestpressException.networkError(response.errorBody() as IOException?)
+                    } else {
+                        throw TestpressException.unexpectedError(IOException())
+                    }
                 }
+            } catch (e: IOException) {
+                throw TestpressException.networkError(IOException())
             }
         }
     }
