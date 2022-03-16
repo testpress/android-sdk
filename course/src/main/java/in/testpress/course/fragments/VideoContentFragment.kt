@@ -216,7 +216,8 @@ class VideoContentFragment : BaseContentDetailFragment() {
     private fun parseVideoDescription() {
         content.description?.let {
             description.text = HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY)
-            val pattern: Pattern = Pattern.compile("\\d\\d:\\d\\d:\\d\\d")
+            val durationRegex = "([0-2]?[0-9]?:?[0-5]?[0-9]:[0-5][0-9])"
+            val pattern: Pattern = Pattern.compile(durationRegex)
             PatternEditableBuilder().addPattern(
                 pattern,
                 Color.parseColor("#2D9BE8"),
