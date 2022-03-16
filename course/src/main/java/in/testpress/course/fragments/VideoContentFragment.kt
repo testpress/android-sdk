@@ -8,6 +8,7 @@ import `in`.testpress.course.repository.OfflineVideoRepository
 import `in`.testpress.course.services.VideoDownloadService
 import `in`.testpress.course.ui.DownloadsActivity
 import `in`.testpress.course.ui.VideoDownloadQualityChooserDialog
+import `in`.testpress.course.util.DateUtils.convertDurationStringToSeconds
 import `in`.testpress.course.util.PatternEditableBuilder
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import `in`.testpress.models.InstituteSettings
@@ -223,13 +224,8 @@ class VideoContentFragment : BaseContentDetailFragment() {
                 Color.parseColor("#2D9BE8"),
                 object : PatternEditableBuilder.SpannableClickedListener {
                     override fun onSpanClicked(text: String) {
-                        val dateFormat: DateFormat = SimpleDateFormat("HH:mm:ss")
-                        dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-                        try {
-                            val date: Date = dateFormat.parse(text)
-                            videoWidgetFragment.seekTo(date.time)
-                        } catch (ignore: ParseException) {
-                        }
+                        val seconds = convertDurationStringToSeconds(text)
+                        videoWidgetFragment.seekTo(seconds * 1000L)
                     }
                 }).into(description)
             toggleDescription(true)

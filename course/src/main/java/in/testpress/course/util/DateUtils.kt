@@ -20,4 +20,17 @@ object DateUtils {
             Settings.System.getInt(context.contentResolver, Settings.System.AUTO_TIME, 0) != 1;
         }
     }
+
+    fun convertDurationStringToSeconds(durationString: String): Int {
+        val durationList = durationString.split(":").toMutableList()
+        var seconds = 0
+        var minutes = 1
+
+        while (durationList.size > 0) {
+            seconds += minutes * durationList.removeLast().toInt()
+            minutes *= 60
+        }
+
+        return seconds
+    }
 }
