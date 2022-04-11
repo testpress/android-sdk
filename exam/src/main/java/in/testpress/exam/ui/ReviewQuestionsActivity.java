@@ -65,8 +65,6 @@ import in.testpress.models.greendao.ReviewQuestionTranslation;
 import in.testpress.models.greendao.ReviewQuestionTranslationDao;
 import in.testpress.models.greendao.SelectedAnswer;
 import in.testpress.models.greendao.SelectedAnswerDao;
-import in.testpress.models.greendao.UserUploadedFile;
-import in.testpress.models.greendao.UserUploadedFileDao;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ExploreSpinnerAdapter;
@@ -433,13 +431,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
                 reviewAnswer.setQuestionId(reviewQuestion.getId());
                 reviewAnswerDao.insertOrReplace(reviewAnswer);
             }
-
-            UserUploadedFileDao userUploadedFileDao = TestpressSDKDatabase.getUserUploadedFileDao(this);
-            for (UserUploadedFile userUploadedFile: reviewItem.getFiles()) {
-                userUploadedFile.setReviewItemId(reviewItem.getId());
-                userUploadedFileDao.insertOrReplace(userUploadedFile);
-            }
-
             // Store translations
             for (ReviewQuestionTranslation translation : reviewQuestion.getTranslations()) {
                 translation.setQuestionId(reviewQuestion.getId());

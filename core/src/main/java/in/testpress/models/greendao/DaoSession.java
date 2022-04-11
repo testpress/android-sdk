@@ -14,7 +14,6 @@ import in.testpress.models.greendao.ReviewQuestion;
 import in.testpress.models.greendao.ReviewAnswer;
 import in.testpress.models.greendao.ReviewQuestionTranslation;
 import in.testpress.models.greendao.ReviewAnswerTranslation;
-import in.testpress.models.greendao.UserUploadedFile;
 import in.testpress.models.greendao.SelectedAnswer;
 import in.testpress.models.greendao.Direction;
 import in.testpress.models.greendao.ExamQuestion;
@@ -50,7 +49,6 @@ import in.testpress.models.greendao.ReviewQuestionDao;
 import in.testpress.models.greendao.ReviewAnswerDao;
 import in.testpress.models.greendao.ReviewQuestionTranslationDao;
 import in.testpress.models.greendao.ReviewAnswerTranslationDao;
-import in.testpress.models.greendao.UserUploadedFileDao;
 import in.testpress.models.greendao.SelectedAnswerDao;
 import in.testpress.models.greendao.DirectionDao;
 import in.testpress.models.greendao.ExamQuestionDao;
@@ -95,7 +93,6 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig reviewAnswerDaoConfig;
     private final DaoConfig reviewQuestionTranslationDaoConfig;
     private final DaoConfig reviewAnswerTranslationDaoConfig;
-    private final DaoConfig userUploadedFileDaoConfig;
     private final DaoConfig selectedAnswerDaoConfig;
     private final DaoConfig directionDaoConfig;
     private final DaoConfig examQuestionDaoConfig;
@@ -131,7 +128,6 @@ public class DaoSession extends AbstractDaoSession {
     private final ReviewAnswerDao reviewAnswerDao;
     private final ReviewQuestionTranslationDao reviewQuestionTranslationDao;
     private final ReviewAnswerTranslationDao reviewAnswerTranslationDao;
-    private final UserUploadedFileDao userUploadedFileDao;
     private final SelectedAnswerDao selectedAnswerDao;
     private final DirectionDao directionDao;
     private final ExamQuestionDao examQuestionDao;
@@ -182,9 +178,6 @@ public class DaoSession extends AbstractDaoSession {
 
         reviewAnswerTranslationDaoConfig = daoConfigMap.get(ReviewAnswerTranslationDao.class).clone();
         reviewAnswerTranslationDaoConfig.initIdentityScope(type);
-
-        userUploadedFileDaoConfig = daoConfigMap.get(UserUploadedFileDao.class).clone();
-        userUploadedFileDaoConfig.initIdentityScope(type);
 
         selectedAnswerDaoConfig = daoConfigMap.get(SelectedAnswerDao.class).clone();
         selectedAnswerDaoConfig.initIdentityScope(type);
@@ -276,7 +269,6 @@ public class DaoSession extends AbstractDaoSession {
         reviewAnswerDao = new ReviewAnswerDao(reviewAnswerDaoConfig, this);
         reviewQuestionTranslationDao = new ReviewQuestionTranslationDao(reviewQuestionTranslationDaoConfig, this);
         reviewAnswerTranslationDao = new ReviewAnswerTranslationDao(reviewAnswerTranslationDaoConfig, this);
-        userUploadedFileDao = new UserUploadedFileDao(userUploadedFileDaoConfig, this);
         selectedAnswerDao = new SelectedAnswerDao(selectedAnswerDaoConfig, this);
         directionDao = new DirectionDao(directionDaoConfig, this);
         examQuestionDao = new ExamQuestionDao(examQuestionDaoConfig, this);
@@ -312,7 +304,6 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(ReviewAnswer.class, reviewAnswerDao);
         registerDao(ReviewQuestionTranslation.class, reviewQuestionTranslationDao);
         registerDao(ReviewAnswerTranslation.class, reviewAnswerTranslationDao);
-        registerDao(UserUploadedFile.class, userUploadedFileDao);
         registerDao(SelectedAnswer.class, selectedAnswerDao);
         registerDao(Direction.class, directionDao);
         registerDao(ExamQuestion.class, examQuestionDao);
@@ -350,7 +341,6 @@ public class DaoSession extends AbstractDaoSession {
         reviewAnswerDaoConfig.clearIdentityScope();
         reviewQuestionTranslationDaoConfig.clearIdentityScope();
         reviewAnswerTranslationDaoConfig.clearIdentityScope();
-        userUploadedFileDaoConfig.clearIdentityScope();
         selectedAnswerDaoConfig.clearIdentityScope();
         directionDaoConfig.clearIdentityScope();
         examQuestionDaoConfig.clearIdentityScope();
@@ -403,10 +393,6 @@ public class DaoSession extends AbstractDaoSession {
 
     public ReviewAnswerTranslationDao getReviewAnswerTranslationDao() {
         return reviewAnswerTranslationDao;
-    }
-
-    public UserUploadedFileDao getUserUploadedFileDao() {
-        return userUploadedFileDao;
     }
 
     public SelectedAnswerDao getSelectedAnswerDao() {

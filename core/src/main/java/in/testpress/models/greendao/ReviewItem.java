@@ -2,7 +2,7 @@ package in.testpress.models.greendao;
 
 import org.greenrobot.greendao.annotation.*;
 
-import java.util.List;
+import in.testpress.R;
 import in.testpress.models.greendao.DaoSession;
 import org.greenrobot.greendao.DaoException;
 
@@ -66,11 +66,6 @@ public class ReviewItem {
 
     @Generated
     private transient Long question__resolvedKey;
-
-    @ToMany(joinProperties = {
-        @JoinProperty(name = "id", referencedName = "reviewItemId")
-    })
-    private List<UserUploadedFile> files;
 
     // KEEP FIELDS - put your custom fields here
     public static final String ANSWERED_CORRECT = "Correct";
@@ -291,28 +286,6 @@ public class ReviewItem {
             questionId = question == null ? null : question.getId();
             question__resolvedKey = questionId;
         }
-    }
-
-    /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    @Generated
-    public List<UserUploadedFile> getFiles() {
-        if (files == null) {
-            __throwIfDetached();
-            UserUploadedFileDao targetDao = daoSession.getUserUploadedFileDao();
-            List<UserUploadedFile> filesNew = targetDao._queryReviewItem_Files(id);
-            synchronized (this) {
-                if(files == null) {
-                    files = filesNew;
-                }
-            }
-        }
-        return files;
-    }
-
-    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    @Generated
-    public synchronized void resetFiles() {
-        files = null;
     }
 
     /**

@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -56,7 +55,6 @@ import in.testpress.models.greendao.ReviewItem;
 import in.testpress.models.greendao.ReviewItemDao;
 import in.testpress.models.greendao.ReviewQuestion;
 import in.testpress.models.greendao.ReviewQuestionTranslation;
-import in.testpress.models.greendao.UserUploadedFile;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.view.ClosableSpinner;
 import in.testpress.util.CommonUtils;
@@ -383,7 +381,6 @@ public class ReviewQuestionsFragment extends Fragment {
         boolean isMultipleMCQType = reviewItem.getQuestion().getType().equals("C");
         boolean isShortAnswerType = reviewItem.getQuestion().getType().equals("S");
         boolean isNumericalType = reviewItem.getQuestion().getType().equals("N");
-        boolean isFileType = reviewItem.getQuestion().getType().equals("F");
         String correctAnswerHtml = "";
         //noinspection unchecked
         List<Object> reviewAnswers = (List<Object>) answers;
@@ -443,10 +440,6 @@ public class ReviewQuestionsFragment extends Fragment {
             html += getUserEssayAnswerHtml();
         }
 
-        if (reviewItem.getQuestion().getType().equals("F")) {
-            html = getUserUploadedFilesHtml(html);
-        }
-
         if (isShortAnswerType || isNumericalType) {
             html += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
                     WebViewUtils.getHeadingTags(getString(R.string.testpress_your_answer)) +
@@ -488,18 +481,6 @@ public class ReviewQuestionsFragment extends Fragment {
                     "</div>";
         }
         return html + "</div>";
-    }
-
-    @NonNull
-    private String getUserUploadedFilesHtml(String html) {
-        int index = 1;
-        html += "<div>";
-        for(UserUploadedFile file: reviewItem.getFiles()) {
-            html += "<a href='" + file.getUrl() +"'>" + "File - " + index + "</a>";
-            index++;
-        }
-        html += "</div>";
-        return html;
     }
 
     @NotNull
