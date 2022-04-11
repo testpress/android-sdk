@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 48;
+    private static final int VERSION = 49;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -20,12 +20,14 @@ public class TestpressSDKDaoGenerator {
         Entity reviewAnswer = addReviewAnswer(schema);
         Entity reviewQuestionTranslation = addReviewQuestionTranslation(schema);
         Entity reviewAnswerTranslation = addReviewAnswerTranslation(schema);
+        Entity userUploadedFile = addUserUploadedFile(schema);
         addSelectedAnswer(schema);
         addAttemptToReviewItem(reviewAttempt, reviewItem);
         addReviewItemToQuestion(reviewItem, reviewQuestion);
         addReviewQuestionToAnswers(reviewQuestion, reviewAnswer);
         addTranslationsToReviewQuestion(reviewQuestion, reviewQuestionTranslation);
         addAnswersToReviewTranslations(reviewQuestionTranslation, reviewAnswerTranslation);
+        addReviewItemToUserUploadedFiles(reviewItem, userUploadedFile);
 
         Entity direction = addDirection(schema);
         Entity examQuestion = addExamQuestion(schema);
@@ -92,6 +94,14 @@ public class TestpressSDKDaoGenerator {
 
         schema.enableKeepSectionsByDefault();
         new DaoGenerator().generateAll(schema, "core/src/main/java");
+    }
+
+    private static Entity addUserUploadedFile(Schema schema) {
+        Entity userUploadedFile = schema.addEntity("UserUploadedFile");
+        userUploadedFile.addLongProperty("id").primaryKey();
+        userUploadedFile.addStringProperty("path");
+        userUploadedFile.addStringProperty("url");
+        return userUploadedFile;
     }
 
     private static void addProductToPrice(Entity price, Entity product) {
@@ -714,6 +724,12 @@ public class TestpressSDKDaoGenerator {
         Property reviewQuestionId = reviewAnswer.addLongProperty("questionId").getProperty();
         ToMany questionToAnswers = reviewQuestion.addToMany(reviewAnswer, reviewQuestionId);
         questionToAnswers.setName("answers");
+    }
+
+    private static void addReviewItemToUserUploadedFiles(Entity reviewItem, Entity userUploadedFile) {
+        Property reviewUserUploadedFileId = userUploadedFile.addLongProperty("reviewItemId").getProperty();
+        ToMany reviewItemToUserUploadedFiles = reviewItem.addToMany(userUploadedFile, reviewUserUploadedFileId);
+        reviewItemToUserUploadedFiles.setName("files");
     }
 
     private static void addTranslationsToReviewQuestion(Entity reviewQuestion, Entity translation) {
