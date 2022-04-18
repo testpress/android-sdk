@@ -876,6 +876,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             attemptItem.setShortText(newAttemptItem.getShortText());
                             attemptItem.setReview(newAttemptItem.getReview());
                             attemptItem.setFiles(newAttemptItem.getFiles());
+                            attemptItem.setEssayText(newAttemptItem.getEssayText());
 
                             if (isNonSectionalOrIBPSExam() || (attempt.hasSectionalLock() && sections.get(currentSectionPosition).equals("Running"))) {
                                 attemptItemList.set(position, attemptItem);
