@@ -53,7 +53,7 @@ class VideoDownloadService : DownloadService(
         return downloadManager
     }
 
-    override fun getForegroundNotification(downloads: MutableList<Download>): Notification {
+    override fun getForegroundNotification(downloads: MutableList<Download>, notMetRequirements: Int): Notification {
 
         val navigateToDownloadsActivity = getIntentForNavigateToDownloadsActivity()
 

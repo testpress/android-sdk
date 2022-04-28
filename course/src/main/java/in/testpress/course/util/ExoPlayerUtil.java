@@ -34,12 +34,11 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.github.vkay94.dtpv.DoubleTapPlayerView;
 import com.github.vkay94.dtpv.youtube.YouTubeOverlay;
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.DefaultControlDispatcher;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
@@ -85,6 +84,7 @@ import static android.content.Context.AUDIO_SERVICE;
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 import static androidx.mediarouter.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
+import static com.google.android.exoplayer2.PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED;
 import static in.testpress.course.api.TestpressCourseApiClient.LAST_POSITION;
 import static in.testpress.course.api.TestpressCourseApiClient.TIME_RANGES;
 
@@ -195,12 +195,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             initScreenRecordTrackers();
         }
         setSpeedRate(1);
-        playerView.setPlaybackPreparer(new PlaybackPreparer() {
-            @Override
-            public void preparePlayback() {
-                initializePlayer();
-            }
-        });
 
         ExoTrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory();
         trackSelector =  new DefaultTrackSelector(activity, videoTrackSelectionFactory);
@@ -396,7 +390,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
     private void registerListeners() {
         registerUsbConnectionStateReceiver();
-        addPlayPauseOnClickListener();
     }
 
     private void registerUsbConnectionStateReceiver() {
@@ -406,19 +399,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             mediaRouter.addCallback(mediaRouteSelector, mediaRouterCallback,
                     MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
         }
-    }
-
-    private void addPlayPauseOnClickListener() {
-        playerView.setControlDispatcher(new DefaultControlDispatcher() {
-            @Override
-            public boolean dispatchSetPlayWhenReady(Player player, boolean playWhenReady) {
-                if (playWhenReady) {
-                    audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-                }
-                updateVideoAttempt();
-                return super.dispatchSetPlayWhenReady(player, playWhenReady);
-            }
-        });
     }
 
     private DialogInterface.OnClickListener trackSelectionListener() {
@@ -774,8 +754,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         }
 
         @Override
-        public void onPlayerError(ExoPlaybackException exception) {
-            handleError(exception.type == TYPE_SOURCE);
+        public void onPlayerError(PlaybackException error) {
+            handleError(error.errorCode == ERROR_CODE_IO_NETWORK_CONNECTION_FAILED);
         }
 
         @Override
