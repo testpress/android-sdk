@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Looper;
 import androidx.appcompat.app.AlertDialog;
 import android.os.Handler;
+import android.util.Log;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -26,6 +27,7 @@ import in.testpress.models.FileDetails;
 import in.testpress.models.ProfileDetails;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.ui.UserDevicesActivity;
+import in.testpress.util.Misc;
 import in.testpress.util.UIUtils;
 import in.testpress.util.UserAgentProvider;
 import okhttp3.Interceptor;
@@ -245,7 +247,8 @@ public class TestpressApiClient {
 
     public RetrofitCall<FileDetails> upload(String filePath) {
         File file = new File(filePath);
-        RequestBody reqFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        String mimeType = Misc.INSTANCE.getMimeType(filePath);
+        RequestBody reqFile = RequestBody.create(MediaType.parse(mimeType), file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), reqFile);
         return getFileUploadService().upload(body);
     }

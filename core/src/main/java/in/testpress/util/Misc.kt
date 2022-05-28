@@ -4,6 +4,10 @@ import android.content.Context
 import android.net.ConnectivityManager
 import java.net.URL
 import java.util.*
+import android.webkit.MimeTypeMap
+
+
+
 
 object Misc {
     fun hasNetworkAvailable(context: Context): Boolean {
@@ -22,5 +26,14 @@ object Misc {
 
     fun getPathFromURL(url: String) {
         URL(url).path.replaceFirst("/", "")
+    }
+
+    fun getMimeType(url: String): String {
+        var type = "multipart/form-data"
+        val extension = MimeTypeMap.getFileExtensionFromUrl(url)
+        if (extension != null) {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension).toString()
+        }
+        return type
     }
 }
