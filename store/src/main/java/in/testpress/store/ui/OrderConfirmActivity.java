@@ -29,6 +29,7 @@ import in.testpress.store.PaymentGatewayFactory;
 import in.testpress.store.PaymentGateway;
 import in.testpress.store.PaymentGatewayListener;
 import in.testpress.store.R;
+import in.testpress.store.TestpressStore;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderConfirmErrorDetails;
 import in.testpress.store.models.OrderItem;
@@ -259,7 +260,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK && data != null && !data.getBooleanExtra(TestpressStore.PAYMENT_SUCCESS, false)) {
             showPaymentStatus();
         } else {
             setResult(resultCode, data);
