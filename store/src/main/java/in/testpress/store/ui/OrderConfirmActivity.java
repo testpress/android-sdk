@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 
@@ -256,6 +257,17 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            showPaymentStatus();
+        } else {
+            setResult(resultCode, data);
+            finish();
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
@@ -323,6 +335,6 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
 
     @Override
     public void onPaymentCancel() {
-
+        showPaymentFailedScreen();
     }
 }
