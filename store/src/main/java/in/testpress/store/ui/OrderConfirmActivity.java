@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -260,12 +261,8 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && data != null && !data.getBooleanExtra(TestpressStore.PAYMENT_SUCCESS, false)) {
-            showPaymentStatus();
-        } else {
-            setResult(resultCode, data);
-            finish();
-        }
+        setResult(resultCode, data);
+        finish();
     }
 
     @Override
