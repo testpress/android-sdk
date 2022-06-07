@@ -9,6 +9,7 @@ import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
 import in.testpress.store.models.NetworkHash;
+import in.testpress.store.models.NetworkOrderStatus;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
@@ -22,6 +23,8 @@ public class StoreApiClient extends TestpressApiClient {
     public static final String V4_PRODUCTS_LIST_PATH =  "/api/v2.4/products/";
 
     public static final String ORDERS_PATH = "/api/v2.2/orders/";
+
+    public static final String ORDER_STATE_REFRESH_PATH = "/api/v2.5/payments/refresh/";
 
     public static final String ORDER_CONFIRM_PATH = "/confirm/";
 
@@ -68,6 +71,12 @@ public class StoreApiClient extends TestpressApiClient {
 
     public RetrofitCall<NetworkProductResponse> getProductsList() {
         return getProductService().getProductsList();
+    }
+
+    public RetrofitCall<NetworkOrderStatus> refreshOrderStatus(String orderId) {
+        HashMap<String, String> parameters = new HashMap<>();
+        parameters.put("order_id", orderId);
+        return getProductService().refreshOrderStatus(parameters);
     }
 
     public RetrofitCall<NetworkHash> generateHash(String key) {

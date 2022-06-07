@@ -31,6 +31,7 @@ import in.testpress.store.PaymentGateway;
 import in.testpress.store.PaymentGatewayListener;
 import in.testpress.store.R;
 import in.testpress.store.TestpressStore;
+import in.testpress.store.models.NetworkOrderStatus;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderConfirmErrorDetails;
 import in.testpress.store.models.OrderItem;
@@ -310,9 +311,27 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         retryButton.setVisibility(View.GONE);
     }
 
+    private void refreshOrderStatus() {
+        apiClient.refreshOrderStatus(order.getOrderId()).enqueue(new TestpressCallback<NetworkOrderStatus>() {
+            @Override
+            public void onSuccess(NetworkOrderStatus result) {
+                if (result.getStatus().equals("success")) {
+                    showPaymentStatus();
+                } else {
+                    showPaymentFailedScreen();
+                }
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                showPaymentFailedScreen();
+            }
+        });
+    }
+
     @Override
     public void onPaymentSuccess() {
-        showPaymentStatus();
+        refreshOrderStatus();
     }
 
     void showPaymentFailedScreen() {
@@ -323,7 +342,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
 
     @Override
     public void onPaymentFailure() {
-        showPaymentFailedScreen();
+        refreshOrderStatus();
     }
 
     @Override
