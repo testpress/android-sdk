@@ -24,7 +24,9 @@ public class StoreApiClient extends TestpressApiClient {
 
     public static final String ORDERS_PATH = "/api/v2.2/orders/";
 
-    public static final String ORDER_STATE_REFRESH_PATH = "/api/v2.5/payments/refresh/";
+    public static final String ORDER_API_PATH = "/api/v2.5/orders";
+
+    public static final String ORDER_STATE_REFRESH_PATH = "/refresh/";
 
     public static final String ORDER_CONFIRM_PATH = "/confirm/";
 
@@ -75,8 +77,7 @@ public class StoreApiClient extends TestpressApiClient {
 
     public RetrofitCall<NetworkOrderStatus> refreshOrderStatus(String orderId) {
         HashMap<String, String> parameters = new HashMap<>();
-        parameters.put("order_id", orderId);
-        return getProductService().refreshOrderStatus(parameters);
+        return getProductService().refreshOrderStatus(orderId, parameters);
     }
 
     public RetrofitCall<NetworkHash> generateHash(String key) {

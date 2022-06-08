@@ -315,7 +315,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         apiClient.refreshOrderStatus(order.getOrderId()).enqueue(new TestpressCallback<NetworkOrderStatus>() {
             @Override
             public void onSuccess(NetworkOrderStatus result) {
-                if (result.getStatus().equals("success")) {
+                if (result.getStatus().equals("Completed")) {
                     showPaymentStatus();
                 } else {
                     showPaymentFailedScreen();
