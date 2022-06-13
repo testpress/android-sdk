@@ -287,7 +287,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
         filterMenu.setVisible(false);
 
         if (!reviewItems.isEmpty()) {
-//            filterMenu.setVisible(true);
+            filterMenu.setVisible(true);
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -314,6 +314,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
                     selectedItemPosition = position;
                     onSpinnerItemSelected(position);
                 }
+                panelListAdapter.notifyDataSetChanged();
             }
 
             @Override
