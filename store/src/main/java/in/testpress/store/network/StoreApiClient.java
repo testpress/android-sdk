@@ -24,7 +24,7 @@ public class StoreApiClient extends TestpressApiClient {
 
     public static final String ORDERS_PATH = "/api/v2.2/orders/";
 
-    public static final String ORDER_API_PATH = "/api/v2.5/orders";
+    public static final String ORDER_API_PATH = "/api/v2.5/orders/";
 
     public static final String ORDER_STATE_REFRESH_PATH = "/refresh/";
 

@@ -251,6 +251,8 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     }
 
     void showPaymentStatus() {
+        progressBar.setVisibility(View.GONE);
+        finish();
         logEvent(EventsTrackerFacade.PAYMENT_SUCCESS);
         Intent intent = new Intent(this, PaymentSuccessActivity.class);
         intent.putExtra(ORDER, order);
@@ -263,7 +265,6 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         setResult(resultCode, data);
-        finish();
     }
 
     @Override
@@ -277,6 +278,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
 
     @Override
     public void onBackPressed() {
+        refreshOrderStatus();
         new AlertDialog.Builder(this, R.style.TestpressAppCompatAlertDialogStyle)
                 .setTitle(R.string.testpress_are_you_sure)
                 .setMessage(R.string.testpress_want_to_cancel_order)
@@ -312,11 +314,13 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     }
 
     private void refreshOrderStatus() {
+        progressBar.setVisibility(View.VISIBLE);
         apiClient.refreshOrderStatus(order.getOrderId()).enqueue(new TestpressCallback<NetworkOrderStatus>() {
             @Override
             public void onSuccess(NetworkOrderStatus result) {
                 if (result.getStatus().equals("Completed")) {
                     showPaymentStatus();
+                    Log.d("TAG", "refreshOrderStatus: on end");
                 } else {
                     showPaymentFailedScreen();
                 }
@@ -335,13 +339,16 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     }
 
     void showPaymentFailedScreen() {
+        progressBar.setVisibility(View.GONE);
         logEvent(EventsTrackerFacade.PAYMENT_SUCCESS);
+        finish();
         Intent intent = new Intent(this, PaymentFailureActivity.class);
         startActivity(intent);
     }
 
     @Override
     public void onPaymentFailure() {
+        progressBar.setVisibility(View.VISIBLE);
         refreshOrderStatus();
     }
 

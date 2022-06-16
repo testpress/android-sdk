@@ -48,7 +48,7 @@ public interface ProductService {
     @POST(PAYU_HASH_GENERATOR_PATH)
     RetrofitCall<NetworkHash> generateHash(@Body HashMap<String, Object> arguments);
 
-    @PUT(ORDER_API_PATH + "{order_id}" + ORDER_STATE_REFRESH_PATH)
+    @POST(ORDER_API_PATH + "{order_id}" + ORDER_STATE_REFRESH_PATH)
     RetrofitCall<NetworkOrderStatus> refreshOrderStatus(
             @Path(value = "order_id", encoded = true) String orderId,
             @Body HashMap<String, String> arguments);
