@@ -5,6 +5,7 @@ import java.util.Map;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.store.models.NetworkHash;
+import in.testpress.store.models.NetworkOrderStatus;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.Product;
 import in.testpress.v2_4.models.ApiResponse;
@@ -16,7 +17,9 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 import static in.testpress.store.network.StoreApiClient.ORDERS_PATH;
+import static in.testpress.store.network.StoreApiClient.ORDER_API_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDER_CONFIRM_PATH;
+import static in.testpress.store.network.StoreApiClient.ORDER_STATE_REFRESH_PATH;
 import static in.testpress.store.network.StoreApiClient.PAYU_HASH_GENERATOR_PATH;
 
 public interface ProductService {
@@ -44,6 +47,11 @@ public interface ProductService {
 
     @POST(PAYU_HASH_GENERATOR_PATH)
     RetrofitCall<NetworkHash> generateHash(@Body HashMap<String, Object> arguments);
+
+    @POST(ORDER_API_PATH + "{order_id}" + ORDER_STATE_REFRESH_PATH)
+    RetrofitCall<NetworkOrderStatus> refreshOrderStatus(
+            @Path(value = "order_id", encoded = true) String orderId,
+            @Body HashMap<String, String> arguments);
 }
 
 
