@@ -320,7 +320,6 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
             public void onSuccess(NetworkOrderStatus result) {
                 if (result.getStatus().equals("Completed")) {
                     showPaymentStatus();
-                    Log.d("TAG", "refreshOrderStatus: on end");
                 } else {
                     showPaymentFailedScreen();
                 }
