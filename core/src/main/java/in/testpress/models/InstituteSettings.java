@@ -229,7 +229,7 @@ public class InstituteSettings {
     }
 
     public boolean isFacebookEventTrackingEnabled() {
-        return isFacebookEventTrackingEnabled;
+        return (isFacebookEventTrackingEnabled & !facebookAppId.isEmpty());
     }
 
     public InstituteSettings setIsFacebookEventTrackingEnabled(boolean isFacebookEventTrackingEnabled) {

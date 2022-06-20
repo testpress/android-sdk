@@ -10,7 +10,7 @@ import io.branch.referral.Branch
 
 class EventsTrackerFacade(val context: Context) {
     val instituteSettings: InstituteSettings? = TestpressSdk.getTestpressSession(context)?.instituteSettings;
-    private val fbEventsTrackerFacade = if(!instituteSettings?.facebookAppId.isNullOrBlank()) FBEventsTrackerFacade(context) else null
+    private val fbEventsTrackerFacade = if(instituteSettings?.isFacebookEventTrackingEnabled == true) FBEventsTrackerFacade(context) else null
     private val branchEventsTrackerFacade = BranchEventTrackerFacade(context)
     private val firebaseEventsTrackerFacade = FirebaseEventsTrackerFacade(context)
 
@@ -29,7 +29,7 @@ class EventsTrackerFacade(val context: Context) {
         fun init(application: Application) {
             val instituteSettings: InstituteSettings = TestpressSdk.getTestpressSession(application)!!.instituteSettings
 
-            if(instituteSettings.isFacebookEventTrackingEnabled and !instituteSettings.facebookAppId.isNullOrBlank()) {
+            if(instituteSettings.isFacebookEventTrackingEnabled) {
                 FacebookSdk.setApplicationId(instituteSettings.facebookAppId)
                 FacebookSdk.fullyInitialize()
                 AppEventsLogger.activateApp(application)
