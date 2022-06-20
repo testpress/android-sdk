@@ -29,7 +29,7 @@ class EventsTrackerFacade(val context: Context) {
         fun init(application: Application) {
             val instituteSettings: InstituteSettings = TestpressSdk.getTestpressSession(application)!!.instituteSettings
 
-            if(instituteSettings.isFacebookEventTrackingEnabled and instituteSettings.facebookAppId.isNotEmpty()) {
+            if(instituteSettings.isFacebookEventTrackingEnabled and !instituteSettings.facebookAppId.isNullOrBlank()) {
                 FacebookSdk.setApplicationId(instituteSettings.facebookAppId)
                 FacebookSdk.fullyInitialize()
                 AppEventsLogger.activateApp(application)
