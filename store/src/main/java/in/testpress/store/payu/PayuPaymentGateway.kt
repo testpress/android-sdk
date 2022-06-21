@@ -56,6 +56,7 @@ class PayuPaymentGateway(order: Order, context: Activity): PaymentGateway(order,
                 .setEmail(order.email)
                 .setSurl(redirectURL)
                 .setFurl(redirectURL)
+                .setUserCredential("default")
                 .setAdditionalParams(getAdditionalParameters())
         return builder.build()
     }
