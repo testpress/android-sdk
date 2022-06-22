@@ -44,6 +44,8 @@ import in.testpress.util.TextWatcherAdapter;
 import in.testpress.util.UIUtils;
 
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
+import static in.testpress.store.TestpressStore.CONTINUE_PURCHASE;
+import static in.testpress.store.TestpressStore.PAYMENT_SUCCESS;
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
 
@@ -252,7 +254,6 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
 
     void showPaymentStatus() {
         progressBar.setVisibility(View.GONE);
-        finish();
         logEvent(EventsTrackerFacade.PAYMENT_SUCCESS);
         Intent intent = new Intent(this, PaymentSuccessActivity.class);
         intent.putExtra(ORDER, order);
@@ -265,6 +266,9 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         setResult(resultCode, data);
+        if (requestCode == STORE_REQUEST_CODE && data.getBooleanExtra(PAYMENT_SUCCESS, false)){
+            finish();
+        }
     }
 
     @Override
