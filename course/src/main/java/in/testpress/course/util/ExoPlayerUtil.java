@@ -83,6 +83,7 @@ import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
+import in.testpress.util.InternetConnectivityChecker;
 import kotlin.Pair;
 
 import static android.content.Context.AUDIO_SERVICE;
@@ -335,7 +336,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 .setDrmMultiSession(true).build();
 
         DownloadRequest downloadRequest = VideoDownload.getDownloadRequest(url, activity);
-        if (isDownloaded) {
+        if (isDownloaded && downloadRequest != null) {
             MediaItem.Builder builder = mediaItem.buildUpon();
             builder
                     .setMediaId(downloadRequest.id)
@@ -790,6 +791,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 DownloadTask downloadTask = new DownloadTask(url, activity);
                 drmLicenseRetries += 1;
                 if (drmLicenseRetries < 2 && downloadTask.isDownloaded()) {
+                    if (!InternetConnectivityChecker.isConnected(activity)) {
+                        displayError(R.string.no_internet_to_sync_license);
+                        return;
+                    }
                     OfflineDRMLicenseHelper.renewLicense(url, content.getId(), activity, this);
                     displayError(R.string.syncing_video);
                 } else {
