@@ -25,11 +25,11 @@ class PaymentFailureActivity: Activity() {
     private fun setOnClickListeners() {
         val continueButton = findViewById<View>(R.id.back_button) as Button
         continueButton.setOnClickListener {
-            backToProductDetail()
+            showProductDetail()
         }
     }
 
-    private fun backToProductDetail() {
+    private fun showProductDetail() {
         val intent = Intent()
         intent.putExtra(TestpressStore.PAYMENT_FAILURE, true)
         setResult(RESULT_OK, intent)
