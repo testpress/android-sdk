@@ -33,6 +33,7 @@ import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 import in.testpress.util.ZoomableImageString;
 
+import static in.testpress.store.TestpressStore.PAYMENT_SUCCESS;
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 
 public class ProductDetailsActivity extends BaseToolBarActivity {
@@ -247,7 +248,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == STORE_REQUEST_CODE && resultCode == RESULT_OK) {
+        if (requestCode == STORE_REQUEST_CODE && resultCode == RESULT_OK && data.getBooleanExtra(PAYMENT_SUCCESS, false)) {
             setResult(RESULT_OK, data);
             finish();
         }

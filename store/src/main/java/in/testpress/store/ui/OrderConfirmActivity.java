@@ -45,6 +45,7 @@ import in.testpress.util.UIUtils;
 
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 import static in.testpress.store.TestpressStore.PAYMENT_SUCCESS;
+import static in.testpress.store.TestpressStore.PAYMENT_FAILURE;
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
 
@@ -264,9 +265,11 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        setResult(resultCode, data);
-        if (requestCode == STORE_REQUEST_CODE && data.getBooleanExtra(PAYMENT_SUCCESS, false)){
-            finish();
+        if (data != null){
+            if (requestCode == STORE_REQUEST_CODE && data.getBooleanExtra(PAYMENT_SUCCESS, false) || data.getBooleanExtra(PAYMENT_FAILURE, false)){
+                setResult(resultCode, data);
+                finish();
+            }
         }
     }
 
@@ -343,9 +346,8 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     void showPaymentFailedScreen() {
         progressBar.setVisibility(View.GONE);
         logEvent(EventsTrackerFacade.PAYMENT_SUCCESS);
-        finish();
         Intent intent = new Intent(this, PaymentFailureActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, STORE_REQUEST_CODE);
     }
 
     @Override
