@@ -44,7 +44,6 @@ import in.testpress.util.TextWatcherAdapter;
 import in.testpress.util.UIUtils;
 
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
-import static in.testpress.store.TestpressStore.CONTINUE_PURCHASE;
 import static in.testpress.store.TestpressStore.PAYMENT_SUCCESS;
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
