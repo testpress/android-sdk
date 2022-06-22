@@ -39,8 +39,7 @@ internal class CustomHttpDrmMediaCallback(val context: Context, val contentId: L
         uuid: UUID,
         request: ExoMediaDrm.ProvisionRequest
     ): ByteArray {
-        val licenseUrl: String = fetchDrmLicenseURL()
-        val updatedRequest = ExoMediaDrm.ProvisionRequest(request.data, licenseUrl)
+        val updatedRequest = ExoMediaDrm.ProvisionRequest(request.data, request.defaultUrl)
         return httpMediaDrmCallback.executeProvisionRequest(uuid, updatedRequest)
     }
 }
