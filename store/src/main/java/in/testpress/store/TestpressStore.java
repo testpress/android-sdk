@@ -20,6 +20,7 @@ public class TestpressStore {
     public static final int STORE_REQUEST_CODE = 1000;
     public static final String CONTINUE_PURCHASE = "continue_purchase";
     public static final String PAYMENT_SUCCESS = "payment_success";
+    public static final String PAYMENT_FAILURE = "payment_failure";
 
     /**
      * Use when testpress store need to be open in a container as a fragment.
