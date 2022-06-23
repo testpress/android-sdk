@@ -20,7 +20,7 @@ public class FullScreenChromeClient extends WebChromeClient {
     private int mOriginalOrientation;
     private int mOriginalSystemUiVisibility;
     private Activity activity;
-    private ValueCallback<Uri[]> uploadMessage;
+    private ValueCallback<Uri[]> filePathCallback;
 
     public FullScreenChromeClient(Activity activity) {
         this.activity = activity;
@@ -63,18 +63,17 @@ public class FullScreenChromeClient extends WebChromeClient {
 
     @Override
     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
-        if (uploadMessage != null) {
-            uploadMessage.onReceiveValue(null);
-            uploadMessage = null;
+        if (this.filePathCallback != null) {
+            this.filePathCallback.onReceiveValue(null);
+            this.filePathCallback = null;
         }
 
-        uploadMessage = filePathCallback;
-
-        Intent intent = fileChooserParams.createIntent();
+        this.filePathCallback = filePathCallback;
         try {
+            Intent intent = fileChooserParams.createIntent();
             activity.startActivityForResult(intent, WebViewConstants.REQUEST_SELECT_FILE);
         } catch (ActivityNotFoundException e) {
-            uploadMessage = null;
+            this.filePathCallback = null;
             Toast.makeText(activity.getApplicationContext(), "Cannot open file chooser", Toast.LENGTH_LONG).show();
             return false;
         }
@@ -83,10 +82,10 @@ public class FullScreenChromeClient extends WebChromeClient {
     }
 
     public void SelectFile(int resultCode, Intent data){
-        if (null == uploadMessage) {
+        if (this.filePathCallback == null) {
             return;
         }
-        uploadMessage.onReceiveValue(FileChooserParams.parseResult(resultCode, data));
-        uploadMessage = null;
+        this.filePathCallback.onReceiveValue(FileChooserParams.parseResult(resultCode, data));
+        this.filePathCallback = null;
     }
 }
