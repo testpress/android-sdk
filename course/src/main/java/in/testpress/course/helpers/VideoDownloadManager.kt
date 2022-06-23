@@ -3,6 +3,8 @@ package `in`.testpress.course.helpers
 import `in`.testpress.course.util.ExoPlayerDataSourceFactory
 import android.content.Context
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
+import com.google.android.exoplayer2.offline.DefaultDownloadIndex
+import com.google.android.exoplayer2.offline.DownloadIndex
 import com.google.android.exoplayer2.offline.DownloadManager
 import com.google.android.exoplayer2.upstream.cache.Cache
 import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor
@@ -38,6 +40,10 @@ class VideoDownloadManager {
             ExoPlayerDataSourceFactory(context).getHttpDataSourceFactory(),
             Executors.newFixedThreadPool(6)
         )
+    }
+
+    fun getDownloadIndex(): DefaultDownloadIndex {
+        return DefaultDownloadIndex(databaseProvider)
     }
 
     fun getDownloadDirectory(): File {

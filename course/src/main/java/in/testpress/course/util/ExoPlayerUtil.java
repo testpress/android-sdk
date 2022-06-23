@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
+import android.media.MediaCodec;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,8 +44,10 @@ import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
+import com.google.android.exoplayer2.drm.DrmSession;
 import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.drm.DrmSessionManagerProvider;
+import com.google.android.exoplayer2.drm.MediaDrmCallbackException;
 import com.google.android.exoplayer2.offline.DownloadRequest;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.MediaSourceFactory;
@@ -70,6 +73,7 @@ import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
 import in.testpress.course.api.TestpressCourseApiClient;
 import in.testpress.course.helpers.CustomHttpDrmMediaCallback;
+import in.testpress.course.helpers.DownloadTask;
 import in.testpress.course.helpers.VideoDownload;
 import in.testpress.course.repository.VideoWatchDataRepository;
 import in.testpress.database.OfflineVideoDao;
@@ -79,6 +83,7 @@ import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.VideoAttempt;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
+import in.testpress.util.InternetConnectivityChecker;
 import kotlin.Pair;
 
 import static android.content.Context.AUDIO_SERVICE;
@@ -87,6 +92,8 @@ import static androidx.mediarouter.media.MediaRouter.RouteInfo.CONNECTION_STATE_
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 import static in.testpress.course.api.TestpressCourseApiClient.LAST_POSITION;
 import static in.testpress.course.api.TestpressCourseApiClient.TIME_RANGES;
+
+import org.greenrobot.greendao.annotation.NotNull;
 
 public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerProvider {
 
@@ -134,6 +141,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     };
     private boolean fullscreen = false;
     private boolean errorOnVideoAttemptUpdate;
+    private int drmLicenseRetries = 0;
     private Handler videoAttemptUpdateHandler;
     private Runnable videoAttemptUpdateTask = new Runnable() {
         @Override
@@ -301,8 +309,12 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
     private void buildPlayer() {
         MediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(new ExoPlayerDataSourceFactory(activity).build());
-        mediaSourceFactory.setDrmSessionManagerProvider(this);
-        MediaItem mediaItem = getMediaItem();
+        DownloadTask downloadTask = new DownloadTask(url, activity);
+        MediaItem mediaItem = getMediaItem(downloadTask.isDownloaded());
+        if (!downloadTask.isDownloaded()) {
+            mediaSourceFactory.setDrmSessionManagerProvider(this);
+        }
+
         player = new SimpleExoPlayer.Builder(activity, new DefaultRenderersFactory(activity))
                 .setMediaSourceFactory(mediaSourceFactory)
                 .setTrackSelector(trackSelector).build();
@@ -317,25 +329,24 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         playerView.controller(youtubeOverlay);
     }
 
-    public MediaItem getMediaItem() {
-        DownloadRequest downloadRequest = VideoDownload.getDownloadRequest(url, activity);
+    public MediaItem getMediaItem(boolean isDownloaded) {
         MediaItem mediaItem = new MediaItem.Builder()
                 .setUri(url)
                 .setDrmUuid(C.WIDEVINE_UUID)
                 .setDrmMultiSession(true).build();
 
-        if (downloadRequest != null) {
+        DownloadRequest downloadRequest = VideoDownload.getDownloadRequest(url, activity);
+        if (isDownloaded && downloadRequest != null) {
             MediaItem.Builder builder = mediaItem.buildUpon();
             builder
-                .setMediaId(downloadRequest.id)
-                .setUri(downloadRequest.uri)
-                .setCustomCacheKey(downloadRequest.customCacheKey)
-                .setMimeType(downloadRequest.mimeType)
-                .setStreamKeys(downloadRequest.streamKeys)
-                .setDrmKeySetId(downloadRequest.keySetId);
+                    .setMediaId(downloadRequest.id)
+                    .setUri(downloadRequest.uri)
+                    .setCustomCacheKey(downloadRequest.customCacheKey)
+                    .setMimeType(downloadRequest.mimeType)
+                    .setStreamKeys(downloadRequest.streamKeys)
+                    .setDrmKeySetId(downloadRequest.keySetId);
             mediaItem = builder.build();
         }
-
         return mediaItem;
     }
 
@@ -737,8 +748,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         return new DefaultDrmSessionManager.Builder().build(new CustomHttpDrmMediaCallback(activity, content.getId()));
     }
 
-    private class PlayerEventListener implements Player.EventListener {
-
+    private class PlayerEventListener implements Player.EventListener, DRMLicenseFetchCallback {
         @Override
         public void onPlaybackStateChanged(int playbackState) {
             if(isPreparing && playbackState == Player.STATE_READY){
@@ -775,7 +785,24 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
         @Override
         public void onPlayerError(ExoPlaybackException exception) {
-            handleError(exception.type == TYPE_SOURCE);
+            Throwable cause = exception.getCause();
+
+            if (isDRMException(cause)) {
+                DownloadTask downloadTask = new DownloadTask(url, activity);
+                drmLicenseRetries += 1;
+                if (drmLicenseRetries < 2 && downloadTask.isDownloaded()) {
+                    if (!InternetConnectivityChecker.isConnected(activity)) {
+                        displayError(R.string.no_internet_to_sync_license);
+                        return;
+                    }
+                    OfflineDRMLicenseHelper.renewLicense(url, content.getId(), activity, this);
+                    displayError(R.string.syncing_video);
+                } else {
+                    displayError(R.string.license_request_failed);
+                }
+            } else {
+                handleError(exception.type == TYPE_SOURCE);
+            }
         }
 
         @Override
@@ -786,6 +813,24 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         @Override
         public void onSeekProcessed() {
             updateVideoAttempt();
+        }
+
+        @Override
+        public void onLicenseFetchSuccess(@NotNull byte[] keySetId) {
+            activity.runOnUiThread(() -> {
+                float currentPosition = getCurrentPosition();
+                MediaItem mediaItem = getMediaItem(true);
+                player.setMediaItem(mediaItem);
+                errorMessageTextView.setVisibility(View.GONE);
+                preparePlayer();
+                player.setPlayWhenReady(true);
+                player.seekTo((long) (currentPosition * 1000));
+            });
+        }
+
+        @Override
+        public void onLicenseFetchFailure() {
+            displayError(R.string.license_error);
         }
     }
 
@@ -801,6 +846,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                     .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), override);
             trackSelector.setParameters(parametersBuilder.build());
         }
+    }
+    
+    private boolean isDRMException(Throwable cause) {
+        return cause instanceof DrmSession.DrmSessionException || cause instanceof MediaCodec.CryptoException || cause instanceof MediaDrmCallbackException;
     }
 
     public static int getRendererIndex(int trackType, MappingTrackSelector.MappedTrackInfo mappedTrackInfo) {

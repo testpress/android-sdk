@@ -9,6 +9,7 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
 import com.google.android.exoplayer2.offline.DownloadService
@@ -97,9 +98,15 @@ class VideoDownloadService : DownloadService(
         val navigateToDownloadsActivity = Intent(this, DownloadsActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        return PendingIntent.getActivity(
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.getActivity(
+                    this, 0, navigateToDownloadsActivity, PendingIntent.FLAG_IMMUTABLE
+            )
+        } else {
+            PendingIntent.getActivity(
                 this, 0, navigateToDownloadsActivity, PendingIntent.FLAG_UPDATE_CURRENT
-        )
+            )
+        }
     }
 
     private fun getFailedNotification(): Notification {
