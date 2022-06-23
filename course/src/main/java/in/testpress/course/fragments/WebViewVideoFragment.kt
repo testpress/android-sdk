@@ -1,5 +1,6 @@
 package `in`.testpress.course.fragments
 
+import `in`.testpress.WebViewConstants
 import `in`.testpress.course.R
 import `in`.testpress.course.api.TestpressCourseApiClient
 import `in`.testpress.course.domain.DomainContent
@@ -8,6 +9,8 @@ import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.util.FullScreenChromeClient
 import `in`.testpress.util.WebViewUtils
 import android.app.Activity
+import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -60,6 +63,13 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
 
         webViewUtils.initWebView(html, activity)
         webView.webChromeClient = fullScreenChromeClient
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+        if (requestCode == WebViewConstants.REQUEST_SELECT_FILE && resultCode == RESULT_OK) {
+            fullScreenChromeClient.SelectFile(resultCode, intent)
+        }
     }
 
     override fun onResume() {

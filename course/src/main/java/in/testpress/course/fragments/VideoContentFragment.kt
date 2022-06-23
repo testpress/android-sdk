@@ -1,5 +1,6 @@
 package `in`.testpress.course.fragments
 
+import `in`.testpress.WebViewConstants
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainVideoContent
@@ -12,7 +13,9 @@ import `in`.testpress.course.util.DateUtils.convertDurationStringToSeconds
 import `in`.testpress.course.util.PatternEditableBuilder
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import `in`.testpress.models.InstituteSettings
+import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -229,6 +232,13 @@ class VideoContentFragment : BaseContentDetailFragment() {
                     }
                 }).into(description)
             toggleDescription(true)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == WebViewConstants.REQUEST_SELECT_FILE && resultCode == RESULT_OK){
+            videoWidgetFragment.onActivityResult(requestCode, resultCode, data)
         }
     }
 }
