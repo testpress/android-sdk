@@ -10,7 +10,8 @@
         android:id="@+id/pdfView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="50dp" />
+        android:layout_marginBottom="50dp"
+        android:forceDarkAllowed="false" />
 
         <ProgressBar
             android:id="@+id/encryptionProgress"
