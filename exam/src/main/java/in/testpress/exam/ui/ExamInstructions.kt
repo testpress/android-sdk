@@ -2,11 +2,12 @@ package `in`.testpress.exam.ui
 
 import `in`.testpress.exam.R
 import `in`.testpress.ui.BaseFragment
+import `in`.testpress.util.WebViewUtils
 import android.os.Bundle
-import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
@@ -31,9 +32,10 @@ class ExamInstructions(val startExam: () -> Unit) : BaseFragment() {
         }
     }
 
-    private lateinit var instructionsView: TextView;
+    private lateinit var instructionsView: WebView;
     private lateinit var toolbarTitle: TextView;
     private lateinit var confirmButton: Button
+    lateinit var webViewUtils: WebViewUtils
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -66,7 +68,7 @@ class ExamInstructions(val startExam: () -> Unit) : BaseFragment() {
 
     private fun displayInstructions(){
         val instructions = requireArguments().getString(INSTRUCTIONFLAG)
-        instructionsView.text = Html.fromHtml(instructions.toString())
+        WebViewUtils(instructionsView).initWebView(instructions, activity)
     }
 
     private fun setListeners(){
