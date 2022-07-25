@@ -360,6 +360,7 @@ public class TestpressSDKDaoGenerator {
         content.addBooleanProperty("isCourseAvailable");
         content.addLongProperty("nextContentId");
         content.addBooleanProperty("hasEnded");
+        content.addStringProperty("examStartUrl");
         content.implementsInterface("android.os.Parcelable");
         return content;
     }
