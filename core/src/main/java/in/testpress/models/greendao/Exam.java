@@ -70,6 +70,7 @@ public class Exam implements android.os.Parcelable {
     private String shareTextForSolutionUnlock;
     private Boolean showAnalytics;
     private String instructions;
+    private Boolean hasAudioQuestions;
 
     /** Used to resolve relations */
     @Generated
@@ -97,7 +98,7 @@ public class Exam implements android.os.Parcelable {
     }
 
     @Generated
-    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock, Boolean showAnalytics, String instructions) {
+    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock, Boolean showAnalytics, String instructions, Boolean hasAudioQuestions) {
         this.totalMarks = totalMarks;
         this.url = url;
         this.id = id;
@@ -132,6 +133,7 @@ public class Exam implements android.os.Parcelable {
         this.shareTextForSolutionUnlock = shareTextForSolutionUnlock;
         this.showAnalytics = showAnalytics;
         this.instructions = instructions;
+        this.hasAudioQuestions = hasAudioQuestions;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -411,6 +413,14 @@ public class Exam implements android.os.Parcelable {
 
     public void setInstructions(String instructions) {
         this.instructions = instructions;
+    }
+
+    public Boolean getHasAudioQuestions() {
+        return hasAudioQuestions;
+    }
+
+    public void setHasAudioQuestions(Boolean hasAudioQuestions) {
+        this.hasAudioQuestions = hasAudioQuestions;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
