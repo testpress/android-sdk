@@ -383,7 +383,6 @@ public class ReviewQuestionsFragment extends Fragment {
         boolean isMultipleMCQType = reviewItem.getQuestion().getType().equals("C");
         boolean isShortAnswerType = reviewItem.getQuestion().getType().equals("S");
         boolean isNumericalType = reviewItem.getQuestion().getType().equals("N");
-        boolean isFileType = reviewItem.getQuestion().getType().equals("F");
         String correctAnswerHtml = "";
         //noinspection unchecked
         List<Object> reviewAnswers = (List<Object>) answers;
