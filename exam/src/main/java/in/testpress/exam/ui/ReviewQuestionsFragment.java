@@ -443,7 +443,7 @@ public class ReviewQuestionsFragment extends Fragment {
         }
 
         if (reviewItem.getQuestion().getType().equals("F")) {
-            html = getUserUploadedFilesHtml(html);
+            html += getUserUploadedFilesHtml(html);
         }
 
         if (isShortAnswerType || isNumericalType) {
