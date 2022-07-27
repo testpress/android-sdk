@@ -444,6 +444,8 @@ public class ReviewQuestionsFragment extends Fragment {
 
         if (reviewItem.getQuestion().getType().equals("F")) {
             html += getUserUploadedFilesHtml(html);
+        } else if (reviewItem.getQuestion().getType().equals("A")) {
+            html += getAudioTypeHtml(html)
         }
 
         if (isShortAnswerType || isNumericalType) {
@@ -495,6 +497,18 @@ public class ReviewQuestionsFragment extends Fragment {
         html += "<div>";
         for(UserUploadedFile file: reviewItem.getFiles()) {
             html += "<a href='" + file.getUrl() +"'>" + "File - " + index + "</a>";
+            index++;
+        }
+        html += "</div>";
+        return html;
+    }
+
+    @NonNull
+    private String getAudioTypeHtml(String html) {
+        int index = 1;
+        html += "<div>";
+        for(UserUploadedFile file: reviewItem.getFiles()) {
+            html += "<audio src='" + file.getUrl() +"' controls>" + "</audio>";
             index++;
         }
         html += "</div>";
