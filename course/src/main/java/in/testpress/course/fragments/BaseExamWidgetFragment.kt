@@ -192,7 +192,7 @@ open class BaseExamWidgetFragment : Fragment() {
 
     private fun startExamInWebview(content: DomainContent) {
             content.examStartUrl?.let {
-                startActivity(WebViewWithSSO.createIntent(requireContext(), content.examStartUrl!!, exam.title
+                startActivity(WebViewWithSSO.createIntent(requireContext(), content.examStartUrl!!, content.title
                         ?: ""))
             }
     }
