@@ -25,6 +25,7 @@ import in.testpress.core.TestpressSession;
 import in.testpress.models.AccountActivity;
 import in.testpress.models.FileDetails;
 import in.testpress.models.ProfileDetails;
+import in.testpress.models.SSOUrl;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.ui.UserDevicesActivity;
 import in.testpress.util.Misc;
@@ -51,6 +52,7 @@ public class TestpressApiClient {
     public static final String ACCOUNT_ACTIVITY_PATH = "api/v2.3/me/login_activity/";
     public static final String LOGOUT_DEVICES = "api/v2.4/auth/logout_devices/";
     public static final String LOGOUT_PATH = "api/v2.4/auth/logout/";
+    public static final String URL_GENERATE_SSO_LINK =  "/api/v2.3/presigned_sso_url/";
 
     /**
      * Query Params
@@ -239,6 +241,10 @@ public class TestpressApiClient {
 
     public RetrofitCall<ProfileDetails> getProfileDetails() {
         return getAuthenticationService().getProfileDetails();
+    }
+
+    public RetrofitCall<SSOUrl> getSSOURL() {
+        return getAuthenticationService().getSsoUrl();
     }
 
     public RetrofitCall<Void> logout() {

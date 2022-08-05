@@ -166,3 +166,7 @@ fun createGreenDaoExamContent(exam: DomainExamContent): Exam {
 fun DomainExamContent.asGreenDaoModel(): Exam {
     return createGreenDaoExamContent(this)
 }
+
+object ExamTemplateType{
+    val IELTS_TEMPLATE  = 12
+}

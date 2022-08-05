@@ -39,5 +39,6 @@ data class ContentEntity(
     var coverImageMedium: String? = null,
     var coverImage: String? = null,
     var nextContentId: Long? = null,
-    var hasEnded: Boolean? = null
+    var hasEnded: Boolean? = null,
+    var examStartUrl: String? = null
 )
