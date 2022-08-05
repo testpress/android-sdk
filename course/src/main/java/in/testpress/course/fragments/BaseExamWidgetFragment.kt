@@ -6,6 +6,7 @@ import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.DomainContentAttempt
 import `in`.testpress.course.domain.DomainExamContent
 import `in`.testpress.course.domain.DomainLanguage
+import `in`.testpress.course.domain.ExamTemplateType.IELTS_TEMPLATE
 import `in`.testpress.course.domain.asGreenDaoModel
 import `in`.testpress.course.domain.getGreenDaoContent
 import `in`.testpress.course.domain.getGreenDaoContentAttempt
@@ -174,12 +175,8 @@ open class BaseExamWidgetFragment : Fragment() {
     }
 
     private fun initStartForFreshExam(exam: DomainExamContent) {
-        if (exam.templateType == 12) {
-            startButton.setOnClickListener {
-                content.examStartUrl?.let {
-                    startActivity(WebViewWithSSO.createIntent(requireContext(), content.examStartUrl!!, exam.title ?: ""))
-                }
-            }
+        if (exam.templateType == IELTS_TEMPLATE) {
+            startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
                 startCourseExam(true, isPartial = false)
@@ -193,16 +190,19 @@ open class BaseExamWidgetFragment : Fragment() {
         }
     }
 
+    private fun startExamInWebview(content: DomainContent) {
+            content.examStartUrl?.let {
+                startActivity(WebViewWithSSO.createIntent(requireContext(), content.examStartUrl!!, exam.title
+                        ?: ""))
+            }
+    }
+
     private fun initStartForResumeExam(
         exam: DomainExamContent,
         pausedAttempt: DomainContentAttempt
     ) {
         if (exam.templateType == 12) {
-            startButton.setOnClickListener {
-                content.examStartUrl?.let {
-                    startActivity(WebViewWithSSO.createIntent(requireContext(), content.examStartUrl!!, exam.title ?: ""))
-                }
-            }
+            startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
                 resumeCourseExam(true, pausedAttempt)
