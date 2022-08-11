@@ -30,6 +30,7 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
     private lateinit var negativeMarkLabel: TextView
     private lateinit var dateLabel: TextView
     private lateinit var languageLabel: TextView
+    private lateinit var webOnlyLabel: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,6 +61,7 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         negativeMarkLabel = view.findViewById(R.id.negative_marks_label)
         dateLabel = view.findViewById(R.id.date_label)
         languageLabel = view.findViewById(R.id.language_label)
+        webOnlyLabel = view.findViewById(R.id.web_only_label)
 
         ViewUtils.setTypeface(
             arrayOf(
@@ -92,6 +94,15 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         showDescription()
         showOrHideExamDate(exam)
         showExamDuration(exam)
+        showInfoIfExamIsWebOnly(exam)
+    }
+
+    private fun showInfoIfExamIsWebOnly(exam: DomainExamContent) {
+        if (exam.isWebOnly()) {
+            webOnlyLabel.visibility = View.VISIBLE
+        } else {
+            webOnlyLabel.visibility = View.GONE
+        }
     }
 
     private fun showDescription() {
