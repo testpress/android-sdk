@@ -445,7 +445,7 @@ public class ReviewQuestionsFragment extends Fragment {
         if (reviewItem.getQuestion().getType().equals("F")) {
             html += getUserUploadedFilesHtml(html);
         } else if (reviewItem.getQuestion().getType().equals("A")) {
-            html += getAudioTypeHtml(html)
+            html += getAudioTypeHtml(html);
         }
 
         if (isShortAnswerType || isNumericalType) {
