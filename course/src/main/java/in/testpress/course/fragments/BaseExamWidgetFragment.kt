@@ -201,7 +201,7 @@ open class BaseExamWidgetFragment : Fragment() {
         exam: DomainExamContent,
         pausedAttempt: DomainContentAttempt
     ) {
-        if (exam.templateType == 12) {
+        if (exam.templateType == IELTS_TEMPLATE || exam.hasAudioQuestions == true) {
             startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {

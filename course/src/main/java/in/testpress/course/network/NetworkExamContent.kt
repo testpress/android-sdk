@@ -45,7 +45,8 @@ data class NetworkExamContent(
     val isGrowthHackEnabled: Boolean? = null,
     val shareTextForSolutionUnlock: String? = null,
     val showAnalytics: Boolean? = null,
-    val totalMarks: String? = null
+    val totalMarks: String? = null,
+    val hasAudioQuestions: Boolean? = null
 )
 
 fun NetworkExamContent.asGreenDaoModel(): Exam {
@@ -83,6 +84,7 @@ fun NetworkExamContent.asGreenDaoModel(): Exam {
         this.isGrowthHackEnabled,
         this.shareTextForSolutionUnlock,
         this.showAnalytics,
-        this.instructions
+        this.instructions,
+        this.hasAudioQuestions
     )
 }

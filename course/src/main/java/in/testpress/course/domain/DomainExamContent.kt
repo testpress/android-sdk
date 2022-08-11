@@ -39,7 +39,8 @@ data class DomainExamContent(
     val isGrowthHackEnabled: Boolean? = null,
     val shareTextForSolutionUnlock: String? = null,
     val showAnalytics: Boolean? = null,
-    val instructions: String? = null
+    val instructions: String? = null,
+    val hasAudioQuestions: Boolean? = null
 ) {
     fun formattedDate(inputString: String): String {
         var date: Date? = null
@@ -112,7 +113,8 @@ fun createDomainExamContent(exam: Exam): DomainExamContent {
         languages = exam.rawLanguages.asDomainLanguages(),
         isGrowthHackEnabled = exam.getIsGrowthHackEnabled(),
         shareTextForSolutionUnlock = exam.shareTextForSolutionUnlock,
-        instructions = exam.instructions
+        instructions = exam.instructions,
+        hasAudioQuestions = exam.hasAudioQuestions
     )
 }
 
@@ -155,7 +157,8 @@ fun createGreenDaoExamContent(exam: DomainExamContent): Exam {
         exam.isGrowthHackEnabled,
         exam.shareTextForSolutionUnlock,
         exam.showAnalytics,
-        exam.instructions
+        exam.instructions,
+        exam.hasAudioQuestions
     )
     greenDaoexam.languages = exam.languages.toGreenDaoModels()
 

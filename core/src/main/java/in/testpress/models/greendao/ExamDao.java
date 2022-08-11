@@ -59,6 +59,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         public final static Property ShareTextForSolutionUnlock = new Property(31, String.class, "shareTextForSolutionUnlock", false, "SHARE_TEXT_FOR_SOLUTION_UNLOCK");
         public final static Property ShowAnalytics = new Property(32, Boolean.class, "showAnalytics", false, "SHOW_ANALYTICS");
         public final static Property Instructions = new Property(33, String.class, "instructions", false, "INSTRUCTIONS");
+        public final static Property HasAudioQuestions = new Property(34, Boolean.class, "hasAudioQuestions", false, "HAS_AUDIO_QUESTIONS");
     }
 
     private DaoSession daoSession;
@@ -111,7 +112,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
                 "\"IS_GROWTH_HACK_ENABLED\" INTEGER," + // 30: isGrowthHackEnabled
                 "\"SHARE_TEXT_FOR_SOLUTION_UNLOCK\" TEXT," + // 31: shareTextForSolutionUnlock
                 "\"SHOW_ANALYTICS\" INTEGER," + // 32: showAnalytics
-                "\"INSTRUCTIONS\" TEXT);"); // 33: instructions
+                "\"INSTRUCTIONS\" TEXT," + // 33: instructions
+                "\"HAS_AUDIO_QUESTIONS\" INTEGER);"); // 34: hasAudioQuestions
     }
 
     /** Drops the underlying database table. */
@@ -293,6 +295,11 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (instructions != null) {
             stmt.bindString(34, instructions);
         }
+ 
+        Boolean hasAudioQuestions = entity.getHasAudioQuestions();
+        if (hasAudioQuestions != null) {
+            stmt.bindLong(35, hasAudioQuestions ? 1L: 0L);
+        }
     }
 
     @Override
@@ -468,6 +475,11 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (instructions != null) {
             stmt.bindString(34, instructions);
         }
+ 
+        Boolean hasAudioQuestions = entity.getHasAudioQuestions();
+        if (hasAudioQuestions != null) {
+            stmt.bindLong(35, hasAudioQuestions ? 1L: 0L);
+        }
     }
 
     @Override
@@ -517,7 +529,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             cursor.isNull(offset + 30) ? null : cursor.getShort(offset + 30) != 0, // isGrowthHackEnabled
             cursor.isNull(offset + 31) ? null : cursor.getString(offset + 31), // shareTextForSolutionUnlock
             cursor.isNull(offset + 32) ? null : cursor.getShort(offset + 32) != 0, // showAnalytics
-            cursor.isNull(offset + 33) ? null : cursor.getString(offset + 33) // instructions
+            cursor.isNull(offset + 33) ? null : cursor.getString(offset + 33), // instructions
+            cursor.isNull(offset + 34) ? null : cursor.getShort(offset + 34) != 0 // hasAudioQuestions
         );
         return entity;
     }
@@ -558,6 +571,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         entity.setShareTextForSolutionUnlock(cursor.isNull(offset + 31) ? null : cursor.getString(offset + 31));
         entity.setShowAnalytics(cursor.isNull(offset + 32) ? null : cursor.getShort(offset + 32) != 0);
         entity.setInstructions(cursor.isNull(offset + 33) ? null : cursor.getString(offset + 33));
+        entity.setHasAudioQuestions(cursor.isNull(offset + 34) ? null : cursor.getShort(offset + 34) != 0);
      }
     
     @Override
