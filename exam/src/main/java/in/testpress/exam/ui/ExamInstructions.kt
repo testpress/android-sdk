@@ -33,7 +33,6 @@ class ExamInstructions(val startExam: () -> Unit) : BaseFragment() {
     }
 
     private lateinit var instructionsView: WebView;
-    private lateinit var toolbarTitle: TextView;
     private lateinit var confirmButton: Button
     lateinit var webViewUtils: WebViewUtils
 
@@ -55,15 +54,11 @@ class ExamInstructions(val startExam: () -> Unit) : BaseFragment() {
         val toolbar: Toolbar = view.findViewById(R.id.toolbar)
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
         toolbar.setNavigationOnClickListener(View.OnClickListener { requireActivity().onBackPressed() })
-
-        val examTitle = requireArguments().getString(TITLE_FLAG)
-        toolbarTitle.text = examTitle;
     }
 
     private fun bindViews(view: View){
         instructionsView = view.findViewById(R.id.instructions_text)
         confirmButton = view.findViewById(R.id.confirm_button)
-        toolbarTitle = view.findViewById(R.id.exam_name)
     }
 
     private fun displayInstructions(){
