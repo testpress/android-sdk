@@ -320,7 +320,7 @@ public class ReviewStatsFragment extends BaseFragment {
             analyticsButton.setVisibility(View.GONE);
         }
 
-        if (exam.getAllowPdf()) {
+        if (Boolean.TRUE.equals(exam.getAllowPdf())) {
             emailPdfButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
