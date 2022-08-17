@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
+import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -87,5 +88,10 @@ public class FullScreenChromeClient extends WebChromeClient {
         }
         this.filePathCallback.onReceiveValue(FileChooserParams.parseResult(resultCode, data));
         this.filePathCallback = null;
+    }
+
+    public void onPermissionRequest(PermissionRequest request) {
+        String[] permissions = {PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID};
+        request.grant(permissions);
     }
 }
