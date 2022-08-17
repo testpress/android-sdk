@@ -90,6 +90,7 @@ public class FullScreenChromeClient extends WebChromeClient {
         this.filePathCallback = null;
     }
 
+    //Reference https://github.com/videojs/video.js/issues/5563
     public void onPermissionRequest(PermissionRequest request) {
         String[] permissions = {PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID};
         request.grant(permissions);
