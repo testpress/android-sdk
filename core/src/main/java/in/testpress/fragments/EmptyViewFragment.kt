@@ -75,9 +75,25 @@ class EmptyViewFragment : Fragment() {
 
     private fun handleForbidden(exception: TestpressException) {
         val errorResponse: JSONObject? = JSONObject(exception.response.errorBody()?.string()!!)
+        if (errorResponse != null && errorResponse.has("detail")) {
+            showCustomPermissionDeniedMessage(errorResponse.getString("detail"))
+        }else{
+            showPermissionDeniedMessage()
+        }
+    }
+
+    private fun showCustomPermissionDeniedMessage(message: String){
         setEmptyText(
             R.string.permission_denied,
-            errorResponse!!.getString("detail"),
+            message,
+            R.drawable.ic_error_outline_black_18dp
+        )
+    }
+
+    private fun showPermissionDeniedMessage(){
+        setEmptyText(
+            R.string.permission_denied,
+            R.string.testpress_no_permission,
             R.drawable.ic_error_outline_black_18dp
         )
     }
