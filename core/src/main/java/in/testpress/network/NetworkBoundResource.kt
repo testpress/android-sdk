@@ -67,7 +67,9 @@ abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
         } else {
             onFetchFailed()
             val exception = TestpressException.httpError(response)
-            setValue(Resource.error(exception, null))
+            withContext(Dispatchers.Main) {
+                setValue(Resource.error(exception, null))
+            }
         }
     }
 
