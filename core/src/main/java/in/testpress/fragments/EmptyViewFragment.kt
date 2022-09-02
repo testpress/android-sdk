@@ -14,7 +14,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-
+import org.json.JSONObject
 
 class EmptyViewFragment : Fragment() {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -66,19 +66,20 @@ class EmptyViewFragment : Fragment() {
 
     fun displayError(exception: TestpressException) {
         when {
-            exception.isForbidden -> handleForbidden()
+            exception.isForbidden -> handleForbidden(exception)
             exception.isNetworkError -> handleNetworkError()
             exception.isPageNotFound -> handleIsPageNotFound()
             else -> handleUnknownError()
         }
     }
 
-    private fun handleForbidden() {
+    private fun handleForbidden(exception: TestpressException) {
+        val errorResponse: JSONObject? = JSONObject(exception.response.errorBody()?.string()!!)
         setEmptyText(
             R.string.permission_denied,
-                R.string.testpress_no_permission,
-                R.drawable.ic_error_outline_black_18dp)
-        retryButton.visibility = View.GONE
+            errorResponse!!.getString("detail"),
+            R.drawable.ic_error_outline_black_18dp
+        )
     }
 
     private fun handleNetworkError() {
@@ -99,7 +100,17 @@ class EmptyViewFragment : Fragment() {
                 R.drawable.ic_error_outline_black_18dp)
     }
 
-    fun setEmptyText(title: Int, description: Int, leftDrawable: Int?) {
+    fun setEmptyText(title: Int, description : Int, leftDrawable: Int?) {
+        emptyContainer.visibility = View.VISIBLE
+        emptyTitleView.setText(title)
+        if (leftDrawable != null) {
+            emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(leftDrawable, 0, 0, 0)
+        }
+        emptyDescView.setText(description)
+        retryButton.visibility = View.VISIBLE
+    }
+
+    fun setEmptyText(title: Int, description : String, leftDrawable: Int?) {
         emptyContainer.visibility = View.VISIBLE
         emptyTitleView.setText(title)
         if (leftDrawable != null) {
