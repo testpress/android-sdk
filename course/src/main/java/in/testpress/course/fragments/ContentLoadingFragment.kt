@@ -122,19 +122,7 @@ class ContentLoadingFragment : Fragment(),
     }
 
     private fun changeFragment(content: DomainContent) {
-        if(content.isLocked == true) {
-            showPermissionDeniedMessage()
-        }else {
-            fragmentChangeListener.changeFragment(content)
-        }
-    }
-
-    private fun showPermissionDeniedMessage(){
-        loadingLayout.visibility = View.GONE
-        emptyViewFragment.setEmptyText(
-            `in`.testpress.R.string.permission_denied,
-            `in`.testpress.R.string.testpress_no_permission,
-            `in`.testpress.R.drawable.ic_error_outline_black_18dp)
+        fragmentChangeListener.changeFragment(content)
     }
 
     override fun onRetryClick() {
