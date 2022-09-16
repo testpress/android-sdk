@@ -209,12 +209,15 @@
         android:gravity="center"
         android:layout_gravity="center" />
 
-    <LinearLayout style="@style/TestpressExamInfoRow"
+    <LinearLayout
+        android:id="@+id/all_the_best_message_layout"
+        style="@style/TestpressExamInfoRow"
         android:gravity="center"
         android:layout_marginBottom="20dp"
         tools:ignore="UseCompoundDrawables">
 
         <ImageView
+            android:id="@+id/exam_status_image"
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:tint="@color/testpress_black"
@@ -224,6 +227,7 @@
             />
 
         <TextView
+            android:id="@+id/exam_status_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/testpress_black"

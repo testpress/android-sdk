@@ -88,6 +88,7 @@
     <string name="testpress_mail_pdf_error_description">There was an error in generating your PDF.</string>
 
     <string name="testpress_all_the_best">All the best!</string>
+    <string name="testpress_exam_has_ended">This exam has ended</string>
     <string name="testpress_no_of_questions">Number of Questions</string>
     <string name="testpress_duration">Duration</string>
     <string name="testpress_mark_per_question">Mark per question</string>
