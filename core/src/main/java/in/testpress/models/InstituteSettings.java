@@ -36,6 +36,7 @@ public class InstituteSettings {
     private String threatsAndTargetsLabel;
     private boolean isVideoDownloadEnabled;
     private boolean showPDFVertically;
+    private String appName;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -312,5 +313,13 @@ public class InstituteSettings {
     public InstituteSettings setShowPDFVertically(boolean showPDFVertically) {
         this.showPDFVertically = showPDFVertically;
         return this;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 }
