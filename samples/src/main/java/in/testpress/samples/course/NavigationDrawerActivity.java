@@ -43,7 +43,8 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                     .setCoursesFrontend(false)
                     .setScreenshotDisabled(true)
                     .setDisplayUserEmailOnVideo(false)
-                    .setCoursesGamificationEnabled(false);
+                    .setCoursesGamificationEnabled(false)
+                    .setAppName(getString(R.string.app_name));
             TestpressSdk.setTestpressSession(this, session);
             if (position == 1) {
                 TestpressCourse.show(this, R.id.fragment_container, session);

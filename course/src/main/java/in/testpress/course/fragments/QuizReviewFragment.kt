@@ -274,7 +274,7 @@ class QuizReviewFragment: Fragment() {
     }
 
     private fun getEmailWaterMarkHtml(): String {
-        return """<div class ='watermark'>© ${getString(R.string.testpress_app_name)}
+        return """<div class ='watermark'>© ${instituteSettings.appName}
                         ${Watermark().get(activity)} </div>"""
     }
 }
