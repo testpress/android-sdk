@@ -101,7 +101,7 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         showOrHideExamDate(exam)
         showExamDuration(exam)
         showInfoIfExamIsWebOnly(exam)
-        showExamStatusMessage(exam)
+        showExamEndedMessage(exam)
     }
 
     private fun showInfoIfExamIsWebOnly(exam: DomainExamContent) {
@@ -139,7 +139,7 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         }
     }
 
-    private fun showExamStatusMessage(exam: DomainExamContent) {
+    private fun showExamEndedMessage(exam: DomainExamContent) {
         if (exam.isEnded()) {
             examStatusImage.visibility = View.GONE
             examStatusMessage.text = "${getText(R.string.testpress_exam_has_ended)}"
