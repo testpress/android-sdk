@@ -50,8 +50,8 @@ class PDFViewer(
                 .enableAntialiasing(true)
                 .defaultPage(pageNumber)
                 .onDraw(this)
+                .swipeHorizontal(instituteSettings?.shouldShowPDFVertically() != true)
                 .load()
-        pdfView.isSwipeVertical = instituteSettings?.shouldShowPDFVertically() == true
     }
 
     override fun onPageChanged(page: Int, pageCount: Int) {

@@ -71,7 +71,7 @@ dependencies {
     androidTestImplementation rootProject.testRunner
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
+    implementation 'com.github.mhiew:android-pdf-viewer:3.2.0-beta.1'
     implementation 'com.mindorks.android:prdownloader:0.6.0'
 
     androidTestImplementation "androidx.test:core:1.4.0"
