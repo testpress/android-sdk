@@ -47,11 +47,6 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 style="@style/Button"
-                android:text="Bookmarks"
-                android:id="@+id/bookmarks" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                style="@style/Button"
                 android:text="Fragment"
                 android:id="@+id/fragment_button" />
 

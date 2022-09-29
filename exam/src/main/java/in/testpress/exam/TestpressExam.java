@@ -13,7 +13,6 @@ import in.testpress.exam.ui.AccessCodeActivity;
 import in.testpress.exam.ui.AccessCodeFragment;
 import in.testpress.exam.ui.AnalyticsActivity;
 import in.testpress.exam.ui.AttemptsActivity;
-import in.testpress.exam.ui.BookmarksActivity;
 import in.testpress.exam.ui.CarouselFragment;
 import in.testpress.exam.ui.CategoriesGridFragment;
 import in.testpress.exam.ui.CategoryGridActivity;
@@ -338,24 +337,6 @@ public class TestpressExam {
                 ReviewStatsActivity.createIntent(activity, exam, courseAttempt),
                 CarouselFragment.TEST_TAKEN_REQUEST_CODE
         );
-    }
-
-    /**
-     * Use when bookmarked items need to be open as a new Activity.
-     *
-     * @param context Context to start the new activity.
-     * @param testpressSession TestpressSession got from the core module.
-     */
-    public static void showBookmarks(@NonNull Context context,
-                                     @NonNull TestpressSession testpressSession) {
-
-        //noinspection ConstantConditions
-        if (context == null) {
-            throw new IllegalArgumentException("Context must not be null.");
-        }
-        init(context, testpressSession);
-        Intent intent = new Intent(context, BookmarksActivity.class);
-        context.startActivity(intent);
     }
 
     private static void handleCourseAttempt(@NonNull Activity activity,

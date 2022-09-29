@@ -1,4 +1,4 @@
-package in.testpress.exam.ui;
+package in.testpress.course.ui;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
@@ -11,7 +11,7 @@ import android.view.View;
 import org.greenrobot.greendao.query.LazyList;
 
 import in.testpress.core.TestpressSdk;
-import in.testpress.exam.R;
+import in.testpress.course.R;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ReviewItem;

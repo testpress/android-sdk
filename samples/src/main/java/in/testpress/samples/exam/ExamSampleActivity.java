@@ -59,12 +59,6 @@ public class ExamSampleActivity extends BaseToolBarActivity {
                 showSDK(view.getId());
             }
         });
-        findViewById(R.id.bookmarks).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showSDK(view.getId());
-            }
-        });
         findViewById(R.id.login_activity_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,9 +97,6 @@ public class ExamSampleActivity extends BaseToolBarActivity {
                     break;
                 case R.id.exam_list:
                     TestpressExam.show(this, session);
-                    break;
-                case R.id.bookmarks:
-                    TestpressExam.showBookmarks(this, session);
                     break;
                 case R.id.login_activity_button:
                     Intent intent = new Intent(this, UserDevicesActivity.class);

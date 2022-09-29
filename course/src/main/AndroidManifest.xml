@@ -62,6 +62,11 @@
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
+        <activity android:name=".ui.BookmarksActivity"
+            android:label="@string/testpress_bookmarks"
+            android:theme="@style/TestpressTheme"
+            android:configChanges="orientation|keyboard|screenSize" />
+
         <activity android:name=".ui.DownloadsActivity"
             android:label="Downloads"
             android:theme="@style/TestpressTheme"

@@ -1,12 +1,10 @@
-package in.testpress.exam.ui;
+package in.testpress.course.ui;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentStatePagerAdapter;
-
 import org.greenrobot.greendao.query.LazyList;
-
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.Language;
 
@@ -27,7 +25,7 @@ class BookmarkPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return BookmarksFragment.getInstance(bookmarks.get(position).getId(),
+        return in.testpress.course.ui.BookmarksFragment.getInstance(bookmarks.get(position).getId(),
                 selectedLanguage);
     }
 

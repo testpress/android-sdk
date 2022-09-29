@@ -1,4 +1,4 @@
-package in.testpress.exam.ui;
+package in.testpress.course.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -29,19 +29,17 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import org.greenrobot.greendao.query.QueryBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
-import in.testpress.exam.R;
+import in.testpress.course.R;
 import in.testpress.exam.pager.BookmarksPager;
 import in.testpress.exam.api.TestpressExamApiClient;
+import in.testpress.exam.ui.EditableItemSpinnerAdapter;
 import in.testpress.models.greendao.Bookmark;
 import in.testpress.models.greendao.BookmarkDao;
 import in.testpress.models.greendao.BookmarkFolder;
@@ -79,7 +77,7 @@ public class BookmarksActivity extends BaseToolBarActivity
     private static final int MISSED_BOOKMARKS_THRESHOLD = 50;
 
     private ViewPager viewPager;
-    private BookmarkPagerAdapter pagerAdapter;
+    private in.testpress.course.ui.BookmarkPagerAdapter pagerAdapter;
     private HeaderFooterListAdapter listAdapter;
     private SwipeRefreshLayout listViewSwipeRefreshLayout;
     private SwipeRefreshLayout viewPagerSwipeRefreshLayout;
@@ -199,7 +197,7 @@ public class BookmarksActivity extends BaseToolBarActivity
         viewPagerSwipeRefreshLayout.setColorSchemeResources(R.color.testpress_color_primary);
         listAdapter = new HeaderFooterListAdapter<SingleTypeAdapter<Bookmark>>(
                 listView,
-                new BookmarksListAdapter(this, currentFolder)
+                new in.testpress.course.ui.BookmarksListAdapter(this, currentFolder)
         );
         listView.setAdapter(listAdapter);
         listView.setOnScrollListener(this);
@@ -218,7 +216,7 @@ public class BookmarksActivity extends BaseToolBarActivity
                         showBookmarksList(false);
                     }
                 });
-        pagerAdapter = new BookmarkPagerAdapter(this, currentFolder);
+        pagerAdapter = new in.testpress.course.ui.BookmarkPagerAdapter(this, currentFolder);
         viewPager.setAdapter(pagerAdapter);
         goToPosition(0);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -246,7 +244,7 @@ public class BookmarksActivity extends BaseToolBarActivity
                     public void onClickEdit(int position) {
                         showFolderUpdateDialogBox(position);
                     }
-        });
+                });
         folderSpinner = spinnerContainer.findViewById(R.id.actionbar_spinner);
         folderSpinner.setAdapter(foldersSpinnerAdapter);
         folderDao = TestpressSDKDatabase.getBookmarkFolderDao(this);
@@ -289,7 +287,7 @@ public class BookmarksActivity extends BaseToolBarActivity
                 refreshPager = null;
                 pager = null;
                 getSupportLoaderManager()
-                        .restartLoader(REFRESH_LOADER_ID, null, BookmarksActivity.this);
+                        .restartLoader(REFRESH_LOADER_ID, null, in.testpress.course.ui.BookmarksActivity.this);
             }
 
             @Override
@@ -407,9 +405,9 @@ public class BookmarksActivity extends BaseToolBarActivity
                     listViewSwipeRefreshLayout.setRefreshing(true);
                     viewPagerSwipeRefreshLayout.setRefreshing(true);
                 }
-                return new BookmarksLoader(this, getRefreshPager());
+                return new in.testpress.course.ui.BookmarksActivity.BookmarksLoader(this, getRefreshPager());
             default:
-                return new BookmarksLoader(this, getOldBookmarksLoadingPager());
+                return new in.testpress.course.ui.BookmarksActivity.BookmarksLoader(this, getOldBookmarksLoadingPager());
         }
     }
 
@@ -781,7 +779,7 @@ public class BookmarksActivity extends BaseToolBarActivity
 
         builder.setPositiveButton(R.string.testpress_update, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                UIUtils.hideSoftKeyboard(BookmarksActivity.this, editText);
+                UIUtils.hideSoftKeyboard(in.testpress.course.ui.BookmarksActivity.this, editText);
                 String inputText = editText.getText().toString();
                 if (inputText.trim().isEmpty() || inputText.trim().equals(folderName)) {
                     return;
@@ -792,8 +790,8 @@ public class BookmarksActivity extends BaseToolBarActivity
         builder.setNegativeButton(R.string.testpress_delete, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                UIUtils.hideSoftKeyboard(BookmarksActivity.this, editText);
-                new AlertDialog.Builder(BookmarksActivity.this,
+                UIUtils.hideSoftKeyboard(in.testpress.course.ui.BookmarksActivity.this, editText);
+                new AlertDialog.Builder(in.testpress.course.ui.BookmarksActivity.this,
                         R.style.TestpressAppCompatAlertDialogStyle)
                         .setTitle(R.string.testpress_are_you_sure)
                         .setMessage(R.string.testpress_want_to_delete_folder)
@@ -901,13 +899,13 @@ public class BookmarksActivity extends BaseToolBarActivity
                         if (object instanceof ReviewItem) {
                             ReviewItem reviewItem = (ReviewItem) object;
                             reviewItem.setBookmarkId(bookmarkId);
-                            TestpressSDKDatabase.getReviewItemDao(BookmarksActivity.this)
+                            TestpressSDKDatabase.getReviewItemDao(in.testpress.course.ui.BookmarksActivity.this)
                                     .insertOrReplaceInTx(reviewItem);
 
                         } else if (object instanceof Content) {
                             Content content = (Content) object;
                             content.setBookmarkId(bookmarkId);
-                            TestpressSDKDatabase.getContentDao(BookmarksActivity.this)
+                            TestpressSDKDatabase.getContentDao(in.testpress.course.ui.BookmarksActivity.this)
                                     .insertOrReplaceInTx(content);
                         }
                         bookmarkFromDB.setActive(true);
@@ -984,8 +982,8 @@ public class BookmarksActivity extends BaseToolBarActivity
         }
     }
 
-    BookmarksListAdapter getBookmarksListAdapter() {
-        return (BookmarksListAdapter) listAdapter.getWrappedAdapter();
+    in.testpress.course.ui.BookmarksListAdapter getBookmarksListAdapter() {
+        return (in.testpress.course.ui.BookmarksListAdapter) listAdapter.getWrappedAdapter();
     }
 
     boolean isLoadingMoreView() {
@@ -1017,3 +1015,4 @@ public class BookmarksActivity extends BaseToolBarActivity
     public void onLoaderReset(@NonNull Loader<List<Bookmark>> loader) {
     }
 }
+

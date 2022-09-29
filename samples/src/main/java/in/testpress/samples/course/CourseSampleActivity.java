@@ -8,6 +8,8 @@ import android.view.View;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.course.TestpressCourse;
+import in.testpress.course.ui.BookmarksActivity;
+import in.testpress.exam.TestpressExam;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
@@ -115,6 +117,12 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                 startActivity(intent);
             }
         });
+        findViewById(R.id.bookmarks).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showSDK(R.id.bookmarks);
+            }
+        });
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -134,6 +142,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                 case R.id.leaderboard:
                 case R.id.course_contents:
                 case R.id.chapter_contents:
+                case R.id.bookmarks:
                 case R.id.content_detail:
                     session.getInstituteSettings()
                             .setBookmarksEnabled(true)
@@ -167,6 +176,9 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                             "/api/v2.2.1/chapters/" + text + "/";
 
                     TestpressCourse.showChapterContents(this, url, session);
+                    break;
+                case R.id.bookmarks:
+                    TestpressCourse.showBookmarks(this, session);
                     break;
                 case R.id.content_detail:
                     TestpressCourse.showContentDetail(this, text, session);
