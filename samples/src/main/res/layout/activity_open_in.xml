@@ -7,6 +7,10 @@
 
     <include layout="@layout/toolbar" />
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="wrap_content"
@@ -43,6 +47,11 @@
 
         <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
+            android:text="Bookmarks"
+            android:id="@+id/bookmarks" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/Button"
             android:text="Content Detail"
             android:id="@+id/content_detail" />
 
@@ -63,5 +72,7 @@
             android:id="@+id/fragment_button" />
 
     </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

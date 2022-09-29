@@ -1,4 +1,4 @@
-package in.testpress.exam.ui;
+package in.testpress.course.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -20,19 +20,17 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.airbnb.lottie.LottieAnimationView;
 import com.theartofdev.edmodo.cropper.CropImage;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
-import in.testpress.exam.R;
+import in.testpress.course.R;
 import in.testpress.exam.api.TestpressExamApiClient;
+import in.testpress.exam.ui.FolderSpinnerAdapter;
 import in.testpress.exam.util.CommentsUtil;
 import in.testpress.exam.util.Watermark;
 import in.testpress.exam.util.ImageUtils;
@@ -90,7 +88,7 @@ public class BookmarksFragment extends BaseFragment {
     private LottieAnimationView removeBookmarkProgressBar;
     private TextView difficultyPercentageText;
     private Bookmark bookmark;
-    private BookmarksActivity bookmarksActivity;
+    private in.testpress.course.ui.BookmarksActivity bookmarksActivity;
     private FullScreenChromeClient fullScreenChromeClient;
     private TestpressExamApiClient apiClient;
     ImageUtils imagePickerUtils;
@@ -101,8 +99,8 @@ public class BookmarksFragment extends BaseFragment {
     private RetrofitCall<Bookmark> updateBookmarkAPIRequest;
     private RetrofitCall<Void> deleteBookmarkAPIRequest;
 
-    public static BookmarksFragment getInstance(long bookmarkId, Language selectedLanguage) {
-        BookmarksFragment reviewQuestionsFragment = new BookmarksFragment();
+    public static in.testpress.course.ui.BookmarksFragment getInstance(long bookmarkId, Language selectedLanguage) {
+        in.testpress.course.ui.BookmarksFragment reviewQuestionsFragment = new in.testpress.course.ui.BookmarksFragment();
         Bundle bundle = new Bundle();
         bundle.putLong(PARAM_BOOKMARK_ID, bookmarkId);
         bundle.putParcelable(PARAM_SELECTED_LANGUAGE, selectedLanguage);
@@ -228,11 +226,11 @@ public class BookmarksFragment extends BaseFragment {
                     setDifficulty(view);
                     if (commentsUtil == null && getActivity() != null) {
                         commentsUtil = new CommentsUtil(
-                                BookmarksFragment.this,
+                                in.testpress.course.ui.BookmarksFragment.this,
                                 getLoaderManager(),
                                 CommentsUtil.getQuestionCommentsUrl(apiClient, reviewItem),
                                 rootLayout,
-                                ((BookmarksActivity) getActivity()).buttonLayout
+                                ((in.testpress.course.ui.BookmarksActivity) getActivity()).buttonLayout
                         );
                         commentsUtil.displayComments();
                     }
@@ -285,7 +283,7 @@ public class BookmarksFragment extends BaseFragment {
             HtmlContent htmlContent = content.getHtml();
             setContentTitle(Html.fromHtml(htmlContent.getTitle()));
             String html = "<div style='padding-left: 20px; padding-right: 20px;'>" +
-                                htmlContent.getTextHtml() + "</div>";
+                    htmlContent.getTextHtml() + "</div>";
 
             webViewUtils.initWebView(html, getActivity());
         } else if (content.getRawVideo() != null) {
@@ -384,7 +382,7 @@ public class BookmarksFragment extends BaseFragment {
         // Add direction/passage
         if (directionHtml != null && !directionHtml.isEmpty()) {
             html += "<div class='question' style='padding-bottom: 0px;'>" +
-                        directionHtml +
+                    directionHtml +
                     "</div>";
         }
 
@@ -479,15 +477,15 @@ public class BookmarksFragment extends BaseFragment {
                     "© "+ getString(R.string.testpress_app_name) +" "+ watermark +
                     "\n" + "</div>";
             html += "<div class='review-explanation'>" +
-                        explanationHtml +
+                    explanationHtml +
                     "</div>";
         }
 
         // Add subject
         if (subject != null && !subject.isEmpty() && !subject.equals("Uncategorized")) {
             html += "<div>" +
-                        WebViewUtils.getHeadingTags(getString(R.string.testpress_subject)) +
-                        "<div class='subject'>" + subject + "</div>" +
+                    WebViewUtils.getHeadingTags(getString(R.string.testpress_subject)) +
+                    "<div class='subject'>" + subject + "</div>" +
                     "</div>";
         }
         return html + "</div>";

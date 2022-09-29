@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
+import in.testpress.course.ui.BookmarksActivity;
 import in.testpress.course.ui.ChapterDetailActivity;
 import in.testpress.course.ui.ContentActivity;
 import in.testpress.course.ui.CourseListActivity;
@@ -150,6 +151,24 @@ public class TestpressCourse {
                 ChapterDetailActivity.createIntent(chapterUrl, activity, null),
                 COURSE_CONTENT_LIST_REQUEST_CODE
         );
+    }
+
+    /**
+     * Use when bookmarked items need to be open as a new Activity.
+     *
+     * @param context Context to start the new activity.
+     * @param testpressSession TestpressSession got from the core module.
+     */
+    public static void showBookmarks(@NonNull Context context,
+                                     @NonNull TestpressSession testpressSession) {
+
+        //noinspection ConstantConditions
+        if (context == null) {
+            throw new IllegalArgumentException("Context must not be null.");
+        }
+        init(context, testpressSession);
+        Intent intent = new Intent(context, BookmarksActivity.class);
+        context.startActivity(intent);
     }
 
     /**
