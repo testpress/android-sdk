@@ -306,8 +306,9 @@ public class BookmarksFragment extends BaseFragment {
     private void displayAttachmentContent() {
         setContentTitle(content.getName());
         showOrHideDescription();
-        updateAttachmentButton();
-        updateLayout();
+        showViewOrDownloadButton();
+        showBookmarkActions();
+        hideProgressBar();
     }
 
     private void setContentTitle(CharSequence title) {
@@ -330,7 +331,7 @@ public class BookmarksFragment extends BaseFragment {
         }
     }
 
-    private void updateAttachmentButton(){
+    private void showViewOrDownloadButton(){
         Button downloadButton = rootLayout.findViewById(R.id.download_attachment);
         if (content.getAttachment().getIsRenderable() == true) {
             downloadButton.setText(R.string.testpress_open_bookmark_file);
@@ -351,10 +352,13 @@ public class BookmarksFragment extends BaseFragment {
         });
     }
 
-    private void updateLayout(){
+    private void showBookmarkActions(){
+        bookmarksLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar(){
         rootLayout.findViewById(R.id.attachment_content_layout).setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
-        bookmarksLayout.setVisibility(View.VISIBLE);
     }
 
     private void startPdfViewActivity(){
