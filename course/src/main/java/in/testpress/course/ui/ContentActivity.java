@@ -38,6 +38,14 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
         return intent;
     }
 
+    public static Intent createIntent(Long contentId, Context context, String productSlug,Boolean hideBottomNavigation) {
+        Intent intent = new Intent(context, ContentActivity.class);
+        intent.putExtra(CONTENT_ID, contentId);
+        intent.putExtra(PRODUCT_SLUG, productSlug);
+        intent.putExtra(HIDE_BOTTOM_NAVIGATION,hideBottomNavigation);
+        return intent;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

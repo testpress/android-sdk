@@ -303,6 +303,14 @@ public class BookmarksFragment extends BaseFragment {
         }
     }
 
+    private void displayAttachmentContent() {
+        setContentTitle(content.getName());
+        showOrHideDescription();
+        showViewOrDownloadButton();
+        showBookmarkActions();
+        hideProgressBar();
+    }
+
     private void setContentTitle(CharSequence title) {
         TextView titleView = rootLayout.findViewById(R.id.title);
         LinearLayout titleLayout = rootLayout.findViewById(R.id.title_layout);
@@ -311,8 +319,7 @@ public class BookmarksFragment extends BaseFragment {
         bookmarksLayout.setVisibility(View.VISIBLE);
     }
 
-    private void displayAttachmentContent() {
-        setContentTitle(content.getName());
+    private void showOrHideDescription(){
         TextView description = rootLayout.findViewById(R.id.attachment_description);
         final Attachment attachment = content.getRawAttachment();
         if (attachment.getDescription() != null && !attachment.getDescription().isEmpty()) {
@@ -322,20 +329,50 @@ public class BookmarksFragment extends BaseFragment {
         } else {
             description.setVisibility(View.GONE);
         }
-        Button downloadButton = rootLayout.findViewById(R.id.download_attachment);
-        ViewUtils.setLeftDrawable(downloadButton.getContext(), downloadButton,
-                R.drawable.ic_file_download_18dp);
+    }
 
+    private void showViewOrDownloadButton(){
+        Button downloadButton = rootLayout.findViewById(R.id.download_attachment);
+        if (content.getAttachment().getIsRenderable() == true) {
+            downloadButton.setText(R.string.testpress_open_bookmark_file);
+        } else {
+            downloadButton.setText(R.string.testpress_download_attachment);
+            ViewUtils.setLeftDrawable(downloadButton.getContext(), downloadButton,
+                    R.drawable.ic_file_download_18dp);
+        }
         downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(Intent.ACTION_VIEW,
-                        Uri.parse(attachment.getAttachmentUrl())));
+                if (content.getAttachment().getIsRenderable() == true){
+                    startPdfViewActivity();
+                }else {
+                    startAttachmentDownloadActivity();
+                }
             }
         });
+    }
+
+    private void showBookmarkActions(){
+        bookmarksLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar(){
         rootLayout.findViewById(R.id.attachment_content_layout).setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
-        bookmarksLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void startPdfViewActivity(){
+        getActivity().startActivity(ContentActivity.createIntent(
+                content.getId(),
+                getContext(),
+                content.getChapterSlug(),false)
+        );
+    }
+
+    private void startAttachmentDownloadActivity(){
+        final Attachment attachment = content.getRawAttachment();
+        startActivity(new Intent(Intent.ACTION_VIEW,
+                Uri.parse(attachment.getAttachmentUrl())));
     }
 
     /**
