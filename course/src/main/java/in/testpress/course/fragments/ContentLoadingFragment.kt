@@ -152,7 +152,7 @@ class ContentFragmentFactory {
                 "Html" -> HtmlContentFragment()
                 "Notes" -> HtmlContentFragment()
                 "VideoConference" -> {
-                    if (content.video != null && content.videoConference?.showRecordedVideo == true) {
+                    if (content.canShowRecordedVideo()) {
                         return VideoContentFragment()
                     }
                     return VideoConferenceFragment()
