@@ -179,7 +179,8 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // provider
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // conferenceId
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // accessToken
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8) // password
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // password
+            cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0 // showRecordedVideo
         );
         return entity;
     }
