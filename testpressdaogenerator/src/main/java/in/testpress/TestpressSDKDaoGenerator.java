@@ -416,6 +416,7 @@ public class TestpressSDKDaoGenerator {
         video.addStringProperty("conferenceId");
         video.addStringProperty("accessToken");
         video.addStringProperty("password");
+        video.addBooleanProperty("showRecordedVideo");
         return video;
     }
 

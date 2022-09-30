@@ -31,6 +31,7 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
         public final static Property ConferenceId = new Property(6, String.class, "conferenceId", false, "CONFERENCE_ID");
         public final static Property AccessToken = new Property(7, String.class, "accessToken", false, "ACCESS_TOKEN");
         public final static Property Password = new Property(8, String.class, "password", false, "PASSWORD");
+        public final static Property ShowRecordedVideo = new Property(9, Boolean.class, "showRecordedVideo", false, "SHOW_RECORDED_VIDEO");
     }
 
 
@@ -54,7 +55,8 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
                 "\"PROVIDER\" TEXT," + // 5: provider
                 "\"CONFERENCE_ID\" TEXT," + // 6: conferenceId
                 "\"ACCESS_TOKEN\" TEXT," + // 7: accessToken
-                "\"PASSWORD\" TEXT);"); // 8: password
+                "\"PASSWORD\" TEXT," + // 8: password
+                "\"SHOW_RECORDED_VIDEO\" INTEGER);"); // 9: showRecordedVideo
     }
 
     /** Drops the underlying database table. */
@@ -111,6 +113,11 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
         if (password != null) {
             stmt.bindString(9, password);
         }
+ 
+        Boolean showRecordedVideo = entity.getShowRecordedVideo();
+        if (showRecordedVideo != null) {
+            stmt.bindLong(10, showRecordedVideo ? 1L: 0L);
+        }
     }
 
     @Override
@@ -161,6 +168,11 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
         if (password != null) {
             stmt.bindString(9, password);
         }
+ 
+        Boolean showRecordedVideo = entity.getShowRecordedVideo();
+        if (showRecordedVideo != null) {
+            stmt.bindLong(10, showRecordedVideo ? 1L: 0L);
+        }
     }
 
     @Override
@@ -196,6 +208,7 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
         entity.setConferenceId(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setAccessToken(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setPassword(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setShowRecordedVideo(cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0);
      }
     
     @Override
