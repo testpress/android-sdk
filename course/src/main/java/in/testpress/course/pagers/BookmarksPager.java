@@ -1,4 +1,4 @@
-package in.testpress.exam.pager;
+package in.testpress.course.pagers;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
