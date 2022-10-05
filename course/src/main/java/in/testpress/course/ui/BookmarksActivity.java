@@ -37,7 +37,7 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
-import in.testpress.exam.pager.BookmarksPager;
+import in.testpress.course.pagers.BookmarksPager;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.ui.EditableItemSpinnerAdapter;
 import in.testpress.models.greendao.Bookmark;

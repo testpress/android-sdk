@@ -102,6 +102,10 @@ data class DomainContent(
 
         return canRetakeExam() || hasNotAttempted()
     }
+
+    fun canShowRecordedVideo(): Boolean {
+        return video != null && videoConference?.showRecordedVideo == true
+    }
 }
 
 fun createDomainContent(contentEntity: ContentEntity): DomainContent {
