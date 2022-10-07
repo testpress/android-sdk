@@ -12,6 +12,7 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 
@@ -31,6 +32,8 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
     private lateinit var dateLabel: TextView
     private lateinit var languageLabel: TextView
     private lateinit var webOnlyLabel: TextView
+    private lateinit var examStatusMessage: TextView
+    private lateinit var examStatusImage: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,6 +65,9 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         dateLabel = view.findViewById(R.id.date_label)
         languageLabel = view.findViewById(R.id.language_label)
         webOnlyLabel = view.findViewById(R.id.web_only_label)
+        examStatusMessage = view.findViewById(R.id.exam_status_message)
+        examStatusImage = view.findViewById(R.id.exam_status_image)
+
 
         ViewUtils.setTypeface(
             arrayOf(
@@ -95,6 +101,7 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         showOrHideExamDate(exam)
         showExamDuration(exam)
         showInfoIfExamIsWebOnly(exam)
+        showExamEndedMessage(exam)
     }
 
     private fun showInfoIfExamIsWebOnly(exam: DomainExamContent) {
@@ -131,4 +138,12 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
             }
         }
     }
+
+    private fun showExamEndedMessage(exam: DomainExamContent) {
+        if (exam.isEnded()) {
+            examStatusImage.visibility = View.GONE
+            examStatusMessage.text = "${getText(R.string.testpress_exam_has_ended)}"
+        }
+    }
+
 }
