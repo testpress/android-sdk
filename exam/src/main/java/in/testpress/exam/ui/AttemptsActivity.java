@@ -96,15 +96,21 @@ public class AttemptsActivity extends BaseToolBarActivity
 
     void fetchOrCheckExam() {
         exam = getIntent().getParcelableExtra(PARAM_EXAM);
+        String examSlug = getIntent().getStringExtra(PARAM_EXAM_SLUG);
         Boolean isDetailsFetched = false;
-        Exam examFromDb = TestpressSDKDatabase.getExamDao(this).queryBuilder().where(ExamDao.Properties.Slug.eq(exam.getSlug())).limit(1).unique();
+        Exam examFromDb;
+        if (exam != null){
+            examFromDb = TestpressSDKDatabase.getExamDao(this).queryBuilder().where(ExamDao.Properties.Slug.eq(exam.getSlug())).limit(1).unique();
+        } else {
+            examFromDb = TestpressSDKDatabase.getExamDao(this).queryBuilder().where(ExamDao.Properties.Slug.eq(examSlug)).limit(1).unique();
+        }
+
         if (examFromDb != null) {
             isDetailsFetched = examFromDb.getIsDetailsFetched();
             exam = examFromDb;
         }
 
         if (exam == null) {
-            String examSlug = getIntent().getStringExtra(PARAM_EXAM_SLUG);
             // Throw exception if both exam & exam slug is null
             Assert.assertNotNull("EXAM must not be null.", examSlug);
             loadExam(examSlug);
