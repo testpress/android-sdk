@@ -10,6 +10,8 @@ import android.view.View;
 
 import org.greenrobot.greendao.query.LazyList;
 
+import java.util.List;
+
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.models.greendao.Bookmark;
@@ -23,16 +25,16 @@ import in.testpress.util.SingleTypeAdapter;
 class BookmarksListAdapter extends SingleTypeAdapter<Bookmark> {
 
     private Activity activity;
-    private LazyList<Bookmark> bookmarks;
+    private List<Bookmark> bookmarks;
     private String currentFolder;
     private int backgroundShadePosition;
     private ObjectAnimator animator;
 
-    BookmarksListAdapter(Activity activity, String currentFolder) {
+    BookmarksListAdapter(Activity activity, List<Bookmark> bookmarks, String currentFolder) {
         super(activity.getLayoutInflater(), R.layout.testpress_bookmark_panel_list_item);
         this.currentFolder = currentFolder;
         this.activity = activity;
-        bookmarks = Bookmark.getQueryBuilderToDisplay(activity, currentFolder).listLazy();
+        this.bookmarks = bookmarks;
     }
 
     @Override
@@ -57,7 +59,7 @@ class BookmarksListAdapter extends SingleTypeAdapter<Bookmark> {
 
     @Override
     public void notifyDataSetChanged() {
-        bookmarks = Bookmark.getQueryBuilderToDisplay(activity, currentFolder).listLazy();
+        //bookmarks = Bookmark.getQueryBuilderToDisplay(activity, currentFolder).listLazy();
         super.notifyDataSetChanged();
     }
 

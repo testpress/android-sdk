@@ -14,6 +14,12 @@
         android:allowBackup="true"
         android:supportsRtl="true" >
 
+        <activity
+            android:name=".ui.BookmarkDetailActivity"
+            android:label="@string/testpress_bookmark"
+            android:theme="@style/TestpressTheme"
+            android:configChanges="orientation|keyboard|screenSize"/>
+
         <activity android:name=".ui.CourseListActivity"
             android:label="@string/testpress_courses"
             android:theme="@style/TestpressTheme"
