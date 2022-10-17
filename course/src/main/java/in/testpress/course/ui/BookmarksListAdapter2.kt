@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 class BookmarksListAdapter2(
     val activity: FragmentActivity,
     var bookmarks: List<Bookmark>,
-    val folderName: String
+    val folderName: String?
 ) : ListAdapter<Bookmark, BookmarksListAdapter2.BookmarkListItemViewHolder>(BOOKMARK_COMPARATOR) {
 
     override fun onCreateViewHolder(

@@ -1,16 +1,14 @@
 package in.testpress.course.ui;
 
+import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
+import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
+
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.core.content.ContextCompat;
-import androidx.loader.content.Loader;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -20,13 +18,25 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
+import in.testpress.course.repository.BookmarkFolderRepository;
+import in.testpress.course.viewmodels.BookmarkFolderViewModel;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.ui.EditableItemSpinnerAdapter;
 import in.testpress.models.greendao.Bookmark;
@@ -43,10 +53,7 @@ import in.testpress.util.ViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
-import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
-import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
-
-public class BookmarksActivity extends BaseToolBarActivity  {
+public class BookmarksActivity extends BaseToolBarActivity {
 
     // Loader for refresh
     private static final int REFRESH_LOADER_ID = 0;
@@ -55,6 +62,11 @@ public class BookmarksActivity extends BaseToolBarActivity  {
     private static final int LOADER_ID = 1;
 
     private BookmarkListFragment fragment;
+
+    private BookmarkFolderViewModel bookmarkFolderViewModel;
+
+    private String TAG = "BookmarksActivity";
+    private String baseUrl;
 
     private SwipeRefreshLayout listViewSwipeRefreshLayout;
     private View contentLayout;
@@ -82,8 +94,16 @@ public class BookmarksActivity extends BaseToolBarActivity  {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_bookmarks);
+        apiClient = new TestpressExamApiClient(this);
 
+        initializeViewModel();
+        initalizeObservers();
         loadBookmarks();
+
+        baseUrl = TestpressSdk.getTestpressSession(getApplicationContext())
+                .getInstituteSettings()
+                .getBaseUrl();
+
         retryButton = findViewById(R.id.retry_button);
         previousButton = findViewById(R.id.previous);
         nextButton = findViewById(R.id.next);
@@ -98,11 +118,10 @@ public class BookmarksActivity extends BaseToolBarActivity  {
         progressDialog.setCancelable(false);
         UIUtils.setIndeterminateDrawable(this, progressDialog, 4);
 
-        apiClient = new TestpressExamApiClient(this);
         bookmarkDao = TestpressSDKDatabase.getBookmarkDao(this);
 
         ViewUtils.setTypeface(
-                new TextView[] { nextButton, previousButton},
+                new TextView[]{nextButton, previousButton},
                 TestpressSdk.getRubikMediumFont(this)
         );
 
@@ -134,6 +153,7 @@ public class BookmarksActivity extends BaseToolBarActivity  {
                 new EditableItemSpinnerAdapter.OnEditItemListener() {
                     @Override
                     public void onClickEdit(int position) {
+                        folderSpinner.setSelection(position);
                         showFolderUpdateDialogBox(position);
                     }
                 });
@@ -147,27 +167,23 @@ public class BookmarksActivity extends BaseToolBarActivity  {
                 ViewGroup.LayoutParams.WRAP_CONTENT);
 
         toolbar.addView(spinnerContainer, lp);
-        addFoldersToSpinner();
-        bookmarkFolders.clear();
-        //noinspection ConstantConditions
-        String baseUrl = TestpressSdk.getTestpressSession(this).getInstituteSettings().getBaseUrl();
-        loadBookmarkFolders(baseUrl + BOOKMARK_FOLDERS_PATH);
+        loadBookmarkFolders();
         folderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 currentFolder = foldersSpinnerAdapter.getTag(i);
-
-                Loader<Bookmark> refreshLoader =
-                        getSupportLoaderManager().getLoader(REFRESH_LOADER_ID);
-
-                if (refreshLoader != null && !refreshLoader.isReset()) {
-                    getSupportLoaderManager().destroyLoader(REFRESH_LOADER_ID);
+                Log.d(TAG, "onItemSelected: "+currentFolder);
+                for (BookmarkFolder folder:
+                     bookmarkFolders) {
+                    if(currentFolder.equals("")){
+                        fragment.setFolderID(0L);
+                        return;
+                    }
+                    if (folder.getName().equals(currentFolder)){
+                        fragment.setFolderID(folder.getId());
+                    }
                 }
-                Loader<Bookmark> loader = getSupportLoaderManager().getLoader(LOADER_ID);
-                if (loader != null && !loader.isReset()) {
-                    getSupportLoaderManager().destroyLoader(LOADER_ID);
-                }
-                }
+            }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
@@ -176,41 +192,105 @@ public class BookmarksActivity extends BaseToolBarActivity  {
         });
     }
 
+    void initializeViewModel() {
+        ViewModelProvider.Factory viewModelFactory = new ViewModelProvider.Factory() {
+            @NonNull
+            @Override
+            public <T extends ViewModel> T create(@NonNull Class<T> aClass) {
+                return (T) new BookmarkFolderViewModel(
+                        new BookmarkFolderRepository(
+                                getApplicationContext(),
+                                apiClient)
+                );
+            }
+        };
+        bookmarkFolderViewModel = new ViewModelProvider(getViewModelStore(), viewModelFactory).get(BookmarkFolderViewModel.class);
+
+    }
+
+    void initalizeObservers(){
+        bookmarkFolderViewModel.getFolders().observe(this, folders ->{
+            switch (folders.getStatus()){
+                case SUCCESS:{
+                    Log.d(TAG, "onCreate: "+folders.getData().size());
+                    bookmarkFolders  = folders.getData();
+                    addFoldersToSpinner();
+                    break;
+                }
+                case LOADING:{
+
+                    break;
+                }
+                case ERROR:{
+                    handleException(folders.getException());
+                    break;
+                }
+            }
+        });
+
+        bookmarkFolderViewModel.getUpdateFolder().observe(this,updateFolder ->{
+            switch (updateFolder.getStatus()){
+                case SUCCESS:{
+                    int currentFolderPosition = folderSpinner.getSelectedItemPosition();
+                        updateFolderSpinnerItem(currentFolderPosition, Objects.requireNonNull(updateFolder.getData()));
+                        progressDialog.dismiss();
+                        Snackbar.make(fragment.requireView(), R.string.testpress_folder_updated,
+                                Snackbar.LENGTH_SHORT).show();
+                    break;
+                }
+                case LOADING:{
+                    Log.d(TAG, "updateBookmarkFolder: loading");
+                    progressDialog.show();
+                    break;
+                }
+                case ERROR:{
+                    Log.d(TAG, "updateBookmarkFolder: error");
+                    handleException(updateFolder.getException());
+                    progressDialog.dismiss();
+                    break;
+                }
+            }
+        });
+
+        bookmarkFolderViewModel.getDeleteFolder().observe(this, result -> {
+            Log.d(TAG, "deleteFolder: "+result.getStatus());
+            switch (result.getStatus()){
+                case SUCCESS:{
+                    int currentFolderPosition = folderSpinner.getSelectedItemPosition();
+                    deleteFolderSpinnerItem(currentFolderPosition);
+                    folderSpinner.setSelection(0);
+                    progressDialog.dismiss();
+                    Snackbar.make(fragment.requireView(), R.string.testpress_folder_deleted,
+                            Snackbar.LENGTH_SHORT).show();
+                    break;
+                }
+                case ERROR:{
+                    progressDialog.dismiss();
+                    handleException(result.getException());
+                    break;
+                }
+            }
+        });
+
+
+    }
+
     private void loadBookmarks() {
-        fragment =new BookmarkListFragment();
+        fragment = new BookmarkListFragment();
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.bookmark_fragment_container, fragment)
                 .commitAllowingStateLoss();
     }
 
-    void loadBookmarkFolders(String url) {
-        bookmarkFoldersLoader = apiClient.getBookmarkFolders(url)
-                .enqueue(new TestpressCallback<ApiResponse<FolderListResponse>>() {
-                    @Override
-                    public void onSuccess(ApiResponse<FolderListResponse> apiResponse) {
-                        bookmarkFolders.addAll(apiResponse.getResults().getFolders());
-                        if (apiResponse.getNext() != null) {
-                            loadBookmarkFolders(apiResponse.getNext());
-                        } else {
-                            folderDao.deleteAll();
-                            folderDao.insertOrReplaceInTx(bookmarkFolders);
-                            addFoldersToSpinner();
-                        }
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        handleException(exception);
-                    }
-                });
+    void loadBookmarkFolders(){
+        bookmarkFolderViewModel.loadFolders(baseUrl+ BOOKMARK_FOLDERS_PATH);
     }
 
     synchronized void addFoldersToSpinner() {
         foldersSpinnerAdapter.clear();
         foldersSpinnerAdapter.addItem("", "All Bookmarks", 0);
-        List<BookmarkFolder> bookmarkFolders = folderDao.queryBuilder().list();
-        for (BookmarkFolder folder: bookmarkFolders) {
+        for (BookmarkFolder folder : bookmarkFolders) {
             foldersSpinnerAdapter
                     .addItem(folder.getName(), folder.getName(), folder.getBookmarksCount());
         }
@@ -228,12 +308,13 @@ public class BookmarksActivity extends BaseToolBarActivity  {
 
     void updateFolderSpinnerItem(BookmarkFolder folder) {
         updateFolderSpinnerItem(foldersSpinnerAdapter.getItemPosition(folder.getName()), folder);
+        fragment.setFolderID(folder.getId());
     }
 
-    void updateFolderSpinnerItem(int position, BookmarkFolder folder) {
+    void updateFolderSpinnerItem(int position, @NonNull BookmarkFolder folder) {
+        Log.d(TAG, "updateFolderSpinnerItem: "+position);
         foldersSpinnerAdapter.updateItem(position, folder.getName(), folder.getName(),
                 folder.getBookmarksCount());
-
         foldersSpinnerAdapter.notifyDataSetChanged();
     }
 
@@ -310,70 +391,14 @@ public class BookmarksActivity extends BaseToolBarActivity  {
         dialog.show();
     }
 
-    void updateBookmarkFolder(long folderId, String folderName, final int position) {
+    void updateBookmarkFolder(long folderId, String folderName, int position) {
         progressDialog.show();
-        updateFolderAPIRequest = apiClient.updateBookmarkFolder(folderId, folderName)
-                .enqueue(new TestpressCallback<BookmarkFolder>() {
-                    @Override
-                    public void onSuccess(BookmarkFolder folder) {
-                        folderDao.updateInTx(folder);
-                        updateFolderSpinnerItem(position, folder);
-                        progressDialog.dismiss();
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        progressDialog.dismiss();
-                        handleException(exception);
-                    }
-                });
+        bookmarkFolderViewModel.updateFolder(folderId,folderName);
     }
 
     void deleteFolder(final Long folderId, final int deletedPosition) {
         progressDialog.show();
-        deleteFolderAPIRequest = apiClient.deleteBookmarkFolder(folderId)
-                .enqueue(new TestpressCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void data) {
-                        folderDao.deleteByKeyInTx(folderId);
-                        List<Bookmark> bookmarks = bookmarkDao.queryBuilder()
-                                .where(BookmarkDao.Properties.FolderId.eq(folderId)).list();
-
-                        if (!bookmarks.isEmpty()) {
-                            for (Bookmark bookmark : bookmarks) {
-                                bookmark.setFolderId(null);
-                                bookmark.setFolder(null);
-                                bookmark.setLoadedInRespectiveFolder(false);
-                                bookmarkDao.insertOrReplaceInTx(bookmark);
-                            }
-                        }
-
-                        int currentFolderPosition = folderSpinner.getSelectedItemPosition();
-                        if (currentFolderPosition == 0) { // All bookmarks
-                            deleteFolderSpinnerItem(deletedPosition);
-                        } else if (currentFolderPosition == deletedPosition) {
-                            addFoldersToSpinner();
-                            folderSpinner.setSelection(0);
-                            folderSpinner.dismissPopUp();
-                        } else {
-                            String currentFolder = foldersSpinnerAdapter.getTag(currentFolderPosition);
-                            deleteFolderSpinnerItem(deletedPosition);
-                            if (deletedPosition < currentFolderPosition) {
-                                folderSpinner.setSelection(
-                                        foldersSpinnerAdapter.getItemPosition(currentFolder));
-
-                                folderSpinner.dismissPopUp();
-                            }
-                        }
-                        progressDialog.dismiss();
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        progressDialog.dismiss();
-                        handleException(exception);
-                    }
-                });
+        bookmarkFolderViewModel.deleteFolder(folderId);
     }
 
     void undoBookmarkDelete(final long bookmarkId) {
@@ -425,15 +450,26 @@ public class BookmarksActivity extends BaseToolBarActivity  {
     }
 
     public void refreshWithProgress() {
-
         fragment.onRefreshing();
+        loadBookmarkFolders();
         listViewSwipeRefreshLayout.setRefreshing(false);
         contentLayout.setVisibility(View.VISIBLE);
-
     }
 
     void handleException(TestpressException exception) {
-
+        if (exception.isUnauthenticated()) {
+            Snackbar.make(fragment.requireView(), R.string.testpress_authentication_failed,
+                    Snackbar.LENGTH_SHORT).show();
+        } else if (exception.isNetworkError()) {
+            Snackbar.make(fragment.requireView(), R.string.testpress_no_internet_connection,
+                    Snackbar.LENGTH_SHORT).show();
+        } else if (exception.isClientError()) {
+            Snackbar.make(fragment.requireView(), R.string.testpress_folder_name_not_allowed,
+                    Snackbar.LENGTH_SHORT).show();
+        } else {
+            Snackbar.make(fragment.requireView(), R.string.testpress_network_error,
+                    Snackbar.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -452,7 +488,7 @@ public class BookmarksActivity extends BaseToolBarActivity  {
 
     @Override
     public RetrofitCall[] getRetrofitCalls() {
-        return new RetrofitCall[] {
+        return new RetrofitCall[]{
                 bookmarkFoldersLoader, updateFolderAPIRequest, deleteFolderAPIRequest,
                 undoBookmarkAPIRequest
         };
@@ -462,6 +498,7 @@ public class BookmarksActivity extends BaseToolBarActivity  {
     public void onResume() {
         super.onResume();
         fragment.onRefreshing();
+        loadBookmarkFolders();
     }
 }
 

@@ -26,10 +26,12 @@ import com.facebook.shimmer.ShimmerFrameLayout
 
 class BookmarkListFragment : Fragment(), EmptyViewListener {
 
+    val TAG = "BookmarkListFragment"
     private lateinit var apiClient: TestpressExamApiClient
-    private val bookmark = mutableListOf<Bookmark>()
+    private var _bookmark = mutableListOf<Bookmark>()
+    private val bookmark get() = filteredBookmarks(_bookmark)
+    private var folderID = 0L
     private var folder = ""
-    private var folderName = ""
 
     lateinit var viewModel: BookmarkListViewModel
     private lateinit var mAdapter: BookmarksListAdapter2
@@ -68,7 +70,7 @@ class BookmarkListFragment : Fragment(), EmptyViewListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindViews()
-        mAdapter = BookmarksListAdapter2(requireActivity(), bookmark, folderName)
+        mAdapter = BookmarksListAdapter2(requireActivity(), bookmark, null)
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireActivity())
             adapter = mAdapter
@@ -86,19 +88,20 @@ class BookmarkListFragment : Fragment(), EmptyViewListener {
                     showLoadingPlaceholder()
                 }
                 Status.SUCCESS -> {
-                    Log.d("BookmarkListFragment", "Got status SUCCESS")
-                    hideLoadingPlaceholder()
-                    val items = resource.data!!
-                    Log.d("Items", "" + items.isEmpty())
-                    if (items.isEmpty()) showEmptyList()
-                    mAdapter.bookmarks = items
+                    //showLoadingPlaceholder()
+                    Log.d("BookmarkListFragment", "Got status SUCCESS${resource.data?.size}")
+                    val items = resource?.data
+                    Log.d("Items", "" + items?.size)
+                    if (items?.isEmpty()!!) showEmptyList()
+                    mAdapter.bookmarks = filteredBookmarks(items)
                     mAdapter.notifyDataSetChanged()
+                    hideLoadingPlaceholder()
                 }
                 Status.ERROR -> {
                     Log.d("BookmarkListFragment", "Got status ERROR")
                     hideLoadingPlaceholder()
                     if (resource.data != null) {
-                        mAdapter.bookmarks = resource.data as List<Bookmark>
+                        mAdapter.bookmarks = filteredBookmarks(resource.data as List<Bookmark>)
                         mAdapter.notifyDataSetChanged()
                     } else {
                         emptyViewFragment.displayError(resource.exception!!)
@@ -125,11 +128,13 @@ class BookmarkListFragment : Fragment(), EmptyViewListener {
     }
 
     private fun showEmptyList() {
+        view!!.findViewById<FrameLayout>(R.id.empty_view_fragment).visibility = View.VISIBLE
         emptyViewFragment.setEmptyText(
             R.string.testpress_no_bookmarks,
             R.string.testpress_no_bookmarks_description,
             R.drawable.ic_error_outline_black_18dp
         )
+        emptyViewFragment.retryButton.visibility = View.GONE
     }
 
     override fun onRetryClick() {
@@ -149,5 +154,19 @@ class BookmarkListFragment : Fragment(), EmptyViewListener {
 
     fun onRefreshing() {
         viewModel.loadBookmarks()
+        view!!.findViewById<FrameLayout>(R.id.empty_view_fragment).visibility = View.GONE
+    }
+
+    private fun filteredBookmarks(bookmarks: List<Bookmark>): List<Bookmark> {
+        if (folderID != 0L) {
+            return bookmarks.filter { it.folderId == folderID }
+            }
+        return bookmarks
+    }
+
+    fun setFolderID(folderId:Long){
+        this.folderID=folderId
+        Log.d(TAG, "setFolderID: $folderId")
+        onRefreshing()
     }
 }

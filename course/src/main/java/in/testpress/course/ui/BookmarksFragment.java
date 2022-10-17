@@ -582,7 +582,7 @@ public class BookmarksFragment extends BaseFragment {
                                 BookmarkFolder folderFromDB = folders.get(0);
                                 folderFromDB.setBookmarksCount(folderFromDB.getBookmarksCount() + 1);
                                 bookmarkFolderDao.insertOrReplaceInTx(folderFromDB);
-                                bookmarksActivity.updateFolderSpinnerItem(folderFromDB);
+                                //bookmarksActivity.updateFolderSpinnerItem(folderFromDB);
                             }
                         }
                         if (bookmark.getFolderId() != null) {
@@ -592,7 +592,7 @@ public class BookmarksFragment extends BaseFragment {
 
                             folderFromDB.setBookmarksCount(folderFromDB.getBookmarksCount() - 1);
                             bookmarkFolderDao.insertOrReplaceInTx(folderFromDB);
-                            bookmarksActivity.updateFolderSpinnerItem(folderFromDB);
+                            //bookmarksActivity.updateFolderSpinnerItem(folderFromDB);
                         }
                         bookmark.setFolder(newBookmark.getFolder());
                         bookmark.setFolderId(newBookmark.getFolderId());
