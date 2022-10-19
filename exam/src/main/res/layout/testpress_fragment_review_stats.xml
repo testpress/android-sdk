@@ -610,22 +610,22 @@
         android:id="@+id/button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/advance_analytics_layout"
+        android:layout_above="@+id/bottom_row"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="15dp"
         android:orientation="horizontal">
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/analytics"
             android:layout_width="0dp"
             android:layout_height="37dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:background="@drawable/testpress_green_stroke"
             android:gravity="center"
-            android:layout_gravity="center_vertical"
             android:text="@string/testpress_analytics"
             android:textColor="@color/testpress_green_light"
             android:textSize="16sp" />
@@ -634,43 +634,18 @@
             android:id="@+id/review"
             android:layout_width="0dp"
             android:layout_height="37dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:background="@drawable/testpress_green_stroke"
             android:drawablePadding="0dp"
             android:gravity="center"
-            android:layout_gravity="center_vertical"
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp"
             android:text="@string/testpress_solutions"
             android:textColor="@color/testpress_green_light"
             android:textSize="16sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/advance_analytics_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/bottom_row"
-        android:gravity="center_horizontal"
-        android:visibility="gone"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="8dp"
-        android:orientation="horizontal" >
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/advance_analytics"
-            android:layout_width="match_parent"
-            android:layout_height="37dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:background="@drawable/testpress_green_stroke"
-            android:text="@string/testpress_advanced_analytics"
-            android:textColor="@color/testpress_green_light"
-            android:textSize="16sp"/>
 
     </LinearLayout>
 
