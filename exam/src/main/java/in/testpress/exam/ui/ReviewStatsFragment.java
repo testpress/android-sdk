@@ -82,6 +82,7 @@ public class ReviewStatsFragment extends BaseFragment {
     private TextView emptyDescView;
     private Button retryButton;
     private TextView analyticsButton;
+    private TextView advanceAnalyticsButton;
     private TextView retakeButton;
     private LinearLayout retakeButtonLayout;
     private LinearLayout timeAnalyticsButtonLayout;
@@ -177,6 +178,7 @@ public class ReviewStatsFragment extends BaseFragment {
         reviewStatLayout = (LinearLayout) view.findViewById(R.id.review_statistics_layout);
         reviewStatLayout.setVisibility(View.GONE);
         analyticsButton = (TextView) view.findViewById(R.id.analytics);
+        advanceAnalyticsButton = (TextView) view.findViewById(R.id.advance_analytics);
         retakeButton = (TextView) view.findViewById(R.id.retake);
         emailPdfButton = (TextView) view.findViewById(R.id.email_mcqs);
         retakeButtonLayout = (LinearLayout) view.findViewById(R.id.retake_button_layout);
@@ -318,6 +320,18 @@ public class ReviewStatsFragment extends BaseFragment {
             analyticsButton.setVisibility(View.VISIBLE);
         } else {
             analyticsButton.setVisibility(View.GONE);
+        }
+
+        if (attempt.isExternalReviewUrlAvailable()){
+            advanceAnalyticsButton.setVisibility(View.VISIBLE);
+            advanceAnalyticsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    getActivity().startActivity(
+                            AdvanceAnalyticsActivity.Companion.createIntent(getActivity(),attempt.getExternalReviewUrl())
+                    );
+                }
+            });
         }
 
         if (Boolean.TRUE.equals(exam.getAllowPdf())) {
