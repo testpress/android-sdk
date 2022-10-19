@@ -7,6 +7,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.webkit.WebViewClient
 
+private const val EXTERNAL_REVIEW_URL = "externalReviewUrl"
+
 
 class AdvanceAnalyticsActivity : BaseToolBarActivity() {
 
@@ -15,7 +17,7 @@ class AdvanceAnalyticsActivity : BaseToolBarActivity() {
     companion object {
         fun createIntent(activity: Activity, externalReviewUrl: String): Intent {
             val intent = Intent(activity, AdvanceAnalyticsActivity::class.java)
-            intent.putExtra("externalReviewUrl", externalReviewUrl)
+            intent.putExtra(EXTERNAL_REVIEW_URL, externalReviewUrl)
             return intent
         }
     }
@@ -24,7 +26,7 @@ class AdvanceAnalyticsActivity : BaseToolBarActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.testpress_activity_advance_analytics)
 
-        val externalReviewUrl = intent.getStringExtra("externalReviewUrl").toString()
+        val externalReviewUrl = intent.getStringExtra(EXTERNAL_REVIEW_URL).toString()
 
         webView = findViewById(R.id.external_url_web_view)
 
