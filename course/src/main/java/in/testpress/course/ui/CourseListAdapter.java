@@ -13,6 +13,7 @@ import java.util.List;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
+import in.testpress.ui.WebViewActivity;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.util.ImageUtils;
