@@ -37,6 +37,7 @@ import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseFragment;
+import in.testpress.ui.WebViewActivity;
 import in.testpress.util.StringUtils;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
@@ -329,9 +330,10 @@ public class ReviewStatsFragment extends BaseFragment {
             advanceAnalyticsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    getActivity().startActivity(
-                            AdvanceAnalyticsActivity.Companion.createIntent(getActivity(),attempt.getExternalReviewUrl())
-                    );
+                    Intent intent = new Intent(requireContext(), WebViewActivity.class);
+                    intent.putExtra("URL", attempt.getExternalReviewUrl());
+                    intent.putExtra("TITLE", getText(R.string.testpress_advanced_analytics));
+                    requireActivity().startActivity(intent);
                 }
             });
         }
