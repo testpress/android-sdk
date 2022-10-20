@@ -1,4 +1,4 @@
-package in.testpress.exam.ui;
+package in.testpress.ui;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -35,7 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-import in.testpress.exam.R;
+import in.testpress.R;
 import in.testpress.ui.BaseToolBarActivity;
 
 public class WebViewActivity extends BaseToolBarActivity {

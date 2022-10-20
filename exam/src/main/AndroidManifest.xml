@@ -68,11 +68,6 @@
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
-        <activity
-            android:name=".ui.WebViewActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="Web View" />
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

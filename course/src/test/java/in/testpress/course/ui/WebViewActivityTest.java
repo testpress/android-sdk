@@ -10,7 +10,7 @@ import android.webkit.CookieManager;
 
 import junit.framework.Assert;
 
-import in.testpress.exam.ui.WebViewActivity;
+import in.testpress.ui.WebViewActivity;
 
 
 @RunWith(RobolectricTestRunner.class)
