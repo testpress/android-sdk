@@ -51,6 +51,7 @@
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
+
         <activity android:name=".ui.AttemptsActivity"
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />

@@ -48,6 +48,7 @@ public class Attempt implements android.os.Parcelable {
     private Integer accuracy;
     private String percentage;
     private Integer lastViewedQuestionId;
+    private String externalReviewUrl;
 
     /** Used to resolve relations */
     @Generated
@@ -77,7 +78,7 @@ public class Attempt implements android.os.Parcelable {
     }
 
     @Generated
-    public Attempt(String url, Long id, String date, Integer totalQuestions, String score, String rank, String maxRank, String reviewUrl, String questionsUrl, Integer correctCount, Integer incorrectCount, String lastStartedTime, String remainingTime, String timeTaken, String state, String percentile, Integer speed, Integer accuracy, String percentage, Integer lastViewedQuestionId) {
+    public Attempt(String url, Long id, String date, Integer totalQuestions, String score, String rank, String maxRank, String reviewUrl, String questionsUrl, Integer correctCount, Integer incorrectCount, String lastStartedTime, String remainingTime, String timeTaken, String state, String percentile, Integer speed, Integer accuracy, String percentage, Integer lastViewedQuestionId, String externalReviewUrl) {
         this.url = url;
         this.id = id;
         this.date = date;
@@ -98,6 +99,7 @@ public class Attempt implements android.os.Parcelable {
         this.accuracy = accuracy;
         this.percentage = percentage;
         this.lastViewedQuestionId = lastViewedQuestionId;
+        this.externalReviewUrl = externalReviewUrl;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -267,6 +269,14 @@ public class Attempt implements android.os.Parcelable {
         this.lastViewedQuestionId = lastViewedQuestionId;
     }
 
+    public String getExternalReviewUrl() {
+        return externalReviewUrl;
+    }
+
+    public void setExternalReviewUrl(String externalReviewUrl) {
+        this.externalReviewUrl = externalReviewUrl;
+    }
+
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
     @Generated
     public List<AttemptSection> getSections() {
@@ -373,6 +383,7 @@ public class Attempt implements android.os.Parcelable {
         percentage = in.readString();
         sections = in.createTypedArrayList(AttemptSection.CREATOR);
         lastViewedQuestionId = in.readInt();
+        externalReviewUrl = in.readString();
     }
 
     @Override
@@ -433,6 +444,7 @@ public class Attempt implements android.os.Parcelable {
         } else {
             dest.writeInt(0);
         }
+        dest.writeString(externalReviewUrl);
 
     }
 
@@ -591,6 +603,10 @@ public class Attempt implements android.os.Parcelable {
     public boolean isAllSectionsCompleted() {
         return (getCurrentSectionPosition() == sections.size() - 1) &&
                 (sections.get(getCurrentSectionPosition()).getState().equals(COMPLETED));
+    }
+
+    public boolean isExternalReviewUrlAvailable(){
+        return getExternalReviewUrl() != null && !getExternalReviewUrl().equals("");
     }
     // KEEP METHODS END
 
