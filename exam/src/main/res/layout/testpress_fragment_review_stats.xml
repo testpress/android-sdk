@@ -610,7 +610,7 @@
         android:id="@+id/button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/advance_analytics_layout"
+        android:layout_above="@+id/advanced_analytics_layout"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="8dp"
@@ -648,7 +648,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/advance_analytics_layout"
+        android:id="@+id/advanced_analytics_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/bottom_row"
@@ -660,7 +660,7 @@
         android:orientation="horizontal" >
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/advance_analytics"
+            android:id="@+id/advanced_analytics"
             android:layout_width="match_parent"
             android:layout_height="37dp"
             android:layout_marginLeft="8dp"

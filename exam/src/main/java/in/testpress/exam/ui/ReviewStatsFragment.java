@@ -83,8 +83,8 @@ public class ReviewStatsFragment extends BaseFragment {
     private TextView emptyDescView;
     private Button retryButton;
     private TextView analyticsButton;
-    private TextView advanceAnalyticsButton;
-    private LinearLayout advanceAnalyticsLayout;
+    private TextView advancedAnalyticsButton;
+    private LinearLayout advancedAnalyticsLayout;
     private TextView retakeButton;
     private LinearLayout retakeButtonLayout;
     private LinearLayout timeAnalyticsButtonLayout;
@@ -180,8 +180,8 @@ public class ReviewStatsFragment extends BaseFragment {
         reviewStatLayout = (LinearLayout) view.findViewById(R.id.review_statistics_layout);
         reviewStatLayout.setVisibility(View.GONE);
         analyticsButton = (TextView) view.findViewById(R.id.analytics);
-        advanceAnalyticsButton = (TextView) view.findViewById(R.id.advance_analytics);
-        advanceAnalyticsLayout = (LinearLayout) view.findViewById(R.id.advance_analytics_layout);
+        advancedAnalyticsButton = (TextView) view.findViewById(R.id.advanced_analytics);
+        advancedAnalyticsLayout = (LinearLayout) view.findViewById(R.id.advanced_analytics_layout);
         retakeButton = (TextView) view.findViewById(R.id.retake);
         emailPdfButton = (TextView) view.findViewById(R.id.email_mcqs);
         retakeButtonLayout = (LinearLayout) view.findViewById(R.id.retake_button_layout);
@@ -326,8 +326,8 @@ public class ReviewStatsFragment extends BaseFragment {
         }
 
         if (attempt.isExternalReviewUrlAvailable()){
-            advanceAnalyticsLayout.setVisibility(View.VISIBLE);
-            advanceAnalyticsButton.setOnClickListener(new View.OnClickListener() {
+            advancedAnalyticsLayout.setVisibility(View.VISIBLE);
+            advancedAnalyticsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(requireContext(), WebViewActivity.class);
