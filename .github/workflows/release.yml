@@ -47,7 +47,9 @@ jobs:
           wget https://media.testpress.in/static/android/zoom_sdk.zip
           unzip -o ./zoom_sdk.zip
 
-      - name: Build and deploy app
-        run: |
-          ./gradlew clean build -x test
-          ./gradlew publishToMavenLocal
+      - name: Generate Build
+        run: ./gradlew clean build -x test
+          
+      - name: Release
+        if: ${{ github.ref == 'refs/heads/master' }}    
+        run: ./gradlew publish
