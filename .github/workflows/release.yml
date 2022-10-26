@@ -1,6 +1,6 @@
 name: Release packages
 
-on: 
+on:
   workflow_dispatch:
 
 jobs:
@@ -50,7 +50,7 @@ jobs:
 
       - name: Generate Build
         run: ./gradlew clean build -x test
-          
+
       - name: Release
-        if: ${{ github.ref == 'refs/heads/master' }}    
+        if: ${{ github.ref == 'refs/heads/master' }}
         run: ./gradlew publish
