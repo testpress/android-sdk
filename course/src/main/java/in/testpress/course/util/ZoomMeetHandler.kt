@@ -89,6 +89,10 @@ class ZoomMeetHandler(
         }
     }
 
+    override fun onMeetingParameterNotification(p0: MeetingParameter?) {
+
+    }
+
     override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
         if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
             Toast.makeText(
@@ -174,8 +178,8 @@ class ZoomMeetHandler(
     override fun onActiveSpeakerVideoUserChanged(p0: Long) {
     }
 
-    override fun onVideoOrderUpdated(p0: MutableList<Long>?) {
-        
+    override fun onHostVideoOrderUpdated(p0: MutableList<Long>?) {
+
     }
 
     override fun onFollowHostVideoOrderChanged(p0: Boolean) {
@@ -213,8 +217,8 @@ class ZoomMeetHandler(
          
     }
 
-    override fun onClosedCaptionReceived(p0: String?) {
-         
+    override fun onClosedCaptionReceived(p0: String?, p1: Long) {
+
     }
 
     override fun onFreeMeetingNeedToUpgrade(p0: FreeMeetingNeedUpgradeType?, p1: String?) {
