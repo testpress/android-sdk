@@ -94,6 +94,7 @@ class ZoomMeetHandler(
     }
 
     override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
+        Toast.makeText(context,zoomSDK.getVersion(context),Toast.LENGTH_SHORT).show()
         if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
             Toast.makeText(
                 context,
