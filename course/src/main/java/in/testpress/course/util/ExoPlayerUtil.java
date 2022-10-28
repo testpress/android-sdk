@@ -293,7 +293,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             progressBar.setVisibility(View.VISIBLE);
             buildPlayer();
             initializeDoubleClickOverlay();
-            initializeAudioManager();
         }
         preparePlayer();
         player.seekTo(getStartPositionInMilliSeconds());
@@ -364,30 +363,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                         youtubeOverlay.setVisibility(View.GONE);
                     }
                 });
-    }
-
-
-    private void initializeAudioManager() {
-        audioManager = (AudioManager) activity.getSystemService(AUDIO_SERVICE);
-        initAudioFocusChangeListener();
-        audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-    }
-
-    private void initAudioFocusChangeListener() {
-        audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
-            public void onAudioFocusChange(int focusChange) {
-                switch (focusChange) {
-                    case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT):
-                        player.pause();
-                        break;
-                    case (AudioManager.AUDIOFOCUS_LOSS) :
-                        player.pause();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        };
     }
 
     private void preparePlayer() {
@@ -748,7 +723,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
             if (usbConnectionStateReceiver != null && !isScreenCasted() &&
                     CommonUtils.isUsbConnected(activity)) {
-                
+
                 displayError(R.string.testpress_usb_connected);
             } else {
                 hideError(R.string.testpress_usb_connected);
