@@ -9,21 +9,27 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.0.4'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath 'com.google.gms:google-services:3.2.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
+
 }
 
 allprojects {
+
     repositories {
         google()
-        jcenter()
+        jcenter() {
+            content {
+                includeModule("com.google.android", "flexbox")
+                includeModule("com.theartofdev.edmodo", "android-image-cropper")
+            }
+        }
         mavenCentral()
         maven { url "https://jitpack.io" }
-        maven { url "https://phonepe.mycloudrepo.io/public/repositories/phonepe-intentsdk-android" }
+        maven {url "https://phonepe.mycloudrepo.io/public/repositories/phonepe-intentsdk-android"}
     }
 }
 
