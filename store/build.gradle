@@ -30,7 +30,7 @@ dependencies {
 
     api 'in.payu:payu-checkout-pro:1.8.0'
     api 'in.payu:payu-gpay:1.4.0'
-    api 'in.payu:phonepe-intent:1.6.1'
+    implementation 'in.payu:phonepe-intent:1.6.1'
 
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
