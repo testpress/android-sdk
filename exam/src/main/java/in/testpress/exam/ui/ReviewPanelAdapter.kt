@@ -1,6 +1,7 @@
 package `in`.testpress.exam.ui
 
 import `in`.testpress.exam.R
+import `in`.testpress.exam.databinding.ReviewPanelItemLayoutBinding
 import `in`.testpress.models.greendao.ReviewItem
 import android.content.Context
 import android.graphics.PorterDuff
@@ -11,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.review_panel_item_layout.view.*
 
 class ReviewPanelAdapter(var questions: List<ReviewItem>, val listener: ListItemClickListener): RecyclerView.Adapter<ReviewPanelAdapter.ViewHolder>() {
 
@@ -64,7 +64,8 @@ class ReviewPanelAdapter(var questions: List<ReviewItem>, val listener: ListItem
     override fun getItemCount(): Int = questions.size
 
     inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-        val questionIndex: TextView = view.question_index_all
+        private val binding = ReviewPanelItemLayoutBinding.bind(view)
+        val questionIndex: TextView = binding.questionIndexAll
     }
 }
 

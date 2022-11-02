@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
@@ -33,6 +32,10 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
         unitTests.includeAndroidResources = true
+    }
+
+    buildFeatures {
+        viewBinding true
     }
 
     compileOptions {

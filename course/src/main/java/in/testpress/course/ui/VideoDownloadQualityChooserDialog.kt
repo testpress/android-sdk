@@ -1,6 +1,8 @@
 package `in`.testpress.course.ui
 
 import `in`.testpress.course.R
+import `in`.testpress.course.databinding.LayoutDocumentViewerBinding
+import `in`.testpress.course.databinding.VideoDownloadDialogBinding
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.helpers.VideoDownloadRequestCreationHandler
 import `in`.testpress.course.util.ExoPlayerTrackNameProvider
@@ -17,7 +19,6 @@ import com.google.android.exoplayer2.offline.DownloadRequest
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector
 import com.google.android.exoplayer2.ui.TrackSelectionView
-import kotlinx.android.synthetic.main.video_download_dialog.*
 import java.io.IOException
 
 typealias OnSubmitListener = (DownloadRequest) -> Unit
@@ -25,6 +26,9 @@ typealias OnSubmitListener = (DownloadRequest) -> Unit
 class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFragment(),
     TrackSelectionView.TrackSelectionListener,
     VideoDownloadRequestCreationHandler.Listener {
+    private var _binding: VideoDownloadDialogBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var trackSelectionView: TrackSelectionView
     lateinit var overrides: List<DefaultTrackSelector.SelectionOverride>
     private var onSubmitListener: OnSubmitListener? = null
@@ -45,7 +49,8 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.video_download_dialog, container, false)
+        _binding = VideoDownloadDialogBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -65,7 +70,7 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
     }
 
     private fun setOnClickListeners() {
-        okButton.setOnClickListener {
+        binding.okButton.setOnClickListener {
             if (::overrides.isInitialized) {
                 val downloadRequest = videoDownloadRequestCreateHandler.buildDownloadRequest(overrides)
                 onSubmitListener?.invoke(downloadRequest)
@@ -73,13 +78,11 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
             dismiss()
         }
 
-        cancelButton.setOnClickListener { dismiss() }
+        binding.cancelButton.setOnClickListener { dismiss() }
     }
 
     private fun showLoading() {
-        if (loadingProgress != null) {
-            loadingProgress.visibility = View.VISIBLE
-        }
+        binding.loadingProgress.visibility = View.VISIBLE
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -101,19 +104,17 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
 
     override fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException) {
         hideLoading()
-        errorText.visibility = View.VISIBLE
+        binding.errorText.visibility = View.VISIBLE
         dialog?.setTitle(null)
-        cancelButton.visibility = View.GONE
-        okButton.setOnClickListener {
+        binding.cancelButton.visibility = View.GONE
+        binding.okButton.setOnClickListener {
             dismiss()
         }
         Log.d("VideoDownload", "onDownloadRequestHandlerPrepareError: ${e.localizedMessage}")
     }
 
     private fun hideLoading() {
-        if (loadingProgress != null) {
-            loadingProgress.visibility = View.GONE
-        }
+        binding.loadingProgress.visibility = View.GONE
     }
 
     override fun onTrackSelectionChanged(

@@ -1,6 +1,7 @@
 package `in`.testpress.exam.ui.adapters
 
 import `in`.testpress.exam.R
+import `in`.testpress.exam.databinding.ShareAppItemBinding
 import `in`.testpress.exam.ui.OnShareAppListener
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -10,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.share_app_item.view.*
 
 class ShareToUnlockAdapter(
     val values: List<ResolveInfo>,
@@ -48,7 +48,8 @@ class ShareToUnlockAdapter(
     override fun getItemCount(): Int = values.size
 
     inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-        val titleView: TextView = view.title
-        val iconView: ImageView = view.icon
+        private val binding = ShareAppItemBinding.bind(view)
+        val titleView: TextView = binding.title
+        val iconView: ImageView = binding.icon
     }
 }
