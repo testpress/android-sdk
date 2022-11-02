@@ -26,9 +26,6 @@ import java.io.IOException
 
 import com.google.android.exoplayer2.source.TrackGroupArray
 
-
-
-
 class VideoDownloadRequestCreationHandler(
     val context: Context,
     val content: DomainContent
