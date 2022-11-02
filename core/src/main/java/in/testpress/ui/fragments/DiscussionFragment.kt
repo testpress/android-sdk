@@ -1,6 +1,7 @@
 package `in`.testpress.ui.fragments
 
 import `in`.testpress.R
+import `in`.testpress.databinding.DiscussionListBinding
 import `in`.testpress.ui.*
 import android.os.Bundle
 import android.view.*
@@ -16,12 +17,14 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.android.synthetic.main.discussion_list.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
 open class DiscussionFragment: Fragment(), DiscussionFilterListener {
+    private var _binding: DiscussionListBinding? = null
+    private val binding get() = _binding!!
+
     open val adapter = DiscussionsAdapter() { forum ->
     }
     lateinit var slidingPaneLayout: SlidingPaneLayout
@@ -45,8 +48,18 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.discussion_list, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = DiscussionListBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -99,11 +112,11 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
     }
 
     private fun setupViews() {
-        discussions.adapter = adapter.withLoadStateHeaderAndFooter(
+        binding.discussions.adapter = adapter.withLoadStateHeaderAndFooter(
                 header = DiscussionsLoadingStateAdapter(adapter, requireContext()),
                 footer = DiscussionsLoadingStateAdapter(adapter, requireContext())
         )
-        discussions.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        binding.discussions.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         initializeFilterFragment()
     }
 

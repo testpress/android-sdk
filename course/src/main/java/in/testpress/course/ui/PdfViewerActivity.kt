@@ -1,6 +1,7 @@
 package `in`.testpress.course.ui
 
 import `in`.testpress.course.R
+import `in`.testpress.course.databinding.LayoutPdfViewerBinding
 import `in`.testpress.course.util.PDFViewer
 import `in`.testpress.course.util.DisplayPDFListener
 import `in`.testpress.course.util.PDFDownloadManager
@@ -9,14 +10,9 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.layout_pdf_viewer.*
-import kotlinx.android.synthetic.main.layout_pdf_viewer.downloadProgress
-import kotlinx.android.synthetic.main.layout_pdf_viewer.emptyContainer
-import kotlinx.android.synthetic.main.layout_pdf_viewer.pdfView
-import kotlinx.android.synthetic.main.layout_pdf_viewer.progressPercentage
 
 class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFListener {
-
+    private lateinit var binding: LayoutPdfViewerBinding
     private lateinit var pdfDownloadManager: PDFDownloadManager
 
     private var pageNumber = 0
@@ -30,7 +26,8 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         disableScreenShot()
-        setContentView(R.layout.layout_pdf_viewer)
+        binding = LayoutPdfViewerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         hideStatusBar()
         getDataFromBundle()
         pdfDownloadManager = PDFDownloadManager(this,this,fileName)
@@ -69,11 +66,11 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
     }
 
     private fun displayPDF() {
-        encryptionProgressbar.visibility = View.VISIBLE
+        binding.encryptionProgressbar.visibility = View.VISIBLE
         PDFViewer(this,displayPDFListener = this).display(
                 pageNumber = pageNumber,
                 file = pdfDownloadManager.get(),
-                pdfView = pdfView
+                pdfView = binding.pdfView
         )
     }
 
@@ -83,15 +80,13 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
     }
 
     override fun downloadProgress(progress: Int) {
-        if (progressPercentage != null) {
-            showDownloadProgress(progress)
-        }
+        showDownloadProgress(progress)
     }
 
     override fun onSingleTapOnPDF() {}
 
     override fun onPDFLoaded() {
-        encryptionProgressbar.visibility = View.GONE
+        binding.encryptionProgressbar.visibility = View.GONE
     }
 
     override fun onError() {
@@ -103,21 +98,21 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
     }
 
     private fun showDownloadProgress(progress: Int) {
-        downloadProgress.visibility = View.VISIBLE
-        progressPercentage.visibility = View.VISIBLE
-        downloadProgress.progress = progress
-        progressPercentage.text = "$progress%"
+        binding.downloadProgress.visibility = View.VISIBLE
+        binding.progressPercentage.visibility = View.VISIBLE
+        binding.downloadProgress.progress = progress
+        binding.progressPercentage.text = "$progress%"
     }
 
     private fun hideDownloadProgress() {
-        downloadProgress.visibility = View.GONE
-        progressPercentage.visibility = View.GONE
+        binding.downloadProgress.visibility = View.GONE
+        binding.progressPercentage.visibility = View.GONE
     }
 
     private fun showErrorView() {
-        encryptionProgressbar.visibility = View.GONE
-        pdfView.visibility = View.GONE
-        emptyContainer.visibility = View.VISIBLE
+        binding.encryptionProgressbar.visibility = View.GONE
+        binding.pdfView.visibility = View.GONE
+        binding.emptyContainer.visibility = View.VISIBLE
     }
 
     override fun onDestroy() {

@@ -4,6 +4,8 @@ import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
+import `in`.testpress.course.databinding.LayoutPdfViewerBinding
+import `in`.testpress.databinding.TestpressContainerLayoutBinding
 import `in`.testpress.ui.WebViewActivity
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
@@ -15,16 +17,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.content_detail_activity.*
 import java.io.IOException
 
 class WebViewWithSSO: AppCompatActivity(), EmptyViewListener {
+    private lateinit var binding: TestpressContainerLayoutBinding
     lateinit var emptyViewFragment: EmptyViewFragment
     val instituteSettings: InstituteSettings? = TestpressSdk.getTestpressSession(this)?.instituteSettings;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.testpress_container_layout)
+        binding = TestpressContainerLayoutBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         initializeEmptyViewFragment()
         showLoading()
         fetchSsoLink()
@@ -67,13 +70,13 @@ class WebViewWithSSO: AppCompatActivity(), EmptyViewListener {
     }
 
     private fun showLoading() {
-        pb_loading.visibility = View.VISIBLE
-        fragment_container.visibility = View.GONE
+        binding.pbLoading.visibility = View.VISIBLE
+        binding.fragmentContainer.visibility = View.GONE
     }
 
     private fun hideLoading() {
-        pb_loading.visibility = View.GONE
-        fragment_container.visibility = View.VISIBLE
+        binding.pbLoading.visibility = View.GONE
+        binding.fragmentContainer.visibility = View.VISIBLE
     }
 
     private fun showErrorView(exception: java.lang.Exception?) {
