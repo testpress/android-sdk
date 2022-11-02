@@ -24,6 +24,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
 
+import com.google.android.exoplayer2.source.TrackGroupArray
+
 class VideoDownloadRequestCreationHandler(
     val context: Context,
     val content: DomainContent
@@ -119,13 +121,13 @@ class VideoDownloadRequestCreationHandler(
         val mappedTrackInfo = downloadHelper.getMappedTrackInfo(0)
         for (index in 0 until downloadHelper.periodCount) {
             downloadHelper.clearTrackSelections(index)
-            val rendererIndex = ExoPlayerUtil.getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
-            downloadHelper.addTrackSelectionForSingleRenderer(
-                index,
-                rendererIndex,
-                DownloadHelper.DEFAULT_TRACK_SELECTOR_PARAMETERS_WITHOUT_CONTEXT,
-                overrides
-            )
+            var builder = DownloadHelper.DEFAULT_TRACK_SELECTOR_PARAMETERS_WITHOUT_CONTEXT.buildUpon()
+            val videoRendererIndex = ExoPlayerUtil.getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
+            val trackGroupArray: TrackGroupArray = mappedTrackInfo.getTrackGroups(videoRendererIndex)
+            for (i in overrides.indices) {
+                builder.setSelectionOverride(videoRendererIndex, trackGroupArray, overrides[i])
+                downloadHelper.addTrackSelection(index, builder.build())
+            }
         }
     }
 
