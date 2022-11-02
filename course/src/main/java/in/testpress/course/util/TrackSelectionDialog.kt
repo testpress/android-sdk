@@ -1,6 +1,8 @@
 package `in`.testpress.course.util
 
 import `in`.testpress.course.R
+import `in`.testpress.course.databinding.LayoutDocumentViewerBinding
+import `in`.testpress.course.databinding.TrackSelectionDialogBinding
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
@@ -13,14 +15,14 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector
 import com.google.android.exoplayer2.ui.TrackSelectionView
-import kotlinx.android.synthetic.main.track_selection_dialog.*
 
 open class TrackSelectionDialog(
     private val parameters: DefaultTrackSelector.Parameters,
     open val mappedTrackInfo: MappingTrackSelector.MappedTrackInfo
 ) : DialogFragment(),
     TrackSelectionView.TrackSelectionListener {
-
+    private var _binding: TrackSelectionDialogBinding? = null
+    private val binding get() = _binding!!
     private lateinit var trackSelectionView: TrackSelectionView
     private var allowAdaptiveSelections = false
     private val rendererIndex = ExoPlayerUtil.getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
@@ -43,7 +45,14 @@ open class TrackSelectionDialog(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.track_selection_dialog, container, false)
+        _binding = TrackSelectionDialogBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,12 +77,12 @@ open class TrackSelectionDialog(
     }
 
     private fun setOnClickListeners() {
-        okButton.setOnClickListener {
+        binding.okButton.setOnClickListener {
             onClickListener?.onClick(dialog, DialogInterface.BUTTON_POSITIVE)
             dismiss()
         }
 
-        cancelButton.setOnClickListener { dismiss() }
+        binding.cancelButton.setOnClickListener { dismiss() }
     }
 
     fun setAllowAdaptiveSelections(allow: Boolean) {
