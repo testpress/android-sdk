@@ -35,14 +35,13 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.github.vkay94.dtpv.DoubleTapPlayerView;
 import com.github.vkay94.dtpv.youtube.YouTubeOverlay;
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.DefaultControlDispatcher;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
 import com.google.android.exoplayer2.drm.DrmSession;
 import com.google.android.exoplayer2.drm.DrmSessionManager;
@@ -98,6 +97,7 @@ import org.greenrobot.greendao.annotation.NotNull;
 public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerProvider {
 
     private static final int OVERLAY_POSITION_CHANGE_INTERVAL = 15000; // 15s
+    private static final int SEEK_TIME_IN_MILLISECOND = 15000; //15s
 
     private FrameLayout exoPlayerMainFrame;
     private View exoPlayerLayout;
@@ -107,7 +107,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private LinearLayout emailIdLayout;
     private TextView emailIdTextView;
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    public SimpleExoPlayer player;
+    public ExoPlayer player;
     private ImageView fullscreenIcon;
     private Dialog fullscreenDialog;
     private TrackSelectionDialog trackSelectionDialog;
@@ -203,12 +203,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             initScreenRecordTrackers();
         }
         setSpeedRate(1);
-        playerView.setPlaybackPreparer(new PlaybackPreparer() {
-            @Override
-            public void preparePlayback() {
-                initializePlayer();
-            }
-        });
 
         ExoTrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory();
         trackSelector =  new DefaultTrackSelector(activity, videoTrackSelectionFactory);
@@ -299,7 +293,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             progressBar.setVisibility(View.VISIBLE);
             buildPlayer();
             initializeDoubleClickOverlay();
-            initializeAudioManager();
         }
         preparePlayer();
         player.seekTo(getStartPositionInMilliSeconds());
@@ -315,12 +308,15 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             mediaSourceFactory.setDrmSessionManagerProvider(this);
         }
 
-        player = new SimpleExoPlayer.Builder(activity, new DefaultRenderersFactory(activity))
+        player = new ExoPlayer.Builder(activity, new DefaultRenderersFactory(activity))
                 .setMediaSourceFactory(mediaSourceFactory)
+                .setSeekForwardIncrementMs(SEEK_TIME_IN_MILLISECOND)
+                .setSeekBackIncrementMs(SEEK_TIME_IN_MILLISECOND)
                 .setTrackSelector(trackSelector).build();
 
         player.addListener(new PlayerEventListener());
         player.addAnalyticsListener(new ExoplayerAnalyticsListener(this));
+        player.setAudioAttributes(AudioAttributes.DEFAULT,true);
         playerView.setPlayer(player);
         player.setPlayWhenReady(playWhenReady);
         player.setPlaybackParameters(new PlaybackParameters(speedRate));
@@ -369,30 +365,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 });
     }
 
-
-    private void initializeAudioManager() {
-        audioManager = (AudioManager) activity.getSystemService(AUDIO_SERVICE);
-        initAudioFocusChangeListener();
-        audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-    }
-
-    private void initAudioFocusChangeListener() {
-        audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
-            public void onAudioFocusChange(int focusChange) {
-                switch (focusChange) {
-                    case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT):
-                        player.pause();
-                        break;
-                    case (AudioManager.AUDIOFOCUS_LOSS) :
-                        player.pause();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        };
-    }
-
     private void preparePlayer() {
         isPreparing = true;
         player.prepare();
@@ -407,7 +379,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
     private void registerListeners() {
         registerUsbConnectionStateReceiver();
-        addPlayPauseOnClickListener();
     }
 
     private void registerUsbConnectionStateReceiver() {
@@ -417,19 +388,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             mediaRouter.addCallback(mediaRouteSelector, mediaRouterCallback,
                     MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
         }
-    }
-
-    private void addPlayPauseOnClickListener() {
-        playerView.setControlDispatcher(new DefaultControlDispatcher() {
-            @Override
-            public boolean dispatchSetPlayWhenReady(Player player, boolean playWhenReady) {
-                if (playWhenReady) {
-                    audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-                }
-                updateVideoAttempt();
-                return super.dispatchSetPlayWhenReady(player, playWhenReady);
-            }
-        });
     }
 
     private DialogInterface.OnClickListener trackSelectionListener() {
@@ -749,6 +707,13 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private class PlayerEventListener implements Player.EventListener, DRMLicenseFetchCallback {
+
+        @Override
+        public void onIsPlayingChanged(boolean isPlaying) {
+            updateVideoAttempt();
+            Player.EventListener.super.onIsPlayingChanged(isPlaying);
+        }
+
         @Override
         public void onPlaybackStateChanged(int playbackState) {
             if(isPreparing && playbackState == Player.STATE_READY){
@@ -758,7 +723,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
             if (usbConnectionStateReceiver != null && !isScreenCasted() &&
                     CommonUtils.isUsbConnected(activity)) {
-                
+
                 displayError(R.string.testpress_usb_connected);
             } else {
                 hideError(R.string.testpress_usb_connected);
@@ -784,7 +749,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         }
 
         @Override
-        public void onPlayerError(ExoPlaybackException exception) {
+        public void onPlayerError(PlaybackException exception) {
             Throwable cause = exception.getCause();
 
             if (isDRMException(cause)) {
@@ -801,7 +766,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                     displayError(R.string.license_request_failed);
                 }
             } else {
-                handleError(exception.type == TYPE_SOURCE);
+                handleError(exception.errorCode == TYPE_SOURCE);
             }
         }
 

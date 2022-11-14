@@ -89,6 +89,10 @@ class ZoomMeetHandler(
         }
     }
 
+    override fun onMeetingParameterNotification(p0: MeetingParameter?) {
+
+    }
+
     override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
         if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
             Toast.makeText(
@@ -174,8 +178,8 @@ class ZoomMeetHandler(
     override fun onActiveSpeakerVideoUserChanged(p0: Long) {
     }
 
-    override fun onVideoOrderUpdated(p0: MutableList<Long>?) {
-        
+    override fun onHostVideoOrderUpdated(p0: MutableList<Long>?) {
+
     }
 
     override fun onFollowHostVideoOrderChanged(p0: Boolean) {
@@ -185,8 +189,18 @@ class ZoomMeetHandler(
     override fun onChatMessageReceived(p0: InMeetingChatMessage?) {
     }
 
+    override fun onChatMsgDeleteNotification(p0: String?, p1: ChatMessageDeleteType?) {
+
+    }
+
+
     override fun onUserNetworkQualityChanged(p0: Long) {
     }
+
+    override fun onSinkMeetingVideoQualityChanged(p0: VideoQuality?, p1: Long) {
+
+    }
+
 
     override fun onMeetingUserJoin(p0: MutableList<Long>?) {
     }
@@ -195,12 +209,24 @@ class ZoomMeetHandler(
          
     }
 
-    override fun onLocalRecordingStatus(p0: InMeetingServiceListener.RecordingStatus?) {
-        
+    override fun onLocalRecordingStatus(p0: Long, p1: InMeetingServiceListener.RecordingStatus?) {
+
     }
 
     override fun onInvalidReclaimHostkey() {
         
+    }
+
+    override fun onPermissionRequested(p0: Array<out String>?) {
+
+    }
+
+    override fun onAllHandsLowered() {
+
+    }
+
+    override fun onLocalVideoOrderUpdated(p0: MutableList<Long>?) {
+
     }
 
     override fun onMeetingUserLeave(p0: MutableList<Long>?) {
@@ -213,8 +239,8 @@ class ZoomMeetHandler(
          
     }
 
-    override fun onClosedCaptionReceived(p0: String?) {
-         
+    override fun onClosedCaptionReceived(p0: String?, p1: Long) {
+
     }
 
     override fun onFreeMeetingNeedToUpgrade(p0: FreeMeetingNeedUpgradeType?, p1: String?) {
@@ -241,6 +267,10 @@ class ZoomMeetHandler(
     override fun onMeetingCoHostChanged(p0: Long) {
     }
 
+    override fun onMeetingCoHostChange(p0: Long, p1: Boolean) {
+
+    }
+
     override fun onLowOrRaiseHandStatusChanged(p0: Long, p1: Boolean) {
     }
 
@@ -259,9 +289,18 @@ class ZoomMeetHandler(
     override fun onSinkAllowAttendeeChatNotification(p0: Int) {
     }
 
+    override fun onSinkPanelistChatPrivilegeChanged(p0: InMeetingChatController.MobileRTCWebinarPanelistChatPrivilege?) {
+
+    }
+
 
     override fun onSpotlightVideoChanged(p0: Boolean) {
     }
+
+    override fun onSpotlightVideoChanged(p0: MutableList<Long>?) {
+
+    }
+
 
     override fun onMeetingHostChanged(p0: Long) {
     }
@@ -277,6 +316,10 @@ class ZoomMeetHandler(
     }
 
     override fun onUserNameChanged(p0: Long, p1: String?) {
+    }
+
+    override fun onUserNamesChanged(p0: MutableList<Long>?) {
+
     }
 
     override fun onMeetingNeedPasswordOrDisplayName(
