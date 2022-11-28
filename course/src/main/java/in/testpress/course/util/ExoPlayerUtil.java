@@ -574,7 +574,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             exoPlayerMainFrame.removeView(exoPlayerLayout);
             fullscreenDialog.addContentView(exoPlayerLayout, new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
+            fullscreenDialog.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
             fullscreenDialog.getWindow().addFlags(FLAG_SECURE);
             setFullscreenIcon(R.drawable.testpress_fullscreen_exit);
             fullscreen = true;
