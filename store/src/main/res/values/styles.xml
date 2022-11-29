@@ -12,4 +12,6 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <color name="testpress_black_light">#50000000</color>
+
 </resources>
