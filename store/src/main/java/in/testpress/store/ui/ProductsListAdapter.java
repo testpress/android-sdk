@@ -58,7 +58,7 @@ public class ProductsListAdapter extends SingleTypeAdapter<Product> {
         setText(4, categories.substring(1, categories.length() - 1));
         if (item.getImages().size() > 0) {
             ImageView imageView = view(5);
-            mImageLoader.displayImage(item.getImages().get(0).getOriginal(), imageView, mOptions);
+            mImageLoader.displayImage(item.getImages().get(0).getMedium(), imageView, mOptions);
         }
     }
 }
