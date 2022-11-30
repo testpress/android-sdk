@@ -15,7 +15,7 @@
     <include layout="@layout/testpress_empty_view" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:visibility="gone"
+        android:visibility="visible"
         android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

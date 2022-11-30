@@ -19,7 +19,7 @@
 
     <dimen name="testpress_button_left_drawable_padding">5dip</dimen>
 
-    <dimen name="testpress_collapsing_app_bar_height">300dp</dimen>
+    <dimen name="testpress_collapsing_app_bar_height">225dp</dimen>
 
     <dimen name="testpress_horizontal_margin">10dp</dimen>
     <dimen name="testpress_vertical_margin">10dp</dimen>

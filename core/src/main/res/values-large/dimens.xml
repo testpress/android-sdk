@@ -4,6 +4,6 @@
 
     <dimen name="testpress_text_size_normal">16sp</dimen>
 
-    <dimen name="testpress_collapsing_app_bar_height">500dp</dimen>
+    <dimen name="testpress_collapsing_app_bar_height">495dp</dimen>
 
 </resources>
