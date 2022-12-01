@@ -16,7 +16,7 @@
         android:layout_height="90dp"
         android:layout_marginRight="10dp"
         android:background="@color/testpress_black_light"
-        android:scaleType="fitCenter"/>
+        android:scaleType="fitCenter" />
 
     <LinearLayout
         android:orientation="vertical"
