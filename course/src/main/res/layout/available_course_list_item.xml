@@ -3,7 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:id="@+id/product_item_layout"
     android:paddingLeft="20dp"
@@ -11,20 +10,13 @@
     android:paddingBottom="20dp"
     android:paddingTop="20dp" >
 
-    <androidx.cardview.widget.CardView
+    <ImageView
+        android:id="@+id/thumbnail_image"
         android:layout_width="160dp"
         android:layout_height="90dp"
-        app:cardCornerRadius="12dp"
-        android:layout_marginRight="10dp">
-
-        <ImageView
-            android:id="@+id/thumbnail_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/testpress_black_light"
-            android:scaleType="fitCenter" />
-
-    </androidx.cardview.widget.CardView>
+        android:layout_marginRight="10dp"
+        android:background="@color/testpress_black_light"
+        android:scaleType="fitCenter" />
 
     <LinearLayout
         android:orientation="vertical"
