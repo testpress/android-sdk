@@ -25,6 +25,7 @@ import in.testpress.core.TestpressSDKDatabase;
 public class Product {
 
     @Id
+    private Long order;
     private Long id;
     private String title;
     private String slug;
@@ -51,12 +52,13 @@ public class Product {
     public Product() {
     }
 
-    public Product(Long id) {
-        this.id = id;
+    public Product(Long order) {
+        this.order = order;
     }
 
     @Generated
-    public Product(Long id, String title, String slug, String descriptionHtml, String image, String startDate, String endDate, String buyNowText, String surl, String furl, String currentPrice, IntegerList prices, IntegerList courseIds) {
+    public Product(Long order, Long id, String title, String slug, String descriptionHtml, String image, String startDate, String endDate, String buyNowText, String surl, String furl, String currentPrice, IntegerList prices, IntegerList courseIds) {
+        this.order = order;
         this.id = id;
         this.title = title;
         this.slug = slug;
@@ -70,6 +72,14 @@ public class Product {
         this.currentPrice = currentPrice;
         this.prices = prices;
         this.courseIds = courseIds;
+    }
+
+    public Long getOrder() {
+        return order;
+    }
+
+    public void setOrder(Long order) {
+        this.order = order;
     }
 
     public Long getId() {
