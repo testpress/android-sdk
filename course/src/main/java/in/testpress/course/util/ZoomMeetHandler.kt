@@ -39,7 +39,10 @@ class ZoomMeetHandler(
     }
 
     fun goToMeet(onInitializeCallback: VideoConferenceInitializeListener) {
-        if (!zoomSDK.isInitialized) {
+        if (zoomSDK.isInitialized) {
+            onInitializeCallback.onSuccess()
+            joinMeeting()
+        } else {
             init(object: VideoConferenceInitializeListener {
                 override fun onSuccess() {
                     onInitializeCallback.onSuccess()
@@ -52,7 +55,6 @@ class ZoomMeetHandler(
             })
         }
 
-        joinMeeting()
     }
 
     private fun joinMeeting() {
