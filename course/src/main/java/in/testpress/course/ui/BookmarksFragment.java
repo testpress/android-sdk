@@ -89,6 +89,7 @@ public class BookmarksFragment extends BaseFragment {
     private TextView difficultyPercentageText;
     private Bookmark bookmark;
     private in.testpress.course.ui.BookmarksActivity bookmarksActivity;
+    private BookmarkDetailActivity bookmarkDetailActivity;
     private FullScreenChromeClient fullScreenChromeClient;
     private TestpressExamApiClient apiClient;
     ImageUtils imagePickerUtils;
@@ -258,7 +259,7 @@ public class BookmarksFragment extends BaseFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        bookmarksActivity = (BookmarksActivity) getActivity();
+        bookmarkDetailActivity = (BookmarkDetailActivity) getActivity();
     }
 
     void updateContentObject() {
@@ -581,7 +582,7 @@ public class BookmarksFragment extends BaseFragment {
                                 BookmarkFolder folderFromDB = folders.get(0);
                                 folderFromDB.setBookmarksCount(folderFromDB.getBookmarksCount() + 1);
                                 bookmarkFolderDao.insertOrReplaceInTx(folderFromDB);
-                                bookmarksActivity.updateFolderSpinnerItem(folderFromDB);
+                                //bookmarksActivity.updateFolderSpinnerItem(folderFromDB);
                             }
                         }
                         if (bookmark.getFolderId() != null) {
@@ -591,7 +592,7 @@ public class BookmarksFragment extends BaseFragment {
 
                             folderFromDB.setBookmarksCount(folderFromDB.getBookmarksCount() - 1);
                             bookmarkFolderDao.insertOrReplaceInTx(folderFromDB);
-                            bookmarksActivity.updateFolderSpinnerItem(folderFromDB);
+                            //bookmarksActivity.updateFolderSpinnerItem(folderFromDB);
                         }
                         bookmark.setFolder(newBookmark.getFolder());
                         bookmark.setFolderId(newBookmark.getFolderId());
@@ -601,7 +602,7 @@ public class BookmarksFragment extends BaseFragment {
                         Snackbar.make(rootLayout, R.string.testpress_bookmark_moved,
                                 Snackbar.LENGTH_SHORT).show();
 
-                        bookmarksActivity.updateItems(true);
+                        //bookmarksActivity.updateItems(true);
                     }
 
                     @Override
@@ -637,7 +638,6 @@ public class BookmarksFragment extends BaseFragment {
                             BookmarkFolder folderFromDB = folders.get(0);
                             folderFromDB.setBookmarksCount(folderFromDB.getBookmarksCount() - 1);
                             bookmarkFolderDao.insertOrReplaceInTx(folderFromDB);
-                            bookmarksActivity.updateFolderSpinnerItem(folderFromDB);
                         }
                         setRemoveBookmarkProgress(false);
                         Snackbar snackbar = Snackbar.make(rootLayout,
@@ -653,9 +653,7 @@ public class BookmarksFragment extends BaseFragment {
                             }
                         });
                         snackbar.show();
-
-                        //noinspection ConstantConditions
-                        bookmarksActivity.updateItems(true);
+                        getActivity().finish();
                     }
 
                     @Override

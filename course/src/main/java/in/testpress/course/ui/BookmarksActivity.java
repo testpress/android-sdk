@@ -1,43 +1,42 @@
 package in.testpress.course.ui;
 
+import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
+import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
+
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.loader.app.LoaderManager;
-import androidx.core.content.ContextCompat;
-import androidx.loader.content.Loader;
-import androidx.viewpager.widget.ViewPager;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import org.greenrobot.greendao.query.QueryBuilder;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
-import in.testpress.course.pagers.BookmarksPager;
+import in.testpress.course.repository.BookmarkFolderRepository;
+import in.testpress.course.viewmodels.BookmarkFolderViewModel;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.ui.EditableItemSpinnerAdapter;
 import in.testpress.models.greendao.Bookmark;
@@ -48,24 +47,13 @@ import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ReviewItem;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
-import in.testpress.ui.HeaderFooterListAdapter;
 import in.testpress.ui.view.ClosableSpinner;
-import in.testpress.util.SingleTypeAdapter;
-import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
-import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
-import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
-import static in.testpress.network.TestpressApiClient.CREATED_SINCE;
-import static in.testpress.network.TestpressApiClient.CREATED_UNTIL;
-import static in.testpress.network.TestpressApiClient.MODIFIED_SINCE;
-import static in.testpress.network.TestpressApiClient.UNFILTERED;
-
-public class BookmarksActivity extends BaseToolBarActivity
-        implements LoaderManager.LoaderCallbacks<List<Bookmark>>, AbsListView.OnScrollListener {
+public class BookmarksActivity extends BaseToolBarActivity {
 
     // Loader for refresh
     private static final int REFRESH_LOADER_ID = 0;
@@ -73,34 +61,23 @@ public class BookmarksActivity extends BaseToolBarActivity
     // Loader to load bottom old bookmarks
     private static final int LOADER_ID = 1;
 
-    // Number of maximum bookmarks which can be missed from the latest
-    private static final int MISSED_BOOKMARKS_THRESHOLD = 50;
+    private BookmarkListFragment fragment;
 
-    private ViewPager viewPager;
-    private in.testpress.course.ui.BookmarkPagerAdapter pagerAdapter;
-    private HeaderFooterListAdapter listAdapter;
+    private BookmarkFolderViewModel bookmarkFolderViewModel;
+
+    private String TAG = "BookmarksActivity";
+    private String baseUrl;
+
     private SwipeRefreshLayout listViewSwipeRefreshLayout;
-    private SwipeRefreshLayout viewPagerSwipeRefreshLayout;
     private View contentLayout;
     View buttonLayout;
-    private ListView listView;
-    private View emptyView;
-    private TextView emptyTitleView;
-    private TextView emptyDescView;
-    private ImageView emptyImageView;
     private Button retryButton;
     private Button previousButton;
     private Button nextButton;
     private ClosableSpinner folderSpinner;
     private LinearLayout newBookmarksAvailableLabel;
-    private BookmarksPager refreshPager;
-    private BookmarksPager pager;
     private EditableItemSpinnerAdapter foldersSpinnerAdapter;
     private View loadingLayout;
-    private int lastFirstVisibleItem;
-    private int lastFirstVisibleItemTop;
-    private boolean isUserSwiped;
-    private boolean isLoadingNewBookmarks;
     private TestpressExamApiClient apiClient;
     private String currentFolder = "";
     private BookmarkFolderDao folderDao;
@@ -117,20 +94,22 @@ public class BookmarksActivity extends BaseToolBarActivity
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_bookmarks);
-        listView = findViewById(R.id.list_view);
-        emptyView = findViewById(R.id.empty_container);
-        emptyTitleView = findViewById(R.id.empty_title);
-        emptyDescView = findViewById(R.id.empty_description);
-        emptyImageView = findViewById(R.id.image_view);
+        apiClient = new TestpressExamApiClient(this);
+
+        initializeViewModel();
+        initalizeObservers();
+        loadBookmarks();
+
+        baseUrl = TestpressSdk.getTestpressSession(getApplicationContext())
+                .getInstituteSettings()
+                .getBaseUrl();
+
         retryButton = findViewById(R.id.retry_button);
         previousButton = findViewById(R.id.previous);
         nextButton = findViewById(R.id.next);
         contentLayout = findViewById(R.id.content_layout);
         buttonLayout = findViewById(R.id.button_layout);
-        viewPager = findViewById(R.id.pager);
         newBookmarksAvailableLabel = findViewById(R.id.new_bookmarks_available_label);
-        ProgressBar progressBar = findViewById(R.id.pb_loading);
-        progressBar.setVisibility(View.GONE);
         loadingLayout = getLayoutInflater().inflate(R.layout.testpress_loading_layout, null);
         ProgressBar footerProgressBar = loadingLayout.findViewById(R.id.progress_bar);
         UIUtils.setIndeterminateDrawable(this, footerProgressBar, 3);
@@ -139,46 +118,24 @@ public class BookmarksActivity extends BaseToolBarActivity
         progressDialog.setCancelable(false);
         UIUtils.setIndeterminateDrawable(this, progressDialog, 4);
 
-        apiClient = new TestpressExamApiClient(this);
         bookmarkDao = TestpressSDKDatabase.getBookmarkDao(this);
 
         ViewUtils.setTypeface(
-                new TextView[] { nextButton, previousButton, emptyTitleView },
+                new TextView[]{nextButton, previousButton},
                 TestpressSdk.getRubikMediumFont(this)
         );
-        emptyDescView.setTypeface(TestpressSdk.getRubikRegularFont(this));
-        previousButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showPrevious();
-            }
-        });
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showNext();
-            }
-        });
-        newBookmarksAvailableLabel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                displayNewBookmarks();
-            }
-        });
+
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                emptyView.setVisibility(View.GONE);
                 if (buttonLayout.getVisibility() == View.VISIBLE) {
                     contentLayout.setVisibility(View.VISIBLE);
-                    viewPagerSwipeRefreshLayout.setRefreshing(true);
-                    viewPager.setVisibility(View.GONE);
-                    loadMoreBookmarks();
                 } else {
                     refreshWithProgress();
                 }
             }
         });
+        contentLayout.setVisibility(View.VISIBLE);
         listViewSwipeRefreshLayout = findViewById(R.id.list_view_swipe_container);
         listViewSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -187,52 +144,6 @@ public class BookmarksActivity extends BaseToolBarActivity
             }
         });
         listViewSwipeRefreshLayout.setColorSchemeResources(R.color.testpress_color_primary);
-        viewPagerSwipeRefreshLayout = findViewById(R.id.pager_swipe_container);
-        viewPagerSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshWithProgress();
-            }
-        });
-        viewPagerSwipeRefreshLayout.setColorSchemeResources(R.color.testpress_color_primary);
-        listAdapter = new HeaderFooterListAdapter<SingleTypeAdapter<Bookmark>>(
-                listView,
-                new in.testpress.course.ui.BookmarksListAdapter(this, currentFolder)
-        );
-        listView.setAdapter(listAdapter);
-        listView.setOnScrollListener(this);
-        listView.setFastScrollEnabled(true);
-        listView.setOnItemClickListener(
-                new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int position,
-                                            long id) {
-
-                        if (viewPager.getCurrentItem() != position) {
-                            viewPager.setCurrentItem(position, false);
-                        } else {
-                            updateNavigationButtons(position);
-                        }
-                        showBookmarksList(false);
-                    }
-                });
-        pagerAdapter = new in.testpress.course.ui.BookmarkPagerAdapter(this, currentFolder);
-        viewPager.setAdapter(pagerAdapter);
-        goToPosition(0);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                goToPosition(position);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         View spinnerContainer =
@@ -242,6 +153,7 @@ public class BookmarksActivity extends BaseToolBarActivity
                 new EditableItemSpinnerAdapter.OnEditItemListener() {
                     @Override
                     public void onClickEdit(int position) {
+                        folderSpinner.setSelection(position);
                         showFolderUpdateDialogBox(position);
                     }
                 });
@@ -255,39 +167,22 @@ public class BookmarksActivity extends BaseToolBarActivity
                 ViewGroup.LayoutParams.WRAP_CONTENT);
 
         toolbar.addView(spinnerContainer, lp);
-        addFoldersToSpinner();
-        bookmarkFolders.clear();
-        //noinspection ConstantConditions
-        String baseUrl = TestpressSdk.getTestpressSession(this).getInstituteSettings().getBaseUrl();
-        loadBookmarkFolders(baseUrl + BOOKMARK_FOLDERS_PATH);
+        loadBookmarkFolders();
         folderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 currentFolder = foldersSpinnerAdapter.getTag(i);
-                pagerAdapter.setCurrentFolder(currentFolder);
-                getBookmarksListAdapter().setCurrentFolder(currentFolder);
-                updateItems(true);
-                if (viewPager.getCurrentItem() == 0) {
-                    updateNavigationButtons(0);
-                } else {
-                    viewPager.setCurrentItem(0, false);
+                Log.d(TAG, "onItemSelected: "+currentFolder);
+                for (BookmarkFolder folder:
+                     bookmarkFolders) {
+                    if(currentFolder.equals("")){
+                        fragment.setFolderID(0L);
+                        return;
+                    }
+                    if (folder.getName().equals(currentFolder)){
+                        fragment.setFolderID(folder.getId());
+                    }
                 }
-                lastFirstVisibleItem = 0;
-                getBookmarksListAdapter().setBackgroundShadePosition(-1);
-                Loader<Bookmark> refreshLoader =
-                        getSupportLoaderManager().getLoader(REFRESH_LOADER_ID);
-
-                if (refreshLoader != null && !refreshLoader.isReset()) {
-                    getSupportLoaderManager().destroyLoader(REFRESH_LOADER_ID);
-                }
-                Loader<Bookmark> loader = getSupportLoaderManager().getLoader(LOADER_ID);
-                if (loader != null && !loader.isReset()) {
-                    getSupportLoaderManager().destroyLoader(LOADER_ID);
-                }
-                refreshPager = null;
-                pager = null;
-                getSupportLoaderManager()
-                        .restartLoader(REFRESH_LOADER_ID, null, in.testpress.course.ui.BookmarksActivity.this);
             }
 
             @Override
@@ -297,72 +192,105 @@ public class BookmarksActivity extends BaseToolBarActivity
         });
     }
 
-    private QueryBuilder<Bookmark> getQueryBuilder() {
-        return Bookmark.getQueryBuilder(this, currentFolder);
-    }
-
-    private QueryBuilder<Bookmark> getQueryBuilderToDisplay() {
-        return Bookmark.getQueryBuilderToDisplay(this, currentFolder);
-    }
-
-    private BookmarksPager getRefreshPager() {
-        if (refreshPager == null) {
-            refreshPager = new BookmarksPager(this, apiClient, currentFolder);
-            QueryBuilder<Bookmark> queryBuilder = getQueryBuilder();
-            if (queryBuilder.count() > 0) {
-                queryBuilder.orderDesc(BookmarkDao.Properties.ModifiedDate);
-                Bookmark latestModified = queryBuilder.list().get(0);
-                refreshPager.setQueryParams(MODIFIED_SINCE, latestModified.getModified());
-                queryBuilder = getQueryBuilder();
-                queryBuilder.orderAsc(BookmarkDao.Properties.CreatedDate);
-                Bookmark oldestCreated = queryBuilder.list().get(0);
-                refreshPager.setQueryParams(CREATED_SINCE, oldestCreated.getCreated());
-                refreshPager.setQueryParams(UNFILTERED, true);
+    void initializeViewModel() {
+        ViewModelProvider.Factory viewModelFactory = new ViewModelProvider.Factory() {
+            @NonNull
+            @Override
+            public <T extends ViewModel> T create(@NonNull Class<T> aClass) {
+                return (T) new BookmarkFolderViewModel(
+                        new BookmarkFolderRepository(
+                                getApplicationContext(),
+                                apiClient)
+                );
             }
-        }
-        return refreshPager;
+        };
+        bookmarkFolderViewModel = new ViewModelProvider(getViewModelStore(), viewModelFactory).get(BookmarkFolderViewModel.class);
+
     }
 
-    private BookmarksPager getOldBookmarksLoadingPager() {
-        if (pager == null) {
-            pager = new BookmarksPager(this, apiClient, currentFolder);
-            QueryBuilder<Bookmark> queryBuilder = getQueryBuilder();
-            if (queryBuilder.count() > 0) {
-                queryBuilder.orderDesc(BookmarkDao.Properties.CreatedDate);
-                Bookmark lastBookmark = queryBuilder.list().get((int) queryBuilder.count() - 1);
-                pager.setQueryParams(CREATED_UNTIL, lastBookmark.getCreated());
+    void initalizeObservers(){
+        bookmarkFolderViewModel.getFolders().observe(this, folders ->{
+            switch (folders.getStatus()){
+                case SUCCESS:{
+                    Log.d(TAG, "onCreate: "+folders.getData().size());
+                    bookmarkFolders  = folders.getData();
+                    addFoldersToSpinner();
+                    break;
+                }
+                case LOADING:{
+
+                    break;
+                }
+                case ERROR:{
+                    handleException(folders.getException());
+                    break;
+                }
             }
-        }
-        return pager;
+        });
+
+        bookmarkFolderViewModel.getUpdateFolder().observe(this,updateFolder ->{
+            switch (updateFolder.getStatus()){
+                case SUCCESS:{
+                    int currentFolderPosition = folderSpinner.getSelectedItemPosition();
+                        updateFolderSpinnerItem(currentFolderPosition, Objects.requireNonNull(updateFolder.getData()));
+                        progressDialog.dismiss();
+                        Snackbar.make(fragment.requireView(), R.string.testpress_folder_updated,
+                                Snackbar.LENGTH_SHORT).show();
+                    break;
+                }
+                case LOADING:{
+                    Log.d(TAG, "updateBookmarkFolder: loading");
+                    progressDialog.show();
+                    break;
+                }
+                case ERROR:{
+                    Log.d(TAG, "updateBookmarkFolder: error");
+                    handleException(updateFolder.getException());
+                    progressDialog.dismiss();
+                    break;
+                }
+            }
+        });
+
+        bookmarkFolderViewModel.getDeleteFolder().observe(this, result -> {
+            Log.d(TAG, "deleteFolder: "+result.getStatus());
+            switch (result.getStatus()){
+                case SUCCESS:{
+                    int currentFolderPosition = folderSpinner.getSelectedItemPosition();
+                    deleteFolderSpinnerItem(currentFolderPosition);
+                    folderSpinner.setSelection(0);
+                    progressDialog.dismiss();
+                    Snackbar.make(fragment.requireView(), R.string.testpress_folder_deleted,
+                            Snackbar.LENGTH_SHORT).show();
+                    break;
+                }
+                case ERROR:{
+                    progressDialog.dismiss();
+                    handleException(result.getException());
+                    break;
+                }
+            }
+        });
+
+
     }
 
-    void loadBookmarkFolders(String url) {
-        bookmarkFoldersLoader = apiClient.getBookmarkFolders(url)
-                .enqueue(new TestpressCallback<ApiResponse<FolderListResponse>>() {
-                    @Override
-                    public void onSuccess(ApiResponse<FolderListResponse> apiResponse) {
-                        bookmarkFolders.addAll(apiResponse.getResults().getFolders());
-                        if (apiResponse.getNext() != null) {
-                            loadBookmarkFolders(apiResponse.getNext());
-                        } else {
-                            folderDao.deleteAll();
-                            folderDao.insertOrReplaceInTx(bookmarkFolders);
-                            addFoldersToSpinner();
-                        }
-                    }
+    private void loadBookmarks() {
+        fragment = new BookmarkListFragment();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.bookmark_fragment_container, fragment)
+                .commitAllowingStateLoss();
+    }
 
-                    @Override
-                    public void onException(TestpressException exception) {
-                        handleException(exception);
-                    }
-                });
+    void loadBookmarkFolders(){
+        bookmarkFolderViewModel.loadFolders(baseUrl+ BOOKMARK_FOLDERS_PATH);
     }
 
     synchronized void addFoldersToSpinner() {
         foldersSpinnerAdapter.clear();
         foldersSpinnerAdapter.addItem("", "All Bookmarks", 0);
-        List<BookmarkFolder> bookmarkFolders = folderDao.queryBuilder().list();
-        for (BookmarkFolder folder: bookmarkFolders) {
+        for (BookmarkFolder folder : bookmarkFolders) {
             foldersSpinnerAdapter
                     .addItem(folder.getName(), folder.getName(), folder.getBookmarksCount());
         }
@@ -380,367 +308,19 @@ public class BookmarksActivity extends BaseToolBarActivity
 
     void updateFolderSpinnerItem(BookmarkFolder folder) {
         updateFolderSpinnerItem(foldersSpinnerAdapter.getItemPosition(folder.getName()), folder);
+        fragment.setFolderID(folder.getId());
     }
 
-    void updateFolderSpinnerItem(int position, BookmarkFolder folder) {
+    void updateFolderSpinnerItem(int position, @NonNull BookmarkFolder folder) {
+        Log.d(TAG, "updateFolderSpinnerItem: "+position);
         foldersSpinnerAdapter.updateItem(position, folder.getName(), folder.getName(),
                 folder.getBookmarksCount());
-
         foldersSpinnerAdapter.notifyDataSetChanged();
     }
 
     void deleteFolderSpinnerItem(int position) {
         foldersSpinnerAdapter.removeItem(position);
         foldersSpinnerAdapter.notifyDataSetChanged();
-    }
-
-    @NonNull
-    @Override
-    public Loader<List<Bookmark>> onCreateLoader(int loaderID, @Nullable Bundle args) {
-        switch (loaderID) {
-            case REFRESH_LOADER_ID:
-                isLoadingNewBookmarks = true;
-                getRefreshPager();
-                if (getQueryBuilderToDisplay().count() == 0) {
-                    listViewSwipeRefreshLayout.setRefreshing(true);
-                    viewPagerSwipeRefreshLayout.setRefreshing(true);
-                }
-                return new in.testpress.course.ui.BookmarksActivity.BookmarksLoader(this, getRefreshPager());
-            default:
-                return new in.testpress.course.ui.BookmarksActivity.BookmarksLoader(this, getOldBookmarksLoadingPager());
-        }
-    }
-
-    private static class BookmarksLoader extends ThrowableLoader<List<Bookmark>> {
-
-        private BookmarksPager pager;
-
-        BookmarksLoader(Context context, BookmarksPager pager) {
-            super(context, null);
-            this.pager = pager;
-        }
-
-        @Override
-        public List<Bookmark> loadData() throws TestpressException {
-            pager.next();
-            return pager.getListResponse().getBookmarks();
-        }
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull final Loader<List<Bookmark>> loader,
-                               List<Bookmark> bookmarks) {
-
-        if (loader.getId() == REFRESH_LOADER_ID) {
-            listViewSwipeRefreshLayout.setRefreshing(false);
-            viewPagerSwipeRefreshLayout.setRefreshing(false);
-            isLoadingNewBookmarks = false;
-        }
-        getSupportLoaderManager().destroyLoader(loader.getId());
-        TestpressException exception =
-                ((ThrowableLoader<List<Bookmark>>) loader).clearException();
-
-        if(exception != null) {
-            if (listAdapter.getFootersCount() != 0) {
-                listAdapter.removeFooter(loadingLayout);
-            }
-            if (loader.getId() == LOADER_ID &&
-                    (viewPager.getCurrentItem() + 1) == pagerAdapter.getCount() &&
-                    viewPagerSwipeRefreshLayout.getVisibility() == View.VISIBLE &&
-                    viewPager.getVisibility() == View.GONE) {
-
-                if (!isLoadingNewBookmarks) {
-                    viewPagerSwipeRefreshLayout.setRefreshing(false);
-                }
-                setEmptyText(R.string.testpress_network_error,
-                        R.string.testpress_no_internet_try_again,
-                        R.drawable.testpress_no_wifi,
-                        false);
-
-                return;
-            }
-            if (pagerAdapter.getCount() != 0) {
-                handleException(exception);
-            } else if(exception.isUnauthenticated()) {
-                setEmptyText(R.string.testpress_authentication_failed,
-                        R.string.testpress_please_login,
-                        R.drawable.testpress_alert_warning,
-                        true);
-            } else if (exception.isNetworkError()) {
-                setEmptyText(R.string.testpress_network_error,
-                        R.string.testpress_no_internet_try_again,
-                        R.drawable.testpress_no_wifi,
-                        true);
-            } else {
-                setEmptyText(R.string.testpress_error_loading_bookmarks,
-                        R.string.testpress_some_thing_went_wrong_try_again,
-                        R.drawable.testpress_alert_warning,
-                        true);
-            }
-            return;
-        }
-
-        switch (loader.getId()) {
-            case REFRESH_LOADER_ID:
-                onRefreshLoadFinished();
-                break;
-            case LOADER_ID:
-                onNetworkLoadFinished();
-                break;
-        }
-    }
-
-    void onRefreshLoadFinished() {
-        if (refreshPager == null) {
-            return;
-        }
-        // If no data is available in the local database, directly insert & display from database
-        if ((getQueryBuilderToDisplay().count() == 0) || refreshPager.getResources().isEmpty()) {
-            if (!refreshPager.getResources().isEmpty()) {
-                saveItems(refreshPager);
-            }
-            updateItems(false);
-        } else {
-            // If data is already available in the local database, then
-            // notify user about the new data to view latest data.
-            if (getQueryBuilder().count() != 0 &&
-                    MISSED_BOOKMARKS_THRESHOLD >= refreshPager.getTotalCount() &&
-                    refreshPager.hasNext()) {
-
-                getSupportLoaderManager().restartLoader(REFRESH_LOADER_ID, null, this);
-                return;
-            }
-            if (isUserSwiped || (lastFirstVisibleItem == 0)) {
-                displayNewBookmarks();
-            } else {
-                newBookmarksAvailableLabel.setVisibility(View.VISIBLE);
-            }
-        }
-    }
-
-    void onNetworkLoadFinished() {
-        if (pager == null) {
-            return;
-        }
-        if (!pager.hasNext()) {
-            if (listAdapter.getFootersCount() != 0) {
-                // if pager reached last page, remove footer if footer exists
-                listAdapter.removeFooter(loadingLayout);
-            }
-        }
-        if (!pager.getResources().isEmpty()) {
-            saveItems(pager);
-        }
-        int previousItemsCount = pagerAdapter.getCount();
-        int currentPosition = viewPager.getCurrentItem();
-        updateItems(false);
-        if (previousItemsCount == currentPosition + 1 && !nextButton.isEnabled()) {
-            viewPager.setCurrentItem(currentPosition + 1, false);
-        }
-        if (!isLoadingNewBookmarks) {
-            viewPagerSwipeRefreshLayout.setRefreshing(false);
-        }
-        viewPager.setVisibility(View.VISIBLE);
-    }
-
-    private void saveItems(BookmarksPager pager) {
-        Bookmark.save(this, pager.getResources(), currentFolder.isEmpty());
-        TestpressSDKDatabase.getBookmarkFolderDao(this).insertOrReplaceInTx(pager.getFolders());
-        TestpressSDKDatabase.getContentTypeDao(this).insertOrReplaceInTx(pager.getContentTypes());
-
-        ReviewItem.save(this, pager.getReviewItems());
-        TestpressSDKDatabase.getReviewQuestionDao(this).insertOrReplaceInTx(pager.getQuestions());
-        TestpressSDKDatabase.getReviewAnswerDao(this).insertOrReplaceInTx(pager.getAnswers());
-        TestpressSDKDatabase.getReviewQuestionTranslationDao(this)
-                .insertOrReplaceInTx(pager.getTranslations());
-        TestpressSDKDatabase.getReviewAnswerTranslationDao(this)
-                .insertOrReplaceInTx(pager.getAnswerTranslations());
-
-        TestpressSDKDatabase.getDirectionDao(this).insertOrReplaceInTx(pager.getDirections());
-        TestpressSDKDatabase.getDirectionTranslationDao(this)
-                .insertOrReplaceInTx(pager.getDirectionTranslations());
-        TestpressSDKDatabase.getSubjectDao(this).insertOrReplaceInTx(pager.getSubjects());
-
-        Content.save(this, pager.getContents());
-        TestpressSDKDatabase.getHtmlContentDao(this).insertOrReplaceInTx(pager.getHtmlContents());
-        TestpressSDKDatabase.getVideoDao(this).insertOrReplaceInTx(pager.getVideos());
-        TestpressSDKDatabase.getAttachmentDao(this).insertOrReplaceInTx(pager.getAttachments());
-    }
-
-    void updateItems(boolean positionModified) {
-        listAdapter.notifyDataSetChanged();
-        pagerAdapter.notifyDataSetChanged(positionModified);
-        if (pagerAdapter.getCount() == 0) {
-            setEmptyText(R.string.testpress_no_bookmarks,
-                    R.string.testpress_no_bookmarks_description,
-                    R.drawable.testpress_bookmark_flat_icon,
-                    true);
-
-            retryButton.setVisibility(View.GONE);
-        } else {
-            contentLayout.setVisibility(View.VISIBLE);
-            setNavigationBarVisible(viewPagerSwipeRefreshLayout.getVisibility() == View.VISIBLE);
-            updateNavigationButtons(viewPager.getCurrentItem());
-            emptyView.setVisibility(View.GONE);
-        }
-    }
-
-    public void displayNewBookmarks() {
-        newBookmarksAvailableLabel.setVisibility(View.GONE);
-        if (MISSED_BOOKMARKS_THRESHOLD < refreshPager.getTotalCount()) {
-            bookmarkDao.deleteAll();
-            pager = null;
-        }
-        if (!refreshPager.getResources().isEmpty()) {
-            saveItems(refreshPager);
-        }
-        updateItems(true);
-        if (listView.getVisibility() == View.VISIBLE) {
-            listView.setSelectionAfterHeaderView();
-        } else {
-            viewPager.setCurrentItem(0, false);
-        }
-    }
-
-    @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-                         int totalItemCount) {
-
-        if (getSupportLoaderManager().hasRunningLoaders())
-            return;
-
-        boolean isScrollingUp;
-        if (listView.getChildAt(0) != null) {
-            // Detect scrolling up or down
-            int currentFirstVisibleItem = listView.getFirstVisiblePosition();
-            int currentFirstVisibleItemTop = Math.abs(listView.getChildAt(0).getTop());
-            if (currentFirstVisibleItem > lastFirstVisibleItem) {
-                isScrollingUp = false;
-            } else if (currentFirstVisibleItem < lastFirstVisibleItem) {
-                isScrollingUp = true;
-            } else if (currentFirstVisibleItemTop > lastFirstVisibleItemTop) {
-                isScrollingUp = false;
-            } else if (currentFirstVisibleItemTop < lastFirstVisibleItemTop) {
-                isScrollingUp = true;
-            } else {
-                isScrollingUp = false;
-            }
-        } else {
-            return;
-        }
-        if (!isScrollingUp &&
-                (listView.getLastVisiblePosition() + 3) >= getBookmarksListAdapter().getCount()) {
-
-            if (pager != null && !pager.hasMore()) {
-                if (listAdapter.getFootersCount() != 0) {
-                    // If pager reached last page, remove footer if footer exists
-                    listAdapter.removeFooter(loadingLayout);
-                }
-                return;
-            }
-            loadMoreBookmarks();
-        }
-    }
-
-    void loadMoreBookmarks() {
-        if (listAdapter.getFootersCount() == 0) {
-            // Display loading footer if not present when loading next page
-            listAdapter.addFooter(loadingLayout);
-        }
-        getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
-    }
-
-    @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
-        lastFirstVisibleItem = listView.getFirstVisiblePosition();
-        lastFirstVisibleItemTop = Math.abs(listView.getChildAt(0).getTop());
-        // While previously loading the next page any error happens, this ensures to try
-        // to load the next page if available, while scrolling
-        if (pager != null) {
-            pager.setHasMore(pager.hasNext());
-        }
-        getBookmarksListAdapter().setBackgroundShadePosition(-1);
-    }
-
-    private void showBookmarksList(boolean show) {
-        if(show) {
-            listViewSwipeRefreshLayout.setVisibility(View.VISIBLE);
-            viewPagerSwipeRefreshLayout.setVisibility(View.GONE);
-            getSupportFragmentManager().getFragments().get(0).setUserVisibleHint(true); // Resume web view
-        } else {
-            viewPagerSwipeRefreshLayout.setVisibility(View.VISIBLE);
-            viewPager.setVisibility(View.VISIBLE);
-            if (!isLoadingNewBookmarks) {
-                viewPagerSwipeRefreshLayout.setRefreshing(false);
-            }
-            listViewSwipeRefreshLayout.setVisibility(View.GONE);
-        }
-        setNavigationBarVisible(!show);
-    }
-
-    private void showPrevious() {
-        if ((viewPager.getCurrentItem() + 1) == pagerAdapter.getCount() &&
-                (viewPager.getVisibility() == View.GONE || emptyView.getVisibility() == View.VISIBLE)) {
-
-            if (!isLoadingNewBookmarks) {
-                viewPagerSwipeRefreshLayout.setRefreshing(false);
-            }
-            viewPager.setVisibility(View.VISIBLE);
-            enableButton(nextButton, true);
-            enableButton(previousButton, viewPager.getCurrentItem() != 0);
-            contentLayout.setVisibility(View.VISIBLE);
-            emptyView.setVisibility(View.GONE);
-        } else if (viewPager.getCurrentItem() != 0) {
-            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
-        }
-    }
-
-    private void showNext() {
-        if ((viewPager.getCurrentItem() + 1) == pagerAdapter.getCount()) {
-            // Reached last item
-            if (listAdapter.getFootersCount() != 0) {
-                viewPagerSwipeRefreshLayout.setRefreshing(true);
-                viewPager.setVisibility(View.GONE);
-            } else {
-                setEmptyText(R.string.testpress_network_error,
-                        R.string.testpress_no_internet_try_again,
-                        R.drawable.testpress_no_wifi,
-                        false);
-            }
-            enableButton(nextButton, false);
-            enableButton(previousButton, true);
-        } else {
-            viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
-        }
-    }
-
-    private void goToPosition(int position) {
-        if (pagerAdapter.getCount() == 0) {
-            return;
-        }
-        listView.setSelection(viewPager.getCurrentItem());
-        listView.smoothScrollToPosition(viewPager.getCurrentItem());
-
-        updateNavigationButtons(position);
-    }
-
-    private void updateNavigationButtons(int currentPosition) {
-        if (currentPosition == 0) {
-            // Reached first item
-            enableButton(previousButton, false);
-        } else {
-            enableButton(previousButton, true);
-        }
-        if ((currentPosition + 1) == pagerAdapter.getCount()) {
-            // Reached last item
-            if (pager != null && pager.hasNext()) {
-                enableButton(nextButton, true);
-            } else {
-                enableButton(nextButton, false);
-            }
-        } else {
-            enableButton(nextButton, true);
-        }
     }
 
     /**
@@ -811,75 +391,14 @@ public class BookmarksActivity extends BaseToolBarActivity
         dialog.show();
     }
 
-    void updateBookmarkFolder(long folderId, String folderName, final int position) {
+    void updateBookmarkFolder(long folderId, String folderName, int position) {
         progressDialog.show();
-        updateFolderAPIRequest = apiClient.updateBookmarkFolder(folderId, folderName)
-                .enqueue(new TestpressCallback<BookmarkFolder>() {
-                    @Override
-                    public void onSuccess(BookmarkFolder folder) {
-                        folderDao.updateInTx(folder);
-                        updateFolderSpinnerItem(position, folder);
-                        progressDialog.dismiss();
-                        Snackbar.make(listView, R.string.testpress_folder_updated,
-                                Snackbar.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        progressDialog.dismiss();
-                        handleException(exception);
-                    }
-                });
+        bookmarkFolderViewModel.updateFolder(folderId,folderName);
     }
 
     void deleteFolder(final Long folderId, final int deletedPosition) {
         progressDialog.show();
-        deleteFolderAPIRequest = apiClient.deleteBookmarkFolder(folderId)
-                .enqueue(new TestpressCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void data) {
-                        folderDao.deleteByKeyInTx(folderId);
-                        List<Bookmark> bookmarks = bookmarkDao.queryBuilder()
-                                .where(BookmarkDao.Properties.FolderId.eq(folderId)).list();
-
-                        if (!bookmarks.isEmpty()) {
-                            for (Bookmark bookmark : bookmarks) {
-                                bookmark.setFolderId(null);
-                                bookmark.setFolder(null);
-                                bookmark.setLoadedInRespectiveFolder(false);
-                                bookmarkDao.insertOrReplaceInTx(bookmark);
-                            }
-                        }
-
-                        int currentFolderPosition = folderSpinner.getSelectedItemPosition();
-                        if (currentFolderPosition == 0) { // All bookmarks
-                            deleteFolderSpinnerItem(deletedPosition);
-                            updateItems(false);
-                        } else if (currentFolderPosition == deletedPosition) {
-                            addFoldersToSpinner();
-                            folderSpinner.setSelection(0);
-                            folderSpinner.dismissPopUp();
-                        } else {
-                            String currentFolder = foldersSpinnerAdapter.getTag(currentFolderPosition);
-                            deleteFolderSpinnerItem(deletedPosition);
-                            if (deletedPosition < currentFolderPosition) {
-                                folderSpinner.setSelection(
-                                        foldersSpinnerAdapter.getItemPosition(currentFolder));
-
-                                folderSpinner.dismissPopUp();
-                            }
-                        }
-                        progressDialog.dismiss();
-                        Snackbar.make(listView, R.string.testpress_folder_deleted,
-                                Snackbar.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        progressDialog.dismiss();
-                        handleException(exception);
-                    }
-                });
+        bookmarkFolderViewModel.deleteFolder(folderId);
     }
 
     void undoBookmarkDelete(final long bookmarkId) {
@@ -920,7 +439,6 @@ public class BookmarksActivity extends BaseToolBarActivity
                             updateFolderSpinnerItem(folder);
                         }
                         progressDialog.dismiss();
-                        updateItems(true);
                     }
 
                     @Override
@@ -931,64 +449,32 @@ public class BookmarksActivity extends BaseToolBarActivity
                 });
     }
 
-    void setNavigationBarVisible(boolean visible) {
-        buttonLayout.setVisibility(visible ? View.VISIBLE : View.GONE);
-    }
-
     public void refreshWithProgress() {
-        refreshPager = null;
-        isUserSwiped = true;
-        listViewSwipeRefreshLayout.setRefreshing(true);
-        viewPagerSwipeRefreshLayout.setRefreshing(true);
-        refresh();
-    }
-
-    protected void refresh() {
-        getSupportLoaderManager().restartLoader(REFRESH_LOADER_ID, null, this);
+        fragment.onRefreshing();
+        loadBookmarkFolders();
+        listViewSwipeRefreshLayout.setRefreshing(false);
+        contentLayout.setVisibility(View.VISIBLE);
     }
 
     void handleException(TestpressException exception) {
-        if(exception.isUnauthenticated()) {
-            Snackbar.make(listView, R.string.testpress_authentication_failed,
+        if (exception.isUnauthenticated()) {
+            Snackbar.make(fragment.requireView(), R.string.testpress_authentication_failed,
                     Snackbar.LENGTH_SHORT).show();
         } else if (exception.isNetworkError()) {
-            Snackbar.make(listView, R.string.testpress_no_internet_connection,
+            Snackbar.make(fragment.requireView(), R.string.testpress_no_internet_connection,
                     Snackbar.LENGTH_SHORT).show();
         } else if (exception.isClientError()) {
-            Snackbar.make(listView, R.string.testpress_folder_name_not_allowed,
+            Snackbar.make(fragment.requireView(), R.string.testpress_folder_name_not_allowed,
                     Snackbar.LENGTH_SHORT).show();
         } else {
-            Snackbar.make(listView, R.string.testpress_network_error,
+            Snackbar.make(fragment.requireView(), R.string.testpress_network_error,
                     Snackbar.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void onBackPressed() {
-        if (listViewSwipeRefreshLayout.getVisibility() == View.GONE && listAdapter.getCount() != 0) {
-            if (isLoadingMoreView()) {
-                emptyView.setVisibility(View.GONE);
-                contentLayout.setVisibility(View.VISIBLE);
-                viewPager.setVisibility(View.VISIBLE);
-                getBookmarksListAdapter().setBackgroundShadePosition(-1);
-            } else {
-                getSupportFragmentManager().getFragments().get(0).setUserVisibleHint(false); // Pause web view
-                getBookmarksListAdapter().setBackgroundShadePosition(viewPager.getCurrentItem());
-            }
-            showBookmarksList(true);
-            getBookmarksListAdapter().notifyDataSetChanged();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    in.testpress.course.ui.BookmarksListAdapter getBookmarksListAdapter() {
-        return (in.testpress.course.ui.BookmarksListAdapter) listAdapter.getWrappedAdapter();
-    }
-
-    boolean isLoadingMoreView() {
-        return (viewPager.getCurrentItem() + 1) == pagerAdapter.getCount() &&
-                (viewPager.getVisibility() == View.GONE || emptyView.getVisibility() == View.VISIBLE);
+        super.onBackPressed();
     }
 
     protected void setEmptyText(int title, int description, int imageResId, boolean hideButtonLayout) {
@@ -996,23 +482,23 @@ public class BookmarksActivity extends BaseToolBarActivity
             buttonLayout.setVisibility(View.GONE);
         }
         contentLayout.setVisibility(View.GONE);
-        emptyTitleView.setText(title);
-        emptyDescView.setText(description);
-        emptyImageView.setImageResource(imageResId);
+
         retryButton.setVisibility(View.VISIBLE);
-        emptyView.setVisibility(View.VISIBLE);
     }
 
     @Override
     public RetrofitCall[] getRetrofitCalls() {
-        return new RetrofitCall[] {
+        return new RetrofitCall[]{
                 bookmarkFoldersLoader, updateFolderAPIRequest, deleteFolderAPIRequest,
                 undoBookmarkAPIRequest
         };
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<List<Bookmark>> loader) {
+    public void onResume() {
+        super.onResume();
+        fragment.onRefreshing();
+        loadBookmarkFolders();
     }
 }
 
