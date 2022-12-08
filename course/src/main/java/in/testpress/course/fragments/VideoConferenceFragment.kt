@@ -122,6 +122,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     private fun joinMeeting() {
         videoConferenceHandler?.joinMeet(object: VideoConferenceInitializeListener {
             override fun onSuccess() {
+                viewModel.createContentAttempt(contentId)
                 hideLoadingAndEnableStartButton()
             }
 
