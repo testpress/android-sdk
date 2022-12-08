@@ -42,20 +42,20 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
         setItems(items);
     }
 
-    @Override
-    public Product getItem(int position) {
-        return productDao.queryBuilder().listLazy().get(position);
-    }
-
-    @Override
-    public int getCount() {
-        return (int) productDao.queryBuilder().count();
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return getItem(position).getId();
-    }
+//    @Override
+//    public Product getItem(int position) {
+//        return productDao.queryBuilder().listLazy().get(position);
+//    }
+//
+//    @Override
+//    public int getCount() {
+//        return (int) productDao.queryBuilder().count();
+//    }
+//
+//    @Override
+//    public long getItemId(int position) {
+//        return getItem(position).getId();
+//    }
 
     @Override
     protected int[] getChildViewIds() {

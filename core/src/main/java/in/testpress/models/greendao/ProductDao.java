@@ -25,20 +25,20 @@ public class ProductDao extends AbstractDao<Product, Long> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Order = new Property(0, Long.class, "order", true, "ORDER");
-        public final static Property Id = new Property(1, Long.class, "id", false, "ID");
-        public final static Property Title = new Property(2, String.class, "title", false, "TITLE");
-        public final static Property Slug = new Property(3, String.class, "slug", false, "SLUG");
-        public final static Property DescriptionHtml = new Property(4, String.class, "descriptionHtml", false, "DESCRIPTION_HTML");
-        public final static Property Image = new Property(5, String.class, "image", false, "IMAGE");
-        public final static Property StartDate = new Property(6, String.class, "startDate", false, "START_DATE");
-        public final static Property EndDate = new Property(7, String.class, "endDate", false, "END_DATE");
-        public final static Property BuyNowText = new Property(8, String.class, "buyNowText", false, "BUY_NOW_TEXT");
-        public final static Property Surl = new Property(9, String.class, "surl", false, "SURL");
-        public final static Property Furl = new Property(10, String.class, "furl", false, "FURL");
-        public final static Property CurrentPrice = new Property(11, String.class, "currentPrice", false, "CURRENT_PRICE");
-        public final static Property Prices = new Property(12, String.class, "prices", false, "PRICES");
-        public final static Property CourseIds = new Property(13, String.class, "courseIds", false, "COURSE_IDS");
+        public final static Property Id = new Property(0, Long.class, "id", true, "ID");
+        public final static Property Title = new Property(1, String.class, "title", false, "TITLE");
+        public final static Property Slug = new Property(2, String.class, "slug", false, "SLUG");
+        public final static Property DescriptionHtml = new Property(3, String.class, "descriptionHtml", false, "DESCRIPTION_HTML");
+        public final static Property Image = new Property(4, String.class, "image", false, "IMAGE");
+        public final static Property StartDate = new Property(5, String.class, "startDate", false, "START_DATE");
+        public final static Property EndDate = new Property(6, String.class, "endDate", false, "END_DATE");
+        public final static Property BuyNowText = new Property(7, String.class, "buyNowText", false, "BUY_NOW_TEXT");
+        public final static Property Surl = new Property(8, String.class, "surl", false, "SURL");
+        public final static Property Furl = new Property(9, String.class, "furl", false, "FURL");
+        public final static Property CurrentPrice = new Property(10, String.class, "currentPrice", false, "CURRENT_PRICE");
+        public final static Property Prices = new Property(11, String.class, "prices", false, "PRICES");
+        public final static Property CourseIds = new Property(12, String.class, "courseIds", false, "COURSE_IDS");
+        public final static Property Order = new Property(13, Long.class, "order", false, "ORDER");
     }
 
     private final IntegerListConverter pricesConverter = new IntegerListConverter();
@@ -56,20 +56,20 @@ public class ProductDao extends AbstractDao<Product, Long> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"PRODUCT\" (" + //
-                "\"ORDER\" INTEGER PRIMARY KEY ," + // 0: order
-                "\"ID\" INTEGER," + // 1: id
-                "\"TITLE\" TEXT," + // 2: title
-                "\"SLUG\" TEXT," + // 3: slug
-                "\"DESCRIPTION_HTML\" TEXT," + // 4: descriptionHtml
-                "\"IMAGE\" TEXT," + // 5: image
-                "\"START_DATE\" TEXT," + // 6: startDate
-                "\"END_DATE\" TEXT," + // 7: endDate
-                "\"BUY_NOW_TEXT\" TEXT," + // 8: buyNowText
-                "\"SURL\" TEXT," + // 9: surl
-                "\"FURL\" TEXT," + // 10: furl
-                "\"CURRENT_PRICE\" TEXT," + // 11: currentPrice
-                "\"PRICES\" TEXT," + // 12: prices
-                "\"COURSE_IDS\" TEXT);"); // 13: courseIds
+                "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
+                "\"TITLE\" TEXT," + // 1: title
+                "\"SLUG\" TEXT," + // 2: slug
+                "\"DESCRIPTION_HTML\" TEXT," + // 3: descriptionHtml
+                "\"IMAGE\" TEXT," + // 4: image
+                "\"START_DATE\" TEXT," + // 5: startDate
+                "\"END_DATE\" TEXT," + // 6: endDate
+                "\"BUY_NOW_TEXT\" TEXT," + // 7: buyNowText
+                "\"SURL\" TEXT," + // 8: surl
+                "\"FURL\" TEXT," + // 9: furl
+                "\"CURRENT_PRICE\" TEXT," + // 10: currentPrice
+                "\"PRICES\" TEXT," + // 11: prices
+                "\"COURSE_IDS\" TEXT," + // 12: courseIds
+                "\"ORDER\" INTEGER);"); // 13: order
     }
 
     /** Drops the underlying database table. */
@@ -82,74 +82,74 @@ public class ProductDao extends AbstractDao<Product, Long> {
     protected final void bindValues(DatabaseStatement stmt, Product entity) {
         stmt.clearBindings();
  
-        Long order = entity.getOrder();
-        if (order != null) {
-            stmt.bindLong(1, order);
-        }
- 
         Long id = entity.getId();
         if (id != null) {
-            stmt.bindLong(2, id);
+            stmt.bindLong(1, id);
         }
  
         String title = entity.getTitle();
         if (title != null) {
-            stmt.bindString(3, title);
+            stmt.bindString(2, title);
         }
  
         String slug = entity.getSlug();
         if (slug != null) {
-            stmt.bindString(4, slug);
+            stmt.bindString(3, slug);
         }
  
         String descriptionHtml = entity.getDescriptionHtml();
         if (descriptionHtml != null) {
-            stmt.bindString(5, descriptionHtml);
+            stmt.bindString(4, descriptionHtml);
         }
  
         String image = entity.getImage();
         if (image != null) {
-            stmt.bindString(6, image);
+            stmt.bindString(5, image);
         }
  
         String startDate = entity.getStartDate();
         if (startDate != null) {
-            stmt.bindString(7, startDate);
+            stmt.bindString(6, startDate);
         }
  
         String endDate = entity.getEndDate();
         if (endDate != null) {
-            stmt.bindString(8, endDate);
+            stmt.bindString(7, endDate);
         }
  
         String buyNowText = entity.getBuyNowText();
         if (buyNowText != null) {
-            stmt.bindString(9, buyNowText);
+            stmt.bindString(8, buyNowText);
         }
  
         String surl = entity.getSurl();
         if (surl != null) {
-            stmt.bindString(10, surl);
+            stmt.bindString(9, surl);
         }
  
         String furl = entity.getFurl();
         if (furl != null) {
-            stmt.bindString(11, furl);
+            stmt.bindString(10, furl);
         }
  
         String currentPrice = entity.getCurrentPrice();
         if (currentPrice != null) {
-            stmt.bindString(12, currentPrice);
+            stmt.bindString(11, currentPrice);
         }
  
         IntegerList prices = entity.getPrices();
         if (prices != null) {
-            stmt.bindString(13, pricesConverter.convertToDatabaseValue(prices));
+            stmt.bindString(12, pricesConverter.convertToDatabaseValue(prices));
         }
  
         IntegerList courseIds = entity.getCourseIds();
         if (courseIds != null) {
-            stmt.bindString(14, courseIdsConverter.convertToDatabaseValue(courseIds));
+            stmt.bindString(13, courseIdsConverter.convertToDatabaseValue(courseIds));
+        }
+ 
+        Long order = entity.getOrder();
+        if (order != null) {
+            stmt.bindLong(14, order);
         }
     }
 
@@ -157,74 +157,74 @@ public class ProductDao extends AbstractDao<Product, Long> {
     protected final void bindValues(SQLiteStatement stmt, Product entity) {
         stmt.clearBindings();
  
-        Long order = entity.getOrder();
-        if (order != null) {
-            stmt.bindLong(1, order);
-        }
- 
         Long id = entity.getId();
         if (id != null) {
-            stmt.bindLong(2, id);
+            stmt.bindLong(1, id);
         }
  
         String title = entity.getTitle();
         if (title != null) {
-            stmt.bindString(3, title);
+            stmt.bindString(2, title);
         }
  
         String slug = entity.getSlug();
         if (slug != null) {
-            stmt.bindString(4, slug);
+            stmt.bindString(3, slug);
         }
  
         String descriptionHtml = entity.getDescriptionHtml();
         if (descriptionHtml != null) {
-            stmt.bindString(5, descriptionHtml);
+            stmt.bindString(4, descriptionHtml);
         }
  
         String image = entity.getImage();
         if (image != null) {
-            stmt.bindString(6, image);
+            stmt.bindString(5, image);
         }
  
         String startDate = entity.getStartDate();
         if (startDate != null) {
-            stmt.bindString(7, startDate);
+            stmt.bindString(6, startDate);
         }
  
         String endDate = entity.getEndDate();
         if (endDate != null) {
-            stmt.bindString(8, endDate);
+            stmt.bindString(7, endDate);
         }
  
         String buyNowText = entity.getBuyNowText();
         if (buyNowText != null) {
-            stmt.bindString(9, buyNowText);
+            stmt.bindString(8, buyNowText);
         }
  
         String surl = entity.getSurl();
         if (surl != null) {
-            stmt.bindString(10, surl);
+            stmt.bindString(9, surl);
         }
  
         String furl = entity.getFurl();
         if (furl != null) {
-            stmt.bindString(11, furl);
+            stmt.bindString(10, furl);
         }
  
         String currentPrice = entity.getCurrentPrice();
         if (currentPrice != null) {
-            stmt.bindString(12, currentPrice);
+            stmt.bindString(11, currentPrice);
         }
  
         IntegerList prices = entity.getPrices();
         if (prices != null) {
-            stmt.bindString(13, pricesConverter.convertToDatabaseValue(prices));
+            stmt.bindString(12, pricesConverter.convertToDatabaseValue(prices));
         }
  
         IntegerList courseIds = entity.getCourseIds();
         if (courseIds != null) {
-            stmt.bindString(14, courseIdsConverter.convertToDatabaseValue(courseIds));
+            stmt.bindString(13, courseIdsConverter.convertToDatabaseValue(courseIds));
+        }
+ 
+        Long order = entity.getOrder();
+        if (order != null) {
+            stmt.bindLong(14, order);
         }
     }
 
@@ -236,52 +236,52 @@ public class ProductDao extends AbstractDao<Product, Long> {
     @Override
     public Product readEntity(Cursor cursor, int offset) {
         Product entity = new Product( //
-            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // order
-            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // id
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // title
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // slug
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // descriptionHtml
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // image
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // startDate
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // endDate
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // buyNowText
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // surl
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // furl
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // currentPrice
-            cursor.isNull(offset + 12) ? null : pricesConverter.convertToEntityProperty(cursor.getString(offset + 12)), // prices
-            cursor.isNull(offset + 13) ? null : courseIdsConverter.convertToEntityProperty(cursor.getString(offset + 13)) // courseIds
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // title
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // slug
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // descriptionHtml
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // image
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // startDate
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // endDate
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // buyNowText
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // surl
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // furl
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // currentPrice
+            cursor.isNull(offset + 11) ? null : pricesConverter.convertToEntityProperty(cursor.getString(offset + 11)), // prices
+            cursor.isNull(offset + 12) ? null : courseIdsConverter.convertToEntityProperty(cursor.getString(offset + 12)), // courseIds
+            cursor.isNull(offset + 13) ? null : cursor.getLong(offset + 13) // order
         );
         return entity;
     }
      
     @Override
     public void readEntity(Cursor cursor, Product entity, int offset) {
-        entity.setOrder(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setId(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
-        entity.setTitle(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setSlug(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setDescriptionHtml(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setImage(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setStartDate(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setEndDate(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setBuyNowText(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setSurl(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setFurl(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setCurrentPrice(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setPrices(cursor.isNull(offset + 12) ? null : pricesConverter.convertToEntityProperty(cursor.getString(offset + 12)));
-        entity.setCourseIds(cursor.isNull(offset + 13) ? null : courseIdsConverter.convertToEntityProperty(cursor.getString(offset + 13)));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setTitle(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setSlug(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setDescriptionHtml(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setImage(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setStartDate(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setEndDate(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setBuyNowText(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setSurl(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setFurl(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setCurrentPrice(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setPrices(cursor.isNull(offset + 11) ? null : pricesConverter.convertToEntityProperty(cursor.getString(offset + 11)));
+        entity.setCourseIds(cursor.isNull(offset + 12) ? null : courseIdsConverter.convertToEntityProperty(cursor.getString(offset + 12)));
+        entity.setOrder(cursor.isNull(offset + 13) ? null : cursor.getLong(offset + 13));
      }
     
     @Override
     protected final Long updateKeyAfterInsert(Product entity, long rowId) {
-        entity.setOrder(rowId);
+        entity.setId(rowId);
         return rowId;
     }
     
     @Override
     public Long getKey(Product entity) {
         if(entity != null) {
-            return entity.getOrder();
+            return entity.getId();
         } else {
             return null;
         }
@@ -289,7 +289,7 @@ public class ProductDao extends AbstractDao<Product, Long> {
 
     @Override
     public boolean hasKey(Product entity) {
-        return entity.getOrder() != null;
+        return entity.getId() != null;
     }
 
     @Override

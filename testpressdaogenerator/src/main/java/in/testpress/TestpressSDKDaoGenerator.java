@@ -122,8 +122,7 @@ public class TestpressSDKDaoGenerator {
 
     private static Entity addProduct(Schema schema) {
         Entity product = schema.addEntity("Product");
-        product.addLongProperty("order").primaryKey();
-        product.addLongProperty("id");
+        product.addLongProperty("id").primaryKey();
         product.addStringProperty("title");
         product.addStringProperty("slug");
         product.addStringProperty("descriptionHtml");
@@ -142,6 +141,7 @@ public class TestpressSDKDaoGenerator {
                 "in.testpress.util.IntegerList",
                 "in.testpress.util.IntegerListConverter"
         ).codeBeforeField("@SerializedName(\"courses\")");
+        product.addLongProperty("order");
         return product;
     }
 

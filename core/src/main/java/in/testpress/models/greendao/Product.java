@@ -25,7 +25,6 @@ import in.testpress.core.TestpressSDKDatabase;
 public class Product {
 
     @Id
-    private Long order;
     private Long id;
     private String title;
     private String slug;
@@ -44,6 +43,7 @@ public class Product {
     @SerializedName("courses")
     @Convert(converter = in.testpress.util.IntegerListConverter.class, columnType = String.class)
     private IntegerList courseIds;
+    private Long order;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -52,13 +52,12 @@ public class Product {
     public Product() {
     }
 
-    public Product(Long order) {
-        this.order = order;
+    public Product(Long id) {
+        this.id = id;
     }
 
     @Generated
-    public Product(Long order, Long id, String title, String slug, String descriptionHtml, String image, String startDate, String endDate, String buyNowText, String surl, String furl, String currentPrice, IntegerList prices, IntegerList courseIds) {
-        this.order = order;
+    public Product(Long id, String title, String slug, String descriptionHtml, String image, String startDate, String endDate, String buyNowText, String surl, String furl, String currentPrice, IntegerList prices, IntegerList courseIds, Long order) {
         this.id = id;
         this.title = title;
         this.slug = slug;
@@ -72,13 +71,6 @@ public class Product {
         this.currentPrice = currentPrice;
         this.prices = prices;
         this.courseIds = courseIds;
-    }
-
-    public Long getOrder() {
-        return order;
-    }
-
-    public void setOrder(Long order) {
         this.order = order;
     }
 
@@ -184,6 +176,14 @@ public class Product {
 
     public void setCourseIds(IntegerList courseIds) {
         this.courseIds = courseIds;
+    }
+
+    public Long getOrder() {
+        return order;
+    }
+
+    public void setOrder(Long order) {
+        this.order = order;
     }
 
     // KEEP METHODS - put your custom methods here
