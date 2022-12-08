@@ -2,6 +2,8 @@ package in.testpress.course.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
+
 import androidx.fragment.app.FragmentActivity;
 import androidx.loader.content.Loader;
 
@@ -107,9 +109,9 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
             getLoaderManager().destroyLoader(loader.getId());
 
         } else {
+            deleteAndInsertProductsInDB(products);
             this.items = products;
             getListAdapter().getWrappedAdapter().setItems(products);
-            deleteAndInsertProductsInDB(products);
             showList();
             getListAdapter().notifyDataSetChanged();
         }
