@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 52;
+    private static final int VERSION = 53;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -141,6 +141,7 @@ public class TestpressSDKDaoGenerator {
                 "in.testpress.util.IntegerList",
                 "in.testpress.util.IntegerListConverter"
         ).codeBeforeField("@SerializedName(\"courses\")");
+        product.addLongProperty("order");
         return product;
     }
 
