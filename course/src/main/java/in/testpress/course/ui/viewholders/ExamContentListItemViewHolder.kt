@@ -33,7 +33,9 @@ class ExamContentListItemViewHolder(view: View) : BaseContentListItemViewHolder(
         content.exam?.let {
             numberOfQuestions.text = it.numberOfQuestions.toString() + " Qs"
             bindDuration(content, it)
-        }?:hideExamDetails()
+        }?: run {
+            hideExamDetails()
+        }
     }
 
     private fun hideExamDetails(){
