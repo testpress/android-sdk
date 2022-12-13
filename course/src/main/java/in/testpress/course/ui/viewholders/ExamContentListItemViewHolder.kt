@@ -18,6 +18,7 @@ class ExamContentListItemViewHolder(view: View) : BaseContentListItemViewHolder(
     private val duration: TextView = view.findViewById(R.id.duration)
     private val durationContainer: LinearLayout = view.findViewById(R.id.duration_container)
     private val numberOfQuestions: TextView = view.findViewById(R.id.number_of_questions)
+    private val questionContainer: LinearLayout = view.findViewById(R.id.question_container)
     private val description: TextView = view.findViewById(R.id.description)
     private val descriptionContainer: LinearLayout = view.findViewById(R.id.description_container)
 
@@ -32,7 +33,15 @@ class ExamContentListItemViewHolder(view: View) : BaseContentListItemViewHolder(
         content.exam?.let {
             numberOfQuestions.text = it.numberOfQuestions.toString() + " Qs"
             bindDuration(content, it)
+        }?: run {
+            hideExamDetails()
         }
+    }
+
+    private fun hideExamDetails(){
+        durationContainer.visibility = View.GONE
+        questionContainer.visibility = View.GONE
+        descriptionContainer.visibility = View.GONE
     }
 
     private fun displayDescription(content: DomainContent) {

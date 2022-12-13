@@ -26,8 +26,14 @@ class VideoContentListItemViewHolder(view: View) : BaseContentListItemViewHolder
         content.video?.let {
             bindDuration(it)
             bindVideoProgress(content)
+        }?: run {
+            hideVideoDuration()
         }
         contentTypeIcon.visibility = View.VISIBLE
+    }
+
+    private fun hideVideoDuration(){
+        durationContainer.visibility = View.GONE
     }
 
     private fun bindVideoProgress(content: DomainContent) {
