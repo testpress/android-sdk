@@ -12,7 +12,8 @@ object MeetingCommonCallback: BaseCallback<MeetingCommonCallback.CommonEvent?>()
             errorCode: Int,
             internalErrorCode: Int
         )
-        fun onChatMessageReceived(inMeetingChatMessage: InMeetingChatMessage) {}
+        fun onChatMessageReceived(inMeetingChatMessage: InMeetingChatMessage)
+        fun onMeetingNeedCloseOtherMeeting(inMeetingEventHandler: InMeetingEventHandler)
     }
 
     private var serviceListener: MeetingServiceListener = object : MeetingServiceListener {
@@ -45,6 +46,12 @@ object MeetingCommonCallback: BaseCallback<MeetingCommonCallback.CommonEvent?>()
         override fun onChatMessageReceived(inMeetingChatMessage: InMeetingChatMessage) {
             for (event in callbacks) {
                 event?.onChatMessageReceived(inMeetingChatMessage)
+            }
+        }
+
+        override fun onMeetingNeedCloseOtherMeeting(inMeetingEventHandler: InMeetingEventHandler){
+            for (event in callbacks) {
+                event?.onMeetingNeedCloseOtherMeeting(inMeetingEventHandler)
             }
         }
     }

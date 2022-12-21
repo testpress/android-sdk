@@ -26,6 +26,7 @@ class ZoomMeetHandler(
 
         if (zoomSDK.isInitialized) {
             registerMeetingServiceListener()
+            zoomSDK.meetingSettingsHelper.isCustomizedMeetingUIEnabled = true
         }
     }
 
