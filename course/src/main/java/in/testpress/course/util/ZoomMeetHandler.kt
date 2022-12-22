@@ -6,6 +6,7 @@ import `in`.testpress.models.ProfileDetails
 import `in`.testpress.util.isEmailValid
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import us.zoom.sdk.*
 import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_MEETING_ID
@@ -72,7 +73,9 @@ class ZoomMeetHandler(
 
     private fun returnToMeeting(){
         if (ZoomSDK.getInstance().meetingSettingsHelper.isCustomizedMeetingUIEnabled) {
-            context.startActivity(Intent(context, CustomMeetingActivity::class.java))
+            val intent = Intent(context, CustomMeetingActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+            context.startActivity(intent)
         }else{
             zoomSDK.meetingService.returnToMeeting(context)
         }

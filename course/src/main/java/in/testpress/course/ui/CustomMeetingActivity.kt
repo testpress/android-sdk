@@ -112,12 +112,11 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
     }
 
     private fun checkShowMeetingLayout() {
-        primaryVideoViewManager = primaryVideoView.videoViewManager
         val newLayoutType: Int = getMeetingLayoutType()
         if (currentLayoutType != newLayoutType) {
             removeOldLayout(currentLayoutType)
             currentLayoutType = newLayoutType
-            addNewLayout(newLayoutType)
+            addNewLayout(currentLayoutType)
         }
     }
 
@@ -131,6 +130,8 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         } else if (type == LAYOUT_TYPE_CONNECTING){
             connectingView.visibility = View.GONE
             meetingScreenContainer.visibility = View.VISIBLE
+        } else if (type == LAYOUT_TYPE_ATTENDEE){
+            primaryVideoViewManager.removeAllVideoUnits()
         }
     }
 
@@ -145,6 +146,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
             connectingView.visibility = View.VISIBLE
             meetingScreenContainer.visibility = View.GONE
         } else if (type == LAYOUT_TYPE_ATTENDEE) {
+            meetingScreenContainer.visibility = View.VISIBLE
             updateVideoView()
         }
     }
@@ -215,6 +217,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         showLeaveMeetingDialog()
     }
 
