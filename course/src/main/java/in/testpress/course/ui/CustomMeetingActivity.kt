@@ -5,14 +5,20 @@ import `in`.testpress.course.ui.callbacks.MeetingCommonCallback
 import `in`.testpress.course.ui.callbacks.MeetingShareCallback
 import `in`.testpress.course.ui.callbacks.MeetingUserCallback
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.Button
+import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.fragment.app.FragmentActivity
 import us.zoom.sdk.*
+
 
 class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
     MeetingCommonCallback.CommonEvent, MeetingShareCallback.ShareEvent {
@@ -61,7 +67,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
         )
-        primaryVideoView = meetingScreen.findViewById<View>(R.id.videoView) as MobileRTCVideoView
+        primaryVideoView = meetingScreen.findViewById<View>(R.id.primaryMeetingView) as MobileRTCVideoView
         primaryVideoViewManager = primaryVideoView.videoViewManager
 
         registerCallbackListener()
@@ -83,7 +89,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
 
     override fun onShareActiveUser(userId: Long) {
         if (inMeetingService.isHostUser(userId) || userId == 0L && isHostSharingScreen) {
-            updateVideoView()
+            checkShowMeetingLayout()
         }
     }
 
@@ -92,6 +98,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         errorCode: Int,
         internalErrorCode: Int
     ) {
+        checkShowMeetingLayout()
     }
 
     private fun getMeetingLayoutType(): Int {
@@ -167,6 +174,42 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
     override fun onMeetingUserLeave(list: List<Long?>?) {}
     override fun onSilentModeChanged(inSilentMode: Boolean) {}
     override fun onLowOrRaiseHandStatusChanged(userId: Long, isRaisedHand: Boolean) {}
+    override fun onMeetingNeedPasswordOrDisplayName(
+        needPassword: Boolean,
+        needUsername: Boolean,
+        inMeetingEventHandler: InMeetingEventHandler
+    ) {
+        showUsernameDialog(needPassword, needUsername, inMeetingEventHandler)
+    }
+
+    private fun showUsernameDialog(
+        needPassword: Boolean,
+        needDisplayName: Boolean,
+        handler: InMeetingEventHandler
+    ) {
+        val builder = Dialog(this, R.style.TestpressAppCompatAlertDialogStyle)
+        builder.setTitle("Please enter your name")
+        builder.setContentView(R.layout.layout_input_username)
+        val username: EditText = builder.findViewById(R.id.edit_name)
+        builder.findViewById<Button>(R.id.btn_cancel).setOnClickListener(View.OnClickListener {
+            builder.dismiss()
+            inMeetingService.leaveCurrentMeeting(true)
+        })
+        builder.findViewById<Button>(R.id.btn_join).setOnClickListener {
+            val userName = username.text.toString()
+            if (TextUtils.isEmpty(userName)) {
+                builder.dismiss()
+                onMeetingNeedPasswordOrDisplayName(needPassword, needDisplayName, handler)
+            }
+            builder.dismiss()
+            handler.setMeetingNamePassword(inMeetingService.meetingPassword, userName, false)
+        }
+
+        builder.setCancelable(false)
+        builder.setCanceledOnTouchOutside(false)
+        builder.show()
+        username.requestFocus()
+    }
 
     override fun onMeetingUserJoin(list: List<Long?>?) {
         checkShowMeetingLayout()

@@ -16,8 +16,10 @@
         android:allowBackup="true"
         android:supportsRtl="true">
         <activity
-            android:name=".CustomMeetingActivity"
-            android:exported="false">
+            android:name=".ui.CustomMeetingActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -101,7 +103,9 @@
             android:name=".ui.PdfViewerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="PDFViewer"
-            android:theme="@style/TestpressTheme" />
+            android:theme="@style/TestpressTheme"
+            android:screenOrientation="portrait"
+            />
 
         <service
             android:name=".services.VideoDownloadService"

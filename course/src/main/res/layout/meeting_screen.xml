@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <us.zoom.sdk.MobileRTCVideoView
-        android:id="@+id/mainMeetingView"
+        android:id="@+id/primaryMeetingView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:focusable="false" />

@@ -1,6 +1,7 @@
 package `in`.testpress.course.ui.callbacks
 
 import `in`.testpress.course.util.SimpleInMeetingListener
+import us.zoom.sdk.InMeetingEventHandler
 import us.zoom.sdk.ZoomSDK
 
 object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
@@ -9,6 +10,11 @@ object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
         fun onMeetingUserLeave(list: List<Long?>?)
         fun onSilentModeChanged(inSilentMode: Boolean)
         fun onLowOrRaiseHandStatusChanged(userId: Long, isRaisedHand: Boolean)
+        fun onMeetingNeedPasswordOrDisplayName(
+            needPassword: Boolean,
+            needUsername: Boolean,
+            inMeetingEventHandler: InMeetingEventHandler
+        )
     }
 
     private var userListener = object: SimpleInMeetingListener() {
@@ -33,6 +39,16 @@ object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
         override fun onLowOrRaiseHandStatusChanged(userId: Long, isRaisedHand: Boolean) {
             for (event in callbacks) {
                 event?.onLowOrRaiseHandStatusChanged(userId, isRaisedHand)
+            }
+        }
+
+        override fun onMeetingNeedPasswordOrDisplayName(
+            needPassword: Boolean,
+            needUsername: Boolean,
+            inMeetingEventHandler: InMeetingEventHandler
+        ) {
+            for (event in callbacks) {
+                event?.onMeetingNeedPasswordOrDisplayName(needPassword, needUsername, inMeetingEventHandler)
             }
         }
 

@@ -1,9 +1,11 @@
 package `in`.testpress.course.util
 
 import `in`.testpress.course.domain.DomainVideoConferenceContent
+import `in`.testpress.course.ui.CustomMeetingActivity
 import `in`.testpress.models.ProfileDetails
 import `in`.testpress.util.isEmailValid
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import us.zoom.sdk.*
 import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_MEETING_ID
@@ -63,8 +65,16 @@ class ZoomMeetHandler(
             if (meetingService.meetingStatus == MeetingStatus.MEETING_STATUS_IDLE) {
                 startMeeting()
             } else {
-                meetingService.returnToMeeting(context)
+                returnToMeeting()
             }
+        }
+    }
+
+    private fun returnToMeeting(){
+        if (ZoomSDK.getInstance().meetingSettingsHelper.isCustomizedMeetingUIEnabled) {
+            context.startActivity(Intent(context, CustomMeetingActivity::class.java))
+        }else{
+            zoomSDK.meetingService.returnToMeeting(context)
         }
     }
 
@@ -79,17 +89,26 @@ class ZoomMeetHandler(
         errorCode: Int,
         internalErrorCode: Int
     ) {
-        if (meetingStatus == MeetingStatus.MEETING_STATUS_FAILED && errorCode == MeetingError.MEETING_ERROR_CLIENT_INCOMPATIBLE) {
-            Toast.makeText(context, "Version of ZoomSDK is too low!", Toast.LENGTH_LONG).show()
+        when (meetingStatus) {
+            MeetingStatus.MEETING_STATUS_FAILED -> {
+                val message =
+                    if (errorCode == MeetingError.MEETING_ERROR_CLIENT_INCOMPATIBLE)
+                        "Version of ZoomSDK is too low!"
+                    else
+                        "Could not join the meeting. Possibly meeting expired or ended"
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            }
+            MeetingStatus.MEETING_STATUS_CONNECTING -> {
+                Log.d("TAG", "onMeetingStatusChanged: ")
+                if (ZoomSDK.getInstance().meetingSettingsHelper.isCustomizedMeetingUIEnabled) {
+                    showCustomMeetingUI()
+                }
+            }
         }
+    }
 
-        if (meetingStatus == MeetingStatus.MEETING_STATUS_FAILED) {
-            Toast.makeText(
-                context,
-                "Could not join the meeting. Possibly meeting expired or ended",
-                Toast.LENGTH_LONG
-            ).show()
-        }
+    private fun showCustomMeetingUI(){
+        context.startActivity(Intent(context, CustomMeetingActivity::class.java))
     }
 
     override fun onMeetingParameterNotification(p0: MeetingParameter?) {
@@ -172,7 +191,7 @@ class ZoomMeetHandler(
     }
 
     override fun onMeetingNeedCloseOtherMeeting(p0: InMeetingEventHandler?) {
-        
+
     }
 
     override fun onActiveVideoUserChanged(p0: Long) {
@@ -186,7 +205,7 @@ class ZoomMeetHandler(
     }
 
     override fun onFollowHostVideoOrderChanged(p0: Boolean) {
-        
+
     }
 
     override fun onChatMessageReceived(p0: InMeetingChatMessage?) {
@@ -206,6 +225,9 @@ class ZoomMeetHandler(
 
 
     override fun onMeetingUserJoin(p0: MutableList<Long>?) {
+        if (ZoomSDK.getInstance().meetingSettingsHelper.isCustomizedMeetingUIEnabled) {
+            showCustomMeetingUI()
+        }
     }
 
     override fun onRecordingStatus(p0: InMeetingServiceListener.RecordingStatus?) {
