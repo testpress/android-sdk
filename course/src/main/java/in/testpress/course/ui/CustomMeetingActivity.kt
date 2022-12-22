@@ -182,33 +182,56 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         showUsernameDialog(needPassword, needUsername, inMeetingEventHandler)
     }
 
+    var dialog: Dialog? = null
     private fun showUsernameDialog(
         needPassword: Boolean,
         needDisplayName: Boolean,
         handler: InMeetingEventHandler
     ) {
-        val builder = Dialog(this, R.style.TestpressAppCompatAlertDialogStyle)
-        builder.setTitle("Please enter your name")
-        builder.setContentView(R.layout.layout_input_username)
-        val username: EditText = builder.findViewById(R.id.edit_name)
-        builder.findViewById<Button>(R.id.btn_cancel).setOnClickListener(View.OnClickListener {
-            builder.dismiss()
+        dialog?.dismiss()
+        dialog = Dialog(this, R.style.TestpressAppCompatAlertDialogStyle)
+        dialog!!.setTitle("Please enter your name")
+        dialog!!.setContentView(R.layout.layout_input_username)
+        val username: EditText = dialog!!.findViewById(R.id.edit_name)
+        dialog!!.findViewById<Button>(R.id.btn_cancel).setOnClickListener(View.OnClickListener {
+            dialog!!.dismiss()
+
             inMeetingService.leaveCurrentMeeting(true)
         })
-        builder.findViewById<Button>(R.id.btn_join).setOnClickListener {
+        dialog!!.findViewById<Button>(R.id.btn_join).setOnClickListener {
             val userName = username.text.toString()
             if (TextUtils.isEmpty(userName)) {
-                builder.dismiss()
+                dialog!!.dismiss()
                 onMeetingNeedPasswordOrDisplayName(needPassword, needDisplayName, handler)
             }
-            builder.dismiss()
+            dialog!!.dismiss()
             handler.setMeetingNamePassword(inMeetingService.meetingPassword, userName, false)
         }
 
-        builder.setCancelable(false)
-        builder.setCanceledOnTouchOutside(false)
-        builder.show()
+        dialog!!.setCancelable(false)
+        dialog!!.setCanceledOnTouchOutside(false)
+        dialog!!.show()
         username.requestFocus()
+    }
+
+    override fun onBackPressed() {
+        showLeaveMeetingDialog()
+    }
+
+    private fun showLeaveMeetingDialog() {
+        val builder = AlertDialog.Builder(this, R.style.TestpressAppCompatAlertDialogStyle)
+        if (inMeetingService.isMeetingConnected) {
+            builder.setMessage("Do you want to leave this meeting?")
+            builder.setCancelable(true)
+            builder.setPositiveButton("Yes"){ _: DialogInterface, _: Int -> leave()}
+            builder.setNegativeButton("No"){ dialog: DialogInterface, i: Int -> dialog.cancel()}
+        }
+        builder.create().show()
+    }
+
+    private fun leave(){
+        finish()
+        inMeetingService.leaveCurrentMeeting(false)
     }
 
     override fun onMeetingUserJoin(list: List<Long?>?) {

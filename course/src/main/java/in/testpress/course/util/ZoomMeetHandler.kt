@@ -99,7 +99,6 @@ class ZoomMeetHandler(
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             }
             MeetingStatus.MEETING_STATUS_CONNECTING -> {
-                Log.d("TAG", "onMeetingStatusChanged: ")
                 if (ZoomSDK.getInstance().meetingSettingsHelper.isCustomizedMeetingUIEnabled) {
                     showCustomMeetingUI()
                 }
