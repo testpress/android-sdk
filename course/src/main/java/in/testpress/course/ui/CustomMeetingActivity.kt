@@ -3,6 +3,8 @@ package `in`.testpress.course.ui
 import `in`.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE
 import `in`.testpress.core.TestpressUserDetails
 import `in`.testpress.course.R
+import `in`.testpress.course.databinding.ActivityCustomMeetingBinding
+import `in`.testpress.course.databinding.MeetingScreenBinding
 import `in`.testpress.course.domain.zoom.callbacks.MeetingCommonCallback
 import `in`.testpress.course.domain.zoom.callbacks.MeetingShareCallback
 import `in`.testpress.course.domain.zoom.callbacks.MeetingUserCallback
@@ -35,47 +37,25 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
     private lateinit var meetingService: MeetingService
     private lateinit var inMeetingService: InMeetingService
     private lateinit var meetingScreenContainer: FrameLayout
-    private lateinit var meetingScreen: View
-    private lateinit var primaryVideoView: MobileRTCVideoView
     private lateinit var primaryVideoViewManager: MobileRTCVideoViewManager
     private lateinit var audioController: InMeetingAudioController
-    private lateinit var waitingForHostView: View
-    private lateinit var waitingRoomView: View
-    private lateinit var connectingView: View
     private var profileDetails: ProfileDetails? = null
     private var isHostSharingScreen = false
     private var isMeetingFailed = false
+    private lateinit var customMeetingBinding: ActivityCustomMeetingBinding
+    private lateinit var meetingScreenBinding: MeetingScreenBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        this.setWindowFullScreen()
-        zoomSDK = ZoomSDK.getInstance()
-        profileDetails = TestpressUserDetails.getInstance().profileDetails
-        if (zoomSDK.meetingService == null || zoomSDK.inMeetingService == null) {
-            finish()
-            return
-        }
-        inMeetingService = zoomSDK.inMeetingService
-        meetingService = zoomSDK.meetingService
-        audioController = inMeetingService.inMeetingAudioController
+        setWindowFullScreen()
 
-        setContentView(R.layout.activity_custom_meeting)
+        customMeetingBinding = ActivityCustomMeetingBinding.inflate(layoutInflater)
+        setContentView(customMeetingBinding.rootView)
 
-        waitingForHostView = findViewById(R.id.waiting_for_host)
-        waitingRoomView = findViewById(R.id.waitingRoom)
-        connectingView = findViewById(R.id.connecting)
-        meetingScreenContainer = findViewById(R.id.meetingViewContainer)
-        meetingScreen = layoutInflater.inflate(R.layout.meeting_screen, null) as View
-        meetingScreenContainer.addView(
-            meetingScreen,
-            FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-        )
-        primaryVideoView = meetingScreen.findViewById<View>(R.id.primaryMeetingView) as MobileRTCVideoView
-        primaryVideoViewManager = primaryVideoView.videoViewManager
-
+        initializeZoomSDK()
+        initializeProfileDetails()
+        initializeMeetingScreen()
+        setPrimaryVideoViewManager()
         registerCallbackListener()
     }
 
@@ -85,6 +65,37 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+
+    private fun initializeZoomSDK(){
+        zoomSDK = ZoomSDK.getInstance()
+        if (zoomSDK.meetingService == null || zoomSDK.inMeetingService == null) {
+            goBack()
+            return
+        }
+        inMeetingService = zoomSDK.inMeetingService
+        meetingService = zoomSDK.meetingService
+        audioController = inMeetingService.inMeetingAudioController
+    }
+
+    private fun initializeProfileDetails(){
+        profileDetails = TestpressUserDetails.getInstance().profileDetails
+    }
+
+    private fun initializeMeetingScreen(){
+        meetingScreenContainer = customMeetingBinding.meetingViewContainer
+        meetingScreenBinding = MeetingScreenBinding.inflate(layoutInflater)
+        meetingScreenContainer.addView(
+            meetingScreenBinding.root,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        )
+    }
+
+    private fun setPrimaryVideoViewManager(){
+        primaryVideoViewManager = meetingScreenBinding.primaryMeetingView.videoViewManager
     }
 
     private fun registerCallbackListener() {
@@ -129,13 +140,13 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
 
     private fun removeOldLayout(type: Int){
         if (type == LAYOUT_TYPE_WAITHOST) {
-            waitingForHostView.visibility = View.GONE
+            customMeetingBinding.waitingForHost.visibility = View.GONE
             meetingScreenContainer.visibility = View.VISIBLE
         } else if (type == LAYOUT_TYPE_IN_WAIT_ROOM) {
-            waitingRoomView.visibility = View.GONE
+            customMeetingBinding.waitingRoom.visibility = View.GONE
             meetingScreenContainer.visibility = View.VISIBLE
         } else if (type == LAYOUT_TYPE_CONNECTING){
-            connectingView.visibility = View.GONE
+            customMeetingBinding.connecting.visibility = View.GONE
             meetingScreenContainer.visibility = View.VISIBLE
         } else if (type == LAYOUT_TYPE_ATTENDEE){
             primaryVideoViewManager.removeAllVideoUnits()
@@ -144,13 +155,13 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
 
     private fun addNewLayout(type: Int){
         if (type == LAYOUT_TYPE_WAITHOST) {
-            waitingForHostView.visibility = View.VISIBLE
+            customMeetingBinding.waitingForHost.visibility = View.VISIBLE
             meetingScreenContainer.visibility = View.GONE
         } else if (type == LAYOUT_TYPE_IN_WAIT_ROOM) {
-            waitingRoomView.visibility = View.VISIBLE
+            customMeetingBinding.waitingRoom.visibility = View.VISIBLE
             meetingScreenContainer.visibility = View.GONE
         } else if (type == LAYOUT_TYPE_CONNECTING) {
-            connectingView.visibility = View.VISIBLE
+            customMeetingBinding.connecting.visibility = View.VISIBLE
             meetingScreenContainer.visibility = View.GONE
         } else if (type == LAYOUT_TYPE_ATTENDEE) {
             meetingScreenContainer.visibility = View.VISIBLE
@@ -236,8 +247,8 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
 
     override fun onMeetingFail(errorCode: Int, internalErrorCode: Int) {
         isMeetingFailed = true
-        primaryVideoView.visibility = View.GONE
-        connectingView.visibility = View.GONE
+        meetingScreenBinding.primaryMeetingView.visibility = View.GONE
+        customMeetingBinding.connecting.visibility = View.GONE
         showJoinFailDialog(errorCode)
     }
 
@@ -249,27 +260,25 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
             .setPositiveButton(
                 "Ok"
             ) { _: DialogInterface?, _: Int ->
-                setResult(COURSE_CONTENT_DETAIL_REQUEST_CODE)
-                finish()
+                goBack()
             }.create()
         dialog.show()
     }
 
     override fun onMeetingLeaveComplete(ret: Long) {
         if (!isMeetingFailed)
-            setResult(COURSE_CONTENT_DETAIL_REQUEST_CODE)
-            finish()
+            goBack()
     }
 
     override fun onResume() {
         super.onResume()
         checkShowMeetingLayout(false)
-        primaryVideoView.onResume()
+        meetingScreenBinding.primaryMeetingView.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        primaryVideoView.onPause()
+        meetingScreenBinding.primaryMeetingView.onPause()
     }
 
     override fun onStop() {
@@ -290,6 +299,11 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         MeetingUserCallback.removeListener(this)
         MeetingCommonCallback.removeListener(this)
         MeetingShareCallback.removeListener(this)
+    }
+
+    private fun goBack(){
+        setResult(COURSE_CONTENT_DETAIL_REQUEST_CODE)
+        finish()
     }
 
     companion object {
