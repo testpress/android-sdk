@@ -1,4 +1,4 @@
-package `in`.testpress.course.ui.callbacks
+package `in`.testpress.course.domain.zoom.callbacks
 
 
 open class BaseCallback<T : BaseEvent?> {

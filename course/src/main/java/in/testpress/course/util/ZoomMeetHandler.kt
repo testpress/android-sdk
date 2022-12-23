@@ -1,7 +1,7 @@
 package `in`.testpress.course.util
 
 import `in`.testpress.course.domain.DomainVideoConferenceContent
-import `in`.testpress.course.ui.callbacks.MeetingCommonCallback
+import `in`.testpress.course.domain.zoom.callbacks.MeetingCommonCallback
 import `in`.testpress.models.ProfileDetails
 import `in`.testpress.util.isEmailValid
 import android.content.Context

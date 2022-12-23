@@ -1,4 +1,4 @@
-package `in`.testpress.course.ui.callbacks
+package `in`.testpress.course.domain.zoom.callbacks
 
 import `in`.testpress.course.util.SimpleInMeetingListener
 import us.zoom.sdk.*
