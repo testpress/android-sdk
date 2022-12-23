@@ -11,7 +11,7 @@ import us.zoom.sdk.InMeetingServiceListener
 import us.zoom.sdk.InMeetingServiceListener.RecordingStatus
 import us.zoom.sdk.VideoQuality
 
-abstract class SimpleInMeetingListener : InMeetingServiceListener {
+open class SimpleInMeetingListener : InMeetingServiceListener {
     override fun onMeetingNeedPasswordOrDisplayName(
         b: Boolean,
         b1: Boolean,
