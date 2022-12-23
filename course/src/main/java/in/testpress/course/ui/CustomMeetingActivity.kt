@@ -223,25 +223,6 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         username.requestFocus()
     }
 
-    override fun onBackPressed() {
-        showLeaveMeetingDialog()
-    }
-
-    private fun showLeaveMeetingDialog() {
-        val builder = AlertDialog.Builder(this, R.style.TestpressAppCompatAlertDialogStyle)
-        if (inMeetingService.isMeetingConnected) {
-            builder.setMessage("Do you want to leave this meeting?")
-            builder.setCancelable(true)
-            builder.setPositiveButton("Yes"){ _: DialogInterface, _: Int -> leave()}
-            builder.setNegativeButton("No"){ dialog: DialogInterface, i: Int -> dialog.cancel()}
-        }
-        builder.create().show()
-    }
-
-    private fun leave(){
-        inMeetingService.leaveCurrentMeeting(false)
-    }
-
     override fun onMeetingUserJoin(list: List<Long?>?) {
         checkShowMeetingLayout(false)
         audioController.connectAudioWithVoIP()
@@ -262,7 +243,10 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
             .setMessage("Error: $error")
             .setPositiveButton(
                 "Ok"
-            ) { _: DialogInterface?, _: Int -> finish() }.create()
+            ) { _: DialogInterface?, _: Int ->
+                setResult(COURSE_CONTENT_DETAIL_REQUEST_CODE)
+                finish()
+            }.create()
         dialog.show()
     }
 
