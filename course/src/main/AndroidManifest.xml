@@ -18,7 +18,9 @@
         <activity
             android:name=".ui.CustomMeetingActivity"
             android:exported="false"
+            android:configChanges="screenSize"
             android:screenOrientation="sensorLandscape"
+            android:theme="@style/TestpressTheme"
             >
             <meta-data
                 android:name="android.app.lib_name"

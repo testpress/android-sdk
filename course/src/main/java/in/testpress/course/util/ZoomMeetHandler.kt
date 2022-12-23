@@ -1,9 +1,11 @@
 package `in`.testpress.course.util
 
+import `in`.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE
 import `in`.testpress.course.domain.DomainVideoConferenceContent
 import `in`.testpress.course.ui.CustomMeetingActivity
 import `in`.testpress.models.ProfileDetails
 import `in`.testpress.util.isEmailValid
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -20,10 +22,12 @@ class ZoomMeetHandler(
     ZoomSDKInitializeListener, InMeetingServiceListener {
 
     private lateinit var zoomSDK: ZoomSDK
+    private lateinit var activity: Activity
     private var onInitializeCallback: VideoConferenceInitializeListener? = null
 
     fun init(callback: VideoConferenceInitializeListener) {
         zoomSDK = ZoomSDK.getInstance()
+        activity = context as Activity
         this.onInitializeCallback = callback
         zoomSDK.initialize(context, this, getInitializationParams())
 
@@ -75,7 +79,8 @@ class ZoomMeetHandler(
         if (ZoomSDK.getInstance().meetingSettingsHelper.isCustomizedMeetingUIEnabled) {
             val intent = Intent(context, CustomMeetingActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-            context.startActivity(intent)
+            intent.putExtra("forceRefresh", true)
+            activity.startActivityForResult(intent, COURSE_CONTENT_DETAIL_REQUEST_CODE)
         }else{
             zoomSDK.meetingService.returnToMeeting(context)
         }
@@ -110,7 +115,7 @@ class ZoomMeetHandler(
     }
 
     private fun showCustomMeetingUI(){
-        context.startActivity(Intent(context, CustomMeetingActivity::class.java))
+        activity.startActivityForResult(Intent(context, CustomMeetingActivity::class.java), COURSE_CONTENT_DETAIL_REQUEST_CODE)
     }
 
     override fun onMeetingParameterNotification(p0: MeetingParameter?) {
@@ -126,6 +131,7 @@ class ZoomMeetHandler(
             ).show()
             onInitializeCallback?.onFailure()
         } else {
+            zoomSDK.meetingSettingsHelper.isCustomizedMeetingUIEnabled = true
             registerMeetingServiceListener()
             onInitializeCallback?.onSuccess()
         }
@@ -226,11 +232,7 @@ class ZoomMeetHandler(
     }
 
 
-    override fun onMeetingUserJoin(p0: MutableList<Long>?) {
-        if (ZoomSDK.getInstance().meetingSettingsHelper.isCustomizedMeetingUIEnabled) {
-            showCustomMeetingUI()
-        }
-    }
+    override fun onMeetingUserJoin(p0: MutableList<Long>?) {}
 
     override fun onRecordingStatus(p0: InMeetingServiceListener.RecordingStatus?) {
          

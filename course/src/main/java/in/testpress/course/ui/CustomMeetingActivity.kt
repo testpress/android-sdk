@@ -1,5 +1,6 @@
 package `in`.testpress.course.ui
 
+import `in`.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE
 import `in`.testpress.course.R
 import `in`.testpress.course.ui.callbacks.MeetingCommonCallback
 import `in`.testpress.course.ui.callbacks.MeetingShareCallback
@@ -9,7 +10,6 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -36,6 +36,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
     private lateinit var meetingScreen: View
     private lateinit var primaryVideoView: MobileRTCVideoView
     private lateinit var primaryVideoViewManager: MobileRTCVideoViewManager
+    private lateinit var audioController: InMeetingAudioController
     private lateinit var waitingForHostView: View
     private lateinit var waitingRoomView: View
     private lateinit var connectingView: View
@@ -52,6 +53,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         }
         inMeetingService = zoomSDK.inMeetingService
         meetingService = zoomSDK.meetingService
+        audioController = inMeetingService.inMeetingAudioController
 
         setContentView(R.layout.activity_custom_meeting)
 
@@ -89,7 +91,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
 
     override fun onShareActiveUser(userId: Long) {
         if (inMeetingService.isHostUser(userId) || userId == 0L && isHostSharingScreen) {
-            checkShowMeetingLayout()
+            checkShowMeetingLayout(true)
         }
     }
 
@@ -98,7 +100,8 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         errorCode: Int,
         internalErrorCode: Int
     ) {
-        checkShowMeetingLayout()
+        val forceRefresh = intent.getBooleanExtra("forceRefresh", false)
+        checkShowMeetingLayout(forceRefresh)
     }
 
     private fun getMeetingLayoutType(): Int {
@@ -111,9 +114,9 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         }
     }
 
-    private fun checkShowMeetingLayout() {
+    private fun checkShowMeetingLayout(forceRefresh: Boolean) {
         val newLayoutType: Int = getMeetingLayoutType()
-        if (currentLayoutType != newLayoutType) {
+        if (currentLayoutType != newLayoutType || forceRefresh) {
             removeOldLayout(currentLayoutType)
             currentLayoutType = newLayoutType
             addNewLayout(currentLayoutType)
@@ -217,7 +220,6 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
         showLeaveMeetingDialog()
     }
 
@@ -233,12 +235,13 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
     }
 
     private fun leave(){
-        finish()
         inMeetingService.leaveCurrentMeeting(false)
     }
 
     override fun onMeetingUserJoin(list: List<Long?>?) {
-        checkShowMeetingLayout()
+        checkShowMeetingLayout(false)
+        audioController.connectAudioWithVoIP()
+        audioController.muteMyAudio(true)
     }
 
     override fun onMeetingFail(errorCode: Int, internalErrorCode: Int) {
@@ -260,7 +263,15 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
     }
 
     override fun onMeetingLeaveComplete(ret: Long) {
-        if (!isMeetingFailed) finish()
+        if (!isMeetingFailed)
+            setResult(COURSE_CONTENT_DETAIL_REQUEST_CODE)
+            finish()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkShowMeetingLayout(false)
+        primaryVideoView.onResume()
     }
 
     override fun onPause() {
