@@ -3,9 +3,9 @@ package `in`.testpress.course.ui
 import `in`.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE
 import `in`.testpress.core.TestpressUserDetails
 import `in`.testpress.course.R
-import `in`.testpress.course.ui.callbacks.MeetingCommonCallback
-import `in`.testpress.course.ui.callbacks.MeetingShareCallback
-import `in`.testpress.course.ui.callbacks.MeetingUserCallback
+import `in`.testpress.course.domain.zoom.callbacks.MeetingCommonCallback
+import `in`.testpress.course.domain.zoom.callbacks.MeetingShareCallback
+import `in`.testpress.course.domain.zoom.callbacks.MeetingUserCallback
 import `in`.testpress.models.ProfileDetails
 import android.app.AlertDialog
 import android.app.Dialog
