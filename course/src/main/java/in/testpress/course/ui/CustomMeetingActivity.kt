@@ -1,10 +1,12 @@
 package `in`.testpress.course.ui
 
 import `in`.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE
+import `in`.testpress.core.TestpressUserDetails
 import `in`.testpress.course.R
 import `in`.testpress.course.ui.callbacks.MeetingCommonCallback
 import `in`.testpress.course.ui.callbacks.MeetingShareCallback
 import `in`.testpress.course.ui.callbacks.MeetingUserCallback
+import `in`.testpress.models.ProfileDetails
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
@@ -40,6 +42,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
     private lateinit var waitingForHostView: View
     private lateinit var waitingRoomView: View
     private lateinit var connectingView: View
+    private var profileDetails: ProfileDetails? = null
     private var isHostSharingScreen = false
     private var isMeetingFailed = false
 
@@ -47,6 +50,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         super.onCreate(savedInstanceState)
         this.setWindowFullScreen()
         zoomSDK = ZoomSDK.getInstance()
+        profileDetails = TestpressUserDetails.getInstance().profileDetails
         if (zoomSDK.meetingService == null || zoomSDK.inMeetingService == null) {
             finish()
             return
@@ -202,6 +206,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         dialog!!.setTitle("Please enter your name")
         dialog!!.setContentView(R.layout.layout_input_username)
         val username: EditText = dialog!!.findViewById(R.id.edit_name)
+        username.setText(profileDetails?.displayName ?: "")
         dialog!!.findViewById<Button>(R.id.btn_cancel).setOnClickListener(View.OnClickListener {
             dialog!!.dismiss()
 

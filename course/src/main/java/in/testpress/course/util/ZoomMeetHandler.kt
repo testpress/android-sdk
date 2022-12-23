@@ -76,10 +76,7 @@ class ZoomMeetHandler(
 
     private fun returnToMeeting(){
         if (ZoomSDK.getInstance().meetingSettingsHelper.isCustomizedMeetingUIEnabled) {
-            val intent = Intent(context, CustomMeetingActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-            intent.putExtra("forceRefresh", true)
-            activity.startActivityForResult(intent, COURSE_CONTENT_DETAIL_REQUEST_CODE)
+            showCustomMeetingUI(true)
         }else{
             zoomSDK.meetingService.returnToMeeting(context)
         }
@@ -109,14 +106,17 @@ class ZoomMeetHandler(
             }
             MeetingStatus.MEETING_STATUS_CONNECTING -> {
                 if (ZoomSDK.getInstance().meetingSettingsHelper.isCustomizedMeetingUIEnabled) {
-                    showCustomMeetingUI()
+                    showCustomMeetingUI(false)
                 }
             }
         }
     }
 
-    private fun showCustomMeetingUI(){
-        activity.startActivityForResult(Intent(context, CustomMeetingActivity::class.java), COURSE_CONTENT_DETAIL_REQUEST_CODE)
+    private fun showCustomMeetingUI(forceRefresh: Boolean){
+        val intent = Intent(context, CustomMeetingActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+        intent.putExtra("forceRefresh", forceRefresh)
+        activity.startActivityForResult(intent, COURSE_CONTENT_DETAIL_REQUEST_CODE)
     }
 
     override fun onMeetingNeedCloseOtherMeeting(inMeetingEventHandler: InMeetingEventHandler) {
