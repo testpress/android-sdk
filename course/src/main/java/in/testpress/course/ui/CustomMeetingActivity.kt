@@ -163,6 +163,25 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         dialog.show()
     }
 
+    override fun onBackPressed() {
+        showLeaveMeetingDialog()
+    }
+
+    private fun showLeaveMeetingDialog() {
+        val builder = AlertDialog.Builder(this, R.style.TestpressAppCompatAlertDialogStyle)
+        if (inMeetingService.isMeetingConnected) {
+            builder.setMessage("Do you want to leave this meeting?")
+            builder.setCancelable(true)
+            builder.setPositiveButton("Yes"){ _: DialogInterface, _: Int -> leave()}
+            builder.setNegativeButton("No"){ dialog: DialogInterface, i: Int -> dialog.cancel()}
+        }
+        builder.create().show()
+    }
+
+    private fun leave(){
+        inMeetingService.leaveCurrentMeeting(false)
+    }
+
     override fun onMeetingLeaveComplete(ret: Long) {
         if (!isMeetingFailed) goBack()
     }
