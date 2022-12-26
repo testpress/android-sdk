@@ -10,6 +10,7 @@ object MeetingShareCallback: BaseCallback<MeetingShareCallback.ShareEvent?>() {
     interface ShareEvent : BaseEvent {
         fun onShareActiveUser(userId: Long)
         fun onShareUserReceivingStatus(userId: Long)
+        fun onSharingStatus(status: SharingStatus, userId: Long)
     }
 
     private var shareListener: InMeetingShareListener = object : InMeetingShareListener {
@@ -19,7 +20,12 @@ object MeetingShareCallback: BaseCallback<MeetingShareCallback.ShareEvent?>() {
             }
         }
 
-        override fun onSharingStatus(status: SharingStatus, userId: Long) {}
+        override fun onSharingStatus(status: SharingStatus, userId: Long) {
+            for (event in callbacks) {
+                event?.onSharingStatus(status, userId)
+            }
+        }
+
         override fun onShareUserReceivingStatus(userId: Long) {
             for (event in callbacks) {
                 event?.onShareUserReceivingStatus(userId)

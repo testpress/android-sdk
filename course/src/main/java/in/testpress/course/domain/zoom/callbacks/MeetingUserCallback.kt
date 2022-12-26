@@ -11,7 +11,6 @@ object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
         fun onMeetingLeaveComplete(ret: Long)
         fun onSilentModeChanged(inSilentMode: Boolean)
         fun onLowOrRaiseHandStatusChanged(userId: Long, isRaisedHand: Boolean)
-        fun onChatMessageReceived(inMeetingChatMessage: InMeetingChatMessage)
     }
 
     private var userListener = object: SimpleInMeetingListener() {
@@ -42,12 +41,6 @@ object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
         override fun onMeetingLeaveComplete(ret: Long) {
             for (event in callbacks) {
                 event?.onMeetingLeaveComplete(ret)
-            }
-        }
-
-        override fun onChatMessageReceived(inMeetingChatMessage: InMeetingChatMessage) {
-            for (event in callbacks) {
-                event?.onChatMessageReceived(inMeetingChatMessage)
             }
         }
     }

@@ -116,6 +116,7 @@ class ZoomMeetHandler(
         val intent = Intent(context, CustomMeetingActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
         intent.putExtra("forceRefresh", forceRefresh)
+        intent.putExtra("conferenceTitle", videoConference.title)
         activity.startActivityForResult(intent, COURSE_CONTENT_DETAIL_REQUEST_CODE)
     }
 
