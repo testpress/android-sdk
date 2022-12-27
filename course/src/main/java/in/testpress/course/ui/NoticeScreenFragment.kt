@@ -30,7 +30,7 @@ class NoticeScreenFragment(
 
     private fun setupBackButton(){
         noticeScreenBinding.toolbar.setNavigationIcon(R.drawable.ic_back)
-        noticeScreenBinding.toolbar.setNavigationOnClickListener(View.OnClickListener { activity!!.onBackPressed() })
+        noticeScreenBinding.toolbar.setNavigationOnClickListener { activity!!.onBackPressed() }
     }
 
     private fun setTitle(){
@@ -43,9 +43,9 @@ class NoticeScreenFragment(
 
     private fun getMessage(): String{
         return when (meetingStatus){
-            MeetingStatus.MEETING_STATUS_CONNECTING -> "Please wait, connection to the class"
+            MeetingStatus.MEETING_STATUS_CONNECTING -> "Connecting to the class"
             MeetingStatus.MEETING_STATUS_IN_WAITING_ROOM -> "Please wait, the meeting host will let you in soon."
-            MeetingStatus.MEETING_STATUS_WAITINGFORHOST -> "Please wait for host to start this meeting."
+            MeetingStatus.MEETING_STATUS_WAITINGFORHOST -> "Wait for host to start this meeting."
             else -> ""
         }
     }

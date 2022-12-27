@@ -12,11 +12,9 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
-import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import us.zoom.sdk.*
@@ -35,7 +33,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setWindowFullScreen()
+        setUpWindow()
 
         customMeetingBinding = ActivityCustomMeetingBinding.inflate(layoutInflater)
         setContentView(customMeetingBinding.rootView)
@@ -45,7 +43,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         registerCallbackListener()
     }
 
-    private fun setWindowFullScreen() {
+    private fun setUpWindow() {
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN
@@ -105,11 +103,6 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         return meetingService.meetingStatus == MeetingStatus.MEETING_STATUS_INMEETING
     }
 
-
-    override fun onMeetingNeedCloseOtherMeeting(inMeetingEventHandler: InMeetingEventHandler) {}
-    override fun onMeetingUserLeave(list: List<Long?>?) {}
-    override fun onSilentModeChanged(inSilentMode: Boolean) {}
-    override fun onLowOrRaiseHandStatusChanged(userId: Long, isRaisedHand: Boolean) {}
     override fun onMeetingNeedPasswordOrDisplayName(
         needPassword: Boolean,
         needUsername: Boolean,
@@ -118,9 +111,6 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         showUsernameDialog(needPassword, needUsername, inMeetingEventHandler)
     }
 
-    override fun onJoinWebinarNeedUserNameAndEmail(inMeetingEventHandler: InMeetingEventHandler) {
-
-    }
 
     var dialog: Dialog? = null
     private fun showUsernameDialog(needPassword: Boolean, needDisplayName: Boolean, handler: InMeetingEventHandler) {
@@ -130,10 +120,10 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         dialog!!.setContentView(R.layout.layout_input_username)
         val username: EditText = dialog!!.findViewById(R.id.edit_name)
         username.setText(profileDetails?.displayName ?: "")
-        dialog!!.findViewById<Button>(R.id.btn_cancel).setOnClickListener(View.OnClickListener {
+        dialog!!.findViewById<Button>(R.id.btn_cancel).setOnClickListener {
             dialog!!.dismiss()
             inMeetingService.leaveCurrentMeeting(true)
-        })
+        }
         dialog!!.findViewById<Button>(R.id.btn_join).setOnClickListener {
             val userName = username.text.toString()
             if (TextUtils.isEmpty(userName)) {
@@ -174,9 +164,19 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
     }
 
     override fun onMeetingLeaveComplete(ret: Long) {
-        if (!isMeetingFailed)
-            goBack()
+        if (!isMeetingFailed) goBack()
     }
+
+    private fun goBack(){
+        setResult(COURSE_CONTENT_DETAIL_REQUEST_CODE)
+        finish()
+    }
+
+    override fun onJoinWebinarNeedUserNameAndEmail(inMeetingEventHandler: InMeetingEventHandler) {}
+    override fun onMeetingNeedCloseOtherMeeting(inMeetingEventHandler: InMeetingEventHandler) {}
+    override fun onMeetingUserLeave(list: List<Long?>?) {}
+    override fun onSilentModeChanged(inSilentMode: Boolean) {}
+    override fun onLowOrRaiseHandStatusChanged(userId: Long, isRaisedHand: Boolean) {}
 
     override fun onResume() {
         super.onResume()
@@ -191,14 +191,5 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
     private fun unRegisterListener() {
         MeetingUserCallback.removeListener(this)
         MeetingCommonCallback.removeListener(this)
-    }
-
-    private fun goBack(){
-        setResult(COURSE_CONTENT_DETAIL_REQUEST_CODE)
-        finish()
-    }
-
-    companion object {
-        private const val TAG = "CustomMeetingActivity"
     }
 }
