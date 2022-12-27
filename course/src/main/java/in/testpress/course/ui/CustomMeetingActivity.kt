@@ -91,16 +91,16 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
             .replace(customMeetingBinding.meetingViewContainer.id, fragment).commit()
     }
 
-    private fun showNoticeScreen(): Boolean{
-        return meetingService.meetingStatus in listOf(
+    private var showNoticeScreen = {
+        meetingService.meetingStatus in listOf(
             MeetingStatus.MEETING_STATUS_WAITINGFORHOST,
             MeetingStatus.MEETING_STATUS_IN_WAITING_ROOM,
             MeetingStatus.MEETING_STATUS_CONNECTING,
         )
     }
 
-    private fun showMeetingScreen(): Boolean{
-        return meetingService.meetingStatus == MeetingStatus.MEETING_STATUS_INMEETING
+    private var showMeetingScreen = {
+        meetingService.meetingStatus == MeetingStatus.MEETING_STATUS_INMEETING
     }
 
     override fun onMeetingNeedPasswordOrDisplayName(
