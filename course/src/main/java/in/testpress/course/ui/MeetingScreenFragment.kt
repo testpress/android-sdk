@@ -23,20 +23,24 @@ class MeetingScreenFragment : Fragment() , MeetingShareCallback.ShareEvent {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         meetingScreenBinding = MeetingScreenBinding.inflate(inflater, container, false)
-        primaryVideoViewManager = meetingScreenBinding.primaryMeetingView.videoViewManager
-        updateVideoView()
         return meetingScreenBinding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        primaryVideoViewManager = meetingScreenBinding.primaryMeetingView.videoViewManager
+        renderVideo()
     }
 
     override fun onSharingStatus(status: SharingStatus, userId: Long) {
         if (inMeetingService.isHostUser(userId) &&
             status == SharingStatus.Sharing_Other_Share_Begin ||
             status == SharingStatus.Sharing_Other_Share_End){
-            updateVideoView()
+            renderVideo()
         }
     }
 
-    private fun updateVideoView() {
+    private fun renderVideo() {
         primaryVideoViewManager.removeAllVideoUnits()
 
         val defaultVideoViewRenderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
