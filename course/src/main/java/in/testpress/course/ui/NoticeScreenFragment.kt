@@ -43,7 +43,7 @@ class NoticeScreenFragment(
 
     private fun getMessage(): String{
         return when (meetingStatus){
-            MeetingStatus.MEETING_STATUS_CONNECTING -> "Connecting to the class"
+            MeetingStatus.MEETING_STATUS_CONNECTING -> "Connecting to the class..."
             MeetingStatus.MEETING_STATUS_IN_WAITING_ROOM -> "Please wait, the meeting host will let you in soon."
             MeetingStatus.MEETING_STATUS_WAITINGFORHOST -> "Wait for host to start this meeting."
             else -> ""
