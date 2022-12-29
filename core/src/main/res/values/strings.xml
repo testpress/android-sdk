@@ -48,6 +48,8 @@
     <string name="lockout_limit_info">Note : Admin has restricted login attempts to %d</string>
 
     <string name="failed_loading_pdf"> Failed to load the PDF </string>
+    <string name="hint"><font size="14">Type message</font></string>
+
 
 
     <string-array name="discussions_author_filter">

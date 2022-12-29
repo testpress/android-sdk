@@ -37,7 +37,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:placeholderText="Type Something"
+        app:placeholderText="@string/hint"
         app:placeholderTextColor="@android:color/darker_gray"
         app:expandedHintEnabled="false"
         app:hintEnabled="false">
@@ -55,7 +55,7 @@
             tools:ignore="Autofill"
             android:paddingTop="0dp"
             android:paddingBottom="0dp"
-            android:textSize="@dimen/testpress_text_size_normal"
+            android:textSize="@dimen/testpress_text_size_small"
             />
 
     </com.google.android.material.textfield.TextInputLayout>
