@@ -30,7 +30,6 @@ class MessageListAdapter(private val currentUserId: Long) : RecyclerView.Adapter
     private fun isCurrentUserMessage(message: InMeetingChatMessage) = run { currentUserId == message.senderUserId }
 
     override fun getItemCount() = messages.count()
-
     override fun getItemId(position: Int) = position.toLong()
 
     fun addMessage(message: InMeetingChatMessage?){
@@ -57,7 +56,7 @@ class MessageListAdapter(private val currentUserId: Long) : RecyclerView.Adapter
             nameText.text = if (isCurrentUserMessage) "Me" else message.senderDisplayName
             nameText.visibility = if (previousMessage?.senderUserId == message.senderUserId) View.GONE else View.VISIBLE
             setColorOnMessageCard(isCurrentUserMessage)
-            }
+        }
 
         fun setColorOnMessageCard(isCurrentUserMessage: Boolean){
             val color = if (isCurrentUserMessage){
