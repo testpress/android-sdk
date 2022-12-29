@@ -87,5 +87,4 @@ class MessageListAdapter(private val currentUserId: Long) : RecyclerView.Adapter
             messageText.text = message.content
         }
     }
-
 }
