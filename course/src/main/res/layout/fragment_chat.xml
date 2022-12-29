@@ -12,7 +12,8 @@
         android:id="@+id/recycler_chat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="6dp"
+        android:layout_marginTop="6dp"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@+id/view"
         app:layout_constraintEnd_toEndOf="parent"
@@ -32,16 +33,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:endIconMode="custom"
-        android:ems="10"
         app:endIconDrawable="@drawable/ic_round_send_24"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:placeholderText="Type Something"
         app:placeholderTextColor="@android:color/darker_gray"
         app:expandedHintEnabled="false"
-
-    >
+        app:hintEnabled="false">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputBox"
@@ -56,6 +55,7 @@
             tools:ignore="Autofill"
             android:paddingTop="0dp"
             android:paddingBottom="0dp"
+            android:textSize="@dimen/testpress_text_size_normal"
             />
 
     </com.google.android.material.textfield.TextInputLayout>
