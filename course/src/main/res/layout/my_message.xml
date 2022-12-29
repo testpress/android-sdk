@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginEnd="6dp"
     android:layout_marginTop="1dp"
-    android:layout_marginStart="6dp">
+    android:layout_marginStart="36dp">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_gchat_message_me"
@@ -29,14 +29,14 @@
                 android:id="@+id/my_chat_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="5dp"
                 android:maxWidth="260dp"
-                android:paddingLeft="12dp"
-                android:paddingTop="8dp"
-                android:paddingRight="12dp"
+                android:paddingLeft="8dp"
+                android:paddingTop="4dp"
+                android:paddingRight="8dp"
                 android:text="This is a Message"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                android:textColor="#000000"
+                android:textSize="15sp" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
