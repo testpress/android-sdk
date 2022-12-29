@@ -16,15 +16,12 @@ class MessageListAdapter(private val currentUserId: Long) : RecyclerView.Adapter
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val view: View
-        if (viewType == VIEW_TYPE_MESSAGE_SENT) {
-            view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.my_message, parent, false)
-            return SentMessageHolder(view)
+        return if (viewType == VIEW_TYPE_MESSAGE_SENT) {
+            SentMessageHolder(LayoutInflater.from(parent.context)
+                .inflate(R.layout.my_message, parent, false))
         } else {
-            view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.received_message, parent, false)
-            return ReceivedMessageHolder(view)
+            ReceivedMessageHolder(LayoutInflater.from(parent.context)
+                .inflate(R.layout.received_message, parent, false))
         }
     }
 
@@ -38,19 +35,12 @@ class MessageListAdapter(private val currentUserId: Long) : RecyclerView.Adapter
         }
     }
 
-    override fun getItemCount(): Int {
-        return messages.count()
-    }
+    override fun getItemCount() = messages.count()
 
-
-    override fun getItemId(position: Int): Long {
-        return position.toLong()
-    }
-
+    override fun getItemId(position: Int) = position.toLong()
 
     override fun getItemViewType(position: Int): Int {
         val message: InMeetingChatMessage = messages[position]
-
         return if (message.senderUserId == currentUserId) {
             VIEW_TYPE_MESSAGE_SENT
         } else {
@@ -66,8 +56,7 @@ class MessageListAdapter(private val currentUserId: Long) : RecyclerView.Adapter
     }
 
 
-    private class ReceivedMessageHolder constructor(itemView: View) :
-        RecyclerView.ViewHolder(itemView) {
+    private class ReceivedMessageHolder constructor(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var messageText: TextView
         var nameText: TextView
 
