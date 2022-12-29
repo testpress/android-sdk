@@ -40,8 +40,7 @@ class MessageListAdapter(private val currentUserId: Long) : RecyclerView.Adapter
     override fun getItemId(position: Int) = position.toLong()
 
     override fun getItemViewType(position: Int): Int {
-        val message: InMeetingChatMessage = messages[position]
-        return if (message.senderUserId == currentUserId) {
+        return if (messages[position].senderUserId == currentUserId) {
             VIEW_TYPE_MESSAGE_SENT
         } else {
             VIEW_TYPE_MESSAGE_RECEIVED
