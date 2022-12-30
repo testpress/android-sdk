@@ -11,7 +11,7 @@ object MeetingChatCallback: BaseCallback<MeetingChatCallback.ChatEvent?>() {
         fun onChatMsgDeleteNotification(msgID: String, deleteBy: ChatMessageDeleteType)
     }
 
-    private var userListener = object: SimpleInMeetingListener() {
+    private var chatListener = object: SimpleInMeetingListener() {
         override fun onChatMessageReceived(inMeetingChatMessage: InMeetingChatMessage) {
             for (event in callbacks) {
                 event?.onChatMessageReceived(inMeetingChatMessage)
@@ -26,6 +26,6 @@ object MeetingChatCallback: BaseCallback<MeetingChatCallback.ChatEvent?>() {
     }
 
     init{
-        ZoomSDK.getInstance().inMeetingService.addListener(userListener)
+        ZoomSDK.getInstance().inMeetingService.addListener(chatListener)
     }
 }
