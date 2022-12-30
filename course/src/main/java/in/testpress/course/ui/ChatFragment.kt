@@ -15,7 +15,7 @@ class ChatFragment : Fragment(), MeetingChatCallback.ChatEvent{
     private var currentUserId: Long = 0
     private lateinit var inMeetingChatController: InMeetingChatController
     private lateinit var messageAdapter: MessageListAdapter
-    private lateinit var fragmentChatBinding: FragmentChatBinding
+    private lateinit var binding: FragmentChatBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,41 +25,45 @@ class ChatFragment : Fragment(), MeetingChatCallback.ChatEvent{
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        fragmentChatBinding = FragmentChatBinding.inflate(inflater, container, false)
-        return fragmentChatBinding.root
+        binding = FragmentChatBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUpSend()
-        setUpRecycleView()
+        setListeners()
+        initializeMessageList()
     }
 
-    private fun setUpSend(){
-        val inputBox = fragmentChatBinding.inputBox
-        val recyclerView = fragmentChatBinding.recyclerChat
-
-        fragmentChatBinding.inputBar.setEndIconOnClickListener {
-            if(inputBox.text?.isNotBlank() == true){
-                inMeetingChatController.sendChatToGroup(InMeetingChatController.MobileRTCChatGroup.MobileRTCChatGroup_All,
-                    inputBox.text.toString()
-                )
-                inputBox.text!!.clear()
-                recyclerView.post { recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1) }
-            }
+    private fun setListeners(){
+        binding.inputBar.setEndIconOnClickListener {
+            sendMessage()
         }
     }
 
-    private fun setUpRecycleView(){
+    private fun sendMessage(){
+        val inputBox = binding.inputBox
+        val recyclerView = binding.recyclerChat
+
+        if(inputBox.text?.isNotBlank() == true){
+            inMeetingChatController.sendChatToGroup(InMeetingChatController.MobileRTCChatGroup.MobileRTCChatGroup_All,
+                inputBox.text.toString()
+            )
+            inputBox.text!!.clear()
+            recyclerView.post { recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1) }
+        }
+    }
+
+    private fun initializeMessageList(){
         messageAdapter = MessageListAdapter(currentUserId)
-        fragmentChatBinding.recyclerChat.layoutManager = LinearLayoutManager(activity)
-        fragmentChatBinding.recyclerChat.adapter = messageAdapter
+        binding.recyclerChat.layoutManager = LinearLayoutManager(activity)
+        binding.recyclerChat.adapter = messageAdapter
     }
 
     override fun onChatMessageReceived(message: InMeetingChatMessage) {
         messageAdapter.addMessage(message)
-        if (! fragmentChatBinding.recyclerChat.canScrollVertically(1)) {
-            fragmentChatBinding.recyclerChat.smoothScrollToPosition(messageAdapter.itemCount - 1)
+        if (! binding.recyclerChat.canScrollVertically(1)) {
+            binding.recyclerChat.smoothScrollToPosition(messageAdapter.itemCount - 1)
         }
     }
 
