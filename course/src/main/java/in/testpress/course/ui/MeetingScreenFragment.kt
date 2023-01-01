@@ -2,11 +2,13 @@ package `in`.testpress.course.ui
 
 import `in`.testpress.course.databinding.MeetingScreenBinding
 import `in`.testpress.course.domain.zoom.callbacks.MeetingShareCallback
+import `in`.testpress.course.domain.zoom.callbacks.MeetingUserCallback
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.core.view.isVisible
 import us.zoom.sdk.*
 
 
@@ -15,6 +17,8 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent {
     private lateinit var inMeetingService: InMeetingService
     private lateinit var primaryVideoViewManager: MobileRTCVideoViewManager
     private lateinit var webCamVideoViewManager: MobileRTCVideoViewManager
+    private lateinit var audioController: InMeetingAudioController
+    private var optionBarFragment: MeetingOptionBarFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,28 +39,39 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent {
         super.onViewCreated(view, savedInstanceState)
         primaryVideoViewManager = meetingScreenBinding.primaryMeetingView.videoViewManager
         webCamVideoViewManager = meetingScreenBinding.webCamView.videoViewManager
+        audioController = inMeetingService.inMeetingAudioController
+        optionBarFragment = meetingScreenBinding.optionBar.getFragment<MeetingOptionBarFragment>()
         setCallbackOnOptionBar()
         renderVideo()
     }
 
     private fun setCallbackOnOptionBar(){
-        val optionBarFragment = meetingScreenBinding.optionBar.getFragment<MeetingOptionBarFragment>()
-        optionBarFragment.setCallback(object: MeetingOptionBarFragment.Companion.MeetingOptionBarCallback {
+        optionBarFragment?.setCallback(object: MeetingOptionBarFragment.Companion.MeetingOptionBarCallback {
             override fun onClickChats() {
-                Log.d("TAG", "onClickChats: ")
+                val sidebar = meetingScreenBinding.sidebar
+                if (sidebar.isVisible){
+                    meetingScreenBinding.sidebar.visibility = View.GONE
+                }else{
+                    meetingScreenBinding.sidebar.visibility = View.VISIBLE
+                }
+                renderVideo()
+                optionBarFragment!!.refreshChatIcon(sidebar.isVisible)
             }
 
             override fun onClickSpeaker() {
-                Log.d("TAG", "onClickSpeaker: ")
-
+                audioController.loudSpeakerStatus = !audioController.loudSpeakerStatus
+                optionBarFragment!!.refreshspeakerIcon(audioController.loudSpeakerStatus)
             }
 
             override fun onClickHand() {
-                Log.d("TAG", "onClickHand: ")
+                inMeetingService.raiseMyHand()
             }
-
         }
         )
+    }
+
+    override fun onLowOrRaiseHandStatusChanged(userId: Long, isRaisedHand: Boolean) {
+        optionBarFragment?.refreshHandIcon(!inMeetingService.isMyself(userId) && isRaisedHand)
     }
 
     override fun onSharingStatus(status: SharingStatus, userId: Long) {
@@ -123,4 +138,9 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent {
         super.onStop()
         primaryVideoViewManager.removeAllVideoUnits()
     }
+
+    override fun onMeetingUserJoin(list: List<Long?>?) {}
+    override fun onMeetingUserLeave(list: List<Long?>?) {}
+    override fun onMeetingLeaveComplete(ret: Long) {}
+    override fun onSilentModeChanged(inSilentMode: Boolean) {}
 }

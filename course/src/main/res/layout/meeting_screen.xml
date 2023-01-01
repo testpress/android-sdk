@@ -21,7 +21,7 @@
         android:layout_width="215dp"
         android:layout_height="0dp"
         android:orientation="vertical"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/optionBar"
         app:layout_constraintStart_toEndOf="@+id/primaryMeetingView"
@@ -52,7 +52,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:name="in.testpress.course.ui.ChatFragment"
+        android:name="in.testpress.course.ui.MeetingOptionBarFragment"
         tools:layout="@layout/meeting_option_bar"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

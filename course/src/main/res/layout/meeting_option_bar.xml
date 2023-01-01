@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_filled_front_hand"
-            android:backgroundTint="@android:color/darker_gray"
+            android:backgroundTint="#aaa"
             />
 
         <Space
@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_chat_filled"
-            android:backgroundTint="@android:color/darker_gray"
+            android:backgroundTint="#aaa"
             />
 
         <Space
@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_volume_off"
-            android:backgroundTint="@android:color/darker_gray"
+            android:backgroundTint="#aaa"
             />
 
 
