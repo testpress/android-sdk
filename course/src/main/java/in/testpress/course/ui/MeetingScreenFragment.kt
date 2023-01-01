@@ -35,7 +35,28 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent {
         super.onViewCreated(view, savedInstanceState)
         primaryVideoViewManager = meetingScreenBinding.primaryMeetingView.videoViewManager
         webCamVideoViewManager = meetingScreenBinding.webCamView.videoViewManager
+        setCallbackOnOptionBar()
         renderVideo()
+    }
+
+    private fun setCallbackOnOptionBar(){
+        val optionBarFragment = meetingScreenBinding.optionBar.getFragment<MeetingOptionBarFragment>()
+        optionBarFragment.setCallback(object: MeetingOptionBarFragment.Companion.MeetingOptionBarCallback {
+            override fun onClickChats() {
+                Log.d("TAG", "onClickChats: ")
+            }
+
+            override fun onClickSpeaker() {
+                Log.d("TAG", "onClickSpeaker: ")
+
+            }
+
+            override fun onClickHand() {
+                Log.d("TAG", "onClickHand: ")
+            }
+
+        }
+        )
     }
 
     override fun onSharingStatus(status: SharingStatus, userId: Long) {
