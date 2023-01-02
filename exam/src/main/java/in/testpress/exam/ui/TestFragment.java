@@ -673,7 +673,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         } else {
             showProgress(R.string.testpress_loading_questions);
         }
-        boolean fetchSinglePageOnly = attempt.hasSectionalLock() || (attempt.hasNoSectionalLock() && exam.getTemplateType() != 2);
+        boolean fetchSinglePageOnly = attempt.hasSectionalLock();
         return new AttemptItemsLoader(getActivity(), this, fetchSinglePageOnly);
     }
 
