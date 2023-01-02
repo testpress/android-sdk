@@ -174,7 +174,11 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
     }
 
     override fun onBackPressed() {
-        showLeaveMeetingDialog()
+        if (inMeetingService.isMeetingConnected) {
+            showLeaveMeetingDialog()
+        } else {
+            goBack()
+        }
     }
 
     private fun showLeaveMeetingDialog() {
