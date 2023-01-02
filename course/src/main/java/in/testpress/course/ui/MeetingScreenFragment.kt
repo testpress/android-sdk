@@ -52,22 +52,22 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent {
         renderWebCamVideo()
     }
 
-    private fun renderPrimaryVideo(){
+    private fun renderPrimaryVideo() {
         primaryVideoViewManager.removeAllVideoUnits()
         val screenShareUserId = inMeetingService.activeShareUserID()
         val defaultVideoViewRenderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
-        if(isHostSharingScreen(screenShareUserId)){
+        if (isHostSharingScreen(screenShareUserId)) {
             primaryVideoViewManager.addShareVideoUnit(screenShareUserId, defaultVideoViewRenderInfo)
-        }else{
+        } else {
             primaryVideoViewManager.addActiveVideoUnit(defaultVideoViewRenderInfo)
         }
     }
 
-    private fun renderWebCamVideo(){
+    private fun renderWebCamVideo() {
         webCamVideoViewManager.removeAllVideoUnits()
 
         val screenShareUserId = inMeetingService.activeShareUserID()
-        if (isHostSharingScreen(screenShareUserId)){
+        if (isHostSharingScreen(screenShareUserId)) {
             meetingScreenBinding.webCamView.visibility = View.VISIBLE
             val defaultVideoViewRenderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100).apply {
                 is_border_visible = false
@@ -77,13 +77,15 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent {
                 inMeetingService.activeShareUserID(),
                 defaultVideoViewRenderInfo
             )
-        }else{
+        } else {
             meetingScreenBinding.webCamView.visibility = View.GONE
         }
     }
 
-    private fun isHostSharingScreen(screenShareUserId: Long): Boolean{
-        return inMeetingService.inMeetingShareController.isOtherSharing && inMeetingService.isHostUser(screenShareUserId)
+    private fun isHostSharingScreen(screenShareUserId: Long): Boolean {
+        return inMeetingService.inMeetingShareController.isOtherSharing && inMeetingService.isHostUser(
+            screenShareUserId
+        )
     }
 
     override fun onResume() {
