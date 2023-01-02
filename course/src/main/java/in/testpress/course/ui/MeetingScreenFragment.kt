@@ -12,13 +12,13 @@ import androidx.core.view.isVisible
 import us.zoom.sdk.*
 
 
-class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent, MeetingUserCallback.UserEvent{
+class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent, MeetingUserCallback.UserEvent, MeetingOptionBarFragment.Companion.MeetingOptionBarCallback{
     private lateinit var meetingScreenBinding: MeetingScreenBinding
     private lateinit var inMeetingService: InMeetingService
     private lateinit var primaryVideoViewManager: MobileRTCVideoViewManager
     private lateinit var webCamVideoViewManager: MobileRTCVideoViewManager
     private lateinit var audioController: InMeetingAudioController
-    private var optionBarFragment: MeetingOptionBarFragment? = null
+    private lateinit var optionBarFragment: MeetingOptionBarFragment
     private var isRaisedHand = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,49 +47,45 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent, Meeti
         webCamVideoViewManager = meetingScreenBinding.webCamView.videoViewManager
         audioController = inMeetingService.inMeetingAudioController
         optionBarFragment = meetingScreenBinding.optionBar.getFragment<MeetingOptionBarFragment>()
-        setCallbackOnOptionBar()
+        optionBarFragment.setCallback(this)
         renderVideo()
     }
 
-    private fun setCallbackOnOptionBar(){
-        optionBarFragment?.setCallback(object: MeetingOptionBarFragment.Companion.MeetingOptionBarCallback {
-            override fun onClickChats() {
-                val sidebar = meetingScreenBinding.sidebar
-                if (sidebar.isVisible){
-                    meetingScreenBinding.sidebar.visibility = View.GONE
-                }else{
-                    meetingScreenBinding.sidebar.visibility = View.VISIBLE
-                }
-                renderVideo()
-                optionBarFragment!!.changeChatIconColor(sidebar.isVisible)
-            }
-
-            override fun onClickSpeaker() {
-                if (audioController.isAudioConnected) {
-                    audioController.disconnectAudio()
-                } else {
-                    audioController.connectAudioWithVoIP()
-                }
-
-                optionBarFragment!!.changeSpeakerIconColor(!audioController.isAudioConnected)
-            }
-
-            override fun onClickHand() {
-                if (isRaisedHand) {
-                    inMeetingService.lowerHand(inMeetingService.myUserID)
-                } else {
-                    inMeetingService.raiseMyHand()
-                }
-            }
+    override fun onClickChats() {
+        val sidebar = meetingScreenBinding.sidebar
+        if (sidebar.isVisible){
+            meetingScreenBinding.sidebar.visibility = View.GONE
+        }else{
+            meetingScreenBinding.sidebar.visibility = View.VISIBLE
         }
-        )
+        renderVideo()
+        optionBarFragment!!.changeChatIconColor(sidebar.isVisible)
     }
+
+    override fun onClickSpeaker() {
+        if (audioController.isAudioConnected) {
+            audioController.disconnectAudio()
+        } else {
+            audioController.connectAudioWithVoIP()
+        }
+
+        optionBarFragment.changeSpeakerIconColor(!audioController.isAudioConnected)
+    }
+
+    override fun onClickHand() {
+        if (isRaisedHand) {
+            inMeetingService.lowerHand(inMeetingService.myUserID)
+        } else {
+            inMeetingService.raiseMyHand()
+        }
+    }
+
 
     override fun onLowOrRaiseHandStatusChanged(userId: Long, isRaisedHand: Boolean) {
         if (!inMeetingService.isMyself(userId)) return
 
         this.isRaisedHand = isRaisedHand
-        optionBarFragment?.changeHandIconColor(isRaisedHand)
+        optionBarFragment.changeHandIconColor(isRaisedHand)
     }
 
     override fun onSharingStatus(status: SharingStatus, userId: Long) {
