@@ -14,6 +14,7 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent {
     private lateinit var meetingScreenBinding: MeetingScreenBinding
     private lateinit var inMeetingService: InMeetingService
     private lateinit var primaryVideoViewManager: MobileRTCVideoViewManager
+    private lateinit var webCamVideoViewManager: MobileRTCVideoViewManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +34,7 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         primaryVideoViewManager = meetingScreenBinding.primaryMeetingView.videoViewManager
+        webCamVideoViewManager = meetingScreenBinding.webCamView.videoViewManager
         renderVideo()
     }
 
@@ -46,15 +48,44 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent {
     }
 
     private fun renderVideo() {
-        primaryVideoViewManager.removeAllVideoUnits()
+        renderPrimaryVideo()
+        renderWebCamVideo()
+    }
 
-        val defaultVideoViewRenderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
+    private fun renderPrimaryVideo() {
+        primaryVideoViewManager.removeAllVideoUnits()
         val screenShareUserId = inMeetingService.activeShareUserID()
-        if (inMeetingService.inMeetingShareController.isOtherSharing && inMeetingService.isHostUser(screenShareUserId)) {
+        val defaultVideoViewRenderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
+        if (isHostSharingScreen(screenShareUserId)) {
             primaryVideoViewManager.addShareVideoUnit(screenShareUserId, defaultVideoViewRenderInfo)
         } else {
             primaryVideoViewManager.addActiveVideoUnit(defaultVideoViewRenderInfo)
         }
+    }
+
+    private fun renderWebCamVideo() {
+        webCamVideoViewManager.removeAllVideoUnits()
+
+        val screenShareUserId = inMeetingService.activeShareUserID()
+        if (isHostSharingScreen(screenShareUserId)) {
+            meetingScreenBinding.webCamView.visibility = View.VISIBLE
+            val defaultVideoViewRenderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100).apply {
+                is_border_visible = false
+                aspect_mode = MobileRTCVideoUnitAspectMode.VIDEO_ASPECT_PAN_AND_SCAN
+            }
+            webCamVideoViewManager.addAttendeeVideoUnit(
+                inMeetingService.activeShareUserID(),
+                defaultVideoViewRenderInfo
+            )
+        } else {
+            meetingScreenBinding.webCamView.visibility = View.GONE
+        }
+    }
+
+    private fun isHostSharingScreen(screenShareUserId: Long): Boolean {
+        return inMeetingService.inMeetingShareController.isOtherSharing && inMeetingService.isHostUser(
+            screenShareUserId
+        )
     }
 
     override fun onResume() {

@@ -12,21 +12,36 @@
         android:layout_height="match_parent"
         android:focusable="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/chatContainer"
+        app:layout_constraintEnd_toStartOf="@+id/sidebar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/chatContainer"
-        android:name="in.testpress.course.ui.ChatFragment"
-        android:layout_width="230dp"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/sidebar"
+        android:layout_width="215dp"
         android:layout_height="0dp"
-        android:background="@color/white"
+        android:orientation="vertical"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/primaryMeetingView"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout="@layout/fragment_chat" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <us.zoom.sdk.MobileRTCVideoView
+            android:id="@+id/webCamView"
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:focusable="false"
+            android:visibility="gone" />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/chatContainer"
+            android:name="in.testpress.course.ui.ChatFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:visibility="visible"
+            tools:layout="@layout/fragment_chat" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.constraintlayout.widget.ConstraintLayout>
 
