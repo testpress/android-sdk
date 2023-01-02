@@ -37,6 +37,7 @@ public class InstituteSettings {
     private boolean isVideoDownloadEnabled;
     private boolean showPDFVertically;
     private String appName;
+    private boolean isCustomMeetingUIEnabled;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -321,5 +322,13 @@ public class InstituteSettings {
 
     public void setAppName(String appName) {
         this.appName = appName;
+    }
+
+    public Boolean getIsCustomMeetingUIEnabled() {
+        return this.isCustomMeetingUIEnabled;
+    }
+
+    public void setIsCustomMeetingUIEnabled(Boolean customMeetingUIEnabled) {
+        this.isCustomMeetingUIEnabled = customMeetingUIEnabled;
     }
 }
