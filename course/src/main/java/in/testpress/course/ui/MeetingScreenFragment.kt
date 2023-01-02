@@ -61,7 +61,7 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent, Meeti
                     meetingScreenBinding.sidebar.visibility = View.VISIBLE
                 }
                 renderVideo()
-                optionBarFragment!!.refreshChatIcon(sidebar.isVisible)
+                optionBarFragment!!.changeChatIconColor(sidebar.isVisible)
             }
 
             override fun onClickSpeaker() {
@@ -71,7 +71,7 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent, Meeti
                     audioController.connectAudioWithVoIP()
                 }
 
-                optionBarFragment!!.refreshSpeakerIcon(!audioController.isAudioConnected)
+                optionBarFragment!!.changeSpeakerIconColor(!audioController.isAudioConnected)
             }
 
             override fun onClickHand() {
@@ -89,7 +89,7 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent, Meeti
         if (!inMeetingService.isMyself(userId)) return
 
         this.isRaisedHand = isRaisedHand
-        optionBarFragment?.refreshHandIcon(isRaisedHand)
+        optionBarFragment?.changeHandIconColor(isRaisedHand)
     }
 
     override fun onSharingStatus(status: SharingStatus, userId: Long) {

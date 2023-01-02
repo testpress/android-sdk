@@ -56,7 +56,7 @@ class MeetingOptionBarFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    fun refreshHandIcon(active: Boolean){
+    fun changeHandIconColor(active: Boolean){
         if (active) {
             binding.hand.backgroundTintList = ColorStateList.valueOf(
                 ContextCompat.getColor(context!!, R.color.testpress_color_primary)
@@ -69,7 +69,7 @@ class MeetingOptionBarFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    fun refreshSpeakerIcon(active: Boolean) {
+    fun changeSpeakerIconColor(active: Boolean) {
         if (active) {
             binding.speaker.backgroundTintList = ColorStateList.valueOf(
                 ContextCompat.getColor(context!!, R.color.testpress_color_primary)
@@ -81,7 +81,7 @@ class MeetingOptionBarFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    fun refreshChatIcon(active: Boolean){
+    fun changeChatIconColor(active: Boolean){
         if (active) {
             binding.showSidebar.backgroundTintList = ColorStateList.valueOf(
                 ContextCompat.getColor(context!!, R.color.testpress_color_primary)
