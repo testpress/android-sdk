@@ -19,11 +19,17 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent {
     private lateinit var webCamVideoViewManager: MobileRTCVideoViewManager
     private lateinit var audioController: InMeetingAudioController
     private var optionBarFragment: MeetingOptionBarFragment? = null
+    private var isRaisedHand = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         inMeetingService = ZoomSDK.getInstance().inMeetingService
+        registerCallback()
+    }
+
+    private fun registerCallback() {
         MeetingShareCallback.addListener(this)
+        MeetingUserCallback.addListener(this)
     }
 
     override fun onCreateView(
@@ -59,19 +65,31 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent {
             }
 
             override fun onClickSpeaker() {
-                audioController.loudSpeakerStatus = !audioController.loudSpeakerStatus
-                optionBarFragment!!.refreshspeakerIcon(audioController.loudSpeakerStatus)
+                if (audioController.isAudioConnected) {
+                    audioController.disconnectAudio()
+                } else {
+                    audioController.connectAudioWithVoIP()
+                }
+
+                optionBarFragment!!.refreshSpeakerIcon(!audioController.isAudioConnected)
             }
 
             override fun onClickHand() {
-                inMeetingService.raiseMyHand()
+                if (isRaisedHand) {
+                    inMeetingService.lowerHand(inMeetingService.myUserID)
+                } else {
+                    inMeetingService.raiseMyHand()
+                }
             }
         }
         )
     }
 
     override fun onLowOrRaiseHandStatusChanged(userId: Long, isRaisedHand: Boolean) {
-        optionBarFragment?.refreshHandIcon(!inMeetingService.isMyself(userId) && isRaisedHand)
+        if (!inMeetingService.isMyself(userId)) return
+
+        this.isRaisedHand = isRaisedHand
+        optionBarFragment?.refreshHandIcon(isRaisedHand)
     }
 
     override fun onSharingStatus(status: SharingStatus, userId: Long) {
@@ -137,6 +155,16 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent {
     override fun onStop() {
         super.onStop()
         primaryVideoViewManager.removeAllVideoUnits()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        removeCallback()
+    }
+
+    private fun removeCallback() {
+        MeetingShareCallback.removeListener(this)
+        MeetingUserCallback.removeListener(this)
     }
 
     override fun onMeetingUserJoin(list: List<Long?>?) {}

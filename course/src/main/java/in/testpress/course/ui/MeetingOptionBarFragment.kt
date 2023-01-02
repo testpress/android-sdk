@@ -2,14 +2,15 @@ package `in`.testpress.course.ui
 
 import `in`.testpress.course.R
 import `in`.testpress.course.databinding.MeetingOptionBarBinding
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 
 
 class MeetingOptionBarFragment : Fragment(), View.OnClickListener {
@@ -22,9 +23,11 @@ class MeetingOptionBarFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         binding.hand.setOnClickListener(this)
         binding.showSidebar.setOnClickListener(this)
         binding.speaker.setOnClickListener(this)
+        binding.exit.setOnClickListener(this)
     }
 
     fun setCallback(callback: MeetingOptionBarCallback){
@@ -37,46 +40,57 @@ class MeetingOptionBarFragment : Fragment(), View.OnClickListener {
         }
 
        val _view = view as ImageButton
-        when (_view.id){
-            binding.showSidebar.id ->{
+        when (_view.id) {
+            binding.showSidebar.id -> {
                 callback!!.onClickChats()
             }
-            binding.speaker.id ->{
-                Log.d("TAG", "onClick: ")
+            binding.speaker.id -> {
                 callback!!.onClickSpeaker()
             }
-            binding.hand.id ->{
-                Log.d("TAG", "onClick: ")
+            binding.hand.id -> {
                 callback!!.onClickHand()
             }
-
+            binding.exit.id -> {
+                activity?.onBackPressed()
+            }
         }
     }
 
     fun refreshHandIcon(active: Boolean){
-        if (active){
-            binding.speaker.setBackgroundColor(Color.parseColor("ffc940"))
+        if (active) {
+            binding.hand.backgroundTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(context!!, R.color.testpress_color_primary)
+            )
         }
-        else{
-            binding.speaker.setBackgroundColor(Color.parseColor("aaa"))
+        else {
+            binding.hand.backgroundTintList = ColorStateList.valueOf(
+                Color.parseColor("#aaaaaa")
+            )
         }
     }
 
-    fun refreshspeakerIcon(active: Boolean){
-        if (active){
-            binding.speaker.setBackgroundColor(Color.parseColor("aaa"))
-        }
-        else{
-            binding.speaker.background.invalidateSelf()
+    fun refreshSpeakerIcon(active: Boolean) {
+        if (active) {
+            binding.speaker.backgroundTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(context!!, R.color.testpress_color_primary)
+            )
+        } else {
+            binding.speaker.backgroundTintList = ColorStateList.valueOf(
+                Color.parseColor("#aaaaaa")
+            )
         }
     }
 
     fun refreshChatIcon(active: Boolean){
-        if (active){
-            binding.speaker.background.invalidateSelf()
+        if (active) {
+            binding.showSidebar.backgroundTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(context!!, R.color.testpress_color_primary)
+            )
         }
-        else{
-            binding.speaker.setBackgroundColor(Color.parseColor("aaa"))
+        else {
+            binding.showSidebar.backgroundTintList = ColorStateList.valueOf(
+                Color.parseColor("#aaaaaa")
+            )
         }
     }
 
