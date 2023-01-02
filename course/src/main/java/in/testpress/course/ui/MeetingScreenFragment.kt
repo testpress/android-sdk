@@ -12,7 +12,7 @@ import androidx.core.view.isVisible
 import us.zoom.sdk.*
 
 
-class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent {
+class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent, MeetingUserCallback.UserEvent{
     private lateinit var meetingScreenBinding: MeetingScreenBinding
     private lateinit var inMeetingService: InMeetingService
     private lateinit var primaryVideoViewManager: MobileRTCVideoViewManager

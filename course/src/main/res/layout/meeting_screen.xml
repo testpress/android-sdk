@@ -23,7 +23,7 @@
         android:orientation="vertical"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/optionBar"
+        app:layout_constraintEnd_toStartOf="@id/optionBar"
         app:layout_constraintStart_toEndOf="@+id/primaryMeetingView"
         app:layout_constraintTop_toTopOf="parent">
 
