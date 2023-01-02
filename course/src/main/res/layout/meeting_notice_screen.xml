@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.NoticeScreenFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".ui.NoticeScreenFragment">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -14,35 +13,34 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/white"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/TestpressTheme.PopupOverlay"
-        app:layout_scrollFlags="scroll|enterAlways"
-        app:contentInsetStartWithNavigation="0dp"
         app:contentInsetStart="0dp"
-        >
+        app:contentInsetStartWithNavigation="0dp"
+        app:layout_scrollFlags="scroll|enterAlways"
+        app:popupTheme="@style/TestpressTheme.PopupOverlay">
+
         <TextView
             android:id="@+id/toolbar_title"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="Video conference title"
-            android:textColor="@color/testpress_text_gray_dark"
-            android:textStyle="bold"
             android:gravity="center_vertical"
             android:paddingBottom="3dp"
+            android:text="Video conference title"
+            android:textColor="@color/testpress_text_gray_dark"
             android:textSize="@dimen/testpress_text_size_xmedium"
-            />
+            android:textStyle="bold" />
     </androidx.appcompat.widget.Toolbar>
 
     <TextView
         android:id="@+id/notice_message"
-        android:layout_below="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:layout_below="@+id/toolbar"
         android:layout_centerInParent="true"
+        android:background="@color/white"
         android:gravity="center"
         android:paddingBottom="36dp"
         android:text="Please wait, Connecting to the class."
-        android:textSize="@dimen/testpress_text_size_large"
-        android:textColor="@color/testpress_text_gray_medium" />
+        android:textColor="@color/testpress_text_gray_medium"
+        android:textSize="@dimen/testpress_text_size_large" />
 
 </RelativeLayout>

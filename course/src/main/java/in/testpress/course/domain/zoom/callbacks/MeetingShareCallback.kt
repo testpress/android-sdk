@@ -6,7 +6,7 @@ import us.zoom.sdk.SharingStatus
 import us.zoom.sdk.ZoomSDK
 
 
-object MeetingShareCallback: BaseCallback<MeetingShareCallback.ShareEvent?>() {
+object MeetingShareCallback : BaseCallback<MeetingShareCallback.ShareEvent?>() {
     interface ShareEvent : BaseEvent {
         fun onSharingStatus(status: SharingStatus, userId: Long)
     }
@@ -23,7 +23,7 @@ object MeetingShareCallback: BaseCallback<MeetingShareCallback.ShareEvent?>() {
         override fun onShareSettingTypeChanged(p0: ShareSettingType?) {}
     }
 
-    init{
+    init {
         ZoomSDK.getInstance().inMeetingService.inMeetingShareController.addListener(shareListener)
     }
 }

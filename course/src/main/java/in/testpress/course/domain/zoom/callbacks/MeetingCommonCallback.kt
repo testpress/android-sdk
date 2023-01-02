@@ -3,7 +3,7 @@ package `in`.testpress.course.domain.zoom.callbacks
 import `in`.testpress.course.util.SimpleInMeetingListener
 import us.zoom.sdk.*
 
-object MeetingCommonCallback: BaseCallback<MeetingCommonCallback.CommonEvent?>() {
+object MeetingCommonCallback : BaseCallback<MeetingCommonCallback.CommonEvent?>() {
     interface CommonEvent : BaseEvent {
         fun onMeetingFail(errorCode: Int, internalErrorCode: Int)
         fun onMeetingStatusChanged(
@@ -11,12 +11,14 @@ object MeetingCommonCallback: BaseCallback<MeetingCommonCallback.CommonEvent?>()
             errorCode: Int,
             internalErrorCode: Int
         )
+
         fun onMeetingNeedCloseOtherMeeting(inMeetingEventHandler: InMeetingEventHandler)
         fun onMeetingNeedPasswordOrDisplayName(
             needPassword: Boolean,
             needUsername: Boolean,
             inMeetingEventHandler: InMeetingEventHandler
         )
+
         fun onJoinWebinarNeedUserNameAndEmail(inMeetingEventHandler: InMeetingEventHandler)
     }
 
@@ -41,7 +43,7 @@ object MeetingCommonCallback: BaseCallback<MeetingCommonCallback.CommonEvent?>()
             }
         }
 
-        override fun onMeetingNeedCloseOtherMeeting(inMeetingEventHandler: InMeetingEventHandler){
+        override fun onMeetingNeedCloseOtherMeeting(inMeetingEventHandler: InMeetingEventHandler) {
             for (event in callbacks) {
                 event?.onMeetingNeedCloseOtherMeeting(inMeetingEventHandler)
             }
@@ -53,7 +55,11 @@ object MeetingCommonCallback: BaseCallback<MeetingCommonCallback.CommonEvent?>()
             inMeetingEventHandler: InMeetingEventHandler
         ) {
             for (event in callbacks) {
-                event?.onMeetingNeedPasswordOrDisplayName(needPassword, needUsername, inMeetingEventHandler)
+                event?.onMeetingNeedPasswordOrDisplayName(
+                    needPassword,
+                    needUsername,
+                    inMeetingEventHandler
+                )
             }
         }
 
