@@ -1,16 +1,16 @@
 package `in`.testpress.course.ui
 
+import `in`.testpress.course.databinding.MeetingScreenBinding
+import `in`.testpress.course.domain.zoom.callbacks.MeetingShareCallback
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import `in`.testpress.course.databinding.MeetingScreenBinding
-import `in`.testpress.course.domain.zoom.callbacks.MeetingShareCallback
+import androidx.fragment.app.Fragment
 import us.zoom.sdk.*
 
 
-class MeetingScreenFragment : Fragment() , MeetingShareCallback.ShareEvent {
+class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent {
     private lateinit var meetingScreenBinding: MeetingScreenBinding
     private lateinit var inMeetingService: InMeetingService
     private lateinit var primaryVideoViewManager: MobileRTCVideoViewManager
@@ -21,7 +21,11 @@ class MeetingScreenFragment : Fragment() , MeetingShareCallback.ShareEvent {
         MeetingShareCallback.addListener(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         meetingScreenBinding = MeetingScreenBinding.inflate(inflater, container, false)
         return meetingScreenBinding.root
     }
@@ -35,7 +39,8 @@ class MeetingScreenFragment : Fragment() , MeetingShareCallback.ShareEvent {
     override fun onSharingStatus(status: SharingStatus, userId: Long) {
         if (inMeetingService.isHostUser(userId) &&
             status == SharingStatus.Sharing_Other_Share_Begin ||
-            status == SharingStatus.Sharing_Other_Share_End){
+            status == SharingStatus.Sharing_Other_Share_End
+        ) {
             renderVideo()
         }
     }
@@ -45,7 +50,7 @@ class MeetingScreenFragment : Fragment() , MeetingShareCallback.ShareEvent {
 
         val defaultVideoViewRenderInfo = MobileRTCVideoUnitRenderInfo(0, 0, 100, 100)
         val screenShareUserId = inMeetingService.activeShareUserID()
-        if (inMeetingService.inMeetingShareController.isOtherSharing && inMeetingService.isHostUser(screenShareUserId)){
+        if (inMeetingService.inMeetingShareController.isOtherSharing && inMeetingService.isHostUser(screenShareUserId)) {
             primaryVideoViewManager.addShareVideoUnit(screenShareUserId, defaultVideoViewRenderInfo)
         } else {
             primaryVideoViewManager.addActiveVideoUnit(defaultVideoViewRenderInfo)

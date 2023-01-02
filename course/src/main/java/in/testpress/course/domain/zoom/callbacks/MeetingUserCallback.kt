@@ -1,7 +1,6 @@
 package `in`.testpress.course.domain.zoom.callbacks
 
 import `in`.testpress.course.util.SimpleInMeetingListener
-import us.zoom.sdk.InMeetingChatMessage
 import us.zoom.sdk.ZoomSDK
 
 object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {

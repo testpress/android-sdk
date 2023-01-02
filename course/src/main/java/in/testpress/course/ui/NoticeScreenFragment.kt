@@ -16,33 +16,37 @@ class NoticeScreenFragment(
 ) : Fragment() {
     private lateinit var noticeScreenBinding: MeetingNoticeScreenBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         noticeScreenBinding = MeetingNoticeScreenBinding.inflate(inflater, container, false)
         this.setUpToolbar()
         this.setNoticeMessage()
         return noticeScreenBinding.root
     }
 
-    private fun setUpToolbar(){
+    private fun setUpToolbar() {
         this.setupBackButton()
         this.setTitle()
     }
 
-    private fun setupBackButton(){
+    private fun setupBackButton() {
         noticeScreenBinding.toolbar.setNavigationIcon(R.drawable.ic_back)
         noticeScreenBinding.toolbar.setNavigationOnClickListener { activity!!.onBackPressed() }
     }
 
-    private fun setTitle(){
+    private fun setTitle() {
         noticeScreenBinding.toolbarTitle.text = conferenceTitle
     }
 
-    private fun setNoticeMessage(){
+    private fun setNoticeMessage() {
         noticeScreenBinding.noticeMessage.text = getMessage()
     }
 
-    private fun getMessage(): String{
-        return when (meetingStatus){
+    private fun getMessage(): String {
+        return when (meetingStatus) {
             MeetingStatus.MEETING_STATUS_CONNECTING -> "Connecting to the class..."
             MeetingStatus.MEETING_STATUS_IN_WAITING_ROOM -> "Please wait, the meeting host will let you in soon."
             MeetingStatus.MEETING_STATUS_WAITINGFORHOST -> "Wait for host to start this meeting."

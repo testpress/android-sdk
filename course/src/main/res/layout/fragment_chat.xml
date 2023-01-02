@@ -12,14 +12,13 @@
         android:id="@+id/recycler_chat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="6dp"
         android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@+id/view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/view"
@@ -30,17 +29,17 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/inputBar"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:endIconMode="custom"
         app:endIconDrawable="@drawable/ic_round_send_24"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+        app:endIconMode="custom"
+        app:expandedHintEnabled="false"
+        app:hintEnabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:placeholderText="@string/hint"
-        app:placeholderTextColor="@android:color/darker_gray"
-        app:expandedHintEnabled="false"
-        app:hintEnabled="false">
+        app:placeholderTextColor="@android:color/darker_gray">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputBox"
@@ -51,12 +50,11 @@
             android:imeOptions="normal"
             android:inputType="textMultiLine"
             android:maxLines="6"
-            android:textColor="@android:color/darker_gray"
-            tools:ignore="Autofill"
             android:paddingTop="0dp"
             android:paddingBottom="0dp"
+            android:textColor="@android:color/darker_gray"
             android:textSize="@dimen/testpress_text_size_small"
-            />
+            tools:ignore="Autofill" />
 
     </com.google.android.material.textfield.TextInputLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

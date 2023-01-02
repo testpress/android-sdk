@@ -51,7 +51,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
-    private fun initializeZoomSDK(){
+    private fun initializeZoomSDK() {
         zoomSDK = ZoomSDK.getInstance()
         if (zoomSDK.meetingService == null || zoomSDK.inMeetingService == null) {
             goBack()
@@ -62,7 +62,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         audioController = inMeetingService.inMeetingAudioController
     }
 
-    private fun initializeProfileDetails(){
+    private fun initializeProfileDetails() {
         profileDetails = TestpressUserDetails.getInstance().profileDetails
     }
 
@@ -71,17 +71,23 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         MeetingUserCallback.addListener(this)
     }
 
-    override fun onMeetingStatusChanged(meetingStatus: MeetingStatus?, errorCode: Int, internalErrorCode: Int) {
+    override fun onMeetingStatusChanged(
+        meetingStatus: MeetingStatus?,
+        errorCode: Int,
+        internalErrorCode: Int
+    ) {
         showMeetingFragment()
     }
 
-    private fun showMeetingFragment(){
-        if(showNoticeScreen()){
-           changeFragment(NoticeScreenFragment(
-               meetingService.meetingStatus,
-               intent.getStringExtra("conferenceTitle") ?: "Video conference"
-           ))
-        }else if (showMeetingScreen()){
+    private fun showMeetingFragment() {
+        if (showNoticeScreen()) {
+            changeFragment(
+                NoticeScreenFragment(
+                    meetingService.meetingStatus,
+                    intent.getStringExtra("conferenceTitle") ?: "Video conference"
+                )
+            )
+        } else if (showMeetingScreen()) {
             changeFragment(MeetingScreenFragment())
         }
     }
@@ -113,7 +119,11 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
 
 
     var dialog: Dialog? = null
-    private fun showUsernameDialog(needPassword: Boolean, needDisplayName: Boolean, handler: InMeetingEventHandler) {
+    private fun showUsernameDialog(
+        needPassword: Boolean,
+        needDisplayName: Boolean,
+        handler: InMeetingEventHandler
+    ) {
         dialog?.dismiss()
         dialog = Dialog(this, R.style.TestpressAppCompatAlertDialogStyle)
         dialog!!.setTitle("Please enter your name")
@@ -172,13 +182,13 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         if (inMeetingService.isMeetingConnected) {
             builder.setMessage("Do you want to leave this meeting?")
             builder.setCancelable(true)
-            builder.setPositiveButton("Yes"){ _: DialogInterface, _: Int -> leave()}
-            builder.setNegativeButton("No"){ dialog: DialogInterface, i: Int -> dialog.cancel()}
+            builder.setPositiveButton("Yes") { _: DialogInterface, _: Int -> leave() }
+            builder.setNegativeButton("No") { dialog: DialogInterface, i: Int -> dialog.cancel() }
         }
         builder.create().show()
     }
 
-    private fun leave(){
+    private fun leave() {
         inMeetingService.leaveCurrentMeeting(false)
     }
 
@@ -186,7 +196,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         if (!isMeetingFailed) goBack()
     }
 
-    private fun goBack(){
+    private fun goBack() {
         setResult(COURSE_CONTENT_DETAIL_REQUEST_CODE)
         finish()
     }
