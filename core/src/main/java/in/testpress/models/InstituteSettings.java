@@ -38,6 +38,7 @@ public class InstituteSettings {
     private boolean showPDFVertically;
     private String appName;
     private boolean isCustomMeetingUIEnabled;
+    private int totalDownloadCount;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -330,5 +331,14 @@ public class InstituteSettings {
 
     public void setIsCustomMeetingUIEnabled(Boolean customMeetingUIEnabled) {
         this.isCustomMeetingUIEnabled = customMeetingUIEnabled;
+    }
+
+    public Integer getTotalDownloadCount() {
+        return totalDownloadCount;
+    }
+
+    public InstituteSettings setTotalDownloadCount(int totalDownloadCount){
+        this.totalDownloadCount = totalDownloadCount;
+        return this;
     }
 }
