@@ -6,6 +6,7 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.api.TestpressCourseApiClient
 import `in`.testpress.course.models.Reputation
+import `in`.testpress.exam.databinding.TestpressFragmentCarouselWithEmptyViewBinding
 import `in`.testpress.network.RetrofitCall
 import `in`.testpress.ui.BaseFragment
 import `in`.testpress.util.UIUtils
@@ -30,8 +31,8 @@ class LeaderboardFragment : BaseFragment() {
     private lateinit var emptyDescView: TextView
     private lateinit var retryButton: Button
     private lateinit var progressBar: ProgressBar
-
     private lateinit var myReputationApiRequest: RetrofitCall<Reputation>
+    private lateinit var binding : TestpressFragmentCarouselWithEmptyViewBinding
 
     companion object {
         fun show(activity: FragmentActivity, containerViewId: Int) {
@@ -46,28 +47,37 @@ class LeaderboardFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view: View = inflater.inflate(
-            R.layout.testpress_fragment_carousel_with_empty_view, container, false
-        )
+        binding = TestpressFragmentCarouselWithEmptyViewBinding.inflate(inflater,container,false)
+        return binding.root
+    }
 
-        carouselView = view.findViewById<LinearLayout>(R.id.fragment_carousel) as LinearLayout
-        viewPager = view.findViewById<ViewPager>(R.id.viewpager) as ViewPager
-        tabLayout = view.findViewById<TabLayout>(R.id.tab_layout) as TabLayout
-        emptyView = view.findViewById<LinearLayout>(R.id.empty_container) as LinearLayout
-        emptyViewImage = view.findViewById<ImageView>(R.id.image_view) as ImageView
-        emptyTitleView = view.findViewById<TextView>(R.id.empty_title) as TextView
-        emptyDescView = view.findViewById<TextView>(R.id.empty_description) as TextView
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        bindViews()
+        initializeOnClickListener()
+    }
+
+    private fun bindViews(){
+        carouselView = binding.fragmentCarousel.root
+        viewPager = binding.fragmentCarousel.viewpager
+        tabLayout = binding.fragmentCarousel.tabLayout
+        emptyView = binding.fragmentEmptyView.root
+        emptyViewImage = binding.fragmentEmptyView.image
+        emptyTitleView = binding.fragmentEmptyView.emptyTitle
+        emptyDescView = binding.fragmentEmptyView.emptyDescription
         emptyTitleView.typeface = TestpressSdk.getRubikMediumFont(requireContext())
         emptyDescView.typeface = TestpressSdk.getRubikRegularFont(requireContext())
-        retryButton = view.findViewById<Button>(R.id.retry_button) as Button
-        progressBar = view.findViewById<ProgressBar>(R.id.pb_loading) as ProgressBar
+        retryButton = binding.fragmentEmptyView.retryButton
+        progressBar = binding.pbLoading
         UIUtils.setIndeterminateDrawable(activity, progressBar, 4)
         carouselView.visibility = View.GONE
+    }
+
+    private fun initializeOnClickListener(){
         retryButton.setOnClickListener {
             emptyView.visibility = View.GONE
             loadMyReputation()
         }
-        return view
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
