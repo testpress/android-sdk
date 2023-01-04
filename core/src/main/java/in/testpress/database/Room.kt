@@ -6,7 +6,6 @@ import `in`.testpress.database.roommigration.RoomMigration10To11.MIGRATION_10_11
 import `in`.testpress.database.roommigration.RoomMigration11To12.MIGRATION_11_12
 import `in`.testpress.database.roommigration.RoomMigration12To13.MIGRATION_12_13
 import `in`.testpress.database.roommigration.RoomMigration13To14.MIGRATION_13_14
-import `in`.testpress.database.roommigration.RoomMigration14To15.MIGRATION_14_15
 import `in`.testpress.database.roommigration.RoomMigration4To5.MIGRATION_4_5
 import `in`.testpress.database.roommigration.RoomMigration5To6.MIGRATION_5_6
 import `in`.testpress.database.roommigration.RoomMigration3To4.MIGRATION_3_4
@@ -36,7 +35,8 @@ import androidx.room.TypeConverters
             UserEntity::class,
             CategoryEntity::class,
             DiscussionThreadAnswerEntity::class,
-            ProductCategoryEntity::class
+            ProductCategoryEntity::class,
+            RunningContentEntity::class
         ], exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class TestpressDatabase : RoomDatabase() {
@@ -49,6 +49,7 @@ abstract class TestpressDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun discussionAnswerDao(): DiscussionAnswerDao
     abstract fun productCategoryDao(): ProductCategoryDao
+    abstract fun runningContentDao(): RunningContentDao
 
     companion object {
         private lateinit var INSTANCE: TestpressDatabase

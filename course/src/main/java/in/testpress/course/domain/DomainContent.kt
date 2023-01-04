@@ -2,6 +2,7 @@ package `in`.testpress.course.domain
 
 import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.database.ContentEntity
+import `in`.testpress.database.entities.RunningContentEntity
 import `in`.testpress.models.greendao.Attachment
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
@@ -59,7 +60,8 @@ data class DomainContent(
     val coverImageMedium: String? = null,
     var nextContentId: Long? = null,
     val hasEnded: Boolean?,
-    val examStartUrl: String? = null
+    val examStartUrl: String? = null,
+    val treePath: String? = null
 ) {
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
@@ -145,7 +147,7 @@ fun createDomainContent(contentEntity: ContentEntity): DomainContent {
         coverImageMedium = contentEntity.coverImageMedium,
         nextContentId = contentEntity.nextContentId,
         hasEnded = contentEntity.hasEnded,
-        examStartUrl = contentEntity.examStartUrl
+        examStartUrl = contentEntity.examStartUrl,
     )
 }
 
@@ -198,6 +200,31 @@ fun createDomainContent(content: Content): DomainContent {
     )
 }
 
+fun createDomainContent(runningContentEntity: RunningContentEntity):DomainContent{
+    return DomainContent(
+        id = runningContentEntity.id,
+        order = runningContentEntity.order,
+        chapterId = runningContentEntity.chapter_id,
+        freePreview = runningContentEntity.free_preview,
+        title = runningContentEntity.title,
+        courseId = runningContentEntity.courseId,
+        examId = runningContentEntity.examId,
+        videoId = runningContentEntity.videoId,
+        attachmentId = runningContentEntity.attachmentId,
+        contentType = runningContentEntity.contentType,
+        image = runningContentEntity.icon,
+        start = runningContentEntity.start,
+        end = runningContentEntity.end,
+        treePath = runningContentEntity.treePath,
+        isLocked =null,
+        isScheduled = null,
+        hasStarted = null,
+        isCourseAvailable = null,
+        hasEnded = null,
+        active = null
+    )
+}
+
 fun ContentEntity.asDomainContent(): DomainContent {
     return createDomainContent(this)
 }
@@ -213,6 +240,16 @@ fun Content.asDomainContent(): DomainContent {
 }
 
 fun List<Content>.asDomainContents(): List<DomainContent> {
+    return this.map {
+        createDomainContent(it)
+    }
+}
+
+fun RunningContentEntity.asDomainContent(): DomainContent {
+    return createDomainContent(this)
+}
+
+fun List<RunningContentEntity>.asListOfDomainContents(): List<DomainContent> {
     return this.map {
         createDomainContent(it)
     }
