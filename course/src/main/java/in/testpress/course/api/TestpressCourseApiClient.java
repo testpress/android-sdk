@@ -133,5 +133,4 @@ public class TestpressCourseApiClient extends TestpressApiClient {
     public RetrofitCall<Reputation> getMyRank() {
         return getCourseService().getMyRank();
     }
-
 }
