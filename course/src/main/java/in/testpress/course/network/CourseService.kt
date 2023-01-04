@@ -5,6 +5,7 @@ import `in`.testpress.course.api.TestpressCourseApiClient
 import `in`.testpress.course.api.TestpressCourseApiClient.COURSE_PATH_v2_5
 import `in`.testpress.course.api.TestpressCourseApiClient.RUNNING_CONTENTS_PATH
 import `in`.testpress.database.entities.ProductCategoryEntity
+import `in`.testpress.database.entities.RunningContentEntity
 import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Content
