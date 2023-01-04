@@ -44,7 +44,7 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                     .setScreenshotDisabled(true)
                     .setDisplayUserEmailOnVideo(false)
                     .setCoursesGamificationEnabled(false)
-                    .setTotalDownloadCount(5)
+                    .setTotalDownloadCount(null)
                     .setAppName(getString(R.string.app_name));
             TestpressSdk.setTestpressSession(this, session);
             if (position == 1) {

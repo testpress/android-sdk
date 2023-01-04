@@ -83,7 +83,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
 
     private fun initializeObserver(){
         offlineVideoViewModel.offlineVideos.observe(viewLifecycleOwner){
-            if (instituteSettings.totalDownloadCount != 0){
+            if (instituteSettings.totalDownloadCount != null && instituteSettings.totalDownloadCount != 0){
                 remainingDownloadCount = instituteSettings.totalDownloadCount - it.size
             }
         }
