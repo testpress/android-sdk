@@ -6,6 +6,7 @@ import `in`.testpress.course.api.TestpressCourseApiClient.PRODUCTS_CATEGORIES_PA
 import `in`.testpress.course.api.TestpressCourseApiClient.V5_PRODUCTS_LIST_PATH
 import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.models.TestpressApiResponse
+import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.Course
 import `in`.testpress.network.RetrofitCall
 import `in`.testpress.network.TestpressApiClient
@@ -57,6 +58,11 @@ interface CourseService {
     fun getProductsCategories(
         @QueryMap arguments: HashMap<String, Any>
     ): RetrofitCall<ApiResponse<List<ProductCategoryEntity>>>
+
+    @GET("${TestpressCourseApiClient.COURSE_PATH_v2_5}{course_id}${TestpressCourseApiClient.RUNNING_CONTENTS_PATH}")
+    fun getRunningContents(
+        @Path(value = "course_id", encoded = true) courseId: Long
+    ): RetrofitCall<ApiResponse<List<Content>>>
 }
 
 
@@ -98,5 +104,9 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     fun getProductsCategories(arguments: HashMap<String, Any>): RetrofitCall<ApiResponse<List<ProductCategoryEntity>>> {
         return getCourseService().getProductsCategories(arguments)
+    }
+
+    fun getRunningContents(courseId: Long): RetrofitCall<ApiResponse<List<Content>>> {
+        return getCourseService().getRunningContents(courseId)
     }
 }
