@@ -103,7 +103,7 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         return getCourseService().getDRMLicenseURL(contentId, args)
     }
 
-    fun getRunningContents(courseId: Long): RetrofitCall<ApiResponse<List<Content>>> {
-        return getCourseService().getRunningContents(courseId)
+    fun getRunningContents(courseId: Long, arguments: HashMap<String, Any>): RetrofitCall<ApiResponse<List<RunningContentEntity>>> {
+        return getCourseService().getRunningContents(courseId, arguments)
     }
 }

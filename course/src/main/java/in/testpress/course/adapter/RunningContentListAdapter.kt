@@ -8,7 +8,6 @@ import `in`.testpress.course.ui.viewholders.ContentListItemViewHolder
 import `in`.testpress.course.ui.viewholders.ExamContentListItemViewHolder
 import `in`.testpress.course.ui.viewholders.VideoContentListItemViewHolder
 import android.content.Context
-import android.util.Log
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -38,11 +37,6 @@ class RunningContentListAdapter :
     override fun getItem(position: Int): DomainContent? {
         if (contents.size > position) return contents[position]
         return null
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        val content = getItem(position)
-        return content?.contentTypeEnum?.ordinal ?: 0
     }
 
     override fun onCreateViewHolder(

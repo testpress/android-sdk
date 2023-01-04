@@ -22,7 +22,7 @@ class CourseDetailsTabAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 5;
+        return 3;
     }
 
     @Override
@@ -36,12 +36,6 @@ class CourseDetailsTabAdapter extends FragmentPagerAdapter {
                 fragment = new RankListFragment();
                 break;
             case 2:
-                fragment = new RunningContentsListFragment();
-                break;
-            case 3:
-                fragment = new RunningContentsListFragment();
-                break;
-            case 4:
                 fragment = new RunningContentsListFragment();
                 break;
             default:
@@ -61,10 +55,6 @@ class CourseDetailsTabAdapter extends FragmentPagerAdapter {
                 return resources.getString(R.string.testpress_leaderboard);
             case 2:
                 return "Running";
-            case 3:
-                return "Upcoming";
-            case 4:
-                return "History";
             default:
                 return null;
         }

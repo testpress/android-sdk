@@ -26,10 +26,8 @@ import static in.testpress.course.api.TestpressCourseApiClient.ATTEMPTS_PATH;
 import static in.testpress.course.api.TestpressCourseApiClient.CHAPTERS_PATH;
 import static in.testpress.course.api.TestpressCourseApiClient.CONTENTS_PATH;
 import static in.testpress.course.api.TestpressCourseApiClient.COURSE_LIST_PATH;
-import static in.testpress.course.api.TestpressCourseApiClient.COURSE_PATH_v2_5;
 import static in.testpress.course.api.TestpressCourseApiClient.LEADERBOARD_PATH;
 import static in.testpress.course.api.TestpressCourseApiClient.RANK_PATH;
-import static in.testpress.course.api.TestpressCourseApiClient.RUNNING_CONTENTS_PATH;
 import static in.testpress.course.api.TestpressCourseApiClient.TARGET_PATH;
 import static in.testpress.course.api.TestpressCourseApiClient.THREAD_PATH;
 import static in.testpress.course.api.TestpressCourseApiClient.USER_VIDEOS_PATH;
@@ -88,10 +86,5 @@ public interface CourseService {
 
     @GET(RANK_PATH)
     RetrofitCall<Reputation> getMyRank();
-
-    @GET(COURSE_PATH_v2_5+"{course_id}"+RUNNING_CONTENTS_PATH)
-    RetrofitCall<ApiResponse<ContentsListResponse>> getRunningContents(
-            @Path(value = "course_id", encoded = true) String courseId
-    );
 
 }

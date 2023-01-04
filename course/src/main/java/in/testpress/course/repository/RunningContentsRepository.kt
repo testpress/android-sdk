@@ -2,10 +2,12 @@ package `in`.testpress.course.repository
 
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
+import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.domain.asListOfDomainContents
+import `in`.testpress.course.domain.asDomainContents
 import `in`.testpress.course.network.CourseNetwork
-import `in`.testpress.database.entities.RunningContentEntity
+import `in`.testpress.models.greendao.Content
+import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.network.Resource
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
@@ -13,77 +15,77 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
 class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
+    val contentDao = TestpressSDKDatabase.getContentDao(context)
     val courseNetwork = CourseNetwork(context)
-    var page = 1
-    private var dataList = mutableListOf<RunningContentEntity>()
 
     private var _resourceContents: MutableLiveData<Resource<List<DomainContent>>> = MutableLiveData()
     val resourceContents: LiveData<Resource<List<DomainContent>>>
         get() = _resourceContents
 
     init {
-        _resourceContents.postValue(Resource.loading(null))
+        val contents = contentDao.queryBuilder()
+            .where(ContentDao.Properties.CourseId.eq(courseId))
+            .list()
+        if (contents.isNotEmpty()) {
+            val sortedContents = sortContentsByOrder(contents)
+            _resourceContents.postValue(Resource.success(sortedContents.asDomainContents()))
+        } else {
+            _resourceContents.value = Resource.loading(null)
+        }
     }
 
-    fun loadItems(page: Int = 1) {
-        val queryParams = hashMapOf<String, Any>("page" to page)
-        courseNetwork.getRunningContents(courseId, queryParams)
-            .enqueue(object : TestpressCallback<ApiResponse<List<RunningContentEntity>>>(){
+    fun loadItems() {
+        courseNetwork.getRunningContents(courseId)
+            .enqueue(object : TestpressCallback<ApiResponse<List<Content>>>(){
                 override fun onException(exception: TestpressException?) {
-                    _resourceContents.postValue(Resource.error(exception!!, null))
+                    val contents = getAll()
+                    if (contents?.isNotEmpty() == true) {
+                        _resourceContents.postValue(Resource.error(exception!!, contents.asDomainContents()))
+                    } else {
+                        _resourceContents.postValue(Resource.error(exception!!, null))
+                    }
                 }
 
-                override fun onSuccess(result: ApiResponse<List<RunningContentEntity>>) {
+                override fun onSuccess(result: ApiResponse<List<Content>>) {
                     handleFetchSuccess(result)
                 }
             })
     }
 
-    private fun handleFetchSuccess(response: ApiResponse<List<RunningContentEntity>>) {
+    private fun handleFetchSuccess(response: ApiResponse<List<Content>>) {
+        deleteExistingContents()
         storeContent(response.results)
-        val contents = getAll()
-        if (contents.isNotEmpty()) {
-            _resourceContents.postValue(Resource.success(contents.asListOfDomainContents()))
-        } else {
-            _resourceContents.postValue(Resource.success(listOf()))
-        }
-        if (response.next != null) {
-            page += 1
-            loadItems(page)
-        } else {
-            page = 1
-        }
+        val contents = contentDao.queryBuilder()
+            .where(ContentDao.Properties.CourseId.eq(courseId))
+            .list()
+        val sortedContents = sortContentsByOrder(contents)
+        _resourceContents.postValue(Resource.success(sortedContents.asDomainContents()))
     }
 
-    private fun getAll(): List<RunningContentEntity> {
-        return dataList
+    private fun deleteExistingContents() {
+        contentDao.queryBuilder()
+            .where(ContentDao.Properties.CourseId.eq(courseId))
+            .buildDelete()
+            .executeDeleteWithoutDetachingEntities()
     }
 
-    private fun storeContent(response: List<RunningContentEntity>): List<DomainContent> {
-        if (page == 1){
-            dataList.removeAll(dataList)
-        }
-        for (data in response){
-            if (!dataList.contains(data)){
-                dataList.add(data)
-            }
-        }
-        return dataList.asListOfDomainContents()
+    private fun getAll(): MutableList<Content>? {
+        return contentDao.queryBuilder()
+            .where(ContentDao.Properties.CourseId.eq(courseId))
+            .list()
     }
 
-//    private fun sort() :List<RunningContentEntity> {
-//
-//        val content = getAll()
-//
-//        Log.d("TAG", "sort: ${content[0].start}")
-//
-//        val dateTimeFormatter: DateTimeFormatter =
-//            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
-//
-//        val result = content.sortedByDescending {
-//            LocalDate.parse(it.start, dateTimeFormatter)
-//        }
-//        println(result)
-//        return result
-//    }
+    private fun storeContent(response: List<Content>): List<DomainContent> {
+
+        val contentDao = TestpressSDKDatabase.getContentDao(context)
+        contentDao.insertOrReplaceInTx(response)
+
+        return response.asDomainContents()
+    }
+
+    private fun sortContentsByOrder(contents: List<Content>): List<Content> {
+        return contents.sortedWith(compareBy {
+            it.id
+        })
+    }
 }
