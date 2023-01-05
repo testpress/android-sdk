@@ -83,8 +83,8 @@ class VideoContentFragment : BaseContentDetailFragment() {
 
     private fun initializeObserver(){
         offlineVideoViewModel.offlineVideos.observe(viewLifecycleOwner){
-            if (instituteSettings.totalDownloadCount != null && instituteSettings.totalDownloadCount != 0){
-                remainingDownloadCount = instituteSettings.totalDownloadCount - it.size
+            if (instituteSettings.maxAllowedDownloadedVideos != null && instituteSettings.maxAllowedDownloadedVideos != 0){
+                remainingDownloadCount = instituteSettings.maxAllowedDownloadedVideos - it.size
             }
         }
     }
@@ -140,7 +140,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
         return if (errorReason == "CourseNotPurchased"){
             "This content is not available for download, please purchase it to watch it in offline."
         } else {
-            "You are reached the maximum download limit of ${instituteSettings.totalDownloadCount}, please delete the video to continue the download."
+            "You are reached the maximum download limit of ${instituteSettings.maxAllowedDownloadedVideos}, please delete the video to continue the download."
         }
     }
 

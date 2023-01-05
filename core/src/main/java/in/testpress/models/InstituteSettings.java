@@ -38,7 +38,7 @@ public class InstituteSettings {
     private boolean showPDFVertically;
     private String appName;
     private boolean isCustomMeetingUIEnabled;
-    private Integer totalDownloadCount;
+    private Integer maxAllowedDownloadedVideos;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -333,12 +333,12 @@ public class InstituteSettings {
         this.isCustomMeetingUIEnabled = customMeetingUIEnabled;
     }
 
-    public Integer getTotalDownloadCount() {
-        return totalDownloadCount;
+    public Integer getMaxAllowedDownloadedVideos() {
+        return maxAllowedDownloadedVideos;
     }
 
-    public InstituteSettings setTotalDownloadCount(Integer totalDownloadCount){
-        this.totalDownloadCount = totalDownloadCount;
+    public InstituteSettings setMaxAllowedDownloadedVideos(Integer maxAllowedDownloadedVideos){
+        this.maxAllowedDownloadedVideos = maxAllowedDownloadedVideos;
         return this;
     }
 }
