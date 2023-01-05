@@ -130,17 +130,25 @@ class VideoContentFragment : BaseContentDetailFragment() {
     private fun showDownloadUnavailableDialog(errorReason: String) {
         val builder =
             AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle)
-        builder.setTitle("Download Unavailable")
+        builder.setTitle(getDialogTitle(errorReason))
         builder.setMessage(getDialogErrorMessage(errorReason))
         builder.setPositiveButton("Ok", null)
         builder.show()
+    }
+
+    private fun getDialogTitle(errorReason: String):String {
+        return if (errorReason == "CourseNotPurchased"){
+            "Download Unavailable"
+        } else {
+            "Maximum download limit reached"
+        }
     }
 
     private fun getDialogErrorMessage(errorReason: String):String{
         return if (errorReason == "CourseNotPurchased"){
             "This content is not available for download, please purchase it to watch it in offline."
         } else {
-            "You are reached the maximum download limit of ${instituteSettings.maxAllowedDownloadedVideos}, please delete the video to continue the download."
+            "You have reached the maximum download limit of ${instituteSettings.maxAllowedDownloadedVideos}. Delete one or more videos to download this video."
         }
     }
 
