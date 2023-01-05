@@ -9,5 +9,5 @@ import androidx.room.Query
 @Dao
 interface RunningContentDao: BaseDao<RunningContentEntity> {
     @Query("SELECT * FROM runningcontententity")
-    fun getAll(): LiveData<List<RunningContentEntity>>
+    fun getAll(): List<RunningContentEntity>
 }
