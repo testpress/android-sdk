@@ -78,10 +78,10 @@ class VideoContentFragment : BaseContentDetailFragment() {
         titleLayout = view.findViewById(R.id.title_layout)
         initializeListeners()
         instituteSettings = TestpressSdk.getTestpressSession(requireContext())!!.instituteSettings;
-        initializeDownloadedCountObserver()
+        initializeRemainingDownloadsCount()
     }
 
-    private fun initializeDownloadedCountObserver(){
+    private fun initializeRemainingDownloadsCount(){
         offlineVideoViewModel.offlineVideos.observe(viewLifecycleOwner){
             if (instituteSettings.maxAllowedDownloadedVideos != null && instituteSettings.maxAllowedDownloadedVideos != 0){
                 remainingDownloadCount = instituteSettings.maxAllowedDownloadedVideos - it.size
