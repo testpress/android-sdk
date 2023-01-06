@@ -47,6 +47,7 @@ class VideoContentFragment : BaseContentDetailFragment() {
     private lateinit var videoDownloadProgress: RingProgressBar
     private lateinit var menu: Menu
     private lateinit var instituteSettings: InstituteSettings;
+    private var remainingDownloadCount :Int? = null
 
     override var isBookmarkEnabled: Boolean
         get() = false
@@ -77,6 +78,15 @@ class VideoContentFragment : BaseContentDetailFragment() {
         titleLayout = view.findViewById(R.id.title_layout)
         initializeListeners()
         instituteSettings = TestpressSdk.getTestpressSession(requireContext())!!.instituteSettings;
+        initializeRemainingDownloadsCount()
+    }
+
+    private fun initializeRemainingDownloadsCount(){
+        offlineVideoViewModel.offlineVideos.observe(viewLifecycleOwner){
+            if (instituteSettings.maxAllowedDownloadedVideos != null && instituteSettings.maxAllowedDownloadedVideos != 0){
+                remainingDownloadCount = instituteSettings.maxAllowedDownloadedVideos - it.size
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -117,18 +127,39 @@ class VideoContentFragment : BaseContentDetailFragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun showDownloadUnavailableDialog() {
+    private fun showDownloadUnavailableDialog(errorReason: VideoDownloadError) {
         val builder =
             AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle)
-        builder.setTitle("Download Unavailable")
-        builder.setMessage("This content is not available for download, please purchase it to watch it in offline.")
+        builder.setTitle(getDialogTitle(errorReason))
+        builder.setMessage(getDialogErrorMessage(errorReason))
         builder.setPositiveButton("Ok", null)
         builder.show()
     }
 
+    private fun getDialogTitle(errorReason: VideoDownloadError):String {
+        return when(errorReason) {
+            VideoDownloadError.COURSE_NOT_PURCHASED -> "Download Unavailable"
+            VideoDownloadError.DOWNLOAD_LIMIT_REACHED -> "Maximum download limit reached"
+        }
+    }
+
+    private fun getDialogErrorMessage(errorReason: VideoDownloadError):String{
+        return when(errorReason) {
+            VideoDownloadError.COURSE_NOT_PURCHASED -> {
+                "This content is not available for download, please purchase it to watch it in offline."
+            }
+            VideoDownloadError.DOWNLOAD_LIMIT_REACHED -> {
+                "You have reached the maximum download limit of ${instituteSettings.maxAllowedDownloadedVideos}. Delete one or more videos to download this video."
+            }
+        }
+    }
+
     private fun showDownloadDialog() {
         if (content.isCourseNotPurchased) {
-            showDownloadUnavailableDialog()
+            showDownloadUnavailableDialog(VideoDownloadError.COURSE_NOT_PURCHASED)
+            return
+        } else if (remainingDownloadCount != null && remainingDownloadCount!! < 1){
+            showDownloadUnavailableDialog(VideoDownloadError.DOWNLOAD_LIMIT_REACHED)
             return
         }
         val videoQualityChooserDialog =
@@ -253,4 +284,8 @@ class VideoWidgetFragmentFactory {
             }
         }
     }
+}
+
+enum class VideoDownloadError {
+    COURSE_NOT_PURCHASED, DOWNLOAD_LIMIT_REACHED
 }
