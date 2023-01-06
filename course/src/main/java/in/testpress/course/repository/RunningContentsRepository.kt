@@ -64,10 +64,13 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
     }
 
     private fun getAll(): List<RunningContentEntity> {
-        return runningContentDao.getAll()
+        return runningContentDao.getAll(courseId)
     }
 
     private suspend fun storeContent(response: List<RunningContentEntity>): List<DomainContent> {
+        if (page == 1){
+            runningContentDao.deleteAll(courseId)
+        }
         runningContentDao.insertAll(response)
         return response.asListOfDomainContents()
     }
