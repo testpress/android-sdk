@@ -131,6 +131,25 @@
             android:textSize="16sp" />
 
         <LinearLayout
+            android:id="@+id/bread_crumb_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="5dp"
+            android:visibility="visible"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="4"
+                android:text="Courses > HYBRID ONL IIT - 2024 (INTEGRATED PROGRAMME) > MATHEMATICS > Trigonometry - I > Lecture Videos"
+                android:textColor="@color/testpress_text_gray_medium"
+                android:id="@+id/bread_crumb"
+                android:textSize="12sp"
+                />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/content_details_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
