@@ -5,40 +5,32 @@ import `in`.testpress.core.TestpressException
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.asListOfDomainContents
 import `in`.testpress.course.network.CourseNetwork
-import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.RunningContentEntity
 import `in`.testpress.network.Resource
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
-    private val runningContentDao = TestpressDatabase.invoke(context).runningContentDao()
     val courseNetwork = CourseNetwork(context)
     var page = 1
+    private var dataList = mutableListOf<RunningContentEntity>()
 
     private var _resourceContents: MutableLiveData<Resource<List<DomainContent>>> = MutableLiveData()
     val resourceContents: LiveData<Resource<List<DomainContent>>>
         get() = _resourceContents
+
+    init {
+        _resourceContents.postValue(Resource.loading(null))
+    }
 
     fun loadItems(page: Int = 1) {
         val queryParams = hashMapOf<String, Any>("page" to page)
         courseNetwork.getRunningContents(courseId, queryParams)
             .enqueue(object : TestpressCallback<ApiResponse<List<RunningContentEntity>>>(){
                 override fun onException(exception: TestpressException?) {
-                    val contents = getAll()
-                    if (contents.isNotEmpty()) {
-                        _resourceContents.postValue(Resource.error(exception!!, sort().asListOfDomainContents()))
-                    } else {
-                        _resourceContents.postValue(Resource.error(exception!!, null))
-                    }
+                    _resourceContents.postValue(Resource.error(exception!!, null))
                 }
 
                 override fun onSuccess(result: ApiResponse<List<RunningContentEntity>>) {
@@ -48,46 +40,50 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
     }
 
     private fun handleFetchSuccess(response: ApiResponse<List<RunningContentEntity>>) {
-        CoroutineScope(Dispatchers.IO).launch {
-            storeContent(response.results)
-            val contents = getAll()
-            if (contents.isNotEmpty()) {
-                _resourceContents.postValue(Resource.success(sort().asListOfDomainContents()))
-            }
-            if (response.next != null) {
-                page += 1
-                loadItems(page)
-            } else {
-                page = 1
-            }
+        storeContent(response.results)
+        val contents = getAll()
+        if (contents.isNotEmpty()) {
+            _resourceContents.postValue(Resource.success(contents.asListOfDomainContents()))
+        } else {
+            _resourceContents.postValue(Resource.success(listOf()))
+        }
+        if (response.next != null) {
+            page += 1
+            loadItems(page)
+        } else {
+            page = 1
         }
     }
 
     private fun getAll(): List<RunningContentEntity> {
-        return runningContentDao.getAll(courseId)
+        return dataList
     }
 
-    private suspend fun storeContent(response: List<RunningContentEntity>): List<DomainContent> {
+    private fun storeContent(response: List<RunningContentEntity>): List<DomainContent> {
         if (page == 1){
-            runningContentDao.deleteAll(courseId)
+            dataList.removeAll(dataList)
         }
-        runningContentDao.insertAll(response)
-        return response.asListOfDomainContents()
+        for (data in response){
+            if (!dataList.contains(data)){
+                dataList.add(data)
+            }
+        }
+        return dataList.asListOfDomainContents()
     }
 
-    private fun sort() :List<RunningContentEntity> {
-
-        val content = getAll()
-
-        Log.d("TAG", "sort: ${content[0].start}")
-
-        val dateTimeFormatter: DateTimeFormatter =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
-
-        val result = content.sortedByDescending {
-            LocalDate.parse(it.start, dateTimeFormatter)
-        }
-        println(result)
-        return result
-    }
+//    private fun sort() :List<RunningContentEntity> {
+//
+//        val content = getAll()
+//
+//        Log.d("TAG", "sort: ${content[0].start}")
+//
+//        val dateTimeFormatter: DateTimeFormatter =
+//            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
+//
+//        val result = content.sortedByDescending {
+//            LocalDate.parse(it.start, dateTimeFormatter)
+//        }
+//        println(result)
+//        return result
+//    }
 }

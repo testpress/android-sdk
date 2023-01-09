@@ -6,7 +6,7 @@ import `in`.testpress.course.adapter.RunningContentListAdapter
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.repository.RunningContentsRepository
 import `in`.testpress.course.viewmodels.RunningContentsListViewModel
-import `in`.testpress.databinding.BaseListLayoutBinding
+import `in`.testpress.databinding.RunningContentListLayoutBinding
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
@@ -22,17 +22,19 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.facebook.shimmer.ShimmerFrameLayout
 
 class RunningContentsListFragment: Fragment(), EmptyViewListener {
 
-    private lateinit var binding : BaseListLayoutBinding
+    private lateinit var binding : RunningContentListLayoutBinding
     private var courseId: Long = -1
     private lateinit var viewModel : RunningContentsListViewModel
     private lateinit var mAdapter: RunningContentListAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var loadingPlaceholder: ShimmerFrameLayout
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,13 +59,14 @@ class RunningContentsListFragment: Fragment(), EmptyViewListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = BaseListLayoutBinding.inflate(inflater,container,false)
+        binding = RunningContentListLayoutBinding.inflate(inflater,container,false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindViews()
+        showLoadingPlaceholder()
         mAdapter = RunningContentListAdapter()
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -72,6 +75,7 @@ class RunningContentsListFragment: Fragment(), EmptyViewListener {
         }
         initializeObservers()
         viewModel.loadContents()
+        swipeRefreshLayout.setOnRefreshListener { viewModel.loadContents() }
     }
 
     private fun bindViews() {
@@ -79,6 +83,7 @@ class RunningContentsListFragment: Fragment(), EmptyViewListener {
         loadingPlaceholder = binding.shimmerViewContainer
         loadingPlaceholder.visibility = View.GONE
         initializeEmptyViewFragment()
+        swipeRefreshLayout = binding.swipeRunningContentContainer
     }
 
     private fun initializeEmptyViewFragment() {
@@ -93,25 +98,23 @@ class RunningContentsListFragment: Fragment(), EmptyViewListener {
         viewModel.items.observe(viewLifecycleOwner, Observer { resource ->
             when (resource?.status) {
                 Status.LOADING -> {
-                    Log.d("ContentListFragment", "Got status LOADING")
                     showLoadingPlaceholder()
                 }
                 Status.SUCCESS -> {
-                    Log.d("ContentListFragment", "Got status SUCCESS")
                     hideLoadingPlaceholder()
                     val items = resource.data!! as List<DomainContent>
-                    Log.d("Items", "" + items.isEmpty())
                     if (items.isEmpty()) showEmptyList()
                     mAdapter.contents = items
                     mAdapter.notifyDataSetChanged()
+                    swipeRefreshLayout.isRefreshing = false
                 }
                 Status.ERROR -> {
-                    Log.d("ContentListFragment", "Got status ERROR")
                     hideLoadingPlaceholder()
                     if (resource.data != null) {
                         mAdapter.contents = resource.data as List<DomainContent>
                         mAdapter.notifyDataSetChanged()
                     } else {
+                        swipeRefreshLayout.visibility = View.GONE
                         emptyViewFragment.displayError(resource.exception!!)
                     }
                 }
@@ -121,7 +124,7 @@ class RunningContentsListFragment: Fragment(), EmptyViewListener {
 
     private fun showEmptyList() {
         emptyViewFragment.setEmptyText(R.string.testpress_no_content,
-            R.string.testpress_no_content_description,
+            "There are no currently available contents for you.",
             R.drawable.ic_error_outline_black_18dp
         )
     }
