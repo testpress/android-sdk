@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import in.testpress.exam.models.AttemptItem;
+import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Language;
 
 class TestQuestionPagerAdapter extends FragmentStatePagerAdapter {
@@ -15,15 +16,17 @@ class TestQuestionPagerAdapter extends FragmentStatePagerAdapter {
     private  int numberOfPages = 0;
     private  List<AttemptItem> attemptItemList = Collections.emptyList();
     private Language selectedLanguage;
+    private Exam exam;
 
     public TestQuestionPagerAdapter(FragmentManager fragmentManager,
                                     List<AttemptItem> attemptItemList,
-                                    Language selectedLanguage) {
+                                    Language selectedLanguage, Exam exam) {
 
         super(fragmentManager);
         this.attemptItemList = attemptItemList;
         numberOfPages = attemptItemList.size();
         this.selectedLanguage = selectedLanguage;
+        this.exam = exam;
     }
 
     public void setCount(int count) {
@@ -33,7 +36,7 @@ class TestQuestionPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         return TestQuestionFragment
-                .getInstance(attemptItemList.get(position), position + 1, selectedLanguage);
+                .getInstance(attemptItemList.get(position), position + 1, selectedLanguage, exam);
     }
 
     @Override

@@ -792,7 +792,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             startCountDownTimer();
         }
         viewPagerAdapter =
-                new TestQuestionPagerAdapter(getFragmentManager(), attemptItemList, selectedLanguage);
+                new TestQuestionPagerAdapter(getFragmentManager(), attemptItemList, selectedLanguage, exam);
 
         viewPager.setAdapter(viewPagerAdapter);
 
