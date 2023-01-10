@@ -76,6 +76,7 @@ class RunningContentsListFragment: Fragment(), EmptyViewListener {
         }
         initializeObservers()
         viewModel.loadContents()
+        swipeRefreshLayout.setOnRefreshListener { viewModel.loadContents() }
     }
 
     private fun bindViews() {
@@ -98,11 +99,9 @@ class RunningContentsListFragment: Fragment(), EmptyViewListener {
         viewModel.items.observe(viewLifecycleOwner, Observer { resource ->
             when (resource?.status) {
                 Status.LOADING -> {
-                    Log.d("ContentListFragment", "Got status LOADING")
                     showLoadingPlaceholder()
                 }
                 Status.SUCCESS -> {
-                    Log.d("ContentListFragment", "Got status SUCCESS")
                     hideLoadingPlaceholder()
                     val items = resource.data!! as List<RunningContentEntity>
                     Log.d("Items", "" + items.isEmpty())
@@ -112,7 +111,6 @@ class RunningContentsListFragment: Fragment(), EmptyViewListener {
                     swipeRefreshLayout.isRefreshing = false
                 }
                 Status.ERROR -> {
-                    Log.d("ContentListFragment", "Got status ERROR")
                     hideLoadingPlaceholder()
                     if (resource.data != null) {
                         mAdapter.contents = resource.data as List<RunningContentEntity>
