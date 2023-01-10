@@ -139,6 +139,7 @@ class ZoomMeetHandler(
     }
 
     override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
+        zoomSDK.zoomUIService.hideMeetingInviteUrl(true)
         if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
             Toast.makeText(
                 context,
