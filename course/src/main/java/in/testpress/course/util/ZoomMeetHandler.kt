@@ -11,7 +11,6 @@ import `in`.testpress.util.isEmailValid
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import us.zoom.sdk.*
 import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_MEETING_ID
