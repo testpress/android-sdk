@@ -94,4 +94,9 @@
         <item name="android:textColorHint">@color/testpress_gray_light</item>
         <item name="android:textColor">@color/testpress_black</item>
     </style>
+
+<!--    Running Content Resources-->
+    <string name="testpress_no_running_content">No Content Available</string>
+    <string name="testpress_no_running_content_description">There are no currently available contents for you.</string>
+    <string name="testpress_error_loading_running_contents">Loading contents failed</string>
 </resources>
