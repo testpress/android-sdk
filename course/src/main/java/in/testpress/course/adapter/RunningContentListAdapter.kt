@@ -2,15 +2,13 @@ package `in`.testpress.course.adapter
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
-import `in`.testpress.course.domain.DomainContent
+import `in`.testpress.course.databinding.RunningContentListItemBinding
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.database.entities.RunningContentEntity
+import `in`.testpress.util.ViewUtils
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -21,16 +19,20 @@ class RunningContentListAdapter :
     var contents: List<RunningContentEntity> = listOf()
 
     companion object {
-        private val DOMAIN_CONTENT_COMPARATOR = object : DiffUtil.ItemCallback<RunningContentEntity>() {
-            override fun areContentsTheSame(
-                oldItem: RunningContentEntity,
-                newItem: RunningContentEntity
-            ): Boolean =
-                oldItem == newItem
+        private val DOMAIN_CONTENT_COMPARATOR =
+            object : DiffUtil.ItemCallback<RunningContentEntity>() {
+                override fun areContentsTheSame(
+                    oldItem: RunningContentEntity,
+                    newItem: RunningContentEntity
+                ): Boolean =
+                    oldItem == newItem
 
-            override fun areItemsTheSame(oldItem: RunningContentEntity, newItem: RunningContentEntity): Boolean =
-                oldItem.id == newItem.id
-        }
+                override fun areItemsTheSame(
+                    oldItem: RunningContentEntity,
+                    newItem: RunningContentEntity
+                ): Boolean =
+                    oldItem.id == newItem.id
+            }
     }
 
     override fun getItemCount(): Int {
@@ -41,9 +43,12 @@ class RunningContentListAdapter :
         parent: ViewGroup,
         viewType: Int
     ): RunningContentViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.runn, parent, false)
-        return RunningContentViewHolder(view)
+        val binding = RunningContentListItemBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return RunningContentViewHolder(binding)
     }
 
     private fun onItemClick(content: RunningContentEntity, context: Context) {
@@ -53,7 +58,7 @@ class RunningContentListAdapter :
                 context,
                 ""
             )
-        );
+        )
 
     }
 
@@ -65,29 +70,48 @@ class RunningContentListAdapter :
     override fun onBindViewHolder(holder: RunningContentViewHolder, position: Int) {
         val content = getItem(position)
         if (content != null) {
-            holder.bind(content) { onItemClick(content,holder.itemView.context)}
+            holder.bind(content) { onItemClick(content, holder.itemView.context) }
         }
     }
 }
 
-class RunningContentViewHolder(val view: View):RecyclerView.ViewHolder(view){
-    private val title = view.findViewById<TextView>(R.id.running_content_title)
-    private val path = view.findViewById<TextView>(R.id.tree_path)
-    //private val date = view.findViewById<TextView>(R.id.start_date_and_end_date)
-    private val image = view.findViewById<ImageView>(R.id.running_content_image)
-
+class RunningContentViewHolder(binding: RunningContentListItemBinding) :
+    RecyclerView.ViewHolder(binding.root) {
+    private val title = binding.runningContentTitle
+    private val path = binding.treePath
+    private val date = binding.startDateAndEndDate
+    private val image = binding.runningContentImage
 
     init {
-        title.typeface = TestpressSdk.getRubikMediumFont(view.context)
-        path.typeface = TestpressSdk.getRubikMediumFont(view.context)
-        //date.typeface = TestpressSdk.getRubikMediumFont(view.context)
+        title.typeface = TestpressSdk.getRubikMediumFont(binding.root.context)
+        path.typeface = TestpressSdk.getRubikMediumFont(binding.root.context)
+        date.typeface = TestpressSdk.getRubikMediumFont(binding.root.context)
     }
 
-    fun bind(content: RunningContentEntity, clickListener: (RunningContentEntity) -> Unit){
+    fun bind(content: RunningContentEntity, clickListener: (RunningContentEntity) -> Unit) {
+
         title.text = content.title
-        path.text = "Courses > HYBRID ONL IIT - 2024 (INTEGRATED PROGRAMME) > MATHEMATICS > Trigonometry - I > Lecture Videos"
-        image.setImageResource(R.drawable.testpress_video_content_icon)
-        itemView.setOnClickListener { clickListener(content)}
+        path.text =content.treePath
+            //"Courses > HYBRID ONL IIT - 2024 (INTEGRATED PROGRAMME) > MATHEMATICS > Trigonometry - I > Lecture Videos"
+        date.text = content.getFormattedStartDateAndEndDate()
+        image.setImageResource(setContentImage(content.contentType))
+        itemView.setOnClickListener { clickListener(content) }
+        setViewVisibility(content)
     }
 
+    private fun setContentImage(contentType: String?): Int {
+        return when (contentType) {
+            "Attachment" -> R.drawable.paperclip
+            "Video" -> R.drawable.play
+            "Notes" -> R.drawable.writing
+            "VideoConference" -> R.drawable.ic_live
+            "Exam" -> R.drawable.test
+            else -> R.drawable.test
+        }
+    }
+    private fun setViewVisibility(content: RunningContentEntity){
+        if (content.getFormattedStartDateAndEndDate() != ""){
+            ViewUtils.setGone(date,false)
+        }
+    }
 }

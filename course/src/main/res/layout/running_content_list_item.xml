@@ -1,41 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
-    tools:ignore="MissingDefaultResource">
+    android:layout_height="wrap_content"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
+    android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
+        android:orientation="horizontal">
 
-    <ImageButton
-        android:id="@+id/imageButton2"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <FrameLayout
+            android:layout_width="128dp"
+            android:layout_height="72dp">
+
+            <ImageView
+                android:id="@+id/thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#CAC8C8" />
+
+            <ImageView
+                android:id="@+id/running_content_image"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center"
+                android:src="@drawable/test"/>
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp">
+
+            <TextView
+                android:id="@+id/running_content_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Title goes here"
+                android:maxLines="1"
+                android:textColor="#000000"
+                android:ellipsize="end"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/start_date_and_end_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="#A6A6A6"
+                android:textSize="12sp"
+                android:maxLines="1"
+                android:text="Start: 01/01/23 10:00 am - End: 01/01/23 12:00 pm"
+                android:visibility="gone"
+                android:ellipsize="end"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/running_title"
+        android:id="@+id/tree_path"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:text="Title"
-        android:textColor="#000000"
-        android:textSize="20sp"
-        app:layout_constraintStart_toEndOf="@+id/imageButton2"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
-        android:text="Tree path"
-        app:layout_constraintStart_toEndOf="@+id/imageButton2"
-        app:layout_constraintTop_toBottomOf="@+id/running_title" />
+        android:layout_marginStart="8dp"
+        android:maxLines="2"
+        android:textSize="12sp"
+        android:ellipsize="end"
+        android:text="Courses > HYBRID ONL IIT - 2024 (INTEGRATED PROGRAMME) > MATHEMATICS > Trigonometry - I > Lecture VideosCourses > HYBRID ONL IIT - 2024 (INTEGRATED PROGRAMME) > MATHEMATICS > Trigonometry - I > Lecture Videos" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

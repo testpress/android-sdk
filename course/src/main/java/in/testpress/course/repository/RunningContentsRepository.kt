@@ -2,8 +2,6 @@ package `in`.testpress.course.repository
 
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
-import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.domain.asListOfDomainContents
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.RunningContentEntity
@@ -23,10 +21,13 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
     private val runningContentDao = TestpressDatabase.invoke(context).runningContentDao()
     val courseNetwork = CourseNetwork(context)
     var page = 1
-
     private var _resourceContents: MutableLiveData<Resource<List<RunningContentEntity>>> = MutableLiveData()
     val resourceContents: LiveData<Resource<List<RunningContentEntity>>>
         get() = _resourceContents
+
+    init {
+        _resourceContents.postValue(Resource.loading(null))
+    }
 
     fun loadItems(page: Int = 1) {
         val queryParams = hashMapOf<String, Any>("page" to page)
@@ -60,6 +61,7 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
             } else {
                 page = 1
             }
+
         }
     }
 
@@ -76,18 +78,12 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
     }
 
     private fun sort() :List<RunningContentEntity> {
-
         val content = getAll()
-
-        Log.d("TAG", "sort: ${content[0].start}")
-
         val dateTimeFormatter: DateTimeFormatter =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
-
         val result = content.sortedByDescending {
             LocalDate.parse(it.start, dateTimeFormatter)
         }
-        println(result)
         return result
     }
 }

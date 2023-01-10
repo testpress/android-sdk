@@ -200,31 +200,6 @@ fun createDomainContent(content: Content): DomainContent {
     )
 }
 
-fun createDomainContent(runningContentEntity: RunningContentEntity):DomainContent{
-    return DomainContent(
-        id = runningContentEntity.id,
-        order = runningContentEntity.order,
-        chapterId = runningContentEntity.chapter_id,
-        freePreview = runningContentEntity.free_preview,
-        title = runningContentEntity.title,
-        courseId = runningContentEntity.courseId,
-        examId = runningContentEntity.examId,
-        videoId = runningContentEntity.videoId,
-        attachmentId = runningContentEntity.attachmentId,
-        contentType = runningContentEntity.contentType,
-        image = runningContentEntity.icon,
-        start = runningContentEntity.start,
-        end = runningContentEntity.end,
-        treePath = runningContentEntity.treePath,
-        isLocked =null,
-        isScheduled = null,
-        hasStarted = null,
-        isCourseAvailable = null,
-        hasEnded = null,
-        active = null
-    )
-}
-
 fun ContentEntity.asDomainContent(): DomainContent {
     return createDomainContent(this)
 }
@@ -240,16 +215,6 @@ fun Content.asDomainContent(): DomainContent {
 }
 
 fun List<Content>.asDomainContents(): List<DomainContent> {
-    return this.map {
-        createDomainContent(it)
-    }
-}
-
-fun RunningContentEntity.asDomainContent(): DomainContent {
-    return createDomainContent(this)
-}
-
-fun List<RunningContentEntity>.asListOfDomainContents(): List<DomainContent> {
     return this.map {
         createDomainContent(it)
     }
