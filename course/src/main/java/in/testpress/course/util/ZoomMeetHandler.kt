@@ -150,6 +150,7 @@ class ZoomMeetHandler(
             registerMeetingServiceListener()
             setIsCustomizedMeetingUIEnabled()
             onInitializeCallback?.onSuccess()
+            zoomSDK.zoomUIService.hideMeetingInviteUrl(true)
         }
     }
 
@@ -170,7 +171,6 @@ class ZoomMeetHandler(
     }
 
     fun startMeeting() {
-        zoomSDK.zoomUIService.hideMeetingInviteUrl(true)
         val meetingService = zoomSDK.meetingService
         val ret = meetingService.joinMeetingWithParams(
             context,
