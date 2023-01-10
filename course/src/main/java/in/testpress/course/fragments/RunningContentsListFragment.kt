@@ -6,6 +6,7 @@ import `in`.testpress.course.adapter.RunningContentListAdapter
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.repository.RunningContentsRepository
 import `in`.testpress.course.viewmodels.RunningContentsListViewModel
+import `in`.testpress.database.entities.RunningContentEntity
 import `in`.testpress.databinding.BaseListLayoutBinding
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
@@ -99,7 +100,7 @@ class RunningContentsListFragment: Fragment(), EmptyViewListener {
                 Status.SUCCESS -> {
                     Log.d("ContentListFragment", "Got status SUCCESS")
                     hideLoadingPlaceholder()
-                    val items = resource.data!! as List<DomainContent>
+                    val items = resource.data!! as List<RunningContentEntity>
                     Log.d("Items", "" + items.isEmpty())
                     if (items.isEmpty()) showEmptyList()
                     mAdapter.contents = items
@@ -109,7 +110,7 @@ class RunningContentsListFragment: Fragment(), EmptyViewListener {
                     Log.d("ContentListFragment", "Got status ERROR")
                     hideLoadingPlaceholder()
                     if (resource.data != null) {
-                        mAdapter.contents = resource.data as List<DomainContent>
+                        mAdapter.contents = resource.data as List<RunningContentEntity>
                         mAdapter.notifyDataSetChanged()
                     } else {
                         emptyViewFragment.displayError(resource.exception!!)

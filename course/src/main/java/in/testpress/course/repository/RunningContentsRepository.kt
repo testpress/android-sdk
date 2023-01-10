@@ -24,8 +24,8 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
     val courseNetwork = CourseNetwork(context)
     var page = 1
 
-    private var _resourceContents: MutableLiveData<Resource<List<DomainContent>>> = MutableLiveData()
-    val resourceContents: LiveData<Resource<List<DomainContent>>>
+    private var _resourceContents: MutableLiveData<Resource<List<RunningContentEntity>>> = MutableLiveData()
+    val resourceContents: LiveData<Resource<List<RunningContentEntity>>>
         get() = _resourceContents
 
     fun loadItems(page: Int = 1) {
@@ -35,7 +35,7 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
                 override fun onException(exception: TestpressException?) {
                     val contents = getAll()
                     if (contents.isNotEmpty()) {
-                        _resourceContents.postValue(Resource.error(exception!!, sort().asListOfDomainContents()))
+                        _resourceContents.postValue(Resource.error(exception!!, sort()))
                     } else {
                         _resourceContents.postValue(Resource.error(exception!!, null))
                     }
@@ -52,7 +52,7 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
             storeContent(response.results)
             val contents = getAll()
             if (contents.isNotEmpty()) {
-                _resourceContents.postValue(Resource.success(sort().asListOfDomainContents()))
+                _resourceContents.postValue(Resource.success(sort()))
             }
             if (response.next != null) {
                 page += 1
@@ -67,12 +67,12 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
         return runningContentDao.getAll(courseId)
     }
 
-    private suspend fun storeContent(response: List<RunningContentEntity>): List<DomainContent> {
+    private suspend fun storeContent(response: List<RunningContentEntity>): List<RunningContentEntity> {
         if (page == 1){
             runningContentDao.deleteAll(courseId)
         }
         runningContentDao.insertAll(response)
-        return response.asListOfDomainContents()
+        return response
     }
 
     private fun sort() :List<RunningContentEntity> {
