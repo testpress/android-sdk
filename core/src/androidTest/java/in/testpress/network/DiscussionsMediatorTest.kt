@@ -40,7 +40,6 @@ class DiscussionsMediatorTest: DbTestMixin() {
         val mediator = DiscussionsMediator(
                 FakeAPIClient(ApplicationProvider.getApplicationContext(), true),
                 db
-        , linkedMapOf()
         )
         val result = mediator.load(LoadType.REFRESH, getPagingState())
 
@@ -52,7 +51,7 @@ class DiscussionsMediatorTest: DbTestMixin() {
         val mediator = DiscussionsMediator(
                 FakeAPIClient(ApplicationProvider.getApplicationContext()),
                 db
-            , linkedMapOf())
+            )
         val result = mediator.load(LoadType.REFRESH, getPagingState())
 
         assertTrue(result is RemoteMediator.MediatorResult.Success)
@@ -66,7 +65,7 @@ class DiscussionsMediatorTest: DbTestMixin() {
         val mediator = DiscussionsMediator(
                 apiClient,
                 db
-            , linkedMapOf())
+            )
         val result = mediator.load(LoadType.REFRESH, getPagingState())
         assertTrue(result is RemoteMediator.MediatorResult.Error)
     }
