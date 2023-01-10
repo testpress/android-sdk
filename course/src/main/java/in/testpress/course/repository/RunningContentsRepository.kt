@@ -35,7 +35,7 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
                 override fun onException(exception: TestpressException?) {
                     val contents = getAll()
                     if (contents.isNotEmpty()) {
-                        _resourceContents.postValue(Resource.error(exception!!, sort()))
+                        _resourceContents.postValue(Resource.error(exception!!, contents))
                     } else {
                         _resourceContents.postValue(Resource.error(exception!!, null))
                     }
@@ -52,7 +52,7 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
             storeContent(response.results)
             val contents = getAll()
             if (contents.isNotEmpty()) {
-                _resourceContents.postValue(Resource.success(sort()))
+                _resourceContents.postValue(Resource.success(contents))
             }
             if (response.next != null) {
                 page += 1
