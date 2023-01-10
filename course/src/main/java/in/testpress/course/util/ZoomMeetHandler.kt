@@ -11,6 +11,7 @@ import `in`.testpress.util.isEmailValid
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import us.zoom.sdk.*
 import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_MEETING_ID
@@ -139,6 +140,7 @@ class ZoomMeetHandler(
     }
 
     override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
+        zoomSDK.zoomUIService.hideMeetingInviteUrl(true)
         if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
             Toast.makeText(
                 context,
@@ -150,7 +152,6 @@ class ZoomMeetHandler(
             registerMeetingServiceListener()
             setIsCustomizedMeetingUIEnabled()
             onInitializeCallback?.onSuccess()
-            zoomSDK.zoomUIService.hideMeetingInviteUrl(true)
         }
     }
 
