@@ -13,7 +13,8 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import us.zoom.sdk.*
-import us.zoom.sdk.MeetingViewsOptions.*
+import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_MEETING_ID
+import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_PASSWORD
 
 class ZoomMeetHandler(
     val context: Context,
