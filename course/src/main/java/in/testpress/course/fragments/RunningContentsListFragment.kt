@@ -6,8 +6,6 @@ import `in`.testpress.course.adapter.RunningContentListAdapter
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.repository.RunningContentsRepository
 import `in`.testpress.course.viewmodels.RunningContentsListViewModel
-import `in`.testpress.database.entities.RunningContentEntity
-import `in`.testpress.databinding.BaseListLayoutBinding
 import `in`.testpress.databinding.RunningContentListLayoutBinding
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
