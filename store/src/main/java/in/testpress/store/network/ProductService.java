@@ -1,6 +1,7 @@
 package in.testpress.store.network;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
@@ -8,6 +9,7 @@ import in.testpress.store.models.NetworkHash;
 import in.testpress.store.models.NetworkOrderStatus;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.Product;
+import in.testpress.store.models.ProductCategories;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.ProductsListResponse;
 import retrofit2.http.Body;
@@ -16,11 +18,14 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
+
+import static in.testpress.store.network.StoreApiClient.CATEGORIES_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDERS_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDER_API_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDER_CONFIRM_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDER_STATE_REFRESH_PATH;
 import static in.testpress.store.network.StoreApiClient.PAYU_HASH_GENERATOR_PATH;
+import static in.testpress.store.network.StoreApiClient.V5_PRODUCTS_LIST_PATH;
 
 public interface ProductService {
 
@@ -52,6 +57,9 @@ public interface ProductService {
     RetrofitCall<NetworkOrderStatus> refreshOrderStatus(
             @Path(value = "order_id", encoded = true) String orderId,
             @Body HashMap<String, String> arguments);
+
+    @GET(V5_PRODUCTS_LIST_PATH+CATEGORIES_PATH)
+    RetrofitCall<TestpressApiResponse<ProductCategories>> getProductsCategories();
 }
 
 

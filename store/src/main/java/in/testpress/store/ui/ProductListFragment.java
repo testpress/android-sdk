@@ -36,6 +36,12 @@ public class ProductListFragment extends PagedItemFragment<Product> {
         super.onCreate(savedInstanceState);
     }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        productCategoriesListView.setVisibility(View.VISIBLE);
+    }
+
     protected BaseResourcePager<Product> getPager() {
         return pager;
     }
@@ -43,6 +49,12 @@ public class ProductListFragment extends PagedItemFragment<Product> {
     @Override
     protected SingleTypeAdapter<Product> createAdapter(List<Product> items) {
         return new ProductsListAdapter(getActivity(), items);
+    }
+
+    @Override
+    public void updateItems(List<Product> items) {
+
+        super.updateItems(items);
     }
 
     public void onListItemClick(ListView l, View v, int position, long id) {

@@ -6,6 +6,7 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import in.testpress.R;
 import in.testpress.core.TestpressException;
+import in.testpress.models.greendao.Product;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.ViewUtils;
@@ -57,6 +59,11 @@ public abstract class BaseListViewFragment<E> extends Fragment
      * List view
      */
     protected ListView listView;
+
+    /**
+     * Product Categories List view
+     */
+    protected RecyclerView productCategoriesListView;
 
     /**
      * Empty view
@@ -135,6 +142,7 @@ public abstract class BaseListViewFragment<E> extends Fragment
                 onListItemClick((ListView) parent, view, position, id);
             }
         });
+        productCategoriesListView = (RecyclerView) view.findViewById(R.id.product_categories_list);
         loadingPlaceholder = view.findViewById(R.id.shimmer_view_container);
         loadingPlaceholder.setVisibility(View.GONE);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);

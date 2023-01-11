@@ -21,6 +21,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.course.R;
 import in.testpress.store.TestpressStore;
+import in.testpress.store.ui.ProductListFragment;
 import in.testpress.ui.BaseFragment;
 
 public class CourseListFragment extends BaseFragment {
@@ -55,7 +56,7 @@ public class CourseListFragment extends BaseFragment {
         if (session.getInstituteSettings().getStoreLabel() != null && !session.getInstituteSettings().getStoreLabel().isEmpty()) {
             storeLabel = session.getInstituteSettings().getStoreLabel();
         }
-        adapter.addFragment(new AvailableCourseListFragment(), storeLabel);
+        adapter.addFragment(new ProductListFragment(), storeLabel);
         viewPager.setAdapter(adapter);
     }
 

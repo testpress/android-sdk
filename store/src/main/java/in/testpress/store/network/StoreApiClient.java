@@ -13,6 +13,7 @@ import in.testpress.store.models.NetworkOrderStatus;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
+import in.testpress.store.models.ProductCategories;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.ProductsListResponse;
 
@@ -33,6 +34,10 @@ public class StoreApiClient extends TestpressApiClient {
     public static final String URL_PAYMENT_RESPONSE_HANDLER = "/payments/response/payu/";
 
     public static final String PAYU_HASH_GENERATOR_PATH = "/api/v2.5/payu/dynamic_hash/";
+
+    public static final String V5_PRODUCTS_LIST_PATH =  "/api/v2.5/products/";
+
+    public static final String CATEGORIES_PATH = "categories/";
 
     public StoreApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
@@ -84,5 +89,9 @@ public class StoreApiClient extends TestpressApiClient {
         HashMap<String, Object> postData = new HashMap<String, Object>();
         postData.put("data", key);
         return getProductService().generateHash(postData);
+    }
+
+    public RetrofitCall<TestpressApiResponse<ProductCategories>> getProductsCategories(){
+        return getProductService().getProductsCategories();
     }
 }
