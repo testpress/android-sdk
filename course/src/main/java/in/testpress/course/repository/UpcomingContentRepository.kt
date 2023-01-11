@@ -3,7 +3,7 @@ package `in`.testpress.course.repository
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.domain.convertUpcomingContentToDomainContent
+import `in`.testpress.course.domain.convertUpcomingContentsToDomainContents
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.RunningContentEntity
@@ -106,7 +106,7 @@ class UpcomingContentRepository(val context: Context, val courseId: Long = -1) {
     }
 
     private fun getAll(): List<DomainContent> {
-        return upcomingContentDao.getAll(courseId).convertUpcomingContentToDomainContent()
+        return upcomingContentDao.getAll(courseId).convertUpcomingContentsToDomainContents()
     }
 
     private suspend fun storeContent(response: List<UpcomingContentEntity>): List<UpcomingContentEntity> {

@@ -315,13 +315,13 @@ fun List<Content>.asDomainContents(): List<DomainContent> {
     }
 }
 
-fun List<RunningContentEntity>.convertRunningContentToDomainContent(): List<DomainContent>{
+fun List<RunningContentEntity>.convertRunningContentsToDomainContents(): List<DomainContent>{
     return this.map {
         createDomainContent(it)
     }
 }
 
-fun List<UpcomingContentEntity>.convertUpcomingContentToDomainContent(): List<DomainContent>{
+fun List<UpcomingContentEntity>.convertUpcomingContentsToDomainContents(): List<DomainContent>{
     return this.map {
         createDomainContent(it)
     }
