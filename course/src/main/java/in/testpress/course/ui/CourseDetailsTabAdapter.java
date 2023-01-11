@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import in.testpress.course.R;
 import in.testpress.course.fragments.RunningContentsListFragment;
+import in.testpress.course.fragments.UpcomingContentListFragment;
 
 class CourseDetailsTabAdapter extends FragmentPagerAdapter {
 
@@ -22,7 +23,7 @@ class CourseDetailsTabAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return 4;
     }
 
     @Override
@@ -37,6 +38,9 @@ class CourseDetailsTabAdapter extends FragmentPagerAdapter {
                 break;
             case 2:
                 fragment = new RunningContentsListFragment();
+                break;
+            case 3:
+                fragment = new UpcomingContentListFragment();
                 break;
             default:
                 fragment = new ChaptersListFragment();
@@ -55,6 +59,8 @@ class CourseDetailsTabAdapter extends FragmentPagerAdapter {
                 return resources.getString(R.string.testpress_leaderboard);
             case 2:
                 return "Running";
+            case 3:
+                return "Upcoming";
             default:
                 return null;
         }

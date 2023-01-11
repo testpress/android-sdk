@@ -2,12 +2,9 @@ package `in`.testpress.database.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.*
 
 @Entity
-data class RunningContentEntity(
+class UpcomingContentEntity(
     @PrimaryKey val id: Long,
     var order: Int? = null,
     var chapter_id: Long? = null,

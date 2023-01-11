@@ -3,6 +3,7 @@ package `in`.testpress.course.adapter
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.databinding.RunningContentListItemBinding
+import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.database.entities.RunningContentEntity
 import `in`.testpress.util.ViewUtils
@@ -14,22 +15,22 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
 class RunningContentListAdapter :
-    ListAdapter<RunningContentEntity, RunningContentViewHolder>(DOMAIN_CONTENT_COMPARATOR) {
+    ListAdapter<DomainContent, RunningContentViewHolder>(DOMAIN_CONTENT_COMPARATOR) {
 
-    var contents: List<RunningContentEntity> = listOf()
+    var contents: List<DomainContent> = listOf()
 
     companion object {
         private val DOMAIN_CONTENT_COMPARATOR =
-            object : DiffUtil.ItemCallback<RunningContentEntity>() {
+            object : DiffUtil.ItemCallback<DomainContent>() {
                 override fun areContentsTheSame(
-                    oldItem: RunningContentEntity,
-                    newItem: RunningContentEntity
+                    oldItem: DomainContent,
+                    newItem: DomainContent
                 ): Boolean =
                     oldItem == newItem
 
                 override fun areItemsTheSame(
-                    oldItem: RunningContentEntity,
-                    newItem: RunningContentEntity
+                    oldItem: DomainContent,
+                    newItem: DomainContent
                 ): Boolean =
                     oldItem.id == newItem.id
             }
@@ -51,7 +52,7 @@ class RunningContentListAdapter :
         return RunningContentViewHolder(binding)
     }
 
-    private fun onItemClick(content: RunningContentEntity, context: Context) {
+    private fun onItemClick(content: DomainContent, context: Context) {
         context.startActivity(
             ContentActivity.createIntent(
                 content.id,
@@ -62,7 +63,7 @@ class RunningContentListAdapter :
 
     }
 
-    override fun getItem(position: Int): RunningContentEntity? {
+    override fun getItem(position: Int): DomainContent? {
         if (contents.size > position) return contents[position]
         return null
     }
@@ -88,7 +89,7 @@ class RunningContentViewHolder(binding: RunningContentListItemBinding) :
         date.typeface = TestpressSdk.getRubikMediumFont(binding.root.context)
     }
 
-    fun bind(content: RunningContentEntity, clickListener: (RunningContentEntity) -> Unit) {
+    fun bind(content: DomainContent, clickListener: (DomainContent) -> Unit) {
 
         title.text = content.title
         path.text =content.treePath
@@ -109,7 +110,7 @@ class RunningContentViewHolder(binding: RunningContentListItemBinding) :
             else -> R.drawable.test
         }
     }
-    private fun setViewVisibility(content: RunningContentEntity){
+    private fun setViewVisibility(content: DomainContent){
         if (content.getFormattedStartDateAndEndDate() != ""){
             ViewUtils.setGone(date,false)
         }

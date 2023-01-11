@@ -2,6 +2,8 @@ package `in`.testpress.course.domain
 
 import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.database.ContentEntity
+import `in`.testpress.database.entities.RunningContentEntity
+import `in`.testpress.database.entities.UpcomingContentEntity
 import `in`.testpress.models.greendao.Attachment
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
@@ -12,6 +14,9 @@ import android.content.Context
 import android.text.format.DateUtils
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.util.Util
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 data class DomainContent(
     val id: Long,
@@ -59,7 +64,8 @@ data class DomainContent(
     val coverImageMedium: String? = null,
     var nextContentId: Long? = null,
     val hasEnded: Boolean?,
-    val examStartUrl: String? = null
+    val examStartUrl: String? = null,
+    val treePath: String? = null
 ) {
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
@@ -105,6 +111,49 @@ data class DomainContent(
 
     fun canShowRecordedVideo(): Boolean {
         return video != null && videoConference?.showRecordedVideo == true
+    }
+
+    fun getFormattedStartDateAndEndDate(): String {
+        var startAndEnd = ""
+        if (getFormattedStartDate() != ""){
+            startAndEnd += "Start: ${getFormattedStartDate()}"  //Result should be like [Start: 01/01/23 10:00 am]
+        }
+        if (getFormattedEndDate() != ""){
+            startAndEnd += " - End: ${getFormattedEndDate()}" //Result should be like [Start: 01/01/23 10:00 am - End: 01/01/23 12:00 pm]
+        }
+        return startAndEnd
+    }
+
+    private fun getFormattedStartDate(): String {
+        var startDateAndTime = ""
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+        simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
+        if (start != null && start != "") {
+            startDateAndTime = try {
+                val date = start.let { simpleDateFormat.parse(it) }
+                val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
+                date?.let { dateFormat.format(it) }!!
+            } catch (e: Exception) {
+                ""
+            }
+        }
+        return startDateAndTime
+    }
+
+    private fun getFormattedEndDate(): String {
+        var endDateAndTime = ""
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+        simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
+        if (end != null && end != "") {
+            endDateAndTime = try {
+                val date = end.let { simpleDateFormat.parse(it) }
+                val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
+                date?.let { dateFormat.format(it) }!!
+            } catch (e: Exception) {
+                ""
+            }
+        }
+        return endDateAndTime
     }
 }
 
@@ -198,6 +247,54 @@ fun createDomainContent(content: Content): DomainContent {
     )
 }
 
+fun createDomainContent(content: RunningContentEntity): DomainContent {
+    return DomainContent(
+        id = content.id,
+        order = content.order,
+        chapterId = content.chapter_id,
+        freePreview = content.free_preview,
+        title = content.title,
+        courseId = content.courseId,
+        examId = content.examId,
+        videoId = content.videoId,
+        attachmentId = content.attachmentId,
+        contentType = content.contentType,
+        start = content.start,
+        end = content.end,
+        treePath = content.treePath,
+        isLocked = null,
+        isScheduled = null,
+        active = null,
+        hasEnded = null,
+        isCourseAvailable = null,
+        hasStarted = null,
+    )
+}
+
+fun createDomainContent(content: UpcomingContentEntity): DomainContent {
+    return DomainContent(
+        id = content.id,
+        order = content.order,
+        chapterId = content.chapter_id,
+        freePreview = content.free_preview,
+        title = content.title,
+        courseId = content.courseId,
+        examId = content.examId,
+        videoId = content.videoId,
+        attachmentId = content.attachmentId,
+        contentType = content.contentType,
+        start = content.start,
+        end = content.end,
+        treePath = content.treePath,
+        isLocked = null,
+        isScheduled = null,
+        active = null,
+        hasEnded = null,
+        isCourseAvailable = null,
+        hasStarted = null,
+    )
+}
+
 fun ContentEntity.asDomainContent(): DomainContent {
     return createDomainContent(this)
 }
@@ -213,6 +310,18 @@ fun Content.asDomainContent(): DomainContent {
 }
 
 fun List<Content>.asDomainContents(): List<DomainContent> {
+    return this.map {
+        createDomainContent(it)
+    }
+}
+
+fun List<RunningContentEntity>.convertRunningContentToDomainContent(): List<DomainContent>{
+    return this.map {
+        createDomainContent(it)
+    }
+}
+
+fun List<UpcomingContentEntity>.convertUpcomingContentToDomainContent(): List<DomainContent>{
     return this.map {
         createDomainContent(it)
     }

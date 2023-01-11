@@ -16,6 +16,7 @@ import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.ContentsListResponse
 import android.content.Context
 import android.util.Log
+import androidx.room.Entity
 import retrofit2.http.*
 import java.util.HashMap
 
@@ -65,6 +66,13 @@ interface CourseService {
         @Path(value = "course_id", encoded = true) courseId: Long,
         @QueryMap queryParams: HashMap<String, Any>
     ): RetrofitCall<ApiResponse<List<RunningContentEntity>>>
+
+    @GET("$COURSE_PATH_v2_5{course_id}$UPCOMING_CONTENTS_PATH")
+    fun getUpcomingContents(
+        @Path(value = "course_id", encoded = true) courseId: Long,
+        @QueryMap queryParams: HashMap<String, Any>,
+    ): RetrofitCall<ApiResponse<List<UpcomingContentEntity>>>
+
 }
 
 
@@ -106,5 +114,9 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     fun getRunningContents(courseId: Long, arguments: HashMap<String, Any>): RetrofitCall<ApiResponse<List<RunningContentEntity>>> {
         return getCourseService().getRunningContents(courseId, arguments)
+    }
+
+    fun getUpcomingContents(courseId: Long, arguments: HashMap<String, Any>): RetrofitCall<ApiResponse<List<UpcomingContentEntity>>> {
+        return getCourseService().getUpcomingContents(courseId, arguments)
     }
 }

@@ -1,13 +1,12 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
-import `in`.testpress.course.TestpressCourse.COURSE_ID
+import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.adapter.RunningContentListAdapter
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.repository.RunningContentsRepository
-import `in`.testpress.course.viewmodels.RunningContentsListViewModel
-import `in`.testpress.database.entities.RunningContentEntity
-import `in`.testpress.databinding.BaseListLayoutBinding
+import `in`.testpress.course.repository.UpcomingContentRepository
+import `in`.testpress.course.viewmodels.UpcomingContentsListViewModel
+import `in`.testpress.database.entities.UpcomingContentEntity
 import `in`.testpress.databinding.RunningContentListLayoutBinding
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
@@ -27,11 +26,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.facebook.shimmer.ShimmerFrameLayout
 
-class RunningContentsListFragment: Fragment(), EmptyViewListener {
-
+class UpcomingContentListFragment: Fragment(), EmptyViewListener {
     private lateinit var binding : RunningContentListLayoutBinding
     private var courseId: Long = -1
-    private lateinit var viewModel : RunningContentsListViewModel
+    private lateinit var viewModel : UpcomingContentsListViewModel
     private lateinit var mAdapter: RunningContentListAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyViewFragment: EmptyViewFragment
@@ -45,15 +43,15 @@ class RunningContentsListFragment: Fragment(), EmptyViewListener {
     }
 
     private fun parseArguments() {
-        courseId = arguments!!.getString(COURSE_ID)?.toLong()!!
+        courseId = arguments!!.getString(TestpressCourse.COURSE_ID)?.toLong()!!
     }
 
     private fun initializeViewModel() {
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return RunningContentsListViewModel(RunningContentsRepository(requireContext(), courseId)) as T
+                return UpcomingContentsListViewModel(UpcomingContentRepository(requireContext(), courseId)) as T
             }
-        }).get(RunningContentsListViewModel::class.java)
+        }).get(UpcomingContentsListViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -125,7 +123,8 @@ class RunningContentsListFragment: Fragment(), EmptyViewListener {
     }
 
     private fun showEmptyList() {
-        emptyViewFragment.setEmptyText(R.string.testpress_no_running_content,
+        emptyViewFragment.setEmptyText(
+            R.string.testpress_no_running_content,
             R.string.testpress_no_running_content_description,
             R.drawable.ic_error_outline_black_18dp
         )
