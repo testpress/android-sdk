@@ -23,7 +23,8 @@ class UpcomingContentRepository(val context: Context, val courseId: Long = -1) {
     private val upcomingContentDao = TestpressDatabase.invoke(context).upcomingContentDao()
     val courseNetwork = CourseNetwork(context)
     var page = 1
-    private var _resourceContents: MutableLiveData<Resource<List<DomainContent>>> = MutableLiveData()
+    private var _resourceContents: MutableLiveData<Resource<List<DomainContent>>> =
+        MutableLiveData()
     val resourceContents: LiveData<Resource<List<DomainContent>>>
         get() = _resourceContents
 
@@ -34,7 +35,7 @@ class UpcomingContentRepository(val context: Context, val courseId: Long = -1) {
     fun loadItems(page: Int = 1) {
         val queryParams = hashMapOf<String, Any>("page" to page)
         courseNetwork.getUpcomingContents(courseId, queryParams)
-            .enqueue(object : TestpressCallback<ApiResponse<List<UpcomingContentEntity>>>(){
+            .enqueue(object : TestpressCallback<ApiResponse<List<UpcomingContentEntity>>>() {
                 override fun onException(exception: TestpressException?) {
                     val contents = getAll()
                     if (contents.isNotEmpty()) {
@@ -49,44 +50,6 @@ class UpcomingContentRepository(val context: Context, val courseId: Long = -1) {
                 }
             })
     }
-
-//    fun loadRunningContentItems(page: Int = 1) {
-//        val queryParams = hashMapOf<String, Any>("page" to page)
-//        courseNetwork.getRunningContents(courseId, queryParams)
-//            .enqueue(object : TestpressCallback<ApiResponse<List<RunningContentEntity>>>(){
-//                override fun onException(exception: TestpressException?) {
-//                    val contents = getAll()
-//                    if (contents.isNotEmpty()) {
-//                        _resourceContents.postValue(Resource.error(exception!!, contents))
-//                    } else {
-//                        _resourceContents.postValue(Resource.error(exception!!, null))
-//                    }
-//                }
-//
-//                override fun onSuccess(result: ApiResponse<List<RunningContentEntity>>) {
-//                    handleFetchSuccess(result)
-//                }
-//            })
-//    }
-//
-//    fun loadUpcomingContentItems(page: Int = 1) {
-//        val queryParams = hashMapOf<String, Any>("page" to page)
-//        courseNetwork.getUpcomingContents(courseId, queryParams)
-//            .enqueue(object : TestpressCallback<ApiResponse<List<UpcomingContentEntity>>>(){
-//                override fun onException(exception: TestpressException?) {
-//                    val contents = getAll()
-//                    if (contents.isNotEmpty()) {
-//                        _resourceContents.postValue(Resource.error(exception!!, contents))
-//                    } else {
-//                        _resourceContents.postValue(Resource.error(exception!!, null))
-//                    }
-//                }
-//
-//                override fun onSuccess(result: ApiResponse<List<UpcomingContentEntity>>) {
-//                    handleFetchSuccess(result)
-//                }
-//            })
-//    }
 
     private fun handleFetchSuccess(response: ApiResponse<List<UpcomingContentEntity>>) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -110,14 +73,14 @@ class UpcomingContentRepository(val context: Context, val courseId: Long = -1) {
     }
 
     private suspend fun storeContent(response: List<UpcomingContentEntity>): List<UpcomingContentEntity> {
-        if (page == 1){
+        if (page == 1) {
             upcomingContentDao.deleteAll(courseId)
         }
         upcomingContentDao.insertAll(response)
         return response
     }
 
-    private fun sort() :List<DomainContent> {
+    private fun sort(): List<DomainContent> {
         val content = getAll()
         val dateTimeFormatter: DateTimeFormatter =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")

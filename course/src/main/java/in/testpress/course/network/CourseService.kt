@@ -8,7 +8,6 @@ import `in`.testpress.database.entities.ProductCategoryEntity
 import `in`.testpress.database.entities.RunningContentEntity
 import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.models.TestpressApiResponse
-import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.Course
 import `in`.testpress.network.RetrofitCall
 import `in`.testpress.network.TestpressApiClient
@@ -16,7 +15,6 @@ import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.ContentsListResponse
 import android.content.Context
 import android.util.Log
-import androidx.room.Entity
 import retrofit2.http.*
 import java.util.HashMap
 
