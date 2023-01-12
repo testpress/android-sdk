@@ -57,6 +57,8 @@ class UpcomingContentRepository(val context: Context, val courseId: Long = -1) {
             val contents = getAll()
             if (contents.isNotEmpty()) {
                 _resourceContents.postValue(Resource.success(contents))
+            } else {
+                _resourceContents.postValue(Resource.success(listOf()))
             }
             if (response.next != null) {
                 page += 1
