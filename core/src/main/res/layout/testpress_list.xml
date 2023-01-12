@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    xmlns:tools="http://schemas.android.com/tools">
 
 
     <com.facebook.shimmer.ShimmerFrameLayout
@@ -54,10 +54,8 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/product_categories_list"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="#50000000"
-        android:visibility="gone"
-        android:orientation="horizontal"/>
+        android:layout_height="40dp"
+        android:visibility="gone"/>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:layout_marginStart="4dp"
+    tools:ignore="MissingDefaultResource">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="4dp"
+        android:paddingTop="4dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        tools:background="@drawable/testpress_black_stroke"
+        android:gravity="center"
+        android:layout_gravity="center_vertical"
+        android:text="ProductCategories"
+        android:textAllCaps="false"
+        android:textColor="#000000"
+        android:textSize="16sp" />
+
+</LinearLayout>

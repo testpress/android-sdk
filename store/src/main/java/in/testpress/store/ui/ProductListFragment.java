@@ -3,17 +3,24 @@ package in.testpress.store.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import android.view.View;
 import android.widget.ListView;
 
 import java.util.List;
+import java.util.Objects;
 
 import in.testpress.core.TestpressException;
 import in.testpress.network.BaseResourcePager;
+import in.testpress.store.ProductCategoriesViewModel;
 import in.testpress.store.R;
+import in.testpress.store.adapter.ProductCategoriesAdapter;
 import in.testpress.store.models.Product;
 import in.testpress.store.network.ProductsPager;
 import in.testpress.store.network.StoreApiClient;
+import in.testpress.store.repository.ProductCategoriesRepository;
 import in.testpress.ui.PagedItemFragment;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -22,6 +29,8 @@ import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 public class ProductListFragment extends PagedItemFragment<Product> {
 
     protected StoreApiClient apiClient;
+    private ProductCategoriesViewModel viewModel;
+    private ProductCategoriesAdapter productCategoriesAdapter;
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
@@ -34,12 +43,38 @@ public class ProductListFragment extends PagedItemFragment<Product> {
         apiClient = new StoreApiClient(getActivity());
         pager = new ProductsPager(apiClient);
         super.onCreate(savedInstanceState);
+        viewModel = new ProductCategoriesViewModel(new ProductCategoriesRepository(requireContext()));
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         productCategoriesListView.setVisibility(View.VISIBLE);
+        productCategoriesAdapter = new ProductCategoriesAdapter(requireContext());
+        productCategoriesListView.setLayoutManager(new LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false));
+        productCategoriesListView.setAdapter(productCategoriesAdapter);
+        initViewModel();
+    }
+
+    private void initViewModel(){
+        initalizeObservers();
+        viewModel.loadContents();
+    }
+
+    private void initalizeObservers(){
+        viewModel.getItems().observe(getViewLifecycleOwner(),resource -> {
+            switch (resource.getStatus()) {
+                case LOADING:
+
+                    break;
+                case SUCCESS:
+                    productCategoriesAdapter.setProductCategories(Objects.requireNonNull(resource.getData()));
+                    break;
+                case ERROR:
+
+                    break;
+            }
+        });
     }
 
     protected BaseResourcePager<Product> getPager() {
