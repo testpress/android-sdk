@@ -251,8 +251,8 @@ fun createDomainContent(content: RunningContentEntity): DomainContent {
     return DomainContent(
         id = content.id,
         order = content.order,
-        chapterId = content.chapter_id,
-        freePreview = content.free_preview,
+        chapterId = content.chapterId,
+        freePreview = content.freePreview,
         title = content.title,
         courseId = content.courseId,
         examId = content.examId,
@@ -275,8 +275,8 @@ fun createDomainContent(content: UpcomingContentEntity): DomainContent {
     return DomainContent(
         id = content.id,
         order = content.order,
-        chapterId = content.chapter_id,
-        freePreview = content.free_preview,
+        chapterId = content.chapterId,
+        freePreview = content.freePreview,
         title = content.title,
         courseId = content.courseId,
         examId = content.examId,
