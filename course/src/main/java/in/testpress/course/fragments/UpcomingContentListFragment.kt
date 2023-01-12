@@ -2,12 +2,11 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse
-import `in`.testpress.course.adapter.RunningContentListAdapter
+import `in`.testpress.course.adapter.ContentStateListAdapter
+import `in`.testpress.course.databinding.ContentStateListLayoutBinding
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.repository.UpcomingContentRepository
 import `in`.testpress.course.viewmodels.UpcomingContentsListViewModel
-import `in`.testpress.database.entities.UpcomingContentEntity
-import `in`.testpress.databinding.RunningContentListLayoutBinding
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
@@ -27,10 +26,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.facebook.shimmer.ShimmerFrameLayout
 
 class UpcomingContentListFragment: Fragment(), EmptyViewListener {
-    private lateinit var binding : RunningContentListLayoutBinding
+    private lateinit var binding : ContentStateListLayoutBinding
     private var courseId: Long = -1
     private lateinit var viewModel : UpcomingContentsListViewModel
-    private lateinit var mAdapter: RunningContentListAdapter
+    private lateinit var mAdapter: ContentStateListAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var loadingPlaceholder: ShimmerFrameLayout
@@ -59,14 +58,14 @@ class UpcomingContentListFragment: Fragment(), EmptyViewListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = RunningContentListLayoutBinding.inflate(inflater,container,false)
+        binding = ContentStateListLayoutBinding.inflate(inflater,container,false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindViews()
-        mAdapter = RunningContentListAdapter()
+        mAdapter = ContentStateListAdapter()
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = mAdapter

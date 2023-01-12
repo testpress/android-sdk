@@ -2,7 +2,7 @@ package `in`.testpress.course.adapter
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
-import `in`.testpress.course.databinding.RunningContentListItemBinding
+import `in`.testpress.course.databinding.ContentStateListItemBinding
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.util.ViewUtils
@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
-class RunningContentListAdapter :
+class ContentStateListAdapter :
     ListAdapter<DomainContent, RunningContentViewHolder>(DOMAIN_CONTENT_COMPARATOR) {
 
     var contents: List<DomainContent> = listOf()
@@ -43,7 +43,7 @@ class RunningContentListAdapter :
         parent: ViewGroup,
         viewType: Int
     ): RunningContentViewHolder {
-        val binding = RunningContentListItemBinding.inflate(
+        val binding = ContentStateListItemBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
@@ -75,7 +75,7 @@ class RunningContentListAdapter :
     }
 }
 
-class RunningContentViewHolder(binding: RunningContentListItemBinding) :
+class RunningContentViewHolder(binding: ContentStateListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
     private val title = binding.runningContentTitle
     private val path = binding.treePath

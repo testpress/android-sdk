@@ -1,6 +1,6 @@
 package `in`.testpress.database.entities
 
-open class BaseEntity {
+open class BaseContentStateEntity {
     var order: Int? = null
     var chapterId: Long? = null
     var freePreview: Boolean? = null

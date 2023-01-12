@@ -7,4 +7,4 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Entity
-data class RunningContentEntity(@PrimaryKey val id: Long): BaseEntity()
+data class RunningContentEntity(@PrimaryKey val id: Long): BaseContentStateEntity()
