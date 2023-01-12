@@ -5,7 +5,6 @@ import `in`.testpress.course.R
 import `in`.testpress.course.databinding.RunningContentListItemBinding
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.ui.ContentActivity
-import `in`.testpress.database.entities.RunningContentEntity
 import `in`.testpress.util.ViewUtils
 import android.content.Context
 import android.view.LayoutInflater
@@ -90,10 +89,8 @@ class RunningContentViewHolder(binding: RunningContentListItemBinding) :
     }
 
     fun bind(content: DomainContent, clickListener: (DomainContent) -> Unit) {
-
         title.text = content.title
         path.text =content.treePath
-            //"Courses > HYBRID ONL IIT - 2024 (INTEGRATED PROGRAMME) > MATHEMATICS > Trigonometry - I > Lecture Videos"
         date.text = content.getFormattedStartDateAndEndDate()
         image.setImageResource(setContentImage(content.contentType))
         itemView.setOnClickListener { clickListener(content) }
