@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,6 +54,13 @@ public class ProductListFragment extends PagedItemFragment<Product> {
         productCategoriesListView.setVisibility(View.VISIBLE);
         productCategoriesAdapter = new ProductCategoriesAdapter(requireContext());
         productCategoriesListView.setLayoutManager(new LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false));
+
+productCategoriesListView.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        Toast.makeText(requireContext(), "Hi", Toast.LENGTH_SHORT).show();
+    }
+});
         productCategoriesListView.setAdapter(productCategoriesAdapter);
         initViewModel();
     }
@@ -68,7 +77,7 @@ public class ProductListFragment extends PagedItemFragment<Product> {
 
                     break;
                 case SUCCESS:
-                    productCategoriesAdapter.setProductCategories(Objects.requireNonNull(resource.getData()));
+                    productCategoriesAdapter.addProductCategories(Objects.requireNonNull(resource.getData()));
                     break;
                 case ERROR:
 
