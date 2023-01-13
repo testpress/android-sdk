@@ -54,9 +54,15 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/product_categories_list"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:clickable="true"
+        android:layout_height="48dp"
+        android:background="#10000000"
         android:visibility="gone"/>
+
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:layout_below="@id/product_categories_list"-->
+<!--        android:background="#ccc" />-->
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"

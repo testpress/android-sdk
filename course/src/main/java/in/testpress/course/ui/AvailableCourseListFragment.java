@@ -4,10 +4,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,11 +17,13 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.AvailableCourseListAdapter;
 import in.testpress.course.R;
+import in.testpress.course.adapter.CategoriesListener;
 import in.testpress.course.adapter.ProductCategoriesAdapter;
 import in.testpress.course.enums.CourseType;
 import in.testpress.course.pagers.CourseProductPager;
 import in.testpress.course.repository.ProductCategoriesRepository;
 import in.testpress.course.util.ManageCourseStates;
+import in.testpress.database.entities.ProductCategoryEntity;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.Product;
@@ -30,7 +34,7 @@ import in.testpress.ui.BaseListViewFragment;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ThrowableLoader;
 
-public class AvailableCourseListFragment extends BaseListViewFragment<Product>  {
+public class AvailableCourseListFragment extends BaseListViewFragment<Product> implements CategoriesListener {
 
     private CourseDao courseDao;
     private CourseProductPager pager;
@@ -38,6 +42,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
     protected StoreApiClient apiClient;
     private ProductCategoriesViewModel viewModel;
     private ProductCategoriesAdapter productCategoriesAdapter;
+    private List<Product> productList = new ArrayList<>();
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
@@ -58,8 +63,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        productCategoriesListView.setVisibility(View.VISIBLE);
-        productCategoriesAdapter = new ProductCategoriesAdapter(requireContext());
+        productCategoriesAdapter = new ProductCategoriesAdapter(requireContext(),this);
         productCategoriesListView.setLayoutManager(new LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false));
         productCategoriesListView.setAdapter(productCategoriesAdapter);
         initViewModel();
@@ -77,10 +81,14 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
 
                     break;
                 case SUCCESS:
-                    productCategoriesAdapter.addProductCategories(Objects.requireNonNull(resource.getData()));
+                    if (resource.getData() != null){
+                        productCategoriesAdapter.setProductCategories(resource.getData());
+                        productCategoriesAdapter.notifyDataSetChanged();
+                        productCategoriesListView.setVisibility(View.VISIBLE);
+                    }
                     break;
                 case ERROR:
-
+                    productCategoriesListView.setVisibility(View.GONE);
                     break;
             }
         });
@@ -89,6 +97,8 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
     @Override
     public void refreshWithProgress() {
         pager.reset();
+        viewModel.loadContents();
+        productCategoriesAdapter.setSelection(0);
         super.refreshWithProgress();
     }
 
@@ -149,6 +159,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
 
         } else {
             this.items = products;
+            productList = products;
             getListAdapter().getWrappedAdapter().setItems(products);
             deleteAndInsertProductsInDB(products);
             showList();
@@ -199,4 +210,14 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
                 R.drawable.ic_error_outline_black_18dp);
     }
 
+    @Override
+    public void invoke(@NonNull ProductCategoryEntity productCategories) {
+        List<Product> filteredProduct = new ArrayList<>();
+        for (Product product : productList){
+            if (product.getId() == 118 && productCategories.getId() == 0){
+                filteredProduct.add(product);
+            }
+        }
+        updateItems(filteredProduct);
+    }
 }

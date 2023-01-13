@@ -9,7 +9,7 @@ import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Course
 import `in`.testpress.network.RetrofitCall
 import `in`.testpress.network.TestpressApiClient
-import `in`.testpress.course.models.ProductCategories
+import `in`.testpress.database.entities.ProductCategoryEntity
 import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.ContentsListResponse
 import android.content.Context
@@ -53,7 +53,9 @@ interface CourseService {
     fun getDRMLicenseURL(@Path(value = "content_id", encoded = true) contentId: Long, @Body arguments: HashMap<String, Any>): RetrofitCall<NetworkDRMLicenseAPIResult>
 
     @GET(V5_PRODUCTS_LIST_PATH + PRODUCTS_CATEGORIES_PATH)
-    fun getProductsCategories(): RetrofitCall<TestpressApiResponse<ProductCategories>>
+    fun getProductsCategories(
+        @QueryMap arguments: HashMap<String, Any>
+    ): RetrofitCall<TestpressApiResponse<ProductCategoryEntity>>
 }
 
 
@@ -93,7 +95,7 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         return getCourseService().getDRMLicenseURL(contentId, args)
     }
 
-    fun getProductsCategories(): RetrofitCall<TestpressApiResponse<ProductCategories>> {
-        return getCourseService().getProductsCategories()
+    fun getProductsCategories(arguments: HashMap<String, Any>): RetrofitCall<TestpressApiResponse<ProductCategoryEntity>> {
+        return getCourseService().getProductsCategories(arguments)
     }
 }

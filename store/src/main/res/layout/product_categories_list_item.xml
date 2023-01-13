@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="4dp"
-    android:layout_marginBottom="4dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
     android:layout_marginStart="4dp"
     tools:ignore="MissingDefaultResource">
 
@@ -22,6 +22,6 @@
         android:text="ProductCategories"
         android:textAllCaps="false"
         android:textColor="#000000"
-        android:textSize="16sp" />
+        android:textSize="12sp" />
 
 </LinearLayout>

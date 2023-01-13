@@ -1,22 +1,24 @@
 package `in`.testpress.course.adapter
 
 import `in`.testpress.store.R
-import `in`.testpress.course.models.ProductCategories
+import `in`.testpress.database.entities.ProductCategoryEntity
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
-class ProductCategoriesAdapter(val context: Context) :
-    ListAdapter<ProductCategories, ProductCategoriesAdapter.ProductCategoriesListItemViewHolder>(
+class ProductCategoriesAdapter(val context: Context, private val categoriesListener: CategoriesListener) :
+    ListAdapter<ProductCategoryEntity, ProductCategoriesAdapter.ProductCategoriesListItemViewHolder>(
         PRODUCT_CATEGORIES_COMPARATOR
     ) {
-    var productCategories: MutableList<ProductCategories> = mutableListOf()
+    var productCategories: MutableList<ProductCategoryEntity> = mutableListOf()
+    var selection = 0
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -30,27 +32,18 @@ class ProductCategoriesAdapter(val context: Context) :
     override fun onBindViewHolder(holder: ProductCategoriesListItemViewHolder, position: Int) {
         val productCategories = getItem(position)
         if (productCategories != null) {
-            holder.bind(productCategories){
-                t(it,holder.itemView.context)
+            holder.bind(productCategories,position){
+                categoriesListener.invoke(productCategories)
+                notifyDataSetChanged()
             }
         }
-    }
-
-    fun t(productCategories: ProductCategories, context: Context){
-        Toast.makeText(context,productCategories.name.toString(),Toast.LENGTH_SHORT).show()
-    }
-
-    fun addProductCategories(list: List<ProductCategories>) {
-        val defaultProductCategories = ProductCategories(id = 0, name = "All Product", null)
-        productCategories.add(defaultProductCategories)
-        productCategories.addAll(list)
     }
 
     override fun getItemCount(): Int {
         return productCategories.size
     }
 
-    override fun getItem(position: Int): ProductCategories? {
+    override fun getItem(position: Int): ProductCategoryEntity? {
         if (productCategories.size > position) return productCategories[position]
         return null
     }
@@ -58,29 +51,38 @@ class ProductCategoriesAdapter(val context: Context) :
     inner class ProductCategoriesListItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name = view.findViewById<Button>(R.id.name)
 
-        fun bind(productCategories: ProductCategories, clickListener: (ProductCategories) -> Unit) {
+        fun bind(productCategories: ProductCategoryEntity,position: Int, clickListener: (ProductCategoryEntity) -> Unit) {
             name.text = productCategories.name
-            //name.background = context.getDrawable(R.drawable.testpress_blue_solid)
-            name.background = context.getDrawable(R.drawable.testpress_black_stroke)
-            itemView.setOnClickListener { clickListener(productCategories) }
+            name.setOnClickListener {
+                clickListener(productCategories)
+                selection = position
+            }
+            if (selection == position){
+                name.background = context.getDrawable(R.drawable.testpress_blue_solid)
+            } else {
+                name.background = context.getDrawable(R.drawable.testpress_black_stroke)
+            }
         }
-
     }
 
     companion object {
         private val PRODUCT_CATEGORIES_COMPARATOR =
-            object : DiffUtil.ItemCallback<ProductCategories>() {
+            object : DiffUtil.ItemCallback<ProductCategoryEntity>() {
                 override fun areContentsTheSame(
-                    oldItem: ProductCategories,
-                    newItem: ProductCategories
+                    oldItem: ProductCategoryEntity,
+                    newItem: ProductCategoryEntity
                 ): Boolean =
                     oldItem == newItem
 
                 override fun areItemsTheSame(
-                    oldItem: ProductCategories,
-                    newItem: ProductCategories
+                    oldItem: ProductCategoryEntity,
+                    newItem: ProductCategoryEntity
                 ): Boolean =
                     oldItem.id == newItem.id
             }
     }
+}
+
+interface CategoriesListener{
+    fun invoke(productCategories: ProductCategoryEntity)
 }
