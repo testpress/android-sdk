@@ -2,22 +2,29 @@ package in.testpress.course.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.View;
+
 import androidx.fragment.app.FragmentActivity;
 import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.List;
+import java.util.Objects;
 
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.AvailableCourseListAdapter;
 import in.testpress.course.R;
+import in.testpress.course.adapter.ProductCategoriesAdapter;
 import in.testpress.course.enums.CourseType;
 import in.testpress.course.pagers.CourseProductPager;
+import in.testpress.course.repository.ProductCategoriesRepository;
 import in.testpress.course.util.ManageCourseStates;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.Product;
 import in.testpress.models.greendao.ProductDao;
+import in.testpress.course.viewmodels.ProductCategoriesViewModel;
 import in.testpress.store.network.StoreApiClient;
 import in.testpress.ui.BaseListViewFragment;
 import in.testpress.util.SingleTypeAdapter;
@@ -29,6 +36,8 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
     private CourseProductPager pager;
     private ProductDao productDao;
     protected StoreApiClient apiClient;
+    private ProductCategoriesViewModel viewModel;
+    private ProductCategoriesAdapter productCategoriesAdapter;
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
@@ -43,6 +52,38 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
         courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
         productDao = TestpressSDKDatabase.getProductDao(getContext());
         pager = new CourseProductPager(apiClient);
+        viewModel = new ProductCategoriesViewModel(new ProductCategoriesRepository(requireContext()));
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        productCategoriesListView.setVisibility(View.VISIBLE);
+        productCategoriesAdapter = new ProductCategoriesAdapter(requireContext());
+        productCategoriesListView.setLayoutManager(new LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false));
+        productCategoriesListView.setAdapter(productCategoriesAdapter);
+        initViewModel();
+    }
+
+    private void initViewModel(){
+        initalizeObservers();
+        viewModel.loadContents();
+    }
+
+    private void initalizeObservers(){
+        viewModel.getItems().observe(getViewLifecycleOwner(),resource -> {
+            switch (resource.getStatus()) {
+                case LOADING:
+
+                    break;
+                case SUCCESS:
+                    productCategoriesAdapter.addProductCategories(Objects.requireNonNull(resource.getData()));
+                    break;
+                case ERROR:
+
+                    break;
+            }
+        });
     }
 
     @Override

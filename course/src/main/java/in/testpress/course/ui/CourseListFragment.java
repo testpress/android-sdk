@@ -56,7 +56,7 @@ public class CourseListFragment extends BaseFragment {
         if (session.getInstituteSettings().getStoreLabel() != null && !session.getInstituteSettings().getStoreLabel().isEmpty()) {
             storeLabel = session.getInstituteSettings().getStoreLabel();
         }
-        adapter.addFragment(new ProductListFragment(), storeLabel);
+        adapter.addFragment(new AvailableCourseListFragment(), storeLabel);
         viewPager.setAdapter(adapter);
     }
 

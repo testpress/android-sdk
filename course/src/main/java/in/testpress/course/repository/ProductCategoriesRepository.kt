@@ -1,17 +1,19 @@
-package `in`.testpress.store.repository
+package `in`.testpress.course.repository
 
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
+import `in`.testpress.course.api.CourseService
+import `in`.testpress.course.models.ProductCategories
+import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.network.Resource
-import `in`.testpress.store.models.ProductCategories
 import `in`.testpress.store.network.StoreApiClient
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
 class ProductCategoriesRepository(val context: Context) {
-    private val productServiced = StoreApiClient(context)
+    private val courseService = CourseNetwork(context)
     var page = 1
     private var productCategoriesList = mutableListOf<ProductCategories>()
     private var _resourceProductCategories: MutableLiveData<Resource<MutableList<ProductCategories>>> = MutableLiveData()
@@ -19,7 +21,7 @@ class ProductCategoriesRepository(val context: Context) {
         get() = _resourceProductCategories
 
     fun loadItems(page: Int = 1) {
-        productServiced.productsCategories.enqueue(object :
+        courseService.getProductsCategories().enqueue(object :
             TestpressCallback<TestpressApiResponse<ProductCategories>>() {
             override fun onSuccess(result: TestpressApiResponse<ProductCategories>) {
                 handleFetchSuccess(result)

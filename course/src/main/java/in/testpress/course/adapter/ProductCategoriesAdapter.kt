@@ -1,10 +1,8 @@
-package `in`.testpress.store.adapter
+package `in`.testpress.course.adapter
 
 import `in`.testpress.store.R
-import `in`.testpress.store.models.ProductCategories
+import `in`.testpress.course.models.ProductCategories
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,7 +36,7 @@ class ProductCategoriesAdapter(val context: Context) :
         }
     }
 
-    fun t(productCategories:ProductCategories,context: Context){
+    fun t(productCategories: ProductCategories, context: Context){
         Toast.makeText(context,productCategories.name.toString(),Toast.LENGTH_SHORT).show()
     }
 

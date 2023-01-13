@@ -2,17 +2,19 @@ package `in`.testpress.course.network
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.api.TestpressCourseApiClient
+import `in`.testpress.course.api.TestpressCourseApiClient.PRODUCTS_CATEGORIES_PATH
+import `in`.testpress.course.api.TestpressCourseApiClient.V5_PRODUCTS_LIST_PATH
 import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Course
 import `in`.testpress.network.RetrofitCall
 import `in`.testpress.network.TestpressApiClient
+import `in`.testpress.course.models.ProductCategories
 import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.ContentsListResponse
 import android.content.Context
-import android.util.Log
 import retrofit2.http.*
-import java.util.HashMap
+
 
 interface CourseService {
     @GET("{content_url}")
@@ -49,6 +51,9 @@ interface CourseService {
 
     @POST("/api/v2.5/chapter_contents/{content_id}/drm_license/?download=true")
     fun getDRMLicenseURL(@Path(value = "content_id", encoded = true) contentId: Long, @Body arguments: HashMap<String, Any>): RetrofitCall<NetworkDRMLicenseAPIResult>
+
+    @GET(V5_PRODUCTS_LIST_PATH + PRODUCTS_CATEGORIES_PATH)
+    fun getProductsCategories(): RetrofitCall<TestpressApiResponse<ProductCategories>>
 }
 
 
@@ -86,5 +91,9 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
     fun getDRMLicenseURL(contentId: Long): RetrofitCall<NetworkDRMLicenseAPIResult> {
         val args = hashMapOf<String, Any>("download" to true)
         return getCourseService().getDRMLicenseURL(contentId, args)
+    }
+
+    fun getProductsCategories(): RetrofitCall<TestpressApiResponse<ProductCategories>> {
+        return getCourseService().getProductsCategories()
     }
 }

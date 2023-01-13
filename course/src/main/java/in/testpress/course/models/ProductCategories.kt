@@ -1,4 +1,4 @@
-package `in`.testpress.store.models
+package `in`.testpress.course.models
 
 data class ProductCategories(
     val id: Int? = null,
