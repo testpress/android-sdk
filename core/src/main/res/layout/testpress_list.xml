@@ -50,16 +50,25 @@
         </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/product_categories_list"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/product_categories_layout"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:visibility="gone"/>
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/product_categories_list"
+            android:layout_marginStart="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </androidx.cardview.widget.CardView>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_below="@id/product_categories_list"
+        android:layout_below="@id/product_categories_layout"
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

@@ -84,11 +84,11 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
                     if (resource.getData() != null){
                         productCategoriesAdapter.setProductCategories(resource.getData());
                         productCategoriesAdapter.notifyDataSetChanged();
-                        productCategoriesListView.setVisibility(View.VISIBLE);
+                        productCategoriesLayout.setVisibility(View.VISIBLE);
                     }
                     break;
                 case ERROR:
-                    productCategoriesListView.setVisibility(View.GONE);
+                    productCategoriesLayout.setVisibility(View.GONE);
                     break;
             }
         });
@@ -98,7 +98,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
     public void refreshWithProgress() {
         pager.reset();
         viewModel.loadContents();
-        productCategoriesAdapter.setSelection(0);
+        productCategoriesAdapter.setSelectedButton(0);
         super.refreshWithProgress();
     }
 

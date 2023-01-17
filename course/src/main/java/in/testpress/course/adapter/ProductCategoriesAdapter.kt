@@ -1,24 +1,22 @@
 package `in`.testpress.course.adapter
 
-import `in`.testpress.store.R
 import `in`.testpress.database.entities.ProductCategoryEntity
+import `in`.testpress.course.R
 import android.content.Context
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.Chip
 
 class ProductCategoriesAdapter(val context: Context, private val categoriesListener: CategoriesListener) :
     ListAdapter<ProductCategoryEntity, ProductCategoriesAdapter.ProductCategoriesListItemViewHolder>(
         PRODUCT_CATEGORIES_COMPARATOR
     ) {
     var productCategories: MutableList<ProductCategoryEntity> = mutableListOf()
-    var selection = 0
+    var selectedButton = 0
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -31,6 +29,9 @@ class ProductCategoriesAdapter(val context: Context, private val categoriesListe
 
     override fun onBindViewHolder(holder: ProductCategoriesListItemViewHolder, position: Int) {
         val productCategories = getItem(position)
+        holder.categoryButton.tag = position
+        holder.categoryButton.isChecked = selectedButton == position
+        holder.categoryButton.text = productCategories?.name
         if (productCategories != null) {
             holder.bind(productCategories,position){
                 categoriesListener.invoke(productCategories)
@@ -40,7 +41,7 @@ class ProductCategoriesAdapter(val context: Context, private val categoriesListe
     }
 
     override fun getItemCount(): Int {
-        return productCategories.size
+        return productCategories.size +10
     }
 
     override fun getItem(position: Int): ProductCategoryEntity? {
@@ -49,18 +50,12 @@ class ProductCategoriesAdapter(val context: Context, private val categoriesListe
     }
 
     inner class ProductCategoriesListItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val name = view.findViewById<Button>(R.id.name)
+        val categoryButton: Chip = view.findViewById(R.id.category_button)
 
         fun bind(productCategories: ProductCategoryEntity,position: Int, clickListener: (ProductCategoryEntity) -> Unit) {
-            name.text = productCategories.name
-            name.setOnClickListener {
+            categoryButton.setOnClickListener {
                 clickListener(productCategories)
-                selection = position
-            }
-            if (selection == position){
-                name.background = context.getDrawable(R.drawable.testpress_blue_solid)
-            } else {
-                name.background = context.getDrawable(R.drawable.testpress_black_stroke)
+                selectedButton = position
             }
         }
     }
