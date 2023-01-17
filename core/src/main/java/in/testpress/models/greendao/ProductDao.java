@@ -39,6 +39,7 @@ public class ProductDao extends AbstractDao<Product, Long> {
         public final static Property Prices = new Property(11, String.class, "prices", false, "PRICES");
         public final static Property CourseIds = new Property(12, String.class, "courseIds", false, "COURSE_IDS");
         public final static Property Order = new Property(13, Long.class, "order", false, "ORDER");
+        public final static Property Category = new Property(14, String.class, "category", false, "CATEGORY");
     }
 
     private final IntegerListConverter pricesConverter = new IntegerListConverter();
@@ -69,7 +70,8 @@ public class ProductDao extends AbstractDao<Product, Long> {
                 "\"CURRENT_PRICE\" TEXT," + // 10: currentPrice
                 "\"PRICES\" TEXT," + // 11: prices
                 "\"COURSE_IDS\" TEXT," + // 12: courseIds
-                "\"ORDER\" INTEGER);"); // 13: order
+                "\"ORDER\" INTEGER," + // 13: order
+                "\"CATEGORY\" TEXT);"); // 14: category
     }
 
     /** Drops the underlying database table. */
@@ -151,6 +153,11 @@ public class ProductDao extends AbstractDao<Product, Long> {
         if (order != null) {
             stmt.bindLong(14, order);
         }
+ 
+        String category = entity.getCategory();
+        if (category != null) {
+            stmt.bindString(15, category);
+        }
     }
 
     @Override
@@ -226,6 +233,11 @@ public class ProductDao extends AbstractDao<Product, Long> {
         if (order != null) {
             stmt.bindLong(14, order);
         }
+ 
+        String category = entity.getCategory();
+        if (category != null) {
+            stmt.bindString(15, category);
+        }
     }
 
     @Override
@@ -249,7 +261,8 @@ public class ProductDao extends AbstractDao<Product, Long> {
             cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // currentPrice
             cursor.isNull(offset + 11) ? null : pricesConverter.convertToEntityProperty(cursor.getString(offset + 11)), // prices
             cursor.isNull(offset + 12) ? null : courseIdsConverter.convertToEntityProperty(cursor.getString(offset + 12)), // courseIds
-            cursor.isNull(offset + 13) ? null : cursor.getLong(offset + 13) // order
+            cursor.isNull(offset + 13) ? null : cursor.getLong(offset + 13), // order
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14) // category
         );
         return entity;
     }
@@ -270,6 +283,7 @@ public class ProductDao extends AbstractDao<Product, Long> {
         entity.setPrices(cursor.isNull(offset + 11) ? null : pricesConverter.convertToEntityProperty(cursor.getString(offset + 11)));
         entity.setCourseIds(cursor.isNull(offset + 12) ? null : courseIdsConverter.convertToEntityProperty(cursor.getString(offset + 12)));
         entity.setOrder(cursor.isNull(offset + 13) ? null : cursor.getLong(offset + 13));
+        entity.setCategory(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
      }
     
     @Override
