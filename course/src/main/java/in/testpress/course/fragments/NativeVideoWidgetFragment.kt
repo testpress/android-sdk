@@ -65,8 +65,9 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
                     Status.SUCCESS -> {
                         val contentAttempt = resource.data!!
                         val videoStartPosition = contentAttempt.video?.lastPosition?.toFloat() ?: 0F
+                        val contentAttemptObjectId = contentAttempt.objectId?.toLong()
                         exoPlayerUtil?.setStartPosition(videoStartPosition)
-                        exoPlayerUtil?.setVideoAttemptParameters(contentAttempt.objectId!!.toLong(), greenDaoContent!!)
+                        exoPlayerUtil?.setVideoAttemptParameters(contentAttemptObjectId?:-1, greenDaoContent!!)
                         exoPlayerUtil?.initializePlayer()
                     }
                     else -> {
