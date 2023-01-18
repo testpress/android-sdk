@@ -1,5 +1,8 @@
 package `in`.testpress.course.fragments
 
+import `in`.testpress.course.TestpressCourse
+import `in`.testpress.course.databinding.ContentStateListLayoutBinding
+import `in`.testpress.course.databinding.UpcomingContentListViewBinding
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.repository.UpcomingContentRepository
 import `in`.testpress.course.viewmodels.UpcomingContentsListViewModel
@@ -7,17 +10,38 @@ import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewListener
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ExpandableListView
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-class UpcomingContentListFragment: BaseContentStateListFragment(), EmptyViewListener {
+class UpcomingContentListFragment: Fragment(), EmptyViewListener {
     private lateinit var viewModel : UpcomingContentsListViewModel
+    private lateinit var binding : UpcomingContentListViewBinding
+    private var courseId: Long = -1
+    lateinit var listView : ExpandableListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        parseArguments()
         initializeViewModel()
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = UpcomingContentListViewBinding.inflate(inflater,container,false)
+        return binding.root
+    }
+
+    private fun parseArguments() {
+        courseId = arguments!!.getString(TestpressCourse.COURSE_ID)?.toLong()!!
     }
 
     private fun initializeViewModel() {
@@ -30,35 +54,22 @@ class UpcomingContentListFragment: BaseContentStateListFragment(), EmptyViewList
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        listView = binding.upcomingContentList
         initializeObservers()
         viewModel.loadContents()
-        swipeRefreshLayout.setOnRefreshListener { viewModel.loadContents() }
     }
 
     private fun initializeObservers() {
         viewModel.items.observe(viewLifecycleOwner, Observer { resource ->
             when (resource?.status) {
                 Status.LOADING -> {
-                    showLoadingPlaceholder()
+
                 }
                 Status.SUCCESS -> {
-                    hideLoadingPlaceholder()
-                    val items = resource.data!! as List<DomainContent>
-                    Log.d("Items", "" + items.isEmpty())
-                    if (items.isEmpty()) showEmptyList("There are no upcoming scheduled contents for you")
-                    mAdapter.contents = items
-                    mAdapter.notifyDataSetChanged()
-                    swipeRefreshLayout.isRefreshing = false
+
                 }
                 Status.ERROR -> {
-                    hideLoadingPlaceholder()
-                    if (resource.data != null) {
-                        mAdapter.contents = resource.data as List<DomainContent>
-                        mAdapter.notifyDataSetChanged()
-                    } else {
-                        swipeRefreshLayout.isRefreshing = false
-                        emptyViewFragment.displayError(resource.exception!!)
-                    }
+
                 }
             }
         })

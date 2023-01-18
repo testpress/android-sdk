@@ -8,16 +8,17 @@ import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.util.ViewUtils
 import android.content.Context
+import android.database.DataSetObserver
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ExpandableListAdapter
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.ListAdapter
 
-class UpcomingContentAdapter :
-    ListAdapter<Any, UpcomingContentViewHolder>(DOMAIN_CONTENT_COMPARATOR) {
+class UpcomingContentAdapter : ExpandableListAdapter{
 
     var contents: List<Any> = listOf()
 
@@ -80,6 +81,86 @@ class UpcomingContentAdapter :
         if (content != null) {
             holder.bind(content)
         }
+    }
+
+    override fun registerDataSetObserver(p0: DataSetObserver?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun unregisterDataSetObserver(p0: DataSetObserver?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getGroupCount(): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun getChildrenCount(p0: Int): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun getGroup(p0: Int): Any {
+        TODO("Not yet implemented")
+    }
+
+    override fun getChild(p0: Int, p1: Int): Any {
+        TODO("Not yet implemented")
+    }
+
+    override fun getGroupId(p0: Int): Long {
+        return p0.toLong()
+    }
+
+    override fun getChildId(p0: Int, p1: Int): Long {
+        TODO("Not yet implemented")
+    }
+
+    override fun hasStableIds(): Boolean {
+        return false
+    }
+
+    override fun getGroupView(p0: Int, p1: Boolean, p2: View?, p3: ViewGroup): View {
+        return  UpcomignContentHeaderListItemBinding.inflate(
+            LayoutInflater.from(p3.context),
+            p3,
+            false
+        ).root
+    }
+
+    override fun getChildView(p0: Int, p1: Int, p2: Boolean, p3: View?, p4: ViewGroup): View {
+        return  UpcomingContentListItemBinding.inflate(
+            LayoutInflater.from(p4.context),
+            p4,
+            false
+        ).root
+    }
+
+    override fun isChildSelectable(p0: Int, p1: Int): Boolean {
+        return false
+    }
+
+    override fun areAllItemsEnabled(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun isEmpty(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun onGroupExpanded(p0: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onGroupCollapsed(p0: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getCombinedChildId(p0: Long, p1: Long): Long {
+        TODO("Not yet implemented")
+    }
+
+    override fun getCombinedGroupId(p0: Long): Long {
+        TODO("Not yet implemented")
     }
 }
 
