@@ -7,7 +7,9 @@ import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.ProductCategoryEntity
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.network.Resource
+import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
@@ -25,8 +27,8 @@ class ProductCategoriesRepository(val context: Context) {
     fun loadItems(page: Int = 1) {
         val queryParams = hashMapOf<String, Any>("page" to page)
         courseService.getProductsCategories(queryParams).enqueue(object :
-            TestpressCallback<TestpressApiResponse<ProductCategoryEntity>>() {
-            override fun onSuccess(result: TestpressApiResponse<ProductCategoryEntity>) {
+            TestpressCallback<ApiResponse<List<ProductCategoryEntity>>>() {
+            override fun onSuccess(result: ApiResponse<List<ProductCategoryEntity>>) {
                 handleFetchSuccess(result)
             }
 
@@ -41,12 +43,13 @@ class ProductCategoriesRepository(val context: Context) {
         })
     }
 
-    private fun handleFetchSuccess(response: TestpressApiResponse<ProductCategoryEntity>) {
+    private fun handleFetchSuccess(response: ApiResponse<List<ProductCategoryEntity>>) {
         CoroutineScope(Dispatchers.IO).launch {
+            Log.d("TAG", "handleFetchSuccess: ${response.results.size}")
             if (page == 1) {
                 deleteExistingContents()
             }
-            storeContent(response.results)
+            storeContent(response.results as MutableList<ProductCategoryEntity>)
             _resourceProductCategories.postValue(Resource.success(getAll()))
 
             if (response.next != null) {

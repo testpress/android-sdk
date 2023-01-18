@@ -56,7 +56,7 @@ interface CourseService {
     @GET(V5_PRODUCTS_LIST_PATH + PRODUCTS_CATEGORIES_PATH)
     fun getProductsCategories(
         @QueryMap arguments: HashMap<String, Any>
-    ): RetrofitCall<TestpressApiResponse<ProductCategoryEntity>>
+    ): RetrofitCall<ApiResponse<List<ProductCategoryEntity>>>
 }
 
 
@@ -96,7 +96,7 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         return getCourseService().getDRMLicenseURL(contentId, args)
     }
 
-    fun getProductsCategories(arguments: HashMap<String, Any>): RetrofitCall<TestpressApiResponse<ProductCategoryEntity>> {
+    fun getProductsCategories(arguments: HashMap<String, Any>): RetrofitCall<ApiResponse<List<ProductCategoryEntity>>> {
         return getCourseService().getProductsCategories(arguments)
     }
 }
