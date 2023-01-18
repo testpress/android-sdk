@@ -12,7 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-class RunningContentsListFragment: BaseContentStateListFragment(),EmptyViewListener {
+class RunningContentsListFragment(fragmentTag: String): BaseContentStateListFragment(fragmentTag),EmptyViewListener {
 
     private lateinit var viewModel : RunningContentsListViewModel
 

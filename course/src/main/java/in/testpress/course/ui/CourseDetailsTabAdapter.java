@@ -37,10 +37,10 @@ class CourseDetailsTabAdapter extends FragmentPagerAdapter {
                 fragment = new RankListFragment();
                 break;
             case 2:
-                fragment = new RunningContentsListFragment();
+                fragment = new RunningContentsListFragment("Running");
                 break;
             case 3:
-                fragment = new UpcomingContentListFragment();
+                fragment = new UpcomingContentListFragment("Upcoming");
                 break;
             default:
                 fragment = new ChaptersListFragment();
@@ -58,9 +58,9 @@ class CourseDetailsTabAdapter extends FragmentPagerAdapter {
             case 1:
                 return resources.getString(R.string.testpress_leaderboard);
             case 2:
-                return "Running";
+                return resources.getString(R.string.testpress_running_content);
             case 3:
-                return "Upcoming";
+                return resources.getString(R.string.testpress_upcoming_content);
             default:
                 return null;
         }

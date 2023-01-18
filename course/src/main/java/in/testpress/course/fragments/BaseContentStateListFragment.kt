@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.facebook.shimmer.ShimmerFrameLayout
 
-open class BaseContentStateListFragment: Fragment() {
+open class BaseContentStateListFragment(val fragmentTag:String): Fragment() {
 
     private lateinit var binding : ContentStateListLayoutBinding
     private lateinit var recyclerView: RecyclerView
@@ -48,7 +48,7 @@ open class BaseContentStateListFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindViews()
-        mAdapter = ContentStateListAdapter()
+        mAdapter = ContentStateListAdapter(fragmentTag)
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = mAdapter
