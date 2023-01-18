@@ -41,7 +41,7 @@ class ProductCategoriesAdapter(val context: Context, private val categoriesListe
     }
 
     override fun getItemCount(): Int {
-        return productCategories.size +10
+        return productCategories.size
     }
 
     override fun getItem(position: Int): ProductCategoryEntity? {

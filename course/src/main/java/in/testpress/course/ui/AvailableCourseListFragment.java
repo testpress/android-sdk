@@ -6,6 +6,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -23,6 +24,7 @@ import in.testpress.course.enums.CourseType;
 import in.testpress.course.pagers.CourseProductPager;
 import in.testpress.course.repository.ProductCategoriesRepository;
 import in.testpress.course.util.ManageCourseStates;
+import in.testpress.course.viewmodels.ProductCategoriesViewModelFactory;
 import in.testpress.database.entities.ProductCategoryEntity;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
@@ -57,7 +59,12 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
         courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
         productDao = TestpressSDKDatabase.getProductDao(getContext());
         pager = new CourseProductPager(apiClient);
-        viewModel = new ProductCategoriesViewModel(new ProductCategoriesRepository(requireContext()));
+        viewModel = new ViewModelProvider(
+                this,
+                new ProductCategoriesViewModelFactory(
+                        new ProductCategoriesRepository(requireContext())
+                )
+        ).get(ProductCategoriesViewModel.class);
     }
 
     @Override
@@ -77,9 +84,6 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
     private void initalizeObservers(){
         viewModel.getItems().observe(getViewLifecycleOwner(),resource -> {
             switch (resource.getStatus()) {
-                case LOADING:
-
-                    break;
                 case SUCCESS:
                     if (resource.getData() != null){
                         productCategoriesAdapter.setProductCategories(resource.getData());
@@ -212,12 +216,16 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
 
     @Override
     public void invoke(@NonNull ProductCategoryEntity productCategories) {
-        List<Product> filteredProduct = new ArrayList<>();
-        for (Product product : productList){
-            if (product.getId() == 118 && productCategories.getId() == 0){
-                filteredProduct.add(product);
-            }
-        }
-        updateItems(filteredProduct);
+//        List<Product> filteredProduct = new ArrayList<>();
+//        if (Objects.equals(productCategories.getId(), -1)){
+//            updateItems(productList);
+//        } else {
+//            for (Product product : productList){
+//                if (Objects.equals(productCategories.getName(), product.getTitle())){
+//                    filteredProduct.add(product);
+//                }
+//            }
+//            updateItems(filteredProduct);
+//        }
     }
 }

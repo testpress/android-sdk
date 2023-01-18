@@ -63,7 +63,7 @@ class ProductCategoriesRepository(val context: Context) {
     }
 
     private suspend fun storeContent(response: MutableList<ProductCategoryEntity>) {
-        productCategoryDao.insert(ProductCategoryEntity(id = 0, name = "All Product", null))
+        productCategoryDao.insert(ProductCategoryEntity(id = -1, name = "All Product", null))
         productCategoryDao.insertAll(response)
     }
 
