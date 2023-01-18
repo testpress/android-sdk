@@ -71,8 +71,8 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         productCategoriesAdapter = new ProductCategoriesAdapter(requireContext(),this);
-        productCategoriesListView.setLayoutManager(new LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false));
-        productCategoriesListView.setAdapter(productCategoriesAdapter);
+        productCategoriesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false));
+        productCategoriesRecyclerView.setAdapter(productCategoriesAdapter);
         initViewModel();
     }
 
@@ -103,6 +103,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
         pager.reset();
         viewModel.loadContents();
         productCategoriesAdapter.setSelectedChip(0);
+        productCategoriesRecyclerView.scrollToPosition(0);
         super.refreshWithProgress();
     }
 

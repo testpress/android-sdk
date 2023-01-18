@@ -85,7 +85,7 @@ public abstract class BaseListViewFragment<E> extends Fragment
     /**
      * Product Categories Recycler View
      */
-    protected RecyclerView productCategoriesListView;
+    protected RecyclerView productCategoriesRecyclerView;
 
     /**
      * Product Categories Layout
@@ -151,7 +151,7 @@ public abstract class BaseListViewFragment<E> extends Fragment
             }
         });
         productCategoriesLayout = (CardView) view.findViewById(R.id.product_categories_layout);
-        productCategoriesListView = (RecyclerView) view.findViewById(R.id.product_categories_list);
+        productCategoriesRecyclerView = (RecyclerView) view.findViewById(R.id.product_categories_list);
         loadingPlaceholder = view.findViewById(R.id.shimmer_view_container);
         loadingPlaceholder.setVisibility(View.GONE);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
