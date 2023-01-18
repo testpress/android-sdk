@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
@@ -215,16 +216,16 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
 
     @Override
     public void invoke(@NonNull ProductCategoryEntity productCategories) {
-//        List<Product> filteredProduct = new ArrayList<>();
-//        if (Objects.equals(productCategories.getId(), -1)){
-//            updateItems(productList);
-//        } else {
-//            for (Product product : productList){
-//                if (Objects.equals(productCategories.getName(), product.getTitle())){
-//                    filteredProduct.add(product);
-//                }
-//            }
-//            updateItems(filteredProduct);
-//        }
+        List<Product> filteredProduct = new ArrayList<>();
+        if (Objects.equals(productCategories.getId(), -1)){
+            updateItems(productList);
+        } else {
+            for (Product product : productList){
+                if (product.getCategory() != null && Objects.equals(product.getCategory(), productCategories.getName())){
+                    filteredProduct.add(product);
+                }
+            }
+            updateItems(filteredProduct);
+        }
     }
 }
