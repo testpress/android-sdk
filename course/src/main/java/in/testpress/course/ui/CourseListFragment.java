@@ -21,7 +21,6 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.course.R;
 import in.testpress.store.TestpressStore;
-import in.testpress.store.ui.ProductListFragment;
 import in.testpress.ui.BaseFragment;
 
 public class CourseListFragment extends BaseFragment {

@@ -2,6 +2,7 @@ package `in`.testpress.course.adapter
 
 import `in`.testpress.database.entities.ProductCategoryEntity
 import `in`.testpress.course.R
+import `in`.testpress.course.databinding.ProductCategoriesListItemBinding
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -16,22 +17,25 @@ class ProductCategoriesAdapter(val context: Context, private val categoriesListe
         PRODUCT_CATEGORIES_COMPARATOR
     ) {
     var productCategories: MutableList<ProductCategoryEntity> = mutableListOf()
-    var selectedButton = 0
+    var selectedChip = 0
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): ProductCategoriesListItemViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.product_categories_list_item, parent, false)
-        return ProductCategoriesListItemViewHolder(view)
+        val binding = ProductCategoriesListItemBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return ProductCategoriesListItemViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ProductCategoriesListItemViewHolder, position: Int) {
         val productCategories = getItem(position)
-        holder.categoryButton.tag = position
-        holder.categoryButton.isChecked = selectedButton == position
-        holder.categoryButton.text = productCategories?.name
+        holder.categoryChip.tag = position
+        holder.categoryChip.isChecked = selectedChip == position
+        holder.categoryChip.text = productCategories?.name
         if (productCategories != null) {
             holder.bind(productCategories,position){
                 categoriesListener.invoke(productCategories)
@@ -49,13 +53,13 @@ class ProductCategoriesAdapter(val context: Context, private val categoriesListe
         return null
     }
 
-    inner class ProductCategoriesListItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val categoryButton: Chip = view.findViewById(R.id.category_button)
+    inner class ProductCategoriesListItemViewHolder(binding: ProductCategoriesListItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        val categoryChip: Chip = binding.categoryChip
 
         fun bind(productCategories: ProductCategoryEntity,position: Int, clickListener: (ProductCategoryEntity) -> Unit) {
-            categoryButton.setOnClickListener {
+            categoryChip.setOnClickListener {
                 clickListener(productCategories)
-                selectedButton = position
+                selectedChip = position
             }
         }
     }

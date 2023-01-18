@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
@@ -102,7 +101,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
     public void refreshWithProgress() {
         pager.reset();
         viewModel.loadContents();
-        productCategoriesAdapter.setSelectedButton(0);
+        productCategoriesAdapter.setSelectedChip(0);
         super.refreshWithProgress();
     }
 

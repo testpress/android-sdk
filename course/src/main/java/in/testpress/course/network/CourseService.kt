@@ -13,8 +13,9 @@ import `in`.testpress.database.entities.ProductCategoryEntity
 import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.ContentsListResponse
 import android.content.Context
+import android.util.Log
 import retrofit2.http.*
-
+import java.util.HashMap
 
 interface CourseService {
     @GET("{content_url}")

@@ -88,7 +88,7 @@ public abstract class BaseListViewFragment<E> extends Fragment
     protected RecyclerView productCategoriesListView;
 
     /**
-     * Product Categories Recycler View
+     * Product Categories Layout
      */
     protected CardView productCategoriesLayout;
 

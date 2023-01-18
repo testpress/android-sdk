@@ -3,13 +3,10 @@ package in.testpress.store.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import android.view.View;
 import android.widget.ListView;
 
 import java.util.List;
-import java.util.Objects;
 
 import in.testpress.core.TestpressException;
 import in.testpress.network.BaseResourcePager;
