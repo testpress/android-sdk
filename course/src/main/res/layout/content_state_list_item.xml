@@ -21,14 +21,15 @@
             <ImageView
                 android:id="@+id/thumbnail"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent"
+                android:background="#f3f3f4"/>
 
             <ImageView
                 android:id="@+id/running_content_image"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_gravity="center"
-                android:src="@drawable/test"/>
+                android:src="@drawable/testpress_exam_icon"/>
 
         </FrameLayout>
 
@@ -59,7 +60,7 @@
                 android:maxLines="1"
                 android:text="Start: 01/01/23 10:00 am - End: 01/01/23 12:00 pm"
                 android:ellipsize="end"
-                android:visibility="visible"/>
+                android:visibility="gone"/>
 
         </LinearLayout>
 

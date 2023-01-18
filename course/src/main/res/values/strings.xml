@@ -103,11 +103,4 @@
     <string name="testpress_no_running_content_description">There are no currently available contents for you.</string>
     <string name="testpress_error_loading_running_contents">Loading contents failed</string>
 
-    <color name="testpress_video_color">#e74c3c</color>
-    <color name="testpress_exam_color">#ec5f5e</color>
-    <color name="testpress_attachments_and_pdf_color">#e6772d</color>
-    <color name="testpress_live_stream_color">#f44336</color>
-    <color name="testpress_notes_color">#ffef41</color>
-    <color name="testpress_default_color">#CAC8C8</color>
-
 </resources>

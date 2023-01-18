@@ -42,7 +42,11 @@ object DateUtils {
             startAndEnd += "Start: ${getFormattedStartDate(start)}"  //Result should be like [Start: 01/01/23 10:00 am]
         }
         if (getFormattedEndDate(end) != ""){
-            startAndEnd += " - End: ${getFormattedEndDate(end)}" //Result should be like [Start: 01/01/23 10:00 am - End: 01/01/23 12:00 pm]
+            startAndEnd += if (startAndEnd == ""){
+                "End: ${getFormattedEndDate(end)}"  //Result should be like [End: 01/01/23 12:00 pm]
+            } else {
+                " - End: ${getFormattedEndDate(end)}" //Result should be like [Start: 01/01/23 10:00 am - End: 01/01/23 12:00 pm]
+            }
         }
         return startAndEnd
     }

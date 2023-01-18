@@ -65,7 +65,8 @@ data class DomainContent(
     var nextContentId: Long? = null,
     val hasEnded: Boolean?,
     val examStartUrl: String? = null,
-    val treePath: String? = null
+    val treePath: String? = null,
+    val icon: String? = null
 ) {
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
@@ -219,6 +220,7 @@ fun createDomainContent(content: RunningContentEntity): DomainContent {
         start = content.start,
         end = content.end,
         treePath = content.treePath,
+        icon = content.icon,
         isLocked = null,
         isScheduled = null,
         active = null,
@@ -243,6 +245,7 @@ fun createDomainContent(content: UpcomingContentEntity): DomainContent {
         start = content.start,
         end = content.end,
         treePath = content.treePath,
+        icon = content.icon,
         isLocked = null,
         isScheduled = null,
         active = null,

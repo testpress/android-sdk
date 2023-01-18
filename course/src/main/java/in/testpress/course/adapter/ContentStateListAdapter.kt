@@ -101,32 +101,21 @@ class RunningContentViewHolder(binding: ContentStateListItemBinding) :
         path.text =content.treePath
         date.text = DateUtils.getFormattedStartDateAndEndDate(content.start,content.end)
         image.setImageResource(getContentImage(content.contentType))
-        thumbnail.setImageResource(getBackgroundColour(content.contentType))
         itemView.setOnClickListener { clickListener(content) }
         setViewVisibility(content)
     }
 
     private fun getContentImage(contentType: String?): Int {
         return when (contentType) {
-            "Attachment" -> R.drawable.paperclip
-            "Video" -> R.drawable.play
-            "Notes" -> R.drawable.writing
-            "VideoConference" -> R.drawable.ic_live
-            "Exam" -> R.drawable.test
-            else -> R.drawable.test
+            "Attachment" -> R.drawable.testpress_file_icon
+            "Video" -> R.drawable.testpress_video_icon
+            "Notes" -> R.drawable.testpress_notes_icon
+            "VideoConference" -> R.drawable.testpress_live_conference_icon
+            "Exam" -> R.drawable.testpress_exam_icon
+            else -> R.drawable.testpress_exam_icon
         }
     }
 
-    private fun getBackgroundColour(contentType: String?): Int {
-        return when (contentType) {
-            "Attachment" -> R.color.testpress_attachments_and_pdf_color
-            "Video" -> R.color.testpress_video_color
-            "Notes" -> R.color.testpress_notes_color
-            "VideoConference" -> R.color.testpress_live_stream_color
-            "Exam" -> R.color.testpress_exam_color
-            else -> R.color.testpress_default_color
-        }
-    }
     private fun setViewVisibility(content: DomainContent){
         if (DateUtils.getFormattedStartDateAndEndDate(content.start,content.end) != ""){
             ViewUtils.setGone(date,false)
