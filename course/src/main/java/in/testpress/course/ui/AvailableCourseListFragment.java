@@ -2,13 +2,17 @@ package in.testpress.course.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +46,10 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
     private CourseProductPager pager;
     private ProductDao productDao;
     protected StoreApiClient apiClient;
-    private ProductCategoriesViewModel viewModel;
+    private ProductCategoriesViewModel productCategoriesViewModel;
     private ProductCategoriesAdapter productCategoriesAdapter;
+    private RecyclerView productCategoriesRecyclerView;
+    private CardView productCategoriesLayout;
     private List<Product> productList = new ArrayList<>();
 
     public static void show(FragmentActivity activity, int containerViewId) {
@@ -59,7 +65,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
         courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
         productDao = TestpressSDKDatabase.getProductDao(getContext());
         pager = new CourseProductPager(apiClient);
-        viewModel = new ViewModelProvider(
+        productCategoriesViewModel = new ViewModelProvider(
                 this,
                 new ProductCategoriesViewModelFactory(
                         new ProductCategoriesRepository(requireContext())
@@ -68,26 +74,40 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
     }
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.available_course_fragment, container, false);
+    }
+
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        bind(view);
+        initProductCategoriesView();
+        initViewModel();
+    }
+
+    private void bind(View view){
+        productCategoriesLayout = (CardView) view.findViewById(R.id.product_categories_layout);
+        productCategoriesRecyclerView = (RecyclerView) view.findViewById(R.id.product_categories_list);
+    }
+
+    private void initProductCategoriesView(){
         productCategoriesAdapter = new ProductCategoriesAdapter(requireContext(),this);
         productCategoriesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false));
         productCategoriesRecyclerView.setAdapter(productCategoriesAdapter);
-        initViewModel();
     }
 
     private void initViewModel(){
         initalizeObservers();
-        viewModel.loadContents();
+        productCategoriesViewModel.loadCategories();
     }
 
     private void initalizeObservers(){
-        viewModel.getItems().observe(getViewLifecycleOwner(),resource -> {
+        productCategoriesViewModel.getItems().observe(getViewLifecycleOwner(),resource -> {
             switch (resource.getStatus()) {
                 case SUCCESS:
                     if (resource.getData() != null){
-                        productCategoriesAdapter.setProductCategories(resource.getData());
-                        productCategoriesAdapter.notifyDataSetChanged();
+                        setCategoriesDataToAdapter(resource.getData());
                         productCategoriesLayout.setVisibility(View.VISIBLE);
                     }
                     break;
@@ -98,13 +118,22 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
         });
     }
 
+    private void setCategoriesDataToAdapter(List<ProductCategoryEntity> list){
+        productCategoriesAdapter.setProductCategories(list);
+        productCategoriesAdapter.notifyDataSetChanged();
+    }
+
     @Override
     public void refreshWithProgress() {
         pager.reset();
-        viewModel.loadContents();
+        refreshProductCategory();
+        super.refreshWithProgress();
+    }
+
+    private void refreshProductCategory(){
+        productCategoriesViewModel.loadCategories();
         productCategoriesAdapter.setSelectedChip(0);
         productCategoriesRecyclerView.scrollToPosition(0);
-        super.refreshWithProgress();
     }
 
     @Override

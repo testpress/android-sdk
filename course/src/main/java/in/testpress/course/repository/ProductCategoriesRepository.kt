@@ -24,7 +24,7 @@ class ProductCategoriesRepository(val context: Context) {
     val resourceProductCategories: LiveData<Resource<MutableList<ProductCategoryEntity>>>
         get() = _resourceProductCategories
 
-    fun loadItems(page: Int = 1) {
+    fun loadCategories(page: Int = 1) {
         val queryParams = hashMapOf<String, Any>("page" to page)
         courseService.getProductsCategories(queryParams).enqueue(object :
             TestpressCallback<ApiResponse<List<ProductCategoryEntity>>>() {
@@ -54,7 +54,7 @@ class ProductCategoriesRepository(val context: Context) {
 
             if (response.next != null) {
                 page += 1
-                loadItems(page)
+                loadCategories(page)
             } else {
                 page = 1
             }

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer_view_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:shimmer_duration="1000">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+
+                <include
+                    layout="@layout/testpress_category_chip_placholder">
+                </include>
+                <include
+                    layout="@layout/testpress_category_chip_placholder">
+                </include>
+                <include
+                    layout="@layout/testpress_category_chip_placholder">
+                </include>
+                <include
+                    layout="@layout/testpress_category_chip_placholder">
+                </include>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                >
+
+                <include
+                    layout="@layout/testpress_list_placholder">
+                </include>
+                <include
+                    layout="@layout/testpress_list_placholder">
+                </include>
+                <include
+                    layout="@layout/testpress_list_placholder">
+                </include>
+                <include
+                    layout="@layout/testpress_list_placholder">
+                </include>
+                <include
+                    layout="@layout/testpress_list_placholder">
+                </include>
+                <include
+                    layout="@layout/testpress_list_placholder">
+                </include>
+                <include
+                    layout="@layout/testpress_list_placholder">
+                </include>
+                <include
+                    layout="@layout/testpress_list_placholder">
+                </include>
+                <include
+                    layout="@layout/testpress_list_placholder">
+                </include>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/product_categories_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/product_categories_list"
+            android:layout_marginStart="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <include
+        layout="@layout/testpress_empty_view">
+    </include>
+
+</LinearLayout>

@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModelProvider
 class ProductCategoriesViewModel(val repository: ProductCategoriesRepository): ViewModel() {
     val items = repository.resourceProductCategories
 
-    fun loadContents() {
-        return repository.loadItems()
+    fun loadCategories() {
+        return repository.loadCategories()
     }
 }
 

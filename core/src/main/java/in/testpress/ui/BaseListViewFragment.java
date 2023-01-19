@@ -3,12 +3,9 @@ package in.testpress.ui;
 import android.app.Activity;
 import android.os.Bundle;
 import com.google.android.material.snackbar.Snackbar;
-
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -17,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -29,7 +25,6 @@ import java.util.List;
 
 import in.testpress.R;
 import in.testpress.core.TestpressException;
-import in.testpress.models.greendao.Product;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.ViewUtils;
@@ -81,16 +76,6 @@ public abstract class BaseListViewFragment<E> extends Fragment
      * Is the list currently shown?
      */
     protected boolean listShown;
-
-    /**
-     * Product Categories Recycler View
-     */
-    protected RecyclerView productCategoriesRecyclerView;
-
-    /**
-     * Product Categories Layout
-     */
-    protected CardView productCategoriesLayout;
 
     protected TestpressException exception;
     protected boolean firstCallBack = true;
@@ -150,8 +135,6 @@ public abstract class BaseListViewFragment<E> extends Fragment
                 onListItemClick((ListView) parent, view, position, id);
             }
         });
-        productCategoriesLayout = (CardView) view.findViewById(R.id.product_categories_layout);
-        productCategoriesRecyclerView = (RecyclerView) view.findViewById(R.id.product_categories_list);
         loadingPlaceholder = view.findViewById(R.id.shimmer_view_container);
         loadingPlaceholder.setVisibility(View.GONE);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
