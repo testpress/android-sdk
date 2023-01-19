@@ -47,9 +47,9 @@ class ProductCategoriesRepository(val context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             Log.d("TAG", "handleFetchSuccess: ${response.results.size}")
             if (page == 1) {
-                deleteExistingContents()
+                deleteExistingProductCategories()
             }
-            storeContent(response.results as MutableList<ProductCategoryEntity>)
+            storeProductCategories(response.results as MutableList<ProductCategoryEntity>)
             _resourceProductCategories.postValue(Resource.success(getAll()))
 
             if (response.next != null) {
@@ -65,12 +65,12 @@ class ProductCategoriesRepository(val context: Context) {
         return productCategoryDao.getAll()
     }
 
-    private suspend fun storeContent(response: MutableList<ProductCategoryEntity>) {
+    private suspend fun storeProductCategories(response: MutableList<ProductCategoryEntity>) {
         productCategoryDao.insert(ProductCategoryEntity(id = -1, name = "All Product", null))
         productCategoryDao.insertAll(response)
     }
 
-    private suspend fun deleteExistingContents() {
+    private suspend fun deleteExistingProductCategories() {
         productCategoryDao.deleteAll()
     }
 }
