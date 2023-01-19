@@ -44,6 +44,7 @@ public class Product {
     @Convert(converter = in.testpress.util.IntegerListConverter.class, columnType = String.class)
     private IntegerList courseIds;
     private Long order;
+    private String category;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -57,7 +58,7 @@ public class Product {
     }
 
     @Generated
-    public Product(Long id, String title, String slug, String descriptionHtml, String image, String startDate, String endDate, String buyNowText, String surl, String furl, String currentPrice, IntegerList prices, IntegerList courseIds, Long order) {
+    public Product(Long id, String title, String slug, String descriptionHtml, String image, String startDate, String endDate, String buyNowText, String surl, String furl, String currentPrice, IntegerList prices, IntegerList courseIds, Long order, String category) {
         this.id = id;
         this.title = title;
         this.slug = slug;
@@ -72,6 +73,7 @@ public class Product {
         this.prices = prices;
         this.courseIds = courseIds;
         this.order = order;
+        this.category = category;
     }
 
     public Long getId() {
@@ -184,6 +186,14 @@ public class Product {
 
     public void setOrder(Long order) {
         this.order = order;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     // KEEP METHODS - put your custom methods here
