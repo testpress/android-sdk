@@ -50,7 +50,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
     private ProductCategoriesAdapter productCategoriesAdapter;
     private RecyclerView productCategoriesRecyclerView;
     private CardView productCategoriesLayout;
-    private List<Product> productList = new ArrayList<>();
+    private List<Product> allProducts = new ArrayList<>();
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
@@ -193,7 +193,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
 
         } else {
             this.items = products;
-            productList = products;
+            allProducts = products;
             getListAdapter().getWrappedAdapter().setItems(products);
             deleteAndInsertProductsInDB(products);
             showList();
@@ -248,9 +248,9 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
     public void invoke(@NonNull ProductCategoryEntity productCategories) {
         List<Product> filteredProduct = new ArrayList<>();
         if (Objects.equals(productCategories.getId(), -1)){
-            updateItems(productList);
+            updateItems(allProducts);
         } else {
-            for (Product product : productList){
+            for (Product product : allProducts){
                 if (product.getCategory() != null && Objects.equals(product.getCategory(), productCategories.getName())){
                     filteredProduct.add(product);
                 }
