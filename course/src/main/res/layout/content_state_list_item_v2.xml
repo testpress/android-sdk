@@ -33,9 +33,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="vertical">
-
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/total_chapters"
@@ -43,10 +42,20 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="5dp"
                 android:drawablePadding="5dp"
-                android:text="0 Chapters"
+                android:text="End Feb 30"
                 android:textColor="#667c8a"
                 android:textSize="12sp"
-                android:drawableLeft="@drawable/ic_content" />
+                android:drawableLeft="@drawable/ic_baseline_schedule_24" />
+
+            <TextView
+                android:id="@+id/content_path"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:drawablePadding="5dp"
+                android:text="Path>Path>Path>Path>Path>Path>"
+                android:textColor="#667c8a"
+                android:textSize="12sp" />
 
         </LinearLayout>
 
