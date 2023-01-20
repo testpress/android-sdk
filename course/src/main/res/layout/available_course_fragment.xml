@@ -87,7 +87,8 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/product_categories_list"
-            android:layout_marginStart="20dp"
+            android:paddingStart="20dp"
+            android:clipToPadding="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
