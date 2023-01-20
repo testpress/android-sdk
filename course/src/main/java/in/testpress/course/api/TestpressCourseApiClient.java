@@ -56,6 +56,10 @@ public class TestpressCourseApiClient extends TestpressApiClient {
 
     public static final String VIDEO_CONTENT_ATTEMPT_UPDATE_PATH =  "/api/v2.5/chapter_content_attempts/videos/update/";
 
+    public static final String V5_PRODUCTS_LIST_PATH =  "/api/v2.5/products/";
+
+    public static final String PRODUCTS_CATEGORIES_PATH = "categories/";
+
     public TestpressCourseApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
     }

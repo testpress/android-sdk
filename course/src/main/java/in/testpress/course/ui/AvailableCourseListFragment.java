@@ -2,33 +2,55 @@ package in.testpress.course.ui;
 
 import android.content.Context;
 import android.os.Bundle;
-import androidx.fragment.app.FragmentActivity;
-import androidx.loader.content.Loader;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.AvailableCourseListAdapter;
 import in.testpress.course.R;
+import in.testpress.course.adapter.CategorySelectionListener;
+import in.testpress.course.adapter.ProductCategoriesAdapter;
 import in.testpress.course.enums.CourseType;
 import in.testpress.course.pagers.CourseProductPager;
+import in.testpress.course.repository.ProductCategoriesRepository;
 import in.testpress.course.util.ManageCourseStates;
+import in.testpress.course.viewmodels.ProductCategoriesViewModelFactory;
+import in.testpress.database.entities.ProductCategoryEntity;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.Product;
 import in.testpress.models.greendao.ProductDao;
+import in.testpress.course.viewmodels.ProductCategoriesViewModel;
 import in.testpress.store.network.StoreApiClient;
 import in.testpress.ui.BaseListViewFragment;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ThrowableLoader;
 
-public class AvailableCourseListFragment extends BaseListViewFragment<Product>  {
+public class AvailableCourseListFragment extends BaseListViewFragment<Product> implements CategorySelectionListener {
 
     private CourseDao courseDao;
     private CourseProductPager pager;
     private ProductDao productDao;
     protected StoreApiClient apiClient;
+    private ProductCategoriesViewModel productCategoriesViewModel;
+    private ProductCategoriesAdapter productCategoriesAdapter;
+    private RecyclerView productCategoriesRecyclerView;
+    private CardView productCategoriesLayout;
+    private List<Product> allProducts = new ArrayList<>();
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
@@ -43,12 +65,66 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
         courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
         productDao = TestpressSDKDatabase.getProductDao(getContext());
         pager = new CourseProductPager(apiClient);
+        productCategoriesViewModel = new ViewModelProvider(
+                this,
+                new ProductCategoriesViewModelFactory(
+                        new ProductCategoriesRepository(requireContext())
+                )
+        ).get(ProductCategoriesViewModel.class);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.available_course_fragment, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        bind(view);
+        initProductCategoriesView();
+        initializeObservers();
+        productCategoriesViewModel.fetchCategories();
+    }
+
+    private void bind(View view){
+        productCategoriesLayout = (CardView) view.findViewById(R.id.product_categories_layout);
+        productCategoriesRecyclerView = (RecyclerView) view.findViewById(R.id.product_categories_list);
+    }
+
+    private void initProductCategoriesView(){
+        productCategoriesAdapter = new ProductCategoriesAdapter(requireContext(),this);
+        productCategoriesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false));
+        productCategoriesRecyclerView.setAdapter(productCategoriesAdapter);
+    }
+
+    private void initializeObservers(){
+        productCategoriesViewModel.getCategories().observe(getViewLifecycleOwner(),resource -> {
+            switch (resource.getStatus()) {
+                case SUCCESS:
+                    if (resource.getData() != null){
+                        productCategoriesAdapter.setProductCategories(resource.getData());
+                        productCategoriesAdapter.notifyDataSetChanged();
+                        productCategoriesLayout.setVisibility(View.VISIBLE);
+                    }
+                    break;
+                case ERROR:
+                    productCategoriesLayout.setVisibility(View.GONE);
+                    break;
+            }
+        });
     }
 
     @Override
     public void refreshWithProgress() {
         pager.reset();
         super.refreshWithProgress();
+    }
+
+    private void refreshProductCategory(){
+        productCategoriesViewModel.fetchCategories();
+        productCategoriesAdapter.setSelectedCategoryPosition(0);
+        productCategoriesRecyclerView.scrollToPosition(0);
     }
 
     @Override
@@ -108,6 +184,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
 
         } else {
             this.items = products;
+            allProducts = products;
             getListAdapter().getWrappedAdapter().setItems(products);
             deleteAndInsertProductsInDB(products);
             showList();
@@ -117,6 +194,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
         if(isItemsEmpty()) {
             setEmptyText();
         }
+        refreshProductCategory();
     }
 
 
@@ -158,4 +236,18 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product>  
                 R.drawable.ic_error_outline_black_18dp);
     }
 
+    @Override
+    public void onCategorySelected(@NonNull ProductCategoryEntity productCategory) {
+        List<Product> filteredProducts = new ArrayList<>();
+        if (Objects.equals(productCategory.getId(), -1)){
+            updateItems(allProducts);
+        } else {
+            for (Product product : allProducts){
+                if (product.getCategory() != null && Objects.equals(product.getCategory(), productCategory.getName())){
+                    filteredProducts.add(product);
+                }
+            }
+            updateItems(filteredProducts);
+        }
+    }
 }
