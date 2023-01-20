@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
 class ProductCategoriesViewModel(val repository: ProductCategoriesRepository): ViewModel() {
-    val items = repository.resourceProductCategories
+    val categories = repository.resourceProductCategories
 
-    fun loadCategories() {
-        return repository.loadCategories()
+    fun fetchCategories() {
+        return repository.fetchCategories()
     }
 }
 

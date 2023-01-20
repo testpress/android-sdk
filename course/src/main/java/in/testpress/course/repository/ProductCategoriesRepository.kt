@@ -15,6 +15,7 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class ProductCategoriesRepository(val context: Context) {
     private val courseService = CourseNetwork(context)
@@ -24,7 +25,7 @@ class ProductCategoriesRepository(val context: Context) {
     val resourceProductCategories: LiveData<Resource<MutableList<ProductCategoryEntity>>>
         get() = _resourceProductCategories
 
-    fun loadCategories(page: Int = 1) {
+    fun fetchCategories(page: Int = 1) {
         val queryParams = hashMapOf<String, Any>("page" to page)
         courseService.getProductsCategories(queryParams).enqueue(object :
             TestpressCallback<ApiResponse<List<ProductCategoryEntity>>>() {
@@ -33,7 +34,7 @@ class ProductCategoriesRepository(val context: Context) {
             }
 
             override fun onException(exception: TestpressException?) {
-                val contents = getAll()
+                val contents = getAllProductCategories()
                 if (contents.isNotEmpty()) {
                     _resourceProductCategories.postValue(Resource.error(exception!!, contents))
                 } else {
@@ -45,24 +46,25 @@ class ProductCategoriesRepository(val context: Context) {
 
     private fun handleFetchSuccess(response: ApiResponse<List<ProductCategoryEntity>>) {
         CoroutineScope(Dispatchers.IO).launch {
-            Log.d("TAG", "handleFetchSuccess: ${response.results.size}")
             if (page == 1) {
                 deleteExistingProductCategories()
             }
             storeProductCategories(response.results as MutableList<ProductCategoryEntity>)
-            _resourceProductCategories.postValue(Resource.success(getAll()))
+            _resourceProductCategories.postValue(Resource.success(getAllProductCategories()))
 
             if (response.next != null) {
                 page += 1
-                loadCategories(page)
+                fetchCategories(page)
             } else {
                 page = 1
             }
         }
     }
 
-    private fun  getAll():MutableList<ProductCategoryEntity>{
-        return productCategoryDao.getAll()
+    private fun  getAllProductCategories():MutableList<ProductCategoryEntity>{
+        return runBlocking {
+            productCategoryDao.getAll()
+        }
     }
 
     private suspend fun storeProductCategories(response: MutableList<ProductCategoryEntity>) {

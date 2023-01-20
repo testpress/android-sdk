@@ -1,23 +1,21 @@
 package `in`.testpress.course.adapter
 
 import `in`.testpress.database.entities.ProductCategoryEntity
-import `in`.testpress.course.R
 import `in`.testpress.course.databinding.ProductCategoriesListItemBinding
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 
-class ProductCategoriesAdapter(val context: Context, private val categoriesListener: CategoriesListener) :
+class ProductCategoriesAdapter(val context: Context, private val categorySelectionListener: CategorySelectionListener) :
     ListAdapter<ProductCategoryEntity, ProductCategoriesAdapter.ProductCategoriesListItemViewHolder>(
         PRODUCT_CATEGORIES_COMPARATOR
     ) {
     var productCategories: MutableList<ProductCategoryEntity> = mutableListOf()
-    var selectedChip = 0
+    var selectedCategoryPosition = 0
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -33,12 +31,12 @@ class ProductCategoriesAdapter(val context: Context, private val categoriesListe
 
     override fun onBindViewHolder(holder: ProductCategoriesListItemViewHolder, position: Int) {
         val productCategories = getItem(position)
-        holder.categoryChip.tag = position
-        holder.categoryChip.isChecked = selectedChip == position
-        holder.categoryChip.text = productCategories?.name
+        holder.category.tag = position
+        holder.category.isChecked = selectedCategoryPosition == position
+        holder.category.text = productCategories?.name
         if (productCategories != null) {
             holder.bind(productCategories,position){
-                categoriesListener.invoke(productCategories)
+                categorySelectionListener.onCategorySelected(productCategories)
                 notifyDataSetChanged()
             }
         }
@@ -54,12 +52,12 @@ class ProductCategoriesAdapter(val context: Context, private val categoriesListe
     }
 
     inner class ProductCategoriesListItemViewHolder(binding: ProductCategoriesListItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        val categoryChip: Chip = binding.categoryChip
+        val category: Chip = binding.category
 
-        fun bind(productCategories: ProductCategoryEntity,position: Int, clickListener: (ProductCategoryEntity) -> Unit) {
-            categoryChip.setOnClickListener {
-                clickListener(productCategories)
-                selectedChip = position
+        fun bind(productCategories: ProductCategoryEntity,position: Int, categorySelectionListener: (ProductCategoryEntity) -> Unit) {
+            category.setOnClickListener {
+                categorySelectionListener(productCategories)
+                selectedCategoryPosition = position
             }
         }
     }
@@ -82,6 +80,6 @@ class ProductCategoriesAdapter(val context: Context, private val categoriesListe
     }
 }
 
-interface CategoriesListener{
-    fun invoke(productCategories: ProductCategoryEntity)
+interface CategorySelectionListener{
+    fun onCategorySelected(productCategory: ProductCategoryEntity)
 }

@@ -2,7 +2,6 @@ package in.testpress.course.ui;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,7 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.course.AvailableCourseListAdapter;
 import in.testpress.course.R;
-import in.testpress.course.adapter.CategoriesListener;
+import in.testpress.course.adapter.CategorySelectionListener;
 import in.testpress.course.adapter.ProductCategoriesAdapter;
 import in.testpress.course.enums.CourseType;
 import in.testpress.course.pagers.CourseProductPager;
@@ -41,7 +40,7 @@ import in.testpress.ui.BaseListViewFragment;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ThrowableLoader;
 
-public class AvailableCourseListFragment extends BaseListViewFragment<Product> implements CategoriesListener {
+public class AvailableCourseListFragment extends BaseListViewFragment<Product> implements CategorySelectionListener {
 
     private CourseDao courseDao;
     private CourseProductPager pager;
@@ -84,7 +83,8 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
         super.onViewCreated(view, savedInstanceState);
         bind(view);
         initProductCategoriesView();
-        initViewModel();
+        initializeObservers();
+        productCategoriesViewModel.fetchCategories();
     }
 
     private void bind(View view){
@@ -98,17 +98,13 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
         productCategoriesRecyclerView.setAdapter(productCategoriesAdapter);
     }
 
-    private void initViewModel(){
-        initalizeObservers();
-        productCategoriesViewModel.loadCategories();
-    }
-
-    private void initalizeObservers(){
-        productCategoriesViewModel.getItems().observe(getViewLifecycleOwner(),resource -> {
+    private void initializeObservers(){
+        productCategoriesViewModel.getCategories().observe(getViewLifecycleOwner(),resource -> {
             switch (resource.getStatus()) {
                 case SUCCESS:
                     if (resource.getData() != null){
-                        setCategoriesDataToAdapter(resource.getData());
+                        productCategoriesAdapter.setProductCategories(resource.getData());
+                        productCategoriesAdapter.notifyDataSetChanged();
                         productCategoriesLayout.setVisibility(View.VISIBLE);
                     }
                     break;
@@ -119,11 +115,6 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
         });
     }
 
-    private void setCategoriesDataToAdapter(List<ProductCategoryEntity> list){
-        productCategoriesAdapter.setProductCategories(list);
-        productCategoriesAdapter.notifyDataSetChanged();
-    }
-
     @Override
     public void refreshWithProgress() {
         pager.reset();
@@ -131,8 +122,8 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
     }
 
     private void refreshProductCategory(){
-        productCategoriesViewModel.loadCategories();
-        productCategoriesAdapter.setSelectedChip(0);
+        productCategoriesViewModel.fetchCategories();
+        productCategoriesAdapter.setSelectedCategoryPosition(0);
         productCategoriesRecyclerView.scrollToPosition(0);
     }
 
@@ -246,17 +237,17 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
     }
 
     @Override
-    public void invoke(@NonNull ProductCategoryEntity productCategories) {
-        List<Product> filteredProduct = new ArrayList<>();
-        if (Objects.equals(productCategories.getId(), -1)){
+    public void onCategorySelected(@NonNull ProductCategoryEntity productCategory) {
+        List<Product> filteredProducts = new ArrayList<>();
+        if (Objects.equals(productCategory.getId(), -1)){
             updateItems(allProducts);
         } else {
             for (Product product : allProducts){
-                if (product.getCategory() != null && Objects.equals(product.getCategory(), productCategories.getName())){
-                    filteredProduct.add(product);
+                if (product.getCategory() != null && Objects.equals(product.getCategory(), productCategory.getName())){
+                    filteredProducts.add(product);
                 }
             }
-            updateItems(filteredProduct);
+            updateItems(filteredProducts);
         }
     }
 }
