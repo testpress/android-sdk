@@ -15,6 +15,7 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -35,7 +36,7 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
         courseNetwork.getRunningContents(courseId, queryParams)
             .enqueue(object : TestpressCallback<ApiResponse<List<RunningContentEntity>>>(){
                 override fun onException(exception: TestpressException?) {
-                    val contents = getAll()
+                    val contents = sort(getAll())
                     if (contents.isNotEmpty()) {
                         _resourceContents.postValue(Resource.error(exception!!, contents))
                     } else {
@@ -52,7 +53,7 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
     private fun handleFetchSuccess(response: ApiResponse<List<RunningContentEntity>>) {
         CoroutineScope(Dispatchers.IO).launch {
             storeContent(response.results)
-            val contents = getAll()
+            val contents = sort(getAll())
             if (contents.isNotEmpty()) {
                 _resourceContents.postValue(Resource.success(contents))
             } else {
@@ -69,7 +70,9 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
     }
 
     private fun getAll(): List<DomainContent> {
-        return runningContentDao.getAll(courseId).convertRunningContentsToDomainContents()
+        return runBlocking {
+            runningContentDao.getAll(courseId).convertRunningContentsToDomainContents()
+        }
     }
 
     private suspend fun storeContent(response: List<RunningContentEntity>): List<RunningContentEntity> {
@@ -80,11 +83,10 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
         return response
     }
 
-    private fun sort() :List<DomainContent> {
-        val content = getAll()
+    private fun sort(contents: List<DomainContent>) :List<DomainContent> {
         val dateTimeFormatter: DateTimeFormatter =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
-        val result = content.sortedByDescending {
+        val result = contents.sortedByDescending {
             LocalDate.parse(it.start, dateTimeFormatter)
         }
         return result
