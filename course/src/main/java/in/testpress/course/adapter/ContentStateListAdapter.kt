@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
 class ContentStateListAdapter(private val fragmentTag: String) :
-    ListAdapter<DomainContent, RunningContentViewHolder>(DOMAIN_CONTENT_COMPARATOR) {
+    ListAdapter<DomainContent, ContentStateViewHolder>(DOMAIN_CONTENT_COMPARATOR) {
 
     var contents: List<DomainContent> = listOf()
 
@@ -44,13 +44,13 @@ class ContentStateListAdapter(private val fragmentTag: String) :
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): RunningContentViewHolder {
+    ): ContentStateViewHolder {
         val binding = ContentStateListItemBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
         )
-        return RunningContentViewHolder(binding)
+        return ContentStateViewHolder(binding)
     }
 
     private fun onItemClick(content: DomainContent, context: Context) {
@@ -74,7 +74,7 @@ class ContentStateListAdapter(private val fragmentTag: String) :
         return null
     }
 
-    override fun onBindViewHolder(holder: RunningContentViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ContentStateViewHolder, position: Int) {
         val content = getItem(position)
         if (content != null) {
             holder.bind(content) { onItemClick(content, holder.itemView.context) }
@@ -82,7 +82,7 @@ class ContentStateListAdapter(private val fragmentTag: String) :
     }
 }
 
-class RunningContentViewHolder(binding: ContentStateListItemBinding) :
+class ContentStateViewHolder(binding: ContentStateListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
     private val title = binding.runningContentTitle
     private val path = binding.treePath

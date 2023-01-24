@@ -3,6 +3,7 @@ package `in`.testpress.course.fragments
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.adapter.ContentStateListAdapter
+import `in`.testpress.course.adapter.RunningContentAdapter
 import `in`.testpress.course.databinding.ContentStateListLayoutBinding
 import `in`.testpress.fragments.EmptyViewFragment
 import android.os.Bundle
@@ -23,7 +24,7 @@ open class BaseContentStateListFragment(val fragmentTag:String): Fragment() {
     private lateinit var loadingPlaceholder: ShimmerFrameLayout
     // Protected properties are used in sub classes
     protected var courseId: Long = -1
-    protected lateinit var mAdapter: ContentStateListAdapter
+    protected lateinit var mAdapter: RunningContentAdapter
     protected lateinit var emptyViewFragment: EmptyViewFragment
     protected lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
@@ -48,7 +49,7 @@ open class BaseContentStateListFragment(val fragmentTag:String): Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindViews()
-        mAdapter = ContentStateListAdapter(fragmentTag)
+        mAdapter = RunningContentAdapter(fragmentTag)
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = mAdapter

@@ -22,30 +22,37 @@
         android:layout_gravity="center_vertical"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="Title goes here"
         android:textColor="#000000"
         android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/thumbnail"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="72dp"
+        android:layout_marginEnd="16dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/guideline1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/thumbnail">
 
         <TextView
-            android:id="@+id/total_chapters"
+            android:id="@+id/end_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="5dp"
-            android:drawableLeft="@drawable/ic_baseline_schedule_24"
+            android:drawableLeft="@drawable/ic_baseline_event_available_24"
             android:drawablePadding="5dp"
-            android:text="End Feb 30"
+            android:gravity="bottom"
+            android:text="20 Days more"
             android:textColor="#667c8a"
             android:textSize="12sp" />
 
@@ -54,11 +61,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
-            android:drawableLeft="@drawable/ic_baseline_location_on_24"
+            android:drawableLeft="@drawable/ic_baseline_home_24"
             android:drawablePadding="5dp"
             android:ellipsize="end"
+            android:gravity="bottom"
             android:maxLines="1"
-            android:text="Path>Path>Path>Path>Path>Path>"
+            android:text="Path>Path>Path>Path>Path>Path>Path>Path>Path>Path>Path"
             android:textColor="#667c8a"
             android:textSize="12sp" />
 
