@@ -10,6 +10,7 @@ import `in`.testpress.database.entities.RunningContentEntity
 import `in`.testpress.network.Resource
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
@@ -23,7 +24,8 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
     private val runningContentDao = TestpressDatabase.invoke(context).runningContentDao()
     val courseNetwork = CourseNetwork(context)
     var page = 1
-    private var _resourceContents: MutableLiveData<Resource<List<DomainContent>>> = MutableLiveData()
+    private var _resourceContents: MutableLiveData<Resource<List<DomainContent>>> =
+        MutableLiveData()
     val resourceContents: LiveData<Resource<List<DomainContent>>>
         get() = _resourceContents
 
@@ -34,7 +36,7 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
     fun loadItems(page: Int = 1) {
         val queryParams = hashMapOf<String, Any>("page" to page)
         courseNetwork.getRunningContents(courseId, queryParams)
-            .enqueue(object : TestpressCallback<ApiResponse<List<RunningContentEntity>>>(){
+            .enqueue(object : TestpressCallback<ApiResponse<List<RunningContentEntity>>>() {
                 override fun onException(exception: TestpressException?) {
                     val contents = sort(getAll())
                     if (contents.isNotEmpty()) {
@@ -76,19 +78,23 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
     }
 
     private suspend fun storeContent(response: List<RunningContentEntity>): List<RunningContentEntity> {
-        if (page == 1){
+        if (page == 1) {
             runningContentDao.deleteAll(courseId)
         }
         runningContentDao.insertAll(response)
         return response
     }
 
-    private fun sort(contents: List<DomainContent>) :List<DomainContent> {
+    private fun sort(contents: List<DomainContent>): List<DomainContent> {
         val dateTimeFormatter: DateTimeFormatter =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
-        val result = contents.sortedByDescending {
-            LocalDate.parse(it.start, dateTimeFormatter)
+        val result = contents.sortedBy {
+            if (it.end != null) {
+                LocalDate.parse(it.end, dateTimeFormatter)
+            } else {
+                it.end
+            }
         }
-        return result
+        return result.sortedBy { it.end == null }
     }
 }

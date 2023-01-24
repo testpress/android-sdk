@@ -88,7 +88,7 @@ class UpcomingContentRepository(val context: Context, val courseId: Long = -1) {
     private fun sort(contents: List<DomainContent>): List<DomainContent> {
         val dateTimeFormatter: DateTimeFormatter =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
-        val result = contents.sortedByDescending {
+        val result = contents.sortedBy {
             LocalDate.parse(it.start, dateTimeFormatter)
         }
         return result

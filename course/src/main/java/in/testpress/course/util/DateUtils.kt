@@ -9,6 +9,9 @@ import java.util.*
 
 object DateUtils {
     const val ONE_DAY_IN_MILLI_SECONDS = 1000 * 60 * 60 * 24
+    const val ONE_YEAR_IN_HOUR = 8640
+    const val ONE_MONTH_IN_HOUR = 720
+    const val ONE_DAY_IN_HOUR = 24
 
     fun difference(start: Date, end: Date): Long {
         val diffTime = end.time - start.time
@@ -36,50 +39,30 @@ object DateUtils {
         return seconds
     }
 
-    fun getFormattedStartDateAndEndDate(start: String?,end: String?): String {
-        var startAndEnd = ""
-        if (getFormattedStartDate(start) != ""){
-            startAndEnd += "Start: ${getFormattedStartDate(start)}"  //Result should be like [Start: 01/01/23 10:00 am]
+    fun convertDateStringToDate(dateString: String?): Date? {
+        var date: Date? = null
+        val simpleDateFormat : SimpleDateFormat = if (dateString != null && dateString.length > 25){
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX") // Input String format "2023-01-23T18:38:57.345432+05:30"
+        } else {
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX") // Input String format "2023-01-23T18:38:57+05:30"
         }
-        if (getFormattedEndDate(end) != ""){
-            startAndEnd += if (startAndEnd == ""){
-                "End: ${getFormattedEndDate(end)}"  //Result should be like [End: 01/01/23 12:00 pm]
-            } else {
-                " - End: ${getFormattedEndDate(end)}" //Result should be like [Start: 01/01/23 10:00 am - End: 01/01/23 12:00 pm]
+
+        simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
+        if (dateString != null && dateString != "") {
+            date = try {
+                dateString.let { simpleDateFormat.parse(it) }
+            } catch (e: Exception) {
+                null
             }
         }
-        return startAndEnd
+        return date
     }
 
-    fun getFormattedStartDate(start: String?): String {
-        var startDateAndTime = ""
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-        simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
-        if (start != null && start != "") {
-            startDateAndTime = try {
-                val date = start.let { simpleDateFormat.parse(it) }
-                val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
-                date?.let { dateFormat.format(it) }!!
-            } catch (e: Exception) {
-                ""
-            }
+    fun getDateDifferentInHours(date1: Date?, date2: Date?): Long? {
+        if (date1 == null || date2 == null) {
+            return null
         }
-        return startDateAndTime  // 01/01/23 10:00 am
-    }
-
-    fun getFormattedEndDate(end: String?): String {
-        var endDateAndTime = ""
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-        simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
-        if (end != null && end != "") {
-            endDateAndTime = try {
-                val date = end.let { simpleDateFormat.parse(it) }
-                val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
-                date?.let { dateFormat.format(it) }!!
-            } catch (e: Exception) {
-                ""
-            }
-        }
-        return endDateAndTime  // 01/01/23 10:00 am
+        val diff: Long = date1.time - date2.time
+        return ((diff / 1000L) / 60L) / 60L
     }
 }
