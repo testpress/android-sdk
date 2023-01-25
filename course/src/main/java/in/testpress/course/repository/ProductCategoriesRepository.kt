@@ -62,7 +62,7 @@ class ProductCategoriesRepository(val context: Context) {
     }
 
     private fun  getAllProductCategories():MutableList<ProductCategoryEntity>{
-        return runBlocking {
+        return runBlocking(Dispatchers.IO) {
             productCategoryDao.getAll()
         }
     }
