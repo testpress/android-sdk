@@ -10,6 +10,7 @@ import `in`.testpress.database.entities.RunningContentEntity
 import `in`.testpress.network.Resource
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
+import android.icu.text.SimpleDateFormat
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Date
 
 class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
     private val runningContentDao = TestpressDatabase.invoke(context).runningContentDao()
@@ -72,7 +74,7 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
     }
 
     private fun getAll(): List<DomainContent> {
-        return runBlocking {
+        return runBlocking(Dispatchers.IO) {
             runningContentDao.getAll(courseId).convertRunningContentsToDomainContents()
         }
     }
@@ -86,14 +88,9 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
     }
 
     private fun sort(contents: List<DomainContent>): List<DomainContent> {
-        val dateTimeFormatter: DateTimeFormatter =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
-        val result = contents.sortedBy {
-            if (it.end != null) {
-                LocalDate.parse(it.end, dateTimeFormatter)
-            } else {
-                it.end
-            }
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+        val result = contents.sortedBy { domainContent ->
+            domainContent.end?.let { simpleDateFormat.parse(it) }?.time
         }
         return result.sortedBy { it.end == null }
     }

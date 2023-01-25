@@ -8,11 +8,14 @@ import `in`.testpress.fragments.EmptyViewListener
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-class RunningContentsListFragment(fragmentTag: String): BaseContentStateListFragment(fragmentTag),EmptyViewListener {
+const val RUNNING_CONTENTS_FRAGMENT_TAG = "RunningContents"
+
+class RunningContentsListFragment: BaseContentStateListFragment(RUNNING_CONTENTS_FRAGMENT_TAG),EmptyViewListener {
 
     private lateinit var viewModel : RunningContentsListViewModel
 
@@ -45,7 +48,6 @@ class RunningContentsListFragment(fragmentTag: String): BaseContentStateListFrag
                 Status.SUCCESS -> {
                     hideLoadingPlaceholder()
                     val items = resource.data!! as List<DomainContent>
-                    Log.d("Items", "" + items.isEmpty())
                     if (items.isEmpty()) showEmptyList("There are no currently available contents for you.")
                     mAdapter.contents = items
                     mAdapter.notifyDataSetChanged()
@@ -54,6 +56,7 @@ class RunningContentsListFragment(fragmentTag: String): BaseContentStateListFrag
                 Status.ERROR -> {
                     hideLoadingPlaceholder()
                     if (resource.data != null) {
+                        swipeRefreshLayout.isRefreshing = false
                         mAdapter.contents = resource.data as List<DomainContent>
                         mAdapter.notifyDataSetChanged()
                     } else {

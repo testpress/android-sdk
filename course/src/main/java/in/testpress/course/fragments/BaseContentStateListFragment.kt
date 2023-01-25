@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.facebook.shimmer.ShimmerFrameLayout
 
-open class BaseContentStateListFragment(val fragmentTag:String): Fragment() {
+open class BaseContentStateListFragment(private val fragmentTag:String): Fragment() {
 
     private lateinit var binding : ContentStateListLayoutBinding
     private lateinit var recyclerView: RecyclerView
@@ -62,6 +62,7 @@ open class BaseContentStateListFragment(val fragmentTag:String): Fragment() {
         loadingPlaceholder.visibility = View.GONE
         initializeEmptyViewFragment()
         swipeRefreshLayout = binding.swipeRunningContentContainer
+        swipeRefreshLayout.setColorSchemeResources(R.color.testpress_color_primary)
     }
 
     private fun initializeEmptyViewFragment() {

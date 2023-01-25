@@ -1,8 +1,5 @@
 package `in`.testpress.course.fragments
 
-import `in`.testpress.course.TestpressCourse
-import `in`.testpress.course.databinding.ContentStateListLayoutBinding
-import `in`.testpress.course.databinding.UpcomingContentListViewBinding
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.repository.UpcomingContentRepository
 import `in`.testpress.course.viewmodels.UpcomingContentsListViewModel
@@ -10,16 +7,14 @@ import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewListener
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ExpandableListView
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-class UpcomingContentListFragment(fragmentTag: String): BaseContentStateListFragment(fragmentTag), EmptyViewListener {
+const val UPCOMING_CONTENTS_FRAGMENT_TAG = "UpcomingContents"
+
+class UpcomingContentsListFragment: BaseContentStateListFragment(UPCOMING_CONTENTS_FRAGMENT_TAG), EmptyViewListener {
     private lateinit var viewModel : UpcomingContentsListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,8 +46,7 @@ class UpcomingContentListFragment(fragmentTag: String): BaseContentStateListFrag
                 Status.SUCCESS -> {
                     hideLoadingPlaceholder()
                     val items = resource.data!! as List<DomainContent>
-                    Log.d("Items", "" + items.isEmpty())
-                    if (items.isEmpty()) showEmptyList("There are no currently available contents for you.")
+                    if (items.isEmpty()) showEmptyList("There are no upcoming scheduled contents for you.")
                     mAdapter.contents = items
                     mAdapter.notifyDataSetChanged()
                     swipeRefreshLayout.isRefreshing = false
@@ -60,6 +54,7 @@ class UpcomingContentListFragment(fragmentTag: String): BaseContentStateListFrag
                 Status.ERROR -> {
                     hideLoadingPlaceholder()
                     if (resource.data != null) {
+                        swipeRefreshLayout.isRefreshing = false
                         mAdapter.contents = resource.data as List<DomainContent>
                         mAdapter.notifyDataSetChanged()
                     } else {

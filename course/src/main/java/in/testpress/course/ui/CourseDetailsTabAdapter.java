@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import in.testpress.course.R;
 import in.testpress.course.fragments.RunningContentsListFragment;
-import in.testpress.course.fragments.UpcomingContentListFragment;
+import in.testpress.course.fragments.UpcomingContentsListFragment;
 
 class CourseDetailsTabAdapter extends FragmentPagerAdapter {
 
@@ -37,10 +37,10 @@ class CourseDetailsTabAdapter extends FragmentPagerAdapter {
                 fragment = new RankListFragment();
                 break;
             case 2:
-                fragment = new RunningContentsListFragment("Running");
+                fragment = new RunningContentsListFragment();
                 break;
             case 3:
-                fragment = new UpcomingContentListFragment("Upcoming");
+                fragment = new UpcomingContentsListFragment();
                 break;
             default:
                 fragment = new ChaptersListFragment();

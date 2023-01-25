@@ -72,7 +72,7 @@ class UpcomingContentRepository(val context: Context, val courseId: Long = -1) {
     }
 
     private fun getAll(): List<DomainContent> {
-        return runBlocking {
+        return runBlocking(Dispatchers.IO) {
             upcomingContentDao.getAll(courseId).convertUpcomingContentsToDomainContents()
         }
     }
