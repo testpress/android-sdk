@@ -2,6 +2,7 @@ package in.testpress.course;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -70,9 +71,7 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
         setText(2,  activity.getResources().getQuantityString(R.plurals.contents_count,
                 contentsCount, contentsCount));
 
-        if (item.getCourseIds().size() == 0) {
-            setGone(6, true);
-        }
+        setGone(6, item.getCourseIds().size() == 0);
 
         String price = String.format("₹%s", item.getCurrentPrice());
         setText(3, price);
