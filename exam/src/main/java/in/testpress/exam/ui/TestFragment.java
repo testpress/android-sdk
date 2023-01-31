@@ -1304,7 +1304,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                                 });
             } else {
                 setTitle(R.string.testpress_loading_failed)
-                        .setMessage(getResources().getString(R.string.testpress_some_thing_went_wrong_try_again)+" "+"(Code: "+exception.getResponse().code()+")")
+                        .setMessage(getResources().getString(R.string.testpress_some_thing_went_wrong_try_again)+" "+"(Error code: "+exception.getResponse().code()+")")
                         .setPositiveButton(R.string.testpress_ok,
                                 new DialogInterface.OnClickListener() {
                                     @Override
