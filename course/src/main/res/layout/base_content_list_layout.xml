@@ -50,27 +50,10 @@
         </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_running_content_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/bottom_progress_bar">
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    <ProgressBar
-        android:id="@+id/bottom_progress_bar"
-        android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
-        android:visibility="gone"
-        android:layout_alignParentBottom="true"/>
 
     <FrameLayout
         android:id="@+id/empty_view_fragment"
