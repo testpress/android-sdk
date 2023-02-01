@@ -33,6 +33,8 @@ public class TestpressCourse {
     public static final String PRODUCT_SLUG = "productSlug";
     public static final String COURSE_IDS = "courseIds";
     public static final String CONTENT_TYPE = "contentType";
+    public static final String CHAPTER_ID = "chapterId";
+    public static final String CONTENTS_URL_FRAG = "contentsUrlFrag";
 
     /**
      * Use when testpress courses need to be open in a container as a fragment.
