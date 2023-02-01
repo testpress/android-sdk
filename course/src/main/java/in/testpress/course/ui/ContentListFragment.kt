@@ -3,40 +3,27 @@ package `in`.testpress.course.ui
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.domain.DomainContent
+import `in`.testpress.course.fragments.BaseContentListFragment
 import `in`.testpress.enums.Status
 import `in`.testpress.course.repository.ContentsRepository
 import `in`.testpress.course.viewmodels.ContentsListViewModel
-import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.VisibleForTesting
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.facebook.shimmer.ShimmerFrameLayout
 
-class ContentListFragment : Fragment(), EmptyViewListener {
-    companion object {
-        const val CONTENTS_URL_FRAG = "contentsUrlFrag"
-        const val CHAPTER_ID = "chapterId"
-    }
+class ContentListFragment : BaseContentListFragment(), EmptyViewListener {
 
-    private lateinit var contentsURL: String
+    private var contentsURL: String = ""
     private var chapterId: Long = -1
     private var productSlug: String? = null
     private lateinit var viewModel: ContentsListViewModel
     private lateinit var mAdapter: ContentListAdapter
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var emptyViewFragment: EmptyViewFragment
-    private lateinit var loadingPlaceholder: ShimmerFrameLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,17 +31,9 @@ class ContentListFragment : Fragment(), EmptyViewListener {
         initializeViewModel()
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(`in`.testpress.R.layout.base_list_layout, container, false)
-    }
-
     private fun parseArguments() {
-        contentsURL = arguments!!.getString(CONTENTS_URL_FRAG)!!
-        chapterId = arguments!!.getLong(CHAPTER_ID)
+        contentsURL = arguments!!.getString(TestpressCourse.CONTENTS_URL_FRAG) ?: ""
+        chapterId = arguments!!.getLong(TestpressCourse.CHAPTER_ID)
         productSlug = arguments!!.getString(TestpressCourse.PRODUCT_SLUG)
     }
 
@@ -68,33 +47,17 @@ class ContentListFragment : Fragment(), EmptyViewListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        bindViews()
         mAdapter = ContentListAdapter(chapterId, productSlug)
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = mAdapter
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
-        initalizeObservers()
+        initializeObservers()
         viewModel.loadContents()
     }
 
-    private fun bindViews() {
-        recyclerView = view!!.findViewById(R.id.recycler_view)
-        loadingPlaceholder = view!!.findViewById(R.id.shimmer_view_container)
-        loadingPlaceholder.visibility = View.GONE
-        initializeEmptyViewFragment()
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun initializeEmptyViewFragment() {
-        emptyViewFragment = EmptyViewFragment()
-        val transaction = childFragmentManager.beginTransaction()
-        transaction.replace(R.id.empty_view_fragment, emptyViewFragment)
-        transaction.commit()
-    }
-
-    private fun initalizeObservers() {
+    private fun initializeObservers() {
 
         viewModel.items.observe(viewLifecycleOwner, Observer { resource ->
             when (resource?.status) {
@@ -107,7 +70,7 @@ class ContentListFragment : Fragment(), EmptyViewListener {
                     hideLoadingPlaceholder()
                     val items = resource.data!! as List<DomainContent>
                     Log.d("Items", "" + items.isEmpty())
-                    if (items.isEmpty()) showEmptyList()
+                    if (items.isEmpty()) showEmptyList(resources.getString(R.string.testpress_no_content))
                     mAdapter.contents = items
                     mAdapter.notifyDataSetChanged()
                 }
@@ -125,25 +88,8 @@ class ContentListFragment : Fragment(), EmptyViewListener {
         })
     }
 
-    private fun showEmptyList() {
-        emptyViewFragment.setEmptyText(R.string.testpress_no_content,
-                R.string.testpress_no_content_description,
-                R.drawable.ic_error_outline_black_18dp
-        )
-    }
-
     override fun onRetryClick() {
         Log.d("onRetryClick", "viewModel load contents")
         viewModel.loadContents()
-    }
-
-    fun showLoadingPlaceholder() {
-        loadingPlaceholder.visibility = View.VISIBLE
-        loadingPlaceholder.startShimmer()
-    }
-
-    fun hideLoadingPlaceholder() {
-        loadingPlaceholder.stopShimmer()
-        loadingPlaceholder.visibility = View.GONE
     }
 }
