@@ -1,23 +1,18 @@
 package `in`.testpress.database
 
+import `in`.testpress.database.entities.BaseContentEntity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
 data class ContentEntity(
     @PrimaryKey val id: Long,
-    var title: String? = null,
     var description: String? = null,
     var image: String? = null,
-    var order: Int? = null,
     var url: String = "",
-    var chapterId: Long? = null,
     var chapterSlug: String = "",
     var chapterUrl: String? = null,
-    var courseId: Long? = null,
-    var freePreview: Boolean? = null,
     var modified: String? = null,
-    var contentType: String,
     var examUrl: String? = null,
     var videoUrl: String? = null,
     var attachmentUrl: String? = null,
@@ -28,11 +23,7 @@ data class ContentEntity(
     var bookmarkId: Long? = null,
     var videoWatchedPercentage: Int? = null,
     var active: Boolean,
-    var examId: Long? = null,
-    var attachmentId: Long? = null,
-    var videoId: Long? = null,
     var htmlId: Long? = null,
-    var start: String? = null,
     var hasStarted: Boolean,
     var isCourseAvailable: Boolean? = null,
     var coverImageSmall: String? = null,
@@ -41,4 +32,4 @@ data class ContentEntity(
     var nextContentId: Long? = null,
     var hasEnded: Boolean? = null,
     var examStartUrl: String? = null
-)
+): BaseContentEntity()
