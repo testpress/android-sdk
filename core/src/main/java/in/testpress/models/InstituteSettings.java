@@ -251,7 +251,7 @@ public class InstituteSettings {
         return this;
     }
 
-    public InstituteSettings enableFacebookTracking(String facebookAppId, Application application){
+    public InstituteSettings enableFacebookEventTracking(String facebookAppId, Application application){
         if (facebookAppId != null && !facebookAppId.isEmpty()) {
             this.setFacebookAppId(facebookAppId);
             this.setIsFacebookEventTrackingEnabled(true);
