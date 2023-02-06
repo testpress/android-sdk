@@ -1094,6 +1094,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             if (getActivity() == null) {
                                 return;
                             }
+                            logEvent(EventsTrackerFacade.ENDED_EXAM);
                             if (progressDialog.isShowing()) {
                                 progressDialog.dismiss();
                             }
