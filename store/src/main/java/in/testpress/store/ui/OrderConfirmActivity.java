@@ -345,7 +345,6 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
 
     void showPaymentFailedScreen() {
         progressBar.setVisibility(View.GONE);
-        logEvent(EventsTrackerFacade.PAYMENT_SUCCESS);
         Intent intent = new Intent(this, PaymentFailureActivity.class);
         startActivityForResult(intent, STORE_REQUEST_CODE);
     }
@@ -358,11 +357,13 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
 
     @Override
     public void onPaymentError(String errorMessage) {
+        logEvent(EventsTrackerFacade.PAYMENT_FAILURE);
         showPaymentFailedScreen();
     }
 
     @Override
     public void onPaymentCancel() {
+        logEvent(EventsTrackerFacade.CANCELLED_PAYMENT);
         showPaymentFailedScreen();
     }
 }
