@@ -1,10 +1,12 @@
 
 package in.testpress.models;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import in.testpress.util.Assert;
+import in.testpress.util.EventsTrackerFacade;
 
 public class InstituteSettings {
 
@@ -246,6 +248,15 @@ public class InstituteSettings {
 
     public InstituteSettings setFacebookAppId(String facebookAppId) {
         this.facebookAppId = facebookAppId;
+        return this;
+    }
+
+    public InstituteSettings enableFacebookEventTracking(String facebookAppId, Application application){
+        if (facebookAppId != null && !facebookAppId.isEmpty()) {
+            this.setFacebookAppId(facebookAppId);
+            this.setIsFacebookEventTrackingEnabled(true);
+            EventsTrackerFacade.Companion.init(application);
+        }
         return this;
     }
 
