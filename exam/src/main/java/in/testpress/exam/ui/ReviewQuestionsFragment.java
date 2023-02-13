@@ -677,6 +677,8 @@ public class ReviewQuestionsFragment extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
         if(!isVisibleToUser) {
             pauseWebview();
+        } else {
+            resumeWebView();
         }
         if (commentsUtil != null) {
             commentsUtil.setUserVisibleHint(isVisibleToUser);
@@ -687,6 +689,12 @@ public class ReviewQuestionsFragment extends Fragment {
         if (webView != null) {
             webView.onPause();
             webView.loadUrl("javascript:stopAudio()");
+        }
+    }
+
+    public void resumeWebView() {
+        if (webView != null) {
+            webView.onResume();
         }
     }
 
