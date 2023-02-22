@@ -84,6 +84,10 @@ dependencies {
     // Allow methods more than 64K
     implementation 'androidx.multidex:multidex:2.0.1'
 
+    //Paging
+    api 'androidx.paging:paging-common-ktx:3.1.1'
+    api 'androidx.paging:paging-runtime-ktx:3.1.1'
+
     def fragment_version = "1.4.1"
 
     debugImplementation "androidx.fragment:fragment-testing:$fragment_version"

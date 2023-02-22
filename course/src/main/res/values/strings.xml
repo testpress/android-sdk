@@ -68,6 +68,10 @@
 
     <string name="testpress_open_bookmark_file">View</string>
 
+    //
+    <string name="testpress_running_contents">Running</string>
+    <string name="testpress_no_running_contents">There are no currently available contents for you.</string>
+
     <string-array name="exo_speed_values">
         <item>0.5</item>
         <item>0.75</item>

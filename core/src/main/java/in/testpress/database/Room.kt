@@ -56,6 +56,7 @@ abstract class TestpressDatabase : RoomDatabase() {
     abstract fun discussionAnswerDao(): DiscussionAnswerDao
     abstract fun productCategoryDao(): ProductCategoryDao
     abstract fun runningContentDao(): RunningContentDao
+    abstract fun runningContentRemoteKeysDao():RunningContentRemoteKeysDao
 
     companion object {
         private lateinit var INSTANCE: TestpressDatabase

@@ -1,7 +1,9 @@
 package `in`.testpress.course.domain
 
 import `in`.testpress.core.TestpressSDKDatabase
+import `in`.testpress.course.util.DateUtils.getFormattedDateStringOrNull
 import `in`.testpress.database.ContentEntity
+import `in`.testpress.database.entities.RunningContentEntity
 import `in`.testpress.models.greendao.Attachment
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
@@ -59,7 +61,9 @@ data class DomainContent(
     val coverImageMedium: String? = null,
     var nextContentId: Long? = null,
     val hasEnded: Boolean?,
-    val examStartUrl: String? = null
+    val examStartUrl: String? = null,
+    val treePath: String? = null,
+    val icon: String? = null
 ) {
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
@@ -198,6 +202,31 @@ fun createDomainContent(content: Content): DomainContent {
     )
 }
 
+fun createDomainContent(content: RunningContentEntity): DomainContent {
+    return DomainContent(
+        id = content.id,
+        order = content.order,
+        chapterId = content.chapterId,
+        freePreview = content.freePreview,
+        title = content.title,
+        courseId = content.courseId,
+        examId = content.examId,
+        videoId = content.videoId,
+        attachmentId = content.attachmentId,
+        contentType = content.contentType,
+        start = getFormattedDateStringOrNull(content.start),
+        end = getFormattedDateStringOrNull(content.end),
+        treePath = content.treePath,
+        icon = content.icon,
+        isLocked = null,
+        isScheduled = null,
+        active = null,
+        hasEnded = null,
+        isCourseAvailable = null,
+        hasStarted = null,
+    )
+}
+
 fun ContentEntity.asDomainContent(): DomainContent {
     return createDomainContent(this)
 }
@@ -213,6 +242,12 @@ fun Content.asDomainContent(): DomainContent {
 }
 
 fun List<Content>.asDomainContents(): List<DomainContent> {
+    return this.map {
+        createDomainContent(it)
+    }
+}
+
+fun List<RunningContentEntity>.convertRunningContentsToDomainContents(): List<DomainContent>{
     return this.map {
         createDomainContent(it)
     }
@@ -239,4 +274,4 @@ enum class ContentType {
 }
 
 inline fun <reified T : Enum<T>> String.asEnumOrDefault(defaultValue: T? = null): T? =
-        enumValues<T>().firstOrNull { it.name.equals(this, ignoreCase = true) } ?: defaultValue
+    enumValues<T>().firstOrNull { it.name.equals(this, ignoreCase = true) } ?: defaultValue

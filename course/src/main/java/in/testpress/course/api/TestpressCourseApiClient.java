@@ -60,10 +60,14 @@ public class TestpressCourseApiClient extends TestpressApiClient {
 
     public static final String PRODUCTS_CATEGORIES_PATH = "categories/";
 
+    public static final String COURSE_PATH_v2_5 =  "/api/v2.5/courses/";
+
+    public static final String RUNNING_CONTENTS_PATH= "/running_contents/";
+
     public TestpressCourseApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
     }
-    
+
     public CourseService getCourseService() {
         return retrofit.create(CourseService.class);
     }
@@ -88,7 +92,7 @@ public class TestpressCourseApiClient extends TestpressApiClient {
     }
 
     public RetrofitCall<ApiResponse<ContentsListResponse>> getContents(String chaptersUrlFrag,
-                                                                         Map<String, Object> queryParams) {
+                                                                       Map<String, Object> queryParams) {
         return getCourseService().getContents(chaptersUrlFrag, queryParams);
     }
 
