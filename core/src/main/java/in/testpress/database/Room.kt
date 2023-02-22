@@ -39,7 +39,9 @@ import androidx.room.TypeConverters
             DiscussionThreadAnswerEntity::class,
             ProductCategoryEntity::class,
             RunningContentEntity::class,
-            UpcomingContentEntity::class
+            UpcomingContentEntity::class,
+            RunningContentRemoteKeys::class,
+            UpcomingContentRemoteKeys::class
         ], exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class TestpressDatabase : RoomDatabase() {
