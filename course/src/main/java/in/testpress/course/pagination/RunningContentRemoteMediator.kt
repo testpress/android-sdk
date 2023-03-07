@@ -1,12 +1,14 @@
 package `in`.testpress.course.pagination
 
-import `in`.testpress.course.repository.RunningContentsRepository
 import `in`.testpress.database.dao.RunningContentDao
 import `in`.testpress.database.dao.RunningContentRemoteKeysDao
 import `in`.testpress.database.entities.RunningContentEntity
 import `in`.testpress.database.entities.RunningContentRemoteKeys
 import androidx.paging.*
 import androidx.room.withTransaction
+import `in`.testpress.course.network.CourseNetwork
+import `in`.testpress.database.TestpressDatabase
+import `in`.testpress.v2_4.models.ApiResponse
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -14,11 +16,13 @@ private const val DEFAULT_PAGE_INDEX = 1
 
 @OptIn(ExperimentalPagingApi::class)
 class RunningContentRemoteMediator(
-    val repository: RunningContentsRepository
+    val courseNetwork: CourseNetwork,
+    val database: TestpressDatabase,
+    val courseId: Long
 ) : RemoteMediator<Int, RunningContentEntity>() {
-    private val db = repository.db
-    private val runningContentDao: RunningContentDao = db.runningContentDao()
-    private val runningContentRemoteKeysDao: RunningContentRemoteKeysDao = db.runningContentRemoteKeysDao()
+
+    private val runningContentDao: RunningContentDao = database.runningContentDao()
+    private val runningContentRemoteKeysDao: RunningContentRemoteKeysDao = database.runningContentRemoteKeysDao()
 
     override suspend fun initialize(): InitializeAction {
         return InitializeAction.LAUNCH_INITIAL_REFRESH
@@ -42,17 +46,15 @@ class RunningContentRemoteMediator(
                 }
             }
 
-            val response = repository.fetchRunningContents(page)
+            val response = fetchRunningContents(page)
 
             val repos = response.results
             val endOfPaginationReached = (response.next == null)
-            db.withTransaction {
+            database.withTransaction {
                 // clear all data in the database
                 if (loadType == LoadType.REFRESH) {
-                    runningContentRemoteKeysDao.clearRemoteKeysByCourseIdAndClassName(
-                        repository.courseId
-                    )
-                    runningContentDao.deleteAll(repository.courseId)
+                    runningContentRemoteKeysDao.clearRemoteKeysByCourseIdAndClassName(courseId)
+                    runningContentDao.deleteAll(courseId)
                 }
                 val prevKey = if (page == 1) null else page.minus(1)
                 val nextKey = if (endOfPaginationReached) null else page.plus(1)
@@ -61,7 +63,7 @@ class RunningContentRemoteMediator(
                         contentId = it.id,
                         prevKey = prevKey,
                         nextKey = nextKey,
-                        repository.courseId
+                        courseId
                     )
                 }
                 runningContentRemoteKeysDao.insertAll(keys)
@@ -73,6 +75,11 @@ class RunningContentRemoteMediator(
         } catch (e: HttpException) {
             return MediatorResult.Error(e)
         }
+    }
+
+    private suspend fun fetchRunningContents(page: Int = 1): ApiResponse<List<RunningContentEntity>> {
+        val queryParams = hashMapOf<String, Any>("page" to page)
+        return courseNetwork.getRunningContents(courseId, queryParams)
     }
 
     private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, RunningContentEntity>): RunningContentRemoteKeys? {
