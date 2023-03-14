@@ -66,7 +66,7 @@ interface CourseService {
 }
 
 
-class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk.getTestpressSession(context)) {
+open class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk.getTestpressSession(context)) {
     private fun getCourseService() = retrofit.create(CourseService::class.java)
 
     fun getNetworkContent(url: String): RetrofitCall<NetworkContent> {
@@ -106,7 +106,7 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         return getCourseService().getProductsCategories(arguments)
     }
 
-    suspend fun getRunningContents(courseId: Long, arguments: HashMap<String, Any>): ApiResponse<List<RunningContentEntity>> {
+    open suspend fun getRunningContents(courseId: Long, arguments: HashMap<String, Any>): ApiResponse<List<RunningContentEntity>> {
         return getCourseService().getRunningContents(courseId, arguments)
     }
 }
