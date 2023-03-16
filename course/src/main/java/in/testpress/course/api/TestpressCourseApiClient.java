@@ -82,7 +82,7 @@ public class TestpressCourseApiClient extends TestpressApiClient {
     }
 
     public RetrofitCall<TestpressApiResponse<Chapter>> getChapters(String courseId,
-                                                                     Map<String, Object> queryParams,
+                                                                   Map<String, Object> queryParams,
                                                                    String latestModifiedDate) {
         return getCourseService().getChapters(courseId, queryParams, latestModifiedDate);
     }
@@ -92,7 +92,7 @@ public class TestpressCourseApiClient extends TestpressApiClient {
     }
 
     public RetrofitCall<ApiResponse<ContentsListResponse>> getContents(String chaptersUrlFrag,
-                                                                       Map<String, Object> queryParams) {
+                                                                         Map<String, Object> queryParams) {
         return getCourseService().getContents(chaptersUrlFrag, queryParams);
     }
 
