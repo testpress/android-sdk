@@ -274,4 +274,4 @@ enum class ContentType {
 }
 
 inline fun <reified T : Enum<T>> String.asEnumOrDefault(defaultValue: T? = null): T? =
-    enumValues<T>().firstOrNull { it.name.equals(this, ignoreCase = true) } ?: defaultValue
+        enumValues<T>().firstOrNull { it.name.equals(this, ignoreCase = true) } ?: defaultValue
