@@ -17,7 +17,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
 
-
 @ExperimentalPagingApi
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -42,6 +41,30 @@ class RunningContentRemoteMediatorTest: TestDatabase() {
         val result = mediator.load(LoadType.REFRESH, getPagingState())
 
         Assert.assertFalse((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
+    }
+
+    @Test
+    fun endOfPaginationShouldBeReachedIfNextPageIsNotAvailable() = runBlocking {
+        val mediator = RunningContentRemoteMediator(
+            FakeAPIClient(ApplicationProvider.getApplicationContext(), true),
+            database,1
+        )
+        val result = mediator.load(LoadType.REFRESH, getPagingState())
+
+        Assert.assertTrue(result is RemoteMediator.MediatorResult.Success)
+        Assert.assertTrue((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
+    }
+
+    @Test
+    fun errorShouldBeReturnedForAPIFailure() = runBlocking {
+        val apiClient = FakeAPIClient(ApplicationProvider.getApplicationContext())
+        apiClient.failureMessage = "Unable to load data"
+        val mediator = RunningContentRemoteMediator(
+            apiClient,
+            database,1
+        )
+        val result = mediator.load(LoadType.REFRESH, getPagingState())
+        Assert.assertTrue(result is RemoteMediator.MediatorResult.Error)
     }
 
     private fun getPagingState() = PagingState<Int, RunningContentEntity>(
