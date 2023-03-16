@@ -53,20 +53,14 @@ data class NetworkContent(
 )
 
 fun NetworkContent.asDatabaseModel(): ContentEntity {
-    return ContentEntity(
+    val contentEntity = ContentEntity(
         id = this.id,
-        title = this.title,
         description = this.description,
         image = this.image,
-        order = this.order,
         url = this.url,
-        chapterId = this.chapterId,
         chapterSlug = this.chapterSlug,
         chapterUrl = this.chapterUrl,
-        courseId = this.courseId,
-        freePreview = this.freePreview,
         modified = this.modified,
-        contentType = this.contentType,
         examUrl = this.examUrl,
         videoUrl = this.videoUrl,
         attachmentUrl = this.attachmentUrl,
@@ -77,11 +71,7 @@ fun NetworkContent.asDatabaseModel(): ContentEntity {
         bookmarkId = this.bookmarkId,
         videoWatchedPercentage = this.videoWatchedPercentage,
         active = this.active,
-        examId = this.examId,
-        attachmentId = this.attachmentId,
-        videoId = this.videoId,
         htmlId = this.htmlId,
-        start = this.start,
         hasStarted = this.hasStarted,
         isCourseAvailable = this.isCourseAvailable,
         coverImage = this.coverImage,
@@ -91,6 +81,17 @@ fun NetworkContent.asDatabaseModel(): ContentEntity {
         hasEnded = this.hasEnded,
         examStartUrl = this.examStartUrl
     )
+    contentEntity.title = this.title
+    contentEntity.order = this.order
+    contentEntity.chapterId = this.chapterId
+    contentEntity.courseId = this.courseId
+    contentEntity.freePreview  = this.freePreview
+    contentEntity.contentType = this.contentType
+    contentEntity.examId = this.examId
+    contentEntity.attachmentId = this.attachmentId
+    contentEntity.videoId = this.videoId
+    contentEntity.start = this.start
+    return contentEntity
 }
 
 fun NetworkContent.asGreenDaoModel(): Content {
