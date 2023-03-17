@@ -227,6 +227,10 @@ fun createDomainContent(content: RunningContentEntity): DomainContent {
     )
 }
 
+fun <T>T.asDomainContent(): DomainContent {
+    return createDomainContent(this as RunningContentEntity)
+}
+
 fun ContentEntity.asDomainContent(): DomainContent {
     return createDomainContent(this)
 }
