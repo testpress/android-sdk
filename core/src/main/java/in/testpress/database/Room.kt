@@ -8,6 +8,7 @@ import `in`.testpress.database.roommigration.RoomMigration12To13.MIGRATION_12_13
 import `in`.testpress.database.roommigration.RoomMigration13To14.MIGRATION_13_14
 import `in`.testpress.database.roommigration.RoomMigration14To15.MIGRATION_14_15
 import `in`.testpress.database.roommigration.RoomMigration15To16.MIGRATION_15_16
+import `in`.testpress.database.roommigration.RoomMigration16To17.MIGRATION_16_17
 import `in`.testpress.database.roommigration.RoomMigration4To5.MIGRATION_4_5
 import `in`.testpress.database.roommigration.RoomMigration5To6.MIGRATION_5_6
 import `in`.testpress.database.roommigration.RoomMigration3To4.MIGRATION_3_4
@@ -22,7 +23,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(version = 16,
+@Database(version = 17,
         entities = [
             ContentEntity::class,
             OfflineVideo::class,
@@ -37,7 +38,11 @@ import androidx.room.TypeConverters
             UserEntity::class,
             CategoryEntity::class,
             DiscussionThreadAnswerEntity::class,
-            ProductCategoryEntity::class
+            ProductCategoryEntity::class,
+            RunningContentEntity::class,
+            RunningContentRemoteKeys::class,
+            UpcomingContentEntity::class,
+            UpcomingContentRemoteKeys::class
         ], exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class TestpressDatabase : RoomDatabase() {
@@ -55,8 +60,9 @@ abstract class TestpressDatabase : RoomDatabase() {
         private lateinit var INSTANCE: TestpressDatabase
 
         val MIGRATIONS = arrayOf(
-                MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9,
-                MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16
+            MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9,
+            MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14,
+            MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17
         )
 
         operator fun invoke(context: Context): TestpressDatabase {
