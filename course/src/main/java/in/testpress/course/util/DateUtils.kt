@@ -4,24 +4,28 @@ import android.content.Context
 import android.os.Build
 import android.provider.Settings
 import java.text.SimpleDateFormat
-import android.icu.text.RelativeDateTimeFormatter
-import android.icu.text.RelativeDateTimeFormatter.Direction.NEXT
-import android.icu.text.RelativeDateTimeFormatter.RelativeUnit.*
-import java.time.LocalDate
+import android.text.format.DateUtils.*
+import `in`.testpress.course.R
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 object DateUtils {
     const val ONE_DAY_IN_MILLI_SECONDS = 1000 * 60 * 60 * 24
 
-    private val ONE_SECOND_IN_MILLISECOND = 1000L
-    private val MONTHS_IN_YEAR = 12L
-    private val DAYS_IN_CURRENT_MONTH = LocalDate.now().lengthOfMonth()
-    private val ONE_MINUTES_IN_SECONDS = 60L
-    private val ONE_HOURS_IN_SECONDS = 60L * ONE_MINUTES_IN_SECONDS
-    private val ONE_DAY_IN_SECONDS = 24L * ONE_HOURS_IN_SECONDS
-    private val ONE_MONTH_IN_SECONDS = DAYS_IN_CURRENT_MONTH * ONE_DAY_IN_SECONDS
-    private val ONE_YEAR_IN_SECONDS = 12L * ONE_MONTH_IN_SECONDS
+    private val CURRENT_MONTH_IN_MILLS get() = getCurrentMonthMills()
+    private val CURRENT_YEAR_IN_MILLS get() = getCurrentYearMills()
+
+    private fun getCurrentMonthMills(): Long {
+        val calendar = Calendar.getInstance()
+        val daysInCurrentMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+        return TimeUnit.DAYS.toMillis(daysInCurrentMonth.toLong())
+    }
+
+    private fun getCurrentYearMills(): Long {
+        val calendar = Calendar.getInstance()
+        val daysInCurrentYear = calendar.getActualMaximum(Calendar.DAY_OF_YEAR)
+        return TimeUnit.DAYS.toMillis(daysInCurrentYear.toLong())
+    }
 
     fun difference(start: Date, end: Date): Long {
         val diffTime = end.time - start.time
@@ -49,74 +53,62 @@ object DateUtils {
         return seconds
     }
 
-    fun getFormattedDateStringOrNull(date: String?):String?{
-        if (date == null) return null
-        val regex = Regex( """.\d{6}""")
-        val formattedDate = regex.replace(date, "")
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX") // Input String format "2023-01-23T18:38:57+05:30"
-        return try {
-            simpleDateFormat.parse(formattedDate)
-            formattedDate
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    fun getHumanizedDateFormat(startTimeOrEndTime: String?):String? {
+    fun getHumanizedDateFormat(startTimeOrEndTime: String?, context: Context): String {
+        if (startTimeOrEndTime.isNullOrEmpty()) return ""
         val currentDate = Date()
         val startOrEndDate = convertStringToDate(startTimeOrEndTime)
-        val secondDifference = getDateDifferentInSecond(startOrEndDate,currentDate)
-        return getStringAccordingToGivenSeconds(secondDifference)
+        val millisecondDifference = getDateDifferentInMillisecond(startOrEndDate, currentDate)
+        return getStringAccordingToGivenSeconds(millisecondDifference, context)
     }
 
-    private fun convertStringToDate(dateString: String?): Date? {
-        var date: Date? = null
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX") // Input String format "2023-01-23T18:38:57+05:30"
+    private fun convertStringToDate(dateString: String): Date? {
+        val regex = Regex(""".\d{6}""")
+        val formattedDate = regex.replace(dateString, "")
+        val simpleDateFormat = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+        } else {
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZZ")
+        }
         simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
-        if (dateString != null && dateString != "") {
-            date = try {
-                dateString.let { simpleDateFormat.parse(it) }
-            } catch (e: Exception) {
-                null
-            }
+        val date = try {
+            formattedDate.let { simpleDateFormat.parse(it) }
+        } catch (e: Exception) {
+            null
         }
         return date
     }
 
-    private fun getDateDifferentInSecond(date1: Date?, date2: Date?): Long? {
-        if (date1 == null || date2 == null) {
+    private fun getDateDifferentInMillisecond(date1: Date?, date2: Date?): Long? {
+        return if (date1 == null || date2 == null) {
             return null
+        } else {
+            date1.time - date2.time
         }
-        val diff: Long = date1.time - date2.time
-        return diff / ONE_SECOND_IN_MILLISECOND
     }
 
-    private fun getStringAccordingToGivenSeconds(second: Long?): String? {
-        val fmt: RelativeDateTimeFormatter = RelativeDateTimeFormatter.getInstance()
+    private fun getStringAccordingToGivenSeconds(millisecond: Long?, context: Context): String {
+        val resource = context.resources
         return when {
-            second == null -> null
-            second > ONE_YEAR_IN_SECONDS -> {  // output in 1 year
-                fmt.format(
-                    ((TimeUnit.SECONDS.toDays(second) / DAYS_IN_CURRENT_MONTH) / MONTHS_IN_YEAR).toDouble(),
-                    NEXT,
-                    YEARS
-                )
+            millisecond == null -> ""
+            millisecond > CURRENT_YEAR_IN_MILLS -> {  // output in 1 year
+                val yearCount = (millisecond / CURRENT_YEAR_IN_MILLS).toInt()
+                resource.getQuantityString(R.plurals.years, yearCount, yearCount)
             }
-            second > ONE_MONTH_IN_SECONDS -> {  // output in 2 months
-                fmt.format(
-                    (TimeUnit.SECONDS.toDays(second) / DAYS_IN_CURRENT_MONTH).toDouble(),
-                    NEXT,
-                    MONTHS
-                )
+            millisecond > CURRENT_MONTH_IN_MILLS -> {  // output in 2 months
+                val monthCount = (millisecond / CURRENT_MONTH_IN_MILLS).toInt()
+                resource.getQuantityString(R.plurals.months, monthCount, monthCount)
             }
-            second > ONE_DAY_IN_SECONDS -> {  // output in 5 days
-                fmt.format(TimeUnit.SECONDS.toDays(second).toDouble(), NEXT, DAYS)
+            millisecond > DAY_IN_MILLIS -> {  // output in 5 days
+                val daysCount = TimeUnit.MILLISECONDS.toDays(millisecond).toInt()
+                resource.getQuantityString(R.plurals.days, daysCount, daysCount)
             }
-            second > ONE_HOURS_IN_SECONDS -> {  // output in 10 hours
-                fmt.format(TimeUnit.SECONDS.toHours(second).toDouble(), NEXT, HOURS)
+            millisecond > HOUR_IN_MILLIS -> {  // output in 10 hours
+                val hoursCount = TimeUnit.MILLISECONDS.toHours(millisecond).toInt()
+                resource.getQuantityString(R.plurals.hours, hoursCount, hoursCount)
             }
             else -> {  // output in 10 minutes
-                fmt.format(TimeUnit.SECONDS.toMinutes(second).toDouble(), NEXT, MINUTES)
+                val minutesCount = TimeUnit.MILLISECONDS.toMinutes(millisecond).toInt()
+                resource.getQuantityString(R.plurals.minutes, minutesCount, minutesCount)
             }
         }
     }

@@ -30,15 +30,18 @@ abstract class BaseContentListAdapter<T : Any>(COMPARATOR: DiffUtil.ItemCallback
         if (content != null) {
             val domainContent = content.asDomainContent()
             holder.bind(domainContent) { onItemClick(domainContent, holder.itemView.context) }
-            holder.setDateAndVisiblity(getDateText(domainContent),getDateVisiblity(domainContent))
+            holder.setDateAndVisiblity(
+                getDateText(domainContent, holder.itemView.context),
+                getDateVisiblity(domainContent, holder.itemView.context)
+            )
         }
     }
 
     abstract fun onItemClick(content: DomainContent, context: Context)
 
-    abstract fun getDateText(content: DomainContent):String
+    abstract fun getDateText(content: DomainContent, context: Context):String
 
-    abstract fun getDateVisiblity(content: DomainContent):Boolean
+    abstract fun getDateVisiblity(content: DomainContent, context: Context):Boolean
 
 }
 

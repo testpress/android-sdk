@@ -36,10 +36,10 @@ class RunningContentListAdapter:BaseContentListAdapter<RunningContentEntity>(COM
         )
     }
 
-    override fun getDateText(content: DomainContent):
-            String = "Ends ${DateUtils.getHumanizedDateFormat(content.end)} - "
+    override fun getDateText(content: DomainContent, context: Context):
+            String = "Ends ${DateUtils.getHumanizedDateFormat(content.end, context)} - "
 
-    override fun getDateVisiblity(content: DomainContent):
-            Boolean = DateUtils.getHumanizedDateFormat(content.end).isNullOrEmpty()
+    override fun getDateVisiblity(content: DomainContent, context: Context):
+            Boolean = DateUtils.getHumanizedDateFormat(content.end, context).isEmpty()
 
 }

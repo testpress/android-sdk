@@ -1,7 +1,6 @@
 package `in`.testpress.course.domain
 
 import `in`.testpress.core.TestpressSDKDatabase
-import `in`.testpress.course.util.DateUtils.getFormattedDateStringOrNull
 import `in`.testpress.database.ContentEntity
 import `in`.testpress.database.entities.RunningContentEntity
 import `in`.testpress.models.greendao.Attachment
@@ -214,8 +213,8 @@ fun createDomainContent(content: RunningContentEntity): DomainContent {
         videoId = content.videoId,
         attachmentId = content.attachmentId,
         contentType = content.contentType,
-        start = getFormattedDateStringOrNull(content.start),
-        end = getFormattedDateStringOrNull(content.end),
+        start = content.start,
+        end = content.end,
         treePath = content.treePath,
         icon = content.icon,
         isLocked = null,
