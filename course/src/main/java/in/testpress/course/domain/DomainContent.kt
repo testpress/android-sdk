@@ -250,12 +250,6 @@ fun List<Content>.asDomainContents(): List<DomainContent> {
     }
 }
 
-fun List<RunningContentEntity>.convertRunningContentsToDomainContents(): List<DomainContent>{
-    return this.map {
-        createDomainContent(it)
-    }
-}
-
 fun DomainContent.getGreenDaoContent(context: Context): Content? {
     val contentDao = TestpressSDKDatabase.getContentDao(context)
     val contents =  contentDao.queryBuilder().where(ContentDao.Properties.Id.eq(this.id)).list()
