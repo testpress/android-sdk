@@ -90,23 +90,23 @@ object DateUtils {
         val resource = context.resources
         return when {
             millisecond == null -> ""
-            millisecond > CURRENT_YEAR_IN_MILLS -> {  // output in 1 year
+            millisecond > CURRENT_YEAR_IN_MILLS -> {  // output -> in 1 year
                 val yearCount = (millisecond / CURRENT_YEAR_IN_MILLS).toInt()
                 resource.getQuantityString(R.plurals.years, yearCount, yearCount)
             }
-            millisecond > CURRENT_MONTH_IN_MILLS -> {  // output in 2 months
+            millisecond > CURRENT_MONTH_IN_MILLS -> {  // output -> in 2 months
                 val monthCount = (millisecond / CURRENT_MONTH_IN_MILLS).toInt()
                 resource.getQuantityString(R.plurals.months, monthCount, monthCount)
             }
-            millisecond > DAY_IN_MILLIS -> {  // output in 5 days
+            millisecond > DAY_IN_MILLIS -> {  // output -> in 5 days
                 val daysCount = TimeUnit.MILLISECONDS.toDays(millisecond).toInt()
                 resource.getQuantityString(R.plurals.days, daysCount, daysCount)
             }
-            millisecond > HOUR_IN_MILLIS -> {  // output in 10 hours
+            millisecond > HOUR_IN_MILLIS -> {  // output -> in 10 hours
                 val hoursCount = TimeUnit.MILLISECONDS.toHours(millisecond).toInt()
                 resource.getQuantityString(R.plurals.hours, hoursCount, hoursCount)
             }
-            else -> {  // output in 10 minutes
+            else -> {  // output -> in 10 minutes
                 val minutesCount = TimeUnit.MILLISECONDS.toMinutes(millisecond).toInt()
                 resource.getQuantityString(R.plurals.minutes, minutesCount, minutesCount)
             }
