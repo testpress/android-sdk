@@ -24,7 +24,7 @@ class RunningContentRemoteMediator(
     private val runningContentDao: RunningContentDao = database.runningContentDao()
     private val runningContentRemoteKeysDao: RunningContentRemoteKeysDao = database.runningContentRemoteKeysDao()
     private var endOfPaginationReached = true
-    private var page = 1
+    private var pageNumber = 1
 
     override suspend fun initialize(): InitializeAction {
         return InitializeAction.LAUNCH_INITIAL_REFRESH
@@ -36,22 +36,19 @@ class RunningContentRemoteMediator(
     ): MediatorResult {
 
         try {
-            page = when (loadType) {
+            pageNumber = when (loadType) {
                 LoadType.REFRESH -> DEFAULT_PAGE_INDEX
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
-                    val remoteKeys = getRemoteKeyForLastItem(state)
-                    val nextKey = remoteKeys?.nextKey
-                        ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
-                    nextKey
+                    getNextPageNumber(state)
+                        ?: return MediatorResult.Success(endOfPaginationReached = true)
                 }
             }
 
-            val apiResponse = fetchRunningContents(page)
-            val result = apiResponse.results
+            val apiResponse = fetchRunningContents(pageNumber)
             endOfPaginationReached = (apiResponse.next == null)
 
-            storeDataInDB(loadType,result)
+            storeDataInDB(loadType,apiResponse.results)
 
             return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
         } catch (e: IOException) {
@@ -61,34 +58,9 @@ class RunningContentRemoteMediator(
         }
     }
 
-    private suspend fun storeDataInDB(
-        loadType: LoadType,
-        result: List<RunningContentEntity>
-    ){
-        database.withTransaction {
-            // clear all data in the database
-            if (loadType == LoadType.REFRESH) {
-                runningContentRemoteKeysDao.clearRemoteKeysByCourseIdAndClassName(courseId)
-                runningContentDao.deleteAll(courseId)
-            }
-            val prevKey = if (page == 1) null else page.minus(1)
-            val nextKey = if (endOfPaginationReached) null else page.plus(1)
-            val keys = result.map {
-                RunningContentRemoteKeys(
-                    contentId = it.id,
-                    prevKey = prevKey,
-                    nextKey = nextKey,
-                    courseId
-                )
-            }
-            runningContentRemoteKeysDao.insertAll(keys)
-            runningContentDao.insertAll(result)
-        }
-    }
-
-    private suspend fun fetchRunningContents(page: Int = 1): ApiResponse<List<RunningContentEntity>> {
-        val queryParams = hashMapOf<String, Any>("page" to page)
-        return courseNetwork.getRunningContents(courseId, queryParams)
+    private suspend fun getNextPageNumber(state: PagingState<Int, RunningContentEntity>) : Int?{
+        val remoteKeys = getRemoteKeyForLastItem(state)
+        return remoteKeys?.nextKey
     }
 
     private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, RunningContentEntity>): RunningContentRemoteKeys? {
@@ -97,5 +69,47 @@ class RunningContentRemoteMediator(
             ?.let { content ->
                 runningContentRemoteKeysDao.remoteKeysContentId(content.id)
             }
+    }
+
+    private suspend fun fetchRunningContents(page: Int = 1): ApiResponse<List<RunningContentEntity>> {
+        val queryParams = hashMapOf<String, Any>("page" to page)
+        return courseNetwork.getRunningContents(courseId, queryParams)
+    }
+
+    private suspend fun storeDataInDB(
+        loadType: LoadType,
+        results: List<RunningContentEntity>
+    ){
+        database.withTransaction {
+            // clear all data in the database
+            if (loadType == LoadType.REFRESH) {
+                clearExistingData(courseId)
+            }
+            saveData(results)
+        }
+    }
+
+    private suspend fun clearExistingData(courseId: Long){
+        runningContentRemoteKeysDao.clearRemoteKeysByCourseIdAndClassName(courseId)
+        runningContentDao.deleteAll(courseId)
+    }
+
+    private suspend fun saveData(results: List<RunningContentEntity>) {
+        val keys = generateRemoteKeys(results)
+        runningContentRemoteKeysDao.insertAll(keys)
+        runningContentDao.insertAll(results)
+    }
+
+    private fun generateRemoteKeys(result: List<RunningContentEntity>):List<RunningContentRemoteKeys> {
+        val prevKey = if (pageNumber == 1) null else pageNumber.minus(1)
+        val nextKey = if (endOfPaginationReached) null else pageNumber.plus(1)
+        return result.map {
+            RunningContentRemoteKeys(
+                contentId = it.id,
+                prevKey = prevKey,
+                nextKey = nextKey,
+                courseId
+            )
+        }
     }
 }

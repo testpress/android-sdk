@@ -8,11 +8,9 @@ import `in`.testpress.course.databinding.BaseContentListLayoutBinding
 import `in`.testpress.course.repository.RunningContentsRepository
 import `in`.testpress.course.viewmodels.RunningContentsListViewModel
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -21,25 +19,26 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.collect
 
 class RunningContentListFragment : Fragment() {
 
     private var courseId: Long = -1
     private lateinit var binding: BaseContentListLayoutBinding
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var emptyContainer: LinearLayout
     private lateinit var adapter: RunningContentListAdapter
     private lateinit var viewModel: RunningContentsListViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        parseArguments()
+        initializeViewModel()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        parseArguments()
-        initializeViewModel()
         binding = BaseContentListLayoutBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -63,19 +62,32 @@ class RunningContentListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        bindViews()
-        initializeListeners()
-        initializeAdapter()
         initializeListView()
-        initializeFooterView()
-        bindListView()
+        initializeListeners()
+        updateListView()
     }
 
-    private fun bindViews() {
-        binding.apply {
-            this@RunningContentListFragment.recyclerView = binding.recyclerView
-            this@RunningContentListFragment.emptyContainer = binding.errorContainer
+    private fun initializeListView() {
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+            adapter = this@RunningContentListFragment.getAdapter()
         }
+        binding.recyclerView.adapter = adapter.withLoadStateFooter(
+            BaseListFooterAdapter {
+                adapter.retry()
+            }
+        )
+    }
+
+    private fun getAdapter(): RunningContentListAdapter {
+        adapter = RunningContentListAdapter()
+        lifecycleScope.launchWhenCreated {
+            viewModel.runningContentList.collect {
+                adapter.submitData(it)
+            }
+        }
+        return adapter
     }
 
     private fun initializeListeners() {
@@ -84,32 +96,7 @@ class RunningContentListFragment : Fragment() {
         }
     }
 
-    private fun initializeAdapter() {
-        adapter = RunningContentListAdapter()
-        lifecycleScope.launchWhenCreated {
-            viewModel.runningContentList.collect {
-                adapter.submitData(it)
-            }
-        }
-    }
-
-    private fun initializeListView() {
-        recyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-            adapter = this@RunningContentListFragment.adapter
-        }
-    }
-
-    private fun initializeFooterView() {
-        recyclerView.adapter = adapter.withLoadStateFooter(
-            BaseListFooterAdapter {
-                adapter.retry()
-            }
-        )
-    }
-
-    private fun bindListView() {
+    private fun updateListView() {
         binding.apply {
             lifecycleScope.launchWhenCreated {
                 adapter.loadStateFlow.collect {

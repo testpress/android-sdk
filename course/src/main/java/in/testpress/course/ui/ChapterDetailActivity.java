@@ -118,15 +118,14 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             InstituteSettings instituteSettings =
                     TestpressSdk.getTestpressSession(this).getInstituteSettings();
 
-            if (instituteSettings.isCoursesFrontend() && productSlug == null) {
+            if (instituteSettings.isCoursesFrontend() &&
+                    instituteSettings.isCoursesGamificationEnabled() && productSlug == null) {
 
                 findViewById(R.id.fragment_carousel).setVisibility(View.VISIBLE);
                 findViewById(R.id.fragment_container).setVisibility(View.GONE);
                 CourseDetailsTabAdapter adapter = new CourseDetailsTabAdapter(getResources(),
                         getSupportFragmentManager(), getIntent().getExtras());
-                if (instituteSettings.isCoursesGamificationEnabled()){
-                    adapter.totalFragment = 3;
-                }
+
                 ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
                 viewPager.setAdapter(adapter);
                 TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);

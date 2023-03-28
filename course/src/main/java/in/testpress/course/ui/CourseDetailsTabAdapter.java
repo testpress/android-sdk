@@ -13,7 +13,6 @@ class CourseDetailsTabAdapter extends FragmentPagerAdapter {
 
     private Resources resources;
     private Bundle bundle;
-    int totalFragment = 2;
 
     CourseDetailsTabAdapter(Resources resources, FragmentManager fragmentManager, Bundle bundle) {
         super(fragmentManager);
@@ -23,7 +22,7 @@ class CourseDetailsTabAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return totalFragment;
+        return 2;
     }
 
     @Override
@@ -34,9 +33,6 @@ class CourseDetailsTabAdapter extends FragmentPagerAdapter {
                 fragment = new ChaptersListFragment();
                 break;
             case 1:
-                fragment = new RunningContentListFragment();
-                break;
-            case 2:
                 fragment = new RankListFragment();
                 break;
             default:
@@ -53,8 +49,6 @@ class CourseDetailsTabAdapter extends FragmentPagerAdapter {
             case 0:
                 return resources.getString(R.string.testpress_learn);
             case 1:
-                return resources.getString(R.string.testpress_running_contents);
-            case 2:
                 return resources.getString(R.string.testpress_leaderboard);
             default:
                 return null;

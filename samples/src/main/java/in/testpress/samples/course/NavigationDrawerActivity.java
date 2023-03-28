@@ -1,14 +1,18 @@
 package in.testpress.samples.course;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.MenuItem;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.course.TestpressCourse;
+import in.testpress.course.fragments.RunningContentListFragment;
+import in.testpress.course.ui.LeaderboardFragment;
 import in.testpress.samples.BaseNavigationDrawerActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
+import in.testpress.util.ViewUtils;
 
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
 
@@ -27,6 +31,9 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                 break;
             case R.id.leaderboard:
                 showSDK(2);
+                break;
+            case R.id.running_content:
+                showSDK(3);
                 break;
         }
         super.onDrawerItemSelected(menuItem);
@@ -49,13 +56,31 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
             TestpressSdk.setTestpressSession(this, session);
             if (position == 1) {
                 TestpressCourse.show(this, R.id.fragment_container, session);
-            } else {
+            } else if (position == 2){
                 TestpressCourse.showLeaderboard(this, R.id.fragment_container, session);
+            } else {
+                launchRunningContentFragment();
             }
         } else {
             Intent intent = new Intent(this, TestpressCoreSampleActivity.class);
             startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
         }
+    }
+    private void launchRunningContentFragment(){
+        ViewUtils.showInputDialogBox(NavigationDrawerActivity.this, "Enter Course ID",
+                new ViewUtils.OnInputCompletedListener() {
+                    @Override
+                    public void onInputComplete(String inputText) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("courseId",inputText);
+                        RunningContentListFragment fragment = new RunningContentListFragment();
+                        fragment.setArguments(bundle);
+                        NavigationDrawerActivity.this.getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container,fragment)
+                                .commitAllowingStateLoss();
+                    }
+                });
+
     }
 
     @Override

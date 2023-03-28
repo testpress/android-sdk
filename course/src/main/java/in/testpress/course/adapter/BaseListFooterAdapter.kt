@@ -34,14 +34,18 @@ class BaseListFooterViewHolder(
 
     fun bind(loadState: LoadState) {
         if (loadState is LoadState.Error) {
-            if (loadState.error.localizedMessage?.contains("404") == true){
-                binding.emptyTitle.text = "Content Not Found"
-                binding.emptyDescription.text = "Content Not Found, Please try after some time"
-            }
+            showErrorMessage(loadState)
         }
         binding.progressBar.isVisible = loadState is LoadState.Loading
         binding.retryButton.isVisible = loadState is LoadState.Error
         binding.errorMessageContainer.isVisible = loadState is LoadState.Error
+    }
+
+    private fun showErrorMessage(loadState: LoadState.Error) {
+        if (loadState.error.localizedMessage?.contains("404") == true){
+            binding.emptyTitle.text = "Content Not Found"
+            binding.emptyDescription.text = "Content Not Found, Please try after some time"
+        }
     }
 
     companion object {
