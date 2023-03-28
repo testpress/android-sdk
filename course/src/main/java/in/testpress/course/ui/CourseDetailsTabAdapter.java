@@ -7,7 +7,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import in.testpress.course.R;
-import in.testpress.course.fragments.RunningContentListFragment;
 
 class CourseDetailsTabAdapter extends FragmentPagerAdapter {
 
