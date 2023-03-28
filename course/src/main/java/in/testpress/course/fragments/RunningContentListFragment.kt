@@ -118,8 +118,6 @@ class RunningContentListFragment : Fragment() {
                     val error = it.refresh is LoadState.Error
                     val isItemCountZero = adapter.itemCount == 0
 
-                    Log.d("TAG", "bindListView: $notLoading $loading $error $isItemCountZero")
-
                     shimmerViewContainer.isVisible = loading
                     recyclerView.isVisible = (notLoading || error) && adapter.itemCount != 0
                     showEmptyOrErrorMessage(
