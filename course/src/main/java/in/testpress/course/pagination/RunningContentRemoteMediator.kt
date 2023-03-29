@@ -1,5 +1,6 @@
 package `in`.testpress.course.pagination
 
+import android.util.Log
 import `in`.testpress.database.dao.RunningContentDao
 import `in`.testpress.database.dao.RunningContentRemoteKeysDao
 import `in`.testpress.database.entities.RunningContentEntity
@@ -23,7 +24,6 @@ class RunningContentRemoteMediator(
 
     private val runningContentDao: RunningContentDao = database.runningContentDao()
     private val runningContentRemoteKeysDao: RunningContentRemoteKeysDao = database.runningContentRemoteKeysDao()
-    private var endOfPaginationReached = true
     private var pageNumber = 1
 
     override suspend fun initialize(): InitializeAction {
@@ -35,32 +35,36 @@ class RunningContentRemoteMediator(
         state: PagingState<Int, RunningContentEntity>
     ): MediatorResult {
 
-        try {
-            pageNumber = when (loadType) {
-                LoadType.REFRESH -> DEFAULT_PAGE_INDEX
-                LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
-                LoadType.APPEND -> {
-                    getNextPageNumber(state)
-                        ?: return MediatorResult.Success(endOfPaginationReached = true)
-                }
-            }
+        pageNumber = getPageNumber(loadType,state)
+        if (pageNumber == -1) return MediatorResult.Success(endOfPaginationReached = true)
 
-            val apiResponse = fetchRunningContents(pageNumber)
-            endOfPaginationReached = (apiResponse.next == null)
+        return try {
+            val response = fetchRunningContents(pageNumber)
 
-            storeDataInDB(loadType,apiResponse.results)
+            storeDataInDB(loadType,response)
 
-            return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
+            MediatorResult.Success(endOfPaginationReached = response.next == null)
         } catch (e: IOException) {
-            return MediatorResult.Error(e)
+            MediatorResult.Error(e)
         } catch (e: HttpException) {
-            return MediatorResult.Error(e)
+            MediatorResult.Error(e)
         }
     }
 
-    private suspend fun getNextPageNumber(state: PagingState<Int, RunningContentEntity>) : Int?{
+    private suspend fun getPageNumber(
+        loadType: LoadType,
+        state: PagingState<Int, RunningContentEntity>
+    ) : Int {
+        return when (loadType) {
+            LoadType.REFRESH -> DEFAULT_PAGE_INDEX
+            LoadType.PREPEND -> -1
+            LoadType.APPEND -> getNextPageNumber(state)
+        }
+    }
+
+    private suspend fun getNextPageNumber(state: PagingState<Int, RunningContentEntity>) : Int{
         val remoteKeys = getRemoteKeyForLastItem(state)
-        return remoteKeys?.nextKey
+        return remoteKeys?.nextKey ?: -1
     }
 
     private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, RunningContentEntity>): RunningContentRemoteKeys? {
@@ -78,14 +82,15 @@ class RunningContentRemoteMediator(
 
     private suspend fun storeDataInDB(
         loadType: LoadType,
-        results: List<RunningContentEntity>
+        response: ApiResponse<List<RunningContentEntity>>
     ){
         database.withTransaction {
             // clear all data in the database
             if (loadType == LoadType.REFRESH) {
                 clearExistingData(courseId)
             }
-            saveData(results)
+            val keys = generateRemoteKeys(response)
+            saveData(response.results,keys)
         }
     }
 
@@ -94,16 +99,20 @@ class RunningContentRemoteMediator(
         runningContentDao.deleteAll(courseId)
     }
 
-    private suspend fun saveData(results: List<RunningContentEntity>) {
-        val keys = generateRemoteKeys(results)
-        runningContentRemoteKeysDao.insertAll(keys)
+    private suspend fun saveData(
+        results: List<RunningContentEntity>,
+        keys: List<RunningContentRemoteKeys>
+    ) {
         runningContentDao.insertAll(results)
+        runningContentRemoteKeysDao.insertAll(keys)
     }
 
-    private fun generateRemoteKeys(result: List<RunningContentEntity>):List<RunningContentRemoteKeys> {
+    private fun generateRemoteKeys(
+        response: ApiResponse<List<RunningContentEntity>>
+    ):List<RunningContentRemoteKeys> {
         val prevKey = if (pageNumber == 1) null else pageNumber.minus(1)
-        val nextKey = if (endOfPaginationReached) null else pageNumber.plus(1)
-        return result.map {
+        val nextKey = if (response.next == null) null else pageNumber.plus(1)
+        return response.results.map {
             RunningContentRemoteKeys(
                 contentId = it.id,
                 prevKey = prevKey,

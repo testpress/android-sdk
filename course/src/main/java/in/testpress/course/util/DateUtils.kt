@@ -53,15 +53,13 @@ object DateUtils {
         return seconds
     }
 
-    fun getHumanizedDateFormat(startTimeOrEndTime: String?, context: Context): String {
-        if (startTimeOrEndTime.isNullOrEmpty()) return ""
-        val currentDate = Date()
-        val startOrEndDate = convertStringToDate(startTimeOrEndTime)
-        val millisecondDifference = getDateDifferentInMillisecond(startOrEndDate, currentDate)
-        return getStringAccordingToGivenSeconds(millisecondDifference, context)
+    fun getHumanizedDateFormatOrEmpty(startTimeOrEndTime: String?, context: Context): String {
+        val futureMills = convertDateStringToMillsOrNull(startTimeOrEndTime) ?: return ""
+        return getAbbreviatedTimeSpanOrEmpty(futureMills, context)
     }
 
-    private fun convertStringToDate(dateString: String): Date? {
+    private fun convertDateStringToMillsOrNull(dateString: String?): Long? {
+        if (dateString.isNullOrEmpty()) return null
         val regex = Regex(""".\d{6}""")
         val formattedDate = regex.replace(dateString, "")
         val simpleDateFormat = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -70,44 +68,36 @@ object DateUtils {
             SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZZ")
         }
         simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
-        val date = try {
-            formattedDate.let { simpleDateFormat.parse(it) }
+        val mills = try {
+            formattedDate.let { simpleDateFormat.parse(it) }?.time
         } catch (e: Exception) {
             null
         }
-        return date
+        return mills
     }
 
-    private fun getDateDifferentInMillisecond(date1: Date?, date2: Date?): Long? {
-        return if (date1 == null || date2 == null) {
-            return null
-        } else {
-            date1.time - date2.time
-        }
-    }
-
-    private fun getStringAccordingToGivenSeconds(millisecond: Long?, context: Context): String {
+    private fun getAbbreviatedTimeSpanOrEmpty(futureMills: Long, context: Context): String {
+        val millsDifference = futureMills - System.currentTimeMillis()
         val resource = context.resources
         return when {
-            millisecond == null -> ""
-            millisecond > CURRENT_YEAR_IN_MILLS -> {  // output -> in 1 year
-                val yearCount = (millisecond / CURRENT_YEAR_IN_MILLS).toInt()
+            millsDifference > CURRENT_YEAR_IN_MILLS -> {  // output -> in 1 year
+                val yearCount = (millsDifference / CURRENT_YEAR_IN_MILLS).toInt()
                 resource.getQuantityString(R.plurals.years, yearCount, yearCount)
             }
-            millisecond > CURRENT_MONTH_IN_MILLS -> {  // output -> in 2 months
-                val monthCount = (millisecond / CURRENT_MONTH_IN_MILLS).toInt()
+            millsDifference > CURRENT_MONTH_IN_MILLS -> {  // output -> in 2 months
+                val monthCount = (millsDifference / CURRENT_MONTH_IN_MILLS).toInt()
                 resource.getQuantityString(R.plurals.months, monthCount, monthCount)
             }
-            millisecond > DAY_IN_MILLIS -> {  // output -> in 5 days
-                val daysCount = TimeUnit.MILLISECONDS.toDays(millisecond).toInt()
+            millsDifference > DAY_IN_MILLIS -> {  // output -> in 5 days
+                val daysCount = TimeUnit.MILLISECONDS.toDays(millsDifference).toInt()
                 resource.getQuantityString(R.plurals.days, daysCount, daysCount)
             }
-            millisecond > HOUR_IN_MILLIS -> {  // output -> in 10 hours
-                val hoursCount = TimeUnit.MILLISECONDS.toHours(millisecond).toInt()
+            millsDifference > HOUR_IN_MILLIS -> {  // output -> in 10 hours
+                val hoursCount = TimeUnit.MILLISECONDS.toHours(millsDifference).toInt()
                 resource.getQuantityString(R.plurals.hours, hoursCount, hoursCount)
             }
             else -> {  // output -> in 10 minutes
-                val minutesCount = TimeUnit.MILLISECONDS.toMinutes(millisecond).toInt()
+                val minutesCount = TimeUnit.MILLISECONDS.toMinutes(millsDifference).toInt()
                 resource.getQuantityString(R.plurals.minutes, minutesCount, minutesCount)
             }
         }

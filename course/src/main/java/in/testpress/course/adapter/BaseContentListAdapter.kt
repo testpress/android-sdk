@@ -30,10 +30,8 @@ abstract class BaseContentListAdapter<T : Any>(COMPARATOR: DiffUtil.ItemCallback
         if (content != null) {
             val domainContent = content.asDomainContent()
             holder.bind(domainContent) { onItemClick(domainContent, holder.itemView.context) }
-            holder.setDateAndVisiblity(
-                getDateText(domainContent, holder.itemView.context),
-                getDateVisiblity(domainContent, holder.itemView.context)
-            )
+            holder.setDate(getDateText(domainContent, holder.itemView.context))
+            holder.setDateVisiblity(getDateVisiblity(domainContent, holder.itemView.context))
         }
     }
 
@@ -65,8 +63,11 @@ class BaseContentListViewHolder(binding: RunningUpcomingListItemBinding) :
         itemView.setOnClickListener { clickListener(content) }
     }
 
-    fun setDateAndVisiblity(dateText: String,visibility: Boolean){
+    fun setDate(dateText: String) {
         date.text = dateText
+    }
+
+    fun setDateVisiblity(visibility: Boolean) {
         ViewUtils.setGone(date, visibility)
     }
 

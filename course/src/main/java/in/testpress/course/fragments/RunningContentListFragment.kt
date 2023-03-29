@@ -100,26 +100,30 @@ class RunningContentListFragment : Fragment() {
         binding.apply {
             lifecycleScope.launchWhenCreated {
                 adapter.loadStateFlow.collect {
-                    val notLoading = it.refresh is LoadState.NotLoading
-                    val loading = it.refresh is LoadState.Loading
-                    val error = it.refresh is LoadState.Error
-                    val isItemCountZero = adapter.itemCount == 0
-
-                    shimmerViewContainer.isVisible = loading
-                    recyclerView.isVisible = (notLoading || error) && adapter.itemCount != 0
-                    showEmptyOrErrorMessage(
-                        notLoading && isItemCountZero,
-                        error && isItemCountZero
-                    )
+                    showOrHidePlaceHolder(it.refresh is LoadState.Loading)
+                    showOrHideListView(it.refresh)
+                    showEmptyOrErrorMessage(it.refresh)
                 }
             }
         }
     }
 
-    private fun showEmptyOrErrorMessage(emptyCondition: Boolean, errorCondition: Boolean) {
-        if (emptyCondition) showEmptyList()
-        if (errorCondition) showNetworkErrorMessage()
-        binding.errorContainer.isVisible = emptyCondition || errorCondition
+    private fun showOrHidePlaceHolder(loadState: Boolean){
+        binding.shimmerViewContainer.isVisible = loadState
+    }
+
+    private fun showOrHideListView(loadState: LoadState){
+        val showOrHide =
+            (loadState is LoadState.NotLoading || loadState is LoadState.Error) && (adapter.itemCount != 0)
+        binding.recyclerView.isVisible = showOrHide
+    }
+
+    private fun showEmptyOrErrorMessage(loadState: LoadState) {
+        val showEmptyMessage = (loadState is LoadState.NotLoading) && (adapter.itemCount == 0)
+        val showErrorMessage = (loadState is LoadState.Error) && (adapter.itemCount == 0)
+        if (showEmptyMessage) showEmptyList()
+        if (showErrorMessage) showNetworkErrorMessage()
+        binding.errorContainer.isVisible = showEmptyMessage || showErrorMessage
     }
 
     private fun showEmptyList() {
