@@ -1,14 +1,17 @@
 package in.testpress.samples.exam;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.MenuItem;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.TestpressExam;
+import in.testpress.exam.ui.ReportQuestionFragment;
 import in.testpress.samples.BaseNavigationDrawerActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
+import in.testpress.util.ViewUtils;
 
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
 
@@ -51,13 +54,29 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
             } else if (position == 2) {
                 TestpressExam.showCategories(this, R.id.fragment_container, session);
             } else {
-
+                launchReportQuestionFragment();
             }
         } else {
             Intent intent = new Intent(NavigationDrawerActivity.this,
                     TestpressCoreSampleActivity.class);
             startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
         }
+    }
+
+    private void launchReportQuestionFragment(){
+        ViewUtils.showInputDialogBox(NavigationDrawerActivity.this, "Enter Course ID",
+                new ViewUtils.OnInputCompletedListener() {
+                    @Override
+                    public void onInputComplete(String inputText) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("question_id",inputText);
+                        ReportQuestionFragment fragment = new ReportQuestionFragment();
+                        fragment.setArguments(bundle);
+                        NavigationDrawerActivity.this.getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container,fragment)
+                                .commitAllowingStateLoss();
+                    }
+                });
     }
 
     @Override
