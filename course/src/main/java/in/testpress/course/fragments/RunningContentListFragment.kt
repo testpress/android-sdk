@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -108,11 +109,11 @@ class RunningContentListFragment : Fragment() {
         }
     }
 
-    private fun showOrHidePlaceHolder(loadState: Boolean){
-        binding.shimmerViewContainer.isVisible = loadState
+    private fun showOrHidePlaceHolder(showOrHide: Boolean) {
+        binding.shimmerViewContainer.isVisible = showOrHide
     }
 
-    private fun showOrHideListView(loadState: LoadState){
+    private fun showOrHideListView(loadState: LoadState) {
         val showOrHide =
             (loadState is LoadState.NotLoading || loadState is LoadState.Error) && (adapter.itemCount != 0)
         binding.recyclerView.isVisible = showOrHide

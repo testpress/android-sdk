@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 class BaseListFooterAdapter(private val retry: () -> Unit) :
     LoadStateAdapter<BaseListFooterViewHolder>() {
     override fun onBindViewHolder(holder: BaseListFooterViewHolder, loadState: LoadState) {
-        holder.bind(loadState)
+        holder.updateUIForLoadState(loadState)
     }
 
     override fun onCreateViewHolder(
@@ -32,7 +32,7 @@ class BaseListFooterViewHolder(
         binding.retryButton.setOnClickListener { retry.invoke() }
     }
 
-    fun bind(loadState: LoadState) {
+    fun updateUIForLoadState(loadState: LoadState) {
         if (loadState is LoadState.Error) {
             showErrorMessage(loadState)
         }

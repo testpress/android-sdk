@@ -7,7 +7,7 @@ import `in`.testpress.database.entities.RunningContentEntity
 import android.content.Context
 import androidx.recyclerview.widget.DiffUtil
 
-class RunningContentListAdapter:BaseContentListAdapter<RunningContentEntity>(COMPARATOR){
+class RunningContentListAdapter : BaseContentListAdapter<RunningContentEntity>(COMPARATOR) {
 
     companion object {
         private val COMPARATOR =
@@ -37,9 +37,9 @@ class RunningContentListAdapter:BaseContentListAdapter<RunningContentEntity>(COM
     }
 
     override fun getDateText(content: DomainContent, context: Context):
-            String = "Ends ${DateUtils.getHumanizedDateFormatOrEmpty(content.end, context)} - "
+            String = "Ends ${DateUtils.getHumanizedTimeDifferenceOrEmpty(content.end, context)} - "
 
     override fun getDateVisiblity(content: DomainContent, context: Context):
-            Boolean = DateUtils.getHumanizedDateFormatOrEmpty(content.end, context).isEmpty()
+            Boolean = DateUtils.getHumanizedTimeDifferenceOrEmpty(content.end, context).isEmpty()
 
 }

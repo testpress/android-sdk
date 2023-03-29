@@ -29,7 +29,7 @@ abstract class BaseContentListAdapter<T : Any>(COMPARATOR: DiffUtil.ItemCallback
         val content = getItem(position)
         if (content != null) {
             val domainContent = content.asDomainContent()
-            holder.bind(domainContent) { onItemClick(domainContent, holder.itemView.context) }
+            holder.updateUi(domainContent) { onItemClick(domainContent, holder.itemView.context) }
             holder.setDate(getDateText(domainContent, holder.itemView.context))
             holder.setDateVisiblity(getDateVisiblity(domainContent, holder.itemView.context))
         }
@@ -56,7 +56,7 @@ class BaseContentListViewHolder(binding: RunningUpcomingListItemBinding) :
         date.typeface = TestpressSdk.getRubikMediumFont(binding.root.context)
     }
 
-    fun bind(content: DomainContent, clickListener: (DomainContent) -> Unit) {
+    fun updateUi(content: DomainContent, clickListener: (DomainContent) -> Unit) {
         title.text = content.title
         path.text = "${content.treePath}"
         thumbnail.setImageResource(getContentImage(content.contentType))

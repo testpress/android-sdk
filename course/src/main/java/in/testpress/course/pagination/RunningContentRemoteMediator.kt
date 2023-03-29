@@ -99,14 +99,6 @@ class RunningContentRemoteMediator(
         runningContentDao.deleteAll(courseId)
     }
 
-    private suspend fun saveData(
-        results: List<RunningContentEntity>,
-        keys: List<RunningContentRemoteKeys>
-    ) {
-        runningContentDao.insertAll(results)
-        runningContentRemoteKeysDao.insertAll(keys)
-    }
-
     private fun generateRemoteKeys(
         response: ApiResponse<List<RunningContentEntity>>
     ):List<RunningContentRemoteKeys> {
@@ -120,5 +112,13 @@ class RunningContentRemoteMediator(
                 courseId
             )
         }
+    }
+
+    private suspend fun saveData(
+        results: List<RunningContentEntity>,
+        keys: List<RunningContentRemoteKeys>
+    ) {
+        runningContentDao.insertAll(results)
+        runningContentRemoteKeysDao.insertAll(keys)
     }
 }

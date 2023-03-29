@@ -53,9 +53,32 @@ object DateUtils {
         return seconds
     }
 
-    fun getHumanizedDateFormatOrEmpty(startTimeOrEndTime: String?, context: Context): String {
+    fun getHumanizedTimeDifferenceOrEmpty(startTimeOrEndTime: String?, context: Context): String {
         val futureMills = convertDateStringToMillsOrNull(startTimeOrEndTime) ?: return ""
-        return getAbbreviatedTimeSpanOrEmpty(futureMills, context)
+        val timeDifferenceInMills = futureMills - System.currentTimeMillis()
+        val resource = context.resources
+        return when {
+            timeDifferenceInMills > CURRENT_YEAR_IN_MILLS -> {  // output -> in 1 year
+                val yearCount = (timeDifferenceInMills / CURRENT_YEAR_IN_MILLS).toInt()
+                resource.getQuantityString(R.plurals.years, yearCount, yearCount)
+            }
+            timeDifferenceInMills > CURRENT_MONTH_IN_MILLS -> {  // output -> in 2 months
+                val monthCount = (timeDifferenceInMills / CURRENT_MONTH_IN_MILLS).toInt()
+                resource.getQuantityString(R.plurals.months, monthCount, monthCount)
+            }
+            timeDifferenceInMills > DAY_IN_MILLIS -> {  // output -> in 5 days
+                val daysCount = TimeUnit.MILLISECONDS.toDays(timeDifferenceInMills).toInt()
+                resource.getQuantityString(R.plurals.days, daysCount, daysCount)
+            }
+            timeDifferenceInMills > HOUR_IN_MILLIS -> {  // output -> in 10 hours
+                val hoursCount = TimeUnit.MILLISECONDS.toHours(timeDifferenceInMills).toInt()
+                resource.getQuantityString(R.plurals.hours, hoursCount, hoursCount)
+            }
+            else -> {  // output -> in 10 minutes
+                val minutesCount = TimeUnit.MILLISECONDS.toMinutes(timeDifferenceInMills).toInt()
+                resource.getQuantityString(R.plurals.minutes, minutesCount, minutesCount)
+            }
+        }
     }
 
     private fun convertDateStringToMillsOrNull(dateString: String?): Long? {
@@ -74,32 +97,5 @@ object DateUtils {
             null
         }
         return mills
-    }
-
-    private fun getAbbreviatedTimeSpanOrEmpty(futureMills: Long, context: Context): String {
-        val millsDifference = futureMills - System.currentTimeMillis()
-        val resource = context.resources
-        return when {
-            millsDifference > CURRENT_YEAR_IN_MILLS -> {  // output -> in 1 year
-                val yearCount = (millsDifference / CURRENT_YEAR_IN_MILLS).toInt()
-                resource.getQuantityString(R.plurals.years, yearCount, yearCount)
-            }
-            millsDifference > CURRENT_MONTH_IN_MILLS -> {  // output -> in 2 months
-                val monthCount = (millsDifference / CURRENT_MONTH_IN_MILLS).toInt()
-                resource.getQuantityString(R.plurals.months, monthCount, monthCount)
-            }
-            millsDifference > DAY_IN_MILLIS -> {  // output -> in 5 days
-                val daysCount = TimeUnit.MILLISECONDS.toDays(millsDifference).toInt()
-                resource.getQuantityString(R.plurals.days, daysCount, daysCount)
-            }
-            millsDifference > HOUR_IN_MILLIS -> {  // output -> in 10 hours
-                val hoursCount = TimeUnit.MILLISECONDS.toHours(millsDifference).toInt()
-                resource.getQuantityString(R.plurals.hours, hoursCount, hoursCount)
-            }
-            else -> {  // output -> in 10 minutes
-                val minutesCount = TimeUnit.MILLISECONDS.toMinutes(millsDifference).toInt()
-                resource.getQuantityString(R.plurals.minutes, minutesCount, minutesCount)
-            }
-        }
     }
 }
