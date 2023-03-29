@@ -1,6 +1,5 @@
 package `in`.testpress.course.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
@@ -11,9 +10,11 @@ import `in`.testpress.course.R
 import `in`.testpress.course.databinding.RunningUpcomingListItemBinding
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.asDomainContent
+import `in`.testpress.course.ui.ContentActivity
+import `in`.testpress.course.util.DateUtils
 import `in`.testpress.util.ViewUtils
 
-abstract class BaseContentListAdapter<T : Any>(COMPARATOR: DiffUtil.ItemCallback<T>):
+class BaseContentListAdapter<T : Any>(COMPARATOR: DiffUtil.ItemCallback<T>):
     PagingDataAdapter<T, BaseContentListViewHolder>(COMPARATOR){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseContentListViewHolder {
@@ -22,28 +23,19 @@ abstract class BaseContentListAdapter<T : Any>(COMPARATOR: DiffUtil.ItemCallback
             parent,
             false
         )
-        return BaseContentListViewHolder(binding)
+        return RunningContentListViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: BaseContentListViewHolder, position: Int) {
         val content = getItem(position)
         if (content != null) {
             val domainContent = content.asDomainContent()
-            holder.updateUi(domainContent) { onItemClick(domainContent, holder.itemView.context) }
-            holder.setDate(getDateText(domainContent, holder.itemView.context))
-            holder.setDateVisiblity(getDateVisiblity(domainContent, holder.itemView.context))
+            holder.bind(domainContent)
         }
     }
-
-    abstract fun onItemClick(content: DomainContent, context: Context)
-
-    abstract fun getDateText(content: DomainContent, context: Context):String
-
-    abstract fun getDateVisiblity(content: DomainContent, context: Context):Boolean
-
 }
 
-class BaseContentListViewHolder(binding: RunningUpcomingListItemBinding) :
+abstract class BaseContentListViewHolder(binding: RunningUpcomingListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
     private val title = binding.title
     private val path = binding.path
@@ -56,20 +48,20 @@ class BaseContentListViewHolder(binding: RunningUpcomingListItemBinding) :
         date.typeface = TestpressSdk.getRubikMediumFont(binding.root.context)
     }
 
-    fun updateUi(content: DomainContent, clickListener: (DomainContent) -> Unit) {
+    fun bind(content: DomainContent) {
         title.text = content.title
         path.text = "${content.treePath}"
         thumbnail.setImageResource(getContentImage(content.contentType))
-        itemView.setOnClickListener { clickListener(content) }
+        setDate(content)
+        setDateVisiblity(content)
+        onItemClick(content)
     }
 
-    fun setDate(dateText: String) {
-        date.text = dateText
-    }
+    abstract fun setDate(content: DomainContent)
 
-    fun setDateVisiblity(visibility: Boolean) {
-        ViewUtils.setGone(date, visibility)
-    }
+    abstract fun setDateVisiblity(content: DomainContent)
+
+    abstract fun onItemClick(content: DomainContent)
 
     private fun getContentImage(contentType: String?): Int {
         return when (contentType) {
@@ -79,6 +71,30 @@ class BaseContentListViewHolder(binding: RunningUpcomingListItemBinding) :
             "VideoConference" -> R.drawable.testpress_live_conference_icon
             "Exam" -> R.drawable.testpress_exam_icon
             else -> R.drawable.testpress_exam_icon
+        }
+    }
+}
+
+class RunningContentListViewHolder(val binding: RunningUpcomingListItemBinding):BaseContentListViewHolder(binding){
+
+    override fun setDate(content: DomainContent) {
+        binding.date.text = "Ends ${DateUtils.getRelativeTimeString(content.end, binding.root.context)} - "
+    }
+
+    override fun setDateVisiblity(content: DomainContent) {
+        val visibility = DateUtils.getRelativeTimeString(content.end, binding.root.context).isEmpty()
+        ViewUtils.setGone(binding.date, visibility)
+    }
+
+    override fun onItemClick(content: DomainContent) {
+        itemView.setOnClickListener {
+            binding.root.context.startActivity(
+                ContentActivity.createIntent(
+                    content.id,
+                    binding.root.context,
+                    ""
+                )
+            )
         }
     }
 }

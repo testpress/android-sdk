@@ -3,7 +3,6 @@ package `in`.testpress.course.fragments
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.adapter.BaseListFooterAdapter
-import `in`.testpress.course.adapter.RunningContentListAdapter
 import `in`.testpress.course.databinding.BaseContentListLayoutBinding
 import `in`.testpress.course.repository.RunningContentsRepository
 import `in`.testpress.course.viewmodels.RunningContentsListViewModel
@@ -16,17 +15,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import `in`.testpress.course.adapter.BaseContentListAdapter
+import `in`.testpress.database.entities.RunningContentEntity
 import kotlinx.coroutines.flow.collect
 
 class RunningContentListFragment : Fragment() {
 
     private var courseId: Long = -1
     private lateinit var binding: BaseContentListLayoutBinding
-    private lateinit var adapter: RunningContentListAdapter
+    private lateinit var adapter: BaseContentListAdapter<RunningContentEntity>
     private lateinit var viewModel: RunningContentsListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,8 +82,8 @@ class RunningContentListFragment : Fragment() {
         )
     }
 
-    private fun getAdapter(): RunningContentListAdapter {
-        adapter = RunningContentListAdapter()
+    private fun getAdapter(): BaseContentListAdapter<RunningContentEntity> {
+        adapter = BaseContentListAdapter(COMPARATOR)
         lifecycleScope.launchWhenCreated {
             viewModel.runningContentList.collect {
                 adapter.submitData(it)
@@ -155,4 +156,22 @@ class RunningContentListFragment : Fragment() {
             retryButton.isVisible = true
         }
     }
+
+    companion object {
+        private val COMPARATOR =
+            object : DiffUtil.ItemCallback<RunningContentEntity>() {
+                override fun areContentsTheSame(
+                    oldItem: RunningContentEntity,
+                    newItem: RunningContentEntity
+                ): Boolean =
+                    oldItem == newItem
+
+                override fun areItemsTheSame(
+                    oldItem: RunningContentEntity,
+                    newItem: RunningContentEntity
+                ): Boolean =
+                    oldItem.id == newItem.id
+            }
+    }
+
 }

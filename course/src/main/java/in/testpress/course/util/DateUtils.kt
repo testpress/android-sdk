@@ -53,8 +53,8 @@ object DateUtils {
         return seconds
     }
 
-    fun getHumanizedTimeDifferenceOrEmpty(startTimeOrEndTime: String?, context: Context): String {
-        val futureMills = convertDateStringToMillsOrNull(startTimeOrEndTime) ?: return ""
+    fun getRelativeTimeString(startTimeOrEndTime: String?, context: Context): String {
+        val futureMills = convertDateStringToMills(startTimeOrEndTime) ?: return ""
         val timeDifferenceInMills = futureMills - System.currentTimeMillis()
         val resource = context.resources
         return when {
@@ -81,7 +81,7 @@ object DateUtils {
         }
     }
 
-    private fun convertDateStringToMillsOrNull(dateString: String?): Long? {
+    private fun convertDateStringToMills(dateString: String?): Long? {
         if (dateString.isNullOrEmpty()) return null
         val regex = Regex(""".\d{6}""")
         val formattedDate = regex.replace(dateString, "")
