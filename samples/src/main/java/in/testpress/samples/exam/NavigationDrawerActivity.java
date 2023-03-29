@@ -28,6 +28,9 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
             case R.id.exams_categories:
                 showSDK(2);
                 break;
+            case R.id.report_question:
+                showSDK(3);
+                break;
         }
         super.onDrawerItemSelected(menuItem);
     }
@@ -45,8 +48,10 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
             TestpressSdk.setTestpressSession(this, session);
             if (position == 1) {
                 TestpressExam.show(this, R.id.fragment_container, session);
-            } else {
+            } else if (position == 2) {
                 TestpressExam.showCategories(this, R.id.fragment_container, session);
+            } else {
+
             }
         } else {
             Intent intent = new Intent(NavigationDrawerActivity.this,
