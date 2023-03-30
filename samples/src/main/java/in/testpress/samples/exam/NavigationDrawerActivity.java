@@ -63,18 +63,17 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
         }
     }
 
-    private void launchReportQuestionFragment(){
+    private void launchReportQuestionFragment() {
         ViewUtils.showInputDialogBox(NavigationDrawerActivity.this, "Enter Course ID",
                 new ViewUtils.OnInputCompletedListener() {
                     @Override
                     public void onInputComplete(String inputText) {
-                        Bundle bundle = new Bundle();
-                        bundle.putString("question_id",inputText);
-                        ReportQuestionFragment fragment = new ReportQuestionFragment();
-                        fragment.setArguments(bundle);
-                        NavigationDrawerActivity.this.getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.fragment_container,fragment)
-                                .commitAllowingStateLoss();
+                        ReportQuestionFragment.Companion.show(
+                                NavigationDrawerActivity.this,
+                                R.id.fragment_container,
+                                inputText,
+                                "787"
+                        );
                     }
                 });
     }

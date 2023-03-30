@@ -3,31 +3,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_horizontal"
     tools:ignore="MissingDefaultResource">
+
+    <ProgressBar
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:id="@+id/pb_loading"
+        android:indeterminate="true"
+        android:layout_centerInParent="true" />
 
     <LinearLayout
         android:id="@+id/resolved_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:gravity="center"
+        android:padding="16dp"
         android:orientation="vertical"
         android:visibility="gone">
 
         <ImageView
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:background="#50ff0000" />
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/round_do_not_disturb_alt_24" />
 
         <TextView
+            android:id="@+id/resolver_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:padding="16dp"
-            android:text="This question has already been analysed and was found to be correct."
+            android:text="This question has already been analyzed and was found to be correct."
             android:textAlignment="center"
-            android:textColor="#000000"
-            android:textSize="16sp" />
+            android:textColor="#000000" />
 
 
     </LinearLayout>
@@ -40,76 +47,94 @@
         android:visibility="gone"
         android:padding="16dp">
 
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:focusable="true"
+            android:layout_gravity="center"
+            android:src="@drawable/round_check_24" />
+
         <TextView
+            android:id="@+id/report_sucessfully_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Reported Sucessfully"
+            android:layout_marginTop="32dp"
+            android:layout_gravity="center"
+            android:padding="8dp"
             android:textColor="@android:color/black"
-            android:textSize="28sp"
+            android:textSize="20sp"
             android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/reported_reason"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
+            android:padding="8dp"
+            android:layout_marginTop="16dp"
             android:text="Reason: %s"
-            android:textColor="@android:color/black"
-            android:textSize="16sp" />
+            android:textColor="@android:color/black" />
 
         <TextView
             android:id="@+id/reported_discription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
+            android:padding="8dp"
             android:text="Discription: %s"
-            android:textColor="@android:color/black"
-            android:textSize="16sp" />
+            android:textColor="@android:color/black" />
 
         <TextView
             android:id="@+id/reported_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
+            android:padding="8dp"
             android:text="Time: %s"
-            android:textColor="@android:color/black"
-            android:textSize="16sp" />
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/thankyou_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_marginTop="32dp"
+            android:layout_gravity="center"
+            android:text="Thank you for the submission"
+            android:textColor="@android:color/black" />
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/report_question_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone"
         android:padding="16dp">
 
         <TextView
+            android:id="@+id/report_question_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Report Question"
+            android:padding="8dp"
             android:textColor="@android:color/black"
-            android:textSize="28sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/report_question_title_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:padding="8dp"
             android:text="Why are you reporting this question?"
             android:textColor="@android:color/black"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <RadioGroup
-            android:id="@+id/radio_button"
+            android:id="@+id/radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:orientation="vertical">
 
             <RadioButton
@@ -117,6 +142,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Error in Question"
+                android:layout_marginTop="4dp"
                 android:theme="@style/ReportQuestionRadioButton" />
 
             <RadioButton
@@ -124,6 +150,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Incorrect Solution"
+                android:layout_marginTop="4dp"
                 android:theme="@style/ReportQuestionRadioButton" />
 
             <RadioButton
@@ -131,6 +158,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="No Solution"
+                android:layout_marginTop="4dp"
                 android:theme="@style/ReportQuestionRadioButton" />
 
             <RadioButton
@@ -138,6 +166,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Incomplete Solution"
+                android:layout_marginTop="4dp"
                 android:theme="@style/ReportQuestionRadioButton" />
 
             <RadioButton
@@ -145,12 +174,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Others"
+                android:layout_marginTop="4dp"
                 android:theme="@style/ReportQuestionRadioButton" />
 
         </RadioGroup>
 
+        <TextView
+            android:id="@+id/radio_button_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Please choose one of the options above."
+            android:textColor="#d9534f"
+            android:visibility="gone" />
+
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/report_reason_input"
+            android:id="@+id/discription_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -169,12 +208,53 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:background="@drawable/testpress_primary_color_stroke"
+            android:background="@color/testpress_color_primary"
             android:gravity="center"
             android:padding="8dp"
             android:text="Submit"
-            android:textColor="@color/testpress_color_primary"
-            android:textSize="16sp" />
+            android:textColor="@color/testpress_white" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/error_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/error_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:drawablePadding="3dp"
+            android:text="Network Error"
+            android:textColor="@color/testpress_black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/error_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingLeft="15dp"
+            android:paddingTop="5dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="15dp"
+            android:text="@string/testpress_no_internet_try_again"
+            android:textColor="@color/testpress_black"
+            android:textSize="14sp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/retry_button"
+            style="@style/TestpressSmallButton"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/testpress_tap_to_retry"
+            android:textSize="12sp" />
 
     </LinearLayout>
 

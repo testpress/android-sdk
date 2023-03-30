@@ -151,8 +151,9 @@ public interface ExamService {
             @Path(value = "question_id",encoded = true) String questionId);
 
     @POST(REPORT_QUESTION+"{question_id}"+REPORTEES)
-    RetrofitCall<ReportQuestionResponse> postReportQuestion(
-            @Path(value = "question_id",encoded = true) String questionId);
+    RetrofitCall<ReportQuestionResponse.ReportQuestion> postReportQuestion(
+            @Path(value = "question_id",encoded = true) String questionId,
+            @Body HashMap<String, Object> params);
 
 }
 
