@@ -6,19 +6,19 @@
     tools:ignore="MissingDefaultResource">
 
     <ProgressBar
+        android:id="@+id/pb_loading"
         android:layout_width="45dp"
         android:layout_height="45dp"
-        android:id="@+id/pb_loading"
-        android:indeterminate="true"
-        android:layout_centerInParent="true" />
+        android:layout_centerInParent="true"
+        android:indeterminate="true" />
 
     <LinearLayout
-        android:id="@+id/resolved_container"
+        android:id="@+id/resolved_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:padding="16dp"
         android:orientation="vertical"
+        android:padding="16dp"
         android:visibility="gone">
 
         <ImageView
@@ -40,47 +40,47 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/already_repoted_question_container"
+        android:id="@+id/sucess_message_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:visibility="gone">
 
         <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:focusable="true"
             android:layout_gravity="center"
+            android:focusable="true"
             android:src="@drawable/round_check_24" />
 
         <TextView
             android:id="@+id/report_sucessfully_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Reported Sucessfully"
-            android:layout_marginTop="32dp"
             android:layout_gravity="center"
+            android:layout_marginTop="32dp"
             android:padding="8dp"
+            android:text="Reported Sucessfully"
             android:textColor="@android:color/black"
             android:textSize="20sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/reported_reason"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
             android:layout_marginTop="16dp"
+            android:padding="8dp"
             android:text="Reason: %s"
             android:textColor="@android:color/black" />
 
         <TextView
-            android:id="@+id/reported_discription"
+            android:id="@+id/reported_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:text="Discription: %s"
+            android:text="Description: %s"
             android:textColor="@android:color/black" />
 
         <TextView
@@ -95,28 +95,28 @@
             android:id="@+id/thankyou_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:layout_marginTop="32dp"
             android:layout_gravity="center"
+            android:layout_marginTop="32dp"
+            android:padding="8dp"
             android:text="Thank you for the submission"
             android:textColor="@android:color/black" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/report_question_container"
+        android:id="@+id/report_question_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/report_question_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Report Question"
             android:padding="8dp"
+            android:text="Report Question"
             android:textColor="@android:color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -141,40 +141,40 @@
                 android:id="@+id/error_in_question"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Error in Question"
                 android:layout_marginTop="4dp"
+                android:text="Error in Question"
                 android:theme="@style/ReportQuestionRadioButton" />
 
             <RadioButton
                 android:id="@+id/incorrect_solution"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Incorrect Solution"
                 android:layout_marginTop="4dp"
+                android:text="Incorrect Solution"
                 android:theme="@style/ReportQuestionRadioButton" />
 
             <RadioButton
                 android:id="@+id/no_solution"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="No Solution"
                 android:layout_marginTop="4dp"
+                android:text="No Solution"
                 android:theme="@style/ReportQuestionRadioButton" />
 
             <RadioButton
                 android:id="@+id/incomplete_solution"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Incomplete Solution"
                 android:layout_marginTop="4dp"
+                android:text="Incomplete Solution"
                 android:theme="@style/ReportQuestionRadioButton" />
 
             <RadioButton
                 android:id="@+id/others"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Others"
                 android:layout_marginTop="4dp"
+                android:text="Others"
                 android:theme="@style/ReportQuestionRadioButton" />
 
         </RadioGroup>
@@ -194,10 +194,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@drawable/rounded_border_edittext"
+            android:gravity="top"
             android:hint="Describe your concern (optional)"
             android:imeOptions="actionDone"
             android:inputType="textMultiLine"
-            android:gravity="top"
             android:lines="4"
             android:padding="16dp"
             android:textColor="@color/testpress_black"
@@ -217,7 +217,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/error_container"
+        android:id="@+id/error_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_vertical"

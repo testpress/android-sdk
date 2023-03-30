@@ -43,8 +43,8 @@ class ReportQuestionFragment : Fragment() {
     }
 
     private fun parseArguments() {
-        questionId = arguments?.getString("question_id") ?: ""
-        examId = arguments?.getString("exam_id") ?: ""
+        questionId = arguments?.getString("question_id")!!
+        examId = arguments?.getString("exam_id")!!
     }
 
     private fun initializeViewModel() {
@@ -74,7 +74,7 @@ class ReportQuestionFragment : Fragment() {
         assignCustomFontToText()
     }
 
-    private fun initializeClickListener(){
+    private fun initializeClickListener() {
         binding.submitButton.setOnClickListener {
             submit()
         }
@@ -86,7 +86,7 @@ class ReportQuestionFragment : Fragment() {
         }
     }
 
-    private fun submit(){
+    private fun submit() {
         if (position == -1) {
             binding.radioButtonError.isVisible = true
             return
@@ -96,19 +96,20 @@ class ReportQuestionFragment : Fragment() {
             examId,
             (++position).toString()
         )
+        hideReportQuestionPage()
     }
 
-    private fun retry(){
+    private fun retry() {
         viewModel.retry()
-        binding.errorContainer.isVisible = false
+        binding.errorLayout.isVisible = false
         showOrHideLoading(true)
     }
 
-    private fun onChange(checkedId: Int){
+    private fun onChange(checkedId: Int) {
         position = binding.radioGroup.indexOfChild(view?.findViewById<RadioButton>(checkedId))
     }
 
-    private fun initializeViewModelObserves(){
+    private fun initializeViewModelObserves() {
         viewModel.reportQuestion.observe(this) { resource ->
             when (resource.status) {
                 Status.LOADING -> {
@@ -137,8 +138,7 @@ class ReportQuestionFragment : Fragment() {
                 Status.SUCCESS -> {
                     showOrHideLoading(false)
                     if (resource.data != null) {
-                        showAlreadyReportQuestionContainer(resource.data!!)
-                        hideOtherContainer()
+                        showSucessMessage(resource.data!!)
                     } else {
                         showNetworkErrorMessage(false)
                     }
@@ -165,7 +165,7 @@ class ReportQuestionFragment : Fragment() {
             //Others
             it.reportQuestionTitle2.typeface =
                 TestpressSdk.getRubikRegularFont(binding.root.context)
-            it.reportedDiscription.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
+            it.reportedDescription.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
             it.reportedReason.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
             it.reportedTime.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
             it.thankyouText.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
@@ -174,38 +174,44 @@ class ReportQuestionFragment : Fragment() {
         }
     }
 
-    private fun showOrHideLoading(show: Boolean){
+    private fun showOrHideLoading(show: Boolean) {
         binding.pbLoading.isVisible = show
     }
 
     private fun validateContainer(result: ReportQuestionResponse) {
-        if (result.is_report_resolved == true) {
-            showQuestionResolvedContainer()
+        if (result.isReportResolved == true) {
+            showReportResolvedPage()
             return
         }
         if (!result.results.isNullOrEmpty()) {
-            showAlreadyReportQuestionContainer(result.results[0])
+            showSucessMessage(result.results[0])
             return
         }
-        showReportQuestionContainer()
+        showReportQuestionPage()
     }
 
-    private fun showReportQuestionContainer() {
-        binding.reportQuestionContainer.visibility = View.VISIBLE
+    private fun showReportQuestionPage() {
+        binding.reportQuestionLayout.visibility = View.VISIBLE
     }
 
-    private fun showAlreadyReportQuestionContainer(result: ReportQuestionResponse.ReportQuestion) {
-        binding.reportedReason.text = "Reason: %s".format(result.type_display)
-        binding.reportedTime.text = "Time: %s".format(result.getFormattedDate(requireContext())?:"NA")
-        binding.reportedDiscription.text = "Discription: %s".format(result.getFormattedDescription().ifEmpty { "NA" })
-        binding.alreadyRepotedQuestionContainer.visibility = View.VISIBLE
+    private fun showSucessMessage(result: ReportQuestionResponse.ReportQuestion) {
+        binding.reportedReason.text = "Reason: %s".format(result.typeDisplay)
+        binding.reportedTime.text =
+            "Time: %s".format(result.getFormattedDate(requireContext()) ?: "NA")
+        binding.reportedDescription.text =
+            "Description: %s".format(result.getFormattedDescription().ifEmpty { "NA" })
+        binding.sucessMessageLayout.visibility = View.VISIBLE
     }
 
-    private fun showQuestionResolvedContainer() {
-        binding.resolvedContainer.visibility = View.VISIBLE
+    private fun hideReportQuestionPage() {
+        binding.sucessMessageLayout.isVisible = true
     }
 
-    private fun showNetworkErrorMessage(showRetryButton:Boolean) {
+    private fun showReportResolvedPage() {
+        binding.resolvedLayout.visibility = View.VISIBLE
+    }
+
+    private fun showNetworkErrorMessage(showRetryButton: Boolean) {
         binding.apply {
             errorTitle.setCompoundDrawablesWithIntrinsicBounds(
                 R.drawable.ic_error_outline_black_18dp,
@@ -213,14 +219,8 @@ class ReportQuestionFragment : Fragment() {
                 0,
                 0
             )
-            errorContainer.isVisible = showRetryButton
+            errorLayout.isVisible = showRetryButton
         }
-    }
-
-    private fun hideOtherContainer(){
-        binding.resolvedContainer.isVisible = false
-        binding.reportQuestionContainer.isVisible = false
-        binding.errorContainer.isVisible = false
     }
 
     companion object {

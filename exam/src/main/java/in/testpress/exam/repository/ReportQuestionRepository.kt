@@ -20,10 +20,6 @@ class ReportQuestionRepository(private val apiClient: TestpressExamApiClient) {
     val submitReport: LiveData<Resource<ReportQuestionResponse.ReportQuestion>>
         get() = _submitReport
 
-    init {
-        _reportQuestion.postValue(Resource.loading(null))
-    }
-
     fun getReportQuestion(questionId: String) {
         apiClient.getReportQuestionResponse(questionId)
             .enqueue(object : TestpressCallback<ReportQuestionResponse>() {

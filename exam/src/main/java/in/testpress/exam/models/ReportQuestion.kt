@@ -11,17 +11,17 @@ data class ReportQuestionResponse(
     val count: Int,
     val next: String?,
     val previous: String?,
-    val per_page: Int?,
+    val perPage: Int?,
     val results: List<ReportQuestion>?,
-    val is_report_resolved: Boolean?
+    val isReportResolved: Boolean?
 ) {
     inner class ReportQuestion(
         val id: Int?,
         val user: User?,
         val description: String?,
         val type: Int?,
-        val type_display: String?,
-        val exam_id: Int?,
+        val typeDisplay: String?,
+        val examId: Int?,
         val created: String?
     ) {
         fun getFormattedDescription():String{
