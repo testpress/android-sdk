@@ -35,7 +35,7 @@ class BaseContentListAdapter<T : Any>(COMPARATOR: DiffUtil.ItemCallback<T>):
     }
 }
 
-abstract class BaseContentListViewHolder(binding: RunningUpcomingListItemBinding) :
+open class BaseContentListViewHolder(binding: RunningUpcomingListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
     private val title = binding.title
     private val path = binding.path
@@ -50,7 +50,6 @@ abstract class BaseContentListViewHolder(binding: RunningUpcomingListItemBinding
 
     open fun bind(content: DomainContent) {
         showContentDetails(content)
-        onItemClick(content)
     }
 
     private fun showContentDetails(content: DomainContent){
@@ -58,8 +57,6 @@ abstract class BaseContentListViewHolder(binding: RunningUpcomingListItemBinding
         path.text = "${content.treePath}"
         thumbnail.setImageResource(getContentImage(content.contentType))
     }
-
-    abstract fun onItemClick(content: DomainContent)
 
     private fun getContentImage(contentType: String?): Int {
         return when (contentType) {
@@ -77,8 +74,9 @@ class RunningContentListViewHolder(val binding: RunningUpcomingListItemBinding):
 
     override fun bind(content: DomainContent) {
         super.bind(content)
-        setDateVisiblity(content)
         setDate(content)
+        setDateVisiblity(content)
+        onItemClick(content)
     }
 
     private fun setDate(content: DomainContent) {
@@ -90,7 +88,7 @@ class RunningContentListViewHolder(val binding: RunningUpcomingListItemBinding):
         ViewUtils.setGone(binding.date, visibility)
     }
 
-    override fun onItemClick(content: DomainContent) {
+    private fun onItemClick(content: DomainContent) {
         itemView.setOnClickListener {
             binding.root.context.startActivity(
                 ContentActivity.createIntent(

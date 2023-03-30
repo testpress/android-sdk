@@ -41,7 +41,6 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:visibility="gone"
                 android:text="Ends in 5 days - "
                 android:textAppearance="?attr/textAppearanceCaption" />
 
