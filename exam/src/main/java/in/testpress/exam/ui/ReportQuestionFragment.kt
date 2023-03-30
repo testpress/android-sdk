@@ -76,23 +76,36 @@ class ReportQuestionFragment : Fragment() {
 
     private fun initializeClickListener(){
         binding.submitButton.setOnClickListener {
-            if (position == -1) {
-                binding.radioButtonError.isVisible = true
-                return@setOnClickListener
-            }
-            viewModel.submitReportQuestion(
-                binding.discriptionInput.text.toString(),
-                examId,
-                (++position).toString()
-            )
+            submit()
         }
         binding.retryButton.setOnClickListener {
-            viewModel.retry()
-            binding.errorContainer.isVisible = false
+            retry()
         }
         binding.radioGroup.setOnCheckedChangeListener { group, checkedId ->
-            position = binding.radioGroup.indexOfChild(view?.findViewById<RadioButton>(checkedId))
+            onChange(checkedId)
         }
+    }
+
+    private fun submit(){
+        if (position == -1) {
+            binding.radioButtonError.isVisible = true
+            return
+        }
+        viewModel.submitReportQuestion(
+            binding.discriptionInput.text.toString(),
+            examId,
+            (++position).toString()
+        )
+    }
+
+    private fun retry(){
+        viewModel.retry()
+        binding.errorContainer.isVisible = false
+        showOrHideLoading(true)
+    }
+
+    private fun onChange(checkedId: Int){
+        position = binding.radioGroup.indexOfChild(view?.findViewById<RadioButton>(checkedId))
     }
 
     private fun initializeViewModelObserves(){
@@ -179,7 +192,6 @@ class ReportQuestionFragment : Fragment() {
 
     private fun showReportQuestionContainer() {
         binding.reportQuestionContainer.visibility = View.VISIBLE
-
     }
 
     private fun showAlreadyReportQuestionContainer(result: ReportQuestionResponse.ReportQuestion) {
