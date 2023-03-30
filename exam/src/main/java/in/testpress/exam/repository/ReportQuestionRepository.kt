@@ -10,10 +10,10 @@ import `in`.testpress.network.Resource
 
 class ReportQuestionRepository(private val apiClient: TestpressExamApiClient) {
 
-    private var _reportQuestions: MutableLiveData<Resource<ReportQuestionResponse>> =
+    private var _questionReport: MutableLiveData<Resource<ReportQuestionResponse>> =
         MutableLiveData()
-    val reportQuestions: LiveData<Resource<ReportQuestionResponse>>
-        get() = _reportQuestions
+    val questionReport: LiveData<Resource<ReportQuestionResponse>>
+        get() = _questionReport
 
     private var _submitReport: MutableLiveData<Resource<ReportQuestionResponse.ReportQuestion>> =
         MutableLiveData()
@@ -21,14 +21,14 @@ class ReportQuestionRepository(private val apiClient: TestpressExamApiClient) {
         get() = _submitReport
 
     fun getReportQuestions(questionId: String) {
-        apiClient.getReportQuestions(questionId)
+        apiClient.getQuestionReport(questionId)
             .enqueue(object : TestpressCallback<ReportQuestionResponse>() {
                 override fun onSuccess(result: ReportQuestionResponse) {
-                    _reportQuestions.postValue(Resource.success(result))
+                    _questionReport.postValue(Resource.success(result))
                 }
 
                 override fun onException(exception: TestpressException) {
-                    _reportQuestions.postValue(Resource.error(exception, null))
+                    _questionReport.postValue(Resource.error(exception, null))
                 }
 
             })
@@ -36,7 +36,7 @@ class ReportQuestionRepository(private val apiClient: TestpressExamApiClient) {
 
     fun submitReportQuestion(questionId: String, params: HashMap<String, Any>) {
         _submitReport.postValue(Resource.loading(null))
-        apiClient.postReportQuestion(questionId, params)
+        apiClient.reportQuestion(questionId, params)
             .enqueue(object : TestpressCallback<ReportQuestionResponse.ReportQuestion>() {
                 override fun onSuccess(result: ReportQuestionResponse.ReportQuestion) {
                     _submitReport.postValue(Resource.success(result))

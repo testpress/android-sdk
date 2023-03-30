@@ -110,7 +110,7 @@ class ReportQuestionFragment : Fragment() {
     }
 
     private fun initializeViewModelObserves() {
-        viewModel.reportQuestions.observe(this) { resource ->
+        viewModel.questionReport.observe(this) { resource ->
             when (resource.status) {
                 Status.LOADING -> {
                     showOrHideLoading(true)
@@ -191,7 +191,7 @@ class ReportQuestionFragment : Fragment() {
     }
 
     private fun showReportQuestionPage() {
-        binding.reportQuestionLayout.visibility = View.VISIBLE
+        binding.reportQuestionLayout.isVisible = true
     }
 
     private fun showSucessMessage(result: ReportQuestionResponse.ReportQuestion) {
@@ -204,7 +204,7 @@ class ReportQuestionFragment : Fragment() {
     }
 
     private fun hideReportQuestionPage() {
-        binding.sucessMessageLayout.isVisible = true
+        binding.reportQuestionLayout.isVisible = false
     }
 
     private fun showReportResolvedPage() {

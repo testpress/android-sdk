@@ -284,11 +284,11 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getExamService().getLanguages(examSlug);
     }
 
-    public RetrofitCall<ReportQuestionResponse> getReportQuestions(String questionId) {
-        return getExamService().getReportQuestions(questionId);
+    public RetrofitCall<ReportQuestionResponse> getQuestionReport(String questionId) {
+        return getExamService().getQuestionReport(questionId);
     }
 
-    public RetrofitCall<ReportQuestionResponse.ReportQuestion> postReportQuestion(String questionId,HashMap<String, Object> params) {
-        return getExamService().createReportQuestion(questionId,params);
+    public RetrofitCall<ReportQuestionResponse.ReportQuestion> reportQuestion(String questionId,HashMap<String, Object> params) {
+        return getExamService().reportQuestion(questionId,params);
     }
 }
