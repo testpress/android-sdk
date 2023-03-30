@@ -21,6 +21,8 @@ import `in`.testpress.exam.R
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.databinding.ReportQuestionFragmentBinding
 import `in`.testpress.exam.models.ReportQuestionResponse
+import `in`.testpress.exam.repository.ReportQuestionRepository
+import `in`.testpress.exam.ui.viewmodel.ReportQuestionViewModel
 import `in`.testpress.network.Resource
 
 class ReportQuestionFragment : Fragment() {
@@ -67,45 +69,49 @@ class ReportQuestionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initializeClickListener()
+        initializeViewModelObserves()
+        assignCustomFontToText()
+    }
 
-        binding.also {
-            //Title
-            it.reportSucessfullyTitle.typeface =
-                TestpressSdk.getRubikMediumFont(binding.root.context)
-            it.reportQuestionTitle.typeface = TestpressSdk.getRubikMediumFont(binding.root.context)
-            it.reportQuestionTitle2.typeface =
-                TestpressSdk.getRubikRegularFont(binding.root.context)
-            // Radio button
-            it.errorInQuestion.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
-            it.incompleteSolution.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
-            it.incorrectSolution.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
-            it.noSolution.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
-            it.others.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
-
-            //Others
-            it.reportedDiscription.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
-            it.reportedReason.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
-            it.reportedTime.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
-            it.thankyouText.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
-            it.submitButton.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
-            it.resolverText.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
+    private fun initializeClickListener(){
+        binding.submitButton.setOnClickListener {
+            if (position == -1) {
+                binding.radioButtonError.isVisible = true
+                return@setOnClickListener
+            }
+            viewModel.submitReportQuestion(
+                binding.discriptionInput.text.toString(),
+                examId,
+                (++position).toString()
+            )
         }
+        binding.retryButton.setOnClickListener {
+            viewModel.retry()
+            binding.errorContainer.isVisible = false
+        }
+        binding.radioGroup.setOnCheckedChangeListener { group, checkedId ->
+            position = binding.radioGroup.indexOfChild(view?.findViewById<RadioButton>(checkedId))
+        }
+    }
 
+    private fun initializeViewModelObserves(){
         viewModel.reportQuestion.observe(this) { resource ->
             when (resource.status) {
                 Status.LOADING -> {
-                    binding.pbLoading.isVisible = true
+                    showOrHideLoading(true)
                 }
                 Status.SUCCESS -> {
-                    binding.pbLoading.isVisible = false
-                    if (resource.data == null) {
-                        Toast.makeText(requireContext(), "Null", Toast.LENGTH_SHORT).show()
-                    } else {
+                    showOrHideLoading(false)
+                    if (resource.data != null) {
                         validateContainer(resource.data!!)
+                    } else {
+                        showNetworkErrorMessage(false)
                     }
                 }
                 Status.ERROR -> {
-                    showNetworkErrorMessage()
+                    showOrHideLoading(false)
+                    showNetworkErrorMessage(true)
                 }
             }
         }
@@ -113,26 +119,50 @@ class ReportQuestionFragment : Fragment() {
         viewModel.submitReport.observe(this) { resource ->
             when (resource.status) {
                 Status.LOADING -> {
-                    binding.pbLoading.isVisible = true
+                    showOrHideLoading(true)
                 }
                 Status.SUCCESS -> {
-                    binding.pbLoading.isVisible = false
-                    if (resource.data == null) {
-                        Toast.makeText(requireContext(), "Null", Toast.LENGTH_SHORT).show()
-                    } else {
+                    showOrHideLoading(false)
+                    if (resource.data != null) {
                         showAlreadyReportQuestionContainer(resource.data!!)
-                        binding.resolvedContainer.visibility = View.GONE
-                        binding.reportQuestionContainer.visibility = View.GONE
+                        hideOtherContainer()
+                    } else {
+                        showNetworkErrorMessage(false)
                     }
                 }
                 Status.ERROR -> {
-                    showNetworkErrorMessage()
+                    showOrHideLoading(false)
                 }
             }
         }
+    }
 
-        radioButtonListener()
-        retryButton()
+    private fun assignCustomFontToText() {
+        binding.also {
+            //Title
+            it.reportSucessfullyTitle.typeface =
+                TestpressSdk.getRubikMediumFont(binding.root.context)
+            it.reportQuestionTitle.typeface = TestpressSdk.getRubikMediumFont(binding.root.context)
+            // Radio button
+            it.errorInQuestion.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
+            it.incompleteSolution.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
+            it.incorrectSolution.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
+            it.noSolution.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
+            it.others.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
+            //Others
+            it.reportQuestionTitle2.typeface =
+                TestpressSdk.getRubikRegularFont(binding.root.context)
+            it.reportedDiscription.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
+            it.reportedReason.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
+            it.reportedTime.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
+            it.thankyouText.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
+            it.submitButton.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
+            it.resolverText.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
+        }
+    }
+
+    private fun showOrHideLoading(show: Boolean){
+        binding.pbLoading.isVisible = show
     }
 
     private fun validateContainer(result: ReportQuestionResponse) {
@@ -149,17 +179,7 @@ class ReportQuestionFragment : Fragment() {
 
     private fun showReportQuestionContainer() {
         binding.reportQuestionContainer.visibility = View.VISIBLE
-        binding.submitButton.setOnClickListener {
-            if (position == -1) {
-                binding.radioButtonError.isVisible = true
-                return@setOnClickListener
-            }
-            viewModel.submitReportQuestion(
-                binding.discriptionInput.text.toString(),
-                examId,
-                (++position).toString()
-            )
-        }
+
     }
 
     private fun showAlreadyReportQuestionContainer(result: ReportQuestionResponse.ReportQuestion) {
@@ -173,20 +193,7 @@ class ReportQuestionFragment : Fragment() {
         binding.resolvedContainer.visibility = View.VISIBLE
     }
 
-    private fun radioButtonListener() {
-        binding.radioGroup.setOnCheckedChangeListener { group, checkedId ->
-            position = binding.radioGroup.indexOfChild(view?.findViewById<RadioButton>(checkedId))
-        }
-    }
-
-    private fun retryButton(){
-        binding.retryButton.setOnClickListener {
-            viewModel.retry()
-            binding.errorContainer.isVisible = false
-        }
-    }
-
-    private fun showNetworkErrorMessage() {
+    private fun showNetworkErrorMessage(showRetryButton:Boolean) {
         binding.apply {
             errorTitle.setCompoundDrawablesWithIntrinsicBounds(
                 R.drawable.ic_error_outline_black_18dp,
@@ -194,8 +201,14 @@ class ReportQuestionFragment : Fragment() {
                 0,
                 0
             )
-            errorContainer.isVisible = true
+            errorContainer.isVisible = showRetryButton
         }
+    }
+
+    private fun hideOtherContainer(){
+        binding.resolvedContainer.isVisible = false
+        binding.reportQuestionContainer.isVisible = false
+        binding.errorContainer.isVisible = false
     }
 
     companion object {
@@ -214,81 +227,5 @@ class ReportQuestionFragment : Fragment() {
                 .replace(fragmentView, fragment)
                 .commitAllowingStateLoss()
         }
-    }
-}
-
-class ReportQuestionViewModel(
-    private val reportQuestionRepository: ReportQuestionRepository,
-    private val questionId: String
-) : ViewModel() {
-
-    init {
-        reportQuestionRepository.getReportQuestion(questionId)
-    }
-
-    val reportQuestion = reportQuestionRepository.reportQuestion
-
-    val submitReport = reportQuestionRepository.submitReport
-
-    fun retry(){
-        reportQuestionRepository.getReportQuestion(questionId)
-    }
-
-    fun submitReportQuestion(
-        description: String,
-        examId: String,
-        type: String
-    ) {
-        val params = HashMap<String, Any>()
-        params["description"] = description
-        params["exam_id"] = examId
-        params["type"] = type
-        reportQuestionRepository.submitReportQuestion(questionId, params)
-    }
-}
-
-class ReportQuestionRepository(private val apiClient: TestpressExamApiClient) {
-
-    private var _reportQuestion: MutableLiveData<Resource<ReportQuestionResponse>> =
-        MutableLiveData()
-    val reportQuestion: LiveData<Resource<ReportQuestionResponse>>
-        get() = _reportQuestion
-
-    private var _submitReport: MutableLiveData<Resource<ReportQuestionResponse.ReportQuestion>> =
-        MutableLiveData()
-    val submitReport: LiveData<Resource<ReportQuestionResponse.ReportQuestion>>
-        get() = _submitReport
-
-    init {
-        _reportQuestion.postValue(Resource.loading(null))
-    }
-
-    fun getReportQuestion(questionId: String) {
-        apiClient.getReportQuestionResponse(questionId)
-            .enqueue(object : TestpressCallback<ReportQuestionResponse>() {
-                override fun onSuccess(result: ReportQuestionResponse) {
-                    _reportQuestion.postValue(Resource.success(result))
-                }
-
-                override fun onException(exception: TestpressException) {
-                    _reportQuestion.postValue(Resource.error(exception, null))
-                }
-
-            })
-    }
-
-    fun submitReportQuestion(questionId: String, params: HashMap<String, Any>) {
-        _submitReport.postValue(Resource.loading(null))
-        apiClient.postReportQuestion(questionId, params)
-            .enqueue(object : TestpressCallback<ReportQuestionResponse.ReportQuestion>() {
-                override fun onSuccess(result: ReportQuestionResponse.ReportQuestion) {
-                    _submitReport.postValue(Resource.success(result))
-                }
-
-                override fun onException(exception: TestpressException) {
-                    _submitReport.postValue(Resource.error(exception, null))
-                }
-
-            })
     }
 }
