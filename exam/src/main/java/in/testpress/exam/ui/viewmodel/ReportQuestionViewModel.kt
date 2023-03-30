@@ -9,15 +9,15 @@ class ReportQuestionViewModel(
 ) : ViewModel() {
 
     init {
-        reportQuestionRepository.getReportQuestion(questionId)
+        reportQuestionRepository.getReportQuestions(questionId)
     }
 
-    val reportQuestion = reportQuestionRepository.reportQuestion
+    val reportQuestions = reportQuestionRepository.reportQuestions
 
     val submitReport = reportQuestionRepository.submitReport
 
     fun retry(){
-        reportQuestionRepository.getReportQuestion(questionId)
+        reportQuestionRepository.getReportQuestions(questionId)
     }
 
     fun submitReportQuestion(

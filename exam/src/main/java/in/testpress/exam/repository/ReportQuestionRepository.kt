@@ -10,25 +10,25 @@ import `in`.testpress.network.Resource
 
 class ReportQuestionRepository(private val apiClient: TestpressExamApiClient) {
 
-    private var _reportQuestion: MutableLiveData<Resource<ReportQuestionResponse>> =
+    private var _reportQuestions: MutableLiveData<Resource<ReportQuestionResponse>> =
         MutableLiveData()
-    val reportQuestion: LiveData<Resource<ReportQuestionResponse>>
-        get() = _reportQuestion
+    val reportQuestions: LiveData<Resource<ReportQuestionResponse>>
+        get() = _reportQuestions
 
     private var _submitReport: MutableLiveData<Resource<ReportQuestionResponse.ReportQuestion>> =
         MutableLiveData()
     val submitReport: LiveData<Resource<ReportQuestionResponse.ReportQuestion>>
         get() = _submitReport
 
-    fun getReportQuestion(questionId: String) {
-        apiClient.getReportQuestionResponse(questionId)
+    fun getReportQuestions(questionId: String) {
+        apiClient.getReportQuestions(questionId)
             .enqueue(object : TestpressCallback<ReportQuestionResponse>() {
                 override fun onSuccess(result: ReportQuestionResponse) {
-                    _reportQuestion.postValue(Resource.success(result))
+                    _reportQuestions.postValue(Resource.success(result))
                 }
 
                 override fun onException(exception: TestpressException) {
-                    _reportQuestion.postValue(Resource.error(exception, null))
+                    _reportQuestions.postValue(Resource.error(exception, null))
                 }
 
             })

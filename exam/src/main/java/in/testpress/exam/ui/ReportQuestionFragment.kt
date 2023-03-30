@@ -110,7 +110,7 @@ class ReportQuestionFragment : Fragment() {
     }
 
     private fun initializeViewModelObserves() {
-        viewModel.reportQuestion.observe(this) { resource ->
+        viewModel.reportQuestions.observe(this) { resource ->
             when (resource.status) {
                 Status.LOADING -> {
                     showOrHideLoading(true)
