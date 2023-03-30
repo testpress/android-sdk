@@ -74,16 +74,12 @@ class RunningContentListViewHolder(val binding: RunningUpcomingListItemBinding):
 
     override fun bind(content: DomainContent) {
         super.bind(content)
-        setDate(content)
-        setDateVisiblity(content)
+        showOrHideDate(content)
         onItemClick(content)
     }
 
-    private fun setDate(content: DomainContent) {
+    private fun showOrHideDate(content: DomainContent) {
         binding.date.text = "Ends ${DateUtils.getRelativeTimeString(content.end, binding.root.context)} - "
-    }
-
-    private fun setDateVisiblity(content: DomainContent) {
         val visibility = DateUtils.getRelativeTimeString(content.end, binding.root.context).isEmpty()
         ViewUtils.setGone(binding.date, visibility)
     }
