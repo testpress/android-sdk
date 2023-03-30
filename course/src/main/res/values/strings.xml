@@ -68,6 +68,10 @@
 
     <string name="testpress_open_bookmark_file">View</string>
 
+    //
+    <string name="testpress_running_contents">Running</string>
+    <string name="testpress_no_running_contents">There are no currently available contents for you.</string>
+
     <string-array name="exo_speed_values">
         <item>0.5</item>
         <item>0.75</item>
@@ -94,4 +98,31 @@
         <item name="android:textColorHint">@color/testpress_gray_light</item>
         <item name="android:textColor">@color/testpress_black</item>
     </style>
+
+
+    <plurals name="minutes">
+        <item quantity="one">in %d minute</item>
+        <item quantity="other">in %d minutes</item>
+    </plurals>
+
+    <plurals name="hours">
+        <item quantity="one">in %d hour</item>
+        <item quantity="other">in %d hours</item>
+    </plurals>
+
+    <plurals name="days">
+        <item quantity="one">in %d day</item>
+        <item quantity="other">in %d days</item>
+    </plurals>
+
+    <plurals name="months">
+        <item quantity="one">in %d month</item>
+        <item quantity="other">in %d months</item>
+    </plurals>
+
+    <plurals name="years">
+        <item quantity="one">in %d year</item>
+        <item quantity="other">in %d years</item>
+    </plurals>
+
 </resources>

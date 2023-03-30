@@ -2,14 +2,14 @@ package `in`.testpress.course.network
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.api.TestpressCourseApiClient
-import `in`.testpress.course.api.TestpressCourseApiClient.PRODUCTS_CATEGORIES_PATH
-import `in`.testpress.course.api.TestpressCourseApiClient.V5_PRODUCTS_LIST_PATH
+import `in`.testpress.course.api.TestpressCourseApiClient.*
 import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Course
 import `in`.testpress.network.RetrofitCall
 import `in`.testpress.network.TestpressApiClient
 import `in`.testpress.database.entities.ProductCategoryEntity
+import `in`.testpress.database.entities.RunningContentEntity
 import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.ContentsListResponse
 import android.content.Context
@@ -57,6 +57,12 @@ interface CourseService {
     fun getProductsCategories(
         @QueryMap arguments: HashMap<String, Any>
     ): RetrofitCall<ApiResponse<List<ProductCategoryEntity>>>
+
+    @GET("$COURSE_PATH_v2_5{course_id}$RUNNING_CONTENTS_PATH")
+    suspend fun getRunningContents(
+        @Path(value = "course_id", encoded = true) courseId: Long,
+        @QueryMap queryParams: HashMap<String, Any>
+    ): ApiResponse<List<RunningContentEntity>>
 }
 
 
@@ -98,5 +104,9 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     fun getProductsCategories(arguments: HashMap<String, Any>): RetrofitCall<ApiResponse<List<ProductCategoryEntity>>> {
         return getCourseService().getProductsCategories(arguments)
+    }
+
+    suspend fun getRunningContents(courseId: Long, arguments: HashMap<String, Any>): ApiResponse<List<RunningContentEntity>> {
+        return getCourseService().getRunningContents(courseId, arguments)
     }
 }

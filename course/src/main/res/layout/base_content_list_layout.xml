@@ -50,14 +50,68 @@
         </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_progress_bar"
+        tools:listitem="@layout/running_upcoming_list_item" />
+
+    <ProgressBar
+        android:id="@+id/bottom_progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"/>
 
     <FrameLayout
         android:id="@+id/empty_view_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/error_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/error_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:drawablePadding="3dp"
+            android:text="Network Error"
+            android:textColor="@color/testpress_black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/error_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingLeft="15dp"
+            android:paddingTop="5dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="15dp"
+            android:text="@string/testpress_no_internet_try_again"
+            android:textColor="@color/testpress_black"
+            android:textSize="14sp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/retry_button"
+            style="@style/TestpressSmallButton"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/testpress_tap_to_retry"
+            android:visibility="gone"
+            android:textSize="12sp" />
+
+    </LinearLayout>
 
 </RelativeLayout>
