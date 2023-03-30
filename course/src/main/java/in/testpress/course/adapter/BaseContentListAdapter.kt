@@ -48,18 +48,16 @@ abstract class BaseContentListViewHolder(binding: RunningUpcomingListItemBinding
         date.typeface = TestpressSdk.getRubikMediumFont(binding.root.context)
     }
 
-    fun bind(content: DomainContent) {
-        title.text = content.title
-        path.text = "${content.treePath}"
-        thumbnail.setImageResource(getContentImage(content.contentType))
-        setDate(content)
-        setDateVisiblity(content)
+    open fun bind(content: DomainContent) {
+        showContentDetails(content)
         onItemClick(content)
     }
 
-    abstract fun setDate(content: DomainContent)
-
-    abstract fun setDateVisiblity(content: DomainContent)
+    private fun showContentDetails(content: DomainContent){
+        title.text = content.title
+        path.text = "${content.treePath}"
+        thumbnail.setImageResource(getContentImage(content.contentType))
+    }
 
     abstract fun onItemClick(content: DomainContent)
 
@@ -77,11 +75,17 @@ abstract class BaseContentListViewHolder(binding: RunningUpcomingListItemBinding
 
 class RunningContentListViewHolder(val binding: RunningUpcomingListItemBinding):BaseContentListViewHolder(binding){
 
-    override fun setDate(content: DomainContent) {
+    override fun bind(content: DomainContent) {
+        super.bind(content)
+        setDateVisiblity(content)
+        setDate(content)
+    }
+
+    private fun setDate(content: DomainContent) {
         binding.date.text = "Ends ${DateUtils.getRelativeTimeString(content.end, binding.root.context)} - "
     }
 
-    override fun setDateVisiblity(content: DomainContent) {
+    private fun setDateVisiblity(content: DomainContent) {
         val visibility = DateUtils.getRelativeTimeString(content.end, binding.root.context).isEmpty()
         ViewUtils.setGone(binding.date, visibility)
     }

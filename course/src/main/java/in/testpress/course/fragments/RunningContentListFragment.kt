@@ -66,7 +66,7 @@ class RunningContentListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initializeListView()
         initializeListeners()
-        observeAdapterLoadingStateAndUpdateUI()
+        showLoadingOrContentsList()
     }
 
     private fun initializeListView() {
@@ -98,7 +98,7 @@ class RunningContentListFragment : Fragment() {
         }
     }
 
-    private fun observeAdapterLoadingStateAndUpdateUI() {
+    private fun showLoadingOrContentsList() {
         binding.apply {
             lifecycleScope.launchWhenCreated {
                 adapter.loadStateFlow.collect {

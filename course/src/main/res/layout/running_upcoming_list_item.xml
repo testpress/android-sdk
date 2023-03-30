@@ -41,7 +41,8 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Ends in 5 days -- Path>Path>Path"
+                android:visibility="gone"
+                android:text="Ends in 5 days - "
                 android:textAppearance="?attr/textAppearanceCaption" />
 
             <TextView
@@ -50,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Ends in 5 days -- Path>Path>Path"
+                android:text="Path>Path>Path"
                 android:textAppearance="?attr/textAppearanceCaption" />
 
         </LinearLayout>
