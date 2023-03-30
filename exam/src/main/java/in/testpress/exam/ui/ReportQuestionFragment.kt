@@ -118,7 +118,7 @@ class ReportQuestionFragment : Fragment() {
                 Status.SUCCESS -> {
                     showOrHideLoading(false)
                     if (resource.data != null) {
-                        validateContainer(resource.data!!)
+                        showPageBasedOnResponse(resource.data!!)
                     } else {
                         showNetworkErrorMessage(false)
                     }
@@ -178,7 +178,7 @@ class ReportQuestionFragment : Fragment() {
         binding.pbLoading.isVisible = show
     }
 
-    private fun validateContainer(result: ReportQuestionResponse) {
+    private fun showPageBasedOnResponse(result: ReportQuestionResponse) {
         if (result.isReportResolved == true) {
             showReportResolvedPage()
             return
