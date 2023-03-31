@@ -563,10 +563,11 @@ public class ReviewQuestionsFragment extends Fragment {
                 @Override
                 public void run() {
                     ReportQuestionFragment.Companion.show(requireActivity(),
-                            R.id.empty_view_fragment,
+                            R.id.report_question_fragment,
                             reviewItem.getIndex(),
                             reviewItem.getQuestionId(),
                             examId);
+                    requireActivity().findViewById(R.id.report_question_fragment).setVisibility(View.VISIBLE);
                 }
             });
         }

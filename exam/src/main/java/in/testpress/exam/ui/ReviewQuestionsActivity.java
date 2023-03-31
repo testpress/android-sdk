@@ -773,4 +773,13 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
                 reviewItemsLoader, languageApiRequest
         };
     }
+
+    @Override
+    public void onBackPressed() {
+        if (findViewById(R.id.report_question_fragment).getVisibility() == View.VISIBLE) {
+            findViewById(R.id.report_question_fragment).setVisibility(View.GONE);
+        } else {
+            super.onBackPressed();
+        }
+    }
 }
