@@ -191,7 +191,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
     }
 
     private void initializeQuestionPager() {
-        pagerAdapter = new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems);
+        pagerAdapter = new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems, exam.getId());
         pager.setAdapter(pagerAdapter);
         slidingPaneLayout.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
             @Override
@@ -772,5 +772,30 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
         return new RetrofitCall[] {
                 reviewItemsLoader, languageApiRequest
         };
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isReportQuestionFragmentVisible()) {
+            hideReportQuestionFragment();
+            showReviewQuestionUi();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private boolean isReportQuestionFragmentVisible(){
+        return findViewById(R.id.report_question_fragment).getVisibility() == View.VISIBLE;
+    }
+
+    private void hideReportQuestionFragment(){
+        findViewById(R.id.report_question_fragment).setVisibility(View.GONE);
+    }
+
+    private void showReviewQuestionUi() {
+        questionLayout.setVisibility(View.VISIBLE);
+        buttonLayout.setVisibility(View.VISIBLE);
+        findViewById(R.id.filter).setVisibility(View.VISIBLE);
+        findViewById(R.id.bookmark).setVisibility(View.VISIBLE);
     }
 }

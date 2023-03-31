@@ -124,6 +124,20 @@ p {
     font-family: 'Rubik-Medium', sans-serif;
 }
 
+.report-button {
+    display: inline-block;
+    margin-top: 15px;
+    margin-right: 10px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-right: 4px;
+    padding-left: 8px;
+    font-size: 0.8rem;
+    color: #484848;
+    text-align: center;
+    font-family: 'Rubik-Medium', sans-serif;
+}
+
 .header {
   display: flex;
   justify-content: space-between;

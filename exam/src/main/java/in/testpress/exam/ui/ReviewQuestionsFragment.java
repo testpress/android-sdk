@@ -75,6 +75,8 @@ public class ReviewQuestionsFragment extends Fragment {
 
     static final String PARAM_REVIEW_ITEM_ID = "reviewItemId";
     static final String PARAM_SELECTED_LANGUAGE = "selectedLanguage";
+
+    static final String PARAM_EXAM_ID = "examID";
     private ReviewItem reviewItem;
     private View emptyView;
     private TextView emptyTitleView;
@@ -105,16 +107,18 @@ public class ReviewQuestionsFragment extends Fragment {
     private InstituteSettings instituteSettings;
     private boolean loadComments = true;
     private MenuItem bookmarkIcon;
+    private Long examId;
 
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
     private RetrofitCall<Bookmark> bookmarkAPIRequest;
     private RetrofitCall<Void> deleteBookmarkAPIRequest;
 
-    public static ReviewQuestionsFragment getInstance(long reviewItemId, Language selectedLanguage) {
+    public static ReviewQuestionsFragment getInstance(long reviewItemId, Language selectedLanguage, Long examId) {
         ReviewQuestionsFragment reviewQuestionsFragment = new ReviewQuestionsFragment();
         Bundle bundle = new Bundle();
         bundle.putLong(ReviewQuestionsFragment.PARAM_REVIEW_ITEM_ID, reviewItemId);
         bundle.putParcelable(PARAM_SELECTED_LANGUAGE, selectedLanguage);
+        bundle.putLong(PARAM_EXAM_ID, examId);
         reviewQuestionsFragment.setArguments(bundle);
         return reviewQuestionsFragment;
     }
@@ -126,6 +130,7 @@ public class ReviewQuestionsFragment extends Fragment {
         long reviewItemId = getArguments().getLong(PARAM_REVIEW_ITEM_ID);
         Assert.assertNotNull("PARAM_REVIEW_ITEM_ID must not be null", reviewItemId);
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
+        examId = getArguments().getLong(PARAM_EXAM_ID);
         reviewItemDao = TestpressSDKDatabase.getReviewItemDao(getContext());
         imageUtils = new ImageUtils(rootLayout, this);
         //noinspection ConstantConditions
@@ -239,6 +244,7 @@ public class ReviewQuestionsFragment extends Fragment {
 
         };
         webView.addJavascriptInterface(new BookmarkListener(), "BookmarkListener");
+        webView.addJavascriptInterface(new ReportListener(), "ReportListener");
         webViewUtils.initWebView(getReviewItemAsHtml(), getActivity());
         FullScreenChromeClient fullScreenChromeClient = new FullScreenChromeClient(getActivity());
         webView.setWebChromeClient(fullScreenChromeClient);
@@ -364,6 +370,14 @@ public class ReviewQuestionsFragment extends Fragment {
         html += "<div>" +
                 "<div class='review-question-index'>" +
                 reviewItem.getIndex() +
+                "</div>";
+
+        // Add Report button
+        html += "<div class='report-button' style='float:right;' onclick='onClickReportButton()'>" +
+                "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" style=\"width:1rem;height:1rem;vertical-align: sub;\">\n" +
+                "  <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z\" />\n" +
+                "</svg>\n" +
+                "Report" +
                 "</div>";
 
 
@@ -538,6 +552,32 @@ public class ReviewQuestionsFragment extends Fragment {
                     }
                 }
             });
+        }
+    }
+
+    private class ReportListener {
+
+        @JavascriptInterface
+        public void onClickReport() {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ReportQuestionFragment.Companion.show(requireActivity(),
+                            R.id.report_question_fragment,
+                            reviewItem.getIndex(),
+                            reviewItem.getQuestionId(),
+                            examId);
+                    hideReviewQuestionUi();
+                    requireActivity().findViewById(R.id.report_question_fragment).setVisibility(View.VISIBLE);
+                }
+            });
+        }
+
+        private void hideReviewQuestionUi() {
+            requireActivity().findViewById(R.id.question_layout).setVisibility(View.GONE);
+            requireActivity().findViewById(R.id.button_layout).setVisibility(View.GONE);
+            requireActivity().findViewById(R.id.bookmark).setVisibility(View.GONE);
+            requireActivity().findViewById(R.id.filter).setVisibility(View.GONE);
         }
     }
 
