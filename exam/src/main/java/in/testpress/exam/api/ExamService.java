@@ -7,6 +7,7 @@ import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.Comment;
 import in.testpress.exam.models.Permission;
+import in.testpress.exam.models.ReportQuestionResponse;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
 import in.testpress.models.TestpressApiResponse;
@@ -33,6 +34,8 @@ import static in.testpress.exam.api.TestpressExamApiClient.EXAMS_LIST_v2_3_PATH;
 import static in.testpress.exam.api.TestpressExamApiClient.EXAMS_PATH;
 import static in.testpress.exam.api.TestpressExamApiClient.LANGUAGES_PATH;
 import static in.testpress.exam.api.TestpressExamApiClient.PERMISSIONS_PATH;
+import static in.testpress.exam.api.TestpressExamApiClient.REPORTEES;
+import static in.testpress.exam.api.TestpressExamApiClient.REPORT_QUESTION;
 
 public interface ExamService {
 
@@ -142,6 +145,16 @@ public interface ExamService {
     @GET(EXAMS_LIST_v2_3_PATH + "{exam_slug}" + LANGUAGES_PATH)
     RetrofitCall<TestpressApiResponse<Language>> getLanguages(
             @Path(value = "exam_slug", encoded = true) String examSlug);
+
+    @GET(REPORT_QUESTION+"{question_id}"+REPORTEES)
+    RetrofitCall<ReportQuestionResponse> getQuestionReports(
+            @Path(value = "question_id",encoded = true) String questionId);
+
+    @POST(REPORT_QUESTION+"{question_id}"+REPORTEES)
+    RetrofitCall<ReportQuestionResponse.ReportQuestion> reportQuestion(
+            @Path(value = "question_id",encoded = true) String questionId,
+            @Body HashMap<String, Object> params);
+
 }
 
 

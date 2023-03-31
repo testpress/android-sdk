@@ -12,6 +12,7 @@ import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.Comment;
 import in.testpress.exam.models.Permission;
+import in.testpress.exam.models.ReportQuestionResponse;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
 import in.testpress.models.TestpressApiResponse;
@@ -86,6 +87,10 @@ public class TestpressExamApiClient extends TestpressApiClient {
     public static final String IS_PARTIAL = "is_partial";
 
     public static final String STATE_PAUSED = "Running";
+
+    public static final String REPORT_QUESTION = "/api/v2.5/questions/";
+
+    public static final String REPORTEES = "/reportees/";
 
     public TestpressExamApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
@@ -277,5 +282,13 @@ public class TestpressExamApiClient extends TestpressApiClient {
 
     public RetrofitCall<TestpressApiResponse<Language>> getLanguages(String examSlug) {
         return getExamService().getLanguages(examSlug);
+    }
+
+    public RetrofitCall<ReportQuestionResponse> getQuestionReports(String questionId) {
+        return getExamService().getQuestionReports(questionId);
+    }
+
+    public RetrofitCall<ReportQuestionResponse.ReportQuestion> reportQuestion(String questionId,HashMap<String, Object> params) {
+        return getExamService().reportQuestion(questionId,params);
     }
 }

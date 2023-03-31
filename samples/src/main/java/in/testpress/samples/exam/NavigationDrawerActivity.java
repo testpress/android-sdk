@@ -1,14 +1,17 @@
 package in.testpress.samples.exam;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.MenuItem;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.TestpressExam;
+import in.testpress.exam.ui.ReportQuestionFragment;
 import in.testpress.samples.BaseNavigationDrawerActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
+import in.testpress.util.ViewUtils;
 
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
 
@@ -28,6 +31,9 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
             case R.id.exams_categories:
                 showSDK(2);
                 break;
+            case R.id.report_question:
+                showSDK(3);
+                break;
         }
         super.onDrawerItemSelected(menuItem);
     }
@@ -45,14 +51,32 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
             TestpressSdk.setTestpressSession(this, session);
             if (position == 1) {
                 TestpressExam.show(this, R.id.fragment_container, session);
-            } else {
+            } else if (position == 2) {
                 TestpressExam.showCategories(this, R.id.fragment_container, session);
+            } else {
+                launchReportQuestionFragment();
             }
         } else {
             Intent intent = new Intent(NavigationDrawerActivity.this,
                     TestpressCoreSampleActivity.class);
             startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
         }
+    }
+
+    private void launchReportQuestionFragment() {
+        ViewUtils.showInputDialogBox(NavigationDrawerActivity.this, "Enter Course ID",
+                new ViewUtils.OnInputCompletedListener() {
+                    @Override
+                    public void onInputComplete(String inputText) {
+                        ReportQuestionFragment.Companion.show(
+                                NavigationDrawerActivity.this,
+                                R.id.fragment_container,
+                                10,
+                                Long.parseLong(inputText),
+                                787
+                        );
+                    }
+                });
     }
 
     @Override

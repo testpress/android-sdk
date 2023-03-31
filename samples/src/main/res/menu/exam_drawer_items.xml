@@ -20,6 +20,11 @@
             android:title="@string/exam_categories" />
 
         <item
+            android:id="@+id/report_question"
+            android:icon="@drawable/ic_assignment_black_24dp"
+            android:title="Report Question" />
+
+        <item
             android:id="@+id/logout"
             android:icon="@drawable/ic_power_settings_new_black_24dp"
             android:title="@string/logout" />

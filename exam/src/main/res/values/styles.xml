@@ -137,4 +137,10 @@
         <item name="android:textColorPrimary">@color/testpress_white</item>
     </style>
 
+    <style name="ReportQuestionRadioButton">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="colorAccent">@color/testpress_color_primary</item>
+        <item name="colorControlNormal">#858585</item>
+    </style>
+
 </resources>
