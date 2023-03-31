@@ -75,6 +75,8 @@ public class ReviewQuestionsFragment extends Fragment {
 
     static final String PARAM_REVIEW_ITEM_ID = "reviewItemId";
     static final String PARAM_SELECTED_LANGUAGE = "selectedLanguage";
+
+    static final String PARAM_EXAM_ID = "examID";
     private ReviewItem reviewItem;
     private View emptyView;
     private TextView emptyTitleView;
@@ -105,16 +107,18 @@ public class ReviewQuestionsFragment extends Fragment {
     private InstituteSettings instituteSettings;
     private boolean loadComments = true;
     private MenuItem bookmarkIcon;
+    private Long examId;
 
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
     private RetrofitCall<Bookmark> bookmarkAPIRequest;
     private RetrofitCall<Void> deleteBookmarkAPIRequest;
 
-    public static ReviewQuestionsFragment getInstance(long reviewItemId, Language selectedLanguage) {
+    public static ReviewQuestionsFragment getInstance(long reviewItemId, Language selectedLanguage, Long examId) {
         ReviewQuestionsFragment reviewQuestionsFragment = new ReviewQuestionsFragment();
         Bundle bundle = new Bundle();
         bundle.putLong(ReviewQuestionsFragment.PARAM_REVIEW_ITEM_ID, reviewItemId);
         bundle.putParcelable(PARAM_SELECTED_LANGUAGE, selectedLanguage);
+        bundle.putLong(PARAM_EXAM_ID, examId);
         reviewQuestionsFragment.setArguments(bundle);
         return reviewQuestionsFragment;
     }
@@ -126,6 +130,7 @@ public class ReviewQuestionsFragment extends Fragment {
         long reviewItemId = getArguments().getLong(PARAM_REVIEW_ITEM_ID);
         Assert.assertNotNull("PARAM_REVIEW_ITEM_ID must not be null", reviewItemId);
         selectedLanguage = getArguments().getParcelable(PARAM_SELECTED_LANGUAGE);
+        examId = getArguments().getLong(PARAM_EXAM_ID);
         reviewItemDao = TestpressSDKDatabase.getReviewItemDao(getContext());
         imageUtils = new ImageUtils(rootLayout, this);
         //noinspection ConstantConditions
@@ -557,10 +562,11 @@ public class ReviewQuestionsFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ReportQuestionFragment.Companion.show(requireActivity()
-                            , R.id.empty_view_fragment,
-                            reviewItem.getQuestionId().toString(),
-                            "787");
+                    ReportQuestionFragment.Companion.show(requireActivity(),
+                            R.id.empty_view_fragment,
+                            reviewItem.getIndex(),
+                            reviewItem.getQuestionId(),
+                            examId);
                 }
             });
         }

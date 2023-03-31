@@ -16,15 +16,19 @@ class ReviewQuestionsPagerAdapter extends FragmentStatePagerAdapter {
     private Language selectedLanguage;
     private boolean positionsModified;
 
+    private Long examId;
+
     public ReviewQuestionsPagerAdapter(FragmentManager fragmentManager,
-                                       List<ReviewItem> reviewItems) {
+                                       List<ReviewItem> reviewItems,
+                                       Long examId) {
         super(fragmentManager);
         this.reviewItems = reviewItems;
+        this.examId = examId;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return ReviewQuestionsFragment.getInstance(reviewItems.get(position).getId(), selectedLanguage);
+        return ReviewQuestionsFragment.getInstance(reviewItems.get(position).getId(), selectedLanguage, examId);
     }
 
     public void setReviewItems(List<ReviewItem> reviewItems) {

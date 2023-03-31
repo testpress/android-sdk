@@ -191,7 +191,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
     }
 
     private void initializeQuestionPager() {
-        pagerAdapter = new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems);
+        pagerAdapter = new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems, exam.getId());
         pager.setAdapter(pagerAdapter);
         slidingPaneLayout.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
             @Override
