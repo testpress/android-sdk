@@ -141,6 +141,7 @@ class ReportQuestionFragment : Fragment() {
                 }
                 Status.ERROR -> {
                     showOrHideLoading(false)
+                    showNetworkErrorMessage(false)
                 }
             }
         }
