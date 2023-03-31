@@ -5,16 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import `in`.testpress.core.TestpressCallback
-import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.enums.Status
 import `in`.testpress.exam.R
@@ -23,12 +18,12 @@ import `in`.testpress.exam.databinding.ReportQuestionFragmentBinding
 import `in`.testpress.exam.models.ReportQuestionResponse
 import `in`.testpress.exam.repository.ReportQuestionRepository
 import `in`.testpress.exam.ui.viewmodel.ReportQuestionViewModel
-import `in`.testpress.network.Resource
 
 class ReportQuestionFragment : Fragment() {
 
-    private var questionId: String = ""
-    private var examId: String = ""
+    private var questionId: Long = -1
+    private var examId: Long = -1
+    private var questionIndex: Long = -1
     private lateinit var apiClient: TestpressExamApiClient
     private lateinit var binding: ReportQuestionFragmentBinding
     private lateinit var viewModel: ReportQuestionViewModel
@@ -43,8 +38,9 @@ class ReportQuestionFragment : Fragment() {
     }
 
     private fun parseArguments() {
-        questionId = arguments?.getString("question_id")!!
-        examId = arguments?.getString("exam_id")!!
+        questionId = arguments?.getLong("question_id")!!
+        examId = arguments?.getLong("exam_id")!!
+        questionIndex = arguments?.getLong("question_index")!!
     }
 
     private fun initializeViewModel() {
@@ -71,7 +67,7 @@ class ReportQuestionFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initializeClickListener()
         initializeViewModelObserves()
-        assignCustomFontToText()
+        changeCustomFont()
     }
 
     private fun initializeClickListener() {
@@ -94,7 +90,7 @@ class ReportQuestionFragment : Fragment() {
         viewModel.submitReportQuestion(
             binding.discriptionInput.text.toString(),
             examId,
-            (++position).toString()
+            ++position
         )
         hideReportQuestionPage()
     }
@@ -150,7 +146,7 @@ class ReportQuestionFragment : Fragment() {
         }
     }
 
-    private fun assignCustomFontToText() {
+    private fun changeCustomFont() {
         binding.also {
             //Title
             it.reportSucessfullyTitle.typeface =
@@ -191,6 +187,7 @@ class ReportQuestionFragment : Fragment() {
     }
 
     private fun showReportQuestionPage() {
+        binding.reportQuestionTitle.text = "Report Question %s".format(questionIndex)
         binding.reportQuestionLayout.isVisible = true
     }
 
@@ -227,12 +224,14 @@ class ReportQuestionFragment : Fragment() {
         fun show(
             fragmentActivity: FragmentActivity,
             fragmentView: Int,
-            questionId: String,
-            examId: String,
+            questionIndex: Long,
+            questionId: Long,
+            examId: Long,
         ) {
             val bundle = Bundle()
-            bundle.putString("question_id", questionId)
-            bundle.putString("exam_id", examId)
+            bundle.putLong("question_index", questionIndex)
+            bundle.putLong("question_id", questionId)
+            bundle.putLong("exam_id", examId)
             val fragment = ReportQuestionFragment()
             fragment.arguments = bundle
             fragmentActivity.supportFragmentManager.beginTransaction()

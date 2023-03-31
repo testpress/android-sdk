@@ -71,8 +71,9 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                         ReportQuestionFragment.Companion.show(
                                 NavigationDrawerActivity.this,
                                 R.id.fragment_container,
-                                inputText,
-                                "787"
+                                10,
+                                Long.parseLong(inputText),
+                                787
                         );
                     }
                 });
