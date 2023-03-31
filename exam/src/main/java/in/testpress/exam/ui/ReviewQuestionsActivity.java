@@ -778,13 +778,13 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
     public void onBackPressed() {
         if (findViewById(R.id.report_question_fragment).getVisibility() == View.VISIBLE) {
             findViewById(R.id.report_question_fragment).setVisibility(View.GONE);
-            showPreviousUi();
+            showReviewQuestionUi();
         } else {
             super.onBackPressed();
         }
     }
 
-    private void showPreviousUi() {
+    private void showReviewQuestionUi() {
         questionLayout.setVisibility(View.VISIBLE);
         buttonLayout.setVisibility(View.VISIBLE);
         findViewById(R.id.filter).setVisibility(View.VISIBLE);

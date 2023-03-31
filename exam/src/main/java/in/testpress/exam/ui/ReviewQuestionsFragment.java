@@ -567,13 +567,13 @@ public class ReviewQuestionsFragment extends Fragment {
                             reviewItem.getIndex(),
                             reviewItem.getQuestionId(),
                             examId);
-                    hidePreviousUi();
+                    hideReviewQuestionUi();
                     requireActivity().findViewById(R.id.report_question_fragment).setVisibility(View.VISIBLE);
                 }
             });
         }
 
-        private void hidePreviousUi() {
+        private void hideReviewQuestionUi() {
             requireActivity().findViewById(R.id.question_layout).setVisibility(View.GONE);
             requireActivity().findViewById(R.id.button_layout).setVisibility(View.GONE);
             requireActivity().findViewById(R.id.bookmark).setVisibility(View.GONE);
