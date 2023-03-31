@@ -12,7 +12,7 @@ class ReportQuestionViewModel(
         reportQuestionRepository.getReportQuestions(questionId.toString())
     }
 
-    val questionReport = reportQuestionRepository.questionReport
+    val questionReports = reportQuestionRepository.questionReports
 
     val submitReport = reportQuestionRepository.submitReport
 

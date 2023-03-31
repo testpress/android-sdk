@@ -106,7 +106,7 @@ class ReportQuestionFragment : Fragment() {
     }
 
     private fun initializeViewModelObserves() {
-        viewModel.questionReport.observe(this) { resource ->
+        viewModel.questionReports.observe(this) { resource ->
             when (resource.status) {
                 Status.LOADING -> {
                     showOrHideLoading(true)
@@ -114,7 +114,7 @@ class ReportQuestionFragment : Fragment() {
                 Status.SUCCESS -> {
                     showOrHideLoading(false)
                     if (resource.data != null) {
-                        showPageBasedOnResponse(resource.data!!)
+                        showSuccessOrFailureUI(resource.data!!)
                     } else {
                         showNetworkErrorMessage(false)
                     }
@@ -175,7 +175,7 @@ class ReportQuestionFragment : Fragment() {
         binding.pbLoading.isVisible = show
     }
 
-    private fun showPageBasedOnResponse(result: ReportQuestionResponse) {
+    private fun showSuccessOrFailureUI(result: ReportQuestionResponse) {
         if (result.isReportResolved == true) {
             showReportResolvedPage()
             return

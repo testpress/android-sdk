@@ -284,8 +284,8 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getExamService().getLanguages(examSlug);
     }
 
-    public RetrofitCall<ReportQuestionResponse> getQuestionReport(String questionId) {
-        return getExamService().getQuestionReport(questionId);
+    public RetrofitCall<ReportQuestionResponse> getQuestionReports(String questionId) {
+        return getExamService().getQuestionReports(questionId);
     }
 
     public RetrofitCall<ReportQuestionResponse.ReportQuestion> reportQuestion(String questionId,HashMap<String, Object> params) {

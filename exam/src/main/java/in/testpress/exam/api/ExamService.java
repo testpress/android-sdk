@@ -147,7 +147,7 @@ public interface ExamService {
             @Path(value = "exam_slug", encoded = true) String examSlug);
 
     @GET(REPORT_QUESTION+"{question_id}"+REPORTEES)
-    RetrofitCall<ReportQuestionResponse> getQuestionReport(
+    RetrofitCall<ReportQuestionResponse> getQuestionReports(
             @Path(value = "question_id",encoded = true) String questionId);
 
     @POST(REPORT_QUESTION+"{question_id}"+REPORTEES)
