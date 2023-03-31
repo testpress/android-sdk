@@ -776,12 +776,20 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
 
     @Override
     public void onBackPressed() {
-        if (findViewById(R.id.report_question_fragment).getVisibility() == View.VISIBLE) {
-            findViewById(R.id.report_question_fragment).setVisibility(View.GONE);
+        if (isReportQuestionFragmentVisible()) {
+            hideReportQuestionFragment();
             showReviewQuestionUi();
         } else {
             super.onBackPressed();
         }
+    }
+
+    private boolean isReportQuestionFragmentVisible(){
+        return findViewById(R.id.report_question_fragment).getVisibility() == View.VISIBLE;
+    }
+
+    private void hideReportQuestionFragment(){
+        findViewById(R.id.report_question_fragment).setVisibility(View.GONE);
     }
 
     private void showReviewQuestionUi() {
