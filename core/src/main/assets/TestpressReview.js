@@ -3,6 +3,10 @@ function onClickBookmarkButton() {
     BookmarkListener.onClickBookmark();
 }
 
+function onClickReportButton() {
+    ReportListener.onClickReport();
+}
+
 function updateBookmarkButtonState(bookmarked) {
     var bookmarkImage = getElement("bookmark-image");
     var bookmarkText = getElement("bookmark-text");
