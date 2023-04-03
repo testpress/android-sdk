@@ -188,7 +188,6 @@ class ReportQuestionFragment : Fragment() {
     }
 
     private fun showReportQuestionPage() {
-        binding.reportQuestionTitle.text = "Report Question %s".format(questionIndex)
         binding.reportQuestionLayout.isVisible = true
     }
 
