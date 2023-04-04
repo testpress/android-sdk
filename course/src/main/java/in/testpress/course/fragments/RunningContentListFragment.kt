@@ -23,7 +23,7 @@ import `in`.testpress.course.adapter.BaseContentListAdapter
 import `in`.testpress.database.entities.ContentEntityLite
 import kotlinx.coroutines.flow.collect
 
-class RunningContentListFragment : Fragment() {
+class RunningContentListFragment(val type: Int) : Fragment() {
 
     private var courseId: Long = -1
     private lateinit var binding: BaseContentListLayoutBinding
@@ -55,7 +55,8 @@ class RunningContentListFragment : Fragment() {
                 return RunningContentsListViewModel(
                     RunningContentsRepository(
                         requireContext(),
-                        courseId
+                        courseId,
+                        type
                     )
                 ) as T
             }

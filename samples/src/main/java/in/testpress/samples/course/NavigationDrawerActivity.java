@@ -73,7 +73,7 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                     public void onInputComplete(String inputText) {
                         Bundle bundle = new Bundle();
                         bundle.putString("courseId",inputText);
-                        RunningContentListFragment fragment = new RunningContentListFragment();
+                        RunningContentListFragment fragment = new RunningContentListFragment(1);
                         fragment.setArguments(bundle);
                         NavigationDrawerActivity.this.getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container,fragment)

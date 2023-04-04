@@ -18,7 +18,8 @@ private const val DEFAULT_PAGE_INDEX = 1
 class RunningContentRemoteMediator(
     val courseNetwork: CourseNetwork,
     val database: TestpressDatabase,
-    val courseId: Long
+    val courseId: Long,
+    val type: Int
 ) : RemoteMediator<Int, ContentEntityLite>() {
 
     private val contentLiteDao: ContentLiteDao = database.contentLiteDao()
@@ -95,7 +96,7 @@ class RunningContentRemoteMediator(
 
     private suspend fun clearExistingData(courseId: Long){
         contentLiteRemoteKeyDao.clearRemoteKeysByCourseIdAndClassName(courseId)
-        contentLiteDao.deleteAll(courseId)
+        contentLiteDao.delete(courseId,type)
     }
 
     private fun generateRemoteKeys(
@@ -108,7 +109,8 @@ class RunningContentRemoteMediator(
                 contentId = it.id,
                 prevKey = prevKey,
                 nextKey = nextKey,
-                courseId
+                courseId,
+                type
             )
         }
     }
@@ -117,7 +119,14 @@ class RunningContentRemoteMediator(
         results: List<ContentEntityLite>,
         keys: List<ContentEntityLiteRemoteKey>
     ) {
-        contentLiteDao.insertAll(results)
+        contentLiteDao.insertAll(addTypeToResponse(results))
         contentLiteRemoteKeyDao.insertAll(keys)
+    }
+
+    private fun addTypeToResponse(results: List<ContentEntityLite>): List<ContentEntityLite>{
+        for (content in results){
+            content.type = type
+        }
+        return results
     }
 }
