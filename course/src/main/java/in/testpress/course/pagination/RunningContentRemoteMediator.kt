@@ -71,7 +71,7 @@ class RunningContentRemoteMediator(
         return state.pages.lastOrNull() { it.data.isNotEmpty() }?.data?.sortedByDescending { it.start }
             ?.lastOrNull()
             ?.let { content ->
-                contentLiteRemoteKeyDao.remoteKeysContentId(content.id)
+                contentLiteRemoteKeyDao.remoteKeyContentId(content.id,type)
             }
     }
 
@@ -95,7 +95,7 @@ class RunningContentRemoteMediator(
     }
 
     private suspend fun clearExistingData(courseId: Long){
-        contentLiteRemoteKeyDao.clearRemoteKeysByCourseIdAndClassName(courseId)
+        contentLiteRemoteKeyDao.clearRemoteKeysByCourseIdAndType(courseId,type)
         contentLiteDao.delete(courseId,type)
     }
 
