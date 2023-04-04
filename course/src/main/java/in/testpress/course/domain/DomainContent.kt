@@ -62,7 +62,8 @@ data class DomainContent(
     val hasEnded: Boolean?,
     val examStartUrl: String? = null,
     val treePath: String? = null,
-    val icon: String? = null
+    val icon: String? = null,
+    val type: Int = 0,
 ) {
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
@@ -223,6 +224,7 @@ fun createDomainContent(content: ContentEntityLite): DomainContent {
         hasEnded = null,
         isCourseAvailable = null,
         hasStarted = null,
+        type = content.type
     )
 }
 
