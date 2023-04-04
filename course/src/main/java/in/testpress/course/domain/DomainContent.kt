@@ -2,7 +2,7 @@ package `in`.testpress.course.domain
 
 import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.database.ContentEntity
-import `in`.testpress.database.entities.RunningContentEntity
+import `in`.testpress.database.entities.ContentEntityLite
 import `in`.testpress.models.greendao.Attachment
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
@@ -201,7 +201,7 @@ fun createDomainContent(content: Content): DomainContent {
     )
 }
 
-fun createDomainContent(content: RunningContentEntity): DomainContent {
+fun createDomainContent(content: ContentEntityLite): DomainContent {
     return DomainContent(
         id = content.id,
         order = content.order,
@@ -227,7 +227,7 @@ fun createDomainContent(content: RunningContentEntity): DomainContent {
 }
 
 fun <T>T.asDomainContent(): DomainContent {
-    return createDomainContent(this as RunningContentEntity)
+    return createDomainContent(this as ContentEntityLite)
 }
 
 fun ContentEntity.asDomainContent(): DomainContent {

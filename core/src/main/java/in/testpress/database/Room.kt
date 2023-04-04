@@ -39,8 +39,8 @@ import androidx.room.TypeConverters
             CategoryEntity::class,
             DiscussionThreadAnswerEntity::class,
             ProductCategoryEntity::class,
-            RunningContentEntity::class,
-            RunningContentRemoteKeys::class,
+            ContentEntityLite::class,
+            ContentEntityLiteRemoteKey::class,
             UpcomingContentEntity::class,
             UpcomingContentRemoteKeys::class
         ], exportSchema = true)
@@ -55,8 +55,8 @@ abstract class TestpressDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun discussionAnswerDao(): DiscussionAnswerDao
     abstract fun productCategoryDao(): ProductCategoryDao
-    abstract fun runningContentDao(): RunningContentDao
-    abstract fun runningContentRemoteKeysDao():RunningContentRemoteKeysDao
+    abstract fun contentLiteDao(): ContentLiteDao
+    abstract fun contentLiteRemoteKeyDao():ContentLiteRemoteKeyDao
 
     companion object {
         private lateinit var INSTANCE: TestpressDatabase
