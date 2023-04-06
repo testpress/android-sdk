@@ -21,9 +21,10 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import `in`.testpress.course.adapter.CourseContentListAdapter
 import `in`.testpress.database.entities.ContentEntityLite
+import `in`.testpress.database.entities.CourseContentType
 import kotlinx.coroutines.flow.collect
 
-class CourseContentListFragment  : Fragment() {
+class CourseContentListFragment(val type: Int): Fragment() {
 
     private var courseId: Long = -1
     private lateinit var binding: BaseContentListLayoutBinding
@@ -55,7 +56,8 @@ class CourseContentListFragment  : Fragment() {
                 return CourseContentListViewModel(
                     CourseContentsRepository(
                         requireContext(),
-                        courseId
+                        courseId,
+                        type
                     )
                 ) as T
             }
@@ -137,8 +139,16 @@ class CourseContentListFragment  : Fragment() {
                 0
             )
             errorTitle.text = resources.getString(R.string.testpress_no_content)
-            errorDescription.text = resources.getString(R.string.testpress_no_running_contents)
+            errorDescription.text = getErrorDescription()
             retryButton.isVisible = false
+        }
+    }
+
+    private fun getErrorDescription(): String{
+        return if (type == CourseContentType.RUNNING_CONTENT.ordinal){
+            resources.getString(R.string.no_running_contents)
+        } else{
+            resources.getString(R.string.no_upcoming_contents)
         }
     }
 

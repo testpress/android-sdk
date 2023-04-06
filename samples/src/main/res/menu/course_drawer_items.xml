@@ -20,6 +20,11 @@
             android:title="Running" />
 
         <item
+            android:id="@+id/upcoming_content"
+            android:icon="@drawable/ic_assignment_black_24dp"
+            android:title="Upcoming" />
+
+        <item
             android:id="@+id/leaderboard"
             android:icon="@drawable/ic_assignment_black_24dp"
             android:title="@string/testpress_leaderboard" />

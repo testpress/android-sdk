@@ -8,6 +8,7 @@ import androidx.paging.*
 import androidx.room.withTransaction
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.database.TestpressDatabase
+import `in`.testpress.database.entities.CourseContentType
 import `in`.testpress.v2_4.models.ApiResponse
 import retrofit2.HttpException
 import java.io.IOException
@@ -18,7 +19,8 @@ private const val DEFAULT_PAGE_INDEX = 1
 class CourseContentsRemoteMediator(
     val courseNetwork: CourseNetwork,
     val database: TestpressDatabase,
-    val courseId: Long
+    val courseId: Long,
+    val type: Int
 ) : RemoteMediator<Int, ContentEntityLite>() {
 
     private val contentLiteDao: ContentLiteDao = database.contentLiteDao()
@@ -70,13 +72,17 @@ class CourseContentsRemoteMediator(
         return state.pages.lastOrNull() { it.data.isNotEmpty() }?.data?.sortedByDescending { it.start }
             ?.lastOrNull()
             ?.let { content ->
-                contentLiteRemoteKeyDao.remoteKeysContentId(content.id)
+                contentLiteRemoteKeyDao.remoteKeysContentId(content.id,type)
             }
     }
 
     private suspend fun fetchCourseContents(page: Int = 1): ApiResponse<List<ContentEntityLite>> {
         val queryParams = hashMapOf<String, Any>("page" to page)
-        return courseNetwork.getRunningContents(courseId, queryParams)
+        return if (type == CourseContentType.RUNNING_CONTENT.ordinal){
+            courseNetwork.getRunningContents(courseId, queryParams)
+        } else {
+            courseNetwork.getUpcomingContents(courseId, queryParams)
+        }
     }
 
     private suspend fun storeDataInDB(
@@ -94,8 +100,8 @@ class CourseContentsRemoteMediator(
     }
 
     private suspend fun clearExistingData(courseId: Long){
-        contentLiteRemoteKeyDao.clearRemoteKeysByCourseIdAndClassName(courseId)
-        contentLiteDao.deleteAll(courseId)
+        contentLiteRemoteKeyDao.clearRemoteKeysByCourseIdAndType(courseId,type)
+        contentLiteDao.delete(courseId,type)
     }
 
     private fun generateRemoteKeys(
@@ -108,7 +114,8 @@ class CourseContentsRemoteMediator(
                 contentId = it.id,
                 prevKey = prevKey,
                 nextKey = nextKey,
-                courseId
+                courseId,
+                type
             )
         }
     }
@@ -117,7 +124,14 @@ class CourseContentsRemoteMediator(
         results: List<ContentEntityLite>,
         keys: List<ContentEntityLiteRemoteKey>
     ) {
-        contentLiteDao.insertAll(results)
+        contentLiteDao.insertAll( g(results)  )
         contentLiteRemoteKeyDao.insertAll(keys)
+    }
+
+    fun g(results: List<ContentEntityLite>): List<ContentEntityLite>{
+        for (content in results){
+            content.type = type
+        }
+        return results
     }
 }
