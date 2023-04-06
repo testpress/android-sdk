@@ -9,5 +9,5 @@ data class ContentEntityLiteRemoteKey(
     val prevKey: Int?,
     val nextKey: Int?,
     val courseId: Long,
-    var type: Int = 0
+    var type: Int = CourseContentType.RUNNING_CONTENT.ordinal
 )
