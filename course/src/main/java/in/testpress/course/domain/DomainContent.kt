@@ -63,7 +63,7 @@ data class DomainContent(
     val examStartUrl: String? = null,
     val treePath: String? = null,
     val icon: String? = null,
-    val type: Int = 0,
+    val type: Int,
 ) {
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
