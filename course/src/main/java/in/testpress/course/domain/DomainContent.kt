@@ -13,6 +13,7 @@ import android.content.Context
 import android.text.format.DateUtils
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.util.Util
+import `in`.testpress.database.entities.CourseContentType
 
 data class DomainContent(
     val id: Long,
@@ -62,7 +63,8 @@ data class DomainContent(
     val hasEnded: Boolean?,
     val examStartUrl: String? = null,
     val treePath: String? = null,
-    val icon: String? = null
+    val icon: String? = null,
+    val type: Int = CourseContentType.RUNNING_CONTENT.ordinal,
 ) {
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
@@ -223,6 +225,7 @@ fun createDomainContent(content: ContentEntityLite): DomainContent {
         hasEnded = null,
         isCourseAvailable = null,
         hasStarted = null,
+        type = content.type
     )
 }
 
