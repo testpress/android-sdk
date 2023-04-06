@@ -18,8 +18,7 @@ private const val DEFAULT_PAGE_INDEX = 1
 class RunningContentRemoteMediator(
     val courseNetwork: CourseNetwork,
     val database: TestpressDatabase,
-    val courseId: Long,
-    val type: Int
+    val courseId: Long
 ) : RemoteMediator<Int, ContentEntityLite>() {
 
     private val contentLiteDao: ContentLiteDao = database.contentLiteDao()
@@ -71,7 +70,7 @@ class RunningContentRemoteMediator(
         return state.pages.lastOrNull() { it.data.isNotEmpty() }?.data?.sortedByDescending { it.start }
             ?.lastOrNull()
             ?.let { content ->
-                contentLiteRemoteKeyDao.remoteKeyContentId(content.id,type)
+                contentLiteRemoteKeyDao.remoteKeysContentId(content.id)
             }
     }
 
@@ -95,8 +94,8 @@ class RunningContentRemoteMediator(
     }
 
     private suspend fun clearExistingData(courseId: Long){
-        contentLiteRemoteKeyDao.clearRemoteKeysByCourseIdAndType(courseId,type)
-        contentLiteDao.delete(courseId,type)
+        contentLiteRemoteKeyDao.clearRemoteKeysByCourseIdAndClassName(courseId)
+        contentLiteDao.deleteAll(courseId)
     }
 
     private fun generateRemoteKeys(
@@ -109,8 +108,7 @@ class RunningContentRemoteMediator(
                 contentId = it.id,
                 prevKey = prevKey,
                 nextKey = nextKey,
-                courseId,
-                type
+                courseId
             )
         }
     }
@@ -119,14 +117,7 @@ class RunningContentRemoteMediator(
         results: List<ContentEntityLite>,
         keys: List<ContentEntityLiteRemoteKey>
     ) {
-        contentLiteDao.insertAll(addTypeToResponse(results))
+        contentLiteDao.insertAll(results)
         contentLiteRemoteKeyDao.insertAll(keys)
-    }
-
-    private fun addTypeToResponse(results: List<ContentEntityLite>): List<ContentEntityLite>{
-        for (content in results){
-            content.type = type
-        }
-        return results
     }
 }

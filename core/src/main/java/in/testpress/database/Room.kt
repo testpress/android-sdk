@@ -41,7 +41,9 @@ import `in`.testpress.database.roommigration.RoomMigration17To18.MIGRATION_17_18
             DiscussionThreadAnswerEntity::class,
             ProductCategoryEntity::class,
             ContentEntityLite::class,
-            ContentEntityLiteRemoteKey::class
+            ContentEntityLiteRemoteKey::class,
+            UpcomingContentEntity::class,
+            UpcomingContentRemoteKeys::class
         ], exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class TestpressDatabase : RoomDatabase() {
