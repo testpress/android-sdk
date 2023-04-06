@@ -7,7 +7,7 @@ import android.view.MenuItem;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.course.TestpressCourse;
-import in.testpress.course.fragments.RunningContentListFragment;
+import in.testpress.course.fragments.CourseContentListFragment;
 import in.testpress.course.ui.LeaderboardFragment;
 import in.testpress.samples.BaseNavigationDrawerActivity;
 import in.testpress.samples.R;
@@ -59,21 +59,21 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
             } else if (position == 2){
                 TestpressCourse.showLeaderboard(this, R.id.fragment_container, session);
             } else {
-                launchRunningContentFragment();
+                launchCourseContentFragment();
             }
         } else {
             Intent intent = new Intent(this, TestpressCoreSampleActivity.class);
             startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
         }
     }
-    private void launchRunningContentFragment(){
+    private void launchCourseContentFragment(){
         ViewUtils.showInputDialogBox(NavigationDrawerActivity.this, "Enter Course ID",
                 new ViewUtils.OnInputCompletedListener() {
                     @Override
                     public void onInputComplete(String inputText) {
                         Bundle bundle = new Bundle();
                         bundle.putString("courseId",inputText);
-                        RunningContentListFragment fragment = new RunningContentListFragment();
+                        CourseContentListFragment fragment = new CourseContentListFragment();
                         fragment.setArguments(bundle);
                         NavigationDrawerActivity.this.getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container,fragment)

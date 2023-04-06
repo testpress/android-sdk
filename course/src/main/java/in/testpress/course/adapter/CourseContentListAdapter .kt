@@ -14,19 +14,19 @@ import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.util.DateUtils
 import `in`.testpress.util.ViewUtils
 
-class BaseContentListAdapter<T : Any>(COMPARATOR: DiffUtil.ItemCallback<T>):
-    PagingDataAdapter<T, BaseContentListViewHolder>(COMPARATOR){
+class CourseContentListAdapter <T : Any>(COMPARATOR: DiffUtil.ItemCallback<T>):
+    PagingDataAdapter<T, BaseCourseContentItemViewHolder>(COMPARATOR){
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseContentListViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseCourseContentItemViewHolder {
         val binding = RunningUpcomingListItemBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
         )
-        return RunningContentListViewHolder(binding)
+        return RunningContentItemViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: BaseContentListViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BaseCourseContentItemViewHolder, position: Int) {
         val content = getItem(position)
         if (content != null) {
             val domainContent = content.asDomainContent()
@@ -35,7 +35,7 @@ class BaseContentListAdapter<T : Any>(COMPARATOR: DiffUtil.ItemCallback<T>):
     }
 }
 
-open class BaseContentListViewHolder(binding: RunningUpcomingListItemBinding) :
+open class BaseCourseContentItemViewHolder(binding: RunningUpcomingListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
     private val title = binding.title
     private val path = binding.path
@@ -70,7 +70,7 @@ open class BaseContentListViewHolder(binding: RunningUpcomingListItemBinding) :
     }
 }
 
-class RunningContentListViewHolder(val binding: RunningUpcomingListItemBinding):BaseContentListViewHolder(binding){
+class RunningContentItemViewHolder(val binding: RunningUpcomingListItemBinding):BaseCourseContentItemViewHolder(binding){
 
     override fun bind(content: DomainContent) {
         super.bind(content)

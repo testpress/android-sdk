@@ -4,8 +4,8 @@ import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.adapter.BaseListFooterAdapter
 import `in`.testpress.course.databinding.BaseContentListLayoutBinding
-import `in`.testpress.course.repository.RunningContentsRepository
-import `in`.testpress.course.viewmodels.RunningContentsListViewModel
+import `in`.testpress.course.repository.CourseContentsRepository
+import `in`.testpress.course.viewmodels.CourseContentListViewModel
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,16 +19,16 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import `in`.testpress.course.adapter.BaseContentListAdapter
+import `in`.testpress.course.adapter.CourseContentListAdapter
 import `in`.testpress.database.entities.ContentEntityLite
 import kotlinx.coroutines.flow.collect
 
-class RunningContentListFragment : Fragment() {
+class CourseContentListFragment  : Fragment() {
 
     private var courseId: Long = -1
     private lateinit var binding: BaseContentListLayoutBinding
-    private lateinit var adapter: BaseContentListAdapter<ContentEntityLite>
-    private lateinit var viewModel: RunningContentsListViewModel
+    private lateinit var adapter: CourseContentListAdapter<ContentEntityLite>
+    private lateinit var viewModel: CourseContentListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,14 +52,14 @@ class RunningContentListFragment : Fragment() {
     private fun initializeViewModel() {
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return RunningContentsListViewModel(
-                    RunningContentsRepository(
+                return CourseContentListViewModel(
+                    CourseContentsRepository(
                         requireContext(),
                         courseId
                     )
                 ) as T
             }
-        }).get(RunningContentsListViewModel::class.java)
+        }).get(CourseContentListViewModel::class.java)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -73,7 +73,7 @@ class RunningContentListFragment : Fragment() {
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-            adapter = this@RunningContentListFragment.getAdapter()
+            adapter = this@CourseContentListFragment.getAdapter()
         }
         binding.recyclerView.adapter = adapter.withLoadStateFooter(
             BaseListFooterAdapter {
@@ -82,10 +82,10 @@ class RunningContentListFragment : Fragment() {
         )
     }
 
-    private fun getAdapter(): BaseContentListAdapter<ContentEntityLite> {
-        adapter = BaseContentListAdapter(COMPARATOR)
+    private fun getAdapter(): CourseContentListAdapter <ContentEntityLite> {
+        adapter = CourseContentListAdapter (COMPARATOR)
         lifecycleScope.launchWhenCreated {
-            viewModel.runningContentList.collect {
+            viewModel.courseContentList.collect {
                 adapter.submitData(it)
             }
         }
