@@ -20,14 +20,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import `in`.testpress.course.adapter.BaseContentListAdapter
-import `in`.testpress.database.entities.RunningContentEntity
+import `in`.testpress.database.entities.ContentEntityLite
 import kotlinx.coroutines.flow.collect
 
 class RunningContentListFragment : Fragment() {
 
     private var courseId: Long = -1
     private lateinit var binding: BaseContentListLayoutBinding
-    private lateinit var adapter: BaseContentListAdapter<RunningContentEntity>
+    private lateinit var adapter: BaseContentListAdapter<ContentEntityLite>
     private lateinit var viewModel: RunningContentsListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,7 +82,7 @@ class RunningContentListFragment : Fragment() {
         )
     }
 
-    private fun getAdapter(): BaseContentListAdapter<RunningContentEntity> {
+    private fun getAdapter(): BaseContentListAdapter<ContentEntityLite> {
         adapter = BaseContentListAdapter(COMPARATOR)
         lifecycleScope.launchWhenCreated {
             viewModel.runningContentList.collect {
@@ -159,16 +159,16 @@ class RunningContentListFragment : Fragment() {
 
     companion object {
         private val COMPARATOR =
-            object : DiffUtil.ItemCallback<RunningContentEntity>() {
+            object : DiffUtil.ItemCallback<ContentEntityLite>() {
                 override fun areContentsTheSame(
-                    oldItem: RunningContentEntity,
-                    newItem: RunningContentEntity
+                    oldItem: ContentEntityLite,
+                    newItem: ContentEntityLite
                 ): Boolean =
                     oldItem == newItem
 
                 override fun areItemsTheSame(
-                    oldItem: RunningContentEntity,
-                    newItem: RunningContentEntity
+                    oldItem: ContentEntityLite,
+                    newItem: ContentEntityLite
                 ): Boolean =
                     oldItem.id == newItem.id
             }

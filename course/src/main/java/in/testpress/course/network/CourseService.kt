@@ -9,7 +9,7 @@ import `in`.testpress.models.greendao.Course
 import `in`.testpress.network.RetrofitCall
 import `in`.testpress.network.TestpressApiClient
 import `in`.testpress.database.entities.ProductCategoryEntity
-import `in`.testpress.database.entities.RunningContentEntity
+import `in`.testpress.database.entities.ContentEntityLite
 import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.ContentsListResponse
 import android.content.Context
@@ -62,7 +62,7 @@ interface CourseService {
     suspend fun getRunningContents(
         @Path(value = "course_id", encoded = true) courseId: Long,
         @QueryMap queryParams: HashMap<String, Any>
-    ): ApiResponse<List<RunningContentEntity>>
+    ): ApiResponse<List<ContentEntityLite>>
 }
 
 
@@ -106,7 +106,7 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         return getCourseService().getProductsCategories(arguments)
     }
 
-    suspend fun getRunningContents(courseId: Long, arguments: HashMap<String, Any>): ApiResponse<List<RunningContentEntity>> {
+    suspend fun getRunningContents(courseId: Long, arguments: HashMap<String, Any>): ApiResponse<List<ContentEntityLite>> {
         return getCourseService().getRunningContents(courseId, arguments)
     }
 }

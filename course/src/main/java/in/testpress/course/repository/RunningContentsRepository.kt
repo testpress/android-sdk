@@ -18,6 +18,6 @@ class RunningContentsRepository(val context: Context, val courseId: Long = -1) {
         config = PagingConfig(pageSize = 15),
         remoteMediator = RunningContentRemoteMediator(courseNetwork,database,courseId)
     ) {
-        database.runningContentDao().getAll(courseId)
+        database.contentLiteDao().getAll(courseId)
     }.flow
 }
