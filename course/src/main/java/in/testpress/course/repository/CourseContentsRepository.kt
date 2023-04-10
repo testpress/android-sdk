@@ -7,6 +7,7 @@ import android.content.Context
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import `in`.testpress.database.entities.CourseContentType
 
 class CourseContentsRepository(val context: Context, val courseId: Long = -1,val type: Int) {
 
@@ -18,6 +19,10 @@ class CourseContentsRepository(val context: Context, val courseId: Long = -1,val
         config = PagingConfig(pageSize = 15),
         remoteMediator = CourseContentsRemoteMediator(courseNetwork,database,courseId,type)
     ) {
-        database.contentLiteDao().getCourseContents(courseId, type)
+        if (type == CourseContentType.RUNNING_CONTENT.ordinal){
+            database.contentLiteDao().getRunningContents(courseId, type)
+        } else {
+            database.contentLiteDao().getUpcomingContents(courseId,type)
+        }
     }.flow
 }
