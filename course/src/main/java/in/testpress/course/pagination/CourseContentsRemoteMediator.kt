@@ -124,16 +124,9 @@ class CourseContentsRemoteMediator(
         results: List<ContentEntityLite>,
         keys: List<ContentEntityLiteRemoteKey>
     ) {
-        contentLiteDao.insertAll( mapContentsWithType(results)  )
+        results.forEach { it.type = type }
+        contentLiteDao.insertAll(results)
         contentLiteRemoteKeyDao.insertAll(keys)
-    }
-
-    private fun mapContentsWithType(results: List<ContentEntityLite>): List<ContentEntityLite>{
-        return results.map { content ->
-            content.apply {
-                this.type = this@CourseContentsRemoteMediator.type
-            }
-        }
     }
 
 }
