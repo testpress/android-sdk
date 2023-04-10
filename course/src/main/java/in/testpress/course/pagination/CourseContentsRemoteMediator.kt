@@ -15,7 +15,7 @@ import java.io.IOException
 private const val DEFAULT_PAGE_INDEX = 1
 
 @OptIn(ExperimentalPagingApi::class)
-class RunningContentRemoteMediator(
+class CourseContentsRemoteMediator(
     val courseNetwork: CourseNetwork,
     val database: TestpressDatabase,
     val courseId: Long
@@ -38,7 +38,7 @@ class RunningContentRemoteMediator(
         if (pageNumber == -1) return MediatorResult.Success(endOfPaginationReached = true)
 
         return try {
-            val response = fetchRunningContents(pageNumber)
+            val response = fetchCourseContents(pageNumber)
 
             storeDataInDB(loadType,response)
 
@@ -74,7 +74,7 @@ class RunningContentRemoteMediator(
             }
     }
 
-    private suspend fun fetchRunningContents(page: Int = 1): ApiResponse<List<ContentEntityLite>> {
+    private suspend fun fetchCourseContents(page: Int = 1): ApiResponse<List<ContentEntityLite>> {
         val queryParams = hashMapOf<String, Any>("page" to page)
         return courseNetwork.getRunningContents(courseId, queryParams)
     }
