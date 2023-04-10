@@ -9,6 +9,7 @@ import in.testpress.core.TestpressSession;
 import in.testpress.course.TestpressCourse;
 import in.testpress.course.fragments.CourseContentListFragment;
 import in.testpress.course.ui.LeaderboardFragment;
+import in.testpress.database.entities.CourseContentType;
 import in.testpress.samples.BaseNavigationDrawerActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
@@ -35,6 +36,9 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
             case R.id.running_content:
                 showSDK(3);
                 break;
+            case R.id.upcoming_content:
+                showSDK(4);
+                break;
         }
         super.onDrawerItemSelected(menuItem);
     }
@@ -58,22 +62,24 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                 TestpressCourse.show(this, R.id.fragment_container, session);
             } else if (position == 2){
                 TestpressCourse.showLeaderboard(this, R.id.fragment_container, session);
-            } else {
-                launchCourseContentFragment();
+            } else if (position == 3) {
+                launchCourseContentFragment(CourseContentType.RUNNING_CONTENT.ordinal());
+            }else {
+                launchCourseContentFragment(CourseContentType.UPCOMING_CONTENT.ordinal());
             }
         } else {
             Intent intent = new Intent(this, TestpressCoreSampleActivity.class);
             startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
         }
     }
-    private void launchCourseContentFragment(){
+    private void launchCourseContentFragment(int type){
         ViewUtils.showInputDialogBox(NavigationDrawerActivity.this, "Enter Course ID",
                 new ViewUtils.OnInputCompletedListener() {
                     @Override
                     public void onInputComplete(String inputText) {
                         Bundle bundle = new Bundle();
                         bundle.putString("courseId",inputText);
-                        CourseContentListFragment fragment = new CourseContentListFragment();
+                        CourseContentListFragment fragment = new CourseContentListFragment(type);
                         fragment.setArguments(bundle);
                         NavigationDrawerActivity.this.getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container,fragment)

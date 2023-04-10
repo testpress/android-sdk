@@ -63,6 +63,12 @@ interface CourseService {
         @Path(value = "course_id", encoded = true) courseId: Long,
         @QueryMap queryParams: HashMap<String, Any>
     ): ApiResponse<List<ContentEntityLite>>
+
+    @GET("$COURSE_PATH_v2_5{course_id}$UPCOMING_CONTENTS_PATH")
+    suspend fun getUpcomingContents(
+        @Path(value = "course_id", encoded = true) courseId: Long,
+        @QueryMap queryParams: HashMap<String, Any>
+    ): ApiResponse<List<ContentEntityLite>>
 }
 
 
@@ -108,5 +114,9 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     suspend fun getRunningContents(courseId: Long, arguments: HashMap<String, Any>): ApiResponse<List<ContentEntityLite>> {
         return getCourseService().getRunningContents(courseId, arguments)
+    }
+
+    suspend fun getUpcomingContents(courseId: Long, arguments: HashMap<String, Any>): ApiResponse<List<ContentEntityLite>> {
+        return getCourseService().getUpcomingContents(courseId, arguments)
     }
 }

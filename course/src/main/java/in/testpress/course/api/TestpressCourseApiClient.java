@@ -64,6 +64,8 @@ public class TestpressCourseApiClient extends TestpressApiClient {
 
     public static final String RUNNING_CONTENTS_PATH= "/running_contents/";
 
+    public static final String UPCOMING_CONTENTS_PATH= "/upcoming_contents/";
+
     public TestpressCourseApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
     }

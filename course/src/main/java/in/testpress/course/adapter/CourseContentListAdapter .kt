@@ -7,12 +7,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
+import `in`.testpress.course.adapter.viewholder.RunningContentItemViewHolder
+import `in`.testpress.course.adapter.viewholder.UpcomingContentItemViewHolder
 import `in`.testpress.course.databinding.RunningUpcomingListItemBinding
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.asDomainContent
-import `in`.testpress.course.ui.ContentActivity
-import `in`.testpress.course.util.DateUtils
-import `in`.testpress.util.ViewUtils
+import `in`.testpress.database.entities.ContentEntityLite
+import `in`.testpress.database.entities.CourseContentType
 
 class CourseContentListAdapter <T : Any>(COMPARATOR: DiffUtil.ItemCallback<T>):
     PagingDataAdapter<T, BaseCourseContentItemViewHolder>(COMPARATOR){
@@ -23,7 +24,11 @@ class CourseContentListAdapter <T : Any>(COMPARATOR: DiffUtil.ItemCallback<T>):
             parent,
             false
         )
-        return RunningContentItemViewHolder(binding)
+        return if (viewType == CourseContentType.RUNNING_CONTENT.ordinal) {
+            RunningContentItemViewHolder(binding)
+        } else {
+            UpcomingContentItemViewHolder(binding)
+        }
     }
 
     override fun onBindViewHolder(holder: BaseCourseContentItemViewHolder, position: Int) {
@@ -31,6 +36,15 @@ class CourseContentListAdapter <T : Any>(COMPARATOR: DiffUtil.ItemCallback<T>):
         if (content != null) {
             val domainContent = content.asDomainContent()
             holder.bind(domainContent)
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        val content = getItem(position) as ContentEntityLite
+        return if (content.type == CourseContentType.RUNNING_CONTENT.ordinal){
+            CourseContentType.RUNNING_CONTENT.ordinal
+        } else {
+            CourseContentType.UPCOMING_CONTENT.ordinal
         }
     }
 }
@@ -66,33 +80,6 @@ open class BaseCourseContentItemViewHolder(binding: RunningUpcomingListItemBindi
             "VideoConference" -> R.drawable.testpress_live_conference_icon
             "Exam" -> R.drawable.testpress_exam_icon
             else -> R.drawable.testpress_exam_icon
-        }
-    }
-}
-
-class RunningContentItemViewHolder(val binding: RunningUpcomingListItemBinding):BaseCourseContentItemViewHolder(binding){
-
-    override fun bind(content: DomainContent) {
-        super.bind(content)
-        showOrHideDate(content)
-        onItemClick(content)
-    }
-
-    private fun showOrHideDate(content: DomainContent) {
-        binding.date.text = "Ends ${DateUtils.getRelativeTimeString(content.end, binding.root.context)} - "
-        val visibility = DateUtils.getRelativeTimeString(content.end, binding.root.context).isEmpty()
-        ViewUtils.setGone(binding.date, visibility)
-    }
-
-    private fun onItemClick(content: DomainContent) {
-        itemView.setOnClickListener {
-            binding.root.context.startActivity(
-                ContentActivity.createIntent(
-                    content.id,
-                    binding.root.context,
-                    ""
-                )
-            )
         }
     }
 }

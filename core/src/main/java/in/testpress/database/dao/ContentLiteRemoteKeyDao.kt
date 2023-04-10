@@ -12,9 +12,9 @@ interface ContentLiteRemoteKeyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(remoteKey: List<ContentEntityLiteRemoteKey>)
 
-    @Query("SELECT * FROM runningcontentremotekeys WHERE contentId = :contentId")
-    suspend fun remoteKeysContentId(contentId: Long): ContentEntityLiteRemoteKey?
+    @Query("SELECT * FROM runningcontentremotekeys WHERE contentId = :contentId AND type = :type")
+    suspend fun remoteKeysContentId(contentId: Long, type: Int): ContentEntityLiteRemoteKey?
 
-    @Query("DELETE FROM runningcontentremotekeys WHERE courseId =:courseId")
-    suspend fun clearRemoteKeysByCourseIdAndClassName(courseId: Long)
+    @Query("DELETE FROM runningcontentremotekeys WHERE courseId =:courseId AND type = :type")
+    suspend fun clearRemoteKeysByCourseIdAndType(courseId: Long, type: Int)
 }

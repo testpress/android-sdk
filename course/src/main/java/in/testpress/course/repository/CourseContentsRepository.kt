@@ -7,8 +7,9 @@ import android.content.Context
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import `in`.testpress.database.entities.CourseContentType
 
-class CourseContentsRepository(val context: Context, val courseId: Long = -1) {
+class CourseContentsRepository(val context: Context, val courseId: Long = -1,val type: Int) {
 
     val courseNetwork = CourseNetwork(context)
     val database = TestpressDatabase.invoke(context)
@@ -16,8 +17,12 @@ class CourseContentsRepository(val context: Context, val courseId: Long = -1) {
     @OptIn(ExperimentalPagingApi::class)
     fun courseContentList() = Pager(
         config = PagingConfig(pageSize = 15),
-        remoteMediator = CourseContentsRemoteMediator(courseNetwork,database,courseId)
+        remoteMediator = CourseContentsRemoteMediator(courseNetwork,database,courseId,type)
     ) {
-        database.contentLiteDao().getAll(courseId)
+        if (type == CourseContentType.RUNNING_CONTENT.ordinal){
+            database.contentLiteDao().getRunningContents(courseId, type)
+        } else {
+            database.contentLiteDao().getUpcomingContents(courseId,type)
+        }
     }.flow
 }
