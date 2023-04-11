@@ -3,14 +3,22 @@ package in.testpress.exam.ui;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
+
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import junit.framework.Assert;
 
@@ -131,6 +140,9 @@ public class ReviewStatsFragment extends BaseFragment {
             Content content = courseAttempt.getRawChapterContent();
             isQuiz = (content != null) && (content.getContentType().equals("Quiz"));
         }
+        if (attempt.getReviewPdf() != null && !attempt.getReviewPdf().isEmpty()){
+            setHasOptionsMenu(true);
+        }
     }
 
     @Override
@@ -148,6 +160,39 @@ public class ReviewStatsFragment extends BaseFragment {
         if (isQuiz) {
             hideViewsForQuiz();
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.testpress_download_icon, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.download_icon) {
+            showDownloadDialogBox();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void showDownloadDialogBox(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle);
+        builder.setTitle("Review PDF Download");
+        builder.setMessage(exam.getTitle()+"-"+attempt.getId().toString()+".pdf");
+        builder.setPositiveButton("Download", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.d("TAG", "onClick: "+attempt.getReviewPdf());
+                requireActivity().startActivity(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse(attempt.getReviewPdf())));
+            }
+        });
+        builder.setNegativeButton("cancel", null);
+        builder.show();
     }
 
     private void bindViews(View view) {
