@@ -120,16 +120,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
 
             if (instituteSettings.isCoursesFrontend() &&
                     instituteSettings.isCoursesGamificationEnabled() && productSlug == null) {
-
-                findViewById(R.id.fragment_carousel).setVisibility(View.VISIBLE);
-                findViewById(R.id.fragment_container).setVisibility(View.GONE);
-                CourseDetailsTabAdapter adapter = new CourseDetailsTabAdapter(getResources(),
-                        getSupportFragmentManager(), getIntent().getExtras());
-
-                ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-                viewPager.setAdapter(adapter);
-                TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-                tabLayout.setupWithViewPager(viewPager);
+                loadCourseTabLayout();
             } else {
                 loadChildChapters();
             }
@@ -242,7 +233,6 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         }
     }
 
-
     void loadChaptersOrContents() {
         getSupportActionBar().setTitle(chapter.getName());
         if (chapter.hasChildren()) {
@@ -256,6 +246,18 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             getIntent().putExtra(PRODUCT_SLUG, productSlug);
             loadContents();
         }
+    }
+
+    void loadCourseTabLayout() {
+        findViewById(R.id.fragment_carousel).setVisibility(View.VISIBLE);
+        findViewById(R.id.fragment_container).setVisibility(View.GONE);
+        CourseDetailsTabAdapter adapter = new CourseDetailsTabAdapter(getResources(),
+                getSupportFragmentManager(), getIntent().getExtras());
+
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setAdapter(adapter);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     private void loadChildChapters() {
