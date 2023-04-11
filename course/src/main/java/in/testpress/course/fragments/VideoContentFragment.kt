@@ -114,17 +114,21 @@ class VideoContentFragment : BaseContentDetailFragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.download) {
-            showDownloadDialog()
-            return true
-        } else if (item.itemId == R.id.downloaded) {
-            requireContext().startActivity(DownloadsActivity.createIntent(requireContext()))
-            return true
-        } else if (item.itemId == R.id.download_progress) {
-            requireContext().startActivity(DownloadsActivity.createIntent(requireContext()))
-            return true
+        return when (item.itemId) {
+            R.id.download -> {
+                showDownloadDialog()
+                true
+            }
+            R.id.downloaded -> {
+                requireContext().startActivity(DownloadsActivity.createIntent(requireContext()))
+                true
+            }
+            R.id.download_progress -> {
+                requireContext().startActivity(DownloadsActivity.createIntent(requireContext()))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun showDownloadUnavailableDialog(errorReason: VideoDownloadError) {
