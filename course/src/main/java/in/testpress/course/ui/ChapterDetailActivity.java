@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import com.google.android.material.tabs.TabLayout;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -99,39 +100,34 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             });
             loadChapter(chapterUrl);
         } else {
-            String title = getIntent().getStringExtra(ACTIONBAR_TITLE);
-            if (title != null && !title.isEmpty()) {
-                //noinspection ConstantConditions
-                getSupportActionBar().setTitle(title);
-            } else {
-                String courseId = getIntent().getStringExtra(COURSE_ID);
-                CourseDao courseDao = TestpressSDKDatabase.getCourseDao(this);
-                List<Course> courses = courseDao.queryBuilder()
-                        .where(CourseDao.Properties.Id.eq(courseId)).list();
-
-                if (!courses.isEmpty()) {
-                    //noinspection ConstantConditions
-                    getSupportActionBar().setTitle(courses.get(0).getTitle());
-                }
-            }
+            setActionBarTitle();
             //noinspection ConstantConditions
             InstituteSettings instituteSettings =
                     TestpressSdk.getTestpressSession(this).getInstituteSettings();
 
             if (instituteSettings.isCoursesFrontend() &&
                     instituteSettings.isCoursesGamificationEnabled() && productSlug == null) {
-
-                findViewById(R.id.fragment_carousel).setVisibility(View.VISIBLE);
-                findViewById(R.id.fragment_container).setVisibility(View.GONE);
-                CourseDetailsTabAdapter adapter = new CourseDetailsTabAdapter(getResources(),
-                        getSupportFragmentManager(), getIntent().getExtras());
-
-                ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-                viewPager.setAdapter(adapter);
-                TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-                tabLayout.setupWithViewPager(viewPager);
+                loadCourseTabLayout();
             } else {
                 loadChildChapters();
+            }
+        }
+    }
+
+    private void setActionBarTitle() {
+        String title = getIntent().getStringExtra(ACTIONBAR_TITLE);
+        if (title != null && !title.isEmpty()) {
+            //noinspection ConstantConditions
+            getSupportActionBar().setTitle(title);
+        } else {
+            String courseId = getIntent().getStringExtra(COURSE_ID);
+            CourseDao courseDao = TestpressSDKDatabase.getCourseDao(this);
+            List<Course> courses = courseDao.queryBuilder()
+                    .where(CourseDao.Properties.Id.eq(courseId)).list();
+
+            if (!courses.isEmpty()) {
+                //noinspection ConstantConditions
+                getSupportActionBar().setTitle(courses.get(0).getTitle());
             }
         }
     }
@@ -242,7 +238,6 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         }
     }
 
-
     void loadChaptersOrContents() {
         getSupportActionBar().setTitle(chapter.getName());
         if (chapter.hasChildren()) {
@@ -256,6 +251,18 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             getIntent().putExtra(PRODUCT_SLUG, productSlug);
             loadContents();
         }
+    }
+
+    void loadCourseTabLayout() {
+        findViewById(R.id.fragment_carousel).setVisibility(View.VISIBLE);
+        findViewById(R.id.fragment_container).setVisibility(View.GONE);
+        CourseDetailsTabAdapter adapter = new CourseDetailsTabAdapter(getResources(),
+                getSupportFragmentManager(), getIntent().getExtras());
+
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setAdapter(adapter);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     private void loadChildChapters() {
