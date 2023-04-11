@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import in.testpress.core.TestpressCallback;
@@ -256,13 +257,28 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     void loadCourseTabLayout() {
         findViewById(R.id.fragment_carousel).setVisibility(View.VISIBLE);
         findViewById(R.id.fragment_container).setVisibility(View.GONE);
-        CourseDetailsTabAdapter adapter = new CourseDetailsTabAdapter(getResources(),
-                getSupportFragmentManager(), getIntent().getExtras());
+        CourseDetailsTabAdapter adapter =
+                new CourseDetailsTabAdapter(getSupportFragmentManager(), getFragmentListWithTitle());
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setAdapter(adapter);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
+    }
+
+    private LinkedHashMap<Fragment, String> getFragmentListWithTitle() {
+        LinkedHashMap<Fragment, String> fragmentListWithTitle = new LinkedHashMap<>();
+        Bundle extras = getIntent().getExtras();
+
+        ChaptersListFragment chaptersListFragment = new ChaptersListFragment();
+        chaptersListFragment.setArguments(extras);
+        fragmentListWithTitle.put(chaptersListFragment, getString(R.string.testpress_learn));
+
+        RankListFragment rankListFragment = new RankListFragment();
+        rankListFragment.setArguments(extras);
+        fragmentListWithTitle.put(rankListFragment, getString(R.string.testpress_leaderboard));
+
+        return fragmentListWithTitle;
     }
 
     private void loadChildChapters() {
