@@ -8,6 +8,8 @@ import androidx.annotation.Nullable;
 import com.google.android.material.tabs.TabLayout;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
+
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -99,21 +101,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             });
             loadChapter(chapterUrl);
         } else {
-            String title = getIntent().getStringExtra(ACTIONBAR_TITLE);
-            if (title != null && !title.isEmpty()) {
-                //noinspection ConstantConditions
-                getSupportActionBar().setTitle(title);
-            } else {
-                String courseId = getIntent().getStringExtra(COURSE_ID);
-                CourseDao courseDao = TestpressSDKDatabase.getCourseDao(this);
-                List<Course> courses = courseDao.queryBuilder()
-                        .where(CourseDao.Properties.Id.eq(courseId)).list();
-
-                if (!courses.isEmpty()) {
-                    //noinspection ConstantConditions
-                    getSupportActionBar().setTitle(courses.get(0).getTitle());
-                }
-            }
+            setActionBarTitle();
             //noinspection ConstantConditions
             InstituteSettings instituteSettings =
                     TestpressSdk.getTestpressSession(this).getInstituteSettings();
@@ -123,6 +111,24 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                 loadCourseTabLayout();
             } else {
                 loadChildChapters();
+            }
+        }
+    }
+
+    private void setActionBarTitle() {
+        String title = getIntent().getStringExtra(ACTIONBAR_TITLE);
+        if (title != null && !title.isEmpty()) {
+            //noinspection ConstantConditions
+            getSupportActionBar().setTitle(title);
+        } else {
+            String courseId = getIntent().getStringExtra(COURSE_ID);
+            CourseDao courseDao = TestpressSDKDatabase.getCourseDao(this);
+            List<Course> courses = courseDao.queryBuilder()
+                    .where(CourseDao.Properties.Id.eq(courseId)).list();
+
+            if (!courses.isEmpty()) {
+                //noinspection ConstantConditions
+                getSupportActionBar().setTitle(courses.get(0).getTitle());
             }
         }
     }
