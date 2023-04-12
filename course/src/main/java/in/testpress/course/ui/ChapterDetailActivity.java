@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 import in.testpress.core.TestpressCallback;
@@ -49,6 +49,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
 
     public static final String CONTENTS_URL_FRAG = "contentsUrlFrag";
     public static final String CHAPTER_ID = "chapterId";
+    public static final String TITLE = "title";
 
     private Chapter chapter;
     private SharedPreferences prefs;
@@ -258,7 +259,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         findViewById(R.id.fragment_carousel).setVisibility(View.VISIBLE);
         findViewById(R.id.fragment_container).setVisibility(View.GONE);
         CourseDetailsTabAdapter adapter =
-                new CourseDetailsTabAdapter(getSupportFragmentManager(), getFragmentListWithTitle());
+                new CourseDetailsTabAdapter(getSupportFragmentManager(), getFragmentList());
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setAdapter(adapter);
@@ -266,30 +267,48 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         tabLayout.setupWithViewPager(viewPager);
     }
 
-    private LinkedHashMap<Fragment, String> getFragmentListWithTitle() {
-        LinkedHashMap<Fragment, String> fragmentListWithTitle = new LinkedHashMap<>();
-        Bundle extras = getIntent().getExtras();
+    private ArrayList<Fragment> getFragmentList() {
+        ArrayList<Fragment> fragments = new ArrayList<>();
 
-        ChaptersListFragment chaptersListFragment = new ChaptersListFragment();
-        chaptersListFragment.setArguments(extras);
-        fragmentListWithTitle.put(chaptersListFragment, getString(R.string.testpress_learn));
-
-        CourseContentListFragment runningContentListFragment =
-                new CourseContentListFragment(CourseContentType.RUNNING_CONTENT.ordinal());
-        runningContentListFragment.setArguments(extras);
-        fragmentListWithTitle.put(runningContentListFragment, getString(R.string.testpress_running_contents));
-
-        CourseContentListFragment upcomingContentListFragment =
-                new CourseContentListFragment(CourseContentType.UPCOMING_CONTENT.ordinal());
-        upcomingContentListFragment.setArguments(extras);
-        fragmentListWithTitle.put(upcomingContentListFragment, getString(R.string.testpress_upcoming_contents));
+        fragments.add(
+                createFragment(
+                        new ChaptersListFragment(),
+                        getIntent().getExtras(),
+                        getString(R.string.testpress_learn)
+                )
+        );
+        fragments.add(
+                createFragment(
+                        new CourseContentListFragment(CourseContentType.RUNNING_CONTENT.ordinal()),
+                        getIntent().getExtras(),
+                        getString(R.string.testpress_running_contents)
+                )
+        );
+        fragments.add(
+                createFragment(
+                        new CourseContentListFragment(CourseContentType.UPCOMING_CONTENT.ordinal()),
+                        getIntent().getExtras(),
+                        getString(R.string.testpress_upcoming_contents)
+                )
+        );
 
         if (instituteSettings.isCoursesGamificationEnabled()) {
-            RankListFragment rankListFragment = new RankListFragment();
-            rankListFragment.setArguments(extras);
-            fragmentListWithTitle.put(rankListFragment, getString(R.string.testpress_leaderboard));
+            fragments.add(
+                    createFragment(
+                            new RankListFragment(),
+                            getIntent().getExtras(),
+                            getString(R.string.testpress_leaderboard)
+                    )
+            );
         }
-        return fragmentListWithTitle;
+
+        return fragments;
+    }
+
+    private Fragment createFragment(Fragment fragment, Bundle extras, String title) {
+        extras.putString(TITLE, title);
+        fragment.setArguments(extras);
+        return fragment;
     }
 
     private void loadChildChapters() {
