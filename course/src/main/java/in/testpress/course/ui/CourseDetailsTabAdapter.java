@@ -1,18 +1,20 @@
 package in.testpress.course.ui;
 
+import static in.testpress.course.ui.ChapterDetailActivity.TITLE;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 
 class CourseDetailsTabAdapter extends FragmentPagerAdapter {
 
-    private LinkedHashMap<Fragment, String> fragmentList;
+    private ArrayList<Fragment> fragmentList;
 
     CourseDetailsTabAdapter(
             FragmentManager fragmentManager,
-            LinkedHashMap<Fragment, String> fragmentList
+            ArrayList<Fragment> fragmentList
     ) {
         super(fragmentManager);
         this.fragmentList = fragmentList;
@@ -25,12 +27,12 @@ class CourseDetailsTabAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return (Fragment) fragmentList.keySet().toArray()[position];
+        return fragmentList.get(position);
     }
 
     @Override
     public CharSequence getPageTitle(final int position) {
-        return fragmentList.get(getItem(position));
+        return fragmentList.get(position).getArguments().getString(TITLE);
     }
 
 }

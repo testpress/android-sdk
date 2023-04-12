@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 import in.testpress.core.TestpressCallback;
@@ -24,6 +24,8 @@ import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.course.api.TestpressCourseApiClient;
+import in.testpress.course.fragments.CourseContentListFragment;
+import in.testpress.database.entities.CourseContentType;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
@@ -47,6 +49,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
 
     public static final String CONTENTS_URL_FRAG = "contentsUrlFrag";
     public static final String CHAPTER_ID = "chapterId";
+    public static final String TITLE = "title";
 
     private Chapter chapter;
     private SharedPreferences prefs;
@@ -60,6 +63,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     private RetrofitCall<Chapter> chapterApiRequest;
     private RetrofitCall<Course> courseApiRequest;
     private String productSlug;
+    InstituteSettings instituteSettings;
 
     public static Intent createIntent(String title, String courseId, Context context, String productSlug) {
         Intent intent = new Intent(context, ChapterDetailActivity.class);
@@ -84,6 +88,8 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         prefs.edit().clear().apply();
         courseDao = TestpressSDKDatabase.getCourseDao(this);
         productSlug = getIntent().getStringExtra(PRODUCT_SLUG);
+        //noinspection ConstantConditions
+        instituteSettings = TestpressSdk.getTestpressSession(this).getInstituteSettings();
         final String chapterUrl = getIntent().getStringExtra(CHAPTER_URL);
         if (chapterUrl != null) {
             emptyView = (LinearLayout) findViewById(R.id.empty_container);
@@ -102,12 +108,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             loadChapter(chapterUrl);
         } else {
             setActionBarTitle();
-            //noinspection ConstantConditions
-            InstituteSettings instituteSettings =
-                    TestpressSdk.getTestpressSession(this).getInstituteSettings();
-
-            if (instituteSettings.isCoursesFrontend() &&
-                    instituteSettings.isCoursesGamificationEnabled() && productSlug == null) {
+            if (instituteSettings.isCoursesFrontend() && productSlug == null) {
                 loadCourseTabLayout();
             } else {
                 loadChildChapters();
@@ -258,7 +259,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         findViewById(R.id.fragment_carousel).setVisibility(View.VISIBLE);
         findViewById(R.id.fragment_container).setVisibility(View.GONE);
         CourseDetailsTabAdapter adapter =
-                new CourseDetailsTabAdapter(getSupportFragmentManager(), getFragmentListWithTitle());
+                new CourseDetailsTabAdapter(getSupportFragmentManager(), getFragmentList());
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setAdapter(adapter);
@@ -266,19 +267,48 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         tabLayout.setupWithViewPager(viewPager);
     }
 
-    private LinkedHashMap<Fragment, String> getFragmentListWithTitle() {
-        LinkedHashMap<Fragment, String> fragmentListWithTitle = new LinkedHashMap<>();
-        Bundle extras = getIntent().getExtras();
+    private ArrayList<Fragment> getFragmentList() {
+        ArrayList<Fragment> fragments = new ArrayList<>();
 
-        ChaptersListFragment chaptersListFragment = new ChaptersListFragment();
-        chaptersListFragment.setArguments(extras);
-        fragmentListWithTitle.put(chaptersListFragment, getString(R.string.testpress_learn));
+        fragments.add(
+                createFragment(
+                        new ChaptersListFragment(),
+                        getIntent().getExtras(),
+                        getString(R.string.testpress_learn)
+                )
+        );
+        fragments.add(
+                createFragment(
+                        new CourseContentListFragment(CourseContentType.RUNNING_CONTENT.ordinal()),
+                        getIntent().getExtras(),
+                        getString(R.string.testpress_running_contents)
+                )
+        );
+        fragments.add(
+                createFragment(
+                        new CourseContentListFragment(CourseContentType.UPCOMING_CONTENT.ordinal()),
+                        getIntent().getExtras(),
+                        getString(R.string.testpress_upcoming_contents)
+                )
+        );
 
-        RankListFragment rankListFragment = new RankListFragment();
-        rankListFragment.setArguments(extras);
-        fragmentListWithTitle.put(rankListFragment, getString(R.string.testpress_leaderboard));
+        if (instituteSettings.isCoursesGamificationEnabled()) {
+            fragments.add(
+                    createFragment(
+                            new RankListFragment(),
+                            getIntent().getExtras(),
+                            getString(R.string.testpress_leaderboard)
+                    )
+            );
+        }
 
-        return fragmentListWithTitle;
+        return fragments;
+    }
+
+    private Fragment createFragment(Fragment fragment, Bundle extras, String title) {
+        extras.putString(TITLE, title);
+        fragment.setArguments(extras);
+        return fragment;
     }
 
     private void loadChildChapters() {
