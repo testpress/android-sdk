@@ -1,34 +1,18 @@
 package in.testpress.exam.ui;
 
-import static android.content.Context.DOWNLOAD_SERVICE;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.DownloadManager;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentActivity;
 
-import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,12 +24,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import junit.framework.Assert;
 
-import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import in.testpress.core.TestpressCallback;
@@ -74,7 +55,6 @@ import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_COURSE_ATTEMPT;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_EXAM;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_PREVIOUS_ACTIVITY;
 
-import com.android.installreferrer.BuildConfig;
 
 public class ReviewStatsFragment extends BaseFragment {
 
@@ -131,6 +111,7 @@ public class ReviewStatsFragment extends BaseFragment {
     private InstituteSettings instituteSettings;
     private RetrofitCall<TestpressApiResponse<Attempt>> attemptsApiRequest;
     private boolean isQuiz = false;
+    private FileDownloader fileDownloader;
 
     public static void showReviewStatsFragment(FragmentActivity activity, Exam exam, Attempt attempt,
                                                boolean showRetakeButton) {
@@ -149,6 +130,7 @@ public class ReviewStatsFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         exam = getArguments().getParcelable(PARAM_EXAM);
         Assert.assertNotNull("PARAM_EXAM must not be null.", exam);
         instituteSettings = getInstituteSettings();
@@ -158,9 +140,6 @@ public class ReviewStatsFragment extends BaseFragment {
             attempt = courseAttempt.getRawAssessment();
             Content content = courseAttempt.getRawChapterContent();
             isQuiz = (content != null) && (content.getContentType().equals("Quiz"));
-        }
-        if (attempt.getReviewPdf() != null && !attempt.getReviewPdf().isEmpty()){
-            setHasOptionsMenu(true);
         }
     }
 
@@ -198,95 +177,28 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void showDownloadDialogBox(){
-
-        String filename = changeFilenameIfAlreadyExist(exam.getTitle()+attempt.getId());
-
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle);
         builder.setTitle("Review PDF Download");
-        builder.setMessage(filename);
-        builder.setPositiveButton("Download", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-//                Log.d("TAG", "onClick: "+attempt.getReviewPdf());
-//                requireActivity().startActivity(new Intent(Intent.ACTION_VIEW,
-//                        Uri.parse(attempt.getReviewPdf())));
-                Log.d("TAG", "onClick: "+ Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
-                downloadAndOpenPdfFile("https://www.sampledocs.in/DownloadFiles/SampleFile?filename=sampledocs-100mb-pdf-file&ext=pdf",filename);
-            }
-        });
-        builder.setNegativeButton("cancel", null);
-        builder.show();
-    }
 
-    private String changeFilenameIfAlreadyExist(String fileName) {
-        int counter = 1;
-        String newFileName = fileName + ".pdf";
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), newFileName);
-        while (file.exists()) {
-            // If the file already exists, append a counter to the filename and try again
-            newFileName = fileName + " (" + counter + ")" + ".pdf";
-            file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), newFileName);
-            counter++;
-        }
-        return newFileName;
-    }
-
-    private void downloadAndOpenPdfFile(String pdfUrl, String pdfFilename) {
-
-        // Create a DownloadManager.Request object to specify the PDF file to download
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(pdfUrl))
-                .setTitle(pdfFilename)
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
-                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,pdfFilename);
-
-        // Get the DownloadManager service and enqueue the download request
-        DownloadManager downloadManager = (DownloadManager) requireContext().getSystemService(DOWNLOAD_SERVICE);
-        long downloadId = downloadManager.enqueue(request);
-
-        // Create a BroadcastReceiver to listen for completion of the download
-        BroadcastReceiver onComplete = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                // Get the ID of the completed download from the intent
-                long completedDownloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-
-                // If the completed download matches the one we started earlier, show a notification and open the PDF file
-                if (completedDownloadId == downloadId) {
-                    Intent intent1 = new Intent(Intent.ACTION_VIEW);
-                    File pdfFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), pdfFilename);
-                    Uri uri = FileProvider.getUriForFile(requireContext(), context.getPackageName()+ ".provider", pdfFile);
-                    intent1.setDataAndType(uri, "application/pdf");
-                    intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    PendingIntent pendingIntent = PendingIntent.getActivity(requireContext(), 0, intent1, PendingIntent.FLAG_UPDATE_CURRENT);
-                    showNotification(pdfFilename, pendingIntent);
+        if (attempt.getReviewPdf() == null || attempt.getReviewPdf().equals("")){
+            builder.setMessage("PDF not available please try again later ");
+            builder.setPositiveButton("ok", null);
+        } else {
+            String filename = FileDownloader.Companion.changeFilenameIfAlreadyExist(exam.getTitle()+attempt.getId(), FileDownloader.FileType.PDF);
+            builder.setMessage(filename);
+            builder.setPositiveButton("Download", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    fileDownloader = new FileDownloader(requireContext(),
+                            attempt.getReviewPdf(),
+                            filename
+                    );
+                    fileDownloader.downloadFile();
                 }
-            }
-        };
-
-        // Register the BroadcastReceiver to listen for completion of the download
-        requireContext().registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-    }
-
-    private void showNotification(String pdfFilename, PendingIntent pendingIntent) {
-        // Create a notification channel if necessary (for Android 8.0 and higher)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("pdf_download_channel", "PDF Download", NotificationManager.IMPORTANCE_DEFAULT);
-            NotificationManager notificationManager = requireContext().getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
+            });
+            builder.setNegativeButton("cancel", null);
         }
-
-        // Create a notification to show that the download is complete
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), "pdf_download_channel")
-                .setSmallIcon(R.drawable.ic_file_download_18dp)
-                .setContentTitle("PDF Download Complete")
-                .setContentText(pdfFilename + " has been downloaded.")
-                .setPriority(NotificationCompat.PRIORITY_MIN)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-
-        // Show the notification
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(requireContext());
-        notificationManager.notify(1, builder.build());
+        builder.show();
     }
 
     private void bindViews(View view) {
@@ -634,5 +546,11 @@ public class ReviewStatsFragment extends BaseFragment {
         InstituteSettings settings =
                 TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
         return settings;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        fileDownloader = null;
     }
 }
