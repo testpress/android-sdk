@@ -60,7 +60,6 @@ import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_COURSE_ATTEMPT;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_EXAM;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_PREVIOUS_ACTIVITY;
 
-
 public class ReviewStatsFragment extends BaseFragment {
 
     static final String PARAM_SHOW_RETAKE_BUTTON = "showRetakeButton";
@@ -116,6 +115,7 @@ public class ReviewStatsFragment extends BaseFragment {
     private InstituteSettings instituteSettings;
     private RetrofitCall<TestpressApiResponse<Attempt>> attemptsApiRequest;
     private boolean isQuiz = false;
+    private ProgressDialog pdfGenerationProgressDialog;
 
     public static void showReviewStatsFragment(FragmentActivity activity, Exam exam, Attempt attempt,
                                                boolean showRetakeButton) {
@@ -552,8 +552,6 @@ public class ReviewStatsFragment extends BaseFragment {
             }
         };
     }
-
-    ProgressDialog pdfGenerationProgressDialog;
 
     private DialogInterface.OnClickListener createRequestPdfListener() {
         return new DialogInterface.OnClickListener() {
