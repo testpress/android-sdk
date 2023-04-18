@@ -81,7 +81,7 @@ class FileDownloaderBroadcastReceiver: BroadcastReceiver() {
     private fun showCompletedNotification(pdfFilename: String, pendingIntent: PendingIntent) {
         createNotificationChannel()
 
-        val builder = NotificationCompat.Builder(context, "pdf_download_channel").apply {
+        val builder = NotificationCompat.Builder(context, "file_download_channel").apply {
             setSmallIcon(R.drawable.ic_baseline_file_download_done_24)
             setContentTitle("PDF Download Complete")
             setContentText("$pdfFilename has been downloaded.")
@@ -97,7 +97,7 @@ class FileDownloaderBroadcastReceiver: BroadcastReceiver() {
     private fun showFailedNotification() {
         createNotificationChannel()
 
-        val builder = NotificationCompat.Builder(context, "pdf_download_channel").apply {
+        val builder = NotificationCompat.Builder(context, "file_download_channel").apply {
             setSmallIcon(R.drawable.ic_baseline_error_24)
             setContentTitle("PDF Download Failed")
             setContentText("Please try again later")
@@ -112,8 +112,8 @@ class FileDownloaderBroadcastReceiver: BroadcastReceiver() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                "pdf_download_channel",
-                "PDF Download",
+                "file_download_channel",
+                "File Download",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             val notificationManager: NotificationManager =
