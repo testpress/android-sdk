@@ -18,6 +18,7 @@ import java.io.File
 class FileDownloaderBroadcastReceiver: BroadcastReceiver() {
 
     lateinit var context: Context
+    private val notificationId = System.currentTimeMillis().toInt()
 
     override fun onReceive(context: Context, intent: Intent) {
         this.context = context
@@ -91,7 +92,7 @@ class FileDownloaderBroadcastReceiver: BroadcastReceiver() {
         }
 
         val notificationManager = NotificationManagerCompat.from(context)
-        notificationManager.notify(1, builder.build())
+        notificationManager.notify(notificationId, builder.build())
     }
 
     private fun showFailedNotification() {
@@ -106,7 +107,7 @@ class FileDownloaderBroadcastReceiver: BroadcastReceiver() {
         }
 
         val notificationManager = NotificationManagerCompat.from(context)
-        notificationManager.notify(1, builder.build())
+        notificationManager.notify(notificationId, builder.build())
     }
 
     private fun createNotificationChannel() {

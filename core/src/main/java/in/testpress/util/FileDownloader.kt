@@ -13,11 +13,6 @@ class FileDownloader(private val context: Context) {
         val request = getDownloadManagerRequest(fileUrl,fileName)
         val downloadManager = context.getSystemService<DownloadManager>()
         downloadManager?.enqueue(request) ?: return
-
-        context.registerReceiver(
-            FileDownloaderBroadcastReceiver(),
-            IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
-        )
     }
 
     private fun getDownloadManagerRequest(fileUrl: String, fileName: String): DownloadManager.Request{
