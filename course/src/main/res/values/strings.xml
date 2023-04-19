@@ -102,9 +102,4 @@
         <item name="android:textColor">@color/testpress_black</item>
     </style>
 
-    <plurals name="time_duration">
-        <item quantity="one">in %d %s</item>
-        <item quantity="other">in %d %ss</item>
-    </plurals>
-
 </resources>

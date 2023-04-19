@@ -8,7 +8,7 @@ import `in`.testpress.course.repository.OfflineVideoRepository
 import `in`.testpress.course.repository.VideoWatchDataRepository
 import `in`.testpress.course.services.VideoDownloadService
 import `in`.testpress.course.ui.OfflineVideoListAdapter
-import `in`.testpress.course.util.DateUtils
+import `in`.testpress.util.DateUtils
 import `in`.testpress.course.viewmodels.CourseViewModel
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import `in`.testpress.database.TestpressDatabase
@@ -31,8 +31,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
 import kotlinx.coroutines.*
-import java.util.*
-import kotlin.concurrent.schedule
 
 
 class DownloadsFragment : Fragment(), EmptyViewListener {

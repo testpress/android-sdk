@@ -1,7 +1,7 @@
 package `in`.testpress.course.helpers
 
 import `in`.testpress.core.TestpressSdk
-import `in`.testpress.course.util.DateUtils
+import `in`.testpress.util.DateUtils
 import android.content.Context
 import java.util.Date
 

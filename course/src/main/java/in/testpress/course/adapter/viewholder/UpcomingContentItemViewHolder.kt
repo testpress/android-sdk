@@ -4,7 +4,7 @@ import android.widget.Toast
 import `in`.testpress.course.adapter.BaseCourseContentItemViewHolder
 import `in`.testpress.course.databinding.RunningUpcomingListItemBinding
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.util.DateUtils
+import `in`.testpress.util.DateUtils
 import `in`.testpress.util.ViewUtils
 
 class UpcomingContentItemViewHolder(val binding: RunningUpcomingListItemBinding) :

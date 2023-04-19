@@ -1,11 +1,11 @@
-package `in`.testpress.course.util
+package `in`.testpress.util
 
+import `in`.testpress.R
 import android.content.Context
 import android.os.Build
 import android.provider.Settings
 import java.text.SimpleDateFormat
 import android.text.format.DateUtils.*
-import `in`.testpress.course.R
 import java.util.*
 import java.util.concurrent.TimeUnit
 
