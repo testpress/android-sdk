@@ -66,4 +66,10 @@
         <item>All</item>
         <item>Commented By me</item>
     </string-array>
+
+    <plurals name="time_duration">
+        <item quantity="one">in %d %s</item>
+        <item quantity="other">in %d %ss</item>
+    </plurals>
+
 </resources>

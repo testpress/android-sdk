@@ -9,7 +9,7 @@ import `in`.testpress.course.repository.OfflineVideoRepository
 import `in`.testpress.course.services.VideoDownloadService
 import `in`.testpress.course.ui.DownloadsActivity
 import `in`.testpress.course.ui.VideoDownloadQualityChooserDialog
-import `in`.testpress.course.util.DateUtils.convertDurationStringToSeconds
+import `in`.testpress.util.DateUtils.convertDurationStringToSeconds
 import `in`.testpress.course.util.PatternEditableBuilder
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import `in`.testpress.models.InstituteSettings
@@ -31,11 +31,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.netopen.hotbitmapgg.library.view.RingProgressBar
-import java.text.DateFormat
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.TimeZone
 import java.util.regex.Pattern
 
 class VideoContentFragment : BaseContentDetailFragment() {
