@@ -103,7 +103,7 @@
     </style>
 
     <plurals name="time_duration">
-        <item quantity="one">in 1 %s</item>
+        <item quantity="one">in %d %s</item>
         <item quantity="other">in %d %ss</item>
     </plurals>
 
