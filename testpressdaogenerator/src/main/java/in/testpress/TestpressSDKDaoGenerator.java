@@ -252,6 +252,7 @@ public class TestpressSDKDaoGenerator {
         attempt.addStringProperty("percentage");
         attempt.addIntProperty("lastViewedQuestionId");
         attempt.addStringProperty("externalReviewUrl");
+        attempt.addBooleanProperty("rankEnabled");
         attempt.implementsInterface("android.os.Parcelable");
         attempt.addStringProperty("reviewPdf");
         return attempt;

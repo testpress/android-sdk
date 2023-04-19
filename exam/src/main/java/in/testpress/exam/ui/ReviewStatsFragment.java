@@ -266,7 +266,7 @@ public class ReviewStatsFragment extends BaseFragment {
         timeTaken.setText(attempt.getTimeTaken());
         correct.setText(attempt.getCorrectCount().toString());
         incorrect.setText(attempt.getIncorrectCount().toString());
-        if (Boolean.FALSE.equals(exam.getEnableRanks()) || attempt.getRank().equals("NA")) {
+        if (Boolean.FALSE.equals(attempt.getRankEnabled())) {
             rankLayout.setVisibility(View.GONE);
         } else {
             rank.setText(attempt.getRank());
