@@ -10,6 +10,13 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 object DateUtils {
+
+    const val YEAR = "Year"
+    const val MONTH = "month"
+    const val DAY = "day"
+    const val HOUR = "hour"
+    const val MINUTE = "minute"
+
     const val ONE_DAY_IN_MILLI_SECONDS = 1000 * 60 * 60 * 24
 
     private val CURRENT_MONTH_IN_MILLS get() = getCurrentMonthMills()
@@ -60,23 +67,23 @@ object DateUtils {
         return when {
             timeDifferenceInMills > CURRENT_YEAR_IN_MILLS -> {  // output -> in 1 year
                 val yearCount = (timeDifferenceInMills / CURRENT_YEAR_IN_MILLS).toInt()
-                resource.getQuantityString(R.plurals.years, yearCount, yearCount)
+                resource.getQuantityString(R.plurals.time_duration, yearCount, yearCount, YEAR)
             }
             timeDifferenceInMills > CURRENT_MONTH_IN_MILLS -> {  // output -> in 2 months
                 val monthCount = (timeDifferenceInMills / CURRENT_MONTH_IN_MILLS).toInt()
-                resource.getQuantityString(R.plurals.months, monthCount, monthCount)
+                resource.getQuantityString(R.plurals.time_duration, monthCount, monthCount, MONTH)
             }
             timeDifferenceInMills > DAY_IN_MILLIS -> {  // output -> in 5 days
                 val daysCount = TimeUnit.MILLISECONDS.toDays(timeDifferenceInMills).toInt()
-                resource.getQuantityString(R.plurals.days, daysCount, daysCount)
+                resource.getQuantityString(R.plurals.time_duration, daysCount, daysCount, DAY)
             }
             timeDifferenceInMills > HOUR_IN_MILLIS -> {  // output -> in 10 hours
                 val hoursCount = TimeUnit.MILLISECONDS.toHours(timeDifferenceInMills).toInt()
-                resource.getQuantityString(R.plurals.hours, hoursCount, hoursCount)
+                resource.getQuantityString(R.plurals.time_duration, hoursCount, hoursCount, HOUR)
             }
             else -> {  // output -> in 10 minutes
                 val minutesCount = TimeUnit.MILLISECONDS.toMinutes(timeDifferenceInMills).toInt()
-                resource.getQuantityString(R.plurals.minutes, minutesCount, minutesCount)
+                resource.getQuantityString(R.plurals.time_duration, minutesCount, minutesCount, MINUTE)
             }
         }
     }
