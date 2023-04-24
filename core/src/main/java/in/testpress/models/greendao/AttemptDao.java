@@ -202,7 +202,7 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
         if (externalReviewUrl != null) {
             stmt.bindString(21, externalReviewUrl);
         }
-
+ 
         String reviewPdf = entity.getReviewPdf();
         if (reviewPdf != null) {
             stmt.bindString(22, reviewPdf);
@@ -322,7 +322,7 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
         if (externalReviewUrl != null) {
             stmt.bindString(21, externalReviewUrl);
         }
-
+ 
         String reviewPdf = entity.getReviewPdf();
         if (reviewPdf != null) {
             stmt.bindString(22, reviewPdf);
