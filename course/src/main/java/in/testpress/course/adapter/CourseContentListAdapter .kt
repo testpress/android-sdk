@@ -15,8 +15,8 @@ import `in`.testpress.course.domain.asDomainContent
 import `in`.testpress.database.entities.ContentEntityLite
 import `in`.testpress.database.entities.CourseContentType
 
-class CourseContentListAdapter (COMPARATOR: DiffUtil.ItemCallback<ContentEntityLite>):
-    PagingDataAdapter<ContentEntityLite, BaseCourseContentItemViewHolder>(COMPARATOR){
+class CourseContentListAdapter :
+    PagingDataAdapter<ContentEntityLite, BaseCourseContentItemViewHolder>(COMPARATOR) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseCourseContentItemViewHolder {
         val binding = RunningUpcomingListItemBinding.inflate(
@@ -46,6 +46,24 @@ class CourseContentListAdapter (COMPARATOR: DiffUtil.ItemCallback<ContentEntityL
             else -> CourseContentType.RUNNING_CONTENT.ordinal
         }
     }
+
+    companion object {
+        private val COMPARATOR =
+            object : DiffUtil.ItemCallback<ContentEntityLite>() {
+                override fun areContentsTheSame(
+                    oldItem: ContentEntityLite,
+                    newItem: ContentEntityLite
+                ): Boolean =
+                    oldItem == newItem
+
+                override fun areItemsTheSame(
+                    oldItem: ContentEntityLite,
+                    newItem: ContentEntityLite
+                ): Boolean =
+                    oldItem.id == newItem.id
+            }
+    }
+
 }
 
 open class BaseCourseContentItemViewHolder(binding: RunningUpcomingListItemBinding) :
