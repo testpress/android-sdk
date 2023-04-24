@@ -529,9 +529,9 @@ public class ReviewStatsFragment extends BaseFragment {
 
     private void handlePDFDownloadRequest() {
         if (isDownloadedPDFAvailable()) {
-            showPDFDownloadDialog();
+            displayDownloadPDFDialog();
         } else {
-            showPDFRequestDialog();
+            displayPDFGenerateRequestDialog();
         }
     }
 
@@ -539,7 +539,7 @@ public class ReviewStatsFragment extends BaseFragment {
         return attempt.getReviewPdf() != null && !attempt.getReviewPdf().equals("");
     }
 
-    private void showPDFDownloadDialog(){
+    private void displayDownloadPDFDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle);
         builder.setTitle("Review PDF Download");
         String filename = exam.getTitle() + "-" + attempt.getId() + FileType.PDF.getExtension();
@@ -549,7 +549,7 @@ public class ReviewStatsFragment extends BaseFragment {
         builder.show();
     }
 
-    private void showPDFRequestDialog(){
+    private void displayPDFGenerateRequestDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle);
         builder.setTitle("Review PDF Download");
         builder.setMessage("PDF not available.");
