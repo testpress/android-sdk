@@ -1,16 +1,25 @@
 package in.testpress.exam.ui;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
+
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import junit.framework.Assert;
 
@@ -38,6 +48,8 @@ import in.testpress.models.greendao.Exam;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseFragment;
 import in.testpress.ui.WebViewActivity;
+import in.testpress.util.FileDownloader;
+import in.testpress.util.FileType;
 import in.testpress.util.StringUtils;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
@@ -103,6 +115,7 @@ public class ReviewStatsFragment extends BaseFragment {
     private InstituteSettings instituteSettings;
     private RetrofitCall<TestpressApiResponse<Attempt>> attemptsApiRequest;
     private boolean isQuiz = false;
+    private ProgressDialog pdfGenerationProgressDialog;
 
     public static void showReviewStatsFragment(FragmentActivity activity, Exam exam, Attempt attempt,
                                                boolean showRetakeButton) {
@@ -346,6 +359,7 @@ public class ReviewStatsFragment extends BaseFragment {
                             true, attempt.getUrlFrag()).show();
                 }
             });
+            setHasOptionsMenu(true);
         } else {
             emailPdfButtonLayout.setVisibility(View.GONE);
         }
@@ -495,5 +509,138 @@ public class ReviewStatsFragment extends BaseFragment {
         InstituteSettings settings =
                 TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
         return settings;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.review_stats_options, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.download_icon) {
+            handlePDFDownloadRequest();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void handlePDFDownloadRequest() {
+        if (isDownloadedPDFAvailable()) {
+            displayDownloadPDFDialog();
+        } else {
+            displayPDFGenerateRequestDialog();
+        }
+    }
+
+    private boolean isDownloadedPDFAvailable() {
+        return attempt.getReviewPdf() != null && !attempt.getReviewPdf().equals("");
+    }
+
+    private void displayDownloadPDFDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle);
+        builder.setTitle("Review PDF Download");
+        String filename = exam.getTitle() + "-" + attempt.getId() + FileType.PDF.getExtension();
+        builder.setMessage(filename);
+        builder.setPositiveButton("Download", startPDFDownload(filename));
+        builder.setNegativeButton("cancel", null);
+        builder.show();
+    }
+
+    private void displayPDFGenerateRequestDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle);
+        builder.setTitle("Review PDF Download");
+        builder.setMessage("PDF not available.");
+        builder.setPositiveButton("Request PDF", requestPdf());
+        builder.setNegativeButton("cancel", null);
+        builder.show();
+    }
+
+    private DialogInterface.OnClickListener startPDFDownload(final String filename) {
+        return new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                FileDownloader fileDownloader = new FileDownloader(requireContext());
+                fileDownloader.downloadFile(attempt.getReviewPdf(), filename);
+                Toast.makeText(requireContext(), "Download Started", Toast.LENGTH_SHORT).show();
+            }
+        };
+    }
+
+    private DialogInterface.OnClickListener requestPdf() {
+        return new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int requestCode) {
+                dialogInterface.dismiss();
+                showPdfRequestProgressDialog();
+                initiatePdfRequest();
+            }
+        };
+    }
+
+    private void showPdfRequestProgressDialog() {
+        pdfGenerationProgressDialog = new ProgressDialog(requireContext());
+        pdfGenerationProgressDialog.setMessage(getResources().getString(R.string.testpress_mail_pdf));
+        pdfGenerationProgressDialog.setCancelable(false);
+        pdfGenerationProgressDialog.setIndeterminate(true);
+        UIUtils.setIndeterminateDrawable(requireContext(), pdfGenerationProgressDialog, 4);
+        pdfGenerationProgressDialog.show();
+    }
+
+    private void initiatePdfRequest() {
+        RetrofitCall<Void> call = new TestpressExamApiClient(requireContext()).mailExplanationsPdf(attempt.getUrlFrag() +
+                TestpressExamApiClient.MAIL_PDF_PATH);
+
+        call.enqueue(new TestpressCallback<Void>() {
+            @Override
+            public void onException(TestpressException exception) {
+                dismissPdfRequestProgressDialog();
+                showPdfRequestErrorDialog(exception.isNetworkError());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                dismissPdfRequestProgressDialog();
+                showPdfRequestSuccessDialog();
+            }
+        });
+    }
+
+    private void dismissPdfRequestProgressDialog() {
+        pdfGenerationProgressDialog.dismiss();
+    }
+
+    private void showPdfRequestErrorDialog(boolean isNetworkError) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(),
+                R.style.TestpressAppCompatAlertDialogStyle);
+        if (isNetworkError) {
+            builder.setTitle(R.string.testpress_network_error);
+            builder.setMessage(R.string.testpress_no_internet_try_again);
+        } else {
+            builder.setTitle(R.string.testpress_mail_pdf_error);
+            builder.setMessage(R.string.testpress_mail_pdf_error_description);
+        }
+        builder.setPositiveButton(R.string.testpress_ok, null);
+        builder.show();
+    }
+
+    private static final String PDF_REQUEST_MESSAGE = "Your PDF request has been initiated. Please wait while your PDF is generated and available in a few minutes";
+
+    private void showPdfRequestSuccessDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(),
+                R.style.TestpressAppCompatAlertDialogStyle);
+        builder.setTitle(R.string.testpress_mail_pdf_complete);
+        builder.setMessage(PDF_REQUEST_MESSAGE);
+        builder.setPositiveButton(R.string.testpress_ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                requireActivity().setResult(RESULT_OK);
+                requireActivity().finish();
+            }
+        });
+        builder.setCancelable(false);
+        builder.show();
     }
 }
