@@ -28,7 +28,7 @@ class CourseContentListFragment(val type: Int): Fragment() {
 
     private var courseId: Long = -1
     private lateinit var binding: BaseContentListLayoutBinding
-    private lateinit var adapter: CourseContentListAdapter<ContentEntityLite>
+    private lateinit var adapter: CourseContentListAdapter
     private lateinit var viewModel: CourseContentListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,7 +84,7 @@ class CourseContentListFragment(val type: Int): Fragment() {
         )
     }
 
-    private fun getAdapter(): CourseContentListAdapter <ContentEntityLite> {
+    private fun getAdapter(): CourseContentListAdapter {
         adapter = CourseContentListAdapter (COMPARATOR)
         lifecycleScope.launchWhenCreated {
             viewModel.courseContentList.collect {
