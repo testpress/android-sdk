@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 56;
+    private static final int VERSION = 57;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -510,6 +510,7 @@ public class TestpressSDKDaoGenerator {
         exam.addBooleanProperty("showAnalytics");
         exam.addStringProperty("instructions");
         exam.addBooleanProperty("hasAudioQuestions");
+        exam.addStringProperty("rankPublishingDate");
         exam.implementsInterface("android.os.Parcelable");
         return exam;
     }

@@ -85,6 +85,7 @@ fun NetworkExamContent.asGreenDaoModel(): Exam {
         this.shareTextForSolutionUnlock,
         this.showAnalytics,
         this.instructions,
-        this.hasAudioQuestions
+        this.hasAudioQuestions,
+        this.rankPublishingDate
     )
 }
