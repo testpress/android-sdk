@@ -24,7 +24,8 @@ data class NetworkAttempt(
     val percentage: String? = null,
     val sections: List<NetworkAttemptSection>? = arrayListOf(),
     val lastViewedQuestionId: Int? = null,
-    val externalReviewUrl:String? = null
+    val externalReviewUrl:String? = null,
+    val reviewPdf:String? = null
 )
 
 fun createNetworkAttempt(attempt: NetworkAttempt): Attempt {
@@ -49,7 +50,8 @@ fun createNetworkAttempt(attempt: NetworkAttempt): Attempt {
         attempt.accuracy,
         attempt.percentage,
         attempt.lastViewedQuestionId,
-        attempt.externalReviewUrl
+        attempt.externalReviewUrl,
+        attempt.reviewPdf
     )
 }
 
