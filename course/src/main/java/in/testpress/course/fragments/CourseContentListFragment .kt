@@ -28,7 +28,7 @@ class CourseContentListFragment(val type: Int): Fragment() {
 
     private var courseId: Long = -1
     private lateinit var binding: BaseContentListLayoutBinding
-    private lateinit var adapter: CourseContentListAdapter<ContentEntityLite>
+    private lateinit var adapter: CourseContentListAdapter
     private lateinit var viewModel: CourseContentListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,8 +84,8 @@ class CourseContentListFragment(val type: Int): Fragment() {
         )
     }
 
-    private fun getAdapter(): CourseContentListAdapter <ContentEntityLite> {
-        adapter = CourseContentListAdapter (COMPARATOR)
+    private fun getAdapter(): CourseContentListAdapter {
+        adapter = CourseContentListAdapter()
         lifecycleScope.launchWhenCreated {
             viewModel.courseContentList.collect {
                 adapter.submitData(it)
@@ -165,23 +165,6 @@ class CourseContentListFragment(val type: Int): Fragment() {
                 resources.getString(`in`.testpress.R.string.testpress_content_not_available_description)
             retryButton.isVisible = true
         }
-    }
-
-    companion object {
-        private val COMPARATOR =
-            object : DiffUtil.ItemCallback<ContentEntityLite>() {
-                override fun areContentsTheSame(
-                    oldItem: ContentEntityLite,
-                    newItem: ContentEntityLite
-                ): Boolean =
-                    oldItem == newItem
-
-                override fun areItemsTheSame(
-                    oldItem: ContentEntityLite,
-                    newItem: ContentEntityLite
-                ): Boolean =
-                    oldItem.id == newItem.id
-            }
     }
 
 }

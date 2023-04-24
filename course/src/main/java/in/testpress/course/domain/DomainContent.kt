@@ -203,34 +203,30 @@ fun createDomainContent(content: Content): DomainContent {
     )
 }
 
-fun createDomainContent(content: ContentEntityLite): DomainContent {
+fun ContentEntityLite.asDomainContent(): DomainContent {
     return DomainContent(
-        id = content.id,
-        order = content.order,
-        chapterId = content.chapterId,
-        freePreview = content.freePreview,
-        title = content.title,
-        courseId = content.courseId,
-        examId = content.examId,
-        videoId = content.videoId,
-        attachmentId = content.attachmentId,
-        contentType = content.contentType,
-        start = content.start,
-        end = content.end,
-        treePath = content.treePath,
-        icon = content.icon,
+        id = this.id,
+        order = this.order,
+        chapterId = this.chapterId,
+        freePreview = this.freePreview,
+        title = this.title,
+        courseId = this.courseId,
+        examId = this.examId,
+        videoId = this.videoId,
+        attachmentId = this.attachmentId,
+        contentType = this.contentType,
+        start = this.start,
+        end = this.end,
+        treePath = this.treePath,
+        icon = this.icon,
         isLocked = null,
         isScheduled = null,
         active = null,
         hasEnded = null,
         isCourseAvailable = null,
         hasStarted = null,
-        type = content.type
+        type = this.type
     )
-}
-
-fun <T>T.asDomainContent(): DomainContent {
-    return createDomainContent(this as ContentEntityLite)
 }
 
 fun ContentEntity.asDomainContent(): DomainContent {

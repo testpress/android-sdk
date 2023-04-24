@@ -15,8 +15,8 @@ import `in`.testpress.course.domain.asDomainContent
 import `in`.testpress.database.entities.ContentEntityLite
 import `in`.testpress.database.entities.CourseContentType
 
-class CourseContentListAdapter <T : Any>(COMPARATOR: DiffUtil.ItemCallback<T>):
-    PagingDataAdapter<T, BaseCourseContentItemViewHolder>(COMPARATOR){
+class CourseContentListAdapter :
+    PagingDataAdapter<ContentEntityLite, BaseCourseContentItemViewHolder>(COMPARATOR) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseCourseContentItemViewHolder {
         val binding = RunningUpcomingListItemBinding.inflate(
@@ -40,13 +40,30 @@ class CourseContentListAdapter <T : Any>(COMPARATOR: DiffUtil.ItemCallback<T>):
     }
 
     override fun getItemViewType(position: Int): Int {
-        val content = getItem(position) as ContentEntityLite
-        return if (content.type == CourseContentType.RUNNING_CONTENT.ordinal){
-            CourseContentType.RUNNING_CONTENT.ordinal
-        } else {
-            CourseContentType.UPCOMING_CONTENT.ordinal
+        val content = getItem(position)
+        return when(content?.type){
+            CourseContentType.UPCOMING_CONTENT.ordinal -> CourseContentType.UPCOMING_CONTENT.ordinal
+            else -> CourseContentType.RUNNING_CONTENT.ordinal
         }
     }
+
+    companion object {
+        private val COMPARATOR =
+            object : DiffUtil.ItemCallback<ContentEntityLite>() {
+                override fun areContentsTheSame(
+                    oldItem: ContentEntityLite,
+                    newItem: ContentEntityLite
+                ): Boolean =
+                    oldItem == newItem
+
+                override fun areItemsTheSame(
+                    oldItem: ContentEntityLite,
+                    newItem: ContentEntityLite
+                ): Boolean =
+                    oldItem.id == newItem.id
+            }
+    }
+
 }
 
 open class BaseCourseContentItemViewHolder(binding: RunningUpcomingListItemBinding) :
