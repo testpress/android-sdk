@@ -513,36 +513,52 @@ public class ReviewStatsFragment extends BaseFragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.testpress_download_icon, menu);
+        inflater.inflate(R.menu.review_stats_options, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.download_icon) {
-            showDownloadDialogBox();
+            handlePDFDownloadRequest();
             return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
     }
 
-    private void showDownloadDialogBox() {
+    private void handlePDFDownloadRequest() {
+        if (isDownloadedPDFAvailable()) {
+            showPDFDownloadDialog();
+        } else {
+            showPDFRequestDialog();
+        }
+    }
+
+    private boolean isDownloadedPDFAvailable() {
+        return attempt.getReviewPdf() != null && !attempt.getReviewPdf().equals("");
+    }
+
+    private void showPDFDownloadDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle);
         builder.setTitle("Review PDF Download");
-        if (attempt.getReviewPdf() == null || attempt.getReviewPdf().equals("")) {
-            builder.setMessage("PDF not available.");
-            builder.setPositiveButton("Request PDF", createRequestPdfListener());
-        } else {
-            String filename = exam.getTitle() + "-" + attempt.getId() + FileType.PDF.getExtension();
-            builder.setMessage(filename);
-            builder.setPositiveButton("Download", createDownloadPdfListener(filename));
-        }
+        String filename = exam.getTitle() + "-" + attempt.getId() + FileType.PDF.getExtension();
+        builder.setMessage(filename);
+        builder.setPositiveButton("Download", startPDFDownload(filename));
         builder.setNegativeButton("cancel", null);
         builder.show();
     }
 
-    private DialogInterface.OnClickListener createDownloadPdfListener(final String filename) {
+    private void showPDFRequestDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle);
+        builder.setTitle("Review PDF Download");
+        builder.setMessage("PDF not available.");
+        builder.setPositiveButton("Request PDF", requestPdf());
+        builder.setNegativeButton("cancel", null);
+        builder.show();
+    }
+
+    private DialogInterface.OnClickListener startPDFDownload(final String filename) {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -553,7 +569,7 @@ public class ReviewStatsFragment extends BaseFragment {
         };
     }
 
-    private DialogInterface.OnClickListener createRequestPdfListener() {
+    private DialogInterface.OnClickListener requestPdf() {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int requestCode) {
