@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import junit.framework.Assert;
 
+import java.text.Format;
 import java.util.HashMap;
 
 import in.testpress.core.TestpressCallback;
@@ -48,6 +49,7 @@ import in.testpress.models.greendao.Exam;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseFragment;
 import in.testpress.ui.WebViewActivity;
+import in.testpress.util.DateUtils;
 import in.testpress.util.FileDownloader;
 import in.testpress.util.FileType;
 import in.testpress.util.StringUtils;
@@ -116,6 +118,8 @@ public class ReviewStatsFragment extends BaseFragment {
     private RetrofitCall<TestpressApiResponse<Attempt>> attemptsApiRequest;
     private boolean isQuiz = false;
     private ProgressDialog pdfGenerationProgressDialog;
+    private LinearLayout rankPublishLayout;
+    private TextView rankPublishDate;
 
     public static void showReviewStatsFragment(FragmentActivity activity, Exam exam, Attempt attempt,
                                                boolean showRetakeButton) {
@@ -208,12 +212,14 @@ public class ReviewStatsFragment extends BaseFragment {
         totalMarksLayout = view.findViewById(R.id.total_marks_layout);
         totalTimeLayout = view.findViewById(R.id.total_time_layout);
         cutoffLayout = view.findViewById(R.id.cutoff_layout);
+        rankPublishLayout = view.findViewById(R.id.rank_publish_layout);
+        rankPublishDate = view.findViewById(R.id.rank_publish_date);
         ViewUtils.setTypeface(
                 new TextView[] {
                         score, rank, correct, incorrect, timeTaken, accuracy, reviewQuestionsButton,
                         analyticsButton, emailPdfButton, retakeButton, emptyTitleView, retryButton,
                         timeAnalyticsButton, percentage, totalQuestions, totalMarks, totalTime,
-                        cutoff, percentile
+                        cutoff, percentile, rankPublishDate
                 },
                 TestpressSdk.getRubikMediumFont(getContext())
         );
@@ -380,8 +386,19 @@ public class ReviewStatsFragment extends BaseFragment {
         } else {
             retakeButtonLayout.setVisibility(View.GONE);
         }
+        if (exam.getEnableRanks() && !attempt.getRankEnabled()) {
+            rankPublishDate.setText(getRankPublishDate());
+        } else {
+            ViewUtils.setGone(rankPublishLayout,true);
+        }
         reviewStatLayout.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
+    }
+
+    private String getRankPublishDate() {
+        return String.format(getResources().getString(R.string.rank_will_be_published),
+                DateUtils.INSTANCE.getRelativeTimeString(exam.getRankPublishingDate(), requireContext())
+        );
     }
 
     private void hideViewsForQuiz() {
