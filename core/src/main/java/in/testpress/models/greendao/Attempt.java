@@ -50,6 +50,7 @@ public class Attempt implements android.os.Parcelable {
     private Integer lastViewedQuestionId;
     private String externalReviewUrl;
     private String reviewPdf;
+    private Boolean rankEnabled;
 
     /** Used to resolve relations */
     @Generated
@@ -79,7 +80,7 @@ public class Attempt implements android.os.Parcelable {
     }
 
     @Generated
-    public Attempt(String url, Long id, String date, Integer totalQuestions, String score, String rank, String maxRank, String reviewUrl, String questionsUrl, Integer correctCount, Integer incorrectCount, String lastStartedTime, String remainingTime, String timeTaken, String state, String percentile, Integer speed, Integer accuracy, String percentage, Integer lastViewedQuestionId, String externalReviewUrl, String reviewPdf) {
+    public Attempt(String url, Long id, String date, Integer totalQuestions, String score, String rank, String maxRank, String reviewUrl, String questionsUrl, Integer correctCount, Integer incorrectCount, String lastStartedTime, String remainingTime, String timeTaken, String state, String percentile, Integer speed, Integer accuracy, String percentage, Integer lastViewedQuestionId, String externalReviewUrl, String reviewPdf, Boolean rankEnabled) {
         this.url = url;
         this.id = id;
         this.date = date;
@@ -102,6 +103,7 @@ public class Attempt implements android.os.Parcelable {
         this.lastViewedQuestionId = lastViewedQuestionId;
         this.externalReviewUrl = externalReviewUrl;
         this.reviewPdf = reviewPdf;
+        this.rankEnabled = rankEnabled;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -287,6 +289,14 @@ public class Attempt implements android.os.Parcelable {
         this.reviewPdf = reviewPdf;
     }
 
+    public Boolean getRankEnabled() {
+        return rankEnabled;
+    }
+
+    public void setRankEnabled(Boolean rankEnabled) {
+        this.rankEnabled = rankEnabled;
+    }
+
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
     @Generated
     public List<AttemptSection> getSections() {
@@ -395,6 +405,8 @@ public class Attempt implements android.os.Parcelable {
         lastViewedQuestionId = in.readInt();
         externalReviewUrl = in.readString();
         reviewPdf = in.readString();
+        byte tmpRankEnabled = in.readByte();
+        rankEnabled = tmpRankEnabled == 0 ? null : tmpRankEnabled == 1;
     }
 
     @Override
@@ -457,6 +469,7 @@ public class Attempt implements android.os.Parcelable {
         }
         dest.writeString(externalReviewUrl);
         dest.writeString(reviewPdf);
+        dest.writeByte((byte) (rankEnabled == null ? 0 : rankEnabled ? 1 : 2));
 
     }
 

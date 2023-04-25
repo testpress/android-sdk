@@ -58,6 +58,7 @@ fun Attempt.asDomainModel(): DomainAttempt {
         percentage = percentage,
         lastViewedQuestionId = lastViewedQuestionId,
         externalReviewUrl = externalReviewUrl,
-        reviewPdf = reviewPdf
+        reviewPdf = reviewPdf,
+        rankEnabled = rankEnabled
     )
 }

@@ -266,11 +266,11 @@ public class ReviewStatsFragment extends BaseFragment {
         timeTaken.setText(attempt.getTimeTaken());
         correct.setText(attempt.getCorrectCount().toString());
         incorrect.setText(attempt.getIncorrectCount().toString());
-        if (attempt.getRank().equals("NA") && !exam.getEnableRanks()) {
-            rankLayout.setVisibility(View.GONE);
-        } else {
+        if (Boolean.TRUE.equals(attempt.getRankEnabled())) {
             rank.setText(attempt.getRank());
             maxRank.setText(attempt.getMaxRank());
+        } else {
+            rankLayout.setVisibility(View.GONE);
         }
         if (attempt.getPercentage() == null || attempt.getPercentage().equals("NA")) {
             percentageLayout.setVisibility(View.GONE);
