@@ -48,7 +48,6 @@ import in.testpress.models.greendao.Exam;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseFragment;
 import in.testpress.ui.WebViewActivity;
-import in.testpress.util.DateUtils;
 import in.testpress.util.FileDownloader;
 import in.testpress.util.FileType;
 import in.testpress.util.StringUtils;
