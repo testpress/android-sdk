@@ -386,13 +386,17 @@ public class ReviewStatsFragment extends BaseFragment {
         } else {
             retakeButtonLayout.setVisibility(View.GONE);
         }
+        displayRankIfAvailable();
+        reviewStatLayout.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
+    }
+
+    private void displayRankIfAvailable() {
         if (exam.getEnableRanks() && !attempt.getRankEnabled()) {
             rankPublishDate.setText(getRankPublishDate());
         } else {
             ViewUtils.setGone(rankPublishLayout,true);
         }
-        reviewStatLayout.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.GONE);
     }
 
     private String getRankPublishDate() {
