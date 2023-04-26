@@ -256,4 +256,6 @@
     <string name="share_app_message">Share this app to your friends twice to unlock explanations</string>
 
     <string name="testpress_advanced_analytics">Advanced Analytics</string>
+
+    <string name="rank_will_be_published">Rank will be published %s</string>
 </resources>
