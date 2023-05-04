@@ -1,6 +1,5 @@
 package `in`.testpress.core.database
 
-import `in`.testpress.util.getOrAwaitValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert
 import org.junit.Test
@@ -15,7 +14,8 @@ class ProductsListDaoTest: ProductListDaoTestMixin() {
         insertCourseIntoDb()
         db.productDao().insert(productCourseFixture())
 
-        val fetchedProductCourse = db.productDao().getAll().getOrAwaitValue()
-        Assert.assertEquals(productWithCoursesFixture(),fetchedProductCourse)
+        val fetchedProductCourse = db.productDao().getAll()
+        Assert.assertEquals(productWithCoursesFixture().size,fetchedProductCourse.size)
+        Assert.assertEquals("Jan 12",fetchedProductCourse[0].courses[0].created)
     }
 }

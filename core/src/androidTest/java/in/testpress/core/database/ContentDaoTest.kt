@@ -13,10 +13,15 @@ import org.junit.runner.RunWith
 class ContentDaoTest : DbTestMixin() {
     fun createContent(): ContentEntity {
         val content = ContentEntity(
-                id = 1, title = "Content", active = true,
-                order = 0, contentType = "exam", isLocked = false,
-                isScheduled = false, hasStarted = true
+            id = 1,
+            active = true,
+            isLocked = false,
+            isScheduled = false,
+            hasStarted = true
         )
+        content.title = "Content"
+        content.order = 0
+        content.contentType = "exam"
         return content
     }
 

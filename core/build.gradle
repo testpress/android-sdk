@@ -101,8 +101,8 @@ dependencies {
     androidTestImplementation rootProject.espressoCore
     androidTestImplementation rootProject.uiautomator
     testImplementation "androidx.arch.core:core-testing:2.1.0"
+    testImplementation "org.robolectric:robolectric:4.9.2"
     testImplementation rootProject.powermockJunit
-    testImplementation rootProject.roboelectric
     testImplementation rootProject.androidxCore
     testImplementation rootProject.mockServer
     androidTestImplementation "androidx.arch.core:core-testing:$core_testing_version"
