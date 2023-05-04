@@ -1,6 +1,8 @@
 package in.testpress.ui;
 
 import androidx.fragment.app.Fragment;
+
+import android.os.Looper;
 import android.widget.TextView;
 
 import androidx.test.core.app.ApplicationProvider;
@@ -11,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.shadows.ShadowLooper;
 
 import in.testpress.R;
 import in.testpress.core.TestpressSdk;
@@ -121,6 +124,7 @@ public class UserDevicesActivityTest {
 
     @Test
     public void testLoginAttemptRestrictionInfo() {
+        ShadowLooper.idleMainLooper();
         activity.setInfoText();
         String lockout_limit_info = "Note : Admin has restricted login attempts to %s";
         TextView info = activity.findViewById(R.id.parallel_login_restriction_note);
