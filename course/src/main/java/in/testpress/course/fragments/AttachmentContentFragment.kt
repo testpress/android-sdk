@@ -2,8 +2,9 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
+import `in`.testpress.course.domain.DomainAttachmentContent
+import `in`.testpress.util.FileDownloader
 import `in`.testpress.util.ViewUtils
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +13,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import java.io.File
 
 class AttachmentContentFragment : BaseContentDetailFragment() {
     private lateinit var attachmentContentLayout: LinearLayout
@@ -51,10 +54,33 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
 
         downloadButton.setOnClickListener {
             forceReloadContent {
-                context!!.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(attachment.attachmentUrl)))
+                downloadFile(attachment)
             }
         }
         attachmentContentLayout.visibility = View.VISIBLE
         viewModel.createContentAttempt(contentId)
     }
+
+    private fun downloadFile(attachment: DomainAttachmentContent){
+        if (isDownloadUrlAvailable(attachment.attachmentUrl)){
+            val fileDownloader = FileDownloader(requireContext())
+            fileDownloader.downloadFile(
+                attachment.attachmentUrl!!,
+                "${attachment.title!!}${getFileType(attachment.attachmentUrl)}"
+            )
+            Toast.makeText(requireContext(),"Download Started...",Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(requireContext(),"File not available, Please try-again later",Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun isDownloadUrlAvailable(url:String?) = !url.isNullOrEmpty()
+
+    private fun getFileType(url: String): String {
+        val uri = Uri.parse(url)
+        val filename = uri.lastPathSegment ?: ""
+        val extension = File(filename).extension
+        return if (extension.isNotBlank()) ".${extension}" else ""
+    }
+
 }
