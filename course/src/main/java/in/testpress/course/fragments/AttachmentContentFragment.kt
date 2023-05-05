@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainAttachmentContent
 import `in`.testpress.util.FileDownloader
+import `in`.testpress.util.PermissionRequestManager
 import `in`.testpress.util.ViewUtils
 import android.net.Uri
 import android.os.Bundle
@@ -63,11 +64,13 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
 
     private fun downloadFile(attachment: DomainAttachmentContent){
         if (isDownloadUrlAvailable(attachment.attachmentUrl)){
-            val fileDownloader = FileDownloader(requireContext())
-            fileDownloader.downloadFile(
-                attachment.attachmentUrl!!,
-                "${attachment.title!!}${getFileType(attachment.attachmentUrl)}"
-            )
+            PermissionRequestManager(requireActivity()){
+                val fileDownloader = FileDownloader(requireContext())
+                fileDownloader.downloadFile(
+                    attachment.attachmentUrl!!,
+                    "${attachment.title!!}${getFileType(attachment.attachmentUrl)}"
+                )
+            }
         } else {
             Toast.makeText(requireContext(),"File not available, Please try-again later",Toast.LENGTH_SHORT).show()
         }

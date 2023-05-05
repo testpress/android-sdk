@@ -52,9 +52,12 @@ import in.testpress.ui.WebViewActivity;
 import in.testpress.util.DateUtils;
 import in.testpress.util.FileDownloader;
 import in.testpress.util.FileType;
+import in.testpress.util.PermissionRequestManager;
 import in.testpress.util.StringUtils;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_ATTEMPT;
@@ -565,7 +568,7 @@ public class ReviewStatsFragment extends BaseFragment {
         builder.setTitle("Review PDF Download");
         String filename = exam.getTitle() + "-" + attempt.getId() + FileType.PDF.getExtension();
         builder.setMessage(filename);
-        builder.setPositiveButton("Download", startPDFDownload(filename));
+        builder.setPositiveButton("Download", onDownloadClick(filename));
         builder.setNegativeButton("cancel", null);
         builder.show();
     }
@@ -579,14 +582,24 @@ public class ReviewStatsFragment extends BaseFragment {
         builder.show();
     }
 
-    private DialogInterface.OnClickListener startPDFDownload(final String filename) {
+    private DialogInterface.OnClickListener onDownloadClick(final String filename) {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                FileDownloader fileDownloader = new FileDownloader(requireContext());
-                fileDownloader.downloadFile(attempt.getReviewPdf(), filename);
+                downloadPDFFile(filename);
             }
         };
+    }
+
+    private void downloadPDFFile(String filename) {
+        new PermissionRequestManager(requireActivity(), new Function0<Unit>() {
+            @Override
+            public Unit invoke() {
+                FileDownloader fileDownloader = new FileDownloader(requireContext());
+                fileDownloader.downloadFile(attempt.getReviewPdf(), filename);
+                return null;
+            }
+        });
     }
 
     private DialogInterface.OnClickListener requestPdf() {
