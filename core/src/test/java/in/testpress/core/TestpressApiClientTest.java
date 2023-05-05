@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.shadows.ShadowAlertDialog;
+import org.robolectric.shadows.ShadowLooper;
 
 import java.io.IOException;
 
@@ -93,6 +94,7 @@ public class TestpressApiClientTest {
         pager.getItems(1, 1);
         mockWebServer.takeRequest();
 
+        ShadowLooper.idleMainLooper();
         AlertDialog alertDialog = (AlertDialog) ShadowAlertDialog.getShownDialogs().get(0);
 
         Assert.assertNotNull(alertDialog);

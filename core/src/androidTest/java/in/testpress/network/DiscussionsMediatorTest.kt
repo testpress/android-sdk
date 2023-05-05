@@ -38,8 +38,9 @@ class DiscussionsMediatorTest: DbTestMixin() {
     @Test
     fun endOfPaginationShouldNotBeReachedIfNextPageIsAvailable() = runBlocking {
         val mediator = DiscussionsMediator(
-                FakeAPIClient(ApplicationProvider.getApplicationContext(), true),
-                db
+            FakeAPIClient(ApplicationProvider.getApplicationContext(), true),
+            db,
+            hashMapOf("sort" to "-created")
         )
         val result = mediator.load(LoadType.REFRESH, getPagingState())
 
@@ -49,8 +50,9 @@ class DiscussionsMediatorTest: DbTestMixin() {
     @Test
     fun endOfPaginationShouldBeReachedIfNextPageIsNotAvailable() = runBlocking {
         val mediator = DiscussionsMediator(
-                FakeAPIClient(ApplicationProvider.getApplicationContext()),
-                db
+            FakeAPIClient(ApplicationProvider.getApplicationContext()),
+            db,
+            hashMapOf("sort" to "-created")
         )
         val result = mediator.load(LoadType.REFRESH, getPagingState())
 
@@ -63,8 +65,9 @@ class DiscussionsMediatorTest: DbTestMixin() {
         val apiClient = FakeAPIClient(ApplicationProvider.getApplicationContext())
         apiClient.failureMessage = "Unable to load data"
         val mediator = DiscussionsMediator(
-                apiClient,
-                db
+            apiClient,
+            db,
+            hashMapOf("sort" to "-created")
         )
         val result = mediator.load(LoadType.REFRESH, getPagingState())
         assertTrue(result is RemoteMediator.MediatorResult.Error)
