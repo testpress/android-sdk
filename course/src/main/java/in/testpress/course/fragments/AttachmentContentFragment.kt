@@ -68,7 +68,6 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
                 attachment.attachmentUrl!!,
                 "${attachment.title!!}${getFileType(attachment.attachmentUrl)}"
             )
-            Toast.makeText(requireContext(),"Download Started...",Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(requireContext(),"File not available, Please try-again later",Toast.LENGTH_SHORT).show()
         }
