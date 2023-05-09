@@ -13,6 +13,7 @@ class FileDownloader(private val context: Context) {
         val request = getDownloadManagerRequest(fileUrl,fileName)
         val downloadManager = context.getSystemService<DownloadManager>()
         downloadManager?.enqueue(request) ?: return
+        ViewUtils.toast(context,"Download Started...")
     }
 
     private fun getDownloadManagerRequest(fileUrl: String, fileName: String): DownloadManager.Request{

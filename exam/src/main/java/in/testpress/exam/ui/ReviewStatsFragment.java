@@ -585,7 +585,6 @@ public class ReviewStatsFragment extends BaseFragment {
             public void onClick(DialogInterface dialogInterface, int i) {
                 FileDownloader fileDownloader = new FileDownloader(requireContext());
                 fileDownloader.downloadFile(attempt.getReviewPdf(), filename);
-                Toast.makeText(requireContext(), "Download Started", Toast.LENGTH_SHORT).show();
             }
         };
     }
