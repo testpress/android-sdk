@@ -11,6 +11,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.view.isVisible
 
 class VideoContentListItemViewHolder(view: View) : BaseContentListItemViewHolder(view) {
     private val duration: TextView = view.findViewById(R.id.duration)
@@ -37,12 +38,12 @@ class VideoContentListItemViewHolder(view: View) : BaseContentListItemViewHolder
     }
 
     private fun bindVideoProgress(content: DomainContent) {
-        attemptedTickContainer.visibility = View.GONE
+        attemptedTickContainer.isVisible = content.hasAttempted()
         videoCompletionProgressContainer.visibility = View.GONE
-        when (content.videoWatchedPercentage) {
-            0, null -> {}
-            100 ->  attemptedTickContainer.visibility = View.VISIBLE
-            else -> showVideoProgress(content.videoWatchedPercentage)
+        content.videoWatchedPercentage?.let { watchedPercentage ->
+            if (watchedPercentage > 0) {
+                showVideoProgress(watchedPercentage)
+            }
         }
     }
 
