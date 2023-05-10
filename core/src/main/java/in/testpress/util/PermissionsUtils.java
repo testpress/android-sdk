@@ -1,5 +1,6 @@
 package in.testpress.util;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -40,6 +41,35 @@ public class PermissionsUtils {
     public PermissionsUtils(Fragment fragment, View rootLayout, String[] permissions) {
         this(fragment.getActivity(), rootLayout, permissions);
         this.fragment = fragment;
+    }
+
+    public PermissionsUtils(Activity activity, View rootLayout) {
+        this.activity = activity;
+        this.rootLayout = rootLayout;
+    }
+
+    public boolean isStoragePermissionGranted(){
+        return ActivityCompat.checkSelfPermission(
+                activity,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public void requestStoragePermissionWithSnackbar() {
+        Snackbar.make(
+                rootLayout,
+                "Required Storage Permission",
+                Snackbar.LENGTH_LONG
+        ).setAction("Allow", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
+                intent.setData(uri);
+                activity.startActivity(intent);
+            }
+        }).show();
     }
 
     public boolean checkPermissionRequired() {

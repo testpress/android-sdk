@@ -52,12 +52,10 @@ import in.testpress.ui.WebViewActivity;
 import in.testpress.util.DateUtils;
 import in.testpress.util.FileDownloader;
 import in.testpress.util.FileType;
-import in.testpress.util.PermissionRequestManager;
+import in.testpress.util.PermissionsUtils;
 import in.testpress.util.StringUtils;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
 
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_ATTEMPT;
@@ -123,6 +121,7 @@ public class ReviewStatsFragment extends BaseFragment {
     private ProgressDialog pdfGenerationProgressDialog;
     private LinearLayout rankPublishLayout;
     private TextView rankPublishDate;
+    private PermissionsUtils permissionsUtils;
 
     public static void showReviewStatsFragment(FragmentActivity activity, Exam exam, Attempt attempt,
                                                boolean showRetakeButton) {
@@ -238,7 +237,7 @@ public class ReviewStatsFragment extends BaseFragment {
                         accuracyLabel, examTitle, attemptDate, emptyDescView, maxRank
                 },
                 TestpressSdk.getRubikRegularFont(getContext()));
-
+        permissionsUtils = new PermissionsUtils(requireActivity(),view);
     }
 
     private void addClickListeners() {
@@ -592,14 +591,12 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void downloadPDFFile(String filename) {
-        new PermissionRequestManager(requireActivity(), new Function0<Unit>() {
-            @Override
-            public Unit invoke() {
-                FileDownloader fileDownloader = new FileDownloader(requireContext());
-                fileDownloader.downloadFile(attempt.getReviewPdf(), filename);
-                return null;
-            }
-        });
+        if (permissionsUtils.isStoragePermissionGranted()){
+            FileDownloader fileDownloader = new FileDownloader(requireContext());
+            fileDownloader.downloadFile(attempt.getReviewPdf(), filename);
+        } else {
+            permissionsUtils.requestStoragePermissionWithSnackbar();
+        }
     }
 
     private DialogInterface.OnClickListener requestPdf() {
