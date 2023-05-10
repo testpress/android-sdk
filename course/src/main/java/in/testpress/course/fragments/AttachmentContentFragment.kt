@@ -56,36 +56,35 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
         }
 
         downloadButton.setOnClickListener {
-            if (permissionsUtils.isStoragePermissionGranted){
-                forceReloadContent {
-                    downloadFile(attachment)
-                }
-            } else {
-                permissionsUtils.requestStoragePermissionWithSnackbar()
-            }
-
+            onDownloadClick(attachment)
         }
         attachmentContentLayout.visibility = View.VISIBLE
         viewModel.createContentAttempt(contentId)
     }
 
-    private fun downloadFile(attachment: DomainAttachmentContent) {
-        if (isDownloadUrlAvailable(attachment.attachmentUrl)) {
+    private fun onDownloadClick(attachment: DomainAttachmentContent){
+        if (permissionsUtils.isStoragePermissionGranted){
+            forceReloadContent {
+                downloadFile(attachment)
+            }
+        } else {
+            permissionsUtils.requestStoragePermissionWithSnackbar()
+        }
+    }
+
+    private fun downloadFile(attachment: DomainAttachmentContent){
+        if (isDownloadUrlAvailable(attachment.attachmentUrl)){
             val fileDownloader = FileDownloader(requireContext())
             fileDownloader.downloadFile(
                 attachment.attachmentUrl!!,
                 "${attachment.title!!}${getFileType(attachment.attachmentUrl)}"
             )
         } else {
-            Toast.makeText(
-                requireContext(),
-                "File not available, Please try-again later",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(requireContext(),"File not available, Please try-again later",Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun isDownloadUrlAvailable(url: String?) = !url.isNullOrEmpty()
+    private fun isDownloadUrlAvailable(url:String?) = !url.isNullOrEmpty()
 
     private fun getFileType(url: String): String {
         val uri = Uri.parse(url)

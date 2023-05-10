@@ -585,18 +585,18 @@ public class ReviewStatsFragment extends BaseFragment {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                downloadPDFFile(filename);
+                if (permissionsUtils.isStoragePermissionGranted()){
+                    downloadPDFFile(filename);
+                } else {
+                    permissionsUtils.requestStoragePermissionWithSnackbar();
+                }
             }
         };
     }
 
     private void downloadPDFFile(String filename) {
-        if (permissionsUtils.isStoragePermissionGranted()){
-            FileDownloader fileDownloader = new FileDownloader(requireContext());
-            fileDownloader.downloadFile(attempt.getReviewPdf(), filename);
-        } else {
-            permissionsUtils.requestStoragePermissionWithSnackbar();
-        }
+        FileDownloader fileDownloader = new FileDownloader(requireContext());
+        fileDownloader.downloadFile(attempt.getReviewPdf(), filename);
     }
 
     private DialogInterface.OnClickListener requestPdf() {
