@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainAttachmentContent
 import `in`.testpress.util.FileDownloader
+import `in`.testpress.util.PermissionsUtils
 import `in`.testpress.util.ViewUtils
 import android.net.Uri
 import android.os.Bundle
@@ -22,6 +23,7 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
     private lateinit var description: TextView
     private lateinit var titleLayout: LinearLayout
     private lateinit var downloadButton: Button
+    private lateinit var permissionsUtils: PermissionsUtils
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,6 +43,7 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
         downloadButton = view.findViewById(R.id.download_attachment)
         ViewUtils.setTypeface(arrayOf(titleView), TestpressSdk.getRubikMediumFont(activity!!))
         ViewUtils.setLeftDrawable(context, downloadButton, R.drawable.ic_file_download_18dp)
+        permissionsUtils = PermissionsUtils(requireActivity(), view)
     }
 
     override fun display() {
@@ -53,12 +56,20 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
         }
 
         downloadButton.setOnClickListener {
-            forceReloadContent {
-                downloadFile(attachment)
-            }
+            onDownloadClick(attachment)
         }
         attachmentContentLayout.visibility = View.VISIBLE
         viewModel.createContentAttempt(contentId)
+    }
+
+    private fun onDownloadClick(attachment: DomainAttachmentContent){
+        if (permissionsUtils.isStoragePermissionGranted){
+            forceReloadContent {
+                downloadFile(attachment)
+            }
+        } else {
+            permissionsUtils.requestStoragePermissionWithSnackbar()
+        }
     }
 
     private fun downloadFile(attachment: DomainAttachmentContent){

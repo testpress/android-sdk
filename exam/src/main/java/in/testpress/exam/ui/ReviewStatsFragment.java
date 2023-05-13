@@ -52,6 +52,7 @@ import in.testpress.ui.WebViewActivity;
 import in.testpress.util.DateUtils;
 import in.testpress.util.FileDownloader;
 import in.testpress.util.FileType;
+import in.testpress.util.PermissionsUtils;
 import in.testpress.util.StringUtils;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
@@ -120,6 +121,7 @@ public class ReviewStatsFragment extends BaseFragment {
     private ProgressDialog pdfGenerationProgressDialog;
     private LinearLayout rankPublishLayout;
     private TextView rankPublishDate;
+    private PermissionsUtils permissionsUtils;
 
     public static void showReviewStatsFragment(FragmentActivity activity, Exam exam, Attempt attempt,
                                                boolean showRetakeButton) {
@@ -235,7 +237,7 @@ public class ReviewStatsFragment extends BaseFragment {
                         accuracyLabel, examTitle, attemptDate, emptyDescView, maxRank
                 },
                 TestpressSdk.getRubikRegularFont(getContext()));
-
+        permissionsUtils = new PermissionsUtils(requireActivity(),view);
     }
 
     private void addClickListeners() {
@@ -565,7 +567,7 @@ public class ReviewStatsFragment extends BaseFragment {
         builder.setTitle("Review PDF Download");
         String filename = exam.getTitle() + "-" + attempt.getId() + FileType.PDF.getExtension();
         builder.setMessage(filename);
-        builder.setPositiveButton("Download", startPDFDownload(filename));
+        builder.setPositiveButton("Download", onDownloadClick(filename));
         builder.setNegativeButton("cancel", null);
         builder.show();
     }
@@ -579,14 +581,22 @@ public class ReviewStatsFragment extends BaseFragment {
         builder.show();
     }
 
-    private DialogInterface.OnClickListener startPDFDownload(final String filename) {
+    private DialogInterface.OnClickListener onDownloadClick(final String filename) {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                FileDownloader fileDownloader = new FileDownloader(requireContext());
-                fileDownloader.downloadFile(attempt.getReviewPdf(), filename);
+                if (permissionsUtils.isStoragePermissionGranted()){
+                    downloadPDFFile(filename);
+                } else {
+                    permissionsUtils.requestStoragePermissionWithSnackbar();
+                }
             }
         };
+    }
+
+    private void downloadPDFFile(String filename) {
+        FileDownloader fileDownloader = new FileDownloader(requireContext());
+        fileDownloader.downloadFile(attempt.getReviewPdf(), filename);
     }
 
     private DialogInterface.OnClickListener requestPdf() {
