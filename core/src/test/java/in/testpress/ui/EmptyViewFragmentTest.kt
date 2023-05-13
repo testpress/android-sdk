@@ -33,7 +33,7 @@ class EmptyViewFragmentTest {
     }
 
     private fun buildErrorResponse(errorCode: Int): Response<TestpressApiResponse<Content>> {
-        val responseBody = ResponseBody.create(MediaType.parse("application/json"), """{"detail":"Error"}""")
+        val responseBody = ResponseBody.create(MediaType.parse("application/json"), """{"detail":"You do not have permission to view this."}""")
         return Response.error<TestpressApiResponse<Content>>(responseBody, okhttp3.Response.Builder()
                 .code(errorCode)
                 .message("Error")
