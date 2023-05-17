@@ -32,11 +32,19 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
 
     @Override
     public void setContentView(final int layoutResId) {
+        super.setContentView(layoutResId);
+        setSecureWindowFlags();
+        setupActionBar();
+    }
+
+    private void setSecureWindowFlags(){
         session = TestpressSdk.getTestpressSession(this);
         if (session != null && session.getInstituteSettings().isScreenshotDisabled()) {
             getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
         }
-        super.setContentView(layoutResId);
+    }
+
+    private void setupActionBar(){
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         logo = findViewById(R.id.toolbar_logo);
         setSupportActionBar(toolbar);
@@ -121,10 +129,7 @@ public abstract class BaseToolBarActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        TestpressSession session = TestpressSdk.getTestpressSession(this);
-        if (session != null && session.getInstituteSettings().isScreenshotDisabled()) {
-            getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
-        }
+        setSecureWindowFlags();
     }
 
 }
