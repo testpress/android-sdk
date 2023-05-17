@@ -29,7 +29,6 @@ import java.util.*
 
 
 class WebViewFragment(
-    private val webViewSettings: WebViewSettings,
     private val javaScriptInterfaceWithNameList: List<Pair<BaseJavaScriptInterface,String>>? = null
 ) : Fragment() {
     companion object {
@@ -136,7 +135,7 @@ class WebViewFragment(
         // Hide the zoom controls for HONEYCOMB+
         webView.settings.displayZoomControls = false
         // Enable pinch to zoom without the zoom buttons
-        webView.settings.builtInZoomControls = webViewSettings.builtInZoomControls
+        webView.settings.builtInZoomControls = false
     }
 
     private fun setupWebViewClient(){
@@ -251,14 +250,6 @@ class WebViewFragment(
         fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?)
         fun onPageFinished(view: WebView?, url: String?)
     }
-
-    @Parcelize
-    data class WebViewSettings(
-        val builtInZoomControls: Boolean = true,
-        val showLoadingBetweenPages: Boolean = false,
-        val IsSSORequired: Boolean = true,
-        val allowNonInstituteUrlInWebView: Boolean = true
-    ) :Parcelable
 
     class BaseJavaScriptInterface
 

@@ -16,9 +16,11 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.View
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
+import kotlinx.parcelize.Parcelize
 import java.io.IOException
 
 class WebViewWithSSO1: BaseToolBarActivity(), EmptyViewListener, WebViewFragment.Listener {
@@ -33,7 +35,7 @@ class WebViewWithSSO1: BaseToolBarActivity(), EmptyViewListener, WebViewFragment
     private var url : String? = null
     private var urlPath : String? = null
     private var showLoadingBetweenPages = false
-    private lateinit var webViewSettings: WebViewFragment.WebViewSettings
+    private lateinit var webViewSettings: Settings
     private var isSSORequired: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,7 +77,7 @@ class WebViewWithSSO1: BaseToolBarActivity(), EmptyViewListener, WebViewFragment
     }
 
     private fun initializeWebViewFragment() {
-        webViewFragment = WebViewFragment(webViewSettings)
+        webViewFragment = WebViewFragment()
         webViewFragment.setListener(this)
     }
 
@@ -190,7 +192,7 @@ class WebViewWithSSO1: BaseToolBarActivity(), EmptyViewListener, WebViewFragment
             context: Context,
             title: String,
             url: String,
-            webViewSettings: WebViewFragment.WebViewSettings,
+            webViewSettings: Settings,
         ): Intent {
             return Intent(context, WebViewWithSSO1::class.java).apply {
                 putExtra(IS_URL_AVAILABLE, true)
@@ -205,7 +207,7 @@ class WebViewWithSSO1: BaseToolBarActivity(), EmptyViewListener, WebViewFragment
             context: Context,
             title: String,
             urlPath: String,
-            webViewSettings: WebViewFragment.WebViewSettings
+            webViewSettings: Settings
         ): Intent {
             return Intent(context, WebViewWithSSO1::class.java).apply {
                 putExtra(IS_URL_AVAILABLE, false)
@@ -215,4 +217,11 @@ class WebViewWithSSO1: BaseToolBarActivity(), EmptyViewListener, WebViewFragment
             }
         }
     }
+
+    @Parcelize
+    data class Settings(
+        val showLoadingBetweenPages: Boolean = false,
+        val IsSSORequired: Boolean = true,
+        val allowNonInstituteUrlInWebView: Boolean = true
+    ) : Parcelable
 }
