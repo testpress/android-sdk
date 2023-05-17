@@ -1,5 +1,6 @@
 package `in`.testpress.course.fragments
 
+import `in`.testpress.Constants.DEFAULT_ATTACHMENT_TITLE
 import `in`.testpress.course.R
 import `in`.testpress.course.databinding.LayoutDocumentViewerBinding
 import `in`.testpress.course.ui.ContentActivity
@@ -78,7 +79,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     override fun display() {
-        (activity as ContentActivity).setActionBarTitle(content.attachment?.title)
+        (activity as ContentActivity).setActionBarTitle(content.attachment?.title?:DEFAULT_ATTACHMENT_TITLE)
         fileName = getFileName()
         pdfDownloadManager = PDFDownloadManager(this,requireContext(),fileName)
         if (pdfDownloadManager.isDownloaded()) {

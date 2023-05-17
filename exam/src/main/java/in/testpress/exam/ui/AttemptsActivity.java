@@ -40,10 +40,12 @@ import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Language;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
+import in.testpress.util.CommonUtils;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 
+import static in.testpress.Constants.DEFAULT_ATTEMPTS_TITLE;
 import static in.testpress.exam.TestpressExam.PARAM_EXAM_SLUG;
 import static in.testpress.exam.api.TestpressExamApiClient.STATE_PAUSED;
 import static in.testpress.exam.ui.CarouselFragment.TEST_TAKEN_REQUEST_CODE;
@@ -116,7 +118,7 @@ public class AttemptsActivity extends BaseToolBarActivity
     }
 
     void checkExamState() {
-        setActionBarTitle(exam.getTitle());
+        setActionBarTitle(CommonUtils.isNullOrEmpty(exam.getTitle()) ? DEFAULT_ATTEMPTS_TITLE : exam.getTitle());
         if ((exam.getAttemptsCount() == 0) ||
                 (exam.getAttemptsCount() == 1 && exam.getPausedAttemptsCount() == 1)) {
             // Show start exam screen with exam details if still exam is not taken or only one
