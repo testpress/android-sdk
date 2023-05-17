@@ -68,6 +68,11 @@
 
         <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
+            android:text="SSO WebView"
+            android:id="@+id/web_view_with_sso" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/Button"
             android:text="Fragment"
             android:id="@+id/fragment_button" />
 

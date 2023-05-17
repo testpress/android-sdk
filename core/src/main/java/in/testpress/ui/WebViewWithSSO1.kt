@@ -12,15 +12,11 @@ import `in`.testpress.models.InstituteSettings
 import `in`.testpress.models.SSOUrl
 import `in`.testpress.network.TestpressApiClient
 import `in`.testpress.util.ActivityUtil
-import `in`.testpress.util.ViewUtils
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import java.io.IOException
@@ -116,7 +112,7 @@ class WebViewWithSSO1: BaseToolBarActivity(), EmptyViewListener, WebViewFragment
     }
 
     private fun loadWebViewFragment(ssoLink: SSOUrl? = null) {
-        val urlToOpen = if (isSSORequired) getUrlToOpen(ssoLink) else url!!
+        val urlToOpen = if (isSSORequired) getSSOUrlToOpen(ssoLink) else getUrlToOpen()
         val arguments = Bundle().apply { putString(WebViewFragment.URL_TO_OPEN, urlToOpen) }
         webViewFragment.arguments = arguments
         supportFragmentManager.beginTransaction()
@@ -124,11 +120,19 @@ class WebViewWithSSO1: BaseToolBarActivity(), EmptyViewListener, WebViewFragment
             .commit()
     }
 
-    private fun getUrlToOpen(ssoLink: SSOUrl?):String{
+    private fun getSSOUrlToOpen(ssoLink: SSOUrl?):String{
+        return if (isUrlAvailable){
+            "$url${ssoLink?.ssoUrl}"
+        } else {
+            "${instituteSettings.baseUrl}${ssoLink?.ssoUrl}&next=$urlPath"
+        }
+    }
+
+    private fun getUrlToOpen():String{
         return if (isUrlAvailable){
             url!!
         } else {
-            "${instituteSettings.baseUrl}${ssoLink?.ssoUrl}&next=$urlPath"
+            "${instituteSettings.baseUrl}$urlPath"
         }
     }
 
@@ -148,6 +152,7 @@ class WebViewWithSSO1: BaseToolBarActivity(), EmptyViewListener, WebViewFragment
     }
 
     override fun onRetryClick() {
+        showLoading()
         openWebView()
     }
 
@@ -171,15 +176,6 @@ class WebViewWithSSO1: BaseToolBarActivity(), EmptyViewListener, WebViewFragment
 
     override fun onPageFinished(view: WebView?, url: String?) {
         hideLoading()
-    }
-
-    override fun onReceivedError(
-        view: WebView?,
-        request: WebResourceRequest?,
-        error: WebResourceError?
-    ) {
-        Log.d("TAG", "onReceivedError: ")
-        //Toast.makeText(this,error?.errorCode!!,Toast.LENGTH_SHORT).show()
     }
 
     companion object {

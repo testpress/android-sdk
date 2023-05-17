@@ -160,22 +160,6 @@ class WebViewFragment(
             override fun onPageFinished(view: WebView?, url: String?) {
                 listener?.onPageFinished(view,url)
             }
-
-            override fun onReceivedError(
-                view: WebView?,
-                request: WebResourceRequest?,
-                error: WebResourceError?
-            ) {
-                listener?.onReceivedError(view,request,error)
-            }
-        }
-    }
-
-    fun openInExternal(url: String) {
-        try {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-        } catch (e: Exception) {
-            ViewUtils.toast(requireContext(),"No suitable app was found to open this URL. Please install any browser app")
         }
     }
 
@@ -266,11 +250,6 @@ class WebViewFragment(
         fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean
         fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?)
         fun onPageFinished(view: WebView?, url: String?)
-        fun onReceivedError(
-            view: WebView?,
-            request: WebResourceRequest?,
-            error: WebResourceError?
-        )
     }
 
     @Parcelize
