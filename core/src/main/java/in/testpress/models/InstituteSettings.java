@@ -358,8 +358,9 @@ public class InstituteSettings {
         return whiteLabeledHostUrl;
     }
 
-    public void setWhiteLabeledHostUrl(String whiteLabeledHostUrl) {
+    public InstituteSettings setWhiteLabeledHostUrl(String whiteLabeledHostUrl) {
         this.whiteLabeledHostUrl = whiteLabeledHostUrl;
+        return this;
     }
 
     public boolean isInstituteUrl(String url) {
