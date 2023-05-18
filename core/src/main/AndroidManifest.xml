@@ -26,7 +26,7 @@
             android:label="Web View" />
 
         <activity
-            android:name=".ui.WebViewWithSSO1"
+            android:name=".ui.ActivityWithWebView"
             android:configChanges="orientation|keyboardHidden|screenSize" />
 
         <receiver android:name=".util.FileDownloaderBroadcastReceiver"

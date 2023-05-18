@@ -1,8 +1,14 @@
 package `in`.testpress.fragments
 
+import `in`.testpress.core.TestpressCallback
+import `in`.testpress.core.TestpressException
+import `in`.testpress.core.TestpressSdk
 import `in`.testpress.databinding.WebviewFragmentBinding
+import `in`.testpress.models.InstituteSettings
+import `in`.testpress.models.SSOUrl
+import `in`.testpress.network.TestpressApiClient
+import `in`.testpress.ui.BaseJavaScriptInterface
 import `in`.testpress.util.ActivityUtil
-import `in`.testpress.util.ViewUtils
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Activity.RESULT_OK
@@ -19,7 +25,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import kotlinx.parcelize.Parcelize
 import java.io.File
@@ -27,20 +32,18 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class WebViewFragment(
-    private val javaScriptInterfaceWithNameList: List<Pair<BaseJavaScriptInterface,String>>? = null
+    var url: String = "",
+    val data: String = "",
+    val webViewFragmentSettings: Settings
 ) : Fragment() {
-    companion object {
-        const val URL_TO_OPEN = "URL"
-    }
 
     private val TAG = "WebViewFragment"
     private var _binding: WebviewFragmentBinding? = null
     private val binding: WebviewFragmentBinding get() = _binding!!
     private lateinit var webView: WebView
+    private lateinit var instituteSettings: InstituteSettings
     private var listener : Listener? = null
-    private var url = ""
     private var mCM: String? = null
     private var mUM: ValueCallback<Uri?>? = null
     private var mUMA: ValueCallback<Array<Uri>?>? = null
@@ -48,11 +51,7 @@ class WebViewFragment(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        parseArguments()
-    }
-
-    private fun parseArguments() {
-        url = arguments!!.getString(URL_TO_OPEN) ?: ""
+        instituteSettings = TestpressSdk.getTestpressSession(requireContext())?.instituteSettings!!
     }
 
     override fun onCreateView(
@@ -66,13 +65,19 @@ class WebViewFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        showLoading()
         webView = binding.webView
+        listener?.onWebViewInitializationSuccess()
         setupCookieManager()
         setupWebViewSettings()
         setupWebViewClient()
         setupWebChromeClient()
-        setJavaScriptInterface()
-        loadWebView()
+        loadContent()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
@@ -114,9 +119,38 @@ class WebViewFragment(
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
+    private fun loadContent(){
+        if (webViewFragmentSettings.isSSORequired){
+            fetchSsoLink()
+            return
+        }
+        loadContentInWebView(url = url, data = data)
+    }
+
+    private fun fetchSsoLink() {
+        showLoading()
+        TestpressApiClient(requireContext(), TestpressSdk.getTestpressSession(requireContext())).ssourl
+            .enqueue(object : TestpressCallback<SSOUrl>() {
+                override fun onSuccess(result: SSOUrl?) {
+                    url = "${instituteSettings.baseUrl}${result?.ssoUrl}&next=$url"
+                    loadContentInWebView(url = url)
+                }
+
+                override fun onException(exception: TestpressException?) {
+                    hideLoading()
+                    listener?.onError(exception)
+                }
+            })
+    }
+
+    private fun showLoading() {
+        binding.pbLoading.visibility = View.VISIBLE
+        binding.webView.visibility = View.GONE
+    }
+
+    private fun hideLoading() {
+        binding.pbLoading.visibility = View.GONE
+        binding.webView.visibility = View.VISIBLE
     }
 
     private fun setupCookieManager(){
@@ -144,20 +178,40 @@ class WebViewFragment(
                 view: WebView?,
                 request: WebResourceRequest?
             ): Boolean {
-                if (!(listener?.shouldOverrideUrlLoading(view, request)!!)) {
-                    view?.loadUrl(request?.url.toString())
+
+                return if (isInstituteUrl()){
+                    false
                 } else {
-                    ActivityUtil.openUrl(requireContext(),request?.url.toString())
+                    if (webViewFragmentSettings.allowNonInstituteUrlInWebView){
+                        false
+                    } else {
+                        ActivityUtil.openUrl(requireContext(),request?.url.toString())
+                        true
+                    }
                 }
-                return true
             }
 
+            fun isInstituteUrl() = true
+
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                listener?.onPageStarted(view,url,favicon)
+                Log.d("TAG", "onPageStarted: ")
+                if (webViewFragmentSettings.showLoadingBetweenPages){
+                    showLoading()
+                }
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
-                listener?.onPageFinished(view,url)
+                Log.d("TAG", "onPageFinished: ")
+                hideLoading()
+            }
+
+            override fun onReceivedError(
+                view: WebView?,
+                request: WebResourceRequest?,
+                error: WebResourceError?
+            ) {
+                //TODO("Need implementation")
+                listener?.onError(TestpressException.unexpectedError(Exception("Page loading error.")))
             }
         }
     }
@@ -206,6 +260,17 @@ class WebViewFragment(
         }
     }
 
+    private fun loadContentInWebView(url: String = "", data: String = "") {
+        if (url.isNotEmpty()){
+            webView.loadUrl(url)
+        } else if (data.isNotEmpty()){
+            webView.loadData(data,"text/html", null)
+        } else {
+            // If both the URL and data are empty, pass an unexpected error
+            listener?.onError(TestpressException.unexpectedError(Exception("URL not found and data not found.")))
+        }
+    }
+
     // Create an image file
     @Throws(IOException::class)
     private fun createImageFile(): File? {
@@ -219,22 +284,12 @@ class WebViewFragment(
         return File.createTempFile(imageFileName, ".jpg", storageDir)
     }
 
-    private fun setJavaScriptInterface() {
-        if (javaScriptInterfaceWithNameList == null) return
-        for (javaScriptInterfaceWithName in javaScriptInterfaceWithNameList) {
-            webView.addJavascriptInterface(
-                javaScriptInterfaceWithName.first,
-                javaScriptInterfaceWithName.second
-            )
-        }
-    }
-
-    private fun loadWebView() {
-        webView.loadUrl(url)
-    }
-
     fun setListener(listener: Listener){
         this.listener = listener
+    }
+
+    fun addJavascriptInterface(javascriptInterface: BaseJavaScriptInterface, name: String){
+        webView.addJavascriptInterface(javascriptInterface,name)
     }
 
     fun canGoBack(): Boolean {
@@ -245,12 +300,21 @@ class WebViewFragment(
         webView.goBack()
     }
 
-    interface Listener {
-        fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean
-        fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?)
-        fun onPageFinished(view: WebView?, url: String?)
+    fun retry(){
+        showLoading()
+        loadContent()
     }
 
-    class BaseJavaScriptInterface
+    @Parcelize
+    data class Settings(
+        val showLoadingBetweenPages: Boolean = false,
+        val isSSORequired: Boolean = true,
+        val allowNonInstituteUrlInWebView: Boolean = true
+    ) : Parcelable
+
+    interface Listener {
+        fun onWebViewInitializationSuccess()
+        fun onError(exception: TestpressException?)
+    }
 
 }
