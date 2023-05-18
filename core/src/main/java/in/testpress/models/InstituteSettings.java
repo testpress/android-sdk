@@ -41,6 +41,7 @@ public class InstituteSettings {
     private String appName;
     private boolean isCustomMeetingUIEnabled;
     private Integer maxAllowedDownloadedVideos;
+    private String whiteLabeledHostUrl;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -351,5 +352,17 @@ public class InstituteSettings {
     public InstituteSettings setMaxAllowedDownloadedVideos(Integer maxAllowedDownloadedVideos){
         this.maxAllowedDownloadedVideos = maxAllowedDownloadedVideos;
         return this;
+    }
+
+    public String getWhiteLabeledHostUrl() {
+        return whiteLabeledHostUrl;
+    }
+
+    public void setWhiteLabeledHostUrl(String whiteLabeledHostUrl) {
+        this.whiteLabeledHostUrl = whiteLabeledHostUrl;
+    }
+
+    public boolean isInstituteUrl(String url) {
+        return url.contains(baseUrl) || url.contains(whiteLabeledHostUrl);
     }
 }
