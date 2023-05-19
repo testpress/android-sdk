@@ -210,10 +210,10 @@ public class CourseSampleActivity extends BaseToolBarActivity {
     }
 
     private void launchWebViewWithSSOActivity() {
-        startActivity(ActivityWithWebView.createUrlIntent(
+        startActivity(WebViewWithSSOActivity.createUrlIntent(
                         CourseSampleActivity.this,
-                        "Question",
-                        "https://design.testpress.in/test_generation/question_filter/"
+                        "Report",
+                        "/report/"
                 )
         );
     }

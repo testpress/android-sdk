@@ -7,8 +7,8 @@ import `in`.testpress.databinding.WebviewFragmentBinding
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.models.SSOUrl
 import `in`.testpress.network.TestpressApiClient
-import `in`.testpress.ui.BaseJavaScriptInterface
 import `in`.testpress.util.ActivityUtil
+import `in`.testpress.util.BaseJavaScriptInterface
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Activity.RESULT_OK
@@ -39,8 +39,8 @@ class WebViewFragment(
 ) : Fragment() {
 
     private val TAG = "WebViewFragment"
-    private var _binding: WebviewFragmentBinding? = null
-    private val binding: WebviewFragmentBinding get() = _binding!!
+    private var _layout: WebviewFragmentBinding? = null
+    private val layout: WebviewFragmentBinding get() = _layout!!
     private lateinit var webView: WebView
     private lateinit var instituteSettings: InstituteSettings
     private var listener : Listener? = null
@@ -59,14 +59,14 @@ class WebViewFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = WebviewFragmentBinding.inflate(inflater, container, false)
-        return binding.root
+        _layout = WebviewFragmentBinding.inflate(inflater, container, false)
+        return layout.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showLoading()
-        webView = binding.webView
+        webView = layout.webView
         listener?.onWebViewInitializationSuccess()
         setupCookieManager()
         setupWebViewSettings()
@@ -77,7 +77,7 @@ class WebViewFragment(
 
     override fun onDestroy() {
         super.onDestroy()
-        _binding = null
+        _layout = null
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
@@ -90,7 +90,7 @@ class WebViewFragment(
             if (resultCode == Activity.RESULT_OK) {
                 if (requestCode == FCR) {
 
-                    if (null == mUMA) {
+                    if (mUMA == null) {
                         return
                     }
                     if (intent == null) {
@@ -111,7 +111,7 @@ class WebViewFragment(
         } else {
 
             if (requestCode == FCR) {
-                if (null == mUM) return
+                if (mUM == null) return
                 val result = if (intent == null || resultCode != RESULT_OK) null else intent.data
                 mUM?.onReceiveValue(result)
                 mUM = null
@@ -144,13 +144,13 @@ class WebViewFragment(
     }
 
     private fun showLoading() {
-        binding.pbLoading.visibility = View.VISIBLE
-        binding.webView.visibility = View.GONE
+        layout.pbLoading.visibility = View.VISIBLE
+        layout.webView.visibility = View.GONE
     }
 
     private fun hideLoading() {
-        binding.pbLoading.visibility = View.GONE
-        binding.webView.visibility = View.VISIBLE
+        layout.pbLoading.visibility = View.GONE
+        layout.webView.visibility = View.VISIBLE
     }
 
     private fun setupCookieManager(){
@@ -170,6 +170,7 @@ class WebViewFragment(
         webView.settings.displayZoomControls = false
         // Enable pinch to zoom without the zoom buttons
         webView.settings.builtInZoomControls = false
+        webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
     }
 
     private fun setupWebViewClient(){
@@ -191,17 +192,18 @@ class WebViewFragment(
                 }
             }
 
-            fun isInstituteUrl() = true
+            fun isInstituteUrl():Boolean {
+                //TODO("Need Implementation")
+                return true
+            }
 
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                Log.d("TAG", "onPageStarted: ")
                 if (webViewFragmentSettings.showLoadingBetweenPages){
                     showLoading()
                 }
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
-                Log.d("TAG", "onPageFinished: ")
                 hideLoading()
             }
 
@@ -211,7 +213,7 @@ class WebViewFragment(
                 error: WebResourceError?
             ) {
                 //TODO("Need implementation")
-                listener?.onError(TestpressException.unexpectedError(Exception("Page loading error.")))
+                listener?.onError(TestpressException.unexpectedError(Exception("WebView error")))
             }
         }
     }
@@ -300,9 +302,13 @@ class WebViewFragment(
         webView.goBack()
     }
 
-    fun retry(){
+    fun retryLoad(){
         showLoading()
-        loadContent()
+        if (!webView.url.isNullOrEmpty()){
+            webView.loadUrl(webView.url!!)
+        } else {
+            loadContent()
+        }
     }
 
     @Parcelize
