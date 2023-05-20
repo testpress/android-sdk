@@ -259,6 +259,15 @@ class WebViewFragment(
                 startActivityForResult(chooserIntent, FCR)
                 return true
             }
+
+            override fun onPermissionRequest(request: PermissionRequest?) {
+                val permissions = arrayOf(
+                    PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID,
+                    PermissionRequest.RESOURCE_AUDIO_CAPTURE,
+                    PermissionRequest.RESOURCE_VIDEO_CAPTURE
+                )
+                request?.grant(permissions)
+            }
         }
     }
 
