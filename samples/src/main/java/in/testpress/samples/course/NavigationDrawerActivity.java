@@ -56,6 +56,7 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                     .setDisplayUserEmailOnVideo(false)
                     .setCoursesGamificationEnabled(false)
                     .setMaxAllowedDownloadedVideos(null)
+                    .setWhiteLabeledHostUrl(session.getInstituteSettings().getBaseUrl())
                     .setAppName(getString(R.string.app_name));
             TestpressSdk.setTestpressSession(this, session);
             if (position == 1) {
