@@ -33,11 +33,11 @@ open class BaseToolBarActivity: AppCompatActivity() {
 
     override fun setContentView(layoutResId: Int) {
         super.setContentView(layoutResId)
-        setSecureWindowFlags()
+        preventScreenshot()
         setupActionBar()
     }
 
-    private fun setSecureWindowFlags() {
+    private fun preventScreenshot() {
         session = TestpressSdk.getTestpressSession(this)
         if (session != null && session!!.instituteSettings.isScreenshotDisabled) {
             window.setFlags(
@@ -116,7 +116,7 @@ open class BaseToolBarActivity: AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        setSecureWindowFlags()
+        preventScreenshot()
     }
 
     public override fun onDestroy() {
