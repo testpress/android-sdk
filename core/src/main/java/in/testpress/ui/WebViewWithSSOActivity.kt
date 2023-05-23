@@ -20,6 +20,7 @@ class WebViewWithSSOActivity : BaseToolBarActivity(), EmptyViewListener, WebView
     private lateinit var webViewFragment: WebViewFragment
     private lateinit var title: String
     private lateinit var urlPath: String
+    private var isSSORequired: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +43,7 @@ class WebViewWithSSOActivity : BaseToolBarActivity(), EmptyViewListener, WebView
     private fun parseArguments() {
         title = intent.getStringExtra(TITLE)!!
         urlPath = intent.getStringExtra(URL_TO_OPEN)!!
+        isSSORequired = intent.getBooleanExtra(IS_SSO_REQUIRED,true)
     }
 
     private fun initializeEmptyViewFragment() {
@@ -54,16 +56,28 @@ class WebViewWithSSOActivity : BaseToolBarActivity(), EmptyViewListener, WebView
     private fun initializeWebViewFragment() {
         webViewFragment = WebViewFragment(
             url = urlPath,
-            webViewFragmentSettings = WebViewFragment.Settings(
-                showLoadingBetweenPages = false,
-                isSSORequired = true,
-                allowNonInstituteUrlInWebView = false
-            )
+            webViewFragmentSettings = getWebViewFragmentSettings()
         )
         webViewFragment.setListener(this)
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, webViewFragment)
             .commit()
+    }
+
+    private fun getWebViewFragmentSettings():WebViewFragment.Settings {
+        return if (isSSORequired){
+            WebViewFragment.Settings(
+                showLoadingBetweenPages = false,
+                isSSORequired = true,
+                allowNonInstituteUrlInWebView = false
+            )
+        } else {
+            WebViewFragment.Settings(
+                showLoadingBetweenPages = false,
+                isSSORequired = false,
+                allowNonInstituteUrlInWebView = true
+            )
+        }
     }
 
     private fun showErrorView(exception: java.lang.Exception?) {
@@ -101,16 +115,19 @@ class WebViewWithSSOActivity : BaseToolBarActivity(), EmptyViewListener, WebView
     companion object {
         const val TITLE = "TITLE"
         const val URL_TO_OPEN = "URL"
+        const val IS_SSO_REQUIRED = "IS_SSO_REQUIRED"
 
         @JvmStatic
         fun createUrlIntent(
             context: Context,
             title: String,
             urlPath: String,
+            isSSORequired: Boolean
         ): Intent {
             return Intent(context, WebViewWithSSOActivity::class.java).apply {
                 putExtra(TITLE, title)
                 putExtra(URL_TO_OPEN, urlPath)
+                putExtra(IS_SSO_REQUIRED,isSSORequired)
             }
         }
     }

@@ -9,6 +9,7 @@ import `in`.testpress.util.UIUtils
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
 import androidx.annotation.StringRes
@@ -33,6 +34,12 @@ open class BaseToolBarActivity: AppCompatActivity() {
 
     override fun setContentView(layoutResId: Int) {
         super.setContentView(layoutResId)
+        preventScreenshot()
+        setupActionBar()
+    }
+
+    override fun setContentView(view: View) {
+        super.setContentView(view)
         preventScreenshot()
         setupActionBar()
     }

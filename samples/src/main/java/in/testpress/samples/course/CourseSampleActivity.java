@@ -213,7 +213,8 @@ public class CourseSampleActivity extends BaseToolBarActivity {
         startActivity(WebViewWithSSOActivity.createUrlIntent(
                         CourseSampleActivity.this,
                         "Report",
-                        urlPath
+                        "https://design.testpress.in/test_generation/question_filter/",
+                        false
                 )
         );
     }

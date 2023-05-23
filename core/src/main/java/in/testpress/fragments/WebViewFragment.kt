@@ -1,5 +1,6 @@
 package `in`.testpress.fragments
 
+import `in`.testpress.R
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
@@ -25,6 +26,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import kotlinx.parcelize.Parcelize
 import java.io.File
@@ -66,6 +68,7 @@ class WebViewFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showLoading()
+        initializedSwipeRefresh()
         webView = layout.webView
         listener?.onWebViewInitializationSuccess()
         setupCookieManager()
@@ -73,6 +76,15 @@ class WebViewFragment(
         setupWebViewClient()
         setupWebChromeClient()
         loadContent()
+    }
+
+    private fun initializedSwipeRefresh(){
+        layout.swipeRefreshLayout.setColorSchemeColors(
+            ContextCompat.getColor(requireContext(), R.color.testpress_color_primary),
+        )
+        layout.swipeRefreshLayout.setOnRefreshListener {
+            webView.loadUrl(webView.url.toString())
+        }
     }
 
     override fun onDestroy() {
@@ -179,8 +191,7 @@ class WebViewFragment(
                 view: WebView?,
                 request: WebResourceRequest?
             ): Boolean {
-
-                return if (isInstituteUrl()){
+                return if (instituteSettings.isInstituteUrl(request?.url.toString())){
                     false
                 } else {
                     if (webViewFragmentSettings.allowNonInstituteUrlInWebView){
@@ -192,11 +203,6 @@ class WebViewFragment(
                 }
             }
 
-            fun isInstituteUrl():Boolean {
-                //TODO("Need Implementation")
-                return true
-            }
-
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 if (webViewFragmentSettings.showLoadingBetweenPages){
                     showLoading()
@@ -204,6 +210,7 @@ class WebViewFragment(
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
+                layout.swipeRefreshLayout.isRefreshing = false
                 hideLoading()
             }
 
