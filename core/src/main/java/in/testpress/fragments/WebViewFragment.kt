@@ -89,6 +89,7 @@ class WebViewFragment(
 
     override fun onDestroy() {
         super.onDestroy()
+        webView.destroy()
         _layout = null
     }
 

@@ -108,8 +108,8 @@ class WebViewWithSSOActivity : BaseToolBarActivity(), EmptyViewListener, WebView
     }
 
     private fun hideWebViewShowEmptyView() {
-        layout.emptyViewContainer.isVisible = false
-        layout.fragmentContainer.isVisible = true
+        layout.emptyViewContainer.isVisible = true
+        layout.fragmentContainer.isVisible = false
     }
 
     companion object {
