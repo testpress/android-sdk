@@ -49,14 +49,10 @@ public class PermissionsUtils {
     }
 
     public boolean isStoragePermissionGranted(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q){
-            return ActivityCompat.checkSelfPermission(
-                    activity,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED;
-        } else {
-            return true;
-        }
+        return ActivityCompat.checkSelfPermission(
+                activity,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED;
     }
 
     public void requestStoragePermissionWithSnackbar() {
