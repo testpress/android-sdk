@@ -19,6 +19,6 @@ fun String.isEmailValid(): Boolean {
  * @return The sanitized file name.
  */
 fun String.sanitizeFileName(): String {
-    val illegalCharactersRegex = Regex("[<>:|/?*]")
+    val illegalCharactersRegex = Regex("[/`?*<>|\":\\\\]")
     return this.replace(illegalCharactersRegex, "_")
 }
