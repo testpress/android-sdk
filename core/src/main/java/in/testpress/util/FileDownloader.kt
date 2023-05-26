@@ -9,7 +9,7 @@ import androidx.core.content.getSystemService
 class FileDownloader(private val context: Context) {
 
     fun downloadFile(fileUrl: String, fileName: String) {
-        val request = getDownloadManagerRequest(fileUrl,fileName)
+        val request = getDownloadManagerRequest(fileUrl,fileName.sanitizeFileName())
         val downloadManager = context.getSystemService<DownloadManager>()
         downloadManager?.enqueue(request) ?: return
         ViewUtils.toast(context,"Download Started...")
