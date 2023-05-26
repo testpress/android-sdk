@@ -10,3 +10,7 @@ object Constants {
     const val DEFAULT_ATTEMPTS_TITLE = "Attempts"
 
 }
+
+object RequestCode {
+    const val PERMISSION = 1005
+}

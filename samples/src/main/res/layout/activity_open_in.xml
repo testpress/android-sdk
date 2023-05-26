@@ -71,6 +71,11 @@
             android:text="Fragment"
             android:id="@+id/fragment_button" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/Button"
+            android:text="Permission"
+            android:id="@+id/premission_check_button" />
+
     </LinearLayout>
 
     </ScrollView>

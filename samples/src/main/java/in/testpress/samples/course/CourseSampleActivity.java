@@ -14,7 +14,10 @@ import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.ui.DiscussionActivity;
+import in.testpress.util.PermissionUtil;
 import in.testpress.util.ViewUtils;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 import static in.testpress.core.TestpressSdk.COURSE_CHAPTER_REQUEST_CODE;
 import static in.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE;
@@ -123,6 +126,32 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                 showSDK(R.id.bookmarks);
             }
         });
+
+        findViewById(R.id.premission_check_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PermissionUtil.INSTANCE.checkIsPermissionsGranted(CourseSampleActivity.this,
+                        PermissionUtil.RequiredPermission.Companion.getAllPermissions(),
+                        new Function0<Unit>() {
+                            @Override
+                            public Unit invoke() {
+                                showInputDialogBox();
+                                return null;
+                            }
+                        });
+            }
+        });
+    }
+
+    private void showInputDialogBox() {
+        ViewUtils.showInputDialogBox(CourseSampleActivity.this, "Enter Chapter Slug",
+                new ViewUtils.OnInputCompletedListener() {
+                    @Override
+                    public void onInputComplete(String inputText) {
+                        text = inputText;
+                        ViewUtils.toast(CourseSampleActivity.this,text);
+                    }
+                });
     }
 
     @SuppressWarnings("ConstantConditions")

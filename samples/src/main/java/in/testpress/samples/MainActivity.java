@@ -12,6 +12,7 @@ import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.samples.exam.ExamSampleActivity;
 import in.testpress.samples.course.CourseSampleActivity;
 import in.testpress.samples.store.StoreSampleActivity;
+import in.testpress.util.PermissionUtil;
 
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
 
@@ -21,6 +22,7 @@ public class MainActivity extends BaseToolBarActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        PermissionUtil.INSTANCE.askAllPermission(this);
         findViewById(R.id.core).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
