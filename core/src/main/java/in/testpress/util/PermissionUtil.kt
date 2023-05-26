@@ -21,8 +21,8 @@ object PermissionUtil {
         READ_STORAGE(Manifest.permission.READ_EXTERNAL_STORAGE, "Storage");
 
         companion object {
-            fun getAllPermissions(): List<RequiredPermission> {
-                return when {
+            fun getAllPermissions(): List<RequiredPermission> =
+                when {
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
                         listOf(CAMERA, MICROPHONE, READ_STORAGE)
                     }
@@ -30,21 +30,16 @@ object PermissionUtil {
                         values().asList()
                     }
                 }
-            }
         }
     }
 
-    fun askAllPermission(activity: Activity) {
+    fun askAllPermissions(activity: Activity) {
         val requiredPermission =
             RequiredPermission.getAllPermissions().map { it.permission }.toTypedArray()
-        ActivityCompat.requestPermissions(
-            activity,
-            requiredPermission,
-            RequestCode.PERMISSION
-        )
+        ActivityCompat.requestPermissions(activity, requiredPermission, RequestCode.PERMISSION)
     }
 
-    fun checkIsPermissionsGranted(
+    fun checkPermissionsGranted(
         activity: Activity,
         permissions: List<RequiredPermission>,
         action: () -> Unit
@@ -67,22 +62,16 @@ object PermissionUtil {
 
     private fun isPermissionGranted(context: Context, permission: String): Boolean {
         return when (permission) {
-            Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    true
-                } else {
-                    ActivityCompat.checkSelfPermission(
-                        context,
-                        permission
-                    ) == PackageManager.PERMISSION_GRANTED
-                }
-            }
-            else -> {
-                ActivityCompat.checkSelfPermission(
-                    context,
-                    permission
-                ) == PackageManager.PERMISSION_GRANTED
-            }
+            Manifest.permission.WRITE_EXTERNAL_STORAGE -> isWriteStoragePermissionGranted(context)
+            else -> ActivityCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    private fun isWriteStoragePermissionGranted(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            true
+        } else {
+            ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
         }
     }
 
@@ -92,7 +81,7 @@ object PermissionUtil {
             message,
             Snackbar.LENGTH_LONG
         ).setAction("Allow") {
-            openAppSettingPage(activity)
+            openAppSettingsPage(activity)
         }.show()
     }
 
@@ -109,7 +98,7 @@ object PermissionUtil {
         }
     }
 
-    private fun openAppSettingPage(activity: Activity) {
+    private fun openAppSettingsPage(activity: Activity) {
         val intent = Intent()
         intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
         val uri = Uri.fromParts("package", activity.packageName, null)

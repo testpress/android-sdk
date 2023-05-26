@@ -8,8 +8,6 @@ import android.view.View;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.course.TestpressCourse;
-import in.testpress.course.ui.BookmarksActivity;
-import in.testpress.exam.TestpressExam;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
@@ -130,7 +128,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
         findViewById(R.id.premission_check_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PermissionUtil.INSTANCE.checkIsPermissionsGranted(CourseSampleActivity.this,
+                PermissionUtil.INSTANCE.checkPermissionsGranted(CourseSampleActivity.this,
                         PermissionUtil.RequiredPermission.Companion.getAllPermissions(),
                         new Function0<Unit>() {
                             @Override
