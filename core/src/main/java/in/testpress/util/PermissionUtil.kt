@@ -33,7 +33,7 @@ object PermissionUtil {
         }
     }
 
-    fun askAllPermissions(activity: Activity) {
+    fun mayBeAskAllPermissions(activity: Activity) {
         val requiredPermission =
             RequiredPermission.getAllPermissions().map { it.permission }.toTypedArray()
         ActivityCompat.requestPermissions(activity, requiredPermission, RequestCode.PERMISSION)
@@ -41,21 +41,21 @@ object PermissionUtil {
 
     fun checkPermissionsGranted(
         activity: Activity,
-        permissions: List<RequiredPermission>,
+        requiredPermissions: List<RequiredPermission>,
         action: () -> Unit
     ) {
-        val requiredPermission = mutableListOf<String>()
-        for (permission in permissions) {
-            if (!isPermissionGranted(activity, permission.permission)) {
-                requiredPermission.add(permission.description)
+        val permissions = mutableListOf<String>()
+        for (requiredPermission in requiredPermissions) {
+            if (!isPermissionGranted(activity, requiredPermission.permission)) {
+                permissions.add(requiredPermission.description)
             }
         }
-        if (requiredPermission.isEmpty()) {
+        if (permissions.isEmpty()) {
             action.invoke()
         } else {
             requestPermissionsWithSnackbar(
                 activity,
-                getSnackBarMessage(requiredPermission)
+                getSnackBarMessage(permissions)
             )
         }
     }

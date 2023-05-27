@@ -135,23 +135,12 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                         new Function0<Unit>() {
                             @Override
                             public Unit invoke() {
-                                showInputDialogBox();
+                                ViewUtils.toast(CourseSampleActivity.this,"Permission Granted");
                                 return null;
                             }
                         });
             }
         });
-    }
-
-    private void showInputDialogBox() {
-        ViewUtils.showInputDialogBox(CourseSampleActivity.this, "Enter Chapter Slug",
-                new ViewUtils.OnInputCompletedListener() {
-                    @Override
-                    public void onInputComplete(String inputText) {
-                        text = inputText;
-                        ViewUtils.toast(CourseSampleActivity.this,text);
-                    }
-                });
     }
 
     @SuppressWarnings("ConstantConditions")
