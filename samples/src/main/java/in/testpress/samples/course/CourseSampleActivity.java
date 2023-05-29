@@ -14,7 +14,6 @@ import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.ui.DiscussionActivity;
-import in.testpress.util.PermissionUtil;
 import in.testpress.util.RequiredPermission;
 import in.testpress.util.ViewUtils;
 import kotlin.Unit;

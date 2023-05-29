@@ -12,7 +12,6 @@ import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.samples.exam.ExamSampleActivity;
 import in.testpress.samples.course.CourseSampleActivity;
 import in.testpress.samples.store.StoreSampleActivity;
-import in.testpress.util.PermissionUtil;
 
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
 import static in.testpress.util.PermissionUtilKt.mayBeAskAllPermissions;
