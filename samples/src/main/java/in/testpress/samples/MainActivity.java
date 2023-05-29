@@ -15,6 +15,7 @@ import in.testpress.samples.store.StoreSampleActivity;
 import in.testpress.util.PermissionUtil;
 
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
+import static in.testpress.util.PermissionUtilKt.mayBeAskAllPermissions;
 
 public class MainActivity extends BaseToolBarActivity {
 
@@ -22,7 +23,7 @@ public class MainActivity extends BaseToolBarActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        PermissionUtil.INSTANCE.mayBeAskAllPermissions(this);
+        mayBeAskAllPermissions(this);
         findViewById(R.id.core).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
