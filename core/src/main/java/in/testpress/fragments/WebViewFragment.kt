@@ -79,6 +79,7 @@ class WebViewFragment(
     }
 
     private fun initializedSwipeRefresh(){
+        layout.swipeRefreshLayout.isEnabled = webViewFragmentSettings.enableSwipeRefresh
         layout.swipeRefreshLayout.setColorSchemeColors(
             ContextCompat.getColor(requireContext(), R.color.testpress_color_primary),
         )
@@ -184,7 +185,7 @@ class WebViewFragment(
         // Enable pinch to zoom without the zoom buttons
         webView.settings.builtInZoomControls = false
         webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
-        webView.settings.setSupportZoom(false)
+        webView.settings.setSupportZoom(webViewFragmentSettings.allowZoomControl)
     }
 
     private fun setupWebViewClient(){
@@ -333,7 +334,9 @@ class WebViewFragment(
     data class Settings(
         val showLoadingBetweenPages: Boolean = false,
         val isSSORequired: Boolean = true,
-        val allowNonInstituteUrlInWebView: Boolean = false
+        val allowNonInstituteUrlInWebView: Boolean = false,
+        val allowZoomControl: Boolean = false,
+        val enableSwipeRefresh: Boolean = false
     ) : Parcelable
 
     interface Listener {

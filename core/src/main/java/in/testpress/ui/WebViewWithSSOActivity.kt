@@ -66,14 +66,9 @@ class WebViewWithSSOActivity : BaseToolBarActivity(), EmptyViewListener, WebView
 
     private fun getWebViewFragmentSettings():WebViewFragment.Settings {
         return if (isSSORequired){
-            WebViewFragment.Settings(
-                showLoadingBetweenPages = false,
-                isSSORequired = true,
-                allowNonInstituteUrlInWebView = false
-            )
+            WebViewFragment.Settings()
         } else {
             WebViewFragment.Settings(
-                showLoadingBetweenPages = false,
                 isSSORequired = false,
                 allowNonInstituteUrlInWebView = true
             )
