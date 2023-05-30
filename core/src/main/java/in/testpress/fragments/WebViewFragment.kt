@@ -184,6 +184,7 @@ class WebViewFragment(
         // Enable pinch to zoom without the zoom buttons
         webView.settings.builtInZoomControls = false
         webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
+        webView.settings.setSupportZoom(false)
     }
 
     private fun setupWebViewClient(){
@@ -332,7 +333,7 @@ class WebViewFragment(
     data class Settings(
         val showLoadingBetweenPages: Boolean = false,
         val isSSORequired: Boolean = true,
-        val allowNonInstituteUrlInWebView: Boolean = true
+        val allowNonInstituteUrlInWebView: Boolean = false
     ) : Parcelable
 
     interface Listener {
