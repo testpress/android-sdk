@@ -46,6 +46,7 @@ ext {
     supportLib = '27.1.1'
     exoPlayer = '2.16.1'
     powermock = '2.0.5'
+    paging_version = "3.1.1"
 
     junit = 'junit:junit:4.12'
     mockito = 'org.mockito:mockito-core:2.23.4'
@@ -72,4 +73,8 @@ ext {
     androidxCore = 'androidx.test:core:1.4.0'
     mockServer = 'com.squareup.okhttp3:mockwebserver:3.10.0'
     shimmer = 'com.facebook.shimmer:shimmer:0.5.0'
+
+    pagingRuntime = 'androidx.paging:paging-runtime-ktx:'+ paging_version
+    pagingCommon = 'androidx.paging:paging-common-ktx:'+ paging_version
+
 }
