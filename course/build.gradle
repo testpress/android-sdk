@@ -86,6 +86,7 @@ dependencies {
 
     //Paging
     api rootProject.pagingRuntime
+    api rootProject.pagingCommon
 
     def fragment_version = "1.4.1"
 
