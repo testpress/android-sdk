@@ -265,20 +265,10 @@ public class ReviewStatsFragment extends BaseFragment {
 
     @SuppressLint("SetTextI18n")
     private void displayTestReport() {
-        if (isExamNotNull()){
-            examTitle.setText(exam.getTitle());
-        } else {
-            examTitle.setText("Custom Module");
-        }
         timeTaken.setText(attempt.getTimeTaken());
         correct.setText(attempt.getCorrectCount().toString());
         incorrect.setText(attempt.getIncorrectCount().toString());
         totalQuestions.setText(attempt.getTotalQuestions().toString());
-        if (isExamNotNull()){
-            totalTime.setText(exam.getDuration());
-        } else {
-            totalTime.setText("");
-        }
         accuracy.setText(attempt.getAccuracy().toString());
         showOrHideAttemptDate();
         showOrHideRankLayout();
@@ -292,6 +282,8 @@ public class ReviewStatsFragment extends BaseFragment {
         showOrHideRetakButton();
         setTotalMarks();
         setCutOff();
+        setExamTitle();
+        setTotalTime();
         displayRankIfAvailable();
         reviewStatLayout.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
@@ -453,6 +445,22 @@ public class ReviewStatsFragment extends BaseFragment {
     private void setCutOff() {
         if (isExamNotNull() && exam.getPassPercentage() != null) {
             cutoff.setText(exam.getPassPercentage().toString());
+        }
+    }
+
+    private void setExamTitle() {
+        if (isExamNotNull()){
+            examTitle.setText(exam.getTitle());
+        } else {
+            examTitle.setText("Custom Module");
+        }
+    }
+
+    private void setTotalTime() {
+        if (isExamNotNull()){
+            totalTime.setText(exam.getDuration());
+        } else {
+            totalTime.setText("");
         }
     }
 
