@@ -1,6 +1,5 @@
 package `in`.testpress.util
 
-import `in`.testpress.RequestCode
 import android.Manifest
 import android.app.Activity
 import android.content.Context
@@ -9,13 +8,11 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.util.Log
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 
-// Enum class representing required permissions with their descriptions
-enum class RequiredPermission(val permission: String, val description: String) {
+// Enum class representing permissions with their descriptions
+enum class Permission(val permission: String, val description: String) {
     CAMERA(Manifest.permission.CAMERA, "Camera"),
     MICROPHONE(Manifest.permission.RECORD_AUDIO, "Microphone"),
     WRITE_STORAGE(Manifest.permission.WRITE_EXTERNAL_STORAGE, "Storage"),
@@ -23,14 +20,12 @@ enum class RequiredPermission(val permission: String, val description: String) {
 
     companion object {
         // Function to get all permissions based on the device's SDK version
-        fun getAllPermissions(): List<RequiredPermission> =
+        fun getAllPermissions(): List<Permission> =
             when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-                    Log.d("TAG", "getAllPermissions: ${Build.VERSION.SDK_INT}")
                     listOf(CAMERA, MICROPHONE, READ_STORAGE)
                 }
                 else -> {
-                    Log.d("TAG", "getAllPermissions: ${Build.VERSION.SDK_INT}")
                     values().asList()
                 }
             }
@@ -38,12 +33,11 @@ enum class RequiredPermission(val permission: String, val description: String) {
 }
 
 // Utility class for handling permissions
-class PermissionUtil {
+class PermissionHandler {
 
-    // Check if required permissions are granted, and take action accordingly
     fun checkPermissionsGranted(
         activity: Activity,
-        requiredPermissions: List<RequiredPermission>,
+        requiredPermissions: List<Permission>,
         action: () -> Unit
     ) {
         val permissions = mutableListOf<String>()
@@ -62,7 +56,6 @@ class PermissionUtil {
         }
     }
 
-    // Check if a specific permission is granted
     private fun isPermissionGranted(context: Context, permission: String): Boolean {
         return when (permission) {
             Manifest.permission.WRITE_EXTERNAL_STORAGE -> isWriteStoragePermissionGranted(context)
@@ -70,7 +63,6 @@ class PermissionUtil {
         }
     }
 
-    // Check if WRITE_EXTERNAL_STORAGE permission is granted
     private fun isWriteStoragePermissionGranted(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             true
@@ -79,7 +71,6 @@ class PermissionUtil {
         }
     }
 
-    // Show a Snackbar with a message requesting permissions
     private fun requestPermissionsWithSnackbar(activity: Activity, message: String) {
         Snackbar.make(
             activity.findViewById(android.R.id.content),
@@ -113,27 +104,4 @@ class PermissionUtil {
         activity.startActivity(intent)
     }
 
-}
-
-// Extension function for Activity to request all permissions
-fun Activity.mayBeAskAllPermissions() {
-    val requiredPermission =
-        RequiredPermission.getAllPermissions().map { it.permission }.toTypedArray()
-    ActivityCompat.requestPermissions(this, requiredPermission, RequestCode.PERMISSION)
-}
-
-// Extension function for Activity to check if required permissions are granted
-fun Activity.checkPermissionsGranted(
-    requiredPermissions: List<RequiredPermission>,
-    action: () -> Unit
-) {
-    PermissionUtil().checkPermissionsGranted(this,requiredPermissions,action)
-}
-
-// Extension function for Fragment to check if required permissions are granted
-fun Fragment.checkPermissionsGranted(
-    requiredPermissions: List<RequiredPermission>,
-    action: () -> Unit
-) {
-    PermissionUtil().checkPermissionsGranted(this.requireActivity(),requiredPermissions,action)
 }

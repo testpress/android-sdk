@@ -14,7 +14,7 @@ import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.ui.DiscussionActivity;
-import in.testpress.util.RequiredPermission;
+import in.testpress.util.Permission;
 import in.testpress.util.ViewUtils;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
@@ -25,7 +25,7 @@ import static in.testpress.core.TestpressSdk.COURSE_CONTENT_LIST_REQUEST_CODE;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
-import static in.testpress.util.PermissionUtilKt.checkPermissionsGranted;
+import static in.testpress.util.extension.ActivityKt.checkPermissionsGranted;
 
 public class CourseSampleActivity extends BaseToolBarActivity {
 
@@ -132,7 +132,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
             @Override
             public void onClick(View view) {
                 checkPermissionsGranted(CourseSampleActivity.this,
-                        RequiredPermission.Companion.getAllPermissions(),
+                        Permission.Companion.getAllPermissions(),
                         new Function0<Unit>() {
                             @Override
                             public Unit invoke() {
