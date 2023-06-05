@@ -27,11 +27,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import junit.framework.Assert;
 
-import java.text.Format;
 import java.util.HashMap;
 
 import in.testpress.core.TestpressCallback;
@@ -264,47 +262,74 @@ public class ReviewStatsFragment extends BaseFragment {
 
     @SuppressLint("SetTextI18n")
     private void displayTestReport() {
+        examTitle.setText(exam.getTitle());
+        timeTaken.setText(attempt.getTimeTaken());
+        correct.setText(attempt.getCorrectCount().toString());
+        incorrect.setText(attempt.getIncorrectCount().toString());
+        totalQuestions.setText(attempt.getTotalQuestions().toString());
+        totalTime.setText(exam.getDuration());
+        accuracy.setText(attempt.getAccuracy().toString());
+        showOrHideAttemptDate();
+        showOrHideRankLayout();
+        showOrHidePercentageLayout();
+        showOrHideScoreLayout();
+        showOrHidePercentileLayout();
+        showOrHideReviewQuestionButton();
+        showOrHideAnalyticsButton();
+        showOrHideAdvancedAnalyticsButton();
+        showOrHideEmailPDFButton();
+        showOrHideRetakButton();
+        setTotalMarks();
+        setCutOff();
+        displayRankIfAvailable();
+        reviewStatLayout.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
+    }
+
+    private void showOrHideAttemptDate() {
         String previousActivity = getArguments().getString(PARAM_PREVIOUS_ACTIVITY);
         if((previousActivity != null) && previousActivity.equals(TestActivity.class.getName())) {
             attemptDate.setVisibility(View.GONE);
         } else {
             attemptDate.setText(attempt.getShortDate());
         }
-        examTitle.setText(exam.getTitle());
-        timeTaken.setText(attempt.getTimeTaken());
-        correct.setText(attempt.getCorrectCount().toString());
-        incorrect.setText(attempt.getIncorrectCount().toString());
+    }
+
+    private void showOrHideRankLayout() {
         if (Boolean.TRUE.equals(attempt.getRankEnabled())) {
             rank.setText(attempt.getRank());
             maxRank.setText(attempt.getMaxRank());
         } else {
             rankLayout.setVisibility(View.GONE);
         }
+    }
+
+    private void showOrHidePercentageLayout() {
         if (attempt.getPercentage() == null || attempt.getPercentage().equals("NA")) {
             percentageLayout.setVisibility(View.GONE);
         } else {
             percentage.setText(attempt.getPercentage());
         }
+    }
+
+    private void showOrHideScoreLayout() {
         if ((exam.getShowScore()) && (attempt.getScore() == null || attempt.getScore().equals("NA"))) {
             scoreLayout.setVisibility(View.GONE);
         } else {
             score.setText(attempt.getScore());
         }
+    }
+
+    private void showOrHidePercentileLayout() {
         if ((exam.getShowPercentile()) &&
                 (attempt.getPercentile() == null || attempt.getPercentile().equals("NA"))) {
             percentileLayout.setVisibility(View.GONE);
         } else {
             percentile.setText(attempt.getPercentile());
         }
-        totalQuestions.setText(attempt.getTotalQuestions().toString());
-        if (exam.getTotalMarks() != null) {
-            totalMarks.setText(exam.getTotalMarks());
-        }
-        totalTime.setText(exam.getDuration());
-        if (exam.getPassPercentage() != null) {
-            cutoff.setText(exam.getPassPercentage().toString());
-        }
-        accuracy.setText(attempt.getAccuracy().toString());
+    }
+
+    private void showOrHideReviewQuestionButton(){
         if (exam.getShowAnswers()) {
             reviewQuestionsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -315,6 +340,13 @@ public class ReviewStatsFragment extends BaseFragment {
                 }
             });
             reviewQuestionsButton.setVisibility(View.VISIBLE);
+        } else {
+            reviewQuestionsButton.setVisibility(View.GONE);
+        }
+    }
+
+    private void showOrHideAnalyticsButton() {
+        if (exam.showAnalytics()) {
             analyticsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -336,16 +368,12 @@ public class ReviewStatsFragment extends BaseFragment {
             // TODO: Clean up TimeAnalytics & enable it
             timeAnalyticsButtonLayout.setVisibility(View.GONE);
         } else {
-            reviewQuestionsButton.setVisibility(View.GONE);
             timeAnalyticsButtonLayout.setVisibility(View.GONE);
-        }
-
-        if (exam.showAnalytics()) {
-            analyticsButton.setVisibility(View.VISIBLE);
-        } else {
             analyticsButton.setVisibility(View.GONE);
         }
+    }
 
+    private void showOrHideAdvancedAnalyticsButton() {
         if (attempt.isExternalReviewUrlAvailable()){
             advancedAnalyticsLayout.setVisibility(View.VISIBLE);
             advancedAnalyticsButton.setOnClickListener(new View.OnClickListener() {
@@ -358,7 +386,9 @@ public class ReviewStatsFragment extends BaseFragment {
                 }
             });
         }
+    }
 
+    private void showOrHideEmailPDFButton() {
         if (Boolean.TRUE.equals(exam.getAllowPdf())) {
             emailPdfButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -371,7 +401,9 @@ public class ReviewStatsFragment extends BaseFragment {
         } else {
             emailPdfButtonLayout.setVisibility(View.GONE);
         }
+    }
 
+    private void showOrHideRetakButton() {
         if (canAttemptExam() && getArguments().getBoolean(PARAM_SHOW_RETAKE_BUTTON, true)) {
             retakeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -388,9 +420,18 @@ public class ReviewStatsFragment extends BaseFragment {
         } else {
             retakeButtonLayout.setVisibility(View.GONE);
         }
-        displayRankIfAvailable();
-        reviewStatLayout.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.GONE);
+    }
+
+    private void setTotalMarks() {
+        if (exam.getTotalMarks() != null) {
+            totalMarks.setText(exam.getTotalMarks());
+        }
+    }
+
+    private void setCutOff() {
+        if (exam.getPassPercentage() != null) {
+            cutoff.setText(exam.getPassPercentage().toString());
+        }
     }
 
     private void displayRankIfAvailable() {
