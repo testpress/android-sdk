@@ -40,12 +40,10 @@ class PermissionHandler {
         requiredPermissions: List<Permission>,
         action: () -> Unit
     ) {
-        val permissions = mutableListOf<String>()
-        for (requiredPermission in requiredPermissions) {
-            if (!isPermissionGranted(activity, requiredPermission.permission)) {
-                permissions.add(requiredPermission.description)
-            }
-        }
+        val permissions = requiredPermissions
+            .filterNot { isPermissionGranted(activity, it.permission) }
+            .map { it.description }
+
         if (permissions.isEmpty()) {
             action.invoke()
         } else {
@@ -82,7 +80,7 @@ class PermissionHandler {
     }
 
     // Generate the Snackbar message based on the required permissions
-    private fun getSnackBarMessage(permissions: MutableList<String>): String {
+    private fun getSnackBarMessage(permissions: List<String>): String {
         val distinctPermissions = permissions.distinct()
         return when {
             distinctPermissions.isEmpty() -> "Permission required to access this functionality"
