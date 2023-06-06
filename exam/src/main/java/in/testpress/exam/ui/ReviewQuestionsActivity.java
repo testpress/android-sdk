@@ -22,6 +22,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -140,12 +141,18 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
         return intent;
     }
 
+    public static Intent createIntent(Activity activity, Attempt attempt) {
+        Intent intent = new Intent(activity, ReviewQuestionsActivity.class);
+        intent.putExtra(ReviewQuestionsActivity.PARAM_ATTEMPT, attempt);
+        return intent;
+    }
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_review_question);
         parseArguments();
-        setTitle(exam.getTitle() + " Solutions");
+        setExamTitle();
         apiClient = new TestpressExamApiClient(this);
         bindViews();
         initializeQuestionsListSidebar();
@@ -164,6 +171,14 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
         InstituteSettings instituteSettings = TestpressSdk.getTestpressSession(this).getInstituteSettings();
         if (instituteSettings.isGrowthHackEnabled()) {
             customiseToolbar();
+        }
+    }
+
+    private void setExamTitle() {
+        if (exam == null){
+            setTitle("Solutions");
+        } else {
+            setTitle(exam.getTitle() + " Solutions");
         }
     }
 
@@ -191,7 +206,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
     }
 
     private void initializeQuestionPager() {
-        pagerAdapter = new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems, exam.getId());
+        pagerAdapter = getReviewQuestionsPagerAdapter();
         pager.setAdapter(pagerAdapter);
         slidingPaneLayout.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
             @Override
@@ -225,6 +240,15 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
         });
     }
 
+    private ReviewQuestionsPagerAdapter getReviewQuestionsPagerAdapter() {
+        if (exam == null){
+            // If Exam null we set Exam ID As -1
+            return new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems, -1L);
+        } else {
+            return new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems, exam.getId());
+        }
+    }
+
 
     private void bindViews() {
         questionsListView = (RecyclerView) findViewById(R.id.questions_list_view);
@@ -247,7 +271,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
 
     private void parseArguments() {
         exam = getIntent().getParcelableExtra(PARAM_EXAM);
-        Assert.assertNotNull("PARAM_EXAM must not be null", exam);
         attempt = getIntent().getParcelableExtra(PARAM_ATTEMPT);
         Assert.assertNotNull("PARAM_ATTEMPT must not be null", attempt);
     }
@@ -327,6 +350,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
     }
 
     void setUpLanguageOptionsMenu() {
+        if (exam == null) return;
         final ArrayList<Language> languages = new ArrayList<>(exam.getRawLanguages());
         if (languages.size() > 1 && optionsMenu != null && !reviewItems.isEmpty()) {
             getMenuInflater().inflate(R.menu.testpress_select_language_menu, optionsMenu);
@@ -507,12 +531,15 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
                 uniqueLanguages.put(language.getCode(), language);
             }
         }
-        exam.setLanguages(new ArrayList<>(uniqueLanguages.values()));
+        if (exam != null){
+            exam.setLanguages(new ArrayList<>(uniqueLanguages.values()));
+        }
         setUpLanguageOptionsMenu();
         onSpinnerItemSelected(0);
     }
 
     void fetchLanguages() {
+        if (exam == null) return;
         progressBar.setVisibility(View.VISIBLE);
         languageApiRequest = apiClient.getLanguages(exam.getSlug())
                 .enqueue(new TestpressCallback<TestpressApiResponse<Language>>() {
@@ -726,7 +753,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
     }
 
     private void initSelectedLanguage(ArrayList<Language> languages) {
-        String selectedLanguageCode = exam.getSelectedLanguage();
+        String selectedLanguageCode = getSelectedLanguageCode();
         if (selectedLanguageCode == null || selectedLanguageCode.isEmpty()) {
             selectedLanguageCode = reviewItems.get(0).getQuestion().getLanguage();
         }
@@ -740,6 +767,15 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
         }
         languageSpinner.setSelection(selectedPosition);
         selectLanguageMenu.setVisible(true);
+    }
+
+    @Nullable
+    private String getSelectedLanguageCode() {
+        if (exam == null){
+            return null;
+        } else {
+            return exam.getSelectedLanguage();
+        }
     }
 
     protected void setEmptyText(final int title, final int description) {
