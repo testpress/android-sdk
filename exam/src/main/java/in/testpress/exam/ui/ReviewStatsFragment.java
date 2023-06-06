@@ -346,6 +346,17 @@ public class ReviewStatsFragment extends BaseFragment {
             reviewQuestionsButton.setVisibility(View.VISIBLE);
         } else if (isExamNotNull() && !exam.showAnalytics()){
             reviewQuestionsButton.setVisibility(View.GONE);
+        } else {
+            reviewQuestionsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO: 05-06-2023
+                    requireActivity().startActivity(
+                            ReviewQuestionsActivity.createIntent(getActivity(), attempt)
+                    );
+                }
+            });
+            reviewQuestionsButton.setVisibility(View.VISIBLE);
         }
     }
 
