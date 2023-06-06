@@ -8,13 +8,14 @@ import android.view.View;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.course.TestpressCourse;
-import in.testpress.course.ui.BookmarksActivity;
-import in.testpress.exam.TestpressExam;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.ui.DiscussionActivity;
+import in.testpress.util.Permission;
 import in.testpress.util.ViewUtils;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 import static in.testpress.core.TestpressSdk.COURSE_CHAPTER_REQUEST_CODE;
 import static in.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE;
@@ -22,6 +23,7 @@ import static in.testpress.core.TestpressSdk.COURSE_CONTENT_LIST_REQUEST_CODE;
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
+import static in.testpress.util.extension.ActivityKt.performActionIfPermissionsGranted;
 
 public class CourseSampleActivity extends BaseToolBarActivity {
 
@@ -121,6 +123,21 @@ public class CourseSampleActivity extends BaseToolBarActivity {
             @Override
             public void onClick(View view) {
                 showSDK(R.id.bookmarks);
+            }
+        });
+
+        findViewById(R.id.premission_check_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                performActionIfPermissionsGranted(CourseSampleActivity.this,
+                        Permission.Companion.getAllPermissions(),
+                        new Function0<Unit>() {
+                            @Override
+                            public Unit invoke() {
+                                ViewUtils.toast(CourseSampleActivity.this,"Permission Granted");
+                                return null;
+                            }
+                        });
             }
         });
     }
