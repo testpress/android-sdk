@@ -6,16 +6,15 @@ import `in`.testpress.util.PermissionHandler
 import android.app.Activity
 import androidx.core.app.ActivityCompat
 
-// Extension function for Activity to request all permissions
 fun Activity.askAllPermissions() {
     val requiredPermission =
         Permission.getAllPermissions().map { it.permission }.toTypedArray()
     ActivityCompat.requestPermissions(this, requiredPermission, RequestCode.PERMISSION)
 }
 
-fun Activity.checkPermissionsGranted(
+fun Activity.performActionIfPermissionsGranted(
     requiredPermissions: List<Permission>,
     action: () -> Unit
 ) {
-    PermissionHandler().checkPermissionsGranted(this,requiredPermissions,action)
+    PermissionHandler().performActionIfPermissionsGranted(this,requiredPermissions,action)
 }

@@ -32,10 +32,9 @@ enum class Permission(val permission: String, val description: String) {
     }
 }
 
-// Utility class for handling permissions
 class PermissionHandler {
 
-    fun checkPermissionsGranted(
+    fun performActionIfPermissionsGranted(
         activity: Activity,
         requiredPermissions: List<Permission>,
         action: () -> Unit
@@ -79,7 +78,6 @@ class PermissionHandler {
         }.show()
     }
 
-    // Generate the Snackbar message based on the required permissions
     private fun getSnackBarMessage(permissions: List<String>): String {
         val distinctPermissions = permissions.distinct()
         return when {
@@ -93,7 +91,6 @@ class PermissionHandler {
         }
     }
 
-    // Open the app's settings page
     private fun openAppSettingsPage(activity: Activity) {
         val intent = Intent()
         intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
