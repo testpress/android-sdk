@@ -22,7 +22,6 @@ import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.util.MultiLanguagesUtil
 import `in`.testpress.exam.util.RetakeExamUtil
-import `in`.testpress.ui.IELTSExamActivity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
