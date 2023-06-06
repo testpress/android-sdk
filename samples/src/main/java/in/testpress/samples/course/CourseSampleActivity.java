@@ -12,6 +12,8 @@ import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.ui.DiscussionActivity;
+import in.testpress.ui.WebViewWithSSOActivity;
+import in.testpress.util.Permission;
 import in.testpress.util.ViewUtils;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
@@ -135,6 +137,20 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                             public Unit invoke() {
                                 ViewUtils.toast(CourseSampleActivity.this,"Permission Granted");
                                 return null;
+                            }
+                        });
+            }
+        });
+
+        findViewById(R.id.web_view_with_sso).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ViewUtils.showInputDialogBox(CourseSampleActivity.this, "Enter Url",
+                        new ViewUtils.OnInputCompletedListener() {
+                            @Override
+                            public void onInputComplete(String inputText) {
+                                text = inputText;
+                                launchWebViewWithSSOActivity(text);
                             }
                         });
             }
