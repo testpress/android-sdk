@@ -116,7 +116,6 @@ abstract class BaseSSOActivity : BaseToolBarActivity(), EmptyViewListener, WebVi
         const val URL_TO_OPEN = "URL"
         const val IS_SSO_REQUIRED = "IS_SSO_REQUIRED"
 
-        @JvmStatic
         fun createUrlIntent(
             currentContext: Context,
             title: String,
@@ -131,5 +130,4 @@ abstract class BaseSSOActivity : BaseToolBarActivity(), EmptyViewListener, WebVi
             }
         }
     }
-
 }

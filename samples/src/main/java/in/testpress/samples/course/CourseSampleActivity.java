@@ -210,13 +210,13 @@ public class CourseSampleActivity extends BaseToolBarActivity {
     }
 
     private void launchWebViewWithSSOActivity(String urlPath) {
-//        startActivity(BaseSSOActivity.createUrlIntent(
-//                        CourseSampleActivity.this,
-//                        "Report",
-//                        urlPath,
-//                        true
-//                )
-//        );
+        startActivity(WebViewWithSSOActivity.createIntent(
+                        CourseSampleActivity.this,
+                        "Test WebView",
+                        urlPath,
+                        true
+                )
+        );
     }
 
     @Override
