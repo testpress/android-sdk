@@ -62,6 +62,14 @@ public class ReviewStatsActivity extends BaseToolBarActivity {
         return intent;
     }
 
+    public static Intent createIntent(Activity activity, Attempt attempt) {
+        Intent intent = new Intent(activity, ReviewStatsActivity.class);
+        intent.putExtra(PARAM_PREVIOUS_ACTIVITY, activity.getClass().getName());
+        intent.putExtra(PARAM_ATTEMPT, attempt);
+        intent.putExtra(PARAM_SHOW_RETAKE_BUTTON, false);
+        return intent;
+    }
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

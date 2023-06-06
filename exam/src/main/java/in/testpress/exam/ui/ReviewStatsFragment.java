@@ -139,7 +139,6 @@ public class ReviewStatsFragment extends BaseFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         exam = getArguments().getParcelable(PARAM_EXAM);
-        Assert.assertNotNull("PARAM_EXAM must not be null.", exam);
         instituteSettings = getInstituteSettings();
         attempt = getArguments().getParcelable(PARAM_ATTEMPT);
         CourseAttempt courseAttempt = getArguments().getParcelable(PARAM_COURSE_ATTEMPT);
@@ -260,14 +259,16 @@ public class ReviewStatsFragment extends BaseFragment {
         }
     }
 
+    private boolean isExamNotNull() {
+        return exam != null;
+    }
+
     @SuppressLint("SetTextI18n")
     private void displayTestReport() {
-        examTitle.setText(exam.getTitle());
         timeTaken.setText(attempt.getTimeTaken());
         correct.setText(attempt.getCorrectCount().toString());
         incorrect.setText(attempt.getIncorrectCount().toString());
         totalQuestions.setText(attempt.getTotalQuestions().toString());
-        totalTime.setText(exam.getDuration());
         accuracy.setText(attempt.getAccuracy().toString());
         showOrHideAttemptDate();
         showOrHideRankLayout();
@@ -281,6 +282,8 @@ public class ReviewStatsFragment extends BaseFragment {
         showOrHideRetakButton();
         setTotalMarks();
         setCutOff();
+        setExamTitle();
+        setTotalTime();
         displayRankIfAvailable();
         reviewStatLayout.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
@@ -296,7 +299,7 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void showOrHideRankLayout() {
-        if (Boolean.TRUE.equals(attempt.getRankEnabled())) {
+        if (isExamNotNull() && Boolean.TRUE.equals(attempt.getRankEnabled())) {
             rank.setText(attempt.getRank());
             maxRank.setText(attempt.getMaxRank());
         } else {
@@ -313,7 +316,9 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void showOrHideScoreLayout() {
-        if ((exam.getShowScore()) && attempt.hasScore()) {
+        //The score layout should be shown even if the exam is null because the random question
+        //generation feature does not require an exam but still has a score.
+        if ((exam == null || exam.getShowScore()) && attempt.hasScore()) {
             score.setText(attempt.getScore());
         } else {
             scoreLayout.setVisibility(View.GONE);
@@ -321,7 +326,7 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void showOrHidePercentileLayout() {
-        if (exam.getShowPercentile() && attempt.hasPercentile()) {
+        if (isExamNotNull() && exam.getShowPercentile() && attempt.hasPercentile()) {
             percentile.setText(attempt.getPercentile());
         } else {
             percentileLayout.setVisibility(View.GONE);
@@ -329,7 +334,7 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void showOrHideReviewQuestionButton(){
-        if (exam.getShowAnswers()) {
+        if (isExamNotNull() && exam.getShowAnswers()) {
             reviewQuestionsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -339,20 +344,17 @@ public class ReviewStatsFragment extends BaseFragment {
                 }
             });
             reviewQuestionsButton.setVisibility(View.VISIBLE);
-        } else {
+        } else if (isExamNotNull() && !exam.showAnalytics()){
             reviewQuestionsButton.setVisibility(View.GONE);
         }
     }
 
     private void showOrHideAnalyticsButton() {
-        if (exam.showAnalytics()) {
+        if (isExamNotNull() && exam.showAnalytics()) {
             analyticsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    getActivity().startActivity(
-                            AnalyticsActivity.createIntent(getActivity(), attempt.getUrlFrag() +
-                                    TestpressExamApiClient.ATTEMPT_SUBJECT_ANALYTICS_PATH, null, exam.getTitle())
-                    );
+                    openAnalyticsActivity(exam.getTitle());
                 }
             });
             analyticsButton.setVisibility(View.VISIBLE);
@@ -366,10 +368,26 @@ public class ReviewStatsFragment extends BaseFragment {
             });
             // TODO: Clean up TimeAnalytics & enable it
             timeAnalyticsButtonLayout.setVisibility(View.GONE);
-        } else {
+        } else if (exam == null){
+            analyticsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openAnalyticsActivity("Custom Module");
+                }
+            });
+            analyticsButton.setVisibility(View.VISIBLE);
             timeAnalyticsButtonLayout.setVisibility(View.GONE);
-            analyticsButton.setVisibility(View.GONE);
+        } else {
+            analyticsButton.setVisibility(View.VISIBLE);
+            timeAnalyticsButtonLayout.setVisibility(View.GONE);
         }
+    }
+
+    private void openAnalyticsActivity(String title) {
+        getActivity().startActivity(
+                AnalyticsActivity.createIntent(getActivity(), attempt.getUrlFrag() +
+                        TestpressExamApiClient.ATTEMPT_SUBJECT_ANALYTICS_PATH, null, title)
+        );
     }
 
     private void showOrHideAdvancedAnalyticsButton() {
@@ -388,7 +406,7 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void showOrHideEmailPDFButton() {
-        if (Boolean.TRUE.equals(exam.getAllowPdf())) {
+        if (isExamNotNull() && Boolean.TRUE.equals(exam.getAllowPdf())) {
             emailPdfButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -403,7 +421,7 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void showOrHideRetakButton() {
-        if (canAttemptExam() && getArguments().getBoolean(PARAM_SHOW_RETAKE_BUTTON, true)) {
+        if (getArguments().getBoolean(PARAM_SHOW_RETAKE_BUTTON, true) && canAttemptExam()) {
             retakeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -422,19 +440,35 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void setTotalMarks() {
-        if (exam.getTotalMarks() != null) {
+        if (isExamNotNull() && exam.getTotalMarks() != null) {
             totalMarks.setText(exam.getTotalMarks());
         }
     }
 
     private void setCutOff() {
-        if (exam.getPassPercentage() != null) {
+        if (isExamNotNull() && exam.getPassPercentage() != null) {
             cutoff.setText(exam.getPassPercentage().toString());
         }
     }
 
+    private void setExamTitle() {
+        if (isExamNotNull()){
+            examTitle.setText(exam.getTitle());
+        } else {
+            examTitle.setText("Custom Module");
+        }
+    }
+
+    private void setTotalTime() {
+        if (isExamNotNull()){
+            totalTime.setText(exam.getDuration());
+        } else {
+            totalTime.setText("");
+        }
+    }
+
     private void displayRankIfAvailable() {
-        if (exam.getEnableRanks() && !attempt.getRankEnabled()) {
+        if (isExamNotNull() && exam.getEnableRanks() && !attempt.getRankEnabled()) {
             rankPublishDate.setText(getRankPublishDate());
         } else {
             ViewUtils.setGone(rankPublishLayout,true);
@@ -471,7 +505,7 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private boolean shouldShowShareButton() {
-        return (exam.isGrowthHackEnabled() && isAppNotSharedAlready()) ||
+        return (isExamNotNull() && exam.isGrowthHackEnabled() && isAppNotSharedAlready()) ||
                 (instituteSettings.isGrowthHackEnabled() && instituteSettings.isAppNotSharedAlready(requireContext()));
     }
 
