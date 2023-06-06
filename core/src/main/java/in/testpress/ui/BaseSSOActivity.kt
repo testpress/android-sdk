@@ -6,18 +6,23 @@ import `in`.testpress.databinding.BaseTestpressWebviewContainerLayoutBinding
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import `in`.testpress.fragments.WebViewFragment
+import `in`.testpress.util.BaseJavaScriptInterface
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.webkit.JavascriptInterface
+import android.widget.Toast
 import androidx.core.view.isVisible
 import java.io.IOException
 
-class WebViewWithSSOActivity : BaseToolBarActivity(), EmptyViewListener, WebViewFragment.Listener {
+abstract class BaseSSOActivity : BaseToolBarActivity(), EmptyViewListener, WebViewFragment.Listener {
 
     private var _layout: BaseTestpressWebviewContainerLayoutBinding? = null
     private val layout: BaseTestpressWebviewContainerLayoutBinding get() = _layout!!
     private lateinit var emptyViewFragment: EmptyViewFragment
-    private lateinit var webViewFragment: WebViewFragment
+    protected lateinit var webViewFragment: WebViewFragment
     private lateinit var title: String
     private lateinit var urlPath: String
     private var isSSORequired: Boolean = true
@@ -90,7 +95,7 @@ class WebViewWithSSOActivity : BaseToolBarActivity(), EmptyViewListener, WebView
         webViewFragment.retryLoad()
     }
 
-    override fun onWebViewInitializationSuccess() {}
+    abstract override fun onWebViewInitializationSuccess()
 
     override fun onError(exception: TestpressException?) {
         hideWebViewShowEmptyView()
@@ -107,19 +112,20 @@ class WebViewWithSSOActivity : BaseToolBarActivity(), EmptyViewListener, WebView
         layout.fragmentContainer.isVisible = false
     }
 
-    companion object {
+    protected companion object {
         const val TITLE = "TITLE"
         const val URL_TO_OPEN = "URL"
         const val IS_SSO_REQUIRED = "IS_SSO_REQUIRED"
 
         @JvmStatic
         fun createUrlIntent(
-            context: Context,
+            currentContext: Context,
             title: String,
             urlPath: String,
-            isSSORequired: Boolean
+            isSSORequired: Boolean,
+            klass: Class<*>
         ): Intent {
-            return Intent(context, WebViewWithSSOActivity::class.java).apply {
+            return Intent(currentContext, klass).apply {
                 putExtra(TITLE, title)
                 putExtra(URL_TO_OPEN, urlPath)
                 putExtra(IS_SSO_REQUIRED,isSSORequired)
@@ -127,4 +133,33 @@ class WebViewWithSSOActivity : BaseToolBarActivity(), EmptyViewListener, WebView
         }
     }
 
+}
+
+class IELTSExamActivity: BaseSSOActivity(){
+
+    override fun onWebViewInitializationSuccess() {
+        Log.d("TAG", "IELTSExamActivity onWebViewInitializationSuccess: ")
+        webViewFragment.addJavascriptInterface(
+            MyJava(),"AndroidInterface"
+        )
+    }
+
+    inner class MyJava:BaseJavaScriptInterface(this){
+        @JavascriptInterface
+        fun onExamEndCallBack(jsonData: String){
+            Toast.makeText(this@IELTSExamActivity,jsonData,Toast.LENGTH_SHORT).show()
+            this@IELTSExamActivity.setResult(9999)
+            this@IELTSExamActivity.finish()
+        }
+    }
+    companion object {
+        @JvmStatic
+        fun createUrlIntent(
+            context: Context,
+            title: String,
+            urlPath: String,
+        ): Intent {
+            return createUrlIntent(context, title, urlPath, true,IELTSExamActivity::class.java)
+        }
+    }
 }

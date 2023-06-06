@@ -22,6 +22,7 @@ import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.util.MultiLanguagesUtil
 import `in`.testpress.exam.util.RetakeExamUtil
+import `in`.testpress.ui.IELTSExamActivity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -192,8 +193,9 @@ open class BaseExamWidgetFragment : Fragment() {
 
     private fun startExamInWebview(content: DomainContent) {
             content.examStartUrl?.let {
-                startActivity(WebViewWithSSO.createIntent(requireContext(), content.examStartUrl!!, content.title
-                        ?: ""))
+                startActivity(
+                    IELTSExamActivity.createUrlIntent(requireContext(),content.title!!,content.examStartUrl)
+                )
             }
     }
 
