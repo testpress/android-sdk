@@ -46,7 +46,7 @@ class PermissionHandler {
         if (permissions.isEmpty()) {
             action.invoke()
         } else {
-            showSnackbarWithRequiredPermissionMessage(
+            showInsufficientPermissionMessage(
                 activity,
                 getSnackBarMessage(permissions)
             )
@@ -68,7 +68,7 @@ class PermissionHandler {
         }
     }
 
-    private fun showSnackbarWithRequiredPermissionMessage(activity: Activity, message: String) {
+    private fun showInsufficientPermissionMessage(activity: Activity, message: String) {
         Snackbar.make(
             activity.findViewById(android.R.id.content),
             message,
