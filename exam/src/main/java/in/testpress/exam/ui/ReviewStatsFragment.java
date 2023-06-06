@@ -305,15 +305,15 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void showOrHidePercentageLayout() {
-        if (attempt.getPercentage() == null || attempt.getPercentage().equals("NA")) {
-            percentageLayout.setVisibility(View.GONE);
-        } else {
+        if (attempt.hasPercentage()) {
             percentage.setText(attempt.getPercentage());
+        } else {
+            percentageLayout.setVisibility(View.GONE);
         }
     }
 
     private void showOrHideScoreLayout() {
-        if ((exam.getShowScore()) && attempt.getScore() != null && !attempt.getScore().equals("NA")) {
+        if ((exam.getShowScore()) && attempt.hasScore()) {
             score.setText(attempt.getScore());
         } else {
             scoreLayout.setVisibility(View.GONE);
@@ -321,7 +321,7 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void showOrHidePercentileLayout() {
-        if (exam.getShowPercentile() && attempt.getPercentile() != null && !attempt.getPercentile().equals("NA")) {
+        if (exam.getShowPercentile() && attempt.hasPercentile()) {
             percentile.setText(attempt.getPercentile());
         } else {
             percentileLayout.setVisibility(View.GONE);
