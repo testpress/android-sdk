@@ -151,11 +151,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_review_question);
         parseArguments();
-        if (exam == null){
-            setTitle("Solutions");
-        } else {
-            setTitle(exam.getTitle() + " Solutions");
-        }
+        setExamTitle();
         apiClient = new TestpressExamApiClient(this);
         bindViews();
         initializeQuestionsListSidebar();
@@ -174,6 +170,14 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
         InstituteSettings instituteSettings = TestpressSdk.getTestpressSession(this).getInstituteSettings();
         if (instituteSettings.isGrowthHackEnabled()) {
             customiseToolbar();
+        }
+    }
+
+    private void setExamTitle() {
+        if (exam == null){
+            setTitle("Solutions");
+        } else {
+            setTitle(exam.getTitle() + " Solutions");
         }
     }
 
@@ -201,11 +205,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
     }
 
     private void initializeQuestionPager() {
-        if (exam == null){
-            pagerAdapter = new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems, -1L);
-        } else {
-            pagerAdapter = new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems, exam.getId());
-        }
+        pagerAdapter = getReviewQuestionsPagerAdapter();
         pager.setAdapter(pagerAdapter);
         slidingPaneLayout.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
             @Override
@@ -237,6 +237,15 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
             public void onPageScrollStateChanged(int state) {
             }
         });
+    }
+
+    private ReviewQuestionsPagerAdapter getReviewQuestionsPagerAdapter() {
+        if (exam == null){
+            // If Exam null we set Exam ID As -1
+            return new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems, -1L);
+        } else {
+            return new ReviewQuestionsPagerAdapter(getSupportFragmentManager(), reviewItems, exam.getId());
+        }
     }
 
 
