@@ -633,6 +633,18 @@ public class Attempt implements android.os.Parcelable {
     public boolean isExternalReviewUrlAvailable(){
         return getExternalReviewUrl() != null && !getExternalReviewUrl().equals("");
     }
+
+    public boolean hasPercentile() {
+        return this.getPercentile() != null && !this.getPercentile().equals("NA");
+    }
+
+    public boolean hasPercentage() {
+        return this.getPercentage() != null || !this.getPercentage().equals("NA");
+    }
+
+    public boolean hasScore() {
+        return this.getScore() != null && !this.getScore().equals("NA");
+    }
     // KEEP METHODS END
 
 }
