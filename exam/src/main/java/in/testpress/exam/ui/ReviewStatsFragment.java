@@ -316,6 +316,8 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void showOrHideScoreLayout() {
+        //The score layout should be shown even if the exam is null because the random question
+        //generation feature does not require an exam but still has a score.
         if ((exam == null || exam.getShowScore()) && attempt.hasScore()) {
             score.setText(attempt.getScore());
         } else {
