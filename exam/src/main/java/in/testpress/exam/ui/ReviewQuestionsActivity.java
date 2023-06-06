@@ -22,6 +22,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -752,13 +753,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
     }
 
     private void initSelectedLanguage(ArrayList<Language> languages) {
-        String selectedLanguageCode;
-        if (exam == null){
-            selectedLanguageCode = null;
-        } else {
-            selectedLanguageCode = exam.getSelectedLanguage();
-        }
-
+        String selectedLanguageCode = getSelectedLanguageCode();
         if (selectedLanguageCode == null || selectedLanguageCode.isEmpty()) {
             selectedLanguageCode = reviewItems.get(0).getQuestion().getLanguage();
         }
@@ -772,6 +767,15 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
         }
         languageSpinner.setSelection(selectedPosition);
         selectLanguageMenu.setVisible(true);
+    }
+
+    @Nullable
+    private String getSelectedLanguageCode() {
+        if (exam == null){
+            return null;
+        } else {
+            return exam.getSelectedLanguage();
+        }
     }
 
     protected void setEmptyText(final int title, final int description) {
