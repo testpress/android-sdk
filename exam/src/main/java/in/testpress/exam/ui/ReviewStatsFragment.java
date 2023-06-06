@@ -313,19 +313,18 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void showOrHideScoreLayout() {
-        if ((exam.getShowScore()) && (attempt.getScore() == null || attempt.getScore().equals("NA"))) {
-            scoreLayout.setVisibility(View.GONE);
-        } else {
+        if ((exam.getShowScore()) && attempt.getScore() != null && !attempt.getScore().equals("NA")) {
             score.setText(attempt.getScore());
+        } else {
+            scoreLayout.setVisibility(View.GONE);
         }
     }
 
     private void showOrHidePercentileLayout() {
-        if ((exam.getShowPercentile()) &&
-                (attempt.getPercentile() == null || attempt.getPercentile().equals("NA"))) {
-            percentileLayout.setVisibility(View.GONE);
-        } else {
+        if (exam.getShowPercentile() && attempt.getPercentile() != null && !attempt.getPercentile().equals("NA")) {
             percentile.setText(attempt.getPercentile());
+        } else {
+            percentileLayout.setVisibility(View.GONE);
         }
     }
 
