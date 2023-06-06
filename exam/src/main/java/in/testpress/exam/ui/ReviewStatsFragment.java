@@ -138,7 +138,7 @@ public class ReviewStatsFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        exam = getArguments().getParcelable(PARAM_EXAM);
+        //exam = getArguments().getParcelable(PARAM_EXAM);
         instituteSettings = getInstituteSettings();
         attempt = getArguments().getParcelable(PARAM_ATTEMPT);
         CourseAttempt courseAttempt = getArguments().getParcelable(PARAM_COURSE_ATTEMPT);
@@ -299,7 +299,7 @@ public class ReviewStatsFragment extends BaseFragment {
     }
 
     private void showOrHideRankLayout() {
-        if (Boolean.TRUE.equals(attempt.getRankEnabled())) {
+        if (isExamNotNull() && Boolean.TRUE.equals(attempt.getRankEnabled())) {
             rank.setText(attempt.getRank());
             maxRank.setText(attempt.getMaxRank());
         } else {
