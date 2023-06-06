@@ -352,10 +352,7 @@ public class ReviewStatsFragment extends BaseFragment {
             analyticsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    getActivity().startActivity(
-                            AnalyticsActivity.createIntent(getActivity(), attempt.getUrlFrag() +
-                                    TestpressExamApiClient.ATTEMPT_SUBJECT_ANALYTICS_PATH, null, exam.getTitle())
-                    );
+                    openAnalyticsActivity(exam.getTitle());
                 }
             });
             analyticsButton.setVisibility(View.VISIBLE);
@@ -373,10 +370,7 @@ public class ReviewStatsFragment extends BaseFragment {
             analyticsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    getActivity().startActivity(
-                            AnalyticsActivity.createIntent(getActivity(), attempt.getUrlFrag() +
-                                    TestpressExamApiClient.ATTEMPT_SUBJECT_ANALYTICS_PATH, null, "Custom Module")
-                    );
+                    openAnalyticsActivity("Custom Module");
                 }
             });
             analyticsButton.setVisibility(View.VISIBLE);
@@ -385,6 +379,13 @@ public class ReviewStatsFragment extends BaseFragment {
             analyticsButton.setVisibility(View.VISIBLE);
             timeAnalyticsButtonLayout.setVisibility(View.GONE);
         }
+    }
+
+    private void openAnalyticsActivity(String title) {
+        getActivity().startActivity(
+                AnalyticsActivity.createIntent(getActivity(), attempt.getUrlFrag() +
+                        TestpressExamApiClient.ATTEMPT_SUBJECT_ANALYTICS_PATH, null, title)
+        );
     }
 
     private void showOrHideAdvancedAnalyticsButton() {
