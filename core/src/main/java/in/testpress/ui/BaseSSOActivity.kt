@@ -7,7 +7,6 @@ import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import `in`.testpress.fragments.WebViewFragment
 import `in`.testpress.util.BaseJavaScriptInterface
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -133,33 +132,4 @@ abstract class BaseSSOActivity : BaseToolBarActivity(), EmptyViewListener, WebVi
         }
     }
 
-}
-
-class IELTSExamActivity: BaseSSOActivity(){
-
-    override fun onWebViewInitializationSuccess() {
-        Log.d("TAG", "IELTSExamActivity onWebViewInitializationSuccess: ")
-        webViewFragment.addJavascriptInterface(
-            MyJava(),"AndroidInterface"
-        )
-    }
-
-    inner class MyJava:BaseJavaScriptInterface(this){
-        @JavascriptInterface
-        fun onExamEndCallBack(jsonData: String){
-            Toast.makeText(this@IELTSExamActivity,jsonData,Toast.LENGTH_SHORT).show()
-            this@IELTSExamActivity.setResult(9999)
-            this@IELTSExamActivity.finish()
-        }
-    }
-    companion object {
-        @JvmStatic
-        fun createUrlIntent(
-            context: Context,
-            title: String,
-            urlPath: String,
-        ): Intent {
-            return createUrlIntent(context, title, urlPath, true,IELTSExamActivity::class.java)
-        }
-    }
 }

@@ -192,11 +192,10 @@ open class BaseExamWidgetFragment : Fragment() {
     }
 
     private fun startExamInWebview(content: DomainContent) {
-            content.examStartUrl?.let {
-                startActivity(
-                    IELTSExamActivity.createUrlIntent(requireContext(),content.title!!,content.examStartUrl)
-                )
-            }
+        content.examStartUrl?.let {
+            startActivity(WebViewWithSSO.createIntent(requireContext(), content.examStartUrl!!, content.title
+                ?: ""))
+        }
     }
 
     private fun initStartForResumeExam(
