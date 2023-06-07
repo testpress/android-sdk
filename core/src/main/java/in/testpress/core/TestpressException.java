@@ -20,6 +20,13 @@ public class TestpressException extends RuntimeException {
         return new TestpressException(message, response, Kind.HTTP, null);
     }
 
+    public static TestpressException httpError(int errorCode, String errorMessage) {
+        String message = errorCode + " " + errorMessage;
+        TestpressException exception = new TestpressException(message, null, Kind.HTTP, null);
+        exception.setStatusCode(errorCode);
+        return exception;
+    }
+
     public static TestpressException networkError(IOException exception) {
         return new TestpressException(exception.getMessage(), null, Kind.NETWORK, exception);
     }
@@ -73,6 +80,10 @@ public class TestpressException extends RuntimeException {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
     }
 
     /**

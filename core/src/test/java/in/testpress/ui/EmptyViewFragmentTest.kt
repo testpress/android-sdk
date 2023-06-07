@@ -54,8 +54,18 @@ class EmptyViewFragmentTest {
     }
 
     @Test
-    fun testForbiddenError() {
+    fun testForbiddenErrorWithResponse() {
         val exception = TestpressException.httpError(buildErrorResponse(403))
+        fragment.displayError(exception)
+
+        Assert.assertEquals(View.VISIBLE, fragment.emptyContainer.visibility)
+        Assert.assertEquals(context.getString(R.string.permission_denied), fragment.emptyTitleView.text)
+        Assert.assertEquals(context.getString(R.string.testpress_no_permission), fragment.emptyDescView.text)
+    }
+
+    @Test
+    fun testForbiddenErrorWithErrorCodeAndMessage() {
+        val exception = TestpressException.httpError(403,"Forbidden")
         fragment.displayError(exception)
 
         Assert.assertEquals(View.VISIBLE, fragment.emptyContainer.visibility)

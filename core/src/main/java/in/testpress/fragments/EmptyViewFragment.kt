@@ -14,6 +14,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import org.json.JSONException
 import org.json.JSONObject
 
 class EmptyViewFragment : Fragment() {
@@ -74,10 +75,17 @@ class EmptyViewFragment : Fragment() {
     }
 
     private fun handleForbidden(exception: TestpressException) {
-        val errorResponse: JSONObject? = JSONObject(exception.response.errorBody()?.string()!!)
-        if (errorResponse != null && errorResponse.has("detail")) {
+        val errorResponse = exception.response?.errorBody()?.string()?.let {
+            try {
+                JSONObject(it)
+            } catch (e: JSONException) {
+                null
+            }
+        }
+
+        if (errorResponse?.has("detail") == true) {
             showCustomPermissionDeniedMessage(errorResponse.getString("detail"))
-        }else{
+        } else {
             showPermissionDeniedMessage()
         }
     }
