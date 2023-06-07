@@ -8,10 +8,9 @@ import `in`.testpress.databinding.WebviewFragmentBinding
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.models.SSOUrl
 import `in`.testpress.network.TestpressApiClient
-import `in`.testpress.util.ActivityUtil
 import `in`.testpress.util.BaseJavaScriptInterface
+import `in`.testpress.util.extension.openUrlInBrowser
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.graphics.Bitmap
@@ -27,8 +26,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import kotlinx.parcelize.Parcelize
+import okhttp3.*
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -38,7 +39,7 @@ class WebViewFragment(
     var url: String = "",
     val data: String = "",
     val webViewFragmentSettings: Settings
-) : Fragment() {
+) : Fragment(),EmptyViewListener {
 
     private val TAG = "WebViewFragment"
     private var _layout: WebviewFragmentBinding? = null
@@ -50,6 +51,7 @@ class WebViewFragment(
     private var mUM: ValueCallback<Uri?>? = null
     private var mUMA: ValueCallback<Array<Uri>?>? = null
     private val FCR = 1
+    private lateinit var emptyViewFragment: EmptyViewFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +71,7 @@ class WebViewFragment(
         super.onViewCreated(view, savedInstanceState)
         showLoading()
         initializedSwipeRefresh()
+        initializeEmptyViewFragment()
         webView = layout.webView
         listener?.onWebViewInitializationSuccess()
         setupCookieManager()
@@ -94,43 +97,11 @@ class WebViewFragment(
         _layout = null
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intent)
-
-        if (Build.VERSION.SDK_INT >= 21) {
-            var results: Array<Uri>? = null
-
-            //Check if response is positive
-            if (resultCode == Activity.RESULT_OK) {
-                if (requestCode == FCR) {
-
-                    if (mUMA == null) {
-                        return
-                    }
-                    if (intent == null) {
-                        //Capture Photo if no image available
-                        if (mCM != null) {
-                            results = arrayOf(Uri.parse(mCM))
-                        }
-                    } else {
-                        val dataString = intent.dataString
-                        if (dataString != null) {
-                            results = arrayOf(Uri.parse(dataString))
-                        }
-                    }
-                }
-            }
-            mUMA?.onReceiveValue(results)
-            mUMA = null
-        } else {
-
-            if (requestCode == FCR) {
-                if (mUM == null) return
-                val result = if (intent == null || resultCode != RESULT_OK) null else intent.data
-                mUM?.onReceiveValue(result)
-                mUM = null
-            }
-        }
+    private fun initializeEmptyViewFragment() {
+        emptyViewFragment = EmptyViewFragment()
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.empty_view_container, emptyViewFragment)
+            .commit()
     }
 
     private fun loadContent(){
@@ -146,15 +117,28 @@ class WebViewFragment(
         TestpressApiClient(requireContext(), TestpressSdk.getTestpressSession(requireContext())).ssourl
             .enqueue(object : TestpressCallback<SSOUrl>() {
                 override fun onSuccess(result: SSOUrl?) {
-                    url = "${instituteSettings.baseUrl}${result?.ssoUrl}&next=$url"
+                    url = "${instituteSettings.baseUrl}${result?.ssoUrl}12&next=$url"
                     loadContentInWebView(url = url)
                 }
 
                 override fun onException(exception: TestpressException?) {
                     hideLoading()
-                    listener?.onError(exception)
+                    showErrorView(exception!!)
                 }
             })
+    }
+
+    private fun showErrorView(exception: TestpressException) {
+        hideWebViewShowEmptyView()
+        if (exception.isForbidden){
+            emptyViewFragment.displayError(exception)
+        } else if (exception.isNetworkError){
+            emptyViewFragment.displayError(exception)
+        } else if (exception.isPageNotFound) {
+            emptyViewFragment.displayError(exception)
+        } else {
+            emptyViewFragment.displayError(exception)
+        }
     }
 
     private fun showLoading() {
@@ -182,7 +166,7 @@ class WebViewFragment(
         webView.settings.domStorageEnabled = true
         // Hide the zoom controls for HONEYCOMB+
         webView.settings.displayZoomControls = false
-        // Enable pinch to zoom without the zoom buttons
+        // Disable pinch to zoom without the zoom buttons
         webView.settings.builtInZoomControls = false
         webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
         webView.settings.setSupportZoom(webViewFragmentSettings.allowZoomControl)
@@ -197,19 +181,12 @@ class WebViewFragment(
                 return if (instituteSettings.isInstituteUrl(request?.url.toString())){
                     false
                 } else {
-                    if (webViewFragmentSettings.allowNonInstituteUrlInWebView){
-                        false
-                    } else {
-                        ActivityUtil.openUrl(requireContext(),request?.url.toString())
-                        true
-                    }
+                    handleNonInstituteUrl(request?.url.toString())
                 }
             }
 
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                if (webViewFragmentSettings.showLoadingBetweenPages){
-                    showLoading()
-                }
+                if (webViewFragmentSettings.showLoadingBetweenPages) showLoading()
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
@@ -222,9 +199,31 @@ class WebViewFragment(
                 request: WebResourceRequest?,
                 error: WebResourceError?
             ) {
-                //TODO("Need implementation")
-                listener?.onError(TestpressException.unexpectedError(Exception("WebView error")))
+                showErrorView(TestpressException.unexpectedError(Exception("WebView error")))
             }
+
+            override fun onReceivedHttpError(
+                view: WebView?,
+                request: WebResourceRequest?,
+                errorResponse: WebResourceResponse?
+            ) {
+                showErrorView(
+                    TestpressException.httpError(
+                        errorResponse?.statusCode!!,
+                        errorResponse.reasonPhrase
+                    )
+                )
+            }
+
+        }
+    }
+
+    private fun handleNonInstituteUrl(url: String?): Boolean {
+        return if (webViewFragmentSettings.allowNonInstituteUrlInWebView) {
+            false
+        } else {
+            openUrlInBrowser(url?:"")
+            true
         }
     }
 
@@ -288,21 +287,8 @@ class WebViewFragment(
             webView.loadData(data,"text/html", null)
         } else {
             // If both the URL and data are empty, pass an unexpected error
-            listener?.onError(TestpressException.unexpectedError(Exception("URL not found and data not found.")))
+            showErrorView(TestpressException.unexpectedError(Exception("URL not found and data not found.")))
         }
-    }
-
-    // Create an image file
-    @Throws(IOException::class)
-    private fun createImageFile(): File? {
-        @SuppressLint("SimpleDateFormat") val timeStamp =
-            SimpleDateFormat("yyyyMMdd_HHmmss").format(
-                Date()
-            )
-        val imageFileName = "img_" + timeStamp + "_"
-        val storageDir =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(imageFileName, ".jpg", storageDir)
     }
 
     fun setListener(listener: Listener){
@@ -324,10 +310,64 @@ class WebViewFragment(
     fun retryLoad(){
         showLoading()
         if (!webView.url.isNullOrEmpty()){
+            Log.d("TAG", "retryLoad: if ")
             webView.loadUrl(webView.url!!)
         } else {
+            Log.d("TAG", "retryLoad: else")
             loadContent()
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            var results: Array<Uri>? = null
+
+            //Check if response is positive
+            if (resultCode == RESULT_OK) {
+                if (requestCode == FCR) {
+
+                    if (mUMA == null) {
+                        return
+                    }
+                    if (intent == null) {
+                        //Capture Photo if no image available
+                        if (mCM != null) {
+                            results = arrayOf(Uri.parse(mCM))
+                        }
+                    } else {
+                        val dataString = intent.dataString
+                        if (dataString != null) {
+                            results = arrayOf(Uri.parse(dataString))
+                        }
+                    }
+                }
+            }
+            mUMA?.onReceiveValue(results)
+            mUMA = null
+        } else {
+
+            if (requestCode == FCR) {
+                if (mUM == null) return
+                val result = if (intent == null || resultCode != RESULT_OK) null else intent.data
+                mUM?.onReceiveValue(result)
+                mUM = null
+            }
+        }
+    }
+
+    // Create an image file
+    @Throws(IOException::class)
+    private fun createImageFile(): File? {
+        @SuppressLint("SimpleDateFormat") val timeStamp =
+            SimpleDateFormat("yyyyMMdd_HHmmss").format(
+                Date()
+            )
+        val imageFileName = "img_" + timeStamp + "_"
+        val storageDir =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(imageFileName, ".jpg", storageDir)
     }
 
     @Parcelize
@@ -341,7 +381,23 @@ class WebViewFragment(
 
     interface Listener {
         fun onWebViewInitializationSuccess()
-        fun onError(exception: TestpressException?)
+    }
+
+    override fun onRetryClick() {
+        hideEmptyViewShowWebView()
+        Log.d("TAG", "onRetryClick: ")
+        retryLoad()
+    }
+
+    private fun hideEmptyViewShowWebView() {
+        Log.d("TAG", "hideEmptyViewShowWebView: ")
+        layout.emptyViewContainer.isVisible = false
+        layout.webView.isVisible = true
+    }
+
+    private fun hideWebViewShowEmptyView() {
+        layout.emptyViewContainer.isVisible = true
+        layout.webView.isVisible = false
     }
 
 }

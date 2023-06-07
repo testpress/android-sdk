@@ -11,8 +11,9 @@ import in.testpress.course.TestpressCourse;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
-import in.testpress.ui.DiscussionActivity;
 import in.testpress.ui.WebViewWithSSOActivity;
+import in.testpress.ui.DiscussionActivity;
+//import in.testpress.ui.WebViewWithSSOActivity;
 import in.testpress.util.Permission;
 import in.testpress.util.ViewUtils;
 import kotlin.Unit;
@@ -226,7 +227,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
     }
 
     private void launchWebViewWithSSOActivity(String urlPath) {
-        startActivity(WebViewWithSSOActivity.createIntent(
+        startActivity(WebViewWithSSOActivity.Companion.createUrlIntent(
                         CourseSampleActivity.this,
                         "Test WebView",
                         urlPath,
