@@ -75,10 +75,14 @@ class WebViewFragment(
         webView = layout.webView
         listener?.onWebViewInitializationSuccess()
         setupCookieManager()
-        setupWebViewSettings()
-        setupWebViewClient()
-        setupWebChromeClient()
+        setupWebView()
         loadContent()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        webView.destroy()
+        _layout = null
     }
 
     private fun initializedSwipeRefresh(){
@@ -91,17 +95,34 @@ class WebViewFragment(
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        webView.destroy()
-        _layout = null
-    }
-
     private fun initializeEmptyViewFragment() {
         emptyViewFragment = EmptyViewFragment()
-        parentFragmentManager.beginTransaction()
+        childFragmentManager.beginTransaction()
             .replace(R.id.empty_view_container, emptyViewFragment)
             .commit()
+    }
+
+    private fun setupCookieManager(){
+        val cookieManager = CookieManager.getInstance()
+        cookieManager.setAcceptCookie(true)
+        cookieManager.removeAllCookies(null)
+    }
+
+    private fun setupWebView() {
+        webView.settings.javaScriptEnabled = true
+        webView.settings.allowFileAccess = true
+        webView.settings.useWideViewPort = false
+        webView.settings.loadWithOverviewMode = true
+        // Allow use of Local Storage
+        webView.settings.domStorageEnabled = true
+        // Hide the zoom controls for HONEYCOMB+
+        webView.settings.displayZoomControls = false
+        // Disable pinch to zoom without the zoom buttons
+        webView.settings.builtInZoomControls = false
+        webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
+        webView.settings.setSupportZoom(webViewFragmentSettings.allowZoomControl)
+        webView.webViewClient = CustomWebViewClient()
+        webView.webChromeClient = CustomWevChromeClient()
     }
 
     private fun loadContent(){
@@ -117,7 +138,7 @@ class WebViewFragment(
         TestpressApiClient(requireContext(), TestpressSdk.getTestpressSession(requireContext())).ssourl
             .enqueue(object : TestpressCallback<SSOUrl>() {
                 override fun onSuccess(result: SSOUrl?) {
-                    url = "${instituteSettings.baseUrl}${result?.ssoUrl}12&next=$url"
+                    url = "${instituteSettings.baseUrl}${result?.ssoUrl}&next=$url"
                     loadContentInWebView(url = url)
                 }
 
@@ -126,19 +147,6 @@ class WebViewFragment(
                     showErrorView(exception!!)
                 }
             })
-    }
-
-    private fun showErrorView(exception: TestpressException) {
-        hideWebViewShowEmptyView()
-        if (exception.isForbidden){
-            emptyViewFragment.displayError(exception)
-        } else if (exception.isNetworkError){
-            emptyViewFragment.displayError(exception)
-        } else if (exception.isPageNotFound) {
-            emptyViewFragment.displayError(exception)
-        } else {
-            emptyViewFragment.displayError(exception)
-        }
     }
 
     private fun showLoading() {
@@ -151,135 +159,6 @@ class WebViewFragment(
         layout.webView.visibility = View.VISIBLE
     }
 
-    private fun setupCookieManager(){
-        val cookieManager = CookieManager.getInstance()
-        cookieManager.setAcceptCookie(true)
-        cookieManager.removeAllCookies(null)
-    }
-
-    private fun setupWebViewSettings() {
-        webView.settings.javaScriptEnabled = true
-        webView.settings.allowFileAccess = true
-        webView.settings.useWideViewPort = false
-        webView.settings.loadWithOverviewMode = true
-        // Allow use of Local Storage
-        webView.settings.domStorageEnabled = true
-        // Hide the zoom controls for HONEYCOMB+
-        webView.settings.displayZoomControls = false
-        // Disable pinch to zoom without the zoom buttons
-        webView.settings.builtInZoomControls = false
-        webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
-        webView.settings.setSupportZoom(webViewFragmentSettings.allowZoomControl)
-    }
-
-    private fun setupWebViewClient(){
-        webView.webViewClient = object : WebViewClient(){
-            override fun shouldOverrideUrlLoading(
-                view: WebView?,
-                request: WebResourceRequest?
-            ): Boolean {
-                return if (instituteSettings.isInstituteUrl(request?.url.toString())){
-                    false
-                } else {
-                    handleNonInstituteUrl(request?.url.toString())
-                }
-            }
-
-            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                if (webViewFragmentSettings.showLoadingBetweenPages) showLoading()
-            }
-
-            override fun onPageFinished(view: WebView?, url: String?) {
-                layout.swipeRefreshLayout.isRefreshing = false
-                hideLoading()
-            }
-
-            override fun onReceivedError(
-                view: WebView?,
-                request: WebResourceRequest?,
-                error: WebResourceError?
-            ) {
-                showErrorView(TestpressException.unexpectedError(Exception("WebView error")))
-            }
-
-            override fun onReceivedHttpError(
-                view: WebView?,
-                request: WebResourceRequest?,
-                errorResponse: WebResourceResponse?
-            ) {
-                showErrorView(
-                    TestpressException.httpError(
-                        errorResponse?.statusCode!!,
-                        errorResponse.reasonPhrase
-                    )
-                )
-            }
-
-        }
-    }
-
-    private fun handleNonInstituteUrl(url: String?): Boolean {
-        return if (webViewFragmentSettings.allowNonInstituteUrlInWebView) {
-            false
-        } else {
-            openUrlInBrowser(url?:"")
-            true
-        }
-    }
-
-    private fun setupWebChromeClient() {
-        webView.webChromeClient = object : WebChromeClient() {
-            override fun onShowFileChooser(
-                webView: WebView?, filePathCallback: ValueCallback<Array<Uri>?>?,
-                fileChooserParams: FileChooserParams?
-            ): Boolean {
-                if (mUMA != null) {
-                    mUMA?.onReceiveValue(null)
-                }
-                mUMA = filePathCallback
-                var takePictureIntent: Intent? = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                if (takePictureIntent!!.resolveActivity(this@WebViewFragment.requireActivity().packageManager) != null) {
-                    var photoFile: File? = null
-                    try {
-                        photoFile = createImageFile()
-                        takePictureIntent.putExtra("PhotoPath", mCM)
-                    } catch (ex: IOException) {
-                        Log.e(TAG, "Image file creation failed", ex)
-                    }
-                    if (photoFile != null) {
-                        mCM = "file:" + photoFile.absolutePath
-                        takePictureIntent!!.putExtra(
-                            MediaStore.EXTRA_OUTPUT,
-                            Uri.fromFile(photoFile)
-                        )
-                    } else {
-                        takePictureIntent = null
-                    }
-                }
-                val contentSelectionIntent = Intent(Intent.ACTION_GET_CONTENT)
-                contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE)
-                contentSelectionIntent.type = "*/*"
-                val intentArray: Array<Intent?> =
-                    takePictureIntent?.let { arrayOf(it) } ?: arrayOfNulls(0)
-                val chooserIntent = Intent(Intent.ACTION_CHOOSER)
-                chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent)
-                chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser")
-                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
-                startActivityForResult(chooserIntent, FCR)
-                return true
-            }
-
-            override fun onPermissionRequest(request: PermissionRequest?) {
-                val permissions = arrayOf(
-                    PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID,
-                    PermissionRequest.RESOURCE_AUDIO_CAPTURE,
-                    PermissionRequest.RESOURCE_VIDEO_CAPTURE
-                )
-                request?.grant(permissions)
-            }
-        }
-    }
-
     private fun loadContentInWebView(url: String = "", data: String = "") {
         if (url.isNotEmpty()){
             webView.loadUrl(url)
@@ -289,6 +168,25 @@ class WebViewFragment(
             // If both the URL and data are empty, pass an unexpected error
             showErrorView(TestpressException.unexpectedError(Exception("URL not found and data not found.")))
         }
+    }
+
+    private fun showErrorView(exception: TestpressException) {
+        hideWebViewShowEmptyView()
+        emptyViewFragment.displayError(exception)
+    }
+
+    private fun hideEmptyViewShowWebView() {
+        layout.emptyViewContainer.isVisible = false
+        layout.webView.isVisible = true
+    }
+
+    private fun hideWebViewShowEmptyView() {
+        layout.emptyViewContainer.isVisible = true
+        layout.webView.isVisible = false
+    }
+
+    override fun onRetryClick() {
+        retryLoad()
     }
 
     fun setListener(listener: Listener){
@@ -307,13 +205,12 @@ class WebViewFragment(
         webView.goBack()
     }
 
-    fun retryLoad(){
+    private fun retryLoad(){
+        hideEmptyViewShowWebView()
         showLoading()
         if (!webView.url.isNullOrEmpty()){
-            Log.d("TAG", "retryLoad: if ")
             webView.loadUrl(webView.url!!)
         } else {
-            Log.d("TAG", "retryLoad: else")
             loadContent()
         }
     }
@@ -357,17 +254,122 @@ class WebViewFragment(
         }
     }
 
-    // Create an image file
-    @Throws(IOException::class)
-    private fun createImageFile(): File? {
-        @SuppressLint("SimpleDateFormat") val timeStamp =
-            SimpleDateFormat("yyyyMMdd_HHmmss").format(
-                Date()
+    private inner class CustomWebViewClient : WebViewClient() {
+
+        override fun shouldOverrideUrlLoading(
+            view: WebView?,
+            request: WebResourceRequest?
+        ): Boolean {
+            return if (instituteSettings.isInstituteUrl(request?.url.toString())) {
+                false
+            } else {
+                handleNonInstituteUrl(request?.url.toString())
+            }
+        }
+
+        private fun handleNonInstituteUrl(url: String?): Boolean {
+            return if (webViewFragmentSettings.allowNonInstituteUrlInWebView) {
+                false
+            } else {
+                openUrlInBrowser(url ?: "")
+                true
+            }
+        }
+
+        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+            if (webViewFragmentSettings.showLoadingBetweenPages) showLoading()
+        }
+
+        override fun onPageFinished(view: WebView?, url: String?) {
+            layout.swipeRefreshLayout.isRefreshing = false
+            hideLoading()
+        }
+
+        override fun onReceivedError(
+            view: WebView?,
+            request: WebResourceRequest?,
+            error: WebResourceError?
+        ) {
+            showErrorView(TestpressException.unexpectedError(Exception("WebView error")))
+        }
+
+        override fun onReceivedHttpError(
+            view: WebView?,
+            request: WebResourceRequest?,
+            errorResponse: WebResourceResponse?
+        ) {
+            showErrorView(
+                TestpressException.httpError(
+                    errorResponse?.statusCode!!,
+                    errorResponse.reasonPhrase
+                )
             )
-        val imageFileName = "img_" + timeStamp + "_"
-        val storageDir =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(imageFileName, ".jpg", storageDir)
+        }
+    }
+
+    private inner class CustomWevChromeClient : WebChromeClient() {
+
+        override fun onShowFileChooser(
+            webView: WebView?, filePathCallback: ValueCallback<Array<Uri>?>?,
+            fileChooserParams: FileChooserParams?
+        ): Boolean {
+            if (mUMA != null) {
+                mUMA?.onReceiveValue(null)
+            }
+            mUMA = filePathCallback
+            var takePictureIntent: Intent? = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            if (takePictureIntent!!.resolveActivity(this@WebViewFragment.requireActivity().packageManager) != null) {
+                var photoFile: File? = null
+                try {
+                    photoFile = createImageFile()
+                    takePictureIntent.putExtra("PhotoPath", mCM)
+                } catch (ex: IOException) {
+                    Log.e(TAG, "Image file creation failed", ex)
+                }
+                if (photoFile != null) {
+                    mCM = "file:" + photoFile.absolutePath
+                    takePictureIntent!!.putExtra(
+                        MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(photoFile)
+                    )
+                } else {
+                    takePictureIntent = null
+                }
+            }
+            val contentSelectionIntent = Intent(Intent.ACTION_GET_CONTENT)
+            contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE)
+            contentSelectionIntent.type = "*/*"
+            val intentArray: Array<Intent?> =
+                takePictureIntent?.let { arrayOf(it) } ?: arrayOfNulls(0)
+            val chooserIntent = Intent(Intent.ACTION_CHOOSER)
+            chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent)
+            chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser")
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
+            startActivityForResult(chooserIntent, FCR)
+            return true
+        }
+
+        override fun onPermissionRequest(request: PermissionRequest?) {
+            val permissions = arrayOf(
+                PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID,
+                PermissionRequest.RESOURCE_AUDIO_CAPTURE,
+                PermissionRequest.RESOURCE_VIDEO_CAPTURE
+            )
+            request?.grant(permissions)
+        }
+
+        // Create an image file
+        @Throws(IOException::class)
+        private fun createImageFile(): File? {
+            @SuppressLint("SimpleDateFormat") val timeStamp =
+                SimpleDateFormat("yyyyMMdd_HHmmss").format(
+                    Date()
+                )
+            val imageFileName = "img_" + timeStamp + "_"
+            val storageDir =
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            return File.createTempFile(imageFileName, ".jpg", storageDir)
+        }
     }
 
     @Parcelize
@@ -381,23 +383,6 @@ class WebViewFragment(
 
     interface Listener {
         fun onWebViewInitializationSuccess()
-    }
-
-    override fun onRetryClick() {
-        hideEmptyViewShowWebView()
-        Log.d("TAG", "onRetryClick: ")
-        retryLoad()
-    }
-
-    private fun hideEmptyViewShowWebView() {
-        Log.d("TAG", "hideEmptyViewShowWebView: ")
-        layout.emptyViewContainer.isVisible = false
-        layout.webView.isVisible = true
-    }
-
-    private fun hideWebViewShowEmptyView() {
-        layout.emptyViewContainer.isVisible = true
-        layout.webView.isVisible = false
     }
 
 }
