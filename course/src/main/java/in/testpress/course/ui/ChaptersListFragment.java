@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import org.greenrobot.greendao.AbstractDao;
 
@@ -16,6 +17,7 @@ import java.util.List;
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
+import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.course.pagers.ChapterPager;
 import in.testpress.course.api.TestpressCourseApiClient;
@@ -94,6 +96,10 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
         if (getCourse() != null && isItemsEmpty()) {
             showLoadingPlaceholder();
+        }
+
+        if (!getCourse().getRootChapters().isEmpty()){
+            showOrHideCustomModuleLayout();
         }
     }
 
@@ -189,7 +195,17 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
             getDao().insertOrReplaceInTx(items);
         }
         hideLoadingPlaceholder();
+        showOrHideCustomModuleLayout();
         swipeRefreshLayout.setEnabled(true);
+    }
+
+    private void showOrHideCustomModuleLayout() {
+        if (parentId == null){
+            View view = this.getView().findViewById(R.id.custom_test_gen);
+            TextView textView = (TextView) view.findViewById(R.id.custom_module_title);
+            textView.setTypeface(TestpressSdk.getRubikMediumFont(this.requireContext()));
+            view.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

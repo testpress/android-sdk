@@ -50,10 +50,13 @@
         </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-
+    <include
+        android:id="@+id/custom_test_gen"
+        layout="@layout/custom_module_layout"/>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_below="@id/custom_test_gen"
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
