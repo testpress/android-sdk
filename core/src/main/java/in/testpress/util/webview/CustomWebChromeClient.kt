@@ -19,33 +19,45 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CustomWevChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
+class CustomWebChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
 
-    private val chooserIntentResult =
-        fragment.registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            var results: Array<Uri>? = null
-            //Check if response is positive
-            if (result.resultCode == RESULT_OK) {
-                if (fragment.filePathCallback == null) {
-                    return@registerForActivityResult
-                }
-                if (result.data == null) {
-                    //Capture Photo if no image available
-                    if (fragment.imagePath != null) {
-                        results = arrayOf(Uri.parse(fragment.imagePath))
-                    }
-                } else {
-                    val dataString = result.data?.dataString
-                    if (dataString != null) {
-                        results = arrayOf(Uri.parse(dataString))
-                    }
-                }
+    private val onActivityResult = fragment.registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        var results: Array<Uri>? = null
+
+        if (result.resultCode == RESULT_OK) {
+            if (fragment.filePathCallback == null) {
+                return@registerForActivityResult
             }
-            fragment.filePathCallback?.onReceiveValue(results)
-            fragment.filePathCallback = null
+            // Check if data is available from the result
+            results = if (result.data == null) {
+                capturedImageNotAvailable()
+            } else {
+                retrieveDataFromIntent(result.data!!)
+            }
         }
+        // Pass the results to the webView callback
+        fragment.filePathCallback?.onReceiveValue(results)
+        fragment.filePathCallback = null
+    }
+
+    private fun capturedImageNotAvailable(): Array<Uri>? {
+        return if (fragment.imagePath != null) {
+            arrayOf(Uri.parse(fragment.imagePath))
+        } else {
+            null
+        }
+    }
+
+    private fun retrieveDataFromIntent(intent: Intent): Array<Uri>? {
+        val dataString = intent.dataString
+        return if (dataString != null) {
+            arrayOf(Uri.parse(dataString))
+        } else {
+            null
+        }
+    }
 
     override fun onShowFileChooser(
         webView: WebView?, filePathCallback: ValueCallback<Array<Uri>?>?,
@@ -55,7 +67,10 @@ class CustomWevChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
             fragment.filePathCallback?.onReceiveValue(null)
         }
         fragment.filePathCallback = filePathCallback
-        chooserIntentResult.launch(createChooserIntent(createTakePictureIntent(),createFileSelectionIntent()))
+        val takePictureIntent = createTakePictureIntent()
+        val fileSelectionIntent = createFileSelectionIntent()
+        val chooserIntent = createChooserIntent(takePictureIntent, fileSelectionIntent)
+        onActivityResult.launch(chooserIntent)
         return true
     }
 

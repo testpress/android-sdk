@@ -98,14 +98,12 @@ class WebViewFragment(
         webView.settings.loadWithOverviewMode = true
         // Allow use of Local Storage
         webView.settings.domStorageEnabled = true
-        // Hide the zoom controls for HONEYCOMB+
-        webView.settings.displayZoomControls = false
         // Disable pinch to zoom without the zoom buttons
         webView.settings.builtInZoomControls = false
         webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
         webView.settings.setSupportZoom(webViewFragmentSettings.allowZoomControl)
         webView.webViewClient = CustomWebViewClient(this)
-        webView.webChromeClient = CustomWevChromeClient(this)
+        webView.webChromeClient = CustomWebChromeClient(this)
     }
 
     private fun loadContent(){

@@ -12,19 +12,20 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
         view: WebView?,
         request: WebResourceRequest?
     ): Boolean {
-        return if (fragment.instituteSettings.isInstituteUrl(request?.url.toString())) {
+        return if (shouldLoadInWebView(request?.url.toString())) {
             false
         } else {
-            handleNonInstituteUrl(request?.url.toString())
+            fragment.openUrlInBrowser(request?.url.toString())
+            true
         }
     }
 
-    private fun handleNonInstituteUrl(url: String?): Boolean {
-        return if (fragment.webViewFragmentSettings.allowNonInstituteUrlInWebView) {
-            false
-        } else {
-            fragment.openUrlInBrowser(url ?: "")
+    private fun shouldLoadInWebView(url: String?):Boolean {
+        val isInstituteUrl = fragment.instituteSettings.isInstituteUrl(url)
+        return if (isInstituteUrl){
             true
+        } else {
+            fragment.webViewFragmentSettings.allowNonInstituteUrlInWebView
         }
     }
 
