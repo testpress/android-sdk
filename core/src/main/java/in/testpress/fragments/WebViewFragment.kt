@@ -1,26 +1,16 @@
 package `in`.testpress.fragments
 
 import `in`.testpress.R
-import `in`.testpress.core.TestpressCallback
-import `in`.testpress.core.TestpressException
-import `in`.testpress.core.TestpressSdk
+import `in`.testpress.core.*
 import `in`.testpress.databinding.WebviewFragmentBinding
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.models.SSOUrl
 import `in`.testpress.network.TestpressApiClient
 import `in`.testpress.util.BaseJavaScriptInterface
-import `in`.testpress.util.extension.openUrlInBrowser
-import android.annotation.SuppressLint
-import android.app.Activity.RESULT_OK
-import android.content.Intent
-import android.graphics.Bitmap
+import `in`.testpress.util.webview.*
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.Parcelable
-import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,11 +19,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import kotlinx.parcelize.Parcelize
-import okhttp3.*
-import java.io.File
-import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
 
 class WebViewFragment(
     var url: String = "",
@@ -41,16 +26,14 @@ class WebViewFragment(
     val webViewFragmentSettings: Settings
 ) : Fragment(),EmptyViewListener {
 
-    private val TAG = "WebViewFragment"
+    val TAG = "WebViewFragment"
     private var _layout: WebviewFragmentBinding? = null
     private val layout: WebviewFragmentBinding get() = _layout!!
-    private lateinit var webView: WebView
-    private lateinit var instituteSettings: InstituteSettings
+    lateinit var webView: WebView
+    lateinit var instituteSettings: InstituteSettings
     private var listener : Listener? = null
-    private var mCM: String? = null
-    private var mUM: ValueCallback<Uri?>? = null
-    private var mUMA: ValueCallback<Array<Uri>?>? = null
-    private val FCR = 1
+    var imagePath: String? = null
+    var filePathCallback: ValueCallback<Array<Uri>?>? = null
     private lateinit var emptyViewFragment: EmptyViewFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,8 +104,8 @@ class WebViewFragment(
         webView.settings.builtInZoomControls = false
         webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
         webView.settings.setSupportZoom(webViewFragmentSettings.allowZoomControl)
-        webView.webViewClient = CustomWebViewClient()
-        webView.webChromeClient = CustomWevChromeClient()
+        webView.webViewClient = CustomWebViewClient(this)
+        webView.webChromeClient = CustomWevChromeClient(this)
     }
 
     private fun loadContent(){
@@ -149,12 +132,13 @@ class WebViewFragment(
             })
     }
 
-    private fun showLoading() {
+    fun showLoading() {
         layout.pbLoading.visibility = View.VISIBLE
         layout.webView.visibility = View.GONE
     }
 
-    private fun hideLoading() {
+    fun hideLoading() {
+        layout.swipeRefreshLayout.isRefreshing = false
         layout.pbLoading.visibility = View.GONE
         layout.webView.visibility = View.VISIBLE
     }
@@ -170,7 +154,7 @@ class WebViewFragment(
         }
     }
 
-    private fun showErrorView(exception: TestpressException) {
+    fun showErrorView(exception: TestpressException) {
         hideWebViewShowEmptyView()
         emptyViewFragment.displayError(exception)
     }
@@ -212,163 +196,6 @@ class WebViewFragment(
             webView.loadUrl(webView.url!!)
         } else {
             loadContent()
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intent)
-
-        if (Build.VERSION.SDK_INT >= 21) {
-            var results: Array<Uri>? = null
-
-            //Check if response is positive
-            if (resultCode == RESULT_OK) {
-                if (requestCode == FCR) {
-
-                    if (mUMA == null) {
-                        return
-                    }
-                    if (intent == null) {
-                        //Capture Photo if no image available
-                        if (mCM != null) {
-                            results = arrayOf(Uri.parse(mCM))
-                        }
-                    } else {
-                        val dataString = intent.dataString
-                        if (dataString != null) {
-                            results = arrayOf(Uri.parse(dataString))
-                        }
-                    }
-                }
-            }
-            mUMA?.onReceiveValue(results)
-            mUMA = null
-        } else {
-
-            if (requestCode == FCR) {
-                if (mUM == null) return
-                val result = if (intent == null || resultCode != RESULT_OK) null else intent.data
-                mUM?.onReceiveValue(result)
-                mUM = null
-            }
-        }
-    }
-
-    private inner class CustomWebViewClient : WebViewClient() {
-
-        override fun shouldOverrideUrlLoading(
-            view: WebView?,
-            request: WebResourceRequest?
-        ): Boolean {
-            return if (instituteSettings.isInstituteUrl(request?.url.toString())) {
-                false
-            } else {
-                handleNonInstituteUrl(request?.url.toString())
-            }
-        }
-
-        private fun handleNonInstituteUrl(url: String?): Boolean {
-            return if (webViewFragmentSettings.allowNonInstituteUrlInWebView) {
-                false
-            } else {
-                openUrlInBrowser(url ?: "")
-                true
-            }
-        }
-
-        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-            if (webViewFragmentSettings.showLoadingBetweenPages) showLoading()
-        }
-
-        override fun onPageFinished(view: WebView?, url: String?) {
-            layout.swipeRefreshLayout.isRefreshing = false
-            hideLoading()
-        }
-
-        override fun onReceivedError(
-            view: WebView?,
-            request: WebResourceRequest?,
-            error: WebResourceError?
-        ) {
-            showErrorView(TestpressException.unexpectedError(Exception("WebView error")))
-        }
-
-        override fun onReceivedHttpError(
-            view: WebView?,
-            request: WebResourceRequest?,
-            errorResponse: WebResourceResponse?
-        ) {
-            showErrorView(
-                TestpressException.httpError(
-                    errorResponse?.statusCode!!,
-                    errorResponse.reasonPhrase
-                )
-            )
-        }
-    }
-
-    private inner class CustomWevChromeClient : WebChromeClient() {
-
-        override fun onShowFileChooser(
-            webView: WebView?, filePathCallback: ValueCallback<Array<Uri>?>?,
-            fileChooserParams: FileChooserParams?
-        ): Boolean {
-            if (mUMA != null) {
-                mUMA?.onReceiveValue(null)
-            }
-            mUMA = filePathCallback
-            var takePictureIntent: Intent? = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            if (takePictureIntent!!.resolveActivity(this@WebViewFragment.requireActivity().packageManager) != null) {
-                var photoFile: File? = null
-                try {
-                    photoFile = createImageFile()
-                    takePictureIntent.putExtra("PhotoPath", mCM)
-                } catch (ex: IOException) {
-                    Log.e(TAG, "Image file creation failed", ex)
-                }
-                if (photoFile != null) {
-                    mCM = "file:" + photoFile.absolutePath
-                    takePictureIntent!!.putExtra(
-                        MediaStore.EXTRA_OUTPUT,
-                        Uri.fromFile(photoFile)
-                    )
-                } else {
-                    takePictureIntent = null
-                }
-            }
-            val contentSelectionIntent = Intent(Intent.ACTION_GET_CONTENT)
-            contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE)
-            contentSelectionIntent.type = "*/*"
-            val intentArray: Array<Intent?> =
-                takePictureIntent?.let { arrayOf(it) } ?: arrayOfNulls(0)
-            val chooserIntent = Intent(Intent.ACTION_CHOOSER)
-            chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent)
-            chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser")
-            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
-            startActivityForResult(chooserIntent, FCR)
-            return true
-        }
-
-        override fun onPermissionRequest(request: PermissionRequest?) {
-            val permissions = arrayOf(
-                PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID,
-                PermissionRequest.RESOURCE_AUDIO_CAPTURE,
-                PermissionRequest.RESOURCE_VIDEO_CAPTURE
-            )
-            request?.grant(permissions)
-        }
-
-        // Create an image file
-        @Throws(IOException::class)
-        private fun createImageFile(): File? {
-            @SuppressLint("SimpleDateFormat") val timeStamp =
-                SimpleDateFormat("yyyyMMdd_HHmmss").format(
-                    Date()
-                )
-            val imageFileName = "img_" + timeStamp + "_"
-            val storageDir =
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-            return File.createTempFile(imageFileName, ".jpg", storageDir)
         }
     }
 
