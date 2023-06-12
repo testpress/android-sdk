@@ -12,7 +12,7 @@ import android.os.Bundle
  * and implement WebViewFragment.Listener.
  */
 
-open class WebViewWithSSOActivity : BaseToolBarActivity(), WebViewFragment.Listener {
+abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.Listener {
 
     private var _layout: BaseTestpressWebviewContainerLayoutBinding? = null
     private val layout: BaseTestpressWebviewContainerLayoutBinding get() = _layout!!
@@ -28,7 +28,6 @@ open class WebViewWithSSOActivity : BaseToolBarActivity(), WebViewFragment.Liste
         parseArguments()
         setActionBarTitle(title)
         initializeWebViewFragment()
-        initializeWebViewFragmentListener()
     }
 
     override fun onBackPressed() {
@@ -50,13 +49,10 @@ open class WebViewWithSSOActivity : BaseToolBarActivity(), WebViewFragment.Liste
             url = urlPath,
             webViewFragmentSettings = getWebViewFragmentSettings()
         )
+        webViewFragment.setListener(this)
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, webViewFragment)
             .commit()
-    }
-
-    protected open fun initializeWebViewFragmentListener() {
-        webViewFragment.setListener(this)
     }
 
     private fun getWebViewFragmentSettings():WebViewFragment.Settings {
@@ -70,9 +66,7 @@ open class WebViewWithSSOActivity : BaseToolBarActivity(), WebViewFragment.Liste
         }
     }
 
-    override fun onWebViewInitializationSuccess() {
-
-    }
+    abstract override fun onWebViewInitializationSuccess()
 
     companion object {
         const val TITLE = "TITLE"
@@ -84,7 +78,7 @@ open class WebViewWithSSOActivity : BaseToolBarActivity(), WebViewFragment.Liste
             title: String,
             urlPath: String,
             isSSORequired: Boolean,
-            klass: Class<out WebViewWithSSOActivity>
+            klass: Class<out AbstractWebViewActivity>
         ): Intent {
             return Intent(currentContext, klass).apply {
                 putExtra(TITLE, title)
@@ -93,4 +87,10 @@ open class WebViewWithSSOActivity : BaseToolBarActivity(), WebViewFragment.Liste
             }
         }
     }
+}
+
+class WebViewWithSSOActivity:AbstractWebViewActivity(){
+
+    override fun onWebViewInitializationSuccess() {}
+
 }
