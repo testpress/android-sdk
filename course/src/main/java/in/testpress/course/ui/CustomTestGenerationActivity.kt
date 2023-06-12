@@ -11,12 +11,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import android.webkit.JavascriptInterface
 import android.widget.Toast
-import com.google.gson.Gson
-import com.google.gson.JsonParseException
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -25,7 +21,7 @@ class CustomTestGenerationActivity: BaseToolBarActivity(), WebViewFragment.Liste
     private var _layout: BaseTestpressWebviewContainerLayoutBinding? = null
     private val layout: BaseTestpressWebviewContainerLayoutBinding get() = _layout!!
     private lateinit var webViewFragment: WebViewFragment
-    private var chapterSlug: String? = null
+    private var courseSlug: String? = null
     private val title: String = "Custom Module"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,17 +42,17 @@ class CustomTestGenerationActivity: BaseToolBarActivity(), WebViewFragment.Liste
     }
 
     private fun parseArguments() {
-        chapterSlug = intent.getStringExtra(CHAPTER_SLUG)
+        courseSlug = intent.getStringExtra(COURSE_SLUG)
     }
 
     private fun initializeWebViewFragment() {
-        if (chapterSlug.isNullOrEmpty()) {
+        if (courseSlug.isNullOrEmpty()) {
             Toast.makeText(this,"Not able to take exam",Toast.LENGTH_SHORT).show()
             this.finish()
             return
         }
         webViewFragment = WebViewFragment(
-            url = "/courses/android/custom_test_generation/",
+            url = "/courses/$courseSlug/custom_test_generation/",
             webViewFragmentSettings = WebViewFragment.Settings()
         )
         webViewFragment.setListener(this)
@@ -70,14 +66,14 @@ class CustomTestGenerationActivity: BaseToolBarActivity(), WebViewFragment.Liste
     }
 
     companion object {
-        const val CHAPTER_SLUG = "CHAPTER_SLUG"
+        const val COURSE_SLUG = "COURSE_SLUG"
 
         fun createIntent(
             currentContext: Context,
-            chapterSlug: String
+            courseSlug: String
         ): Intent {
             return Intent(currentContext, CustomTestGenerationActivity::class.java).apply {
-                putExtra(CHAPTER_SLUG, chapterSlug)
+                putExtra(COURSE_SLUG, courseSlug)
             }
         }
     }
