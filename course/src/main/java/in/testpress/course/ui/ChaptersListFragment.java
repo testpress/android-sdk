@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import org.greenrobot.greendao.AbstractDao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.ToDoubleBiFunction;
 
@@ -34,11 +35,15 @@ import in.testpress.models.greendao.CourseDao;
 import in.testpress.network.BaseResourcePager;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseDataBaseFragment;
+import in.testpress.util.Permission;
 import in.testpress.util.SingleTypeAdapter;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
+import static in.testpress.util.extension.FragmentKt.performActionIfPermissionsGranted;
 
 public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
@@ -209,7 +214,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.custom_test_icon) {
-            // TODO: 12-06-2023
+            openCustomTestGenerationActivity();
             Toast.makeText(requireContext(), "hi", Toast.LENGTH_SHORT).show();
             return true;
         }
@@ -219,5 +224,20 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     @Override
     protected AbstractDao<Chapter, Long> getDao() {
         return chapterDao;
+    }
+
+    private void openCustomTestGenerationActivity() {
+        List<Permission> permissions = new ArrayList<>();
+        permissions.add(Permission.CAMERA);
+        permissions.add(Permission.MICROPHONE);
+        performActionIfPermissionsGranted(this,
+                permissions,
+                new Function0<Unit>() {
+                    @Override
+                    public Unit invoke() {
+                        // TODO: 12-06-2023  
+                        return null;
+                    }
+                });
     }
 }
