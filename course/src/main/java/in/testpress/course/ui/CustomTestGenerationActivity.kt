@@ -13,8 +13,7 @@ import org.json.JSONObject
 
 class CustomTestGenerationActivity: WebViewWithSSOActivity(), WebViewFragment.Listener {
 
-    override fun initializeWebViewFragment() {
-        super.initializeWebViewFragment()
+    override fun initializeWebViewFragmentListener() {
         webViewFragment.setListener(this)
     }
 
