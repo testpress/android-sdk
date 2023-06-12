@@ -1,15 +1,18 @@
 package in.testpress.course.ui;
 
-import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.loader.content.Loader;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.greenrobot.greendao.AbstractDao;
@@ -19,7 +22,6 @@ import java.util.List;
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
-import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.course.pagers.ChapterPager;
 import in.testpress.course.api.TestpressCourseApiClient;
@@ -36,8 +38,6 @@ import in.testpress.util.SingleTypeAdapter;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
-
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
@@ -101,10 +101,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         if (getCourse() != null && isItemsEmpty()) {
             showLoadingPlaceholder();
         }
-
-        if (!getCourse().getRootChapters().isEmpty()){
-            showOrHideCustomModuleLayout();
-        }
+        setHasOptionsMenu(parentId == null);
     }
 
     private void fetchCourseAndShowChapters(String courseId) {
@@ -199,33 +196,22 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
             getDao().insertOrReplaceInTx(items);
         }
         hideLoadingPlaceholder();
-        showOrHideCustomModuleLayout();
         swipeRefreshLayout.setEnabled(true);
     }
 
-    private void showOrHideCustomModuleLayout() {
-        ExtendedFloatingActionButton fab = getView().findViewById(R.id.extended_fab);
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.custom_test_generation, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(requireContext(), "Created", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            listView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-                @Override
-                public void onScrollChange(View view, int i, int i1, int i2, int i3) {
-                    if (listView.getFirstVisiblePosition() == 0) {
-                        fab.extend();
-                    } else {
-                        fab.shrink();
-                    }
-                }
-            });
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.custom_test_icon) {// Not implemented here
+            Toast.makeText(requireContext(), "hi", Toast.LENGTH_SHORT).show();
+            return false;
         }
-
+        return false;
     }
 
     @Override

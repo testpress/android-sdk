@@ -50,10 +50,6 @@
         </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -76,26 +72,6 @@
             android:layout_alignParentBottom="true"
             android:layout_margin="16dp" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/extended_fab"
-            style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton.Icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:layout_margin="16dp"
-            android:backgroundTint="@color/testpress_color_primary"
-            android:contentDescription="extended_fab_content_desc"
-            android:text="Create custom exam"
-            android:textAppearance="?attr/textAppearanceButton"
-            app:elevation="2dp"
-            app:icon="@drawable/ic_baseline_add_24"
-            app:iconPadding="16dp"
-            app:iconSize="24dp"
-            app:pressedTranslationZ="6dp"
-            app:rippleColor="?attr/colorOnSecondary" />
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buy_button"
