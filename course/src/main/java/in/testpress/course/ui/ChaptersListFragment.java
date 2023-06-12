@@ -107,7 +107,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         if (getCourse() != null && isItemsEmpty()) {
             showLoadingPlaceholder();
         }
-        setHasOptionsMenu(parentId == null);
+        setHasOptionsMenu(isCustomTestGenerationEnabled());
     }
 
     private void fetchCourseAndShowChapters(String courseId) {
@@ -209,6 +209,10 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.custom_test_generation, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private boolean isCustomTestGenerationEnabled() {
+        return parentId == null && course.getAllowCustomTestGeneration();
     }
 
     @Override
