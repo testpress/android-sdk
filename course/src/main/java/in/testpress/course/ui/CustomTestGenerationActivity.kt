@@ -1,82 +1,27 @@
 package `in`.testpress.course.ui
 
-import `in`.testpress.R
-import `in`.testpress.databinding.BaseTestpressWebviewContainerLayoutBinding
 import `in`.testpress.exam.ui.ReviewStatsActivity
 import `in`.testpress.fragments.WebViewFragment
 import `in`.testpress.models.greendao.Attempt
-import `in`.testpress.ui.BaseToolBarActivity
+import `in`.testpress.ui.WebViewWithSSOActivity
 import `in`.testpress.util.BaseJavaScriptInterface
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import android.os.Bundle
 import android.webkit.JavascriptInterface
 import android.widget.Toast
 import org.json.JSONException
 import org.json.JSONObject
 
-class CustomTestGenerationActivity: BaseToolBarActivity(), WebViewFragment.Listener {
+class CustomTestGenerationActivity: WebViewWithSSOActivity(), WebViewFragment.Listener {
 
-    private var _layout: BaseTestpressWebviewContainerLayoutBinding? = null
-    private val layout: BaseTestpressWebviewContainerLayoutBinding get() = _layout!!
-    private lateinit var webViewFragment: WebViewFragment
-    private var courseSlug: String? = null
-    private val title: String = "Custom Module"
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        _layout = BaseTestpressWebviewContainerLayoutBinding.inflate(layoutInflater)
-        setContentView(layout.root)
-        parseArguments()
-        setActionBarTitle(title)
-        initializeWebViewFragment()
-    }
-
-    override fun onBackPressed() {
-        if (webViewFragment.canGoBack()) {
-            webViewFragment.goBack()
-        } else {
-            super.onBackPressed()
-        }
-    }
-
-    private fun parseArguments() {
-        courseSlug = intent.getStringExtra(COURSE_SLUG)
-    }
-
-    private fun initializeWebViewFragment() {
-        if (courseSlug.isNullOrEmpty()) {
-            Toast.makeText(this,"Not able to take exam",Toast.LENGTH_SHORT).show()
-            this.finish()
-            return
-        }
-        webViewFragment = WebViewFragment(
-            url = "/courses/$courseSlug/custom_test_generation/",
-            webViewFragmentSettings = WebViewFragment.Settings()
-        )
+    override fun initializeWebViewFragment() {
+        super.initializeWebViewFragment()
         webViewFragment.setListener(this)
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, webViewFragment)
-            .commit()
     }
 
     override fun onWebViewInitializationSuccess() {
         webViewFragment.addJavascriptInterface(JavaScriptInterface(this),"AndroidInterface")
     }
 
-    companion object {
-        const val COURSE_SLUG = "COURSE_SLUG"
-
-        fun createIntent(
-            currentContext: Context,
-            courseSlug: String
-        ): Intent {
-            return Intent(currentContext, CustomTestGenerationActivity::class.java).apply {
-                putExtra(COURSE_SLUG, courseSlug)
-            }
-        }
-    }
 }
 
 class JavaScriptInterface(val activity: Activity):BaseJavaScriptInterface(activity) {

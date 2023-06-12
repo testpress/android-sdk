@@ -263,9 +263,12 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                                     @Override
                                     public Unit invoke() {
                                         startActivity(
-                                                CustomTestGenerationActivity.Companion.createIntent(
+                                                CustomTestGenerationActivity.Companion.createUrlIntent(
                                                         CourseSampleActivity.this,
-                                                        text
+                                                        "Custom Module",
+                                                        "/courses/"+text+"/custom_test_generation/",
+                                                        true,
+                                                        CustomTestGenerationActivity.class
                                                 )
                                         );
                                         return null;
