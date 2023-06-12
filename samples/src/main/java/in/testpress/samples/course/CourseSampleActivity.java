@@ -11,7 +11,9 @@ import in.testpress.course.TestpressCourse;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
+import in.testpress.ui.WebViewWithSSOActivity;
 import in.testpress.ui.DiscussionActivity;
+//import in.testpress.ui.WebViewWithSSOActivity;
 import in.testpress.util.Permission;
 import in.testpress.util.ViewUtils;
 import kotlin.Unit;
@@ -140,6 +142,20 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                         });
             }
         });
+
+        findViewById(R.id.web_view_with_sso).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ViewUtils.showInputDialogBox(CourseSampleActivity.this, "Enter Url",
+                        new ViewUtils.OnInputCompletedListener() {
+                            @Override
+                            public void onInputComplete(String inputText) {
+                                text = inputText;
+                                launchWebViewWithSSOActivity(text);
+                            }
+                        });
+            }
+        });
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -208,6 +224,16 @@ public class CourseSampleActivity extends BaseToolBarActivity {
             Intent intent = new Intent(this, TestpressCoreSampleActivity.class);
             startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);
         }
+    }
+
+    private void launchWebViewWithSSOActivity(String urlPath) {
+        startActivity(WebViewWithSSOActivity.Companion.createUrlIntent(
+                        CourseSampleActivity.this,
+                        "Test WebView",
+                        urlPath,
+                        true
+                )
+        );
     }
 
     @Override

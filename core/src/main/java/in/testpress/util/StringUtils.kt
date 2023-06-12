@@ -22,3 +22,7 @@ fun String.sanitizeFileName(): String {
     val illegalCharactersRegex = Regex("[/`?*<>|\":\\\\]")
     return this.replace(illegalCharactersRegex, "_")
 }
+
+internal fun String?.isValidUrl():Boolean{
+    return this != null && android.util.Patterns.WEB_URL.matcher(this).matches()
+}
