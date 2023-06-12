@@ -18,6 +18,7 @@ import android.widget.Toast;
 import org.greenrobot.greendao.AbstractDao;
 
 import java.util.List;
+import java.util.function.ToDoubleBiFunction;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
@@ -207,11 +208,12 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.custom_test_icon) {// Not implemented here
+        if (item.getItemId() == R.id.custom_test_icon) {
+            // TODO: 12-06-2023
             Toast.makeText(requireContext(), "hi", Toast.LENGTH_SHORT).show();
-            return false;
+            return true;
         }
-        return false;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
