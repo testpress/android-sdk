@@ -49,6 +49,7 @@ public class Course {
 
     @Convert(converter = in.testpress.util.StringListConverter.class, columnType = String.class)
     private StringList tags;
+    private Boolean allowCustomTestGeneration;
 
     /** Used to resolve relations */
     @Generated
@@ -81,7 +82,7 @@ public class Course {
     }
 
     @Generated
-    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount, Integer order, Boolean active, String external_content_link, String external_link_label, boolean childItemsLoaded, Boolean isProduct, Boolean isMyCourse, Integer examsCount, Integer videosCount, Integer htmlContentsCount, Integer attachmentsCount, StringList tags) {
+    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount, Integer order, Boolean active, String external_content_link, String external_link_label, boolean childItemsLoaded, Boolean isProduct, Boolean isMyCourse, Integer examsCount, Integer videosCount, Integer htmlContentsCount, Integer attachmentsCount, StringList tags, Boolean allowCustomTestGeneration) {
         this.id = id;
         this.url = url;
         this.title = title;
@@ -107,6 +108,7 @@ public class Course {
         this.htmlContentsCount = htmlContentsCount;
         this.attachmentsCount = attachmentsCount;
         this.tags = tags;
+        this.allowCustomTestGeneration = allowCustomTestGeneration;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -314,6 +316,14 @@ public class Course {
 
     public void setTags(StringList tags) {
         this.tags = tags;
+    }
+
+    public Boolean getAllowCustomTestGeneration() {
+        return allowCustomTestGeneration;
+    }
+
+    public void setAllowCustomTestGeneration(Boolean allowCustomTestGeneration) {
+        this.allowCustomTestGeneration = allowCustomTestGeneration;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
