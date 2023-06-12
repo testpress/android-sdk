@@ -8,15 +8,8 @@ import android.content.Intent
 import android.os.Bundle
 
 /**
- * Activity that extends this activity must override initializeWebViewFragment()method
+ * Activity that extends this activity must override initializeWebViewFragmentListener() method
  * and implement WebViewFragment.Listener.
- *
- * The override method should look like this:
- * override fun initializeWebViewFragment() {
- *     super.initializeWebViewFragment()
- *     webViewFragment.setListener(this)
- *     // Your additional implementation
- * }
  */
 
 open class WebViewWithSSOActivity : BaseToolBarActivity(), WebViewFragment.Listener {
@@ -35,6 +28,7 @@ open class WebViewWithSSOActivity : BaseToolBarActivity(), WebViewFragment.Liste
         parseArguments()
         setActionBarTitle(title)
         initializeWebViewFragment()
+        initializeWebViewFragmentListener()
     }
 
     override fun onBackPressed() {
@@ -56,10 +50,13 @@ open class WebViewWithSSOActivity : BaseToolBarActivity(), WebViewFragment.Liste
             url = urlPath,
             webViewFragmentSettings = getWebViewFragmentSettings()
         )
-        webViewFragment.setListener(this)
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, webViewFragment)
             .commit()
+    }
+
+    protected open fun initializeWebViewFragmentListener() {
+        webViewFragment.setListener(this)
     }
 
     private fun getWebViewFragmentSettings():WebViewFragment.Settings {
