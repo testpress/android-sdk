@@ -73,9 +73,9 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
             title: String,
             urlPath: String,
             isSSORequired: Boolean,
-            klass: Class<out AbstractWebViewActivity>
+            activityToOpen: Class<out AbstractWebViewActivity>
         ): Intent {
-            return Intent(currentContext, klass).apply {
+            return Intent(currentContext, activityToOpen).apply {
                 putExtra(TITLE, title)
                 putExtra(URL_TO_OPEN, urlPath)
                 putExtra(IS_SSO_REQUIRED, isSSORequired)
