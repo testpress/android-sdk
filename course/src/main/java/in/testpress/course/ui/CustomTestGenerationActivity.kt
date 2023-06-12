@@ -12,6 +12,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.webkit.JavascriptInterface
 import android.widget.Toast
 import com.google.gson.Gson
@@ -87,38 +88,37 @@ class JavaScriptInterface(val activity: Activity):BaseJavaScriptInterface(activi
     @JavascriptInterface
     fun onExamEndCallBack(jsonData: String) {
         try {
-            val jsonObject = JSONObject(jsonData)
-            val attempt = Attempt()
-            attempt.url = jsonObject.optString("url")
-            attempt.id = jsonObject.optLong("id")
-            attempt.date = jsonObject.optString("date")
-            attempt.totalQuestions = jsonObject.optInt("total_questions")
-            attempt.score = jsonObject.optString("score")
-            attempt.rank = jsonObject.optString("rank")
-            attempt.maxRank = jsonObject.optString("max_rank")
-            attempt.reviewUrl = jsonObject.optString("review_url")
-            attempt.questionsUrl = jsonObject.optString("questions_url")
-            attempt.correctCount = jsonObject.optInt("correct_count")
-            attempt.incorrectCount = jsonObject.optInt("incorrect_count")
-            attempt.lastStartedTime = jsonObject.optString("last_started_time")
-            attempt.remainingTime = jsonObject.optString("remaining_time")
-            attempt.timeTaken = jsonObject.optString("time_taken")
-            attempt.state = jsonObject.optString("state")
-            attempt.percentile = jsonObject.optString("percentile")
-            attempt.speed = jsonObject.optInt("speed")
-            attempt.accuracy = jsonObject.optInt("accuracy")
-            attempt.percentage = jsonObject.optString("percentage")
-            attempt.lastViewedQuestionId = jsonObject.optInt("last_viewed_question_id")
-            attempt.reviewPdf = jsonObject.optString("review_pdf")
-            attempt.rankEnabled = jsonObject.optBoolean("rank_enabled")
-
+            val attempt = parseJsonToAttempt(jsonData)
             activity.finish()
             activity.startActivity(ReviewStatsActivity.createIntent(activity, attempt))
         } catch (e: JSONException) {
-
             activity.finish()
             Toast.makeText(activity, "Review Not available for this exam", Toast.LENGTH_SHORT)
                 .show()
         }
+    }
+
+    private fun parseJsonToAttempt(json: String): Attempt {
+        val jsonObject = JSONObject(json)
+        val attempt = Attempt()
+        attempt.url = jsonObject.optString("url")
+        attempt.id = jsonObject.optLong("id")
+        attempt.date = jsonObject.optString("date")
+        attempt.totalQuestions = jsonObject.optInt("total_questions")
+        attempt.score = jsonObject.optString("score")
+        attempt.reviewUrl = jsonObject.optString("review_url")
+        attempt.questionsUrl = jsonObject.optString("questions_url")
+        attempt.correctCount = jsonObject.optInt("correct_count")
+        attempt.incorrectCount = jsonObject.optInt("incorrect_count")
+        attempt.lastStartedTime = jsonObject.optString("last_started_time")
+        attempt.remainingTime = jsonObject.optString("remaining_time")
+        attempt.timeTaken = jsonObject.optString("time_taken")
+        attempt.state = jsonObject.optString("state")
+        attempt.speed = jsonObject.optInt("speed")
+        attempt.accuracy = jsonObject.optInt("accuracy")
+        attempt.percentage = jsonObject.optString("percentage")
+        attempt.lastViewedQuestionId = jsonObject.optInt("last_viewed_question_id")
+        attempt.reviewPdf = jsonObject.optString("review_pdf")
+        return attempt
     }
 }
