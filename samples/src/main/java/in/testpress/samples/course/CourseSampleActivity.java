@@ -8,6 +8,7 @@ import android.view.View;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.course.TestpressCourse;
+import in.testpress.course.ui.CustomTestGenerationActivity;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
@@ -26,6 +27,9 @@ import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
 import static in.testpress.util.extension.ActivityKt.performActionIfPermissionsGranted;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CourseSampleActivity extends BaseToolBarActivity {
 
@@ -156,6 +160,13 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                         });
             }
         });
+
+        findViewById(R.id.custom_test_generation).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchCustomTestGenerationActivity();
+            }
+        });
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -235,6 +246,33 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                         WebViewWithSSOActivity.class
                 )
         );
+    }
+
+    private void launchCustomTestGenerationActivity() {
+        ViewUtils.showInputDialogBox(CourseSampleActivity.this, "Enter Chapter slug",
+                new ViewUtils.OnInputCompletedListener() {
+                    @Override
+                    public void onInputComplete(String inputText) {
+                        text = inputText;
+                        List<Permission> permissions = new ArrayList<>();
+                        permissions.add(Permission.CAMERA);
+                        permissions.add(Permission.MICROPHONE);
+                        performActionIfPermissionsGranted(CourseSampleActivity.this,
+                                permissions,
+                                new Function0<Unit>() {
+                                    @Override
+                                    public Unit invoke() {
+                                        startActivity(
+                                                CustomTestGenerationActivity.Companion.createIntent(
+                                                        CourseSampleActivity.this,
+                                                        text
+                                                )
+                                        );
+                                        return null;
+                                    }
+                                });
+                    }
+                });
     }
 
     @Override
