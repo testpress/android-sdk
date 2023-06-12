@@ -231,7 +231,8 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                         CourseSampleActivity.this,
                         "Test WebView",
                         urlPath,
-                        true
+                        true,
+                        WebViewWithSSOActivity.class
                 )
         );
     }

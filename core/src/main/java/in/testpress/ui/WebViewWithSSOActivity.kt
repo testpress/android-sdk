@@ -7,11 +7,23 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 
+/**
+ * Activity that extends this activity must override initializeWebViewFragment()method
+ * and implement WebViewFragment.Listener.
+ *
+ * The override method should look like this:
+ * override fun initializeWebViewFragment() {
+ *     super.initializeWebViewFragment()
+ *     webViewFragment.setListener(this)
+ *     // Your additional implementation
+ * }
+ */
+
 open class WebViewWithSSOActivity : BaseToolBarActivity(), WebViewFragment.Listener {
 
     private var _layout: BaseTestpressWebviewContainerLayoutBinding? = null
     private val layout: BaseTestpressWebviewContainerLayoutBinding get() = _layout!!
-    private lateinit var webViewFragment: WebViewFragment
+    protected lateinit var webViewFragment: WebViewFragment
     private lateinit var title: String
     private lateinit var urlPath: String
     private var isSSORequired: Boolean = true
@@ -39,7 +51,7 @@ open class WebViewWithSSOActivity : BaseToolBarActivity(), WebViewFragment.Liste
         isSSORequired = intent.getBooleanExtra(IS_SSO_REQUIRED,true)
     }
 
-    private fun initializeWebViewFragment() {
+    protected open fun initializeWebViewFragment() {
         webViewFragment = WebViewFragment(
             url = urlPath,
             webViewFragmentSettings = getWebViewFragmentSettings()
@@ -74,12 +86,13 @@ open class WebViewWithSSOActivity : BaseToolBarActivity(), WebViewFragment.Liste
             currentContext: Context,
             title: String,
             urlPath: String,
-            isSSORequired: Boolean
+            isSSORequired: Boolean,
+            klass: Class<out WebViewWithSSOActivity>
         ): Intent {
-            return Intent(currentContext, WebViewWithSSOActivity::class.java).apply {
+            return Intent(currentContext, klass).apply {
                 putExtra(TITLE, title)
                 putExtra(URL_TO_OPEN, urlPath)
-                putExtra(IS_SSO_REQUIRED,isSSORequired)
+                putExtra(IS_SSO_REQUIRED, isSSORequired)
             }
         }
     }
