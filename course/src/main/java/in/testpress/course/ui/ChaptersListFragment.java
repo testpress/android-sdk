@@ -1,5 +1,6 @@
 package in.testpress.course.ui;
 
+import android.os.Build;
 import android.os.Bundle;
 import androidx.loader.content.Loader;
 
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.greenrobot.greendao.AbstractDao;
 
@@ -34,6 +36,8 @@ import in.testpress.util.SingleTypeAdapter;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
+
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
@@ -200,12 +204,28 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     }
 
     private void showOrHideCustomModuleLayout() {
-        if (parentId == null){
-            View view = this.getView().findViewById(R.id.custom_test_gen);
-            TextView textView = (TextView) view.findViewById(R.id.custom_module_title);
-            textView.setTypeface(TestpressSdk.getRubikMediumFont(this.requireContext()));
-            view.setVisibility(View.VISIBLE);
+        ExtendedFloatingActionButton fab = getView().findViewById(R.id.extended_fab);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(requireContext(), "Created", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            listView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+                @Override
+                public void onScrollChange(View view, int i, int i1, int i2, int i3) {
+                    if (listView.getFirstVisiblePosition() == 0) {
+                        fab.extend();
+                    } else {
+                        fab.shrink();
+                    }
+                }
+            });
         }
+
     }
 
     @Override
