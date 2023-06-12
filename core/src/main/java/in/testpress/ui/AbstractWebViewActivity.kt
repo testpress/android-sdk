@@ -7,11 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 
-/**
- * Activity that extends this activity must override initializeWebViewFragmentListener() method
- * and implement WebViewFragment.Listener.
- */
-
 abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.Listener {
 
     private var _layout: BaseTestpressWebviewContainerLayoutBinding? = null
