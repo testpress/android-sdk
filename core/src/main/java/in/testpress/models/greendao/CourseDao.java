@@ -50,6 +50,7 @@ public class CourseDao extends AbstractDao<Course, Long> {
         public final static Property HtmlContentsCount = new Property(22, Integer.class, "htmlContentsCount", false, "HTML_CONTENTS_COUNT");
         public final static Property AttachmentsCount = new Property(23, Integer.class, "attachmentsCount", false, "ATTACHMENTS_COUNT");
         public final static Property Tags = new Property(24, String.class, "tags", false, "TAGS");
+        public final static Property AllowCustomTestGeneration = new Property(25, Boolean.class, "allowCustomTestGeneration", false, "ALLOW_CUSTOM_TEST_GENERATION");
     }
 
     private DaoSession daoSession;
@@ -93,7 +94,8 @@ public class CourseDao extends AbstractDao<Course, Long> {
                 "\"VIDEOS_COUNT\" INTEGER," + // 21: videosCount
                 "\"HTML_CONTENTS_COUNT\" INTEGER," + // 22: htmlContentsCount
                 "\"ATTACHMENTS_COUNT\" INTEGER," + // 23: attachmentsCount
-                "\"TAGS\" TEXT);"); // 24: tags
+                "\"TAGS\" TEXT," + // 24: tags
+                "\"ALLOW_CUSTOM_TEST_GENERATION\" INTEGER);"); // 25: allowCustomTestGeneration
     }
 
     /** Drops the underlying database table. */
@@ -226,6 +228,11 @@ public class CourseDao extends AbstractDao<Course, Long> {
         if (tags != null) {
             stmt.bindString(25, tagsConverter.convertToDatabaseValue(tags));
         }
+ 
+        Boolean allowCustomTestGeneration = entity.getAllowCustomTestGeneration();
+        if (allowCustomTestGeneration != null) {
+            stmt.bindLong(26, allowCustomTestGeneration ? 1L: 0L);
+        }
     }
 
     @Override
@@ -352,6 +359,11 @@ public class CourseDao extends AbstractDao<Course, Long> {
         if (tags != null) {
             stmt.bindString(25, tagsConverter.convertToDatabaseValue(tags));
         }
+ 
+        Boolean allowCustomTestGeneration = entity.getAllowCustomTestGeneration();
+        if (allowCustomTestGeneration != null) {
+            stmt.bindLong(26, allowCustomTestGeneration ? 1L: 0L);
+        }
     }
 
     @Override
@@ -392,7 +404,8 @@ public class CourseDao extends AbstractDao<Course, Long> {
             cursor.isNull(offset + 21) ? null : cursor.getInt(offset + 21), // videosCount
             cursor.isNull(offset + 22) ? null : cursor.getInt(offset + 22), // htmlContentsCount
             cursor.isNull(offset + 23) ? null : cursor.getInt(offset + 23), // attachmentsCount
-            cursor.isNull(offset + 24) ? null : tagsConverter.convertToEntityProperty(cursor.getString(offset + 24)) // tags
+            cursor.isNull(offset + 24) ? null : tagsConverter.convertToEntityProperty(cursor.getString(offset + 24)), // tags
+            cursor.isNull(offset + 25) ? null : cursor.getShort(offset + 25) != 0 // allowCustomTestGeneration
         );
         return entity;
     }
@@ -424,6 +437,7 @@ public class CourseDao extends AbstractDao<Course, Long> {
         entity.setHtmlContentsCount(cursor.isNull(offset + 22) ? null : cursor.getInt(offset + 22));
         entity.setAttachmentsCount(cursor.isNull(offset + 23) ? null : cursor.getInt(offset + 23));
         entity.setTags(cursor.isNull(offset + 24) ? null : tagsConverter.convertToEntityProperty(cursor.getString(offset + 24)));
+        entity.setAllowCustomTestGeneration(cursor.isNull(offset + 25) ? null : cursor.getShort(offset + 25) != 0);
      }
     
     @Override
