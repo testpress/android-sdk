@@ -227,7 +227,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
     }
 
     private void launchWebViewWithSSOActivity(String urlPath) {
-        startActivity(WebViewWithSSOActivity.Companion.createUrlIntent(
+        startActivity(WebViewWithSSOActivity.Companion.createIntent(
                         CourseSampleActivity.this,
                         "Test WebView",
                         urlPath,

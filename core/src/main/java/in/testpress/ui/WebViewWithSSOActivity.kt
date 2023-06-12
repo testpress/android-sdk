@@ -70,7 +70,7 @@ open class WebViewWithSSOActivity : BaseToolBarActivity(), WebViewFragment.Liste
         const val URL_TO_OPEN = "URL"
         const val IS_SSO_REQUIRED = "IS_SSO_REQUIRED"
 
-        fun createUrlIntent(
+        fun createIntent(
             currentContext: Context,
             title: String,
             urlPath: String,
