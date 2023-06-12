@@ -1,9 +1,8 @@
 package `in`.testpress.course.ui
 
 import `in`.testpress.exam.ui.ReviewStatsActivity
-import `in`.testpress.fragments.WebViewFragment
 import `in`.testpress.models.greendao.Attempt
-import `in`.testpress.ui.WebViewWithSSOActivity
+import `in`.testpress.ui.AbstractWebViewActivity
 import `in`.testpress.util.BaseJavaScriptInterface
 import android.app.Activity
 import android.webkit.JavascriptInterface
@@ -11,11 +10,7 @@ import android.widget.Toast
 import org.json.JSONException
 import org.json.JSONObject
 
-class CustomTestGenerationActivity: WebViewWithSSOActivity(), WebViewFragment.Listener {
-
-    override fun initializeWebViewFragmentListener() {
-        webViewFragment.setListener(this)
-    }
+class CustomTestGenerationActivity: AbstractWebViewActivity() {
 
     override fun onWebViewInitializationSuccess() {
         webViewFragment.addJavascriptInterface(JavaScriptInterface(this),"AndroidInterface")
