@@ -230,25 +230,14 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     }
 
     private void openCustomTestGenerationActivity() {
-        List<Permission> permissions = new ArrayList<>();
-        permissions.add(Permission.CAMERA);
-        permissions.add(Permission.MICROPHONE);
-        performActionIfPermissionsGranted(this,
-                permissions,
-                new Function0<Unit>() {
-                    @Override
-                    public Unit invoke() {
-                        startActivity(
-                                CustomTestGenerationActivity.Companion.createIntent(
-                                        requireContext(),
-                                        "Custom Module",
-                                        "/courses/"+course.getSlug()+"/custom_test_generation/",
-                                        true,
-                                        CustomTestGenerationActivity.class
-                                )
-                        );
-                        return null;
-                    }
-                });
+        startActivity(
+                CustomTestGenerationActivity.Companion.createIntent(
+                        requireContext(),
+                        "Custom Module",
+                        "/courses/"+course.getSlug()+"/custom_test_generation/",
+                        true,
+                        CustomTestGenerationActivity.class
+                )
+        );
     }
 }
