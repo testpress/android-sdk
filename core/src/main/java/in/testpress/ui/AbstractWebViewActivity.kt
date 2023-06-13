@@ -39,7 +39,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
         isSSORequired = intent.getBooleanExtra(IS_SSO_REQUIRED,true)
     }
 
-    protected open fun initializeWebViewFragment() {
+    private fun initializeWebViewFragment() {
         webViewFragment = WebViewFragment(
             url = urlPath,
             webViewFragmentSettings = getWebViewFragmentSettings()
