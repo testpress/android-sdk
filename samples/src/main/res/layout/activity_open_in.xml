@@ -81,6 +81,11 @@
             android:text="Permission"
             android:id="@+id/premission_check_button" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/Button"
+            android:text="Custom Test"
+            android:id="@+id/custom_test_generation" />
+
     </LinearLayout>
 
     </ScrollView>
