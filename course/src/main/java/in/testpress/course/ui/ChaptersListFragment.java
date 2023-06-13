@@ -1,17 +1,25 @@
 package in.testpress.course.ui;
 
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.loader.content.Loader;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import org.greenrobot.greendao.AbstractDao;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.ToDoubleBiFunction;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
@@ -27,11 +35,15 @@ import in.testpress.models.greendao.CourseDao;
 import in.testpress.network.BaseResourcePager;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseDataBaseFragment;
+import in.testpress.util.Permission;
 import in.testpress.util.SingleTypeAdapter;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
+import static in.testpress.util.extension.FragmentKt.performActionIfPermissionsGranted;
 
 public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
@@ -95,6 +107,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         if (getCourse() != null && isItemsEmpty()) {
             showLoadingPlaceholder();
         }
+        setHasOptionsMenu(isCustomTestGenerationEnabled());
     }
 
     private void fetchCourseAndShowChapters(String courseId) {
@@ -193,7 +206,38 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     }
 
     @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.custom_test_generation, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private boolean isCustomTestGenerationEnabled() {
+        return parentId == null && course.getAllowCustomTestGeneration() != null && course.getAllowCustomTestGeneration();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.custom_test_icon) {
+            openCustomTestGenerationActivity();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected AbstractDao<Chapter, Long> getDao() {
         return chapterDao;
+    }
+
+    private void openCustomTestGenerationActivity() {
+        startActivity(
+                CustomTestGenerationActivity.Companion.createIntent(
+                        requireContext(),
+                        "Custom Module",
+                        "/courses/"+course.getSlug()+"/custom_test_generation/",
+                        true,
+                        CustomTestGenerationActivity.class
+                )
+        );
     }
 }
