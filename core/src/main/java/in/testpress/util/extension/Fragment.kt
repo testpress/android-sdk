@@ -1,7 +1,5 @@
 package `in`.testpress.util.extension
 
-import `in`.testpress.util.Permission
-import `in`.testpress.util.PermissionHandler
 import `in`.testpress.util.ViewUtils
 import `in`.testpress.util.isValidUrl
 import android.content.Intent
@@ -15,11 +13,4 @@ fun Fragment.openUrlInBrowser(url: String?) {
     } else {
         ViewUtils.toast(this.requireContext(),"No suitable app was found to open this URL. Please install any browser app")
     }
-}
-
-fun Fragment.performActionIfPermissionsGranted(
-    requiredPermissions: List<Permission>,
-    action: () -> Unit
-) {
-    PermissionHandler().performActionIfPermissionsGranted(this.requireActivity(),requiredPermissions,action)
 }
