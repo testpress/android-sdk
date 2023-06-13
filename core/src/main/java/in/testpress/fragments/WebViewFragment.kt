@@ -8,6 +8,7 @@ import `in`.testpress.models.SSOUrl
 import `in`.testpress.network.TestpressApiClient
 import `in`.testpress.util.BaseJavaScriptInterface
 import `in`.testpress.util.webview.*
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
@@ -175,6 +176,7 @@ class WebViewFragment(
         this.listener = listener
     }
 
+    @SuppressLint("JavascriptInterface")
     fun addJavascriptInterface(javascriptInterface: BaseJavaScriptInterface, name: String){
         webView.addJavascriptInterface(javascriptInterface,name)
     }
