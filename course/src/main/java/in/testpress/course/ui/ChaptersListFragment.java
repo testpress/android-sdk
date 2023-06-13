@@ -212,14 +212,13 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     }
 
     private boolean isCustomTestGenerationEnabled() {
-        return parentId == null && course.getAllowCustomTestGeneration();
+        return parentId == null && course.getAllowCustomTestGeneration() != null && course.getAllowCustomTestGeneration();
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.custom_test_icon) {
             openCustomTestGenerationActivity();
-            Toast.makeText(requireContext(), "hi", Toast.LENGTH_SHORT).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -239,7 +238,15 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
                 new Function0<Unit>() {
                     @Override
                     public Unit invoke() {
-                        // TODO: 12-06-2023  
+                        startActivity(
+                                CustomTestGenerationActivity.Companion.createIntent(
+                                        requireContext(),
+                                        "Custom Module",
+                                        "/courses/"+course.getSlug()+"/custom_test_generation/",
+                                        true,
+                                        CustomTestGenerationActivity.class
+                                )
+                        );
                         return null;
                     }
                 });
