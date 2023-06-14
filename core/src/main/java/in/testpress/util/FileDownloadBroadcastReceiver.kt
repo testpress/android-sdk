@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
@@ -61,10 +62,10 @@ class FileDownloaderBroadcastReceiver: BroadcastReceiver() {
     }
 
     private fun createPendingIntent(localFilePath: String): PendingIntent {
-        val intent = if (localFilePath.isPDF()) {
-            createIntentToOpenPDF(localFilePath)
-        } else {
-            createIntentToOpenDownloadActivity()
+        val intent = when {
+            localFilePath.isPDF() -> createIntentToOpenPDF(localFilePath)
+            localFilePath.isImageFile() -> createIntentToOpenImage(localFilePath)
+            else -> createIntentToOpenDownloadActivity()
         }
 
         return PendingIntent.getActivity(
@@ -76,15 +77,26 @@ class FileDownloaderBroadcastReceiver: BroadcastReceiver() {
     }
 
     private fun createIntentToOpenPDF(localFilePath: String): Intent {
-        val pdfFile = File(Uri.parse(localFilePath).path.toString())
-        val uri = FileProvider.getUriForFile(
+        val uriToOpen = getFileProviderUri(localFilePath)
+        return Intent(Intent.ACTION_VIEW)
+            .setDataAndType(uriToOpen, "application/pdf")
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+
+    private fun createIntentToOpenImage(localFilePath: String): Intent {
+        val uriToOpen = getFileProviderUri(localFilePath)
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setDataAndType(uriToOpen, "image/*")
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        return intent
+    }
+    private fun getFileProviderUri(localFilePath: String): Uri {
+        val file = File(Uri.parse(localFilePath).path.toString())
+        return FileProvider.getUriForFile(
             context,
             context.packageName + ".provider",
-            pdfFile
+            file
         )
-        return Intent(Intent.ACTION_VIEW)
-            .setDataAndType(uri, "application/pdf")
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
 
     private fun createIntentToOpenDownloadActivity(): Intent {

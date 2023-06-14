@@ -27,6 +27,10 @@ internal fun String?.isValidUrl():Boolean{
     return this != null && android.util.Patterns.WEB_URL.matcher(this).matches()
 }
 
-internal fun String?.isPDF():Boolean {
-    return this != null && this.contains(".pdf")
+fun String.isPDF():Boolean {
+    return this.contains(".pdf")
+}
+
+fun String.isImageFile():Boolean {
+    return this.contains(".pgn") || this.contains(".jpg") || this.contains(".gif")
 }
