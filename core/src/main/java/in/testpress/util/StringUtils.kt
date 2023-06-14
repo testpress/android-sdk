@@ -32,5 +32,5 @@ fun String.isPDF():Boolean {
 }
 
 fun String.isImageFile():Boolean {
-    return this.contains(".pgn") || this.contains(".jpg") || this.contains(".gif")
+    return this.contains(".png") || this.contains(".jpg") || this.contains(".gif")
 }
