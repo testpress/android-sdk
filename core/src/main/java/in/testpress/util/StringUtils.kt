@@ -26,3 +26,7 @@ fun String.sanitizeFileName(): String {
 internal fun String?.isValidUrl():Boolean{
     return this != null && android.util.Patterns.WEB_URL.matcher(this).matches()
 }
+
+internal fun String?.isPDF():Boolean {
+    return this != null && this.contains(".pdf")
+}
