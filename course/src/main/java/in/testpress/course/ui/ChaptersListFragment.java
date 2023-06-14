@@ -43,7 +43,6 @@ import kotlin.jvm.functions.Function0;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
-import static in.testpress.util.extension.FragmentKt.performActionIfPermissionsGranted;
 
 public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
