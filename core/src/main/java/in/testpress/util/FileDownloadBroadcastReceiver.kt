@@ -61,15 +61,11 @@ class FileDownloaderBroadcastReceiver: BroadcastReceiver() {
     }
 
     private fun createPendingIntent(localFilePath: String): PendingIntent {
-        val intent = Intent(Intent.ACTION_VIEW)
-        val pdfFile  = File(Uri.parse(localFilePath).path.toString())
-        val uri = FileProvider.getUriForFile(
-            context,
-            context.packageName + ".provider",
-            pdfFile
-        )
-        intent.setDataAndType(uri, "application/pdf")
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val intent = when {
+            localFilePath.isPDF() -> createIntentToOpenPDF(localFilePath)
+            localFilePath.isImageFile() -> createIntentToOpenImage(localFilePath)
+            else -> createIntentToOpenDownloadActivity()
+        }
 
         return PendingIntent.getActivity(
             context,
@@ -77,6 +73,34 @@ class FileDownloaderBroadcastReceiver: BroadcastReceiver() {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+    }
+
+    private fun createIntentToOpenPDF(localFilePath: String): Intent {
+        val uriToOpen = getFileProviderUri(localFilePath)
+        return Intent(Intent.ACTION_VIEW)
+            .setDataAndType(uriToOpen, "application/pdf")
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+
+    private fun createIntentToOpenImage(localFilePath: String): Intent {
+        val uriToOpen = getFileProviderUri(localFilePath)
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setDataAndType(uriToOpen, "image/*")
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        return intent
+    }
+    private fun getFileProviderUri(localFilePath: String): Uri {
+        val file = File(Uri.parse(localFilePath).path.toString())
+        return FileProvider.getUriForFile(
+            context,
+            context.packageName + ".provider",
+            file
+        )
+    }
+
+    private fun createIntentToOpenDownloadActivity(): Intent {
+        return Intent(DownloadManager.ACTION_VIEW_DOWNLOADS)
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
 
     private fun showCompletedNotification(pdfFilename: String, pendingIntent: PendingIntent) {

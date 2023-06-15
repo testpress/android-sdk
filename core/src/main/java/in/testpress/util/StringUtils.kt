@@ -1,6 +1,7 @@
 package `in`.testpress.util
 
 import android.text.TextUtils
+import android.webkit.MimeTypeMap
 
 object StringUtils{
     @JvmStatic
@@ -26,3 +27,9 @@ fun String.sanitizeFileName(): String {
 internal fun String?.isValidUrl():Boolean{
     return this != null && android.util.Patterns.WEB_URL.matcher(this).matches()
 }
+
+fun String.isPDF():Boolean = this.getFileType() == "pdf"
+
+fun String.isImageFile(): Boolean = this.getFileType() == "png" || this.getFileType() == "jpg" || this.getFileType() == "gif"
+
+fun String.getFileType(): String = MimeTypeMap.getFileExtensionFromUrl(this)
