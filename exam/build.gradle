@@ -42,7 +42,7 @@ dependencies {
     api rootProject.imageCropper
     api rootProject.lottie
     api 'com.github.HBiSoft:PickiT:0.1.14'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    api rootProject.constraintLayout
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
     testImplementation rootProject.roboelectric

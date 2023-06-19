@@ -61,7 +61,7 @@ android {
 }
 
 dependencies {
-    api 'androidx.constraintlayout:constraintlayout:2.0.4'
+    api rootProject.constraintLayout
     def core_version = "1.2.0"
     def core_testing_version = "2.1.0"
     def room_version = "2.3.0"
