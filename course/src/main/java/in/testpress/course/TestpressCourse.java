@@ -217,7 +217,7 @@ public class TestpressCourse {
         Assert.assertNotNull("Activity must not be null.", activity);
 
         init(activity.getApplicationContext(), testpressSession);
-        LeaderboardFragment.show(activity, containerViewId);
+        LeaderboardFragment.Companion.show(activity, containerViewId);
     }
 
     /**
