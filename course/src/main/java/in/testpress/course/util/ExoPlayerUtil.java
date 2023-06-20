@@ -398,7 +398,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                     MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
                     int rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo);
                     DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
-                    if (!trackSelectionDialog.getOverrides().isEmpty()) {
+                    if (trackSelectionDialog.getOverrides().isEmpty()) {
+                        parametersBuilder.clearSelectionOverrides(rendererIndex);
+                        trackSelector.setParameters(parametersBuilder.build());
+                    } else {
                         parametersBuilder.clearSelectionOverrides(rendererIndex)
                                 .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), trackSelectionDialog.getOverrides().get(0));
                         trackSelector.setParameters(parametersBuilder.build());
@@ -798,6 +801,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             displayError(R.string.license_error);
         }
     }
+
+    DefaultTrackSelector.SelectionOverride override;
 
     private void playLowBitrateTrack() {
         MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
