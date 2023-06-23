@@ -20,6 +20,7 @@ import in.testpress.store.TestpressStore;
 import in.testpress.store.ui.ProductDetailsActivity;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
+import in.testpress.util.ViewUtils;
 
 
 public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
@@ -70,9 +71,7 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
         setText(2,  activity.getResources().getQuantityString(R.plurals.contents_count,
                 contentsCount, contentsCount));
 
-        if (item.getCourseIds().size() == 0) {
-            setGone(6, true);
-        }
+        setGone(6,item.getCourseIds().size() == 0);
 
         String price = String.format("₹%s", item.getCurrentPrice());
         setText(3, price);
