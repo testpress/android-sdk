@@ -21,6 +21,7 @@ import in.testpress.store.ui.ProductDetailsActivity;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
 
+
 public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
 
     private Activity activity;
