@@ -54,29 +54,35 @@
             android:orientation="horizontal"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="5dp"
+            android:weightSum="2"
             android:id="@+id/counts" >
 
             <TextView
                 android:id="@+id/total_chapters"
-                android:text="0 Chapters"
-                android:textSize="12sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:drawableLeft="@drawable/ic_content"
                 android:drawablePadding="5dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="10000 Chapters"
                 android:textColor="#667c8a"
-                android:layout_marginRight="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/total_contents"
-                android:text="0 Contents"
-                android:textSize="12sp"
-                android:layout_marginLeft="5dp"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="4dp"
                 android:drawableLeft="@drawable/ic_chapter"
                 android:drawablePadding="5dp"
-                android:textColor="#667c8a" />
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="10000 Contents"
+                android:textColor="#667c8a"
+                android:textSize="12sp" />
 
         </LinearLayout>
 
