@@ -1,15 +1,10 @@
 package `in`.testpress.course.util
 
 
-import us.zoom.sdk.ChatMessageDeleteType
-import us.zoom.sdk.FreeMeetingNeedUpgradeType
+import us.zoom.sdk.*
 import us.zoom.sdk.InMeetingAudioController.MobileRTCMicrophoneError
 import us.zoom.sdk.InMeetingChatController.MobileRTCWebinarPanelistChatPrivilege
-import us.zoom.sdk.InMeetingChatMessage
-import us.zoom.sdk.InMeetingEventHandler
-import us.zoom.sdk.InMeetingServiceListener
 import us.zoom.sdk.InMeetingServiceListener.RecordingStatus
-import us.zoom.sdk.VideoQuality
 
 open class SimpleInMeetingListener : InMeetingServiceListener {
     override fun onMeetingNeedPasswordOrDisplayName(
@@ -52,6 +47,7 @@ open class SimpleInMeetingListener : InMeetingServiceListener {
     override fun onLowOrRaiseHandStatusChanged(l: Long, b: Boolean) {}
     override fun onChatMessageReceived(inMeetingChatMessage: InMeetingChatMessage) {}
     override fun onChatMsgDeleteNotification(msgID: String, deleteBy: ChatMessageDeleteType) {}
+    override fun onShareMeetingChatStatusChanged(p0: Boolean) {}
     override fun onUserNetworkQualityChanged(userId: Long) {}
     override fun onSinkMeetingVideoQualityChanged(videoQuality: VideoQuality, userId: Long) {}
     override fun onHostAskUnMute(userId: Long) {}
