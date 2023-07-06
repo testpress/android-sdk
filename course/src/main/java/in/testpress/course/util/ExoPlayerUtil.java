@@ -709,12 +709,12 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         return new DefaultDrmSessionManager.Builder().build(new CustomHttpDrmMediaCallback(activity, content.getId()));
     }
 
-    private class PlayerEventListener implements Player.EventListener, DRMLicenseFetchCallback {
+    private class PlayerEventListener implements Player.Listener, DRMLicenseFetchCallback {
 
         @Override
         public void onIsPlayingChanged(boolean isPlaying) {
             updateVideoAttempt();
-            Player.EventListener.super.onIsPlayingChanged(isPlaying);
+            Player.Listener.super.onIsPlayingChanged(isPlaying);
         }
 
         @Override
