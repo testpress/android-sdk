@@ -31,6 +31,7 @@ public class StoreApiClient extends TestpressApiClient {
     public static final String ORDER_CONFIRM_PATH = "/confirm/";
 
     public static final String URL_PAYMENT_RESPONSE_HANDLER = "/payments/response/payu/";
+    public static final String RAZORPAY_PAYMENT_RESPONSE_PATH = "/payments/response/razorpay/";
 
     public static final String PAYU_HASH_GENERATOR_PATH = "/api/v2.5/payu/dynamic_hash/";
 
