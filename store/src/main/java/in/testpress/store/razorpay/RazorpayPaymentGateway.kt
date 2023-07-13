@@ -1,6 +1,5 @@
 package `in`.testpress.store.razorpay
 
-import com.razorpay.PaymentResultWithDataListener
 import android.app.Activity
 import com.razorpay.*
 import `in`.testpress.core.TestpressSdk
@@ -11,7 +10,7 @@ import org.json.JSONObject
 import `in`.testpress.store.network.StoreApiClient
 
 
-class RazorpayPaymentGateway(order: Order, context: Activity): PaymentGateway(order, context), PaymentResultWithDataListener {
+class RazorpayPaymentGateway(order: Order, context: Activity): PaymentGateway(order, context), PaymentResultListener {
     val instituteSettings: InstituteSettings = TestpressSdk.getTestpressSession(context)!!.instituteSettings
     val redirectURL = instituteSettings.baseUrl + StoreApiClient.RAZORPAY_PAYMENT_RESPONSE_PATH
 
@@ -26,7 +25,7 @@ class RazorpayPaymentGateway(order: Order, context: Activity): PaymentGateway(or
     }
 
     private fun getParameters(): JSONObject {
-        val payloadHelper = PayloadHelper("INR", order.amount, order.orderId)
+        val payloadHelper = PayloadHelper("INR", order.amount.toInt(), order.orderId)
         payloadHelper.name = order.name
         payloadHelper.prefillEmail = order.email
         payloadHelper.prefillContact = order.phone
@@ -50,7 +49,7 @@ class RazorpayPaymentGateway(order: Order, context: Activity): PaymentGateway(or
         return payloadHelper.getJson()
     }
 
-    override fun onPaymentSuccess(razorpayPaymentId: String?, PaymentData: PaymentData) {
+    override fun onPaymentSuccess(razorpayPaymentId: String?) {
         paymentGatewayListener?.onPaymentSuccess()
     }
 
