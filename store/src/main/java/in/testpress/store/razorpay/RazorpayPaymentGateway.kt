@@ -25,7 +25,8 @@ class RazorpayPaymentGateway(order: Order, context: Activity): PaymentGateway(or
     }
 
     private fun getParameters(): JSONObject {
-        val payloadHelper = PayloadHelper("INR", order.amount.toInt(), order.orderId)
+        var amount = (order.amount.toFloat() * 100).toInt() // INR in paisa
+        val payloadHelper = PayloadHelper("INR", amount, order.orderId)
         payloadHelper.name = order.name
         payloadHelper.prefillEmail = order.email
         payloadHelper.prefillContact = order.phone
