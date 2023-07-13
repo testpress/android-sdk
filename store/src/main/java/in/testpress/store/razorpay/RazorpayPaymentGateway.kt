@@ -1,7 +1,6 @@
 package `in`.testpress.store.razorpay
 
 import com.razorpay.PaymentResultWithDataListener
-import com.razorpay.ExternalWalletListener
 import android.app.Activity
 import com.razorpay.*
 import `in`.testpress.core.TestpressSdk
@@ -9,16 +8,10 @@ import `in`.testpress.models.InstituteSettings
 import `in`.testpress.store.PaymentGateway
 import `in`.testpress.store.models.Order
 import org.json.JSONObject
-import android.app.AlertDialog
-import android.content.DialogInterface
-import android.widget.Toast
 import `in`.testpress.store.network.StoreApiClient
-import java.lang.Exception
 
 
-class RazorpayPaymentGateway(order: Order, context: Activity): PaymentGateway(order, context), PaymentResultWithDataListener, ExternalWalletListener, DialogInterface.OnClickListener {
-    private lateinit var alertDialogBuilder: AlertDialog.Builder
-
+class RazorpayPaymentGateway(order: Order, context: Activity): PaymentGateway(order, context), PaymentResultWithDataListener {
     val instituteSettings: InstituteSettings = TestpressSdk.getTestpressSession(context)!!.instituteSettings
     val redirectURL = instituteSettings.baseUrl + StoreApiClient.RAZORPAY_PAYMENT_RESPONSE_PATH
 
@@ -29,17 +22,11 @@ class RazorpayPaymentGateway(order: Order, context: Activity): PaymentGateway(or
     private fun startPayment() {
         val co = Checkout()
         co.setKeyID(order.apikey)
-        try {
-            var options = getParameters()
-            co.open(context, options)
-        }catch (e: Exception){
-            Toast.makeText(context,"Error in payment: "+ e.message,Toast.LENGTH_LONG).show()
-            e.printStackTrace()
-        }
+        co.open(context, getParameters())
     }
 
     private fun getParameters(): JSONObject {
-        val payloadHelper = PayloadHelper("INR", 1000, order.orderId)
+        val payloadHelper = PayloadHelper("INR", order.amount, order.orderId)
         payloadHelper.name = order.name
         payloadHelper.prefillEmail = order.email
         payloadHelper.prefillContact = order.phone
@@ -63,35 +50,11 @@ class RazorpayPaymentGateway(order: Order, context: Activity): PaymentGateway(or
         return payloadHelper.getJson()
     }
 
-    override fun onPaymentSuccess(p0: String?, p1: PaymentData?) {
+    override fun onPaymentSuccess(razorpayPaymentId: String?, PaymentData: PaymentData) {
         paymentGatewayListener?.onPaymentSuccess()
-        try{
-            alertDialogBuilder.setMessage("Payment Successful : Payment ID: $p0\nPayment Data: ${p1?.data}")
-            alertDialogBuilder.show()
-        }catch (e: Exception){
-            e.printStackTrace()
-        }
     }
 
-    override fun onPaymentError(p0: Int, p1: String?, p2: PaymentData?) {
-        paymentGatewayListener?.onPaymentError(p1)
-        try {
-            alertDialogBuilder.setMessage("Payment Failed : Payment Data: ${p2?.data}")
-            alertDialogBuilder.show()
-        }catch (e: Exception){
-            e.printStackTrace()
-        }
-    }
-
-    override fun onExternalWalletSelected(p0: String?, p1: PaymentData?) {
-        try{
-            alertDialogBuilder.setMessage("External wallet was selected : Payment Data: ${p1?.data}")
-            alertDialogBuilder.show()
-        }catch (e: Exception){
-            e.printStackTrace()
-        }
-    }
-
-    override fun onClick(dialog: DialogInterface?, which: Int) {
+    override fun onPaymentError(errorCode: Int, response: String?) {
+        paymentGatewayListener?.onPaymentError(response)
     }
 }
