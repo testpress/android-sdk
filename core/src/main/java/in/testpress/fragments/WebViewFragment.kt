@@ -12,6 +12,7 @@ import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -144,6 +145,7 @@ class WebViewFragment(
 
     private fun loadContentInWebView(url: String = "", data: String = "") {
         if (url.isNotEmpty()){
+            Log.d("TAG", "loadContentInWebView: $url")
             webView.loadUrl(url)
         } else if (data.isNotEmpty()){
             webView.loadData(data,"text/html", null)
