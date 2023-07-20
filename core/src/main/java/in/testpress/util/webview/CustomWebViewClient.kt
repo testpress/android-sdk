@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressException
 import `in`.testpress.fragments.WebViewFragment
 import `in`.testpress.util.extension.openUrlInBrowser
 import android.graphics.Bitmap
+import android.util.Log
 import android.webkit.*
 
 class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
@@ -12,6 +13,7 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
         view: WebView?,
         request: WebResourceRequest?
     ): Boolean {
+        Log.d("TAG", "shouldOverrideUrlLoading: ${request?.url}")
         return if (shouldLoadInWebView(request?.url.toString())) {
             false
         } else {
