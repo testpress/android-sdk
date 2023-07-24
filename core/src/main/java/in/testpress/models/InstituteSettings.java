@@ -42,6 +42,7 @@ public class InstituteSettings {
     private boolean isCustomMeetingUIEnabled;
     private Integer maxAllowedDownloadedVideos;
     private String whiteLabeledHostUrl;
+    private String currentPaymentApp;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -365,5 +366,14 @@ public class InstituteSettings {
 
     public boolean isInstituteUrl(String url) {
         return url.contains(baseUrl) || url.contains(whiteLabeledHostUrl);
+    }
+
+    public String getCurrentPaymentApp() {
+        return currentPaymentApp;
+    }
+
+    public InstituteSettings setCurrentPaymentApp(String currentPaymentApp) {
+        this.currentPaymentApp = currentPaymentApp;
+        return this;
     }
 }
