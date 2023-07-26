@@ -210,7 +210,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             initializeSectionsFilter();
         }
 
-        if (exam.hasMultipleLanguages()) {
+        if (exam != null && exam.hasMultipleLanguages()) {
             initializeLanguageFilter();
         }
     }
@@ -1107,7 +1107,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                                 progressDialog.dismiss();
                             }
                             TestFragment.this.attempt = attempt;
-                            showReview(ReviewStatsActivity.createIntent(getActivity(), exam, attempt));
+                            showReview(attempt);
                         }
 
                         @Override
@@ -1120,6 +1120,15 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             );
                         }
                     });
+        }
+    }
+
+    private void showReview(Attempt attempt) {
+        if (exam != null) {
+            showReview(ReviewStatsActivity.createIntent(getActivity(), exam, attempt));
+        } else {
+            showReview(ReviewStatsActivity.createIntent(getActivity(), attempt));
+            requireActivity().finish();
         }
     }
 
