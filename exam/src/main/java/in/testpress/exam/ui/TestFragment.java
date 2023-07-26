@@ -156,10 +156,12 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     private void logEvent(String name) {
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("exam_name", exam.getTitle());
-        params.put("id", exam.getId());
-        eventsTrackerFacade.logEvent(name, params);
+        if (exam != null){
+            HashMap<String, Object> params = new HashMap<>();
+            params.put("exam_name", exam.getTitle());
+            params.put("id", exam.getId());
+            eventsTrackerFacade.logEvent(name, params);
+        }
     }
 
     private void initializeAttemptAndExamVariables(Bundle savedInstanceState) {
@@ -204,7 +206,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         initializeListeners();
         initializeQuestionsListAdapter();
 
-        if (attempt.hasSections() || exam.getTemplateType() == 2) {
+        if (exam != null && (attempt.hasSections() || exam.getTemplateType() == 2)) {
             initializeSectionsFilter();
         }
 
@@ -741,7 +743,9 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             endExam();
             return;
         }
-        initializeSectionSpinner();
+        if (exam != null){
+            initializeSectionSpinner();
+        }
 
         for (int i = 0; i< attemptItemList.size(); i++) {
             attemptItemList.get(i).setIndex(i + 1);
@@ -855,7 +859,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     private boolean isNonSectionalOrIBPSExam() {
-        return exam.getTemplateType() == 2 || attempt.hasNoSectionalLock();
+        return true;
     }
 
     private void saveResult(final int position, final Action action) {

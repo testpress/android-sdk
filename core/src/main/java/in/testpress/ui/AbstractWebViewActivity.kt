@@ -41,7 +41,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
 
     private fun initializeWebViewFragment() {
         webViewFragment = WebViewFragment(
-            url = urlPath,
+            data = urlPath,
             webViewFragmentSettings = getWebViewFragmentSettings()
         )
         webViewFragment.setListener(this)
@@ -71,13 +71,13 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
         fun createIntent(
             currentContext: Context,
             title: String,
-            urlPath: String,
+            data: String,
             isSSORequired: Boolean,
             activityToOpen: Class<out AbstractWebViewActivity>
         ): Intent {
             return Intent(currentContext, activityToOpen).apply {
                 putExtra(TITLE, title)
-                putExtra(URL_TO_OPEN, urlPath)
+                putExtra(URL_TO_OPEN, data)
                 putExtra(IS_SSO_REQUIRED, isSSORequired)
             }
         }
