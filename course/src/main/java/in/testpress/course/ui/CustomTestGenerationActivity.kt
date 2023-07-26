@@ -1,22 +1,18 @@
 package `in`.testpress.course.ui
 
-import `in`.testpress.BuildConfig
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.course.R
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.ui.TestFragment
 import `in`.testpress.models.greendao.Attempt
-import `in`.testpress.models.greendao.AttemptSection
 import `in`.testpress.ui.AbstractWebViewActivity
 import `in`.testpress.util.BaseJavaScriptInterface
 import android.os.Bundle
-import android.util.Log
 import android.webkit.JavascriptInterface
 import android.widget.Toast
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
+import android.widget.Toolbar
+import androidx.core.view.isVisible
 
 
 class CustomTestGenerationActivity: AbstractWebViewActivity() {
@@ -40,12 +36,23 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
     }
 
     private fun startExam(attempt: Attempt) {
+        findViewById<Toolbar>(R.id.toolbar).isVisible = false
         val testFragment = TestFragment()
         val bundle  = Bundle()
         bundle.putParcelable("attempt", attempt)
         testFragment.arguments = bundle
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, testFragment).commitAllowingStateLoss()
+    }
+
+    override fun onBackPressed() {
+        val testFragment: TestFragment? =
+            (supportFragmentManager.findFragmentById(R.id.fragment_container) as TestFragment?)
+        if (testFragment != null) {
+            testFragment.showEndExamAlert()
+        } else {
+            super.onBackPressed()
+        }
     }
 
 }
@@ -55,7 +62,7 @@ class JavaScriptInterface(val activity: CustomTestGenerationActivity):BaseJavaSc
     @JavascriptInterface
     fun onExamEndCallBack(jsonData: String) {
         Toast.makeText(activity, jsonData, Toast.LENGTH_SHORT).show()
-        activity.getAttempt("41546")
+        activity.getAttempt("41557")
     }
 
 }

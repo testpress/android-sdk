@@ -9,6 +9,7 @@ import androidx.annotation.StringRes;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;

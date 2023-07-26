@@ -213,6 +213,9 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         if (exam != null && exam.hasMultipleLanguages()) {
             initializeLanguageFilter();
         }
+        if (exam == null) {
+            view.findViewById(R.id.timer).setVisibility(View.GONE);
+        }
     }
 
     private void initializeLanguageFilter() {
@@ -616,32 +619,36 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     private void endExamAlert() {
-        AlertDialog.Builder dialogBuilder =
-                new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
-                        .setTitle(R.string.testpress_end_title)
-                        .setMessage(R.string.testpress_end_message);
+        if (exam == null){
+            showEndExamAlert();
+        } else {
+            AlertDialog.Builder dialogBuilder =
+                    new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
+                            .setTitle(R.string.testpress_end_title)
+                            .setMessage(R.string.testpress_end_message);
 
-        if (attempt.hasNoSectionalLock() || sections.size() < 2) {
-            dialogBuilder
-                    .setPositiveButton(R.string.testpress_end, new DialogInterface.OnClickListener() {
+            if (attempt.hasNoSectionalLock() || sections.size() < 2) {
+                dialogBuilder
+                        .setPositiveButton(R.string.testpress_end, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                endExam();
+                            }
+                        });
+            }
+            endExamAlertDialog = dialogBuilder
+                    .setNegativeButton(R.string.testpress_pause, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            endExam();
+                            pauseExam();
                         }
-                    });
-        }
-        endExamAlertDialog = dialogBuilder
-                .setNegativeButton(R.string.testpress_pause, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        pauseExam();
-                    }
-                })
-                .setNeutralButton(R.string.testpress_cancel, null)
-                .show();
+                    })
+                    .setNeutralButton(R.string.testpress_cancel, null)
+                    .show();
 
-        endExamAlertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                .setTextColor(ContextCompat.getColor(getActivity(), R.color.testpress_red_incorrect));
+            endExamAlertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                    .setTextColor(ContextCompat.getColor(getActivity(), R.color.testpress_red_incorrect));
+        }
     }
 
     void showPauseExamAlert() {
@@ -655,6 +662,21 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                                         pauseExam();
                                     }
                         })
+                        .setNegativeButton(R.string.testpress_cancel, null)
+                        .show();
+    }
+
+    public void showEndExamAlert() {
+        pauseExamAlertDialog =
+                new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
+                        .setMessage("Are you sure? Want to end the exam")
+                        .setPositiveButton("Yes, End!",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        endExam();
+                                    }
+                                })
                         .setNegativeButton(R.string.testpress_cancel, null)
                         .show();
     }
