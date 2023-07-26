@@ -60,9 +60,9 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
 class JavaScriptInterface(val activity: CustomTestGenerationActivity):BaseJavaScriptInterface(activity) {
 
     @JavascriptInterface
-    fun onExamEndCallBack(jsonData: String) {
+    fun startCustomTest(jsonData: String) {
         Toast.makeText(activity, jsonData, Toast.LENGTH_SHORT).show()
-        activity.getAttempt("41557")
+        activity.getAttempt(jsonData)
     }
 
 }
