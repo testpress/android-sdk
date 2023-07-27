@@ -11,7 +11,7 @@ import `in`.testpress.models.InstituteSettings
 class PaymentGatewayFactory {
     fun create(order: Order, activity: Activity): PaymentGateway {
         val instituteSettings: InstituteSettings = TestpressSdk.getTestpressSession(activity)!!.instituteSettings
-        if (instituteSettings.currentPaymentApp.lowercase() == "razorpay")
+        if (instituteSettings.currentPaymentApp != null && instituteSettings.currentPaymentApp.lowercase() == "razorpay")
             return RazorpayPaymentGateway(order, activity)
         return PayuPaymentGateway(order, activity)
     }
