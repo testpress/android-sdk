@@ -144,4 +144,5 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
         setEmptyText(R.string.testpress_no_courses, R.string.testpress_no_courses_description,
                     R.drawable.ic_error_outline_black_18dp);
     }
+
 }

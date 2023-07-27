@@ -53,7 +53,7 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
 
     override fun onBackPressed() {
         val testFragment: TestFragment? =
-            (supportFragmentManager.findFragmentById(R.id.fragment_container) as TestFragment?)
+            (supportFragmentManager.findFragmentById(R.id.fragment_container) as? TestFragment?)
         if (testFragment != null) {
             testFragment.showEndExamAlert()
         } else {
