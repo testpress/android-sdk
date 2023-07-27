@@ -25,7 +25,13 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
         val apiClient = TestpressExamApiClient(this)
         apiClient.startAttempt("api/v2.2/attempts/$attemptId/start/").enqueue(object : TestpressCallback<Attempt>(){
             override fun onSuccess(result: Attempt?) {
-                startExam(result!!)
+                // Attempt we are receiving here does not contain remaining time because its
+                // infinite timing exam attempt. As our app doesn't support exams with infinite
+                // timing, so we are set 24 hours for remainingTime in this attempt.
+                result?.let {
+                    it.remainingTime = "24:00:00"
+                    startExam(result)
+                }
             }
 
             override fun onException(exception: TestpressException?) {
