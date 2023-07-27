@@ -1,14 +1,19 @@
 package `in`.testpress.course.ui
 
-import `in`.testpress.exam.ui.ReviewStatsActivity
+import `in`.testpress.core.TestpressCallback
+import `in`.testpress.core.TestpressException
+import `in`.testpress.course.R
+import `in`.testpress.exam.api.TestpressExamApiClient
+import `in`.testpress.exam.ui.TestFragment
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.ui.AbstractWebViewActivity
 import `in`.testpress.util.BaseJavaScriptInterface
-import android.app.Activity
+import android.os.Bundle
 import android.webkit.JavascriptInterface
 import android.widget.Toast
-import org.json.JSONException
-import org.json.JSONObject
+import android.widget.Toolbar
+import androidx.core.view.isVisible
+
 
 class CustomTestGenerationActivity: AbstractWebViewActivity() {
 
@@ -16,48 +21,58 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
         webViewFragment.addJavascriptInterface(JavaScriptInterface(this),"AndroidInterface")
     }
 
+    fun getAttempt(attemptId: String) {
+        val apiClient = TestpressExamApiClient(this)
+        apiClient.startAttempt("api/v2.2/attempts/$attemptId/start/")
+            .enqueue(object : TestpressCallback<Attempt>() {
+                override fun onSuccess(result: Attempt?) {
+                    // Attempt we are receiving here does not contain remaining time because its
+                    // infinite timing exam attempt. As our app doesn't support exams with infinite
+                    // timing, so we are set 24 hours for remainingTime in this attempt.
+                    result?.let {
+                        it.remainingTime = "24:00:00"
+                        startExam(result)
+                    }
+                }
+
+                override fun onException(exception: TestpressException) {
+                    Toast.makeText(
+                        this@CustomTestGenerationActivity,
+                        "Something went wrong, Please try again later",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    finish()
+                }
+            })
+    }
+
+    private fun startExam(attempt: Attempt) {
+        findViewById<Toolbar>(R.id.toolbar).isVisible = false
+        val testFragment = TestFragment()
+        val bundle  = Bundle()
+        bundle.putParcelable("attempt", attempt)
+        testFragment.arguments = bundle
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, testFragment).commitAllowingStateLoss()
+    }
+
+    override fun onBackPressed() {
+        val testFragment: TestFragment? =
+            (supportFragmentManager.findFragmentById(R.id.fragment_container) as? TestFragment?)
+        if (testFragment != null) {
+            testFragment.showEndExamAlert()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
 }
 
-class JavaScriptInterface(val activity: Activity):BaseJavaScriptInterface(activity) {
+class JavaScriptInterface(val activity: CustomTestGenerationActivity):BaseJavaScriptInterface(activity) {
 
     @JavascriptInterface
-    fun onExamEndCallBack(jsonData: String) {
-        try {
-            val attempt = parseJsonToAttempt(jsonData)
-            activity.finish()
-            activity.startActivity(ReviewStatsActivity.createIntent(activity, attempt))
-        } catch (e: JSONException) {
-            activity.finish()
-            Toast.makeText(activity, "Review Not available for this exam", Toast.LENGTH_SHORT)
-                .show()
-        }
+    fun startCustomTest(attemptId: String) {
+        activity.getAttempt(attemptId)
     }
 
-    private fun parseJsonToAttempt(json: String): Attempt {
-        try {
-            val jsonObject = JSONObject(json)
-            val attempt = Attempt()
-            attempt.url = jsonObject.optString("url")
-            attempt.id = jsonObject.optLong("id")
-            attempt.date = jsonObject.optString("date")
-            attempt.totalQuestions = jsonObject.optInt("total_questions")
-            attempt.score = jsonObject.optString("score")
-            attempt.reviewUrl = jsonObject.optString("review_url")
-            attempt.questionsUrl = jsonObject.optString("questions_url")
-            attempt.correctCount = jsonObject.optInt("correct_count")
-            attempt.incorrectCount = jsonObject.optInt("incorrect_count")
-            attempt.lastStartedTime = jsonObject.optString("last_started_time")
-            attempt.remainingTime = jsonObject.optString("remaining_time")
-            attempt.timeTaken = jsonObject.optString("time_taken")
-            attempt.state = jsonObject.optString("state")
-            attempt.speed = jsonObject.optInt("speed")
-            attempt.accuracy = jsonObject.optInt("accuracy")
-            attempt.percentage = jsonObject.optString("percentage")
-            attempt.lastViewedQuestionId = jsonObject.optInt("last_viewed_question_id")
-            attempt.reviewPdf = jsonObject.optString("review_pdf")
-            return attempt
-        } catch (e: JSONException) {
-            throw e
-        }
-    }
 }

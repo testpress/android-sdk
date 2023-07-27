@@ -243,7 +243,7 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
 
     private String getMarksHtml(AttemptQuestion attemptQuestion){
         String marksHtml = "<div class='marks-wrapper'>";
-        String marks = exam.getVariableMarkPerQuestion() ? attemptQuestion.getMarks() : exam.getMarkPerQuestion();
+        String marks = getQuestionMarks(attemptQuestion);
         if (marks != null && !marks.equals("0.00")){
             marksHtml +=  "<div class='positive-marks'>" +
                     "<div class='label'>Marks</div>" +
@@ -252,7 +252,7 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
                     "</div>";
         }
 
-        String negativeMarks = exam.getVariableMarkPerQuestion() ? attemptQuestion.getNegativeMarks() : exam.getNegativeMarks();
+        String negativeMarks = getQuestionNegativeMarks(attemptQuestion);
 
         if (negativeMarks != null && !negativeMarks.equals("0.00")){
             marksHtml +=  "<div class='negative-marks'>" +
@@ -263,6 +263,22 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
 
         marksHtml += "</div>";
         return marksHtml;
+    }
+
+    private String getQuestionMarks(AttemptQuestion attemptQuestion) {
+        if (exam != null){
+            return exam.getVariableMarkPerQuestion() ? attemptQuestion.getMarks() : exam.getMarkPerQuestion();
+        } else {
+            return attemptQuestion.getMarks();
+        }
+    }
+
+    private String getQuestionNegativeMarks(AttemptQuestion attemptQuestion) {
+        if (exam != null){
+            return exam.getVariableMarkPerQuestion() ? attemptQuestion.getNegativeMarks() : exam.getNegativeMarks();
+        } else {
+            return attemptQuestion.getNegativeMarks();
+        }
     }
     
     @NotNull
