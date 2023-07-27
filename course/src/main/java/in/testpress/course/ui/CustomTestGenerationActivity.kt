@@ -23,22 +23,27 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
 
     fun getAttempt(attemptId: String) {
         val apiClient = TestpressExamApiClient(this)
-        apiClient.startAttempt("api/v2.2/attempts/$attemptId/start/").enqueue(object : TestpressCallback<Attempt>(){
-            override fun onSuccess(result: Attempt?) {
-                // Attempt we are receiving here does not contain remaining time because its
-                // infinite timing exam attempt. As our app doesn't support exams with infinite
-                // timing, so we are set 24 hours for remainingTime in this attempt.
-                result?.let {
-                    it.remainingTime = "24:00:00"
-                    startExam(result)
+        apiClient.startAttempt("api/v2.2/attempts/$attemptId/start/")
+            .enqueue(object : TestpressCallback<Attempt>() {
+                override fun onSuccess(result: Attempt?) {
+                    // Attempt we are receiving here does not contain remaining time because its
+                    // infinite timing exam attempt. As our app doesn't support exams with infinite
+                    // timing, so we are set 24 hours for remainingTime in this attempt.
+                    result?.let {
+                        it.remainingTime = "24:00:00"
+                        startExam(result)
+                    }
                 }
-            }
 
-            override fun onException(exception: TestpressException?) {
-                Toast.makeText(this@CustomTestGenerationActivity,"Not able to start exam",Toast.LENGTH_SHORT).show()
-                finish()
-            }
-        })
+                override fun onException(exception: TestpressException) {
+                    Toast.makeText(
+                        this@CustomTestGenerationActivity,
+                        "Something went wrong, Please try again later",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    finish()
+                }
+            })
     }
 
     private fun startExam(attempt: Attempt) {
