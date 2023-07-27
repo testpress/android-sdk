@@ -106,7 +106,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         if (getCourse() != null && isItemsEmpty()) {
             showLoadingPlaceholder();
         }
-        //setHasOptionsMenu(isCustomTestGenerationEnabled());
+        setHasOptionsMenu(isCustomTestGenerationEnabled());
     }
 
     private void fetchCourseAndShowChapters(String courseId) {
@@ -204,24 +204,24 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         swipeRefreshLayout.setEnabled(true);
     }
 
-//    @Override
-//    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-//        inflater.inflate(R.menu.custom_test_generation, menu);
-//        super.onCreateOptionsMenu(menu, inflater);
-//    }
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.custom_test_generation, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
-//    private boolean isCustomTestGenerationEnabled() {
-//        return parentId == null && course.getAllowCustomTestGeneration() != null && course.getAllowCustomTestGeneration();
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        if (item.getItemId() == R.id.custom_test_icon) {
-//            openCustomTestGenerationActivity();
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
+    private boolean isCustomTestGenerationEnabled() {
+        return parentId == null && course.getAllowCustomTestGeneration() != null && course.getAllowCustomTestGeneration();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.custom_test_icon) {
+            openCustomTestGenerationActivity();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected AbstractDao<Chapter, Long> getDao() {

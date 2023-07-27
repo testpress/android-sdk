@@ -119,8 +119,8 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
     }
 
     private void authenticate(String userId, String accessToken, TestpressSdk.Provider provider) {
-        InstituteSettings instituteSettings = new InstituteSettings("https://7bd0-183-82-178-197.ngrok-free.app");
-        instituteSettings.setWhiteLabeledHostUrl("https://7bd0-183-82-178-197.ngrok-free.app");
+        InstituteSettings instituteSettings = new InstituteSettings("https://sandbox.testpress.in");
+        instituteSettings.setWhiteLabeledHostUrl("https://sandbox.testpress.in");
         TestpressSdk.initialize(this, instituteSettings, userId, accessToken, provider,
                 new TestpressCallback<TestpressSession>() {
                     @Override

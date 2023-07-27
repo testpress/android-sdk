@@ -266,23 +266,8 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                                                 CustomTestGenerationActivity.Companion.createIntent(
                                                         CourseSampleActivity.this,
                                                         "Custom Module",
-                                                        "<html>\n" +
-                                                                "<head>\n" +
-                                                                "    <title>Android JavaScript Sample</title>\n" +
-                                                                "</head>\n" +
-                                                                "<body>\n" +
-                                                                "    <h1>Android JavaScript Sample</h1>\n" +
-                                                                "    <button onclick=\"showMessage()\">Click Me</button>\n" +
-                                                                "\n" +
-                                                                "    <script>\n" +
-                                                                "        // Function to call the Android method and display a toast\n" +
-                                                                "        function showMessage() {\n" +
-                                                                "            AndroidInterface.onExamEndCallBack('Hello from JavaScript!');\n" +
-                                                                "        }\n" +
-                                                                "    </script>\n" +
-                                                                "</body>\n" +
-                                                                "</html>",
-                                                        false,
+                                                        "/courses/"+text+"/custom_test_generation/",
+                                                        true,
                                                         CustomTestGenerationActivity.class
                                                 )
                                         );
