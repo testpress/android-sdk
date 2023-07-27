@@ -881,7 +881,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     private boolean isNonSectionalOrIBPSExam() {
-        return true;
+        return exam != null && (exam.getTemplateType() == 2 || attempt.hasNoSectionalLock());
     }
 
     private void saveResult(final int position, final Action action) {
