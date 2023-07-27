@@ -71,9 +71,8 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
 class JavaScriptInterface(val activity: CustomTestGenerationActivity):BaseJavaScriptInterface(activity) {
 
     @JavascriptInterface
-    fun startCustomTest(jsonData: String) {
-        Toast.makeText(activity, jsonData, Toast.LENGTH_SHORT).show()
-        activity.getAttempt(jsonData)
+    fun startCustomTest(attemptId: String) {
+        activity.getAttempt(attemptId)
     }
 
 }

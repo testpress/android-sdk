@@ -266,7 +266,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                                                 CustomTestGenerationActivity.Companion.createIntent(
                                                         CourseSampleActivity.this,
                                                         "Custom Module",
-                                                        "/courses/"+text+"/custom_test_generation/",
+                                                        "/courses/custom_test_generation/?course_id="+inputText,
                                                         true,
                                                         CustomTestGenerationActivity.class
                                                 )
