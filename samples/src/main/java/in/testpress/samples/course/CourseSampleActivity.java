@@ -249,7 +249,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
     }
 
     private void launchCustomTestGenerationActivity() {
-        ViewUtils.showInputDialogBox(CourseSampleActivity.this, "Enter Chapter slug",
+        ViewUtils.showInputDialogBox(CourseSampleActivity.this, "Enter Chapter ID",
                 new ViewUtils.OnInputCompletedListener() {
                     @Override
                     public void onInputComplete(String inputText) {
