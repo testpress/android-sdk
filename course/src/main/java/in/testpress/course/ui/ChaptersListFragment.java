@@ -233,7 +233,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
                 CustomTestGenerationActivity.Companion.createIntent(
                         requireContext(),
                         "Custom Module",
-                        "/courses/"+course.getSlug()+"/custom_test_generation/",
+                        "/courses/custom_test_generation/?course_id="+courseId,
                         true,
                         CustomTestGenerationActivity.class
                 )
