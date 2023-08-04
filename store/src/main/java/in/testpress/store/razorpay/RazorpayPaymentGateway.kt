@@ -10,7 +10,7 @@ import org.json.JSONObject
 import `in`.testpress.store.network.StoreApiClient
 
 
-class RazorpayPaymentGateway(order: Order, context: Activity): PaymentGateway(order, context), PaymentResultListener {
+class RazorpayPaymentGateway(order: Order, context: Activity): PaymentGateway(order, context) {
     val instituteSettings: InstituteSettings = TestpressSdk.getTestpressSession(context)!!.instituteSettings
     val redirectURL = instituteSettings.baseUrl + StoreApiClient.RAZORPAY_PAYMENT_RESPONSE_PATH
 
@@ -48,13 +48,5 @@ class RazorpayPaymentGateway(order: Order, context: Activity): PaymentGateway(or
         payloadHelper.image = instituteSettings.appToolbarLogo
         payloadHelper.sendSmsHash = true
         return payloadHelper.getJson()
-    }
-
-    override fun onPaymentSuccess(razorpayPaymentId: String?) {
-        paymentGatewayListener?.onPaymentSuccess()
-    }
-
-    override fun onPaymentError(errorCode: Int, response: String?) {
-        paymentGatewayListener?.onPaymentError(response)
     }
 }
