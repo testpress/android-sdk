@@ -352,7 +352,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         refreshOrderStatus();
     }
 
-    private void showPaymentFailedScreen() {
+    void showPaymentFailedScreen() {
         progressBar.setVisibility(View.GONE);
         Intent intent = new Intent(this, PaymentFailureActivity.class);
         startActivityForResult(intent, STORE_REQUEST_CODE);
