@@ -49,12 +49,4 @@ class RazorpayPaymentGateway(order: Order, context: Activity): PaymentGateway(or
         payloadHelper.sendSmsHash = true
         return payloadHelper.getJson()
     }
-
-    override fun onPaymentSuccess(razorpayPaymentId: String?) {
-        paymentGatewayListener?.onPaymentSuccess()
-    }
-
-    override fun onPaymentError(errorCode: Int, response: String?) {
-        paymentGatewayListener?.onPaymentError(response)
-    }
 }

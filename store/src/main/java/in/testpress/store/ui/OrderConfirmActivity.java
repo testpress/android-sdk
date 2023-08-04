@@ -43,13 +43,16 @@ import in.testpress.util.FBEventsTrackerFacade;
 import in.testpress.util.TextWatcherAdapter;
 import in.testpress.util.UIUtils;
 
+import com.razorpay.PaymentResultListener;
+
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 import static in.testpress.store.TestpressStore.PAYMENT_SUCCESS;
 import static in.testpress.store.TestpressStore.PAYMENT_FAILURE;
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
 
-public class OrderConfirmActivity extends BaseToolBarActivity implements PaymentGatewayListener {
+
+public class OrderConfirmActivity extends BaseToolBarActivity implements PaymentGatewayListener, PaymentResultListener {
 
     public static final String ORDER = "order";
     private static final String TAG = "OrderConfirmActivity";
@@ -201,9 +204,10 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         apiClient.orderConfirm(order)
                 .enqueue(new TestpressCallback<Order>() {
                     @Override
-                    public void onSuccess(final Order order) {
+                    public void onSuccess(final Order confirmedOrder) {
                         progressBar.setVisibility(View.GONE);
-                        PaymentGateway paymentGateway = new PaymentGatewayFactory().create(order, OrderConfirmActivity.this);
+                        order.setOrderId(confirmedOrder.getOrderId()); // orderId for Razorpay order gets assigned by Razorpay on confirming
+                        PaymentGateway paymentGateway = new PaymentGatewayFactory().create(confirmedOrder, OrderConfirmActivity.this);
                         paymentGateway.setPaymentGatewayListener(OrderConfirmActivity.this);
                         paymentGateway.showPaymentPage();
                     }
@@ -343,7 +347,12 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         refreshOrderStatus();
     }
 
-    void showPaymentFailedScreen() {
+    @Override
+    public void onPaymentSuccess(String razorpayPaymentID) {
+        refreshOrderStatus();
+    }
+
+    private void showPaymentFailedScreen() {
         progressBar.setVisibility(View.GONE);
         Intent intent = new Intent(this, PaymentFailureActivity.class);
         startActivityForResult(intent, STORE_REQUEST_CODE);
@@ -359,6 +368,12 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     public void onPaymentError(String errorMessage) {
         logEvent(EventsTrackerFacade.PAYMENT_FAILURE);
         showPaymentFailedScreen();
+    }
+
+    @Override
+    public void onPaymentError(int razorpayErrorCode, String razorpayErrorResponse) {
+        progressBar.setVisibility(View.VISIBLE);
+        refreshOrderStatus();
     }
 
     @Override
