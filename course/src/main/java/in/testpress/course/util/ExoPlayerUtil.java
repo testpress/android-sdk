@@ -10,8 +10,15 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaCodec;
+import android.os.Build;
 import android.os.Handler;
+import android.os.Vibrator;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -58,6 +65,7 @@ import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.ExoTrackSelection;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
 
@@ -88,6 +96,7 @@ import in.testpress.util.CommonUtils;
 import in.testpress.util.InternetConnectivityChecker;
 import kotlin.Pair;
 
+import static android.content.Context.AUDIO_SERVICE;
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 import static androidx.mediarouter.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
@@ -159,6 +168,12 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private DefaultTrackSelector trackSelector;
     private DialogInterface.OnClickListener dialogOnClickListener;
     private VideoWatchDataRepository videoWatchDataRepository;
+    private ScaleGestureDetector scaleGestureDetector;
+    float lastTouchX = 0f;
+    float lastTouchY = 0f;
+    float posX = 0f;
+    float posY = 0f;
+    Vibrator vibrator;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition) {
@@ -214,6 +229,54 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         // set activity as portrait mode at first
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         activity.getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
+
+        vibrator  = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
+
+        playerView.setOnTouchListener(new OnTouchListener() {
+                                          @Override
+                                          public boolean onTouch(View view, MotionEvent motionEvent) {
+                                              if (fullscreen) {
+                                                  scaleGestureDetector.onTouchEvent(motionEvent);
+                                                  if (playerView.getResizeMode() == AspectRatioFrameLayout.RESIZE_MODE_ZOOM && scaleGesture.scaleFactor > 1.2){
+                                                      switch (motionEvent.getAction()) {
+                                                          case MotionEvent.ACTION_DOWN:
+                                                              lastTouchX = motionEvent.getX();
+                                                              lastTouchY = motionEvent.getY();
+                                                              break;
+
+                                                          case MotionEvent.ACTION_MOVE:
+                                                                      float deltaX = motionEvent.getRawX() - lastTouchX;
+                                                                      float deltaY = motionEvent.getRawY() - lastTouchY;
+
+                                                                      // Calculate the new positions
+                                                                      float newPosX = posX + deltaX;
+                                                                      float newPosY = posY + deltaY;
+
+                                                                      // Calculate the maximum allowed translations
+                                                                      float maxPosX = (playerView.getVideoSurfaceView().getWidth() * scaleGesture.scaleFactor - playerView.getWidth()) / 2;
+                                                                      float maxPosY = (playerView.getVideoSurfaceView().getHeight() * scaleGesture.scaleFactor - playerView.getHeight()) / 2;
+                                                                      float minPosX = -maxPosX;
+                                                                      float minPosY = -maxPosY;
+
+                                                                      // Apply boundary checks
+                                                                      posX = Math.min(Math.max(newPosX, minPosX), maxPosX);
+                                                                      posY = Math.min(Math.max(newPosY, minPosY), maxPosY);
+
+                                                                      // Apply translations
+                                                                      playerView.getVideoSurfaceView().setTranslationX(posX);
+                                                                      playerView.getVideoSurfaceView().setTranslationY(posY);
+
+                                                                      lastTouchX = motionEvent.getRawX();
+                                                                      lastTouchY = motionEvent.getRawY();
+                                                              break;
+                                                      }
+                                                      return true;
+                                                  }
+                                              }
+                                              return false;
+                                          }
+                                      }
+        );
     }
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
@@ -296,6 +359,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             progressBar.setVisibility(View.VISIBLE);
             buildPlayer();
             initializeDoubleClickOverlay();
+            initializePinchToZoom();
         }
         preparePlayer();
         player.seekTo(getStartPositionInMilliSeconds());
@@ -366,6 +430,13 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                         youtubeOverlay.setVisibility(View.GONE);
                     }
                 });
+    }
+
+    private ScaleGesture scaleGesture;
+
+    private void initializePinchToZoom() {
+        scaleGesture = new ScaleGesture();
+        scaleGestureDetector = new ScaleGestureDetector(activity, scaleGesture);
     }
 
     private void preparePlayer() {
@@ -848,6 +919,44 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         }
 
         return -1;
+    }
+
+    private class ScaleGesture extends ScaleGestureDetector.SimpleOnScaleGestureListener{
+
+        Float  scaleFactor = 1.0f;
+
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            if (playerView.getResizeMode() == AspectRatioFrameLayout.RESIZE_MODE_ZOOM) {
+                scaleFactor *= detector.getScaleFactor();
+                scaleFactor = Math.max(1.0f, Math.min(scaleFactor,6.0f));
+                playerView.getVideoSurfaceView().setScaleX(scaleFactor);
+                playerView.getVideoSurfaceView().setScaleY(scaleFactor);
+            } else {
+                scaleFactor = detector.getScaleFactor();
+            }
+            return true;
+        }
+
+
+
+
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector) {
+            if (scaleFactor > 1 && scaleFactor < 1.2) {
+                vibrator.vibrate(100);
+                playerView.getVideoSurfaceView().setX(0);
+                playerView.getVideoSurfaceView().setY(0);
+                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
+            }else if (scaleFactor > 1){
+                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
+            } else {
+                vibrator.vibrate(100);
+                playerView.getVideoSurfaceView().setX(0);
+                playerView.getVideoSurfaceView().setY(0);
+                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
+            }
+        }
     }
 
 }
