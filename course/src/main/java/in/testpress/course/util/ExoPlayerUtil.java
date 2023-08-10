@@ -69,6 +69,7 @@ import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -124,6 +125,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private TrackSelectionDialog trackSelectionDialog;
     private YouTubeOverlay youtubeOverlay;
     List<String[]> watchedTimeRanges = new ArrayList<>();
+    private TextView pinchToZoomText;
 
 
     private Activity activity;
@@ -174,6 +176,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     float posX = 0f;
     float posY = 0f;
     Vibrator vibrator;
+    int moveCalled = 0;
+
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition) {
@@ -189,6 +193,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         fullscreenIcon = exoPlayerMainFrame.findViewById(R.id.exo_fullscreen_icon);
         progressBar = exoPlayerMainFrame.findViewById(R.id.exo_player_progress);
         errorMessageTextView = exoPlayerMainFrame.findViewById(R.id.error_message);
+        pinchToZoomText = exoPlayerMainFrame.findViewById(R.id.pinch_to_zoom_text);
         TestpressSession session = TestpressSdk.getTestpressSession(activity);
         if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
             setUserEmailOverlay();
@@ -232,45 +237,53 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
         vibrator  = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
 
+
+
         playerView.setOnTouchListener(new OnTouchListener() {
                                           @Override
                                           public boolean onTouch(View view, MotionEvent motionEvent) {
                                               if (fullscreen) {
                                                   scaleGestureDetector.onTouchEvent(motionEvent);
-                                                  if (playerView.getResizeMode() == AspectRatioFrameLayout.RESIZE_MODE_ZOOM && scaleGesture.scaleFactor > 1.2){
+                                                  if (scaleGesture.isDragEnabled) {
                                                       switch (motionEvent.getAction()) {
                                                           case MotionEvent.ACTION_DOWN:
                                                               lastTouchX = motionEvent.getX();
                                                               lastTouchY = motionEvent.getY();
-                                                              break;
+                                                              return false;
 
                                                           case MotionEvent.ACTION_MOVE:
-                                                                      float deltaX = motionEvent.getRawX() - lastTouchX;
-                                                                      float deltaY = motionEvent.getRawY() - lastTouchY;
+                                                              moveCalled = moveCalled + 1;
+                                                              if (moveCalled < 5){
+                                                                  return false;
+                                                              }
+                                                              float deltaX = motionEvent.getRawX() - lastTouchX;
+                                                              float deltaY = motionEvent.getRawY() - lastTouchY;
 
-                                                                      // Calculate the new positions
-                                                                      float newPosX = posX + deltaX;
-                                                                      float newPosY = posY + deltaY;
+                                                              // Calculate the new positions
+                                                              float newPosX = posX + deltaX;
+                                                              float newPosY = posY + deltaY;
 
-                                                                      // Calculate the maximum allowed translations
-                                                                      float maxPosX = (playerView.getVideoSurfaceView().getWidth() * scaleGesture.scaleFactor - playerView.getWidth()) / 2;
-                                                                      float maxPosY = (playerView.getVideoSurfaceView().getHeight() * scaleGesture.scaleFactor - playerView.getHeight()) / 2;
-                                                                      float minPosX = -maxPosX;
-                                                                      float minPosY = -maxPosY;
+                                                              // Calculate the maximum allowed translations
+                                                              float maxPosX = (playerView.getVideoSurfaceView().getWidth() * scaleGesture.scaleFactor - playerView.getWidth()) / 2;
+                                                              float maxPosY = (playerView.getVideoSurfaceView().getHeight() * scaleGesture.scaleFactor - playerView.getHeight()) / 2;
+                                                              float minPosX = -maxPosX;
+                                                              float minPosY = -maxPosY;
 
-                                                                      // Apply boundary checks
-                                                                      posX = Math.min(Math.max(newPosX, minPosX), maxPosX);
-                                                                      posY = Math.min(Math.max(newPosY, minPosY), maxPosY);
+                                                              // Apply boundary checks
+                                                              posX = Math.min(Math.max(newPosX, minPosX), maxPosX);
+                                                              posY = Math.min(Math.max(newPosY, minPosY), maxPosY);
 
-                                                                      // Apply translations
-                                                                      playerView.getVideoSurfaceView().setTranslationX(posX);
-                                                                      playerView.getVideoSurfaceView().setTranslationY(posY);
+                                                              // Apply translations
+                                                              playerView.getVideoSurfaceView().setTranslationX(posX);
+                                                              playerView.getVideoSurfaceView().setTranslationY(posY);
 
-                                                                      lastTouchX = motionEvent.getRawX();
-                                                                      lastTouchY = motionEvent.getRawY();
-                                                              break;
+                                                              lastTouchX = motionEvent.getRawX();
+                                                              lastTouchY = motionEvent.getRawY();
+                                                              return true;
+                                                          case MotionEvent.ACTION_UP:
+                                                              moveCalled = 0;
+                                                              return false;
                                                       }
-                                                      return true;
                                                   }
                                               }
                                               return false;
@@ -921,41 +934,78 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         return -1;
     }
 
+    //private boolean isDragEnable = false;
+    //private boolean isZoomToFit = false;
+
     private class ScaleGesture extends ScaleGestureDetector.SimpleOnScaleGestureListener{
 
-        Float  scaleFactor = 1.0f;
+        float scaleFactor = 1.0f;
+        boolean isDragEnabled = false;
+        boolean isZoomToFit = false;
 
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            if (playerView.getResizeMode() == AspectRatioFrameLayout.RESIZE_MODE_ZOOM) {
+            if (isZoomToFit) {
+                float pivotX = detector.getFocusX();
+                float pivotY = detector.getFocusY();
+
                 scaleFactor *= detector.getScaleFactor();
                 scaleFactor = Math.max(1.0f, Math.min(scaleFactor,6.0f));
+
                 playerView.getVideoSurfaceView().setScaleX(scaleFactor);
                 playerView.getVideoSurfaceView().setScaleY(scaleFactor);
+                playerView.getVideoSurfaceView().setPivotX(pivotX);
+                playerView.getVideoSurfaceView().setPivotY(pivotY);
             } else {
                 scaleFactor = detector.getScaleFactor();
+            }
+            if (scaleFactor > 1.2){
+                pinchToZoomText.setVisibility(View.VISIBLE);
+                DecimalFormat decimalFormat = new DecimalFormat("0.0x");
+                // Format the float value
+                String formattedValue = decimalFormat.format(scaleFactor);
+                pinchToZoomText.setText(formattedValue);
             }
             return true;
         }
 
-
-
-
         @Override
         public void onScaleEnd(ScaleGestureDetector detector) {
+            android.util.Log.d("TAG", "onScaleEnd: X "+detector.getCurrentSpanX());
+            android.util.Log.d("TAG", "onScaleEnd: Y "+detector.getCurrentSpanY());
             if (scaleFactor > 1 && scaleFactor < 1.2) {
+                playerView.getVideoSurfaceView().setScaleX(1.0f);
+                playerView.getVideoSurfaceView().setScaleY(1.0f);
+                isZoomToFit = true;
+                pinchToZoomText.setVisibility(View.VISIBLE);
+                pinchToZoomText.setText("Zoomed to fit");
+                isDragEnabled = false;
                 vibrator.vibrate(100);
                 playerView.getVideoSurfaceView().setX(0);
                 playerView.getVideoSurfaceView().setY(0);
-                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
-            }else if (scaleFactor > 1){
-                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
+                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
+            }else if (scaleFactor > 1.2){
+                isDragEnabled = true;
             } else {
+                isZoomToFit = false;
                 vibrator.vibrate(100);
+                pinchToZoomText.setVisibility(View.VISIBLE);
+                pinchToZoomText.setText("Original");
+                isDragEnabled = false;
+                playerView.getVideoSurfaceView().setScaleX(1.0f);
+                playerView.getVideoSurfaceView().setScaleY(1.0f);
                 playerView.getVideoSurfaceView().setX(0);
                 playerView.getVideoSurfaceView().setY(0);
                 playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
             }
+
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    pinchToZoomText.setVisibility(View.GONE);
+                }
+            }, 500);
         }
     }
 
