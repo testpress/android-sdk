@@ -13,6 +13,7 @@ import android.media.MediaCodec;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Vibrator;
+import androidx.transition.ChangeBounds;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -934,71 +935,66 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         return -1;
     }
 
-    //private boolean isDragEnable = false;
-    //private boolean isZoomToFit = false;
-
     private class ScaleGesture extends ScaleGestureDetector.SimpleOnScaleGestureListener{
 
         float scaleFactor = 1.0f;
         boolean isDragEnabled = false;
-        boolean isZoomToFit = false;
 
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            if (isZoomToFit) {
-                float pivotX = detector.getFocusX();
-                float pivotY = detector.getFocusY();
-
                 scaleFactor *= detector.getScaleFactor();
                 scaleFactor = Math.max(1.0f, Math.min(scaleFactor,6.0f));
-
                 playerView.getVideoSurfaceView().setScaleX(scaleFactor);
                 playerView.getVideoSurfaceView().setScaleY(scaleFactor);
-                playerView.getVideoSurfaceView().setPivotX(pivotX);
-                playerView.getVideoSurfaceView().setPivotY(pivotY);
-            } else {
-                scaleFactor = detector.getScaleFactor();
-            }
+
             if (scaleFactor > 1.2){
-                pinchToZoomText.setVisibility(View.VISIBLE);
                 DecimalFormat decimalFormat = new DecimalFormat("0.0x");
-                // Format the float value
                 String formattedValue = decimalFormat.format(scaleFactor);
-                pinchToZoomText.setText(formattedValue);
+                updateTextView(formattedValue);
             }
             return true;
         }
 
         @Override
         public void onScaleEnd(ScaleGestureDetector detector) {
-            android.util.Log.d("TAG", "onScaleEnd: X "+detector.getCurrentSpanX());
-            android.util.Log.d("TAG", "onScaleEnd: Y "+detector.getCurrentSpanY());
             if (scaleFactor > 1 && scaleFactor < 1.2) {
-                playerView.getVideoSurfaceView().setScaleX(1.0f);
-                playerView.getVideoSurfaceView().setScaleY(1.0f);
-                isZoomToFit = true;
-                pinchToZoomText.setVisibility(View.VISIBLE);
-                pinchToZoomText.setText("Zoomed to fit");
+                vibrator.vibrate(50);
+                updateTextView("Zoomed to fit");
+                resetSurfaceView();
+                resetScaleFactor();
                 isDragEnabled = false;
-                vibrator.vibrate(100);
-                playerView.getVideoSurfaceView().setX(0);
-                playerView.getVideoSurfaceView().setY(0);
                 playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
             }else if (scaleFactor > 1.2){
                 isDragEnabled = true;
+                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
             } else {
-                isZoomToFit = false;
-                vibrator.vibrate(100);
-                pinchToZoomText.setVisibility(View.VISIBLE);
-                pinchToZoomText.setText("Original");
+                vibrator.vibrate(50);
+                updateTextView("Original");
+                resetSurfaceView();
+                resetScaleFactor();
                 isDragEnabled = false;
-                playerView.getVideoSurfaceView().setScaleX(1.0f);
-                playerView.getVideoSurfaceView().setScaleY(1.0f);
-                playerView.getVideoSurfaceView().setX(0);
-                playerView.getVideoSurfaceView().setY(0);
-                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
+                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT);
             }
+            hideTextViewAfter500Ms();
+        }
 
+        private void updateTextView(String text) {
+            pinchToZoomText.setVisibility(View.VISIBLE);
+            pinchToZoomText.setText(text);
+        }
+
+        private void resetSurfaceView() {
+            playerView.getVideoSurfaceView().setScaleX(1.0f);
+            playerView.getVideoSurfaceView().setScaleY(1.0f);
+            playerView.getVideoSurfaceView().setX(0);
+            playerView.getVideoSurfaceView().setY(0);
+        }
+
+        private void resetScaleFactor() {
+            scaleFactor = 1.0f;
+        }
+
+        private void hideTextViewAfter500Ms() {
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
