@@ -1,7 +1,6 @@
 package in.testpress.course.ui;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,7 +18,6 @@ import java.util.List;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
-import in.testpress.core.TestpressSession;
 import in.testpress.course.R;
 import in.testpress.course.helpers.CourseLastSyncedDate;
 import in.testpress.models.InstituteSettings;
@@ -56,7 +54,7 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setHasOptionsMenu(isCustomTestGenerationEnabled());
+        setHasOptionsMenu(instituteSettings.getEnableCustomTest());
     }
 
     private void initializeTags() {
@@ -163,11 +161,6 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
                     R.drawable.ic_error_outline_black_18dp);
     }
 
-    private boolean isCustomTestGenerationEnabled() {
-        //return instituteSettings.getAllowCustomTestGeneration() != null && course.getAllowCustomTestGeneration();
-        return true;
-    }
-
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.custom_test_generation, menu);
@@ -188,7 +181,7 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
                 CustomTestGenerationActivity.Companion.createIntent(
                         requireContext(),
                         "Custom Module",
-                        "/courses/custom_test_generation/?"+constrictQueryParamForAvailableCourses(),
+                        "/courses/custom_test_generation/?"+constrictQueryParamForAvailableCourses()+"%26testpress_app=android",
                         true,
                         CustomTestGenerationActivity.class
                 )
@@ -196,12 +189,10 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
     }
 
     private String constrictQueryParamForAvailableCourses(){
-        Log.d("TAG", getCourses().size()+"");
         StringBuilder queryParam = new StringBuilder();
         for (Course course : getCourses()) {
             queryParam.append("course_id=").append(course.getId()).append("%26");
         }
-        Log.d("TAG", queryParam.toString());
         return queryParam.toString();
     }
 

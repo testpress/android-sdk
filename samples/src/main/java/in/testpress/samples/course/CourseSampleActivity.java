@@ -199,6 +199,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
             session.getInstituteSettings().setVideoDownloadEnabled(true);
             session.getInstituteSettings().setScreenshotDisabled(false);
             session.getInstituteSettings().setDisableStudentAnalytics(false);
+            session.getInstituteSettings().setEnableCustomTest(true);
             session.getInstituteSettings().setStoreLabel("Available Courses");
             session.getInstituteSettings().setAppToolbarLogo("https://media.testpress.in/institute/elixir/institutes/elixir-neet-pg-preparation-app/9571158ee51b4c36b9dd14b9dae17452.png");
 
