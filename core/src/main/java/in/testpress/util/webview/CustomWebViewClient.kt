@@ -8,6 +8,8 @@ import android.webkit.*
 
 class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
 
+    private var currentLoadingUrl = ""
+
     override fun shouldOverrideUrlLoading(
         view: WebView?,
         request: WebResourceRequest?
@@ -30,6 +32,7 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
     }
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+        currentLoadingUrl = view?.url.toString()
         if (fragment.webViewFragmentSettings.showLoadingBetweenPages) fragment.showLoading()
     }
 
@@ -50,11 +53,15 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
         request: WebResourceRequest?,
         errorResponse: WebResourceResponse?
     ) {
-        fragment.showErrorView(
-            TestpressException.httpError(
-                errorResponse?.statusCode!!,
-                errorResponse.reasonPhrase
-            )
-        )
+        // Verify if the error is related to the current URL being loaded in the WebView
+        // This is important to display errors only for the specific URL being loaded in the WebView.
+        // Since a WebView might load multiple types of URLs simultaneously, such as static and image URLs.
+        val requestUrl = request?.url.toString()
+        if (currentLoadingUrl == requestUrl) {
+            val statusCode = errorResponse?.statusCode ?: -1
+            val reasonPhrase = errorResponse?.reasonPhrase ?: "Unknown Error"
+            val httpError = TestpressException.httpError(statusCode, reasonPhrase)
+            fragment.showErrorView(httpError)
+        }
     }
 }
