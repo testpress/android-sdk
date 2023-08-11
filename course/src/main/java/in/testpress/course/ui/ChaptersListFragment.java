@@ -24,10 +24,12 @@ import java.util.function.ToDoubleBiFunction;
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
+import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.course.pagers.ChapterPager;
 import in.testpress.course.api.TestpressCourseApiClient;
 import in.testpress.course.util.UIUtils;
+import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Course;
@@ -54,6 +56,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     private String productSlug;
     private Course course;
     private RetrofitCall<Course> courseApiRequest;
+    private InstituteSettings instituteSettings;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,6 +65,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         apiClient = new TestpressCourseApiClient(getActivity());
         chapterDao = TestpressSDKDatabase.getChapterDao(getActivity());
         courseDao = TestpressSDKDatabase.getCourseDao(getActivity());
+        instituteSettings = TestpressSdk.getTestpressSession(requireContext()).getInstituteSettings();
         List<Course> courses = courseDao.queryBuilder().where(CourseDao.Properties.Id.eq(courseId)).list();
         if (!courses.isEmpty()) {
             course = courses.get(0);
@@ -211,7 +215,8 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     }
 
     private boolean isCustomTestGenerationEnabled() {
-        return parentId == null && course.getAllowCustomTestGeneration() != null && course.getAllowCustomTestGeneration();
+        return instituteSettings.getEnableCustomTest() && parentId == null
+                && course.getAllowCustomTestGeneration() != null && course.getAllowCustomTestGeneration();
     }
 
     @Override

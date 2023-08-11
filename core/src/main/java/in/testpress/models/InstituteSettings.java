@@ -43,6 +43,7 @@ public class InstituteSettings {
     private Integer maxAllowedDownloadedVideos;
     private String whiteLabeledHostUrl;
     private String currentPaymentApp;
+    private Boolean enableCustomTest;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -375,5 +376,13 @@ public class InstituteSettings {
     public InstituteSettings setCurrentPaymentApp(String currentPaymentApp) {
         this.currentPaymentApp = currentPaymentApp;
         return this;
+    }
+
+    public Boolean getEnableCustomTest() {
+        return enableCustomTest != null && enableCustomTest;
+    }
+
+    public void setEnableCustomTest(Boolean enableCustomTest) {
+        this.enableCustomTest = enableCustomTest;
     }
 }
