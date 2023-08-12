@@ -261,8 +261,8 @@ public class TestpressApiClient {
 
     private String checkHeaderValue(String value) {
         // Header value does not contains illegal characters.
-        // Sanitizes the value by removing illegal characters.
-        // Conditions in this method is refers from okhttp Headers.checkValue().
+        // Here we are Sanitizing the value by removing illegal characters.
+        // Following code in this method is refers from okhttp Headers.checkValue().
         StringBuilder sanitizedValue = new StringBuilder();
         for (int i = 0, length = value.length(); i < length; i++) {
             char c = value.charAt(i);
