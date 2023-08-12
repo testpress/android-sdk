@@ -116,7 +116,7 @@ public class TestpressApiClient {
             @Override
             public okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
                 Request.Builder header = chain.request().newBuilder()
-                        .addHeader("User-Agent", UserAgentProvider.get(context));
+                        .addHeader("User-Agent", checkHeaderValue(UserAgentProvider.get(context)));
                 if (testpressSession != null) {
                     header.addHeader("Authorization", "JWT " + testpressSession.getToken());
                 }
@@ -257,6 +257,20 @@ public class TestpressApiClient {
         RequestBody reqFile = RequestBody.create(MediaType.parse(mimeType), file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), reqFile);
         return getFileUploadService().upload(body);
+    }
+
+    private String checkHeaderValue(String value) {
+        // Header value does not contains illegal characters.
+        // Sanitizes the value by removing illegal characters.
+        // Conditions in this method is refers from okhttp Headers.checkValue().
+        StringBuilder sanitizedValue = new StringBuilder();
+        for (int i = 0, length = value.length(); i < length; i++) {
+            char c = value.charAt(i);
+            if ((c > '\u001f' || c == '\t') && c < '\u007f') {
+                sanitizedValue.append(c);
+            }
+        }
+        return sanitizedValue.toString();
     }
 
 }
