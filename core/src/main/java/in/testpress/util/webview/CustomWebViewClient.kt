@@ -53,9 +53,8 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
         request: WebResourceRequest?,
         errorResponse: WebResourceResponse?
     ) {
-        // Verify if the error is related to the current URL being loaded in the WebView
-        // This is important to display errors only for the specific URL being loaded in the WebView.
-        // Since a WebView might load multiple types of URLs simultaneously, such as static and image URLs.
+        // We are not showing error for other URLs like static and image URLs.
+        // Because WebView can load multiple URLs simultaneously like browser.
         val requestUrl = request?.url.toString()
         if (currentLoadingUrl == requestUrl) {
             val statusCode = errorResponse?.statusCode ?: -1
