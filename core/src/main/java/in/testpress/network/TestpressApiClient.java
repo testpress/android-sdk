@@ -261,10 +261,8 @@ public class TestpressApiClient {
     }
 
     private String sanitizeHeaderValue(String value) {
-        // Header value should not contains non-ASCII values.
+        // Header value should not contains non-ASCII values. Refer - https://github.com/square/okhttp/issues/891
         // Here we are Sanitizing the value by removing non-ASCII values.
-        // Refer - https://github.com/square/okhttp/issues/891
-        // Following code in this method is refers from okhttp Headers.checkValue().
         StringBuilder sanitizedValue = new StringBuilder();
         for (int i = 0, length = value.length(); i < length; i++) {
             char c = value.charAt(i);
