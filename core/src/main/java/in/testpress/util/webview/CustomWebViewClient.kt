@@ -8,7 +8,7 @@ import android.webkit.*
 
 class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
 
-    private var currentLoadingUrl = ""
+    private var errorList = linkedMapOf<WebResourceRequest?,WebResourceResponse?>()
 
     override fun shouldOverrideUrlLoading(
         view: WebView?,
@@ -32,12 +32,13 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
     }
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-        currentLoadingUrl = view?.url.toString()
         if (fragment.webViewFragmentSettings.showLoadingBetweenPages) fragment.showLoading()
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {
         fragment.hideLoading()
+        fragment.hideEmptyViewShowWebView()
+        checkWebViewHasError()
     }
 
     override fun onReceivedError(
@@ -53,14 +54,22 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
         request: WebResourceRequest?,
         errorResponse: WebResourceResponse?
     ) {
+        errorList[request] = errorResponse
+    }
+
+    private fun checkWebViewHasError() {
         // We are not showing error for other URLs like static and image URLs.
         // Because WebView can load multiple URLs simultaneously like browser.
-        val requestUrl = request?.url.toString()
-        if (currentLoadingUrl == requestUrl) {
-            val statusCode = errorResponse?.statusCode ?: -1
-            val reasonPhrase = errorResponse?.reasonPhrase ?: "Unknown Error"
-            val httpError = TestpressException.httpError(statusCode, reasonPhrase)
-            fragment.showErrorView(httpError)
+        errorList.forEach { error ->
+            val requestUrl = error.key?.url.toString()
+            val currentWebViewUrl = fragment.webView.url.toString()
+            if (requestUrl == currentWebViewUrl) {
+                val statusCode = error.value?.statusCode ?: -1
+                val reasonPhrase = error.value?.reasonPhrase ?: "Unknown Error"
+                val httpError = TestpressException.httpError(statusCode, reasonPhrase)
+                fragment.showErrorView(httpError)
+                errorList.clear()
+            }
         }
     }
 }
