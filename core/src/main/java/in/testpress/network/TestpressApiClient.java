@@ -31,6 +31,7 @@ import in.testpress.ui.UserDevicesActivity;
 import in.testpress.util.Misc;
 import in.testpress.util.UIUtils;
 import in.testpress.util.UserAgentProvider;
+import okhttp3.Headers;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -116,7 +117,7 @@ public class TestpressApiClient {
             @Override
             public okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
                 Request.Builder header = chain.request().newBuilder()
-                        .addHeader("User-Agent", checkHeaderValue(UserAgentProvider.get(context)));
+                        .addHeader("User-Agent", sanitizeHeaderValue(UserAgentProvider.get(context)));
                 if (testpressSession != null) {
                     header.addHeader("Authorization", "JWT " + testpressSession.getToken());
                 }
@@ -259,9 +260,10 @@ public class TestpressApiClient {
         return getFileUploadService().upload(body);
     }
 
-    private String checkHeaderValue(String value) {
-        // Header value does not contains illegal characters.
-        // Here we are Sanitizing the value by removing illegal characters.
+    private String sanitizeHeaderValue(String value) {
+        // Header value should not contains non-ASCII values.
+        // Here we are Sanitizing the value by removing non-ASCII values.
+        // Refer - https://github.com/square/okhttp/issues/891
         // Following code in this method is refers from okhttp Headers.checkValue().
         StringBuilder sanitizedValue = new StringBuilder();
         for (int i = 0, length = value.length(); i < length; i++) {
