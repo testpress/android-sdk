@@ -158,7 +158,7 @@ class WebViewFragment(
         emptyViewFragment.displayError(exception)
     }
 
-    private fun hideEmptyViewShowWebView() {
+    fun hideEmptyViewShowWebView() {
         layout.emptyViewContainer.isVisible = false
         layout.webView.isVisible = true
     }
