@@ -116,7 +116,7 @@ public class TestpressApiClient {
             @Override
             public okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
                 Request.Builder header = chain.request().newBuilder()
-                        .addHeader("User-Agent", sanitizeHeaderValue(UserAgentProvider.get(context)));
+                        .addHeader("User-Agent", UserAgentProvider.get(context));
                 if (testpressSession != null) {
                     header.addHeader("Authorization", "JWT " + testpressSession.getToken());
                 }
@@ -257,23 +257,6 @@ public class TestpressApiClient {
         RequestBody reqFile = RequestBody.create(MediaType.parse(mimeType), file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), reqFile);
         return getFileUploadService().upload(body);
-    }
-
-    private String sanitizeHeaderValue(String value) {
-        // Header value should not contains non-ASCII values. Refer - https://github.com/square/okhttp/issues/891
-        // Here we are Sanitizing the value by removing non-ASCII values.
-        StringBuilder sanitizedValue = new StringBuilder();
-        for (int i = 0, length = value.length(); i < length; i++) {
-            char c = value.charAt(i);
-            if (isASCIICharacter(c)) {
-                sanitizedValue.append(c);
-            }
-        }
-        return sanitizedValue.toString();
-    }
-
-    private boolean isASCIICharacter(char c) {
-        return (c > '\u001f' || c == '\t') && c < '\u007f';
     }
 
 }
