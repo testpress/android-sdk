@@ -266,11 +266,15 @@ public class TestpressApiClient {
         StringBuilder sanitizedValue = new StringBuilder();
         for (int i = 0, length = value.length(); i < length; i++) {
             char c = value.charAt(i);
-            if ((c > '\u001f' || c == '\t') && c < '\u007f') {
+            if (isASCIICharacter(c)) {
                 sanitizedValue.append(c);
             }
         }
         return sanitizedValue.toString();
+    }
+
+    private boolean isASCIICharacter(char c) {
+        return (c > '\u001f' || c == '\t') && c < '\u007f';
     }
 
 }
