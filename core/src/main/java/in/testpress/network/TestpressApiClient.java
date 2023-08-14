@@ -31,7 +31,6 @@ import in.testpress.ui.UserDevicesActivity;
 import in.testpress.util.Misc;
 import in.testpress.util.UIUtils;
 import in.testpress.util.UserAgentProvider;
-import okhttp3.Headers;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
