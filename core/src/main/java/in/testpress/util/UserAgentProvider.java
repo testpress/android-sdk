@@ -3,7 +3,6 @@ package in.testpress.util;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.util.Log;
 
 /**
  * Class that builds a User-Agent that is set on all HTTP calls.
