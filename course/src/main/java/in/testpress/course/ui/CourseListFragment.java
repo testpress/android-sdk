@@ -20,12 +20,15 @@ import java.util.List;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.course.R;
+import in.testpress.fragments.WebViewFragment;
 import in.testpress.store.TestpressStore;
 import in.testpress.ui.BaseFragment;
 
 public class CourseListFragment extends BaseFragment {
     private TabLayout tabs;
     private Adapter adapter;
+    private WebViewFragment webViewFragment;
+    private boolean isWebViewVisibleToUser = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,8 +58,42 @@ public class CourseListFragment extends BaseFragment {
         if (session.getInstituteSettings().getStoreLabel() != null && !session.getInstituteSettings().getStoreLabel().isEmpty()) {
             storeLabel = session.getInstituteSettings().getStoreLabel();
         }
-        adapter.addFragment(new AvailableCourseListFragment(), storeLabel);
+        webViewFragment = new WebViewFragment(
+                "https://www.epratibha.net/courses/",
+                "",
+                new WebViewFragment.Settings(
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                )
+        );
+        adapter.addFragment(webViewFragment, storeLabel);
         viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+            @Override
+            public void onPageSelected(int position) {
+                if (position == 1){
+                    isWebViewVisibleToUser = true;
+                } else {
+                    isWebViewVisibleToUser = false;
+                }
+            }
+            @Override
+            public void onPageScrollStateChanged(int state) {}
+        });
+    }
+
+    public Boolean onBackPress(){
+        if (webViewFragment != null && isWebViewVisibleToUser && webViewFragment.canGoBack()){
+            webViewFragment.goBack();
+            return false;
+        } else {
+            return true;
+        }
     }
 
     static class Adapter extends FragmentPagerAdapter {
