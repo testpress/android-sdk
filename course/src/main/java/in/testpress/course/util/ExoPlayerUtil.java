@@ -13,9 +13,9 @@ import android.media.MediaCodec;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Vibrator;
-import androidx.transition.ChangeBounds;
-import android.util.DisplayMetrics;
+
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -98,7 +98,6 @@ import in.testpress.util.CommonUtils;
 import in.testpress.util.InternetConnectivityChecker;
 import kotlin.Pair;
 
-import static android.content.Context.AUDIO_SERVICE;
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 import static androidx.mediarouter.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
@@ -126,7 +125,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private TrackSelectionDialog trackSelectionDialog;
     private YouTubeOverlay youtubeOverlay;
     List<String[]> watchedTimeRanges = new ArrayList<>();
-    private TextView pinchToZoomText;
+    private TextView pinchToZoomModeText;
+    private TextView zoomMeasurmentText;
 
 
     private Activity activity;
@@ -194,7 +194,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         fullscreenIcon = exoPlayerMainFrame.findViewById(R.id.exo_fullscreen_icon);
         progressBar = exoPlayerMainFrame.findViewById(R.id.exo_player_progress);
         errorMessageTextView = exoPlayerMainFrame.findViewById(R.id.error_message);
-        pinchToZoomText = exoPlayerMainFrame.findViewById(R.id.pinch_to_zoom_text);
+        pinchToZoomModeText = exoPlayerMainFrame.findViewById(R.id.pinch_to_zoom_mode_text);
+        zoomMeasurmentText = exoPlayerMainFrame.findViewById(R.id.zoomed_mesurment_text);
         TestpressSession session = TestpressSdk.getTestpressSession(activity);
         if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
             setUserEmailOverlay();
@@ -245,7 +246,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                                           public boolean onTouch(View view, MotionEvent motionEvent) {
                                               if (fullscreen) {
                                                   scaleGestureDetector.onTouchEvent(motionEvent);
-                                                  if (scaleGesture.isDragEnabled) {
+                                                  if (scaleGesture.isDragEnabled()) {
                                                       switch (motionEvent.getAction()) {
                                                           case MotionEvent.ACTION_DOWN:
                                                               lastTouchX = motionEvent.getX();
@@ -265,8 +266,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                                                               float newPosY = posY + deltaY;
 
                                                               // Calculate the maximum allowed translations
-                                                              float maxPosX = (playerView.getVideoSurfaceView().getWidth() * scaleGesture.scaleFactor - playerView.getWidth()) / 2;
-                                                              float maxPosY = (playerView.getVideoSurfaceView().getHeight() * scaleGesture.scaleFactor - playerView.getHeight()) / 2;
+                                                              float maxPosX = (playerView.getVideoSurfaceView().getWidth() * scaleGesture.getScaleFactor() - playerView.getWidth()) / 2;
+                                                              float maxPosY = (playerView.getVideoSurfaceView().getHeight() * scaleGesture.getScaleFactor() - playerView.getHeight()) / 2;
                                                               float minPosX = -maxPosX;
                                                               float minPosY = -maxPosY;
 
@@ -446,10 +447,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 });
     }
 
-    private ScaleGesture scaleGesture;
+    private PinchToZoomGesture scaleGesture;
 
     private void initializePinchToZoom() {
-        scaleGesture = new ScaleGesture();
+        scaleGesture = new PinchToZoomGesture(exoPlayerLayout,playerView,pinchToZoomModeText,zoomMeasurmentText,vibrator);
         scaleGestureDetector = new ScaleGestureDetector(activity, scaleGesture);
     }
 
@@ -950,37 +951,47 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             if (scaleFactor > 1.2){
                 DecimalFormat decimalFormat = new DecimalFormat("0.0x");
                 String formattedValue = decimalFormat.format(scaleFactor);
-                updateTextView(formattedValue);
+                updateZoomMesurmentTextView(formattedValue);
             }
             return true;
         }
 
         @Override
         public void onScaleEnd(ScaleGestureDetector detector) {
+            long _1000_Mills = 1000;
             if (scaleFactor > 1 && scaleFactor < 1.2) {
                 vibrator.vibrate(50);
-                updateTextView("Zoomed to fit");
+                updateZoomModeTextView("Zoomed to fit");
                 resetSurfaceView();
                 resetScaleFactor();
                 isDragEnabled = false;
                 playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
+                hideTextViewAfter(pinchToZoomModeText, _1000_Mills);
             }else if (scaleFactor > 1.2){
                 isDragEnabled = true;
                 playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
+                long _200_Mills = 200;
+                hideTextViewAfter(zoomMeasurmentText, _200_Mills);
             } else {
                 vibrator.vibrate(50);
-                updateTextView("Original");
+                updateZoomModeTextView("Original");
                 resetSurfaceView();
                 resetScaleFactor();
                 isDragEnabled = false;
                 playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT);
+                hideTextViewAfter(pinchToZoomModeText, _1000_Mills);
             }
-            hideTextViewAfter500Ms();
+
         }
 
-        private void updateTextView(String text) {
-            pinchToZoomText.setVisibility(View.VISIBLE);
-            pinchToZoomText.setText(text);
+        private void updateZoomModeTextView(String text) {
+            pinchToZoomModeText.setVisibility(View.VISIBLE);
+            pinchToZoomModeText.setText(text);
+        }
+
+        private void updateZoomMesurmentTextView(String text) {
+            zoomMeasurmentText.setVisibility(View.VISIBLE);
+            zoomMeasurmentText.setText(text);
         }
 
         private void resetSurfaceView() {
@@ -994,14 +1005,14 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             scaleFactor = 1.0f;
         }
 
-        private void hideTextViewAfter500Ms() {
+        private void hideTextViewAfter(TextView textView, long mills) {
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    pinchToZoomText.setVisibility(View.GONE);
+                    textView.setVisibility(View.GONE);
                 }
-            }, 500);
+            }, mills);
         }
     }
 
