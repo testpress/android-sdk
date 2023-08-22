@@ -33,6 +33,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -112,7 +113,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private static final int SEEK_TIME_IN_MILLISECOND = 15000; //15s
 
     private FrameLayout exoPlayerMainFrame;
-    private View exoPlayerLayout;
+    private ConstraintLayout exoPlayerLayout;
     private DoubleTapPlayerView playerView;
     private LottieAnimationView progressBar;
     private TextView errorMessageTextView;
@@ -240,7 +241,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         vibrator  = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
 
 
+        addDragSupport();
+    }
 
+    private void addDragSupport() {
         playerView.setOnTouchListener(new OnTouchListener() {
                                           @Override
                                           public boolean onTouch(View view, MotionEvent motionEvent) {
