@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 
 import in.testpress.models.greendao.Content;
 import in.testpress.network.RetrofitCall;
@@ -108,6 +109,21 @@ public class CommonUtils {
         }
 
         return "";
+    }
+
+    public static HashMap<String, String> getUserCredentials(Context context) {
+        AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+        Account[] accounts = accountManager.getAccountsByType(context.getPackageName());
+        if (accounts.length > 0) {
+            Account userAccount = accounts[0];
+            String username = userAccount.name;
+            String password = accountManager.getPassword(userAccount);
+            HashMap<String, String> userCredentials = new HashMap<>();
+            userCredentials.put("username", username);
+            userCredentials.put("password", password);
+            return userCredentials;
+        }
+        return new HashMap<>();
     }
 
     public static boolean isNullOrEmpty(String str) {
