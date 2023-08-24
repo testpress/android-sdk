@@ -110,6 +110,19 @@ public class CommonUtils {
         return "";
     }
 
+    public static String[] getUserCredentials(Context context) {
+        AccountManager manager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+        Account[] accounts = manager.getAccountsByType(context.getPackageName());
+
+        if (accounts.length > 0) {
+            String username = accounts[0].name;
+            String password = manager.getPassword(accounts[0]);
+            return new String[]{username, password};
+        }
+
+        return new String[]{"", ""};
+    }
+
     public static boolean isNullOrEmpty(String str) {
         return str == null || str.isEmpty();
     }

@@ -23,6 +23,7 @@ import in.testpress.course.R;
 import in.testpress.fragments.WebViewFragment;
 import in.testpress.store.TestpressStore;
 import in.testpress.ui.BaseFragment;
+import in.testpress.util.CommonUtils;
 
 public class CourseListFragment extends BaseFragment {
     private TabLayout tabs;
@@ -58,8 +59,9 @@ public class CourseListFragment extends BaseFragment {
         if (session.getInstituteSettings().getStoreLabel() != null && !session.getInstituteSettings().getStoreLabel().isEmpty()) {
             storeLabel = session.getInstituteSettings().getStoreLabel();
         }
+        String[] credentials = CommonUtils.getUserCredentials(requireContext());
         webViewFragment = new WebViewFragment(
-                "https://www.epratibha.net/courses/",
+                "https://www.epratibha.net/mobile-login/?email=" + credentials[0] + "&pass=" + credentials[0],
                 "",
                 new WebViewFragment.Settings(
                         true,

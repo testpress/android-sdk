@@ -13,13 +13,11 @@ import android.app.Activity;
 
 public class CourseListActivity extends BaseToolBarActivity {
 
-    private CourseListFragment fragment;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_container_layout);
-        fragment = new CourseListFragment();
+        CourseListFragment fragment = new CourseListFragment();
         fragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                 .commitAllowingStateLoss();
@@ -32,13 +30,6 @@ public class CourseListActivity extends BaseToolBarActivity {
             for (Fragment fragment : getSupportFragmentManager().getFragments()) {
                 fragment.onActivityResult(requestCode, resultCode, data);
             }
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (fragment.onBackPress()){
-            super.onBackPressed();
         }
     }
 }
