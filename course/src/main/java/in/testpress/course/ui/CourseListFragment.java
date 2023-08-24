@@ -61,7 +61,7 @@ public class CourseListFragment extends BaseFragment {
         }
         String[] credentials = CommonUtils.getUserCredentials(requireContext());
         webViewFragment = new WebViewFragment(
-                "https://www.epratibha.net/mobile-login/?email=" + credentials[0] + "&pass=" + credentials[0],
+                "https://www.epratibha.net/mobile-login/?email=" + credentials[0] + "&pass=" + credentials[1],
                 "",
                 new WebViewFragment.Settings(
                         true,
