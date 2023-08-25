@@ -26,6 +26,9 @@ import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.mediarouter.media.MediaControlIntent;
 import androidx.mediarouter.media.MediaRouteSelector;
 import androidx.mediarouter.media.MediaRouter;
@@ -577,13 +580,20 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             exoPlayerMainFrame.removeView(exoPlayerLayout);
             fullscreenDialog.addContentView(exoPlayerLayout, new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            fullscreenDialog.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
             fullscreenDialog.getWindow().addFlags(FLAG_SECURE);
             setFullscreenIcon(R.drawable.testpress_fullscreen_exit);
             fullscreen = true;
             fullscreenDialog.show();
+            hideAppBars();
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         }
+    }
+
+    private void hideAppBars() {
+        WindowCompat.setDecorFitsSystemWindows(fullscreenDialog.getWindow(), false);
+        WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(fullscreenDialog.getWindow(), playerView);
+        controller.hide(WindowInsetsCompat.Type.systemBars());
+        controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
     }
 
     private void closeFullscreenDialog() {
