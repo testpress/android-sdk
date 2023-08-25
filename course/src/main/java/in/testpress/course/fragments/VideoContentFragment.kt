@@ -102,10 +102,10 @@ class VideoContentFragment : BaseContentDetailFragment() {
     private fun setProgressBarInMenuItem() {
         menu.findItem(R.id.download_progress).setActionView(R.layout.download_progress)
         val progressView = menu.findItem(R.id.download_progress).actionView
-        progressView.setOnClickListener {
+        progressView?.setOnClickListener {
             requireContext().startActivity(DownloadsActivity.createIntent(requireContext()))
         }
-        videoDownloadProgress = progressView.findViewById(R.id.video_download_progress)
+        videoDownloadProgress = progressView?.findViewById(R.id.video_download_progress)!!
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
