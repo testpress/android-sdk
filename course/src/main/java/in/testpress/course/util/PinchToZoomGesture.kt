@@ -2,9 +2,11 @@ package `in`.testpress.course.util
 
 import `in`.testpress.course.R
 import android.os.*
+import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
 import android.view.View
+import android.view.View.OnTouchListener
 import android.view.animation.*
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -109,4 +111,64 @@ class PinchToZoomGesture(
         })
     }
 
+}
+
+class OnTouchDragListener(private val exoPlayerUtil: ExoPlayerUtil) : OnTouchListener {
+
+    var lastTouchX = 0f
+    var lastTouchY = 0f
+    var posX = 0f
+    var posY = 0f
+    var moveCalled = 0
+
+    override fun onTouch(p0: View?, motionEvent: MotionEvent?): Boolean {
+        if (exoPlayerUtil.fullscreen) {
+            exoPlayerUtil.scaleGestureDetector.onTouchEvent(motionEvent)
+            if (exoPlayerUtil.scaleGesture.isDragEnabled) {
+                when (motionEvent?.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        lastTouchX = motionEvent.x
+                        lastTouchY = motionEvent.y
+                        return false
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        moveCalled += 1
+                        if (moveCalled < 5) {
+                            return false
+                        }
+                        val deltaX: Float = motionEvent.rawX - lastTouchX
+                        val deltaY: Float = motionEvent.rawY - lastTouchY
+
+                        // Calculate the new positions
+                        val newPosX: Float = posX + deltaX
+                        val newPosY: Float = posY + deltaY
+
+                        // Calculate the maximum allowed translations
+                        val maxPosX: Float =
+                            (exoPlayerUtil.playerView.videoSurfaceView?.width!! * exoPlayerUtil.scaleGesture.scaleFactor - exoPlayerUtil.playerView.width) / 2
+                        val maxPosY: Float =
+                            (exoPlayerUtil.playerView.videoSurfaceView?.height!! * exoPlayerUtil.scaleGesture.scaleFactor - exoPlayerUtil.playerView.height) / 2
+                        val minPosX = -maxPosX
+                        val minPosY = -maxPosY
+
+                        // Apply boundary checks
+                        posX = newPosX.coerceAtLeast(minPosX).coerceAtMost(maxPosX)
+                        posY = newPosY.coerceAtLeast(minPosY).coerceAtMost(maxPosY)
+
+                        // Apply translations
+                        exoPlayerUtil.playerView.videoSurfaceView?.translationX = posX
+                        exoPlayerUtil.playerView.videoSurfaceView?.translationY = posY
+                        lastTouchX = motionEvent.rawX
+                        lastTouchY = motionEvent.rawY
+                        return true
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        moveCalled = 0
+                        return false
+                    }
+                }
+            }
+        }
+        return false
+    }
 }

@@ -1,5 +1,6 @@
 package in.testpress.course.util;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -10,16 +11,10 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaCodec;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Vibrator;
-
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -42,7 +37,6 @@ import androidx.mediarouter.media.MediaControlIntent;
 import androidx.mediarouter.media.MediaRouteSelector;
 import androidx.mediarouter.media.MediaRouter;
 import androidx.mediarouter.media.MediaRouter.RouteInfo;
-
 import com.airbnb.lottie.LottieAnimationView;
 import com.github.vkay94.dtpv.DoubleTapPlayerView;
 import com.github.vkay94.dtpv.youtube.YouTubeOverlay;
@@ -67,17 +61,13 @@ import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.ExoTrackSelection;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
-
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
@@ -98,7 +88,6 @@ import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
 import in.testpress.util.InternetConnectivityChecker;
 import kotlin.Pair;
-
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 import static androidx.mediarouter.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
@@ -114,7 +103,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
     private FrameLayout exoPlayerMainFrame;
     private ConstraintLayout exoPlayerLayout;
-    private DoubleTapPlayerView playerView;
+    DoubleTapPlayerView playerView;
     private LottieAnimationView progressBar;
     private TextView errorMessageTextView;
     private LinearLayout emailIdLayout;
@@ -152,7 +141,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             overlayPositionHandler.postDelayed(this, OVERLAY_POSITION_CHANGE_INTERVAL);
         }
     };
-    private boolean fullscreen = false;
+    boolean fullscreen = false;
     private boolean errorOnVideoAttemptUpdate;
     private int drmLicenseRetries = 0;
     private Handler videoAttemptUpdateHandler;
@@ -170,14 +159,9 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private DefaultTrackSelector trackSelector;
     private DialogInterface.OnClickListener dialogOnClickListener;
     private VideoWatchDataRepository videoWatchDataRepository;
-    private ScaleGestureDetector scaleGestureDetector;
-    float lastTouchX = 0f;
-    float lastTouchY = 0f;
-    float posX = 0f;
-    float posY = 0f;
+    ScaleGestureDetector scaleGestureDetector;
+    PinchToZoomGesture scaleGesture;
     Vibrator vibrator;
-    int moveCalled = 0;
-
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition) {
@@ -240,58 +224,9 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         addDragSupport();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void addDragSupport() {
-        playerView.setOnTouchListener(new OnTouchListener() {
-                                          @Override
-                                          public boolean onTouch(View view, MotionEvent motionEvent) {
-                                              if (fullscreen) {
-                                                  scaleGestureDetector.onTouchEvent(motionEvent);
-                                                  if (scaleGesture.isDragEnabled()) {
-                                                      switch (motionEvent.getAction()) {
-                                                          case MotionEvent.ACTION_DOWN:
-                                                              lastTouchX = motionEvent.getX();
-                                                              lastTouchY = motionEvent.getY();
-                                                              return false;
-
-                                                          case MotionEvent.ACTION_MOVE:
-                                                              moveCalled = moveCalled + 1;
-                                                              if (moveCalled < 5){
-                                                                  return false;
-                                                              }
-                                                              float deltaX = motionEvent.getRawX() - lastTouchX;
-                                                              float deltaY = motionEvent.getRawY() - lastTouchY;
-
-                                                              // Calculate the new positions
-                                                              float newPosX = posX + deltaX;
-                                                              float newPosY = posY + deltaY;
-
-                                                              // Calculate the maximum allowed translations
-                                                              float maxPosX = (playerView.getVideoSurfaceView().getWidth() * scaleGesture.getScaleFactor() - playerView.getWidth()) / 2;
-                                                              float maxPosY = (playerView.getVideoSurfaceView().getHeight() * scaleGesture.getScaleFactor() - playerView.getHeight()) / 2;
-                                                              float minPosX = -maxPosX;
-                                                              float minPosY = -maxPosY;
-
-                                                              // Apply boundary checks
-                                                              posX = Math.min(Math.max(newPosX, minPosX), maxPosX);
-                                                              posY = Math.min(Math.max(newPosY, minPosY), maxPosY);
-
-                                                              // Apply translations
-                                                              playerView.getVideoSurfaceView().setTranslationX(posX);
-                                                              playerView.getVideoSurfaceView().setTranslationY(posY);
-
-                                                              lastTouchX = motionEvent.getRawX();
-                                                              lastTouchY = motionEvent.getRawY();
-                                                              return true;
-                                                          case MotionEvent.ACTION_UP:
-                                                              moveCalled = 0;
-                                                              return false;
-                                                      }
-                                                  }
-                                              }
-                                              return false;
-                                          }
-                                      }
-        );
+        playerView.setOnTouchListener(new OnTouchDragListener(this));
     }
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
@@ -446,8 +381,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                     }
                 });
     }
-
-    private PinchToZoomGesture scaleGesture;
 
     private void initializePinchToZoom() {
         scaleGesture = new PinchToZoomGesture(exoPlayerMainFrame,vibrator);
