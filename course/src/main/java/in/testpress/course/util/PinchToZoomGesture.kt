@@ -1,5 +1,6 @@
 package `in`.testpress.course.util
 
+import `in`.testpress.course.R
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.os.*
@@ -16,24 +17,21 @@ import java.text.DecimalFormat
 
 
 class PinchToZoomGesture(
-    val exoPlayerLayout: View,
-    val playerView: DoubleTapPlayerView,
-    val zoomModeText: TextView,
-    val zoomMesurmentText: TextView,
+    exoPlayerMainFrame: FrameLayout,
     val vibrator: Vibrator
 ) : SimpleOnScaleGestureListener() {
 
     var scaleFactor = 1.0f
     var isDragEnabled = false
-    var runner: Runnable? = null
+    private val zoomModeText: TextView = exoPlayerMainFrame.findViewById(R.id.pinch_to_zoom_mode_text)
+    private val zoomMesurmentText: TextView = exoPlayerMainFrame.findViewById(R.id.zoomed_mesurment_text)
+    private val playerView: DoubleTapPlayerView = exoPlayerMainFrame.findViewById(R.id.exo_player_view)
 
     override fun onScale(detector: ScaleGestureDetector): Boolean {
         playerView.hideController()
         hideAllTextViews()
         scaleFactor *= detector.scaleFactor
         scaleFactor = 1.0f.coerceAtLeast(scaleFactor.coerceAtMost(6.0f))
-//        exoPlayerLayout.scaleX = scaleFactor
-//        exoPlayerLayout.scaleY = scaleFactor
         playerView.videoSurfaceView?.scaleX = scaleFactor
         playerView.videoSurfaceView?.scaleY = scaleFactor
         if (scaleFactor > 1.2) {
@@ -50,7 +48,6 @@ class PinchToZoomGesture(
     }
 
     override fun onScaleEnd(detector: ScaleGestureDetector?) {
-        val _1000_Mills: Long = 1000
         if (scaleFactor > 1 && scaleFactor < 1.2) {
             vibrator.vibrate(50)
             updateZoomModeTextView("Zoomed to fit")

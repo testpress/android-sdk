@@ -126,8 +126,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private TrackSelectionDialog trackSelectionDialog;
     private YouTubeOverlay youtubeOverlay;
     List<String[]> watchedTimeRanges = new ArrayList<>();
-    private TextView pinchToZoomModeText;
-    private TextView zoomMeasurmentText;
 
 
     private Activity activity;
@@ -195,8 +193,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         fullscreenIcon = exoPlayerMainFrame.findViewById(R.id.exo_fullscreen_icon);
         progressBar = exoPlayerMainFrame.findViewById(R.id.exo_player_progress);
         errorMessageTextView = exoPlayerMainFrame.findViewById(R.id.error_message);
-        pinchToZoomModeText = exoPlayerMainFrame.findViewById(R.id.pinch_to_zoom_mode_text);
-        zoomMeasurmentText = exoPlayerMainFrame.findViewById(R.id.zoomed_mesurment_text);
         TestpressSession session = TestpressSdk.getTestpressSession(activity);
         if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
             setUserEmailOverlay();
@@ -454,7 +450,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private PinchToZoomGesture scaleGesture;
 
     private void initializePinchToZoom() {
-        scaleGesture = new PinchToZoomGesture(exoPlayerLayout,playerView,pinchToZoomModeText,zoomMeasurmentText,vibrator);
+        scaleGesture = new PinchToZoomGesture(exoPlayerMainFrame,vibrator);
         scaleGestureDetector = new ScaleGestureDetector(activity, scaleGesture);
     }
 
@@ -938,86 +934,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         }
 
         return -1;
-    }
-
-    private class ScaleGesture extends ScaleGestureDetector.SimpleOnScaleGestureListener{
-
-        float scaleFactor = 1.0f;
-        boolean isDragEnabled = false;
-
-        @Override
-        public boolean onScale(ScaleGestureDetector detector) {
-                scaleFactor *= detector.getScaleFactor();
-                scaleFactor = Math.max(1.0f, Math.min(scaleFactor,6.0f));
-                playerView.getVideoSurfaceView().setScaleX(scaleFactor);
-                playerView.getVideoSurfaceView().setScaleY(scaleFactor);
-
-            if (scaleFactor > 1.2){
-                DecimalFormat decimalFormat = new DecimalFormat("0.0x");
-                String formattedValue = decimalFormat.format(scaleFactor);
-                updateZoomMesurmentTextView(formattedValue);
-            }
-            return true;
-        }
-
-        @Override
-        public void onScaleEnd(ScaleGestureDetector detector) {
-            long _1000_Mills = 1000;
-            if (scaleFactor > 1 && scaleFactor < 1.2) {
-                vibrator.vibrate(50);
-                updateZoomModeTextView("Zoomed to fit");
-                resetSurfaceView();
-                resetScaleFactor();
-                isDragEnabled = false;
-                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
-                hideTextViewAfter(pinchToZoomModeText, _1000_Mills);
-            }else if (scaleFactor > 1.2){
-                isDragEnabled = true;
-                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
-                long _200_Mills = 200;
-                hideTextViewAfter(zoomMeasurmentText, _200_Mills);
-            } else {
-                vibrator.vibrate(50);
-                updateZoomModeTextView("Original");
-                resetSurfaceView();
-                resetScaleFactor();
-                isDragEnabled = false;
-                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT);
-                hideTextViewAfter(pinchToZoomModeText, _1000_Mills);
-            }
-
-        }
-
-        private void updateZoomModeTextView(String text) {
-            pinchToZoomModeText.setVisibility(View.VISIBLE);
-            pinchToZoomModeText.setText(text);
-        }
-
-        private void updateZoomMesurmentTextView(String text) {
-            zoomMeasurmentText.setVisibility(View.VISIBLE);
-            zoomMeasurmentText.setText(text);
-        }
-
-        private void resetSurfaceView() {
-            playerView.getVideoSurfaceView().setScaleX(1.0f);
-            playerView.getVideoSurfaceView().setScaleY(1.0f);
-            playerView.getVideoSurfaceView().setX(0);
-            playerView.getVideoSurfaceView().setY(0);
-        }
-
-        private void resetScaleFactor() {
-            scaleFactor = 1.0f;
-        }
-
-        private void hideTextViewAfter(TextView textView, long mills) {
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    textView.setVisibility(View.GONE);
-                }
-            }, mills);
-        }
     }
 
 }
