@@ -78,7 +78,7 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="32dp"
             android:background="@drawable/exoplayer_zoom_mode_round_background"
-            android:textColor="#50FFFFFF"
+            android:textColor="#90FFFFFF"
             android:visibility="gone"
             android:padding="8dp"
             android:textSize="16sp"

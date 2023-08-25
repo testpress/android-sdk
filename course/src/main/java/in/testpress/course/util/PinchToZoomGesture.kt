@@ -1,13 +1,11 @@
 package `in`.testpress.course.util
 
 import `in`.testpress.course.R
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.os.*
-import android.util.Log
 import android.view.ScaleGestureDetector
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
 import android.view.View
+import android.view.animation.*
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
@@ -18,7 +16,7 @@ import java.text.DecimalFormat
 
 class PinchToZoomGesture(
     exoPlayerMainFrame: FrameLayout,
-    val vibrator: Vibrator
+    private val vibrator: Vibrator
 ) : SimpleOnScaleGestureListener() {
 
     var scaleFactor = 1.0f
@@ -54,17 +52,19 @@ class PinchToZoomGesture(
             resetSurfaceView()
             resetScaleFactor()
             isDragEnabled = false
-            playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
+            playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
         } else if (scaleFactor > 1.2) {
             isDragEnabled = true
             playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
         } else {
-            vibrator.vibrate(50)
-            updateZoomModeTextView("Original")
-            resetSurfaceView()
-            resetScaleFactor()
-            isDragEnabled = false
-            playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
+            if (playerView.resizeMode != AspectRatioFrameLayout.RESIZE_MODE_FIT) {
+                vibrator.vibrate(50)
+                updateZoomModeTextView("Original")
+                resetSurfaceView()
+                resetScaleFactor()
+                isDragEnabled = false
+                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+            }
         }
         zoomMesurmentText.isVisible = false
     }
@@ -92,17 +92,21 @@ class PinchToZoomGesture(
     }
 
     private fun TextView.hideTextView() {
-        Log.d("TAG", "hideTextView: ")
-        this.animate().cancel()
-        this.alpha = 100f
-        this.animate()
-            .alpha(0f)
-            .setDuration(1000)
-            .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    this@hideTextView.isVisible = false
-                }
-            })
+        val animationSet = AnimationSet(false)
+        val fadeOutAnimation = AlphaAnimation(1.0f, 0.0f)
+        fadeOutAnimation.duration = 500
+        fadeOutAnimation.startOffset = 500
+        val interpolator: Interpolator = LinearInterpolator()
+        fadeOutAnimation.interpolator = interpolator
+        animationSet.addAnimation(fadeOutAnimation)
+        this.startAnimation(animationSet)
+        animationSet.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {}
+            override fun onAnimationEnd(animation: Animation?) {
+                this@hideTextView.visibility = View.GONE
+            }
+            override fun onAnimationRepeat(animation: Animation?) {}
+        })
     }
 
 }
