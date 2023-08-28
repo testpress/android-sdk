@@ -24,51 +24,48 @@ class PinchToZoomGesture(
     var scaleFactor = 1.0f
     var isDragEnabled = false
     private val zoomModeText: TextView = exoPlayerMainFrame.findViewById(R.id.pinch_to_zoom_mode_text)
-    private val zoomMesurmentText: TextView = exoPlayerMainFrame.findViewById(R.id.zoomed_mesurment_text)
     private val playerView: DoubleTapPlayerView = exoPlayerMainFrame.findViewById(R.id.exo_player_view)
+    private var currentMode = ZoomMode.ORIGINAL
 
     override fun onScale(detector: ScaleGestureDetector): Boolean {
         playerView.hideController()
-        hideAllTextViews()
         scaleFactor *= detector.scaleFactor
         scaleFactor = 1.0f.coerceAtLeast(scaleFactor.coerceAtMost(6.0f))
         playerView.videoSurfaceView?.scaleX = scaleFactor
         playerView.videoSurfaceView?.scaleY = scaleFactor
         if (scaleFactor > 1.2) {
-            val decimalFormat = DecimalFormat("0.0x")
+            val decimalFormat = DecimalFormat("0.0 x")
             val formattedValue = decimalFormat.format(scaleFactor.toDouble())
             updateZoomMesurmentTextView(formattedValue)
         }
         return true
     }
 
-    private fun hideAllTextViews() {
-        zoomModeText.isVisible = false
-        zoomMesurmentText.isVisible = false
-    }
-
-    override fun onScaleEnd(detector: ScaleGestureDetector?) {
-        if (scaleFactor > 1 && scaleFactor < 1.2) {
+    override fun onScaleEnd(detector: ScaleGestureDetector) {
+        if (scaleFactor > 1.2) {
+            isDragEnabled = true
+            playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+            currentMode = ZoomMode.ZOOM
+            zoomModeText.isVisible = false
+        } else {
+            if (scaleFactor > 1 && scaleFactor < 1.2) {
+                if (currentMode != ZoomMode.ZOOMED_TO_FIT) {
+                    currentMode = ZoomMode.ZOOMED_TO_FIT
+                    updateZoomModeTextView(currentMode.mode)
+                }
+                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+            } else {
+                if (currentMode != ZoomMode.ORIGINAL) {
+                    currentMode = ZoomMode.ORIGINAL
+                    updateZoomModeTextView(currentMode.mode)
+                }
+                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+            }
             vibrator.vibrate(50)
-            updateZoomModeTextView("Zoomed to fit")
             resetSurfaceView()
             resetScaleFactor()
             isDragEnabled = false
-            playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-        } else if (scaleFactor > 1.2) {
-            isDragEnabled = true
-            playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-        } else {
-            if (playerView.resizeMode != AspectRatioFrameLayout.RESIZE_MODE_FIT) {
-                vibrator.vibrate(50)
-                updateZoomModeTextView("Original")
-                resetSurfaceView()
-                resetScaleFactor()
-                isDragEnabled = false
-                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
-            }
         }
-        zoomMesurmentText.isVisible = false
     }
 
     private fun updateZoomModeTextView(text: String) {
@@ -78,8 +75,9 @@ class PinchToZoomGesture(
     }
 
     private fun updateZoomMesurmentTextView(text: String) {
-        zoomMesurmentText.visibility = View.VISIBLE
-        zoomMesurmentText.text = text
+        zoomModeText.clearAnimation()
+        zoomModeText.visibility = View.VISIBLE
+        zoomModeText.text = text
     }
 
     private fun resetSurfaceView() {
@@ -95,20 +93,43 @@ class PinchToZoomGesture(
 
     private fun TextView.hideTextView() {
         val animationSet = AnimationSet(false)
+
+        // Fade in animation
+        val fadeInAnimation = AlphaAnimation(0.0f, 1.0f)
+        fadeInAnimation.duration = 250
+        animationSet.addAnimation(AlphaAnimation(0.0f, 1.0f).apply {
+            duration = 250
+        })
+
+        // Stay visible for 500ms
+        val stayDuration = 500
+        animationSet.addAnimation(AlphaAnimation(1.0f, 1.0f).apply {
+            duration = stayDuration.toLong()
+            startOffset = fadeInAnimation.duration
+        })
+
+        // Fade out animation
         val fadeOutAnimation = AlphaAnimation(1.0f, 0.0f)
-        fadeOutAnimation.duration = 500
-        fadeOutAnimation.startOffset = 500
-        val interpolator: Interpolator = LinearInterpolator()
-        fadeOutAnimation.interpolator = interpolator
+        fadeOutAnimation.duration = 250
+        fadeOutAnimation.startOffset = fadeInAnimation.duration + stayDuration
         animationSet.addAnimation(fadeOutAnimation)
-        this.startAnimation(animationSet)
+
         animationSet.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation?) {}
             override fun onAnimationEnd(animation: Animation?) {
                 this@hideTextView.visibility = View.GONE
             }
+
             override fun onAnimationRepeat(animation: Animation?) {}
         })
+
+        this.startAnimation(animationSet)
+    }
+
+    enum class ZoomMode (val mode: String){
+        ORIGINAL("Original"),
+        ZOOMED_TO_FIT("Zoomed to fit"),
+        ZOOM("Zoom")
     }
 
 }
@@ -121,11 +142,11 @@ class OnTouchDragListener(private val exoPlayerUtil: ExoPlayerUtil) : OnTouchLis
     var posY = 0f
     var moveCalled = 0
 
-    override fun onTouch(p0: View?, motionEvent: MotionEvent?): Boolean {
+    override fun onTouch(p0: View, motionEvent: MotionEvent): Boolean {
         if (exoPlayerUtil.fullscreen) {
             exoPlayerUtil.scaleGestureDetector.onTouchEvent(motionEvent)
             if (exoPlayerUtil.scaleGesture.isDragEnabled) {
-                when (motionEvent?.action) {
+                when (motionEvent.action) {
                     MotionEvent.ACTION_DOWN -> {
                         lastTouchX = motionEvent.x
                         lastTouchY = motionEvent.y
