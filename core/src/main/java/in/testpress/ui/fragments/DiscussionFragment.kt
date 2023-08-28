@@ -66,8 +66,8 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
         inflater.inflate(R.menu.discussions_menu, menu)
         val filterMenu = menu.findItem(R.id.options)
         val actionView = filterMenu.actionView
-        val filterIcon = actionView.findViewById<ImageView>(R.id.filter)
-        filterIcon.setOnClickListener {
+        val filterIcon = actionView?.findViewById<ImageView>(R.id.filter)
+        filterIcon?.setOnClickListener {
             toggledSideBar()
         }
         initializeSearchView(menu)

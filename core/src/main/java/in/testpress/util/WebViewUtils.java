@@ -42,7 +42,6 @@ public class WebViewUtils {
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setDatabaseEnabled(true);
         webSettings.setDomStorageEnabled(true);
-        webSettings.setAppCacheEnabled(true);
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
     }

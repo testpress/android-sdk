@@ -73,7 +73,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
             menu.findItem(R.id.sync).isVisible = true
         }
 
-        menu.findItem(R.id.sync).actionView.setOnClickListener {
+        menu.findItem(R.id.sync).actionView?.setOnClickListener {
             if (job.isActive) {
                 showAlert(requireContext(), "Syncing Video", "Video watched information is being synced with server.")
             } else {
@@ -218,11 +218,11 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
     private fun syncVideoWatchData() {
         job = viewModel.viewModelScope.launch(Dispatchers.IO) {
             val refreshItem = menu.findItem(R.id.sync)
-            refreshItem.actionView.startRotation()
+            refreshItem.actionView?.startRotation()
 
             VideoWatchDataRepository(requireContext(), TestpressDatabase(requireContext()).offlineVideoDao()).sync()
             launch(Dispatchers.Main) {
-                refreshItem.actionView.clearAnimation()
+                refreshItem.actionView?.clearAnimation()
             }
         }
     }
