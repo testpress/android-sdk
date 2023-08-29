@@ -219,14 +219,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         activity.getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
 
         vibrator  = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
-
-
-        addDragSupport();
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private void addDragSupport() {
-        playerView.setOnTouchListener(new OnTouchDragListener(this));
     }
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
@@ -600,6 +592,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             changeOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             setFullscreenIcon(R.drawable.testpress_fullscreen_exit);
             hideSystemBars();
+            scaleGesture.resetPinchToZoomGesture();
+            playerView.setOnTouchListener(new OnTouchDragListener(this));
         }
     }
 
@@ -631,6 +625,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             changeOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
             removePlayerViewFromDialog();
             setFullscreenIcon(R.drawable.testpress_fullscreen);
+            scaleGesture.resetPinchToZoomGesture();
         }
     }
 

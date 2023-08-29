@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import com.github.vkay94.dtpv.DoubleTapPlayerView
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import com.google.android.exoplayer2.ui.PlayerView
 import java.text.DecimalFormat
 
 
@@ -53,17 +54,20 @@ class PinchToZoomGesture(
                     currentMode = ZoomMode.ZOOMED_TO_FIT
                     updateZoomModeTextView(currentMode.mode)
                 }
+                playerView.videoSurfaceView?.scaleX = 1.0f
+                playerView.videoSurfaceView?.scaleY = 1.0f
+                playerView.videoSurfaceView?.x = 0f
+                playerView.videoSurfaceView?.y = 0f
+                scaleFactor = 1.0f
                 playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
             } else {
                 if (currentMode != ZoomMode.ORIGINAL) {
                     currentMode = ZoomMode.ORIGINAL
                     updateZoomModeTextView(currentMode.mode)
                 }
-                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+                resetPinchToZoomGesture()
             }
             vibrator.vibrate(50)
-            resetSurfaceView()
-            resetScaleFactor()
             isDragEnabled = false
         }
     }
@@ -78,17 +82,6 @@ class PinchToZoomGesture(
         zoomModeText.clearAnimation()
         zoomModeText.visibility = View.VISIBLE
         zoomModeText.text = text
-    }
-
-    private fun resetSurfaceView() {
-        playerView.videoSurfaceView?.scaleX = 1.0f
-        playerView.videoSurfaceView?.scaleY = 1.0f
-        playerView.videoSurfaceView?.x = 0f
-        playerView.videoSurfaceView?.y = 0f
-    }
-
-    private fun resetScaleFactor() {
-        scaleFactor = 1.0f
     }
 
     private fun TextView.hideTextView() {
@@ -130,6 +123,15 @@ class PinchToZoomGesture(
         ORIGINAL("Original"),
         ZOOMED_TO_FIT("Zoomed to fit"),
         ZOOM("Zoom")
+    }
+
+    fun resetPinchToZoomGesture() {
+        scaleFactor = 1.0f
+        playerView.videoSurfaceView?.scaleX = 1.0f
+        playerView.videoSurfaceView?.scaleY = 1.0f
+        playerView.videoSurfaceView?.x = 0f
+        playerView.videoSurfaceView?.y = 0f
+        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
     }
 
 }
