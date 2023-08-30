@@ -38,7 +38,6 @@ class RazorpayPaymentGateway(order: Order, context: Activity): PaymentGateway(or
         payloadHelper.allowRotation = true
         payloadHelper.rememberCustomer = true
         payloadHelper.redirect = true
-        payloadHelper.callbackUrl = redirectURL
         payloadHelper.modalConfirmClose = true
         payloadHelper.backDropColor = "#ffffff"
         payloadHelper.hideTopBar = true
