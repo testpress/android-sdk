@@ -110,7 +110,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         if (getCourse() != null && isItemsEmpty()) {
             showLoadingPlaceholder();
         }
-        setHasOptionsMenu(isCustomTestGenerationEnabled());
+        setHasOptionsMenu(productSlug == null && isCustomTestGenerationEnabled());
     }
 
     private void fetchCourseAndShowChapters(String courseId) {
