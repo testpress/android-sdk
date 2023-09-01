@@ -1,6 +1,5 @@
 package in.testpress.course.util;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -12,7 +11,6 @@ import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.os.Handler;
-import android.os.Vibrator;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,11 +61,13 @@ import com.google.android.exoplayer2.trackselection.ExoTrackSelection;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
@@ -88,6 +88,8 @@ import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
 import in.testpress.util.InternetConnectivityChecker;
 import kotlin.Pair;
+
+import static android.content.Context.AUDIO_SERVICE;
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 import static androidx.mediarouter.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
@@ -101,8 +103,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private static final int OVERLAY_POSITION_CHANGE_INTERVAL = 15000; // 15s
     private static final int SEEK_TIME_IN_MILLISECOND = 15000; //15s
 
-    private FrameLayout exoPlayerMainFrame;
-    private ConstraintLayout exoPlayerLayout;
+    public FrameLayout exoPlayerMainFrame;
+    private View exoPlayerLayout;
     DoubleTapPlayerView playerView;
     private LottieAnimationView progressBar;
     private TextView errorMessageTextView;
@@ -117,7 +119,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     List<String[]> watchedTimeRanges = new ArrayList<>();
 
 
-    private Activity activity;
+    public Activity activity;
     private long videoAttemptId = -1;
     private Content content;
     private String url;
@@ -161,7 +163,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private VideoWatchDataRepository videoWatchDataRepository;
     ScaleGestureDetector scaleGestureDetector;
     PinchToZoomGesture scaleGesture;
-    Vibrator vibrator;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition) {
@@ -375,7 +376,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void initializePinchToZoom() {
-        scaleGesture = new PinchToZoomGesture(exoPlayerMainFrame,vibrator);
+        scaleGesture = new PinchToZoomGesture(this);
         scaleGestureDetector = new ScaleGestureDetector(activity, scaleGesture);
     }
 

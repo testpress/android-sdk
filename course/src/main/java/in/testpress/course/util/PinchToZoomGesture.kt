@@ -1,6 +1,7 @@
 package `in`.testpress.course.util
 
 import `in`.testpress.course.R
+import android.content.Context
 import android.os.*
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
@@ -8,25 +9,23 @@ import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.animation.*
-import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
 import com.github.vkay94.dtpv.DoubleTapPlayerView
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import com.google.android.exoplayer2.ui.PlayerView
 import java.text.DecimalFormat
 
 
 class PinchToZoomGesture(
-    exoPlayerMainFrame: FrameLayout,
-    private val vibrator: Vibrator
+    exoPlayerUtil: ExoPlayerUtil,
 ) : SimpleOnScaleGestureListener() {
 
     var scaleFactor = 1.0f
     var isDragEnabled = false
-    private val zoomModeText: TextView = exoPlayerMainFrame.findViewById(R.id.zoom_mode_text)
-    private val zoomSizeText: TextView = exoPlayerMainFrame.findViewById(R.id.zoom_size_text)
-    private val playerView: DoubleTapPlayerView = exoPlayerMainFrame.findViewById(R.id.exo_player_view)
+    private val zoomModeText: TextView = exoPlayerUtil.exoPlayerMainFrame.findViewById(R.id.zoom_mode_text)
+    private val zoomSizeText: TextView = exoPlayerUtil.exoPlayerMainFrame.findViewById(R.id.zoom_size_text)
+    private val playerView: DoubleTapPlayerView = exoPlayerUtil.exoPlayerMainFrame.findViewById(R.id.exo_player_view)
+    private val vibrator = exoPlayerUtil.activity.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     private var currentMode = ZoomMode.ORIGINAL
 
     override fun onScale(detector: ScaleGestureDetector): Boolean {
@@ -65,9 +64,6 @@ class PinchToZoomGesture(
             }
             vibrator.vibrate(50)
             isDragEnabled = false
-        }
-        if (currentMode == ZoomMode.ZOOM){
-            zoomModeText.clearAnimation()
         }
         zoomSizeText.visibility = View.GONE
     }
