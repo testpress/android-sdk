@@ -24,7 +24,8 @@ class PinchToZoomGesture(
 
     var scaleFactor = 1.0f
     var isDragEnabled = false
-    private val zoomModeText: TextView = exoPlayerMainFrame.findViewById(R.id.pinch_to_zoom_mode_text)
+    private val zoomModeText: TextView = exoPlayerMainFrame.findViewById(R.id.zoom_mode_text)
+    private val zoomSizeText: TextView = exoPlayerMainFrame.findViewById(R.id.zoom_size_text)
     private val playerView: DoubleTapPlayerView = exoPlayerMainFrame.findViewById(R.id.exo_player_view)
     private var currentMode = ZoomMode.ORIGINAL
 
@@ -35,9 +36,9 @@ class PinchToZoomGesture(
         playerView.videoSurfaceView?.scaleX = scaleFactor
         playerView.videoSurfaceView?.scaleY = scaleFactor
         if (scaleFactor > 1.2) {
-            val decimalFormat = DecimalFormat("0.0 x")
+            val decimalFormat = DecimalFormat("0.0x")
             val formattedValue = decimalFormat.format(scaleFactor.toDouble())
-            updateZoomMesurmentTextView(formattedValue)
+            updateZoomSizeTestView(formattedValue)
         }
         return true
     }
@@ -54,22 +55,21 @@ class PinchToZoomGesture(
                     currentMode = ZoomMode.ZOOMED_TO_FIT
                     updateZoomModeTextView(currentMode.mode)
                 }
-                playerView.videoSurfaceView?.scaleX = 1.0f
-                playerView.videoSurfaceView?.scaleY = 1.0f
-                playerView.videoSurfaceView?.x = 0f
-                playerView.videoSurfaceView?.y = 0f
-                scaleFactor = 1.0f
-                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                resetPinchToZoomGesture(ZoomMode.ZOOMED_TO_FIT)
             } else {
                 if (currentMode != ZoomMode.ORIGINAL) {
                     currentMode = ZoomMode.ORIGINAL
                     updateZoomModeTextView(currentMode.mode)
                 }
-                resetPinchToZoomGesture()
+                resetPinchToZoomGesture(ZoomMode.ORIGINAL)
             }
             vibrator.vibrate(50)
             isDragEnabled = false
         }
+        if (currentMode == ZoomMode.ZOOM){
+            zoomModeText.clearAnimation()
+        }
+        zoomSizeText.visibility = View.GONE
     }
 
     private fun updateZoomModeTextView(text: String) {
@@ -78,10 +78,10 @@ class PinchToZoomGesture(
         zoomModeText.hideTextView()
     }
 
-    private fun updateZoomMesurmentTextView(text: String) {
+    private fun updateZoomSizeTestView(text: String) {
         zoomModeText.clearAnimation()
-        zoomModeText.visibility = View.VISIBLE
-        zoomModeText.text = text
+        zoomSizeText.visibility = View.VISIBLE
+        zoomSizeText.text = text
     }
 
     private fun TextView.hideTextView() {
@@ -125,13 +125,17 @@ class PinchToZoomGesture(
         ZOOM("Zoom")
     }
 
-    fun resetPinchToZoomGesture() {
+    fun resetPinchToZoomGesture(zoomMode: ZoomMode) {
         scaleFactor = 1.0f
         playerView.videoSurfaceView?.scaleX = 1.0f
         playerView.videoSurfaceView?.scaleY = 1.0f
         playerView.videoSurfaceView?.x = 0f
         playerView.videoSurfaceView?.y = 0f
-        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+        playerView.resizeMode = if (zoomMode == ZoomMode.ZOOMED_TO_FIT) {
+            AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+        } else {
+            AspectRatioFrameLayout.RESIZE_MODE_FIT
+        }
     }
 
 }

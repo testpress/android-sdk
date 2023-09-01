@@ -55,7 +55,7 @@
             android:background="#40000000"
             />
 
-        <TextView android:id="@+id/pinch_to_zoom_mode_text"
+        <TextView android:id="@+id/zoom_mode_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -67,6 +67,20 @@
             android:visibility="gone"
             android:padding="8dp"
             android:textSize="16sp"
+            />
+
+        <TextView android:id="@+id/zoom_size_text"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:gravity="center"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/exoplayer_zoom_mode_round_background"
+            android:textColor="#80FFFFFF"
+            android:visibility="gone"
+            android:textSize="18sp"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
