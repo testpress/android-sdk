@@ -115,12 +115,6 @@ class PinchToZoomGesture(
         this.startAnimation(animationSet)
     }
 
-    enum class ZoomMode (val mode: String){
-        ORIGINAL("Original"),
-        ZOOMED_TO_FIT("Zoomed to fit"),
-        ZOOM("Zoom")
-    }
-
     fun resetPinchToZoomGesture(zoomMode: ZoomMode) {
         scaleFactor = 1.0f
         playerView.videoSurfaceView?.scaleX = 1.0f
@@ -134,20 +128,28 @@ class PinchToZoomGesture(
         }
     }
 
+    enum class ZoomMode (val mode: String){
+        ORIGINAL("Original"),
+        ZOOMED_TO_FIT("Zoomed to fit"),
+        ZOOM("Zoom")
+    }
+
 }
 
 class OnTouchDragListener(private val exoPlayerUtil: ExoPlayerUtil) : OnTouchListener {
 
-    var lastTouchX = 0f
-    var lastTouchY = 0f
-    var posX = 0f
-    var posY = 0f
-    var moveCalled = 0
+    private var lastTouchX = 0f
+    private var lastTouchY = 0f
+    private var posX = 0f
+    private var posY = 0f
+    private var moveCalled = 0
+    private val playerView get() = exoPlayerUtil.playerView
+    private val scaleGesture get() = exoPlayerUtil.scaleGesture
 
     override fun onTouch(p0: View, motionEvent: MotionEvent): Boolean {
         if (exoPlayerUtil.fullscreen) {
             exoPlayerUtil.scaleGestureDetector.onTouchEvent(motionEvent)
-            if (exoPlayerUtil.scaleGesture.isDragEnabled) {
+            if (scaleGesture.isDragEnabled) {
                 when (motionEvent.action) {
                     MotionEvent.ACTION_DOWN -> {
                         lastTouchX = motionEvent.x
@@ -168,9 +170,9 @@ class OnTouchDragListener(private val exoPlayerUtil: ExoPlayerUtil) : OnTouchLis
 
                         // Calculate the maximum allowed translations
                         val maxPosX: Float =
-                            (exoPlayerUtil.playerView.videoSurfaceView?.width!! * exoPlayerUtil.scaleGesture.scaleFactor - exoPlayerUtil.playerView.width) / 2
+                            (playerView.videoSurfaceView?.width!! * scaleGesture.scaleFactor - playerView.width) / 2
                         val maxPosY: Float =
-                            (exoPlayerUtil.playerView.videoSurfaceView?.height!! * exoPlayerUtil.scaleGesture.scaleFactor - exoPlayerUtil.playerView.height) / 2
+                            (playerView.videoSurfaceView?.height!! * scaleGesture.scaleFactor - playerView.height) / 2
                         val minPosX = -maxPosX
                         val minPosY = -maxPosY
 
@@ -179,8 +181,8 @@ class OnTouchDragListener(private val exoPlayerUtil: ExoPlayerUtil) : OnTouchLis
                         posY = newPosY.coerceAtLeast(minPosY).coerceAtMost(maxPosY)
 
                         // Apply translations
-                        exoPlayerUtil.playerView.videoSurfaceView?.translationX = posX
-                        exoPlayerUtil.playerView.videoSurfaceView?.translationY = posY
+                        playerView.videoSurfaceView?.translationX = posX
+                        playerView.videoSurfaceView?.translationY = posY
                         lastTouchX = motionEvent.rawX
                         lastTouchY = motionEvent.rawY
                         return true
