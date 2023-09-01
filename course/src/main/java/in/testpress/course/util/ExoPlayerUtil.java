@@ -593,7 +593,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             changeOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             setFullscreenIcon(R.drawable.testpress_fullscreen_exit);
             hideSystemBars();
-            activity.findViewById(R.id.dark_screen).setVisibility(View.VISIBLE);
+            activity.findViewById(R.id.blank_layout).setVisibility(View.VISIBLE);
             scaleGesture.resetPinchToZoomGesture();
             playerView.setOnTouchListener(new OnTouchDragListener(this));
         }
@@ -628,7 +628,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             removePlayerViewFromDialog();
             setFullscreenIcon(R.drawable.testpress_fullscreen);
             scaleGesture.resetPinchToZoomGesture();
-            activity.findViewById(R.id.dark_screen).setVisibility(View.GONE);
+            activity.findViewById(R.id.blank_layout).setVisibility(View.GONE);
         }
     }
 

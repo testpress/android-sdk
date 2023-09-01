@@ -35,9 +35,7 @@ class PinchToZoomGesture(
         playerView.videoSurfaceView?.scaleX = scaleFactor
         playerView.videoSurfaceView?.scaleY = scaleFactor
         if (scaleFactor > 1.2) {
-            val decimalFormat = DecimalFormat("0.0x")
-            val formattedValue = decimalFormat.format(scaleFactor.toDouble())
-            updateZoomSizeTestView(formattedValue)
+            updateZoomSizeTextView()
         }
         return true
     }
@@ -45,22 +43,13 @@ class PinchToZoomGesture(
     override fun onScaleEnd(detector: ScaleGestureDetector) {
         if (scaleFactor > 1.2) {
             isDragEnabled = true
-            playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
             currentMode = ZoomMode.ZOOM
-            zoomModeText.isVisible = false
+            playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
         } else {
             if (scaleFactor > 1 && scaleFactor < 1.2) {
-                if (currentMode != ZoomMode.ZOOMED_TO_FIT) {
-                    currentMode = ZoomMode.ZOOMED_TO_FIT
-                    updateZoomModeTextView(currentMode.mode)
-                }
-                resetPinchToZoomGesture(ZoomMode.ZOOMED_TO_FIT)
+                setZoomToFitMode()
             } else {
-                if (currentMode != ZoomMode.ORIGINAL) {
-                    currentMode = ZoomMode.ORIGINAL
-                    updateZoomModeTextView(currentMode.mode)
-                }
-                resetPinchToZoomGesture(ZoomMode.ORIGINAL)
+                setOriginalMode()
             }
             vibrator.vibrate(50)
             isDragEnabled = false
@@ -68,16 +57,32 @@ class PinchToZoomGesture(
         zoomSizeText.visibility = View.GONE
     }
 
-    private fun updateZoomModeTextView(text: String) {
+    private fun setOriginalMode() {
+        if (currentMode != ZoomMode.ORIGINAL) {
+            currentMode = ZoomMode.ORIGINAL
+            updateZoomModeTextView()
+        }
+        resetPinchToZoomGesture(ZoomMode.ORIGINAL)
+    }
+
+    private fun setZoomToFitMode() {
+        if (currentMode != ZoomMode.ZOOMED_TO_FIT) {
+            currentMode = ZoomMode.ZOOMED_TO_FIT
+            updateZoomModeTextView()
+        }
+        resetPinchToZoomGesture(ZoomMode.ZOOMED_TO_FIT)
+    }
+
+    private fun updateZoomModeTextView() {
         zoomModeText.visibility = View.VISIBLE
-        zoomModeText.text = text
+        zoomModeText.text = currentMode.mode
         zoomModeText.hideTextView()
     }
 
-    private fun updateZoomSizeTestView(text: String) {
+    private fun updateZoomSizeTextView() {
         zoomModeText.clearAnimation()
         zoomSizeText.visibility = View.VISIBLE
-        zoomSizeText.text = text
+        zoomSizeText.text = DecimalFormat("0.0x").format(scaleFactor.toDouble())
     }
 
     private fun TextView.hideTextView() {
