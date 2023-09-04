@@ -88,7 +88,6 @@ import in.testpress.util.CommonUtils;
 import in.testpress.util.InternetConnectivityChecker;
 import kotlin.Pair;
 
-import static android.content.Context.AUDIO_SERVICE;
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 import static androidx.mediarouter.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
@@ -217,8 +216,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         // set activity as portrait mode at first
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         activity.getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
-
-        vibrator  = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
@@ -592,10 +589,14 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             changeOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             setFullscreenIcon(R.drawable.testpress_fullscreen_exit);
             hideSystemBars();
-            activity.findViewById(R.id.blank_layout).setVisibility(View.VISIBLE);
-            scaleGesture.resetPinchToZoomGesture();
-            playerView.setOnTouchListener(new OnTouchDragListener(this));
+            addPinchToZoom();
         }
+    }
+
+    private void addPinchToZoom() {
+        pinchToZoomGesture.resetPinchToZoomGesture(PinchToZoomGesture.ZoomMode.ORIGINAL);
+        playerView.setOnTouchListener(new VideoTouchDragHandler(playerView,pinchToZoomGesture,scaleGestureDetector));
+        activity.findViewById(R.id.blank_layout).setVisibility(View.VISIBLE);
     }
 
     private void addPlayerLayoutToDialog() {
@@ -626,10 +627,14 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             changeOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
             removePlayerViewFromDialog();
             setFullscreenIcon(R.drawable.testpress_fullscreen);
-            scaleGesture.resetPinchToZoomGesture();
-            activity.findViewById(R.id.blank_layout).setVisibility(View.GONE);
-            playerView.setOnTouchListener(null);
+            removePinchToZoom();
         }
+    }
+
+    private void removePinchToZoom() {
+        pinchToZoomGesture.resetPinchToZoomGesture(PinchToZoomGesture.ZoomMode.ORIGINAL);
+        playerView.setOnTouchListener(null);
+        activity.findViewById(R.id.blank_layout).setVisibility(View.GONE);
     }
 
     private void removePlayerViewFromDialog() {

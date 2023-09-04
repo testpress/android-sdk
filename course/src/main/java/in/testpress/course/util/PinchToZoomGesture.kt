@@ -105,6 +105,7 @@ class PinchToZoomGesture(
         playerView.videoSurfaceView?.scaleY = 1.0f
         playerView.videoSurfaceView?.x = 0f
         playerView.videoSurfaceView?.y = 0f
+        currentMode = zoomMode
         playerView.resizeMode = if (zoomMode == ZoomMode.ZOOMED_TO_FIT) {
             AspectRatioFrameLayout.RESIZE_MODE_ZOOM
         } else {
