@@ -20,6 +20,10 @@ class VideoTouchDragHandler(
     private var lastTouchY = 0f
     private var posX = 0f
     private var posY = 0f
+    private var deltaX = 0f
+    private var deltaY = 0f
+    private var newPosX = 0f
+    private var newPosY = 0f
     private var touchEventCalled = 0
     private val MINIMUM_TOUCH_EVENT_REQUIRED = 5
 
@@ -27,53 +31,81 @@ class VideoTouchDragHandler(
         scaleGestureDetector.onTouchEvent(motionEvent)
         if (this.pinchToZoomGesture.isDragEnabled) {
             when (motionEvent.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    // Store the initial touch coordinates.
-                    lastTouchX = motionEvent.x
-                    lastTouchY = motionEvent.y
-                    return false
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    touchEventCalled += 1
-                    // Only start dragging after a few move events to avoid accidental drags.
-                    if (touchEventCalled < MINIMUM_TOUCH_EVENT_REQUIRED) {
-                        return false
-                    }
-                    // Calculate the change in touch coordinates.
-                    val deltaX: Float = motionEvent.rawX - lastTouchX
-                    val deltaY: Float = motionEvent.rawY - lastTouchY
-
-                    // Calculate the new positions based on the changes.
-                    val newPosX: Float = posX + deltaX
-                    val newPosY: Float = posY + deltaY
-
-                    // Calculate the maximum allowed translations based on the scaled view size.
-                    val maxPosX: Float =
-                        (playerView.videoSurfaceView?.width!! * this.pinchToZoomGesture.scaleFactor - playerView.width) / 2
-                    val maxPosY: Float =
-                        (playerView.videoSurfaceView?.height!! * this.pinchToZoomGesture.scaleFactor - playerView.height) / 2
-                    val minPosX = -maxPosX
-                    val minPosY = -maxPosY
-
-                    // Apply boundary checks to prevent over-translation.
-                    posX = newPosX.coerceAtLeast(minPosX).coerceAtMost(maxPosX)
-                    posY = newPosY.coerceAtLeast(minPosY).coerceAtMost(maxPosY)
-
-                    // Apply translations to the video surface view.
-                    playerView.videoSurfaceView?.translationX = posX
-                    playerView.videoSurfaceView?.translationY = posY
-
-                    // Update the last touch coordinates.
-                    lastTouchX = motionEvent.rawX
-                    lastTouchY = motionEvent.rawY
-                    return true
-                }
-                MotionEvent.ACTION_UP -> {
-                    touchEventCalled = 0
-                    return false
-                }
+                MotionEvent.ACTION_DOWN -> handleActionDown(motionEvent)
+                MotionEvent.ACTION_UP -> handleActionUp()
+                MotionEvent.ACTION_MOVE -> handleActionMove(motionEvent)
             }
         }
         return false
+    }
+
+    private fun handleActionDown(motionEvent: MotionEvent): Boolean {
+        updateLastTouchCoordinates(motionEvent)
+        return false
+    }
+
+    private fun handleActionUp(): Boolean {
+        resetAllValues()
+        return false
+    }
+
+    private fun resetAllValues() {
+        touchEventCalled = 0
+        deltaX = 0f
+        deltaY = 0f
+        newPosX = 0f
+        newPosY = 0f
+    }
+
+    private fun handleActionMove(motionEvent: MotionEvent): Boolean {
+        touchEventCalled += 1
+        // Only start dragging after a few move events to avoid accidental drags.
+        if (touchEventCalled < MINIMUM_TOUCH_EVENT_REQUIRED) {
+            return false
+        }
+        calculateCoordinatesChange(motionEvent)
+        calculateNewPositions()
+        applyBoundaryChecks()
+        updatePlayerViewPosition()
+        updateLastTouchCoordinates(motionEvent)
+        return true
+    }
+
+    private fun calculateNewPositions() {
+        // Calculate the new positions based on the changes.
+        newPosX = posX + deltaX
+        newPosY = posY + deltaY
+    }
+
+    private fun calculateCoordinatesChange(motionEvent: MotionEvent) {
+        // Calculate the change in touch coordinates.
+        deltaX = motionEvent.rawX - lastTouchX
+        deltaY = motionEvent.rawY - lastTouchY
+    }
+
+    private fun applyBoundaryChecks() {
+        // Calculate the maximum allowed translations based on the scaled view size.
+        val maxPosX: Float =
+            (playerView.videoSurfaceView?.width!! * this.pinchToZoomGesture.scaleFactor - playerView.width) / 2
+        val maxPosY: Float =
+            (playerView.videoSurfaceView?.height!! * this.pinchToZoomGesture.scaleFactor - playerView.height) / 2
+        val minPosX = -maxPosX
+        val minPosY = -maxPosY
+
+        // Apply boundary checks to prevent over-translation.
+        posX = newPosX.coerceAtLeast(minPosX).coerceAtMost(maxPosX)
+        posY = newPosY.coerceAtLeast(minPosY).coerceAtMost(maxPosY)
+    }
+
+    private fun updatePlayerViewPosition() {
+        playerView.videoSurfaceView?.let {
+            it.translationX = posX
+            it.translationY = posY
+        }
+    }
+
+    private fun updateLastTouchCoordinates(motionEvent: MotionEvent) {
+        lastTouchX = motionEvent.rawX
+        lastTouchY = motionEvent.rawY
     }
 }
