@@ -36,21 +36,13 @@ class VideoTouchDragHandler(
                     return false
                 }
                 MotionEvent.ACTION_UP -> {
-                    resetAllValues()
+                    touchEventCalled = 0
                     return false
                 }
                 MotionEvent.ACTION_MOVE -> drag(motionEvent)
             }
         }
         return false
-    }
-
-    private fun resetAllValues() {
-        touchEventCalled = 0
-        deltaX = 0f
-        deltaY = 0f
-        newPlayerPosX = 0f
-        newPlayerPosY = 0f
     }
 
     private fun drag(motionEvent: MotionEvent): Boolean {
@@ -67,16 +59,16 @@ class VideoTouchDragHandler(
         return true
     }
 
-    private fun calculateNewPositions() {
-        // Calculate the new positions based on the changes.
-        newPlayerPosX = playerViewPosX + deltaX
-        newPlayerPosY = playerViewPosY + deltaY
-    }
-
     private fun calculateCoordinatesChange(motionEvent: MotionEvent) {
         // Calculate the change in touch coordinates.
         deltaX = motionEvent.rawX - lastTouchX
         deltaY = motionEvent.rawY - lastTouchY
+    }
+
+    private fun calculateNewPositions() {
+        // Calculate the new positions based on the changes.
+        newPlayerPosX = playerViewPosX + deltaX
+        newPlayerPosY = playerViewPosY + deltaY
     }
 
     private fun applyBoundaryChecks() {
