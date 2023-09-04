@@ -102,9 +102,9 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private static final int OVERLAY_POSITION_CHANGE_INTERVAL = 15000; // 15s
     private static final int SEEK_TIME_IN_MILLISECOND = 15000; //15s
 
-    public FrameLayout exoPlayerMainFrame;
+    private FrameLayout exoPlayerMainFrame;
     private View exoPlayerLayout;
-    DoubleTapPlayerView playerView;
+    private DoubleTapPlayerView playerView;
     private LottieAnimationView progressBar;
     private TextView errorMessageTextView;
     private LinearLayout emailIdLayout;
@@ -160,8 +160,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private DefaultTrackSelector trackSelector;
     private DialogInterface.OnClickListener dialogOnClickListener;
     private VideoWatchDataRepository videoWatchDataRepository;
-    ScaleGestureDetector scaleGestureDetector;
-    PinchToZoomGesture scaleGesture;
+    private ScaleGestureDetector scaleGestureDetector;
+    private PinchToZoomGesture pinchToZoomGesture;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition) {
@@ -375,8 +375,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void initializePinchToZoom() {
-        scaleGesture = new PinchToZoomGesture(this);
-        scaleGestureDetector = new ScaleGestureDetector(activity, scaleGesture);
+        pinchToZoomGesture = new PinchToZoomGesture(activity,exoPlayerMainFrame);
+        scaleGestureDetector = new ScaleGestureDetector(activity, pinchToZoomGesture);
     }
 
     private void preparePlayer() {
@@ -628,6 +628,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             setFullscreenIcon(R.drawable.testpress_fullscreen);
             scaleGesture.resetPinchToZoomGesture();
             activity.findViewById(R.id.blank_layout).setVisibility(View.GONE);
+            playerView.setOnTouchListener(null);
         }
     }
 
