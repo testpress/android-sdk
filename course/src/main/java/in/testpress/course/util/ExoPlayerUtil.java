@@ -118,7 +118,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     List<String[]> watchedTimeRanges = new ArrayList<>();
 
 
-    public Activity activity;
+    private Activity activity;
     private long videoAttemptId = -1;
     private Content content;
     private String url;
@@ -142,7 +142,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             overlayPositionHandler.postDelayed(this, OVERLAY_POSITION_CHANGE_INTERVAL);
         }
     };
-    boolean fullscreen = false;
+    private boolean fullscreen = false;
     private boolean errorOnVideoAttemptUpdate;
     private int drmLicenseRetries = 0;
     private Handler videoAttemptUpdateHandler;

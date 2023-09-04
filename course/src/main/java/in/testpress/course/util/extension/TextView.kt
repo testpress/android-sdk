@@ -1,7 +1,8 @@
 package `in`.testpress.course.util.extension
 
+import `in`.testpress.course.util.AnimationType
+import `in`.testpress.course.util.getAnimation
 import android.view.View
-import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.AnimationSet
 import android.widget.TextView
@@ -12,27 +13,16 @@ import android.widget.TextView
  */
 
 fun TextView.animateHideTextView() {
-    val animationSet = AnimationSet(false)
 
-    // Fade in animation
-    val fadeInAnimation = AlphaAnimation(0.0f, 1.0f)
-    fadeInAnimation.duration = 250
-    animationSet.addAnimation(AlphaAnimation(0.0f, 1.0f).apply {
-        duration = 250
-    })
+    val fadeInAnimation = getAnimation(AnimationType.FADE_IN, 250, 0)
+    val stayAnimation = getAnimation(AnimationType.STAY, 500, fadeInAnimation.duration)
+    val fadeOutAnimation = getAnimation(AnimationType.FADE_OUT, 250, fadeInAnimation.duration + stayAnimation.duration)
 
-    // Stay visible for 500ms
-    val stayDuration = 500
-    animationSet.addAnimation(AlphaAnimation(1.0f, 1.0f).apply {
-        duration = stayDuration.toLong()
-        startOffset = fadeInAnimation.duration
-    })
-
-    // Fade out animation
-    val fadeOutAnimation = AlphaAnimation(1.0f, 0.0f)
-    fadeOutAnimation.duration = 250
-    fadeOutAnimation.startOffset = fadeInAnimation.duration + stayDuration
-    animationSet.addAnimation(fadeOutAnimation)
+    val animationSet = AnimationSet(false).apply {
+        this.addAnimation(fadeInAnimation)
+        this.addAnimation(stayAnimation)
+        this.addAnimation(fadeOutAnimation)
+    }
 
     animationSet.setAnimationListener(object : Animation.AnimationListener {
         override fun onAnimationStart(animation: Animation?) {}
