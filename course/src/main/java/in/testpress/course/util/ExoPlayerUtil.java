@@ -214,6 +214,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
         // set activity as portrait mode at first
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        activity.getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
     }
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
@@ -599,7 +600,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private void closeFullscreenDialog() {
 
         if (!iscloseFullscreenDialogCalled) {
-            activity.getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
             isopenFullscreenDialogCalled = false;
             iscloseFullscreenDialogCalled = true;
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
