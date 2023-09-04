@@ -33,17 +33,19 @@ class PinchToZoomGesture(
     override fun onScale(detector: ScaleGestureDetector): Boolean {
         playerView.hideController()
         calculateScaleFactor(detector.scaleFactor)
-        setPlayerViewScale()
+        zoomPlayerView()
         displayZoomSize()
         return true
     }
 
     private fun calculateScaleFactor(newScaleFactor: Float) {
+        // Update the scaleFactor by multiplying it with the detected scale factor,
+        // and ensure it stays within the range of 1.0f to 6.0f.
         scaleFactor *= newScaleFactor
         scaleFactor = MIN_SCALE.coerceAtLeast(scaleFactor.coerceAtMost(MAX_SCALE))
     }
 
-    private fun setPlayerViewScale() {
+    private fun zoomPlayerView() {
         playerView.videoSurfaceView?.let {
             it.scaleX = scaleFactor
             it.scaleY = scaleFactor
@@ -60,20 +62,20 @@ class PinchToZoomGesture(
 
     override fun onScaleEnd(detector: ScaleGestureDetector) {
         when {
-            scaleFactor > ZOOM_SCALE_THRESHOLD -> setZoomMode()
-            scaleFactor > MIN_SCALE && scaleFactor < ZOOM_SCALE_THRESHOLD -> setZoomToFitMode()
-            else -> setOriginalMode()
+            scaleFactor > ZOOM_SCALE_THRESHOLD -> changeToZoomMode()
+            scaleFactor > MIN_SCALE && scaleFactor < ZOOM_SCALE_THRESHOLD -> changeToZoomToFitMode()
+            else -> changeToOriginalMode()
         }
         zoomSizeText.visibility = View.GONE
     }
 
-    private fun setZoomMode() {
+    private fun changeToZoomMode() {
         isDragEnabled = true
         currentMode = ZoomMode.ZOOM
         playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
     }
 
-    private fun setZoomToFitMode() {
+    private fun changeToZoomToFitMode() {
         if (currentMode != ZoomMode.ZOOMED_TO_FIT) {
             currentMode = ZoomMode.ZOOMED_TO_FIT
             updateZoomModeTextView()
@@ -83,7 +85,7 @@ class PinchToZoomGesture(
         isDragEnabled = false
     }
 
-    private fun setOriginalMode() {
+    private fun changeToOriginalMode() {
         if (currentMode != ZoomMode.ORIGINAL) {
             currentMode = ZoomMode.ORIGINAL
             updateZoomModeTextView()

@@ -18,12 +18,12 @@ class VideoTouchDragHandler(
 
     private var lastTouchX = 0f
     private var lastTouchY = 0f
-    private var posX = 0f
-    private var posY = 0f
+    private var playerViewPosX = 0f
+    private var playerViewPosY = 0f
+    private var newPlayerPosX = 0f
+    private var newPlayerPosY = 0f
     private var deltaX = 0f
     private var deltaY = 0f
-    private var newPosX = 0f
-    private var newPosY = 0f
     private var touchEventCalled = 0
     private val MINIMUM_TOUCH_EVENT_REQUIRED = 5
 
@@ -31,21 +31,17 @@ class VideoTouchDragHandler(
         scaleGestureDetector.onTouchEvent(motionEvent)
         if (this.pinchToZoomGesture.isDragEnabled) {
             when (motionEvent.action) {
-                MotionEvent.ACTION_DOWN -> handleActionDown(motionEvent)
-                MotionEvent.ACTION_UP -> handleActionUp()
-                MotionEvent.ACTION_MOVE -> handleActionMove(motionEvent)
+                MotionEvent.ACTION_DOWN -> {
+                    updateLastTouchCoordinates(motionEvent)
+                    return false
+                }
+                MotionEvent.ACTION_UP -> {
+                    resetAllValues()
+                    return false
+                }
+                MotionEvent.ACTION_MOVE -> drag(motionEvent)
             }
         }
-        return false
-    }
-
-    private fun handleActionDown(motionEvent: MotionEvent): Boolean {
-        updateLastTouchCoordinates(motionEvent)
-        return false
-    }
-
-    private fun handleActionUp(): Boolean {
-        resetAllValues()
         return false
     }
 
@@ -53,11 +49,11 @@ class VideoTouchDragHandler(
         touchEventCalled = 0
         deltaX = 0f
         deltaY = 0f
-        newPosX = 0f
-        newPosY = 0f
+        newPlayerPosX = 0f
+        newPlayerPosY = 0f
     }
 
-    private fun handleActionMove(motionEvent: MotionEvent): Boolean {
+    private fun drag(motionEvent: MotionEvent): Boolean {
         touchEventCalled += 1
         // Only start dragging after a few move events to avoid accidental drags.
         if (touchEventCalled < MINIMUM_TOUCH_EVENT_REQUIRED) {
@@ -73,8 +69,8 @@ class VideoTouchDragHandler(
 
     private fun calculateNewPositions() {
         // Calculate the new positions based on the changes.
-        newPosX = posX + deltaX
-        newPosY = posY + deltaY
+        newPlayerPosX = playerViewPosX + deltaX
+        newPlayerPosY = playerViewPosY + deltaY
     }
 
     private fun calculateCoordinatesChange(motionEvent: MotionEvent) {
@@ -93,14 +89,14 @@ class VideoTouchDragHandler(
         val minPosY = -maxPosY
 
         // Apply boundary checks to prevent over-translation.
-        posX = newPosX.coerceAtLeast(minPosX).coerceAtMost(maxPosX)
-        posY = newPosY.coerceAtLeast(minPosY).coerceAtMost(maxPosY)
+        playerViewPosX = newPlayerPosX.coerceAtLeast(minPosX).coerceAtMost(maxPosX)
+        playerViewPosY = newPlayerPosY.coerceAtLeast(minPosY).coerceAtMost(maxPosY)
     }
 
     private fun updatePlayerViewPosition() {
         playerView.videoSurfaceView?.let {
-            it.translationX = posX
-            it.translationY = posY
+            it.translationX = playerViewPosX
+            it.translationY = playerViewPosY
         }
     }
 
