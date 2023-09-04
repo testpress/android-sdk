@@ -88,7 +88,6 @@ import in.testpress.util.CommonUtils;
 import in.testpress.util.InternetConnectivityChecker;
 import kotlin.Pair;
 
-import static android.content.Context.AUDIO_SERVICE;
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 import static androidx.mediarouter.media.MediaRouter.RouteInfo.CONNECTION_STATE_CONNECTED;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
@@ -578,19 +577,27 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         if (!isopenFullscreenDialogCalled) {
             iscloseFullscreenDialogCalled = false;
             isopenFullscreenDialogCalled = true;
-            exoPlayerMainFrame.removeView(exoPlayerLayout);
-            fullscreenDialog.addContentView(exoPlayerLayout, new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            fullscreenDialog.getWindow().addFlags(FLAG_SECURE);
+            addPlayerLayoutToDialog();
+            changeOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             setFullscreenIcon(R.drawable.testpress_fullscreen_exit);
-            fullscreen = true;
-            fullscreenDialog.show();
-            hideAppBars();
-            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            hideSystemBars();
         }
     }
 
-    private void hideAppBars() {
+    private void addPlayerLayoutToDialog() {
+        exoPlayerMainFrame.removeView(exoPlayerLayout);
+        fullscreenDialog.addContentView(exoPlayerLayout, new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        fullscreenDialog.getWindow().addFlags(FLAG_SECURE);
+        fullscreenDialog.show();
+    }
+
+    private void changeOrientation(int orientation) {
+        activity.setRequestedOrientation(orientation);
+        fullscreen = orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+    }
+
+    private void hideSystemBars() {
         WindowCompat.setDecorFitsSystemWindows(fullscreenDialog.getWindow(), false);
         WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(fullscreenDialog.getWindow(), playerView);
         controller.hide(WindowInsetsCompat.Type.systemBars());
@@ -602,13 +609,16 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         if (!iscloseFullscreenDialogCalled) {
             isopenFullscreenDialogCalled = false;
             iscloseFullscreenDialogCalled = true;
-            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
-            ((ViewGroup) exoPlayerLayout.getParent()).removeView(exoPlayerLayout);
-            exoPlayerMainFrame.addView(exoPlayerLayout);
-            fullscreen = false;
-            fullscreenDialog.dismiss();
+            changeOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+            removePlayerViewFromDialog();
             setFullscreenIcon(R.drawable.testpress_fullscreen);
         }
+    }
+
+    private void removePlayerViewFromDialog() {
+        ((ViewGroup) exoPlayerLayout.getParent()).removeView(exoPlayerLayout);
+        exoPlayerMainFrame.addView(exoPlayerLayout);
+        fullscreenDialog.dismiss();
     }
 
     private void setFullscreenIcon(@DrawableRes int imageResId) {
