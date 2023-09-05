@@ -32,20 +32,20 @@ class VideoTouchDragHandler(
         if (this.pinchToZoomGesture.isDragEnabled) {
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    updateLastTouchCoordinates(motionEvent)
+                    storeLastTouchCoordinates(motionEvent)
                     return false
                 }
                 MotionEvent.ACTION_UP -> {
                     touchEventCalled = 0
                     return false
                 }
-                MotionEvent.ACTION_MOVE -> drag(motionEvent)
+                MotionEvent.ACTION_MOVE -> dragPlayerView(motionEvent)
             }
         }
         return false
     }
 
-    private fun drag(motionEvent: MotionEvent): Boolean {
+    private fun dragPlayerView(motionEvent: MotionEvent): Boolean {
         touchEventCalled += 1
         // Only start dragging after a few move events to avoid accidental drags.
         if (touchEventCalled < MINIMUM_TOUCH_EVENT_REQUIRED) {
@@ -55,7 +55,7 @@ class VideoTouchDragHandler(
         calculateNewPositions()
         applyBoundaryChecks()
         updatePlayerViewPosition()
-        updateLastTouchCoordinates(motionEvent)
+        storeLastTouchCoordinates(motionEvent)
         return true
     }
 
@@ -92,7 +92,7 @@ class VideoTouchDragHandler(
         }
     }
 
-    private fun updateLastTouchCoordinates(motionEvent: MotionEvent) {
+    private fun storeLastTouchCoordinates(motionEvent: MotionEvent) {
         lastTouchX = motionEvent.rawX
         lastTouchY = motionEvent.rawY
     }
