@@ -53,18 +53,6 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
         questionNumberView.typeface = TestpressSdk.getRubikMediumFont(this)
     }
 
-    private fun customiseToolbar() {
-        toolbar.setBackgroundColor(Color.WHITE)
-        toolbar.setTitleTextColor(resources.getColor(R.color.testpress_color_primary))
-        supportActionBar!!.setDisplayHomeAsUpEnabled(false)
-        showLogoInToolbar()
-        val closeButton = findViewById<ImageButton>(R.id.close)
-        closeButton.visibility = View.VISIBLE
-        closeButton.setOnClickListener {
-            showEndExamAlert()
-        }
-    }
-
     private fun initializeViewModel() {
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -73,14 +61,6 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
                 ) as T
             }
         }).get(QuizExamViewModel::class.java)
-    }
-
-    private fun loadQuestions() {
-        val fragment = LoadingQuestionsFragment().apply {
-            arguments = intent.extras
-        }
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment).commitAllowingStateLoss()
     }
 
     private fun initializeListeners() {
@@ -105,6 +85,26 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
                 }
             }
         })
+    }
+
+    private fun loadQuestions() {
+        val fragment = LoadingQuestionsFragment().apply {
+            arguments = intent.extras
+        }
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment).commitAllowingStateLoss()
+    }
+
+    private fun customiseToolbar() {
+        toolbar.setBackgroundColor(Color.WHITE)
+        toolbar.setTitleTextColor(resources.getColor(R.color.testpress_color_primary))
+        supportActionBar!!.setDisplayHomeAsUpEnabled(false)
+        showLogoInToolbar()
+        val closeButton = findViewById<ImageButton>(R.id.close)
+        closeButton.visibility = View.VISIBLE
+        closeButton.setOnClickListener {
+            showEndExamAlert()
+        }
     }
 
     private fun showEndExamAlert() {
