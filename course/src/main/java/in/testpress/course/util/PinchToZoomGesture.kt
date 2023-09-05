@@ -16,7 +16,7 @@ import java.text.DecimalFormat
 
 class PinchToZoomGesture(
     activity: Activity,
-    playerViewFrameLayout: FrameLayout
+    playerOverlayLayout: FrameLayout
 ) : SimpleOnScaleGestureListener() {
 
     private val MAX_SCALE = 6.0f
@@ -24,9 +24,9 @@ class PinchToZoomGesture(
     private val ZOOM_SCALE_THRESHOLD = 1.2f
     var scaleFactor = 1.0f
     var isDragEnabled = false
-    private val zoomModeText: TextView = playerViewFrameLayout.findViewById(R.id.zoom_mode_text)
-    private val zoomSizeText: TextView = playerViewFrameLayout.findViewById(R.id.zoom_size_text)
-    private val playerView: DoubleTapPlayerView = playerViewFrameLayout.findViewById(R.id.exo_player_view)
+    private val zoomModeText: TextView = playerOverlayLayout.findViewById(R.id.zoom_mode_text)
+    private val zoomSizeText: TextView = playerOverlayLayout.findViewById(R.id.zoom_size_text)
+    private val playerView: DoubleTapPlayerView = playerOverlayLayout.findViewById(R.id.exo_player_view)
     private val vibrator = activity.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     private var currentMode = ZoomMode.ORIGINAL
 
