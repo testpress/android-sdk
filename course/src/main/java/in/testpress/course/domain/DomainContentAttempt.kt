@@ -18,6 +18,10 @@ data class DomainContentAttempt(
     val assessment: DomainAttempt? = null
 )
 
+fun DomainContentAttempt.getEndAttemptUrl(context: Context):String? {
+    return this.getGreenDaoContentAttempt(context)?.endAttemptUrl
+}
+
 fun createDomainContentAttempt(contentAttempt: CourseAttempt): DomainContentAttempt {
     return DomainContentAttempt(
         id = contentAttempt.id,

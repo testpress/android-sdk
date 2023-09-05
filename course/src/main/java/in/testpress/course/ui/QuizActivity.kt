@@ -3,6 +3,7 @@ package `in`.testpress.course.ui
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
+import `in`.testpress.course.domain.getEndAttemptUrl
 import `in`.testpress.enums.Status
 import `in`.testpress.course.fragments.ExamEndHanlder
 import `in`.testpress.course.fragments.LoadingQuestionsFragment
@@ -142,7 +143,7 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
         viewModel.loadAttempt(attemptId).observe(this, Observer {
             contentAttemptId = it?.data!!.id
             this.attemptId = it.data!!.assessment?.id!!
-            examEndUrl = it?.data?.assessment?.endUrl
+            examEndUrl = it?.data?.getEndAttemptUrl(this)
             val examId = intent.getLongExtra("EXAM_ID", -1)
             val bundle = Bundle().apply {
                 putLong("EXAM_ID", examId)
