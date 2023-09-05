@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.os.Handler;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -33,7 +34,6 @@ import androidx.mediarouter.media.MediaControlIntent;
 import androidx.mediarouter.media.MediaRouteSelector;
 import androidx.mediarouter.media.MediaRouter;
 import androidx.mediarouter.media.MediaRouter.RouteInfo;
-
 import com.airbnb.lottie.LottieAnimationView;
 import com.github.vkay94.dtpv.DoubleTapPlayerView;
 import com.github.vkay94.dtpv.youtube.YouTubeOverlay;
@@ -159,6 +159,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private DefaultTrackSelector trackSelector;
     private DialogInterface.OnClickListener dialogOnClickListener;
     private VideoWatchDataRepository videoWatchDataRepository;
+    private ScaleGestureDetector scaleGestureDetector;
+    private PinchToZoomGesture pinchToZoomGesture;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition) {
@@ -296,6 +298,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             progressBar.setVisibility(View.VISIBLE);
             buildPlayer();
             initializeDoubleClickOverlay();
+            initializePinchToZoom();
         }
         preparePlayer();
         player.seekTo(getStartPositionInMilliSeconds());
@@ -366,6 +369,11 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                         youtubeOverlay.setVisibility(View.GONE);
                     }
                 });
+    }
+
+    private void initializePinchToZoom() {
+        pinchToZoomGesture = new PinchToZoomGesture(activity,exoPlayerMainFrame);
+        scaleGestureDetector = new ScaleGestureDetector(activity, pinchToZoomGesture);
     }
 
     private void preparePlayer() {
@@ -581,7 +589,14 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             changeOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             setFullscreenIcon(R.drawable.testpress_fullscreen_exit);
             hideSystemBars();
+            addPinchToZoom();
         }
+    }
+
+    private void addPinchToZoom() {
+        pinchToZoomGesture.resetPinchToZoomGesture(PinchToZoomGesture.ZoomMode.ORIGINAL);
+        playerView.setOnTouchListener(new VideoTouchDragHandler(playerView,pinchToZoomGesture,scaleGestureDetector));
+        activity.findViewById(R.id.blank_layout).setVisibility(View.VISIBLE);
     }
 
     private void addPlayerLayoutToDialog() {
@@ -612,7 +627,14 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             changeOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
             removePlayerViewFromDialog();
             setFullscreenIcon(R.drawable.testpress_fullscreen);
+            removePinchToZoom();
         }
+    }
+
+    private void removePinchToZoom() {
+        pinchToZoomGesture.resetPinchToZoomGesture(PinchToZoomGesture.ZoomMode.ORIGINAL);
+        playerView.setOnTouchListener(null);
+        activity.findViewById(R.id.blank_layout).setVisibility(View.GONE);
     }
 
     private void removePlayerViewFromDialog() {
