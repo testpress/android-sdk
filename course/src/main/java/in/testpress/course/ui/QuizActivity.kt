@@ -173,4 +173,8 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
         questionNumberView.visibility = View.VISIBLE
         questionNumberView.text = "$number of $total"
     }
+
+    override fun onBackPressed() {
+        showEndExamAlert()
+    }
 }
