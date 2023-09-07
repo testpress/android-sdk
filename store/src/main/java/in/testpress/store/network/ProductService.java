@@ -51,7 +51,7 @@ public interface ProductService {
     @POST(ORDER_API_PATH + "{order_id}" + ORDER_STATE_REFRESH_PATH)
     RetrofitCall<NetworkOrderStatus> refreshOrderStatus(
             @Path(value = "order_id", encoded = true) String orderId,
-            @Body HashMap<String, String> arguments);
+            @Body HashMap<String, Boolean> arguments);
 }
 
 

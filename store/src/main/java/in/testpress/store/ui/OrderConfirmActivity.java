@@ -288,7 +288,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
 
     @Override
     public void onBackPressed() {
-        refreshOrderStatus();
+        refreshOrderStatus(false);
         new AlertDialog.Builder(this, R.style.TestpressAppCompatAlertDialogStyle)
                 .setTitle(R.string.testpress_are_you_sure)
                 .setMessage(R.string.testpress_want_to_cancel_order)
@@ -323,9 +323,9 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         retryButton.setVisibility(View.GONE);
     }
 
-    private void refreshOrderStatus() {
+    private void refreshOrderStatus(Boolean reconciliation) {
         progressBar.setVisibility(View.VISIBLE);
-        apiClient.refreshOrderStatus(order.getOrderId()).enqueue(new TestpressCallback<NetworkOrderStatus>() {
+        apiClient.refreshOrderStatus(order.getOrderId(), reconciliation).enqueue(new TestpressCallback<NetworkOrderStatus>() {
             @Override
             public void onSuccess(NetworkOrderStatus result) {
                 if (result.getStatus().equals("Completed")) {
@@ -344,12 +344,12 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
 
     @Override
     public void onPaymentSuccess() {
-        refreshOrderStatus();
+        refreshOrderStatus(false);
     }
 
     @Override
     public void onPaymentSuccess(String razorpayPaymentID) {
-        refreshOrderStatus();
+        refreshOrderStatus(false);
     }
 
     void showPaymentFailedScreen() {
@@ -361,7 +361,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     @Override
     public void onPaymentFailure() {
         progressBar.setVisibility(View.VISIBLE);
-        refreshOrderStatus();
+        refreshOrderStatus(false);
     }
 
     @Override
@@ -373,7 +373,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     @Override
     public void onPaymentError(int razorpayErrorCode, String razorpayErrorResponse) {
         progressBar.setVisibility(View.VISIBLE);
-        refreshOrderStatus();
+        refreshOrderStatus(true);
     }
 
     @Override
