@@ -80,6 +80,21 @@ class LoadingQuestionsFragment : Fragment(),
         transaction.commit()
     }
 
+    private fun loadAttempt() {
+        viewModel.loadAttempt(contentId).observe(viewLifecycleOwner, Observer {resource ->
+            when(resource?.status) {
+                Status.SUCCESS -> resource.data?.let { domainContentAttempt ->
+                    contentAttempt = domainContentAttempt
+                    initUserSelectedAnswers()
+                }
+                Status.ERROR -> {
+                    loadingLayout.visibility = View.GONE
+                    emptyViewFragment.displayError(resource.exception!!)
+                }
+            }
+        })
+    }
+
     private fun initUserSelectedAnswers() {
         val attempt = contentAttempt.assessment!!
         val questionsUrl = "/api/v2.4/exams/${examId}/questions/"
@@ -90,21 +105,6 @@ class LoadingQuestionsFragment : Fragment(),
                         it.duration == null
                     }
                     fragmentChangeListener.showQuiz(contentAttempt.id, resource.data!!.size, index)
-                }
-                Status.ERROR -> {
-                    loadingLayout.visibility = View.GONE
-                    emptyViewFragment.displayError(resource.exception!!)
-                }
-            }
-        })
-    }
-
-    private fun loadAttempt() {
-        viewModel.loadAttempt(contentId).observe(viewLifecycleOwner, Observer {resource ->
-            when(resource?.status) {
-                Status.SUCCESS -> resource.data?.let { domainContentAttempt ->
-                    contentAttempt = domainContentAttempt
-                    initUserSelectedAnswers()
                 }
                 Status.ERROR -> {
                     loadingLayout.visibility = View.GONE
