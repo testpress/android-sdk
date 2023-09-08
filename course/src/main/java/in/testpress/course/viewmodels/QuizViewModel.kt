@@ -9,8 +9,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class QuizViewModel(val repository: QuizQuestionsRepository): ViewModel() {
-    fun loadAttempt(contentId: Long): LiveData<Resource<DomainContentAttempt>> {
-        return repository.createAttempt(contentId)
+    fun loadContentAttempt(contentId: Long): LiveData<Resource<DomainContentAttempt>> {
+        return repository.createContentAttempt(contentId)
     }
 
     fun loadUserSelectedAnswers(examID: Long, attemptId: Long, url: String): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
