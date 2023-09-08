@@ -9,8 +9,8 @@ import androidx.lifecycle.ViewModel
 class QuizExamViewModel(val repository: QuizExamRepository): ViewModel() {
     val endExamState = repository.resourceAttempt
 
-    fun loadAttempt(id: Long): LiveData<Resource<DomainContentAttempt>> {
-        return repository.loadAttempt(id)
+    fun loadContentAttempt(id: Long): LiveData<Resource<DomainContentAttempt>> {
+        return repository.loadContentAttempt(id)
     }
 
     fun endExam(url: String, attemptId: Long) {

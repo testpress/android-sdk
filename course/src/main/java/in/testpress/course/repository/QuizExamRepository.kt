@@ -3,10 +3,7 @@ package `in`.testpress.course.repository
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSDKDatabase
-import `in`.testpress.course.domain.DomainAttempt
-import `in`.testpress.course.domain.DomainContentAttempt
-import `in`.testpress.course.domain.asDomainContentAttempt
-import `in`.testpress.course.domain.asDomainModel
+import `in`.testpress.course.domain.*
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.network.Resource
@@ -35,17 +32,17 @@ open class QuizExamRepository(val context: Context) {
     val resourceAttempt: LiveData<Resource<DomainAttempt>>
         get() = _resourceAttempt
 
-    fun createAttempt(contentId: Long): LiveData<Resource<DomainContentAttempt>> {
+    fun createContentAttempt(contentId: Long): LiveData<Resource<DomainContentAttempt>> {
         courseNetwork.createContentAttempt(contentId)
             .enqueue(object: TestpressCallback<NetworkContentAttempt>() {
                 override fun onSuccess(result: NetworkContentAttempt?) {
                     saveContentAttempt(result)
-                    loadAttempt(result!!.id)
+                    loadContentAttempt(result!!.id)
                 }
 
                 override fun onException(exception: TestpressException?) {
                     if (exception?.isNetworkError == true) {
-                        loadAttemptFromDB(contentId)
+                        loadContentAttemptFromDB(contentId)
                     } else {
                         _resourceContentAttempt.postValue(Resource.error(exception!!, null))
                     }
@@ -54,12 +51,12 @@ open class QuizExamRepository(val context: Context) {
         return resourceContentAttempt
     }
 
-    fun loadAttemptFromDB(contentId: Long) {
-        val contentAttempt = getRunningAttemptFromDB(contentId) ?: createLocalContentAttempt(contentId)
+    fun loadContentAttemptFromDB(contentId: Long) {
+        val contentAttempt = getRunningContentAttemptFromDB(contentId) ?: createLocalContentAttempt(contentId)
         _resourceContentAttempt.postValue(Resource.success(contentAttempt.asDomainContentAttempt()))
     }
 
-    private fun getRunningAttemptFromDB(contentId: Long): CourseAttempt? {
+    private fun getRunningContentAttemptFromDB(contentId: Long): CourseAttempt? {
         val contentAttempts = courseAttemptDao.queryBuilder()
             .where(CourseAttemptDao.Properties.ChapterContentId.eq(contentId)).list()
         val attemptIds = contentAttempts.map {it.assessmentId.toInt()}
@@ -92,7 +89,7 @@ open class QuizExamRepository(val context: Context) {
         courseAttemptDao.insertOrReplaceInTx(contentAttempt?.asGreenDaoModel())
     }
 
-    fun loadAttempt(contentAttemptId: Long): LiveData<Resource<DomainContentAttempt>> {
+    fun loadContentAttempt(contentAttemptId: Long): LiveData<Resource<DomainContentAttempt>> {
         val contentAttempts = courseAttemptDao.queryBuilder()
             .where(CourseAttemptDao.Properties.Id.eq(contentAttemptId)).list()
 

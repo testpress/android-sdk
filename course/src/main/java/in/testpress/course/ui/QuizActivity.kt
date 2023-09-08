@@ -140,7 +140,7 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
     }
 
     override fun showQuiz(attemptId: Long, totalNoOfQuestions:Int, index: Int) {
-        viewModel.loadAttempt(attemptId).observe(this, Observer {
+        viewModel.loadContentAttempt(attemptId).observe(this, Observer {
             contentAttemptId = it?.data!!.id
             this.attemptId = it.data!!.assessment?.id!!
             examEndUrl = it?.data?.getEndAttemptUrl(this)

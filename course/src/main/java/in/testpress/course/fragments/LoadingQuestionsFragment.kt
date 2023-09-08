@@ -81,7 +81,7 @@ class LoadingQuestionsFragment : Fragment(),
     }
 
     private fun loadAttempt() {
-        viewModel.loadAttempt(contentId).observe(viewLifecycleOwner, Observer {resource ->
+        viewModel.loadContentAttempt(contentId).observe(viewLifecycleOwner, Observer { resource ->
             when(resource?.status) {
                 Status.SUCCESS -> resource.data?.let { domainContentAttempt ->
                     contentAttempt = domainContentAttempt
