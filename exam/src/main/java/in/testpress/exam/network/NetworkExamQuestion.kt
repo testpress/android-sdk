@@ -7,11 +7,12 @@ data class NetworkExamQuestion(
     val order: Int? = null,
     val questionId: Long? = null,
     val sectionId: Long? = null,
-    var examId: Long? = null
+    var examId: Long? = null,
+    var attemptId: Long? = null
 )
 
 fun NetworkExamQuestion.asGreenDaoModel(): ExamQuestion {
-    return ExamQuestion(id, order, examId, questionId)
+    return ExamQuestion(id, order, examId, attemptId, questionId)
 }
 
 fun List<NetworkExamQuestion>.asGreenDaoModels(): List<ExamQuestion> {

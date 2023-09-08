@@ -20,6 +20,7 @@ public class ExamQuestion {
     private Long id;
     private Integer order;
     private Long examId;
+    private Long attemptId;
     private Long questionId;
 
     /** Used to resolve relations */
@@ -48,10 +49,11 @@ public class ExamQuestion {
     }
 
     @Generated
-    public ExamQuestion(Long id, Integer order, Long examId, Long questionId) {
+    public ExamQuestion(Long id, Integer order, Long examId, Long attemptId, Long questionId) {
         this.id = id;
         this.order = order;
         this.examId = examId;
+        this.attemptId = attemptId;
         this.questionId = questionId;
     }
 
@@ -84,6 +86,14 @@ public class ExamQuestion {
 
     public void setExamId(Long examId) {
         this.examId = examId;
+    }
+
+    public Long getAttemptId() {
+        return attemptId;
+    }
+
+    public void setAttemptId(Long attemptId) {
+        this.attemptId = attemptId;
     }
 
     public Long getQuestionId() {

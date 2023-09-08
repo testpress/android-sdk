@@ -28,7 +28,8 @@ public class ExamQuestionDao extends AbstractDao<ExamQuestion, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "ID");
         public final static Property Order = new Property(1, Integer.class, "order", false, "ORDER");
         public final static Property ExamId = new Property(2, Long.class, "examId", false, "EXAM_ID");
-        public final static Property QuestionId = new Property(3, Long.class, "questionId", false, "QUESTION_ID");
+        public final static Property AttemptId = new Property(3, Long.class, "attemptId", false, "ATTEMPT_ID");
+        public final static Property QuestionId = new Property(4, Long.class, "questionId", false, "QUESTION_ID");
     }
 
     private DaoSession daoSession;
@@ -50,7 +51,8 @@ public class ExamQuestionDao extends AbstractDao<ExamQuestion, Long> {
                 "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"ORDER\" INTEGER," + // 1: order
                 "\"EXAM_ID\" INTEGER," + // 2: examId
-                "\"QUESTION_ID\" INTEGER);"); // 3: questionId
+                "\"ATTEMPT_ID\" INTEGER," + // 3: attemptId
+                "\"QUESTION_ID\" INTEGER);"); // 4: questionId
     }
 
     /** Drops the underlying database table. */
@@ -78,9 +80,14 @@ public class ExamQuestionDao extends AbstractDao<ExamQuestion, Long> {
             stmt.bindLong(3, examId);
         }
  
+        Long attemptId = entity.getAttemptId();
+        if (attemptId != null) {
+            stmt.bindLong(4, attemptId);
+        }
+ 
         Long questionId = entity.getQuestionId();
         if (questionId != null) {
-            stmt.bindLong(4, questionId);
+            stmt.bindLong(5, questionId);
         }
     }
 
@@ -103,9 +110,14 @@ public class ExamQuestionDao extends AbstractDao<ExamQuestion, Long> {
             stmt.bindLong(3, examId);
         }
  
+        Long attemptId = entity.getAttemptId();
+        if (attemptId != null) {
+            stmt.bindLong(4, attemptId);
+        }
+ 
         Long questionId = entity.getQuestionId();
         if (questionId != null) {
-            stmt.bindLong(4, questionId);
+            stmt.bindLong(5, questionId);
         }
     }
 
@@ -126,7 +138,8 @@ public class ExamQuestionDao extends AbstractDao<ExamQuestion, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // order
             cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // examId
-            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3) // questionId
+            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // attemptId
+            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4) // questionId
         );
         return entity;
     }
@@ -136,7 +149,8 @@ public class ExamQuestionDao extends AbstractDao<ExamQuestion, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setOrder(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
         entity.setExamId(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
-        entity.setQuestionId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
+        entity.setAttemptId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
+        entity.setQuestionId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
      }
     
     @Override
