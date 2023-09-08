@@ -56,25 +56,34 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         if (response?.next != null) {
             page += 1
             fetchQuestions(url, examId, attemptId)
-            saveQuestionsToDB(response?.results, examId)
+            saveQuestionsToDB(response?.results, examId, attemptId)
         } else {
             page = 1
-            saveQuestionsToDB(response?.results, examId)
-            val questions = getQuestionsFromDB(examId)
+            saveQuestionsToDB(response?.results, examId, attemptId)
+            val questions = getQuestionsFromDB(examId, attemptId)
             createUserSelectedAnswers(questions!!, attemptId)
         }
     }
 
-    private fun cleanQuestionInDB(examId: Long) {
-        examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.ExamId.eq(examId))
-            .buildDelete().executeDeleteWithoutDetachingEntities()
+    private fun cleanQuestionInDB(examId: Long, attemptId: Long) {
+        if (examId == -1L) {
+            examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.AttemptId.eq(attemptId))
+                .buildDelete().executeDeleteWithoutDetachingEntities()
+        } else {
+            examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.ExamId.eq(examId))
+                .buildDelete().executeDeleteWithoutDetachingEntities()
+        }
     }
 
-    private fun getQuestionsFromDB(examId: Long): List<ExamQuestion>? {
-        return examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.ExamId.eq(examId)).list()
+    private fun getQuestionsFromDB(examId: Long, attemptId: Long): List<ExamQuestion>? {
+        return if (examId == -1L) {
+            examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.AttemptId.eq(attemptId)).list()
+        } else {
+            examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.ExamId.eq(examId)).list()
+        }
     }
 
-    private fun saveQuestionsToDB(response: NetworkExamQuestionResult?, examId: Long) {
+    private fun saveQuestionsToDB(response: NetworkExamQuestionResult?, examId: Long, attemptId: Long) {
         val questionDao = TestpressSDKDatabase.getQuestionDao(context)
         val answerDao = TestpressSDKDatabase.getAnswerDao(context)
         val directionDao = TestpressSDKDatabase.getDirectionDao(context)
@@ -91,8 +100,10 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         answerDao.insertOrReplaceInTx(answers.asGreenDaoModels())
         questionDao.insertOrReplaceInTx(questions?.asGreenDaoModels())
 
-        for(examQuestion in response?.examQuestions ?:listOf()) {
-            examQuestion.examId = examId
+        val defaultExamId = if (examId == -1L) null else examId
+        for (examQuestion in response?.examQuestions ?: listOf()) {
+            examQuestion.examId = defaultExamId
+            examQuestion.attemptId = attemptId
         }
 
         examQuestionDao.insertOrReplaceInTx(response?.examQuestions?.asGreenDaoModels())
@@ -100,15 +111,15 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     }
 
     fun getQuestions(examId: Long, attemptId: Long, url: String): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
-        if(getQuestionsFromDB(examId)?.isNotEmpty() == true) {
+        if(getQuestionsFromDB(examId, attemptId)?.isNotEmpty() == true) {
             val userSelectedAnswers = userSelectedAnswerDao.queryBuilder().where(UserSelectedAnswerDao.Properties.AttemptId.eq(attemptId)).list()
             if (userSelectedAnswers.isEmpty()) {
-                createUserSelectedAnswers(getQuestionsFromDB(examId)!!, attemptId)
+                createUserSelectedAnswers(getQuestionsFromDB(examId, attemptId)!!, attemptId)
             } else {
                 _resourceUserSelectedAnswers.postValue(Resource.success(userSelectedAnswers.asDomainModels()))
             }
         } else {
-            cleanQuestionInDB(examId)
+            cleanQuestionInDB(examId,attemptId)
             fetchQuestions(url, examId, attemptId)
         }
         return resourceUserSelectedAnswers
