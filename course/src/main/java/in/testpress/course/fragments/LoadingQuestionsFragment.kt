@@ -125,5 +125,5 @@ class LoadingQuestionsFragment : Fragment(),
 }
 
 interface ShowQuizHandler {
-    fun showQuiz(attemptId: Long, totalNoOfQuestions: Int, index: Int)
+    fun showQuiz(contentAttempt: Long, totalNoOfQuestions: Int, index: Int)
 }
