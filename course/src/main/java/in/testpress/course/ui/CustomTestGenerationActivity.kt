@@ -8,7 +8,9 @@ import `in`.testpress.exam.ui.TestFragment
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.ui.AbstractWebViewActivity
 import `in`.testpress.util.BaseJavaScriptInterface
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.webkit.JavascriptInterface
 import android.widget.Toast
 import android.widget.Toolbar
@@ -72,7 +74,17 @@ class JavaScriptInterface(val activity: CustomTestGenerationActivity):BaseJavaSc
 
     @JavascriptInterface
     fun startCustomTest(attemptId: String) {
-        activity.getAttempt(attemptId)
+        //activity.getAttempt(attemptId)
+
+        val intent = Intent(activity, QuizActivity::class.java).apply {
+            //putExtra(ContentActivity.CONTENT_ID, content.id)
+            //putExtra("EXAM_ID", exam.id)
+            putExtra("ATTEMPT_ID", attemptId.toLong())
+        }
+        Log.d("TAG", "startCustomTest: $attemptId")
+        activity.startActivity(intent)
+        activity.finish()
+
     }
 
 }

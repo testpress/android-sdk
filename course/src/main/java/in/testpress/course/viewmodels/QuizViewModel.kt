@@ -1,5 +1,6 @@
 package `in`.testpress.course.viewmodels
 
+import `in`.testpress.course.domain.DomainAttempt
 import `in`.testpress.course.domain.DomainContentAttempt
 import `in`.testpress.network.Resource
 import `in`.testpress.course.repository.QuizQuestionsRepository
@@ -11,6 +12,10 @@ import androidx.lifecycle.ViewModel
 class QuizViewModel(val repository: QuizQuestionsRepository): ViewModel() {
     fun loadContentAttempt(contentId: Long): LiveData<Resource<DomainContentAttempt>> {
         return repository.createContentAttempt(contentId)
+    }
+
+    fun loadAttempt(contentId: Long): LiveData<Resource<DomainAttempt>> {
+        return repository.createAttempt(contentId)
     }
 
     fun loadUserSelectedAnswers(examID: Long, attemptId: Long, url: String): LiveData<Resource<List<DomainUserSelectedAnswer>>> {

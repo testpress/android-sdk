@@ -34,6 +34,11 @@ interface CourseService {
     @PUT("{end_exam_url}")
     fun endContentAttempt(
         @Path(value = "end_exam_url", encoded = true) endExamUrlFrag: String?
+    ): RetrofitCall<NetworkContentAttempt>
+
+    @PUT("{end_exam_url}")
+    fun endAttempt(
+        @Path(value = "end_exam_url", encoded = true) endExamUrlFrag: String?
     ): RetrofitCall<NetworkAttempt>
 
     @GET("{contents_url}")
@@ -87,8 +92,12 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         return getCourseService().getContentAttempts(url)
     }
 
-    fun endContentAttempt(url: String):  RetrofitCall<NetworkAttempt> {
+    fun endContentAttempt(url: String):  RetrofitCall<NetworkContentAttempt> {
         return getCourseService().endContentAttempt(url)
+    }
+
+    fun endAttempt(url: String):  RetrofitCall<NetworkAttempt> {
+        return getCourseService().endAttempt(url)
     }
 
     fun getContents(url: String, arguments: HashMap<String, Any>): RetrofitCall<ApiResponse<ContentsListResponse>> {
