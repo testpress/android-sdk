@@ -76,8 +76,9 @@ public class StoreApiClient extends TestpressApiClient {
         return getProductService().getProductsList();
     }
 
-    public RetrofitCall<NetworkOrderStatus> refreshOrderStatus(String orderId) {
-        HashMap<String, String> parameters = new HashMap<>();
+    public RetrofitCall<NetworkOrderStatus> refreshOrderStatus(String orderId, Boolean reconciliation) {
+        HashMap<String, Boolean> parameters = new HashMap<>();
+        parameters.put("trigger_payment_reconciliation", reconciliation);
         return getProductService().refreshOrderStatus(orderId, parameters);
     }
 
