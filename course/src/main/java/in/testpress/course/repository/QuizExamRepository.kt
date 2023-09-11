@@ -25,7 +25,7 @@ open class QuizExamRepository(val context: Context) {
     val courseAttemptDao = TestpressSDKDatabase.getCourseAttemptDao(context)
     val attemptDao = TestpressSDKDatabase.getAttemptDao(context)
 
-    var _resourceAttempt: MutableLiveData<Resource<DomainAttempt>> = MutableLiveData()
+    private var _resourceAttempt: MutableLiveData<Resource<DomainAttempt>> = MutableLiveData()
     val resourceAttempt: LiveData<Resource<DomainAttempt>>
         get() = _resourceAttempt
 
