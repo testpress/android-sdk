@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.getEndAttemptUrl
+import `in`.testpress.course.domain.getGreenDaoAttempt
 import `in`.testpress.enums.Status
 import `in`.testpress.course.fragments.ExamEndHanlder
 import `in`.testpress.course.fragments.LoadingQuestionsFragment
@@ -68,6 +69,20 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
         toolbar.setNavigationIcon(R.drawable.ic_close_white_24dp)
         toolbar.setNavigationOnClickListener {
             showEndExamAlert()
+        }
+
+        viewModel.endAttemptState.observe(this) {
+            dialog.hide()
+            when(it.status) {
+                Status.SUCCESS -> {
+                    val intent = ReviewStatsActivity.createIntent(this, it.data?.getGreenDaoAttempt(this))
+                    finish()
+                    startActivity(intent)
+                }
+                Status.ERROR -> {
+                    handleExamEndError(it.exception!!)
+                }
+            }
         }
 
         viewModel.endContentAttemptState.observe(this, Observer {
@@ -139,24 +154,49 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
         alertDialog = alertDialogBuilder.show()
     }
 
-    override fun showQuiz(contentAttempt: Long, totalNoOfQuestions:Int, index: Int) {
-        viewModel.loadContentAttempt(contentAttempt).observe(this, Observer {
-            contentAttemptId = it?.data!!.id
-            this.attemptId = it.data!!.assessment?.id!!
-            examEndUrl = it?.data?.getEndAttemptUrl(this)
-            val examId = intent.getLongExtra("EXAM_ID", -1)
-            val bundle = Bundle().apply {
-                putLong("EXAM_ID", examId)
-                putLong("ATTEMPT_ID", it.data!!.assessment!!.id)
-                putInt("NO_OF_QUESTIONS", totalNoOfQuestions)
-                putInt("START_INDEX", index)
-            }
-            val quizSlideFragment = QuizSlideFragment().apply { arguments=bundle }
-            quizSlideFragment.endHanlder = this
-            quizSlideFragment.questionNumberHandler = this
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, quizSlideFragment).commitAllowingStateLoss()
-        })
+    override fun showQuiz(
+        ContentAttemptId: Long?,
+        attemptId: Long?,
+        totalNoOfQuestions: Int,
+        index: Int
+    ) {
+        if (examId == -1L) {
+            viewModel.loadAttempt(attemptId!!).observe(this, Observer {
+                contentAttemptId = -1
+                this.attemptId = it.data!!.id
+                examEndUrl = it?.data?.endUrl
+                val examId = intent.getLongExtra("EXAM_ID", -1)
+                val bundle = Bundle().apply {
+                    putLong("EXAM_ID", examId)
+                    putLong("ATTEMPT_ID", it.data!!.id)
+                    putInt("NO_OF_QUESTIONS", totalNoOfQuestions)
+                    putInt("START_INDEX", index)
+                }
+                val quizSlideFragment = QuizSlideFragment().apply { arguments=bundle }
+                quizSlideFragment.endHanlder = this
+                quizSlideFragment.questionNumberHandler = this
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, quizSlideFragment).commitAllowingStateLoss()
+            })
+        } else {
+            viewModel.loadContentAttempt(ContentAttemptId!!).observe(this, Observer {
+                contentAttemptId = it?.data!!.id
+                this.attemptId = it.data!!.assessment?.id!!
+                examEndUrl = it?.data?.getEndAttemptUrl(this)
+                val examId = intent.getLongExtra("EXAM_ID", -1)
+                val bundle = Bundle().apply {
+                    putLong("EXAM_ID", examId)
+                    putLong("ATTEMPT_ID", it.data!!.assessment!!.id)
+                    putInt("NO_OF_QUESTIONS", totalNoOfQuestions)
+                    putInt("START_INDEX", index)
+                }
+                val quizSlideFragment = QuizSlideFragment().apply { arguments=bundle }
+                quizSlideFragment.endHanlder = this
+                quizSlideFragment.questionNumberHandler = this
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, quizSlideFragment).commitAllowingStateLoss()
+            })
+        }
     }
 
     override fun endExam() {
@@ -165,7 +205,7 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
             dialog.hide()
             finish()
         } else {
-            viewModel.endExam(examEndUrl!!, attemptId)
+            viewModel.endExam(examId, examEndUrl!!, attemptId)
         }
     }
 
