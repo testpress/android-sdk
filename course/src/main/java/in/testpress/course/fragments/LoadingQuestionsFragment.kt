@@ -1,6 +1,7 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
+import `in`.testpress.course.domain.DomainAttempt
 import `in`.testpress.course.domain.DomainContentAttempt
 import `in`.testpress.enums.Status
 import `in`.testpress.course.repository.QuizQuestionsRepository
@@ -24,9 +25,11 @@ class LoadingQuestionsFragment : Fragment(),
     private lateinit var attemptUrl: String
     private var examId = -1L
     private var contentId = -1L
+    private var attemptId = -1L
     lateinit var viewModel: QuizViewModel
     lateinit var fragmentChangeListener: ShowQuizHandler
-    private lateinit var contentAttempt: DomainContentAttempt
+    private var contentAttempt: DomainContentAttempt? = null
+    private var attempt: DomainAttempt? = null
 
     private lateinit var loadingLayout: LinearLayout
     private lateinit var emptyViewFragment: EmptyViewFragment
@@ -71,6 +74,7 @@ class LoadingQuestionsFragment : Fragment(),
         attemptUrl = requireArguments().getString("ATTEMPT_URL", "")
         examId = requireArguments().getLong("EXAM_ID", -1)
         contentId = requireArguments().getLong(CONTENT_ID, -1)
+        attemptId = requireArguments().getLong("ATTEMPT_ID", -1)
     }
 
     private fun initializeEmptyViewFragment() {
@@ -81,30 +85,48 @@ class LoadingQuestionsFragment : Fragment(),
     }
 
     private fun loadAttempt() {
-        viewModel.loadContentAttempt(contentId).observe(viewLifecycleOwner, Observer { resource ->
-            when(resource?.status) {
-                Status.SUCCESS -> resource.data?.let { domainContentAttempt ->
-                    contentAttempt = domainContentAttempt
-                    initUserSelectedAnswers()
+        if (examId == -1L) {
+            viewModel.loadAttempt(attemptId).observe(viewLifecycleOwner, Observer { resource ->
+                when(resource?.status) {
+                    Status.SUCCESS -> resource.data?.let { domainAttempt ->
+                        attempt = domainAttempt
+                        initUserSelectedAnswers()
+                    }
+                    Status.ERROR -> {
+                        loadingLayout.visibility = View.GONE
+                        emptyViewFragment.displayError(resource.exception!!)
+                    }
                 }
-                Status.ERROR -> {
-                    loadingLayout.visibility = View.GONE
-                    emptyViewFragment.displayError(resource.exception!!)
+            })
+        } else {
+            viewModel.loadContentAttempt(contentId).observe(viewLifecycleOwner, Observer { resource ->
+                when(resource?.status) {
+                    Status.SUCCESS -> resource.data?.let { domainContentAttempt ->
+                        contentAttempt = domainContentAttempt
+                        attempt = domainContentAttempt.assessment
+                        initUserSelectedAnswers()
+                    }
+                    Status.ERROR -> {
+                        loadingLayout.visibility = View.GONE
+                        emptyViewFragment.displayError(resource.exception!!)
+                    }
                 }
-            }
-        })
+            })
+        }
+
     }
 
     private fun initUserSelectedAnswers() {
-        val attempt = contentAttempt.assessment!!
-        val questionsUrl = "/api/v2.4/exams/${examId}/questions/"
-        viewModel.loadUserSelectedAnswers(examId, attempt.id, questionsUrl).observe(viewLifecycleOwner, Observer { resource ->
+        //val attempt = contentAttempt.assessment!!
+        //https://lmsdemo.testpress.in/api/v2.5/attempts/53351/questions/?page=1
+        val questionsUrl = "/api/v2.5/attempts/${attempt?.id}/questions/"
+        viewModel.loadUserSelectedAnswers(examId, attempt?.id!!, questionsUrl).observe(viewLifecycleOwner, Observer { resource ->
             when(resource?.status) {
                 Status.SUCCESS -> {
                     val index = resource.data!!.indexOfFirst{
                         it.duration == null
                     }
-                    fragmentChangeListener.showQuiz(contentAttempt.id, resource.data!!.size, index)
+                    fragmentChangeListener.showQuiz(contentAttempt?.id, attempt?.id, resource.data!!.size, index)
                 }
                 Status.ERROR -> {
                     loadingLayout.visibility = View.GONE
@@ -116,14 +138,10 @@ class LoadingQuestionsFragment : Fragment(),
 
     override fun onRetryClick() {
         loadingLayout.visibility = View.VISIBLE
-        if (::contentAttempt.isInitialized) {
-            initUserSelectedAnswers()
-        } else {
-            loadAttempt()
-        }
+        loadAttempt()
     }
 }
 
 interface ShowQuizHandler {
-    fun showQuiz(contentAttempt: Long, totalNoOfQuestions: Int, index: Int)
+    fun showQuiz(contentAttemptId: Long?, attemptId: Long?, totalNoOfQuestions: Int, index: Int)
 }
