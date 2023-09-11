@@ -117,8 +117,6 @@ class LoadingQuestionsFragment : Fragment(),
     }
 
     private fun initUserSelectedAnswers() {
-        //val attempt = contentAttempt.assessment!!
-        //https://lmsdemo.testpress.in/api/v2.5/attempts/53351/questions/?page=1
         val questionsUrl = "/api/v2.5/attempts/${attempt?.id}/questions/"
         viewModel.loadUserSelectedAnswers(examId, attempt?.id!!, questionsUrl).observe(viewLifecycleOwner, Observer { resource ->
             when(resource?.status) {
