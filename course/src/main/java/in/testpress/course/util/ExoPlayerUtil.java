@@ -212,6 +212,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         trackSelector =  new DefaultTrackSelector(activity, videoTrackSelectionFactory);
         initFullscreenDialog();
         initResolutionSelector();
+        initializePinchToZoom();
 
         // set activity as portrait mode at first
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -298,7 +299,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             progressBar.setVisibility(View.VISIBLE);
             buildPlayer();
             initializeDoubleClickOverlay();
-            initializePinchToZoom();
         }
         preparePlayer();
         player.seekTo(getStartPositionInMilliSeconds());
