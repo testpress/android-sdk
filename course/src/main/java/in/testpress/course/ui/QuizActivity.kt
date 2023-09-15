@@ -70,7 +70,7 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
             showEndExamAlert()
         }
 
-        viewModel.endContentAttemptState.observe(this, Observer {
+        viewModel.endExamState.observe(this, Observer {
             dialog.hide()
             when(it.status) {
                 Status.SUCCESS -> {

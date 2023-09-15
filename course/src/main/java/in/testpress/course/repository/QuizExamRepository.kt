@@ -28,9 +28,9 @@ open class QuizExamRepository(val context: Context) {
     val resourceContentAttempt: LiveData<Resource<DomainContentAttempt>>
         get() = _resourceContentAttempt
 
-    private var _endContentAttemptState: MutableLiveData<Resource<DomainContentAttempt>> = MutableLiveData()
-    val endContentAttemptState: LiveData<Resource<DomainContentAttempt>>
-        get() = _endContentAttemptState
+    var _resourceAttempt: MutableLiveData<Resource<DomainAttempt>> = MutableLiveData()
+    val resourceAttempt: LiveData<Resource<DomainAttempt>>
+        get() = _resourceAttempt
 
     fun createContentAttempt(contentId: Long): LiveData<Resource<DomainContentAttempt>> {
         courseNetwork.createContentAttempt(contentId)
@@ -101,13 +101,12 @@ open class QuizExamRepository(val context: Context) {
 
     fun endExam(url: String, attemptId: Long) {
         courseNetwork.endContentAttempt(url)
-            .enqueue(object : TestpressCallback<NetworkContentAttempt>() {
-                override fun onSuccess(result: NetworkContentAttempt?) {
-                    courseAttemptDao.insertOrReplaceInTx(result?.asGreenDaoModel())
-                    attemptDao.insertOrReplaceInTx(result?.assessment?.asGreenDaoModel())
-                    val contentAttempts = courseAttemptDao.queryBuilder()
-                        .where(CourseAttemptDao.Properties.Id.eq(result?.id)).list()
-                    _endContentAttemptState.postValue(Resource.success(contentAttempts[0].asDomainContentAttempt()))
+            .enqueue(object : TestpressCallback<NetworkAttempt>() {
+                override fun onSuccess(result: NetworkAttempt?) {
+                    attemptDao.insertOrReplaceInTx(result?.asGreenDaoModel())
+                    val attempts = attemptDao.queryBuilder()
+                        .where(AttemptDao.Properties.Id.eq(result!!.id)).list()
+                    _resourceAttempt.postValue(Resource.success(attempts[0].asDomainModel()))
                 }
 
                 override fun onException(exception: TestpressException?) {
@@ -115,9 +114,7 @@ open class QuizExamRepository(val context: Context) {
                         .where(AttemptDao.Properties.Id.eq(attemptId)).list()[0]
                     attempt.state = "COMPLETED"
                     attemptDao.insertOrReplaceInTx(attempt)
-                    val contentAttempts = courseAttemptDao.queryBuilder()
-                        .where(CourseAttemptDao.Properties.AssessmentId.eq(attempt.id)).list()
-                    _endContentAttemptState.postValue(Resource.success(contentAttempts[0].asDomainContentAttempt()))
+                    _resourceAttempt.postValue(Resource.success(attempt.asDomainModel()))
                 }
             })
     }

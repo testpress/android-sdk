@@ -7,8 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 
 class QuizExamViewModel(val repository: QuizExamRepository): ViewModel() {
-
-    val endContentAttemptState = repository.endContentAttemptState
+    val endExamState = repository.resourceAttempt
 
     fun loadContentAttempt(id: Long): LiveData<Resource<DomainContentAttempt>> {
         return repository.loadContentAttempt(id)

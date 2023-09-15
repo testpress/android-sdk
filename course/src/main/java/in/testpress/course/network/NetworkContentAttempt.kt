@@ -2,7 +2,6 @@ package `in`.testpress.course.network
 
 import `in`.testpress.course.domain.DomainContentAttempt
 import `in`.testpress.exam.network.NetworkAttempt
-import `in`.testpress.exam.network.asGreenDaoModel
 import `in`.testpress.models.greendao.CourseAttempt
 
 data class NetworkContentAttempt(
@@ -31,7 +30,6 @@ fun createContentAttempt(contentAttempt: NetworkContentAttempt): CourseAttempt {
         contentAttempt.userVideoId
     )
     courseAttempt.chapterContent = contentAttempt.chapterContent?.asGreenDaoModel()
-    courseAttempt.assessment = contentAttempt.assessment?.asGreenDaoModel()
     return courseAttempt
 }
 
