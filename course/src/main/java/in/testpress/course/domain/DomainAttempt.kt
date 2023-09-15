@@ -1,9 +1,6 @@
 package `in`.testpress.course.domain
 
-import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.models.greendao.Attempt
-import `in`.testpress.models.greendao.AttemptDao
-import android.content.Context
 
 data class DomainAttempt(
     val id : Long,
@@ -64,13 +61,4 @@ fun Attempt.asDomainModel(): DomainAttempt {
         reviewPdf = reviewPdf,
         rankEnabled = rankEnabled
     )
-}
-
-fun DomainAttempt.getGreenDaoAttempt(context: Context): Attempt? {
-    val attemptDao = TestpressSDKDatabase.getAttemptDao(context)
-    val attempts =  attemptDao.queryBuilder().where(AttemptDao.Properties.Id.eq(this.id)).list()
-    if (attempts.isNotEmpty()) {
-        return attempts[0]
-    }
-    return null
 }
