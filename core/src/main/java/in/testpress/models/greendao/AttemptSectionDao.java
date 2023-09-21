@@ -25,17 +25,18 @@ public class AttemptSectionDao extends AbstractDao<AttemptSection, Long> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Id = new Property(0, Long.class, "id", true, "ID");
-        public final static Property State = new Property(1, String.class, "state", false, "STATE");
-        public final static Property QuestionsUrl = new Property(2, String.class, "questionsUrl", false, "QUESTIONS_URL");
-        public final static Property StartUrl = new Property(3, String.class, "startUrl", false, "START_URL");
-        public final static Property EndUrl = new Property(4, String.class, "endUrl", false, "END_URL");
-        public final static Property RemainingTime = new Property(5, String.class, "remainingTime", false, "REMAINING_TIME");
-        public final static Property Name = new Property(6, String.class, "name", false, "NAME");
-        public final static Property Duration = new Property(7, String.class, "duration", false, "DURATION");
-        public final static Property Order = new Property(8, Integer.class, "order", false, "ORDER");
-        public final static Property Instructions = new Property(9, String.class, "instructions", false, "INSTRUCTIONS");
-        public final static Property AttemptId = new Property(10, Long.class, "attemptId", false, "ATTEMPT_ID");
+        public final static Property Id = new Property(0, Long.class, "id", false, "ID");
+        public final static Property AttemptSectionId = new Property(1, Long.class, "attemptSectionId", true, "ATTEMPT_SECTION_ID");
+        public final static Property State = new Property(2, String.class, "state", false, "STATE");
+        public final static Property QuestionsUrl = new Property(3, String.class, "questionsUrl", false, "QUESTIONS_URL");
+        public final static Property StartUrl = new Property(4, String.class, "startUrl", false, "START_URL");
+        public final static Property EndUrl = new Property(5, String.class, "endUrl", false, "END_URL");
+        public final static Property RemainingTime = new Property(6, String.class, "remainingTime", false, "REMAINING_TIME");
+        public final static Property Name = new Property(7, String.class, "name", false, "NAME");
+        public final static Property Duration = new Property(8, String.class, "duration", false, "DURATION");
+        public final static Property Order = new Property(9, Integer.class, "order", false, "ORDER");
+        public final static Property Instructions = new Property(10, String.class, "instructions", false, "INSTRUCTIONS");
+        public final static Property AttemptId = new Property(11, Long.class, "attemptId", false, "ATTEMPT_ID");
     }
 
     private Query<AttemptSection> attempt_SectionsQuery;
@@ -52,17 +53,18 @@ public class AttemptSectionDao extends AbstractDao<AttemptSection, Long> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"ATTEMPT_SECTION\" (" + //
-                "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
-                "\"STATE\" TEXT," + // 1: state
-                "\"QUESTIONS_URL\" TEXT," + // 2: questionsUrl
-                "\"START_URL\" TEXT," + // 3: startUrl
-                "\"END_URL\" TEXT," + // 4: endUrl
-                "\"REMAINING_TIME\" TEXT," + // 5: remainingTime
-                "\"NAME\" TEXT," + // 6: name
-                "\"DURATION\" TEXT," + // 7: duration
-                "\"ORDER\" INTEGER," + // 8: order
-                "\"INSTRUCTIONS\" TEXT," + // 9: instructions
-                "\"ATTEMPT_ID\" INTEGER);"); // 10: attemptId
+                "\"ID\" INTEGER," + // 0: id
+                "\"ATTEMPT_SECTION_ID\" INTEGER PRIMARY KEY ," + // 1: attemptSectionId
+                "\"STATE\" TEXT," + // 2: state
+                "\"QUESTIONS_URL\" TEXT," + // 3: questionsUrl
+                "\"START_URL\" TEXT," + // 4: startUrl
+                "\"END_URL\" TEXT," + // 5: endUrl
+                "\"REMAINING_TIME\" TEXT," + // 6: remainingTime
+                "\"NAME\" TEXT," + // 7: name
+                "\"DURATION\" TEXT," + // 8: duration
+                "\"ORDER\" INTEGER," + // 9: order
+                "\"INSTRUCTIONS\" TEXT," + // 10: instructions
+                "\"ATTEMPT_ID\" INTEGER);"); // 11: attemptId
     }
 
     /** Drops the underlying database table. */
@@ -80,54 +82,59 @@ public class AttemptSectionDao extends AbstractDao<AttemptSection, Long> {
             stmt.bindLong(1, id);
         }
  
+        Long attemptSectionId = entity.getAttemptSectionId();
+        if (attemptSectionId != null) {
+            stmt.bindLong(2, attemptSectionId);
+        }
+ 
         String state = entity.getState();
         if (state != null) {
-            stmt.bindString(2, state);
+            stmt.bindString(3, state);
         }
  
         String questionsUrl = entity.getQuestionsUrl();
         if (questionsUrl != null) {
-            stmt.bindString(3, questionsUrl);
+            stmt.bindString(4, questionsUrl);
         }
  
         String startUrl = entity.getStartUrl();
         if (startUrl != null) {
-            stmt.bindString(4, startUrl);
+            stmt.bindString(5, startUrl);
         }
  
         String endUrl = entity.getEndUrl();
         if (endUrl != null) {
-            stmt.bindString(5, endUrl);
+            stmt.bindString(6, endUrl);
         }
  
         String remainingTime = entity.getRemainingTime();
         if (remainingTime != null) {
-            stmt.bindString(6, remainingTime);
+            stmt.bindString(7, remainingTime);
         }
  
         String name = entity.getName();
         if (name != null) {
-            stmt.bindString(7, name);
+            stmt.bindString(8, name);
         }
  
         String duration = entity.getDuration();
         if (duration != null) {
-            stmt.bindString(8, duration);
+            stmt.bindString(9, duration);
         }
  
         Integer order = entity.getOrder();
         if (order != null) {
-            stmt.bindLong(9, order);
+            stmt.bindLong(10, order);
         }
  
         String instructions = entity.getInstructions();
         if (instructions != null) {
-            stmt.bindString(10, instructions);
+            stmt.bindString(11, instructions);
         }
  
         Long attemptId = entity.getAttemptId();
         if (attemptId != null) {
-            stmt.bindLong(11, attemptId);
+            stmt.bindLong(12, attemptId);
         }
     }
 
@@ -140,76 +147,82 @@ public class AttemptSectionDao extends AbstractDao<AttemptSection, Long> {
             stmt.bindLong(1, id);
         }
  
+        Long attemptSectionId = entity.getAttemptSectionId();
+        if (attemptSectionId != null) {
+            stmt.bindLong(2, attemptSectionId);
+        }
+ 
         String state = entity.getState();
         if (state != null) {
-            stmt.bindString(2, state);
+            stmt.bindString(3, state);
         }
  
         String questionsUrl = entity.getQuestionsUrl();
         if (questionsUrl != null) {
-            stmt.bindString(3, questionsUrl);
+            stmt.bindString(4, questionsUrl);
         }
  
         String startUrl = entity.getStartUrl();
         if (startUrl != null) {
-            stmt.bindString(4, startUrl);
+            stmt.bindString(5, startUrl);
         }
  
         String endUrl = entity.getEndUrl();
         if (endUrl != null) {
-            stmt.bindString(5, endUrl);
+            stmt.bindString(6, endUrl);
         }
  
         String remainingTime = entity.getRemainingTime();
         if (remainingTime != null) {
-            stmt.bindString(6, remainingTime);
+            stmt.bindString(7, remainingTime);
         }
  
         String name = entity.getName();
         if (name != null) {
-            stmt.bindString(7, name);
+            stmt.bindString(8, name);
         }
  
         String duration = entity.getDuration();
         if (duration != null) {
-            stmt.bindString(8, duration);
+            stmt.bindString(9, duration);
         }
  
         Integer order = entity.getOrder();
         if (order != null) {
-            stmt.bindLong(9, order);
+            stmt.bindLong(10, order);
         }
  
         String instructions = entity.getInstructions();
         if (instructions != null) {
-            stmt.bindString(10, instructions);
+            stmt.bindString(11, instructions);
         }
  
         Long attemptId = entity.getAttemptId();
         if (attemptId != null) {
-            stmt.bindLong(11, attemptId);
+            stmt.bindLong(12, attemptId);
         }
     }
 
     @Override
     public Long readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
+        return cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1);
     }    
 
     @Override
     public AttemptSection readEntity(Cursor cursor, int offset) {
         AttemptSection entity = new AttemptSection( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // state
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // questionsUrl
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // startUrl
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // endUrl
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // remainingTime
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // name
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // duration
-            cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8), // order
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // instructions
-            cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10) // attemptId
+            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // attemptSectionId
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // state
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // questionsUrl
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // startUrl
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // endUrl
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // remainingTime
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // name
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // duration
+            cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9), // order
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // instructions
+            cursor.isNull(offset + 11) ? null : cursor.getLong(offset + 11) // attemptId
         );
         return entity;
     }
@@ -217,28 +230,29 @@ public class AttemptSectionDao extends AbstractDao<AttemptSection, Long> {
     @Override
     public void readEntity(Cursor cursor, AttemptSection entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setState(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setQuestionsUrl(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setStartUrl(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setEndUrl(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setRemainingTime(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setName(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setDuration(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setOrder(cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8));
-        entity.setInstructions(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setAttemptId(cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10));
+        entity.setAttemptSectionId(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
+        entity.setState(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setQuestionsUrl(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setStartUrl(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setEndUrl(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setRemainingTime(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setName(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setDuration(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setOrder(cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9));
+        entity.setInstructions(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setAttemptId(cursor.isNull(offset + 11) ? null : cursor.getLong(offset + 11));
      }
     
     @Override
     protected final Long updateKeyAfterInsert(AttemptSection entity, long rowId) {
-        entity.setId(rowId);
+        entity.setAttemptSectionId(rowId);
         return rowId;
     }
     
     @Override
     public Long getKey(AttemptSection entity) {
         if(entity != null) {
-            return entity.getId();
+            return entity.getAttemptSectionId();
         } else {
             return null;
         }
@@ -246,7 +260,7 @@ public class AttemptSectionDao extends AbstractDao<AttemptSection, Long> {
 
     @Override
     public boolean hasKey(AttemptSection entity) {
-        return entity.getId() != null;
+        return entity.getAttemptSectionId() != null;
     }
 
     @Override
