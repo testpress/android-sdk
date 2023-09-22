@@ -30,7 +30,7 @@ data class NetworkAttempt(
 )
 
 fun createNetworkAttempt(attempt: NetworkAttempt): Attempt {
-    val greenDoaAttempt = Attempt(
+    val greenDaoAttempt = Attempt(
         attempt.url,
         attempt.id,
         attempt.date,
@@ -55,8 +55,8 @@ fun createNetworkAttempt(attempt: NetworkAttempt): Attempt {
         attempt.reviewPdf,
         attempt.rankEnabled
     )
-    greenDoaAttempt.sections = attempt.sections?.asGreenDaoModel()
-    return greenDoaAttempt
+    greenDaoAttempt.sections = attempt.sections?.asGreenDaoModel()
+    return greenDaoAttempt
 }
 
 fun NetworkAttempt.asGreenDaoModel(): Attempt {
