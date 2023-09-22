@@ -5,6 +5,7 @@ import `in`.testpress.models.greendao.CourseAttempt
 
 data class NetworkAttemptSection(
         val id: Long,
+        val attemptSectionId: Long,
         var state: String? = null,
         val questionsUrl: String? = null,
         val startUrl: String? = null,
@@ -28,15 +29,16 @@ fun List<NetworkAttemptSection>.asGreenDaoModel(): List<AttemptSection> {
 fun createAttemptSection(networkAttemptSection: NetworkAttemptSection): AttemptSection {
     return AttemptSection(
             networkAttemptSection.id,
+            networkAttemptSection.attemptSectionId,
             networkAttemptSection.state,
             networkAttemptSection.questionsUrl,
             networkAttemptSection.startUrl,
             networkAttemptSection.endUrl,
             networkAttemptSection.remainingTime,
-            networkAttemptSection.name,
-            networkAttemptSection.duration,
-            networkAttemptSection.order,
-            networkAttemptSection.instructions,
+            networkAttemptSection.info?.name,
+            networkAttemptSection.info?.duration,
+            networkAttemptSection.info?.order,
+            networkAttemptSection.info?.instructions,
             networkAttemptSection.attemptId
     )
 }

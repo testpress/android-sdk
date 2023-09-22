@@ -18,9 +18,10 @@ import in.testpress.util.CommonUtils;
  */
 @Entity
 public class AttemptSection implements android.os.Parcelable {
+    private Long id;
 
     @Id
-    private Long id;
+    private Long attemptSectionId;
     private String state;
     private String questionsUrl;
     private String startUrl;
@@ -39,13 +40,14 @@ public class AttemptSection implements android.os.Parcelable {
     public AttemptSection() {
     }
 
-    public AttemptSection(Long id) {
-        this.id = id;
+    public AttemptSection(Long attemptSectionId) {
+        this.attemptSectionId = attemptSectionId;
     }
 
     @Generated
-    public AttemptSection(Long id, String state, String questionsUrl, String startUrl, String endUrl, String remainingTime, String name, String duration, Integer order, String instructions, Long attemptId) {
+    public AttemptSection(Long id, Long attemptSectionId, String state, String questionsUrl, String startUrl, String endUrl, String remainingTime, String name, String duration, Integer order, String instructions, Long attemptId) {
         this.id = id;
+        this.attemptSectionId = attemptSectionId;
         this.state = state;
         this.questionsUrl = questionsUrl;
         this.startUrl = startUrl;
@@ -64,6 +66,14 @@ public class AttemptSection implements android.os.Parcelable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getAttemptSectionId() {
+        return attemptSectionId;
+    }
+
+    public void setAttemptSectionId(Long attemptSectionId) {
+        this.attemptSectionId = attemptSectionId;
     }
 
     public String getState() {
