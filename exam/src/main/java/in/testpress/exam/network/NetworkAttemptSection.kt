@@ -27,18 +27,18 @@ fun List<NetworkAttemptSection>.asGreenDaoModel(): List<AttemptSection> {
 }
 
 fun createAttemptSection(networkAttemptSection: NetworkAttemptSection): AttemptSection {
-    return AttemptSection(
-            networkAttemptSection.id,
-            networkAttemptSection.attemptSectionId,
-            networkAttemptSection.state,
-            networkAttemptSection.questionsUrl,
-            networkAttemptSection.startUrl,
-            networkAttemptSection.endUrl,
-            networkAttemptSection.remainingTime,
-            networkAttemptSection.info?.name,
-            networkAttemptSection.info?.duration,
-            networkAttemptSection.info?.order,
-            networkAttemptSection.info?.instructions,
-            networkAttemptSection.attemptId
-    )
+        return AttemptSection(
+                networkAttemptSection.id,
+                networkAttemptSection.attemptSectionId,
+                networkAttemptSection.state,
+                networkAttemptSection.questionsUrl,
+                networkAttemptSection.startUrl,
+                networkAttemptSection.endUrl,
+                networkAttemptSection.remainingTime,
+                networkAttemptSection.name ?: networkAttemptSection.info?.name,
+                networkAttemptSection.duration ?: networkAttemptSection.info?.duration,
+                networkAttemptSection.order ?: networkAttemptSection.info?.order,
+                networkAttemptSection.instructions ?: networkAttemptSection.info?.instructions,
+                networkAttemptSection.attemptId
+        )
 }
