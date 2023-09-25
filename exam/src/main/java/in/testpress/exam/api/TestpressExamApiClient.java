@@ -15,6 +15,7 @@ import in.testpress.exam.models.Permission;
 import in.testpress.exam.models.ReportQuestionResponse;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
+import in.testpress.exam.network.NetworkAttemptSection;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.AttemptSection;
@@ -183,7 +184,7 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getExamService().heartbeat(heartbeatUrlFrag);
     }
 
-    public RetrofitCall<AttemptSection> updateSection(String urlFrag) {
+    public RetrofitCall<NetworkAttemptSection> updateSection(String urlFrag) {
         return getExamService().updateSection(urlFrag);
     }
 

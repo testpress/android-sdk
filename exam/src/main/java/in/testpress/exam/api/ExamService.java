@@ -10,6 +10,7 @@ import in.testpress.exam.models.Permission;
 import in.testpress.exam.models.ReportQuestionResponse;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
+import in.testpress.exam.network.NetworkAttemptSection;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.AttemptSection;
@@ -91,7 +92,7 @@ public interface ExamService {
             @Path(value = "end_exam_url", encoded = true) String endExamUrlFrag);
 
     @PATCH("/{url_frag}")
-    RetrofitCall<AttemptSection> updateSection(
+    RetrofitCall<NetworkAttemptSection> updateSection(
             @Path(value = "url_frag", encoded = true) String urlFrag);
 
     @PUT("{end_exam_url}")

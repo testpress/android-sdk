@@ -49,6 +49,8 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
+import in.testpress.exam.network.NetworkAttemptSection;
+import in.testpress.exam.network.NetworkAttemptSectionKt;
 import in.testpress.exam.pager.TestQuestionsPager;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.ui.loaders.AttemptItemsLoader;
@@ -128,8 +130,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
     private enum Action { PAUSE, END, UPDATE_ANSWER, END_SECTION }
     private RetrofitCall<Attempt> heartBeatApiRequest;
-    private RetrofitCall<AttemptSection> endSectionApiRequest;
-    private RetrofitCall<AttemptSection> startSectionApiRequest;
+    private RetrofitCall<NetworkAttemptSection> endSectionApiRequest;
+    private RetrofitCall<NetworkAttemptSection> startSectionApiRequest;
     private RetrofitCall<CourseAttempt> endContentAttemptApiRequest;
     private RetrofitCall<Attempt> endAttemptApiRequest;
     private RetrofitCall<Attempt> resumeExamApiRequest;
@@ -1016,13 +1018,14 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             return;
         }
         endSectionApiRequest = apiClient.updateSection(section.getEndUrlFrag())
-                .enqueue(new TestpressCallback<AttemptSection>() {
+                .enqueue(new TestpressCallback<NetworkAttemptSection>() {
                     @Override
-                    public void onSuccess(AttemptSection attemptSection) {
+                    public void onSuccess(NetworkAttemptSection attemptSection) {
                         if (getActivity() == null) {
                             return;
                         }
-                        sections.set(attemptSection.getOrder(), attemptSection);
+                        AttemptSection greenDaoAttemptSection = NetworkAttemptSectionKt.createAttemptSection(attemptSection);
+                        sections.set(greenDaoAttemptSection.getOrder(), greenDaoAttemptSection);
                         attempt.setSections(sections);
                         onSectionEnded();
                     }
@@ -1054,16 +1057,19 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         showProgress(R.string.testpress_starting_section);
         String sectionStartUrlFrag = sections.get(attempt.getCurrentSectionPosition()).getStartUrlFrag();
         startSectionApiRequest = apiClient.updateSection(sectionStartUrlFrag)
-                .enqueue(new TestpressCallback<AttemptSection>() {
+                .enqueue(new TestpressCallback<NetworkAttemptSection>() {
                     @Override
-                    public void onSuccess(AttemptSection section) {
+                    public void onSuccess(NetworkAttemptSection section) {
                         if (getActivity() == null) {
                             return;
                         }
-                        sections.set(section.getOrder(), section);
+                        AttemptSection greenDaoAttemptSection = NetworkAttemptSectionKt.createAttemptSection(section);
+                        sections.set(greenDaoAttemptSection.getOrder(),greenDaoAttemptSection);
                         attempt.setSections(sections);
+                        String questionUrl = greenDaoAttemptSection.getQuestionsUrlFrag();
+                        questionUrl = questionUrl.replace("2.3","2.2");
                         questionsResourcePager =
-                                new TestQuestionsPager(section.getQuestionsUrlFrag(), apiClient);
+                                new TestQuestionsPager(questionUrl, apiClient);
 
                         attemptItemList.clear();
                         getLoaderManager().restartLoader(0, null, TestFragment.this);
