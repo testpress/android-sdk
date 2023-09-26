@@ -26,11 +26,8 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.RadioButton
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -183,28 +180,39 @@ open class BaseExamWidgetFragment : Fragment() {
             startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
-                startCourseExam(true, isPartial = false)
+                showExamModeDialog(exam) { (startCourseExam(true, isPartial = false)) }
+                //startCourseExam(true, isPartial = false)
             }
         } else {
             startButton.setOnClickListener {
                 RetakeExamUtil.showRetakeOptions(context) { isPartial ->
-                    startCourseExam(false, isPartial)
+                    showExamModeDialog(exam) { startCourseExam(false, isPartial) }
                 }
             }
         }
     }
 
-    private fun showExamModeDialog() {
-        val options = arrayOf("Option 1", "Option 2", "Option 3")
+    private fun showExamModeDialog(exam: DomainExamContent, action: () -> Unit) {
+        val options = arrayOf("Regular Mode", "Quiz Mode")
         var selectedOption = 0
         val builder =
             AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle)
-        builder.setTitle("Choose an Option")
+        builder.setTitle("Select Exam Mode")
         builder.setSingleChoiceItems(options, selectedOption) { _, which ->
             selectedOption = which
         }
         builder.setPositiveButton("OK") { dialog: DialogInterface?, which: Int ->
-            Toast.makeText(requireContext(), "${selectedOption}", Toast.LENGTH_SHORT).show()
+            when(selectedOption){
+                0 -> action.invoke()
+                1 -> {
+                    val intent = Intent(requireContext(), QuizActivity::class.java).apply {
+                        putExtra(ContentActivity.CONTENT_ID, content.id)
+                        putExtra("EXAM_ID", exam.id)
+                        putExtra("ATTEMPT_URL", exam.attemptsUrl)
+                    }
+                    requireActivity().startActivity(intent)
+                }
+            }
         }
         builder.setNegativeButton("Cancel") { _, _ -> }
         builder.create().show()
@@ -225,10 +233,12 @@ open class BaseExamWidgetFragment : Fragment() {
             startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
-                resumeCourseExam(true, pausedAttempt)
+                showExamModeDialog(exam) { resumeCourseExam(true, pausedAttempt) }
             }
         } else {
-            startButton.setOnClickListener { resumeCourseExam(false, pausedAttempt) }
+            startButton.setOnClickListener {
+                showExamModeDialog(exam) { resumeCourseExam(false, pausedAttempt) }
+            }
         }
     }
 
