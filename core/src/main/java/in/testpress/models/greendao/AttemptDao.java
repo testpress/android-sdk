@@ -45,6 +45,7 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
         public final static Property ExternalReviewUrl = new Property(20, String.class, "externalReviewUrl", false, "EXTERNAL_REVIEW_URL");
         public final static Property ReviewPdf = new Property(21, String.class, "reviewPdf", false, "REVIEW_PDF");
         public final static Property RankEnabled = new Property(22, Boolean.class, "rankEnabled", false, "RANK_ENABLED");
+        public final static Property AttemptType = new Property(23, Integer.class, "attemptType", false, "ATTEMPT_TYPE");
     }
 
     private DaoSession daoSession;
@@ -85,7 +86,8 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
                 "\"LAST_VIEWED_QUESTION_ID\" INTEGER," + // 19: lastViewedQuestionId
                 "\"EXTERNAL_REVIEW_URL\" TEXT," + // 20: externalReviewUrl
                 "\"REVIEW_PDF\" TEXT," + // 21: reviewPdf
-                "\"RANK_ENABLED\" INTEGER);"); // 22: rankEnabled
+                "\"RANK_ENABLED\" INTEGER," + // 22: rankEnabled
+                "\"ATTEMPT_TYPE\" INTEGER);"); // 23: attemptType
     }
 
     /** Drops the underlying database table. */
@@ -212,6 +214,11 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
         if (rankEnabled != null) {
             stmt.bindLong(23, rankEnabled ? 1L: 0L);
         }
+ 
+        Integer attemptType = entity.getAttemptType();
+        if (attemptType != null) {
+            stmt.bindLong(24, attemptType);
+        }
     }
 
     @Override
@@ -332,6 +339,11 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
         if (rankEnabled != null) {
             stmt.bindLong(23, rankEnabled ? 1L: 0L);
         }
+ 
+        Integer attemptType = entity.getAttemptType();
+        if (attemptType != null) {
+            stmt.bindLong(24, attemptType);
+        }
     }
 
     @Override
@@ -370,7 +382,8 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
             cursor.isNull(offset + 19) ? null : cursor.getInt(offset + 19), // lastViewedQuestionId
             cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20), // externalReviewUrl
             cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21), // reviewPdf
-            cursor.isNull(offset + 22) ? null : cursor.getShort(offset + 22) != 0 // rankEnabled
+            cursor.isNull(offset + 22) ? null : cursor.getShort(offset + 22) != 0, // rankEnabled
+            cursor.isNull(offset + 23) ? null : cursor.getInt(offset + 23) // attemptType
         );
         return entity;
     }
@@ -400,6 +413,7 @@ public class AttemptDao extends AbstractDao<Attempt, Long> {
         entity.setExternalReviewUrl(cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20));
         entity.setReviewPdf(cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21));
         entity.setRankEnabled(cursor.isNull(offset + 22) ? null : cursor.getShort(offset + 22) != 0);
+        entity.setAttemptType(cursor.isNull(offset + 23) ? null : cursor.getInt(offset + 23));
      }
     
     @Override

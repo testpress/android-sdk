@@ -61,6 +61,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         public final static Property Instructions = new Property(33, String.class, "instructions", false, "INSTRUCTIONS");
         public final static Property HasAudioQuestions = new Property(34, Boolean.class, "hasAudioQuestions", false, "HAS_AUDIO_QUESTIONS");
         public final static Property RankPublishingDate = new Property(35, String.class, "rankPublishingDate", false, "RANK_PUBLISHING_DATE");
+        public final static Property EnableQuizMode = new Property(36, Boolean.class, "enableQuizMode", false, "ENABLE_QUIZ_MODE");
     }
 
     private DaoSession daoSession;
@@ -115,7 +116,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
                 "\"SHOW_ANALYTICS\" INTEGER," + // 32: showAnalytics
                 "\"INSTRUCTIONS\" TEXT," + // 33: instructions
                 "\"HAS_AUDIO_QUESTIONS\" INTEGER," + // 34: hasAudioQuestions
-                "\"RANK_PUBLISHING_DATE\" TEXT);"); // 35: rankPublishingDate
+                "\"RANK_PUBLISHING_DATE\" TEXT," + // 35: rankPublishingDate
+                "\"ENABLE_QUIZ_MODE\" INTEGER);"); // 36: enableQuizMode
     }
 
     /** Drops the underlying database table. */
@@ -307,6 +309,11 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (rankPublishingDate != null) {
             stmt.bindString(36, rankPublishingDate);
         }
+ 
+        Boolean enableQuizMode = entity.getEnableQuizMode();
+        if (enableQuizMode != null) {
+            stmt.bindLong(37, enableQuizMode ? 1L: 0L);
+        }
     }
 
     @Override
@@ -492,6 +499,11 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (rankPublishingDate != null) {
             stmt.bindString(36, rankPublishingDate);
         }
+ 
+        Boolean enableQuizMode = entity.getEnableQuizMode();
+        if (enableQuizMode != null) {
+            stmt.bindLong(37, enableQuizMode ? 1L: 0L);
+        }
     }
 
     @Override
@@ -543,7 +555,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             cursor.isNull(offset + 32) ? null : cursor.getShort(offset + 32) != 0, // showAnalytics
             cursor.isNull(offset + 33) ? null : cursor.getString(offset + 33), // instructions
             cursor.isNull(offset + 34) ? null : cursor.getShort(offset + 34) != 0, // hasAudioQuestions
-            cursor.isNull(offset + 35) ? null : cursor.getString(offset + 35) // rankPublishingDate
+            cursor.isNull(offset + 35) ? null : cursor.getString(offset + 35), // rankPublishingDate
+            cursor.isNull(offset + 36) ? null : cursor.getShort(offset + 36) != 0 // enableQuizMode
         );
         return entity;
     }
@@ -586,6 +599,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         entity.setInstructions(cursor.isNull(offset + 33) ? null : cursor.getString(offset + 33));
         entity.setHasAudioQuestions(cursor.isNull(offset + 34) ? null : cursor.getShort(offset + 34) != 0);
         entity.setRankPublishingDate(cursor.isNull(offset + 35) ? null : cursor.getString(offset + 35));
+        entity.setEnableQuizMode(cursor.isNull(offset + 36) ? null : cursor.getShort(offset + 36) != 0);
      }
     
     @Override

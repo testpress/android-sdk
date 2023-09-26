@@ -33,7 +33,8 @@ data class DomainAttempt(
     val accuracy : Int? = null,
     val lastViewedQuestionId: Int? = null,
     val externalReviewUrl :String? = null,
-    val reviewPdf: String? = null
+    val reviewPdf: String? = null,
+    val attemptType: Int? = null
 ) {
     val endUrl = url + "end/"
 }
@@ -62,7 +63,8 @@ fun Attempt.asDomainModel(): DomainAttempt {
         lastViewedQuestionId = lastViewedQuestionId,
         externalReviewUrl = externalReviewUrl,
         reviewPdf = reviewPdf,
-        rankEnabled = rankEnabled
+        rankEnabled = rankEnabled,
+        attemptType = attemptType
     )
 }
 

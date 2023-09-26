@@ -72,6 +72,7 @@ public class Exam implements android.os.Parcelable {
     private String instructions;
     private Boolean hasAudioQuestions;
     private String rankPublishingDate;
+    private Boolean enableQuizMode;
 
     /** Used to resolve relations */
     @Generated
@@ -99,7 +100,7 @@ public class Exam implements android.os.Parcelable {
     }
 
     @Generated
-    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock, Boolean showAnalytics, String instructions, Boolean hasAudioQuestions, String rankPublishingDate) {
+    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock, Boolean showAnalytics, String instructions, Boolean hasAudioQuestions, String rankPublishingDate, Boolean enableQuizMode) {
         this.totalMarks = totalMarks;
         this.url = url;
         this.id = id;
@@ -136,6 +137,7 @@ public class Exam implements android.os.Parcelable {
         this.instructions = instructions;
         this.hasAudioQuestions = hasAudioQuestions;
         this.rankPublishingDate = rankPublishingDate;
+        this.enableQuizMode = enableQuizMode;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -431,6 +433,14 @@ public class Exam implements android.os.Parcelable {
 
     public void setRankPublishingDate(String rankPublishingDate) {
         this.rankPublishingDate = rankPublishingDate;
+    }
+
+    public Boolean getEnableQuizMode() {
+        return enableQuizMode;
+    }
+
+    public void setEnableQuizMode(Boolean enableQuizMode) {
+        this.enableQuizMode = enableQuizMode;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
