@@ -8,6 +8,7 @@ import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.HtmlContent;
+import in.testpress.models.greendao.LiveStream;
 import in.testpress.models.greendao.Price;
 import in.testpress.models.greendao.Product;
 import in.testpress.models.greendao.Stream;
@@ -22,6 +23,8 @@ public class ContentsListResponse {
     private List<HtmlContent> notes = new ArrayList<>();
     private List<Stream> streams = new ArrayList<>();
     private List<VideoConference> videoConferences = new ArrayList<>();
+    private List<LiveStream> liveStreams = new ArrayList<>();
+
 
     public List<Exam> getExams() {
         return exams;
@@ -75,6 +78,10 @@ public class ContentsListResponse {
 
     public List<VideoConference> getVideoConferences() {
         return videoConferences;
+    }
+
+    public List<LiveStream> getLiveStreams() {
+        return this.liveStreams;
     }
 
     public void setVideoConferences(List<VideoConference> videoConferences) {
