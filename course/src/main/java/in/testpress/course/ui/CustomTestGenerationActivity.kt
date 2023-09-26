@@ -8,6 +8,7 @@ import `in`.testpress.exam.ui.TestFragment
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.ui.AbstractWebViewActivity
 import `in`.testpress.util.BaseJavaScriptInterface
+import android.content.Intent
 import android.os.Bundle
 import android.webkit.JavascriptInterface
 import android.widget.Toast
@@ -73,6 +74,15 @@ class JavaScriptInterface(val activity: CustomTestGenerationActivity):BaseJavaSc
     @JavascriptInterface
     fun startCustomTest(attemptId: String) {
         activity.getAttempt(attemptId)
+    }
+
+    @JavascriptInterface
+    fun startCustomTestInQuizMode(attemptId: String) {
+        val intent = Intent(activity, QuizActivity::class.java).apply {
+            putExtra("ATTEMPT_ID", attemptId.toLong())
+        }
+        activity.startActivity(intent)
+        activity.finish()
     }
 
 }
