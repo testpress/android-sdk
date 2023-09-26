@@ -28,6 +28,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -177,6 +178,8 @@ open class BaseExamWidgetFragment : Fragment() {
     private fun initStartForFreshExam(exam: DomainExamContent) {
         if (exam.templateType == IELTS_TEMPLATE) {
             startButton.setOnClickListener {startExamInWebview(content)}
+        } else if (contentAttempts.isEmpty() && exam.enableQuizMode == true) {
+            Toast.makeText(requireContext(),"${exam.enableQuizMode}",Toast.LENGTH_SHORT).show()
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
                 startCourseExam(true, isPartial = false)
