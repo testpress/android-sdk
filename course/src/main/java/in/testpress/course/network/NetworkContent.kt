@@ -130,6 +130,7 @@ fun NetworkContent.asGreenDaoModel(): Content {
         this.courseId,
         this.chapterId,
         this.videoConferenceId,
+        null,
         this.htmlId,
         this.videoId,
         this.attachmentId,
