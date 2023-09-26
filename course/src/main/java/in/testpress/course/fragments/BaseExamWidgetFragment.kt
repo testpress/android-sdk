@@ -23,12 +23,15 @@ import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.util.MultiLanguagesUtil
 import `in`.testpress.exam.util.RetakeExamUtil
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.RadioButton
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -178,8 +181,6 @@ open class BaseExamWidgetFragment : Fragment() {
     private fun initStartForFreshExam(exam: DomainExamContent) {
         if (exam.templateType == IELTS_TEMPLATE) {
             startButton.setOnClickListener {startExamInWebview(content)}
-        } else if (contentAttempts.isEmpty() && exam.enableQuizMode == true) {
-            Toast.makeText(requireContext(),"${exam.enableQuizMode}",Toast.LENGTH_SHORT).show()
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
                 startCourseExam(true, isPartial = false)
@@ -191,6 +192,22 @@ open class BaseExamWidgetFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun showExamModeDialog() {
+        val options = arrayOf("Option 1", "Option 2", "Option 3")
+        var selectedOption = 0
+        val builder =
+            AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle)
+        builder.setTitle("Choose an Option")
+        builder.setSingleChoiceItems(options, selectedOption) { _, which ->
+            selectedOption = which
+        }
+        builder.setPositiveButton("OK") { dialog: DialogInterface?, which: Int ->
+            Toast.makeText(requireContext(), "${selectedOption}", Toast.LENGTH_SHORT).show()
+        }
+        builder.setNegativeButton("Cancel") { _, _ -> }
+        builder.create().show()
     }
 
     private fun startExamInWebview(content: DomainContent) {
