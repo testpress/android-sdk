@@ -26,7 +26,8 @@ data class NetworkAttempt(
     val lastViewedQuestionId: Int? = null,
     val externalReviewUrl:String? = null,
     val reviewPdf:String? = null,
-    val rankEnabled: Boolean? = null
+    val rankEnabled: Boolean? = null,
+    val attemptType: Int? = null
 )
 
 fun createNetworkAttempt(attempt: NetworkAttempt): Attempt {
@@ -53,7 +54,8 @@ fun createNetworkAttempt(attempt: NetworkAttempt): Attempt {
         attempt.lastViewedQuestionId,
         attempt.externalReviewUrl,
         attempt.reviewPdf,
-        attempt.rankEnabled
+        attempt.rankEnabled,
+        attempt.attemptType
     )
     greenDaoAttempt.sections = attempt.sections?.asGreenDaoModel()
     return greenDaoAttempt
