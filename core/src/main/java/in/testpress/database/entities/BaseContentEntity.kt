@@ -10,6 +10,7 @@ open class BaseContentEntity {
     var contentId: Long? = null
     var videoId: Long? = null
     var attachmentId: Long? = null
+    var liveStreamId: Long? = null
     var contentType: String? = null
     var icon: String? = null
     var start: String? = null

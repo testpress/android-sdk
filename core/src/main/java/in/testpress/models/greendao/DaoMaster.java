@@ -43,6 +43,7 @@ public class DaoMaster extends AbstractDaoMaster {
         AttachmentDao.createTable(db, ifNotExists);
         ExamDao.createTable(db, ifNotExists);
         VideoConferenceDao.createTable(db, ifNotExists);
+        LiveStreamDao.createTable(db, ifNotExists);
         LanguageDao.createTable(db, ifNotExists);
         CourseAttemptDao.createTable(db, ifNotExists);
         AttemptDao.createTable(db, ifNotExists);
@@ -82,6 +83,7 @@ public class DaoMaster extends AbstractDaoMaster {
         AttachmentDao.dropTable(db, ifExists);
         ExamDao.dropTable(db, ifExists);
         VideoConferenceDao.dropTable(db, ifExists);
+        LiveStreamDao.dropTable(db, ifExists);
         LanguageDao.dropTable(db, ifExists);
         CourseAttemptDao.dropTable(db, ifExists);
         AttemptDao.dropTable(db, ifExists);
@@ -135,6 +137,7 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(AttachmentDao.class);
         registerDaoClass(ExamDao.class);
         registerDaoClass(VideoConferenceDao.class);
+        registerDaoClass(LiveStreamDao.class);
         registerDaoClass(LanguageDao.class);
         registerDaoClass(CourseAttemptDao.class);
         registerDaoClass(AttemptDao.class);
