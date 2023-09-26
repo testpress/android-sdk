@@ -523,16 +523,16 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
     public void onPause() {
         onTimeRangeChange((long)startPosition, (long)getCurrentPosition());
-        updateVideoAttempt();
         if (Util.SDK_INT <= 23) {
+            updateVideoAttempt();
             releasePlayer();
         }
     }
 
     public void onStop() {
         onTimeRangeChange((long)startPosition, (long)getCurrentPosition());
-        updateVideoAttempt();
         if (Util.SDK_INT > 23) {
+            updateVideoAttempt();
             releasePlayer();
         }
     }
@@ -754,9 +754,11 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private class PlayerEventListener implements Player.Listener, DRMLicenseFetchCallback {
 
         @Override
-        public void onIsPlayingChanged(boolean isPlaying) {
-            updateVideoAttempt();
-            Player.Listener.super.onIsPlayingChanged(isPlaying);
+        public void onPlayWhenReadyChanged(boolean playWhenReady, int reason) {
+            if (!playWhenReady) {
+                updateVideoAttempt();
+            }
+            Player.Listener.super.onPlayWhenReadyChanged(playWhenReady, reason);
         }
 
         @Override
@@ -774,7 +776,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 hideError(R.string.testpress_usb_connected);
                 if (errorOnVideoAttemptUpdate) {
                     errorMessageTextView.setVisibility(View.GONE);
-                    updateVideoAttempt();
                 } else if (playbackState == Player.STATE_READY) {
                     errorMessageTextView.setVisibility(View.GONE);
                 }
