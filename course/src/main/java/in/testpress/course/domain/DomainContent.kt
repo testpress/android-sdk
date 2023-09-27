@@ -43,6 +43,7 @@ data class DomainContent(
     val attachmentId: Long? = null,
     val videoId: Long? = null,
     val videoConferenceID: Long? = null,
+    val liveStreamId: Long? = null,
     val htmlId: Long? = null,
     val start: String? = null,
     val end: String? = null,
@@ -56,6 +57,7 @@ data class DomainContent(
     var exam: DomainExamContent? = null,
     val video: DomainVideoContent? = null,
     val videoConference: DomainVideoConferenceContent? = null,
+    val liveStream: DomainLiveStream? = null,
     val isCourseAvailable: Boolean?,
     val coverImageSmall: String? = null,
     val coverImageMedium: String? = null,
@@ -109,7 +111,8 @@ data class DomainContent(
     }
 
     fun canShowRecordedVideo(): Boolean {
-        return video != null && videoConference?.showRecordedVideo == true
+        return video != null &&
+                (videoConference?.showRecordedVideo == true || liveStream?.showRecordedVideo == true)
     }
 }
 
@@ -193,6 +196,8 @@ fun createDomainContent(content: Content): DomainContent {
         attemptsUrl = content.attemptsUrl,
         videoConferenceID = content.videoConferenceId,
         videoConference = content.rawVideoConference?.asDomainContent(),
+        liveStreamId = content.liveStreamId,
+        liveStream = content.liveStream?.asDomainContent(),
         isCourseAvailable = content.isCourseAvailable,
         coverImageMedium = content.coverImageMedium,
         coverImage = content.coverImage,
@@ -266,7 +271,7 @@ fun DomainContent.getGreenDaoContentAttempts(context: Context): List<CourseAttem
 }
 
 enum class ContentType {
-    Exam, Quiz, Video, Attachment, Notes, Unknown
+    Exam, Quiz, Video, Attachment, Notes, LiveStream, Unknown
 }
 
 inline fun <reified T : Enum<T>> String.asEnumOrDefault(defaultValue: T? = null): T? =
