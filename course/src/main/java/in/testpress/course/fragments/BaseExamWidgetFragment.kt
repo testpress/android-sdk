@@ -173,7 +173,7 @@ open class BaseExamWidgetFragment : Fragment() {
             startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(requireActivity(), exam.asGreenDaoModel(), startButton) {
-                if (exam.enableQuizMode == true) {
+                if (exam.isQuizModeEnabled()) {
                     showExamModeDialog(exam) { (startCourseExam(true, isPartial = false)) }
                     return@supportMultiLanguage
                 } else {
@@ -184,7 +184,7 @@ open class BaseExamWidgetFragment : Fragment() {
         } else {
             startButton.setOnClickListener {
                 RetakeExamUtil.showRetakeOptions(context) { isPartial ->
-                    if (exam.enableQuizMode == true) {
+                    if (exam.isQuizModeEnabled()) {
                         showExamModeDialog(exam) { startCourseExam(false, isPartial) }
                         return@showRetakeOptions
                     } else {
@@ -244,12 +244,14 @@ open class BaseExamWidgetFragment : Fragment() {
         hasMultipleLanguages: Boolean,
         pausedAttempt: DomainContentAttempt
     ) {
-        if (exam.enableQuizMode == true) {
-            if (pausedAttempt.assessment?.attemptType == 1){
-                resumeCourseExam(hasMultipleLanguages, pausedAttempt)
-            } else {
+        if (exam.isQuizModeEnabled()) {
+            if (pausedAttempt.assessment?.isAttemptTypeQuiz() == true){
                 startQuizActivity(exam)
+            } else {
+                resumeCourseExam(hasMultipleLanguages, pausedAttempt)
             }
+        } else {
+            resumeCourseExam(hasMultipleLanguages, pausedAttempt)
         }
     }
 
