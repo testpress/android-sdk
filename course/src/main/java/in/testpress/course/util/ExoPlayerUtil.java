@@ -144,15 +144,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private boolean fullscreen = false;
     private boolean errorOnVideoAttemptUpdate;
     private int drmLicenseRetries = 0;
-    private Handler videoAttemptUpdateHandler;
-    private Runnable videoAttemptUpdateTask = new Runnable() {
-        @Override
-        public void run() {
-            if (!isScreenCasted()) {
-                updateVideoAttempt();
-            }
-        }
-    };
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     public AudioManager audioManager;
     AudioManager.OnAudioFocusChangeListener audioFocusChangeListener;
@@ -251,17 +243,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 } else {
                     closeFullscreenDialog();
                 }
-            }
-        });
-    }
-
-    public void openOnlyInFullScreen() {
-        openFullscreenDialog();
-        fullscreenDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                fullscreenDialog.dismiss();
-                activity.finish();
             }
         });
     }
@@ -475,18 +456,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
     public void setStartPosition(float startPosition) {
         this.startPosition = startPosition;
-    }
-
-    public boolean isPlayWhenReady() {
-        return player.getPlayWhenReady();
-    }
-
-    public void setPlayWhenReady(boolean playWhenReady) {
-        this.playWhenReady = playWhenReady;
-    }
-
-    public float getSpeedRate() {
-        return speedRate;
     }
 
     public void setSpeedRate(float speedRate) {
