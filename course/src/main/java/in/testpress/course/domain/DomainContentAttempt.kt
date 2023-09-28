@@ -2,6 +2,8 @@ package `in`.testpress.course.domain
 
 import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.database.TestpressDatabase
+import `in`.testpress.exam.domain.DomainAttempt
+import `in`.testpress.exam.domain.asDomainModel
 import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.models.greendao.CourseAttemptDao
 import android.content.Context

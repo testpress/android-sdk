@@ -1,4 +1,4 @@
-package `in`.testpress.course.domain
+package `in`.testpress.exam.domain
 
 import `in`.testpress.models.greendao.Exam
 import java.text.DateFormat

@@ -1,7 +1,7 @@
 package `in`.testpress.course.repository
 
 import `in`.testpress.core.TestpressException
-import `in`.testpress.course.domain.asDomainLanguage
+import `in`.testpress.exam.domain.asDomainLanguage
 import `in`.testpress.enums.Status
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContentAttempt

@@ -2,7 +2,7 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
-import `in`.testpress.course.domain.DomainExamContent
+import `in`.testpress.exam.domain.DomainExamContent
 import `in`.testpress.course.domain.getGreenDaoContentAttempt
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.exam.api.TestpressExamApiClient.STATE_PAUSED

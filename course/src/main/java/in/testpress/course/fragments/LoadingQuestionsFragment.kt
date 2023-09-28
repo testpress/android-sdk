@@ -1,7 +1,7 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
-import `in`.testpress.course.domain.DomainAttempt
+import `in`.testpress.exam.domain.DomainAttempt
 import `in`.testpress.course.domain.DomainContentAttempt
 import `in`.testpress.enums.Status
 import `in`.testpress.course.repository.QuizQuestionsRepository

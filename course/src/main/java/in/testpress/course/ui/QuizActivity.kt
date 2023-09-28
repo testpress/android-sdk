@@ -4,7 +4,7 @@ import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.getEndAttemptUrl
-import `in`.testpress.course.domain.getGreenDaoAttempt
+import `in`.testpress.exam.domain.getGreenDaoAttempt
 import `in`.testpress.enums.Status
 import `in`.testpress.course.fragments.ExamEndHanlder
 import `in`.testpress.course.fragments.LoadingQuestionsFragment

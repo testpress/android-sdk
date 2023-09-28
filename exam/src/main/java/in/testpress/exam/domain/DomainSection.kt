@@ -1,4 +1,4 @@
-package `in`.testpress.course.domain
+package `in`.testpress.exam.domain
 
 data class DomainSection(
     val order: Int? = null,
