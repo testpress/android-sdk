@@ -141,10 +141,10 @@ class ContentRepositoryTest {
     @Test
     fun createAttemptShouldMakeAPICall() {
         val apiCall = RetrofitCallMock(Resource.success(createContentAttempt()))
-        `when`(courseNetwork.createContentAttempt(1, hashMapOf(("attempt_type" to 1)))).thenReturn(apiCall)
+        `when`(courseNetwork.createContentAttempt(1)).thenReturn(apiCall)
         val result = repo.createContentAttempt(1).getOrAwaitValue()
 
-        verify(courseNetwork).createContentAttempt(1, hashMapOf(("attempt_type" to 1)))
+        verify(courseNetwork).createContentAttempt(1)
         assert(result == apiCall.resource)
     }
 
