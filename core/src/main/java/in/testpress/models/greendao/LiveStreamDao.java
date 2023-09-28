@@ -24,7 +24,7 @@ public class LiveStreamDao extends AbstractDao<LiveStream, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "ID");
         public final static Property Title = new Property(1, String.class, "title", false, "TITLE");
-        public final static Property StreamURL = new Property(2, String.class, "streamURL", false, "STREAM_URL");
+        public final static Property StreamUrl = new Property(2, String.class, "streamUrl", false, "STREAM_URL");
         public final static Property Duration = new Property(3, Integer.class, "duration", false, "DURATION");
         public final static Property Status = new Property(4, String.class, "status", false, "STATUS");
         public final static Property ShowRecordedVideo = new Property(5, Boolean.class, "showRecordedVideo", false, "SHOW_RECORDED_VIDEO");
@@ -45,7 +45,7 @@ public class LiveStreamDao extends AbstractDao<LiveStream, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"LIVE_STREAM\" (" + //
                 "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"TITLE\" TEXT," + // 1: title
-                "\"STREAM_URL\" TEXT," + // 2: streamURL
+                "\"STREAM_URL\" TEXT," + // 2: streamUrl
                 "\"DURATION\" INTEGER," + // 3: duration
                 "\"STATUS\" TEXT," + // 4: status
                 "\"SHOW_RECORDED_VIDEO\" INTEGER);"); // 5: showRecordedVideo
@@ -71,9 +71,9 @@ public class LiveStreamDao extends AbstractDao<LiveStream, Long> {
             stmt.bindString(2, title);
         }
  
-        String streamURL = entity.getStreamURL();
-        if (streamURL != null) {
-            stmt.bindString(3, streamURL);
+        String streamUrl = entity.getStreamUrl();
+        if (streamUrl != null) {
+            stmt.bindString(3, streamUrl);
         }
  
         Integer duration = entity.getDuration();
@@ -106,9 +106,9 @@ public class LiveStreamDao extends AbstractDao<LiveStream, Long> {
             stmt.bindString(2, title);
         }
  
-        String streamURL = entity.getStreamURL();
-        if (streamURL != null) {
-            stmt.bindString(3, streamURL);
+        String streamUrl = entity.getStreamUrl();
+        if (streamUrl != null) {
+            stmt.bindString(3, streamUrl);
         }
  
         Integer duration = entity.getDuration();
@@ -137,7 +137,7 @@ public class LiveStreamDao extends AbstractDao<LiveStream, Long> {
         LiveStream entity = new LiveStream( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // title
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // streamURL
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // streamUrl
             cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // duration
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // status
             cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0 // showRecordedVideo
@@ -149,7 +149,7 @@ public class LiveStreamDao extends AbstractDao<LiveStream, Long> {
     public void readEntity(Cursor cursor, LiveStream entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setTitle(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setStreamURL(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setStreamUrl(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setDuration(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
         entity.setStatus(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setShowRecordedVideo(cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0);

@@ -16,7 +16,7 @@ public class LiveStream {
     @Id
     private Long id;
     private String title;
-    private String streamURL;
+    private String streamUrl;
     private Integer duration;
     private String status;
     private Boolean showRecordedVideo;
@@ -33,10 +33,10 @@ public class LiveStream {
     }
 
     @Generated
-    public LiveStream(Long id, String title, String streamURL, Integer duration, String status, Boolean showRecordedVideo) {
+    public LiveStream(Long id, String title, String streamUrl, Integer duration, String status, Boolean showRecordedVideo) {
         this.id = id;
         this.title = title;
-        this.streamURL = streamURL;
+        this.streamUrl = streamUrl;
         this.duration = duration;
         this.status = status;
         this.showRecordedVideo = showRecordedVideo;
@@ -58,12 +58,12 @@ public class LiveStream {
         this.title = title;
     }
 
-    public String getStreamURL() {
-        return streamURL;
+    public String getStreamUrl() {
+        return streamUrl;
     }
 
-    public void setStreamURL(String streamURL) {
-        this.streamURL = streamURL;
+    public void setStreamUrl(String streamUrl) {
+        this.streamUrl = streamUrl;
     }
 
     public Integer getDuration() {
