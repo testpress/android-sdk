@@ -158,12 +158,7 @@ class ContentFragmentFactory {
                     }
                     return VideoConferenceFragment()
                 }
-                "Live Stream" -> {
-                    if (content.canShowRecordedVideo()) {
-                        return VideoContentFragment()
-                    }
-                    return LiveStreamFragment()
-                }
+                "Live Stream" -> LiveStreamFragment()
                 else -> ContentLoadingFragment()
             }
         }
