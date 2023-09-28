@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 61;
+    private static final int VERSION = 62;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -58,8 +58,10 @@ public class TestpressSDKDaoGenerator {
         Entity attachment = addAttachment(schema);
         Entity exam = addExam(schema);
         Entity videoConference = addVideoConference(schema);
+        Entity liveStream = addLiveStream(schema);
         addLanguage(schema, exam);
         addVideoConferenceToContent(content, videoConference);
+        addLiveStreamToContent(content, liveStream);
         addHTMLToContent(content, html);
         addVideoToContent(content, video);
         addStreamToVideo(stream, video);
@@ -302,6 +304,12 @@ public class TestpressSDKDaoGenerator {
         content.addToOne(videoConference, htmlId, "videoConference");
     }
 
+    private static void addLiveStreamToContent(Entity content, Entity liveStream) {
+        Property liveStreamId = content.addLongProperty("liveStreamId").getProperty();
+        content.addToOne(liveStream, liveStreamId, "liveStream");
+    }
+
+
     private static void addHTMLToContent(Entity content, Entity html) {
         Property htmlId = content.addLongProperty("htmlId").getProperty();
         content.addToOne(html, htmlId, "htmlContent");
@@ -423,6 +431,17 @@ public class TestpressSDKDaoGenerator {
         video.addStringProperty("conferenceId");
         video.addStringProperty("accessToken");
         video.addStringProperty("password");
+        video.addBooleanProperty("showRecordedVideo");
+        return video;
+    }
+
+    private static Entity addLiveStream(Schema schema) {
+        Entity video = schema.addEntity("LiveStream");
+        video.addLongProperty("id").primaryKey();
+        video.addStringProperty("title");
+        video.addStringProperty("streamUrl");
+        video.addIntProperty("duration");
+        video.addStringProperty("status");
         video.addBooleanProperty("showRecordedVideo");
         return video;
     }

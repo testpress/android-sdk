@@ -25,6 +25,7 @@ import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.ExamQuestionDao;
 import in.testpress.models.greendao.HtmlContentDao;
 import in.testpress.models.greendao.LanguageDao;
+import in.testpress.models.greendao.LiveStreamDao;
 import in.testpress.models.greendao.ProductDao;
 import in.testpress.models.greendao.QuestionDao;
 import in.testpress.models.greendao.ReviewAnswerDao;
@@ -92,6 +93,10 @@ public class TestpressSDKDatabase {
 
     public static VideoConferenceDao getVideoConferenceDao(Context context) {
         return getDaoSession(context).getVideoConferenceDao();
+    }
+
+    public static LiveStreamDao getLiveStreamDao(Context context) {
+        return getDaoSession(context).getLiveStreamDao();
     }
 
     public static HtmlContentDao getHtmlContentDao(Context context) {

@@ -63,6 +63,7 @@ public class Content implements android.os.Parcelable {
     private Long courseId;
     private Long chapterId;
     private Long videoConferenceId;
+    private Long liveStreamId;
     private Long htmlId;
     private Long videoId;
     private Long attachmentId;
@@ -87,6 +88,12 @@ public class Content implements android.os.Parcelable {
 
     @Generated
     private transient Long videoConference__resolvedKey;
+
+    @ToOne(joinProperty = "liveStreamId")
+    private LiveStream liveStream;
+
+    @Generated
+    private transient Long liveStream__resolvedKey;
 
     @ToOne(joinProperty = "htmlId")
     private HtmlContent htmlContent;
@@ -130,7 +137,7 @@ public class Content implements android.os.Parcelable {
     }
 
     @Generated
-    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, String coverImage, String coverImageMedium, String coverImageSmall, Boolean isCourseAvailable, Long nextContentId, Boolean hasEnded, String examStartUrl, Long courseId, Long chapterId, Long videoConferenceId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
+    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, String coverImage, String coverImageMedium, String coverImageSmall, Boolean isCourseAvailable, Long nextContentId, Boolean hasEnded, String examStartUrl, Long courseId, Long chapterId, Long videoConferenceId, Long liveStreamId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
         this.order = order;
         this.htmlContentTitle = htmlContentTitle;
         this.htmlContentUrl = htmlContentUrl;
@@ -165,6 +172,7 @@ public class Content implements android.os.Parcelable {
         this.courseId = courseId;
         this.chapterId = chapterId;
         this.videoConferenceId = videoConferenceId;
+        this.liveStreamId = liveStreamId;
         this.htmlId = htmlId;
         this.videoId = videoId;
         this.attachmentId = attachmentId;
@@ -450,6 +458,14 @@ public class Content implements android.os.Parcelable {
         this.videoConferenceId = videoConferenceId;
     }
 
+    public Long getLiveStreamId() {
+        return liveStreamId;
+    }
+
+    public void setLiveStreamId(Long liveStreamId) {
+        this.liveStreamId = liveStreamId;
+    }
+
     public Long getHtmlId() {
         return htmlId;
     }
@@ -529,6 +545,31 @@ public class Content implements android.os.Parcelable {
             this.videoConference = videoConference;
             videoConferenceId = videoConference == null ? null : videoConference.getId();
             videoConference__resolvedKey = videoConferenceId;
+        }
+    }
+
+    /** To-one relationship, resolved on first access. */
+    @Generated
+    public LiveStream getLiveStream() {
+        Long __key = this.liveStreamId;
+        if (liveStream__resolvedKey == null || !liveStream__resolvedKey.equals(__key)) {
+            __throwIfDetached();
+            LiveStreamDao targetDao = daoSession.getLiveStreamDao();
+            LiveStream liveStreamNew = targetDao.load(__key);
+            synchronized (this) {
+                liveStream = liveStreamNew;
+            	liveStream__resolvedKey = __key;
+            }
+        }
+        return liveStream;
+    }
+
+    @Generated
+    public void setLiveStream(LiveStream liveStream) {
+        synchronized (this) {
+            this.liveStream = liveStream;
+            liveStreamId = liveStream == null ? null : liveStream.getId();
+            liveStream__resolvedKey = liveStreamId;
         }
     }
 
