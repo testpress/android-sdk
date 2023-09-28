@@ -111,7 +111,8 @@ data class DomainContent(
     }
 
     fun canShowRecordedVideo(): Boolean {
-        return video != null && videoConference?.showRecordedVideo == true
+        return video != null &&
+                (videoConference?.showRecordedVideo == true || liveStream?.showRecordedVideo == true)
     }
 }
 
