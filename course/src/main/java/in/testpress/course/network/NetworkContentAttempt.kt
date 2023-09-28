@@ -2,6 +2,7 @@ package `in`.testpress.course.network
 
 import `in`.testpress.course.domain.DomainContentAttempt
 import `in`.testpress.exam.network.NetworkAttempt
+import `in`.testpress.exam.network.asDomainModel
 import `in`.testpress.exam.network.asGreenDaoModel
 import `in`.testpress.models.greendao.CourseAttempt
 
@@ -44,7 +45,8 @@ fun createDomainContentAttempt(contentAttempt: NetworkContentAttempt): DomainCon
         contentAttempt.trophies,
         contentAttempt.chapterContentId,
         contentAttempt.assessmentId,
-        contentAttempt.userVideoId
+        contentAttempt.userVideoId,
+        contentAttempt.assessment?.asDomainModel()
     )
 }
 

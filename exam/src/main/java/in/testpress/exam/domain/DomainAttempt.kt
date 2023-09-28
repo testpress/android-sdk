@@ -28,7 +28,7 @@ data class DomainAttempt(
     val unanswered_count : Int? = null,
     val totalBonus : Int? = null,
     val rankEnabled : Boolean? = null,
-    val sections : List<String>? = null,
+    val sections : List<DomainAttemptSection>? = null,
     val speed : Int? = null,
     val accuracy : Int? = null,
     val lastViewedQuestionId: Int? = null,
@@ -64,7 +64,8 @@ fun Attempt.asDomainModel(): DomainAttempt {
         externalReviewUrl = externalReviewUrl,
         reviewPdf = reviewPdf,
         rankEnabled = rankEnabled,
-        attemptType = attemptType
+        attemptType = attemptType,
+        sections = sections.asDomainModels()
     )
 }
 
