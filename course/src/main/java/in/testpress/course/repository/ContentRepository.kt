@@ -15,6 +15,7 @@ import `in`.testpress.course.network.asDatabaseModel
 import `in`.testpress.course.network.asGreenDaoModel
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.enums.Status
+import `in`.testpress.exam.network.asGreenDaoModel
 import `in`.testpress.models.greendao.Content
 import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.network.NetworkBoundResource

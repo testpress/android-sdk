@@ -4,7 +4,7 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.ContentType
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.domain.DomainExamContent
+import `in`.testpress.exam.domain.DomainExamContent
 import android.os.Build
 import android.text.Html
 import android.view.LayoutInflater

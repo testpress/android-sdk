@@ -9,6 +9,8 @@ import `in`.testpress.course.network.NetworkContentAttempt
 import `in`.testpress.network.Resource
 import `in`.testpress.course.network.asGreenDaoModel
 import `in`.testpress.exam.api.TestpressExamApiClient
+import `in`.testpress.exam.domain.DomainAttempt
+import `in`.testpress.exam.domain.asDomainModel
 import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.exam.network.asGreenDaoModel
 import `in`.testpress.models.greendao.Attempt

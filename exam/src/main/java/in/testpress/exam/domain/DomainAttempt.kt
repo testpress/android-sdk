@@ -1,4 +1,4 @@
-package `in`.testpress.course.domain
+package `in`.testpress.exam.domain
 
 import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.models.greendao.Attempt

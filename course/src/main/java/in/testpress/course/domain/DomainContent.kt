@@ -14,6 +14,8 @@ import android.text.format.DateUtils
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.util.Util
 import `in`.testpress.database.entities.CourseContentType
+import `in`.testpress.exam.domain.DomainExamContent
+import `in`.testpress.exam.domain.asDomainContent
 
 data class DomainContent(
     val id: Long,

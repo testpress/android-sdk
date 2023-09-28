@@ -1,4 +1,4 @@
-package `in`.testpress.course.network
+package `in`.testpress.exam.network
 
 import `in`.testpress.exam.network.NetworkSection
 import `in`.testpress.models.greendao.Exam
