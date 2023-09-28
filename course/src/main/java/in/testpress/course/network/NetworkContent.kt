@@ -32,6 +32,7 @@ data class NetworkContent(
     val videoId: Long? = null,
     val htmlId: Long? = null,
     val videoConferenceId: Long? = null,
+    val liveStreamId: Long? = null,
     val start: String? = null,
     val end: String? = null,
     val htmlContentTitle: String? = null,
@@ -46,6 +47,7 @@ data class NetworkContent(
     val attachment: NetworkAttachmentContent? = null,
     val video: NetworkVideoContent? = null,
     val videoConference: NetworkVideoConferenceContent? = null,
+    val liveStream: NetworkLiveStream? = null,
     val isCourseAvailable: Boolean? = null,
     val nextContentId: Long? = null,
     val hasEnded: Boolean? = null,
@@ -90,6 +92,7 @@ fun NetworkContent.asDatabaseModel(): ContentEntity {
     contentEntity.examId = this.examId
     contentEntity.attachmentId = this.attachmentId
     contentEntity.videoId = this.videoId
+    contentEntity.liveStreamId = this.liveStreamId
     contentEntity.start = this.start
     return contentEntity
 }
@@ -130,7 +133,7 @@ fun NetworkContent.asGreenDaoModel(): Content {
         this.courseId,
         this.chapterId,
         this.videoConferenceId,
-        null,
+        this.liveStreamId,
         this.htmlId,
         this.videoId,
         this.attachmentId,
