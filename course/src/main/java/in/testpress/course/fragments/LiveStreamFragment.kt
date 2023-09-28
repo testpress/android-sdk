@@ -52,4 +52,24 @@ class LiveStreamFragment : BaseContentDetailFragment() {
         exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil)
         exoPlayerUtil?.initializePlayer()
     }
+
+    override fun onResume() {
+        super.onResume()
+        exoPlayerUtil?.onResume()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        exoPlayerUtil?.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        exoPlayerUtil?.onStop()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        exoplayerFullscreenHelper?.disableOrientationListener()
+    }
 }
