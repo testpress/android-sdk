@@ -16,7 +16,7 @@ fun createDomainLiveStream(liveStream: LiveStream): DomainLiveStream =
         id = liveStream.id,
         title = liveStream.title,
         status = liveStream.status,
-        streamUrl = liveStream.streamURL,
+        streamUrl = liveStream.streamUrl,
         duration = liveStream.duration,
         showRecordedVideo = liveStream.showRecordedVideo
     )
