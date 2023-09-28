@@ -806,6 +806,11 @@ public class Exam implements android.os.Parcelable {
     public boolean showAnalytics() {
         return showAnalytics != null && showAnalytics == true;
     }
+
+    public boolean isQuizModeEnabled() {
+        return enableQuizMode != null && enableQuizMode;
+    }
+
     // KEEP METHODS END
 
 }

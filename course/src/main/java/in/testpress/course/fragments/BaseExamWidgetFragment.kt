@@ -173,26 +173,26 @@ open class BaseExamWidgetFragment : Fragment() {
             startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(requireActivity(), exam.asGreenDaoModel(), startButton) {
-                if (exam.isQuizModeEnabled()) {
-                    showExamModeDialog(exam) { (startCourseExam(true, isPartial = false)) }
-                    return@supportMultiLanguage
-                } else {
-                    startCourseExam(true, isPartial = false)
-                    return@supportMultiLanguage
-                }
+                showExamPopupOrStartExamInRegularMode(exam, hasMultipleLanguages = true, isPartial = false)
             }
         } else {
             startButton.setOnClickListener {
                 RetakeExamUtil.showRetakeOptions(context) { isPartial ->
-                    if (exam.isQuizModeEnabled()) {
-                        showExamModeDialog(exam) { startCourseExam(false, isPartial) }
-                        return@showRetakeOptions
-                    } else {
-                        startCourseExam(false, isPartial)
-                        return@showRetakeOptions
-                    }
+                    showExamPopupOrStartExamInRegularMode(exam, hasMultipleLanguages = false,isPartial)
                 }
             }
+        }
+    }
+
+    private fun showExamPopupOrStartExamInRegularMode(
+        exam: DomainExamContent,
+        hasMultipleLanguages: Boolean,
+        isPartial: Boolean
+    ) {
+        if (exam.isQuizModeEnabled()) {
+            showExamModeDialog(exam) { (startCourseExam(hasMultipleLanguages,isPartial)) }
+        } else {
+            startCourseExam(hasMultipleLanguages,isPartial)
         }
     }
 
@@ -230,16 +230,16 @@ open class BaseExamWidgetFragment : Fragment() {
             startButton.setOnClickListener { startExamInWebview(content) }
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
-                resumeCourseExam(exam, true, pausedAttempt)
+                resumeExamBasedOnAttemptType(exam, true, pausedAttempt)
             }
         } else {
             startButton.setOnClickListener {
-                resumeCourseExam(exam, false, pausedAttempt)
+                resumeExamBasedOnAttemptType(exam, false, pausedAttempt)
             }
         }
     }
 
-    private fun resumeCourseExam(
+    private fun resumeExamBasedOnAttemptType(
         exam: DomainExamContent,
         hasMultipleLanguages: Boolean,
         pausedAttempt: DomainContentAttempt
