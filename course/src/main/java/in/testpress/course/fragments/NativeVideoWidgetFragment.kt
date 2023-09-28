@@ -19,7 +19,6 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
     private lateinit var exoPlayerMainFrame: AspectRatioFrameLayout
     private var exoPlayerUtil: ExoPlayerUtil? = null
 
-    private val session by lazy { TestpressSdk.getTestpressSession(requireActivity()) }
     private val exoplayerFullscreenHelper: ExoplayerFullscreenHelper by lazy {
         ExoplayerFullscreenHelper(activity)
     }
