@@ -31,6 +31,19 @@ class LiveStreamFragment : BaseContentDetailFragment() {
     }
 
     override fun display() {
+        when (content.liveStream?.status) {
+            "Running" -> displayPlayerViewWithChat()
+            "Not Started" -> displayNotStartedNotice()
+            "Completed" -> displayEndedNotice()
+        }
+    }
+
+    private fun initializeExoplayerFullscreenHelper() {
+        exoplayerFullscreenHelper = ExoplayerFullscreenHelper(activity)
+        exoplayerFullscreenHelper.initializeOrientationListener()
+    }
+
+    private fun displayPlayerViewWithChat(){
         initializePlayerView()
         initializeExoPlayer()
         setupChatWebView()
@@ -41,9 +54,21 @@ class LiveStreamFragment : BaseContentDetailFragment() {
         hideBottomNavigationBar()
     }
 
-    private fun initializeExoplayerFullscreenHelper() {
-        exoplayerFullscreenHelper = ExoplayerFullscreenHelper(activity)
-        exoplayerFullscreenHelper.initializeOrientationListener()
+    private fun displayNotStartedNotice(){
+        emptyViewFragment.setEmptyText(
+            R.string.waiting_for_live_stream_title,
+            R.string.waiting_for_live_stream_desc,
+            null)
+    }
+
+    private fun displayEndedNotice(){
+        val description = if (content.liveStream?.showRecordedVideo == true) {
+            R.string.live_stream_concluded_desc
+        } else {
+            R.string.live_stream_concluded_no_recording_desc
+        }
+        emptyViewFragment.setEmptyText(R.string.live_stream_finished, description, null)
+        emptyViewFragment.showOrHideButton(show = false)
     }
 
     private fun initializePlayerView() {
