@@ -1,5 +1,6 @@
 package `in`.testpress.exam.network
 
+import `in`.testpress.exam.domain.DomainAttemptSection
 import `in`.testpress.models.greendao.AttemptSection
 import `in`.testpress.models.greendao.CourseAttempt
 
@@ -42,3 +43,21 @@ fun createAttemptSection(networkAttemptSection: NetworkAttemptSection): AttemptS
                 networkAttemptSection.attemptId
         )
 }
+
+fun NetworkAttemptSection.asDomainModel() = DomainAttemptSection(
+        id = this.id,
+        attemptSectionId = this.attemptSectionId,
+        state = this.state,
+        questionsUrl = this.questionsUrl,
+        startUrl = this.startUrl,
+        endUrl = this.endUrl,
+        remainingTime = this.remainingTime,
+        name = this.name,
+        duration = this.duration,
+        order = this.order,
+        instructions = this.instructions,
+        this.attemptId
+)
+
+fun List<NetworkAttemptSection>.asDomainModels(): List<DomainAttemptSection> =
+        map { it.asDomainModel() }
