@@ -626,6 +626,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     public void updateVideoAttempt() {
+        if (content.getContentType().equals("Live Stream") && content.getVideo() == null){
+            return;
+        }
+
         if (videoAttemptId == -1 && videoWatchDataRepository != null) {
             videoWatchDataRepository.save(content, getVideoAttemptParameters());
             return;
