@@ -37,6 +37,7 @@ data class DomainAttempt(
     val attemptType: Int? = null
 ) {
     val endUrl = url + "end/"
+    fun isAttemptTypeQuiz() = attemptType != null && attemptType == 1
 }
 
 fun Attempt.asDomainModel(): DomainAttempt {

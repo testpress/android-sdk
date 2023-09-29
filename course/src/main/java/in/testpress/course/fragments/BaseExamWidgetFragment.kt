@@ -23,11 +23,12 @@ import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.util.MultiLanguagesUtil
 import `in`.testpress.exam.util.RetakeExamUtil
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -146,14 +147,7 @@ open class BaseExamWidgetFragment : Fragment() {
 
     private fun updateStartButtonListener(exam: DomainExamContent, pausedAttempt: DomainContentAttempt?) {
         if (content.contentType.equals("Quiz", ignoreCase = true)) {
-            startButton.setOnClickListener {
-                val intent = Intent(requireContext(), QuizActivity::class.java).apply {
-                    putExtra(ContentActivity.CONTENT_ID, content.id)
-                    putExtra("EXAM_ID", exam.id)
-                    putExtra("ATTEMPT_URL", exam.attemptsUrl)
-                }
-                requireActivity().startActivity(intent)
-            }
+            startButton.setOnClickListener { startQuizActivity(exam) }
             return
         }
 
@@ -178,16 +172,47 @@ open class BaseExamWidgetFragment : Fragment() {
         if (exam.templateType == IELTS_TEMPLATE) {
             startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
-            MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
-                startCourseExam(true, isPartial = false)
+            MultiLanguagesUtil.supportMultiLanguage(requireActivity(), exam.asGreenDaoModel(), startButton) {
+                showExamModesOrStartExam(exam, hasMultipleLanguages = true, isPartial = false)
             }
         } else {
             startButton.setOnClickListener {
                 RetakeExamUtil.showRetakeOptions(context) { isPartial ->
-                    startCourseExam(false, isPartial)
+                    showExamModesOrStartExam(exam, hasMultipleLanguages = false,isPartial)
                 }
             }
         }
+    }
+
+    private fun showExamModesOrStartExam(
+        exam: DomainExamContent,
+        hasMultipleLanguages: Boolean,
+        isPartial: Boolean
+    ) {
+        if (exam.isQuizModeEnabled()) {
+            showExamModeDialog(exam) { (startCourseExam(hasMultipleLanguages,isPartial)) }
+        } else {
+            startCourseExam(hasMultipleLanguages,isPartial)
+        }
+    }
+
+    private fun showExamModeDialog(exam: DomainExamContent, action: () -> Unit) {
+        val options = arrayOf("Regular Mode", "Quiz Mode")
+        var selectedOption = 0
+        val builder =
+            AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle)
+        builder.setTitle("Select Exam Mode")
+        builder.setSingleChoiceItems(options, selectedOption) { _, which ->
+            selectedOption = which
+        }
+        builder.setPositiveButton("OK") { dialog: DialogInterface?, which: Int ->
+            when(selectedOption){
+                0 -> action.invoke()
+                1 -> startQuizActivity(exam)
+            }
+        }
+        builder.setNegativeButton("Cancel") { _, _ -> }
+        builder.create().show()
     }
 
     private fun startExamInWebview(content: DomainContent) {
@@ -202,13 +227,31 @@ open class BaseExamWidgetFragment : Fragment() {
         pausedAttempt: DomainContentAttempt
     ) {
         if (exam.templateType == IELTS_TEMPLATE || exam.hasAudioQuestions == true) {
-            startButton.setOnClickListener {startExamInWebview(content)}
+            startButton.setOnClickListener { startExamInWebview(content) }
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
-                resumeCourseExam(true, pausedAttempt)
+                resumeExamBasedOnAttemptType(exam, true, pausedAttempt)
             }
         } else {
-            startButton.setOnClickListener { resumeCourseExam(false, pausedAttempt) }
+            startButton.setOnClickListener {
+                resumeExamBasedOnAttemptType(exam, false, pausedAttempt)
+            }
+        }
+    }
+
+    private fun resumeExamBasedOnAttemptType(
+        exam: DomainExamContent,
+        hasMultipleLanguages: Boolean,
+        pausedAttempt: DomainContentAttempt
+    ) {
+        if (exam.isQuizModeEnabled()) {
+            if (pausedAttempt.assessment?.isAttemptTypeQuiz() == true){
+                startQuizActivity(exam)
+            } else {
+                resumeCourseExam(hasMultipleLanguages, pausedAttempt)
+            }
+        } else {
+            resumeCourseExam(hasMultipleLanguages, pausedAttempt)
         }
     }
 
@@ -235,6 +278,15 @@ open class BaseExamWidgetFragment : Fragment() {
             hasMultipleLanguages,
             TestpressSdk.getTestpressSession(requireActivity())!!
         )
+    }
+
+    private fun startQuizActivity(exam: DomainExamContent) {
+        val intent = Intent(requireContext(), QuizActivity::class.java).apply {
+            putExtra(ContentActivity.CONTENT_ID, content.id)
+            putExtra("EXAM_ID", exam.id)
+            putExtra("ATTEMPT_URL", exam.attemptsUrl)
+        }
+        requireActivity().startActivity(intent)
     }
 
     open fun display() {}

@@ -3,19 +3,17 @@ package `in`.testpress.course.network
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.api.TestpressCourseApiClient
 import `in`.testpress.course.api.TestpressCourseApiClient.*
+import `in`.testpress.database.entities.ContentEntityLite
+import `in`.testpress.database.entities.ProductCategoryEntity
 import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Course
 import `in`.testpress.network.RetrofitCall
 import `in`.testpress.network.TestpressApiClient
-import `in`.testpress.database.entities.ProductCategoryEntity
-import `in`.testpress.database.entities.ContentEntityLite
 import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.ContentsListResponse
 import android.content.Context
-import android.util.Log
 import retrofit2.http.*
-import java.util.HashMap
 
 interface CourseService {
     @GET("{content_url}")
@@ -25,7 +23,8 @@ interface CourseService {
 
     @POST(TestpressCourseApiClient.CONTENTS_PATH + "{content_id}" + TestpressCourseApiClient.ATTEMPTS_PATH)
     fun createContentAttempt(
-        @Path(value = "content_id", encoded = true) contentId: Long
+        @Path(value = "content_id", encoded = true) contentId: Long,
+        @Body queryParams: HashMap<String, Int>
     ): RetrofitCall<NetworkContentAttempt>
 
     @GET
@@ -84,8 +83,11 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         return getCourseService().getNetworkContent(url)
     }
 
-    fun createContentAttempt(contentId: Long): RetrofitCall<NetworkContentAttempt> {
-        return getCourseService().createContentAttempt(contentId)
+    fun createContentAttempt(
+        contentId: Long,
+        queryParams: HashMap<String, Int> = hashMapOf()
+    ): RetrofitCall<NetworkContentAttempt> {
+        return getCourseService().createContentAttempt(contentId, queryParams)
     }
 
     fun getContentAttempts(url: String): RetrofitCall<TestpressApiResponse<NetworkContentAttempt>> {

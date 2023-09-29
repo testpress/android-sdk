@@ -140,6 +140,10 @@ public class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView
                     @Override
                     public void onClick(View v) {
                         //noinspection ConstantConditions
+                        if (mContent.getExam().isQuizModeEnabled()) {
+                            resumeExamBasedOnAttemptType();
+                            return;
+                        }
                         if (mContent.getContentType().equals("Quiz")) {
                             Intent intent = new Intent(mActivity, QuizActivity.class);
                             intent.putExtra(CONTENT_ID, mContent.getId());
@@ -150,6 +154,19 @@ public class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView
                         }
                         TestpressExam.resumeCourseAttempt(mActivity, mContent, courseAttempt, false,
                                 TestpressSdk.getTestpressSession(mActivity));
+                    }
+
+                    private void resumeExamBasedOnAttemptType() {
+                        if(courseAttempt.getAssessment().isAttemptTypeQuiz()){
+                            Intent intent = new Intent(mActivity, QuizActivity.class);
+                            intent.putExtra(CONTENT_ID, mContent.getId());
+                            intent.putExtra("EXAM_ID", mContent.getExamId());
+                            intent.putExtra("ATTEMPT_URL", mContent.getExam().getAttemptsUrl());
+                            mActivity.startActivity(intent);
+                        } else {
+                            TestpressExam.resumeCourseAttempt(mActivity, mContent, courseAttempt, false,
+                                    TestpressSdk.getTestpressSession(mActivity));
+                        }
                     }
                 });
                 holder.resumeLabel.setVisibility(isGamificationEnabled ? View.GONE : View.VISIBLE);

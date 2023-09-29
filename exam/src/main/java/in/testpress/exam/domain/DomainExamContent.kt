@@ -82,6 +82,8 @@ data class DomainExamContent(
     }
 
     fun hasMultipleLanguages() = languages.size > 1
+
+    fun isQuizModeEnabled() = enableQuizMode != null && enableQuizMode == true
 }
 
 fun createDomainExamContent(exam: Exam): DomainExamContent {

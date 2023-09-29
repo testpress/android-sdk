@@ -64,7 +64,7 @@ open class QuizExamRepository(val context: Context) {
     }
 
     fun createContentAttempt(contentId: Long): LiveData<Resource<DomainContentAttempt>> {
-        courseNetwork.createContentAttempt(contentId)
+        courseNetwork.createContentAttempt(contentId, hashMapOf(("attempt_type" to 1)))
             .enqueue(object: TestpressCallback<NetworkContentAttempt>() {
                 override fun onSuccess(result: NetworkContentAttempt?) {
                     saveContentAttempt(result)
