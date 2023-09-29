@@ -716,10 +716,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             Log.d("TAG", "progressDialog: 1");
         }
 
-        if (true) {
-            showDisableResumeAttemptAlert();
-        }
-
         getLoaderManager().destroyLoader(loader.getId());
         //noinspection ThrowableResultOfMethodCallIgnored
         TestpressException exception = ((ThrowableLoader<List<AttemptItem>>) loader).clearException();
@@ -811,16 +807,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
         questionsListProgressBar.setVisibility(View.GONE);
         isNextPageQuestionsBeingFetched = false;
-    }
-
-    private void showDisableResumeAttemptAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle);
-        builder.setTitle(R.string.exam_resume_disable_warning_title);
-        builder.setMessage(R.string.exam_resume_disable_warning_description);
-        builder.setPositiveButton("OK", null);
-        builder.setNegativeButton("Cancel", null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
     }
 
     private void initializeSectionSpinner() {
