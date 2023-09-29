@@ -47,7 +47,8 @@ data class NetworkExamContent(
     val showAnalytics: Boolean? = null,
     val totalMarks: String? = null,
     val hasAudioQuestions: Boolean? = null,
-    val enableQuizMode: Boolean? = null
+    val enableQuizMode: Boolean? = null,
+    val disableAttemptResume: Boolean? = null
 )
 
 fun NetworkExamContent.asGreenDaoModel(): Exam {
@@ -88,6 +89,7 @@ fun NetworkExamContent.asGreenDaoModel(): Exam {
         this.instructions,
         this.hasAudioQuestions,
         this.rankPublishingDate,
-        this.enableQuizMode
+        this.enableQuizMode,
+        this.disableAttemptResume
     )
 }

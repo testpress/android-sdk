@@ -73,6 +73,7 @@ public class Exam implements android.os.Parcelable {
     private Boolean hasAudioQuestions;
     private String rankPublishingDate;
     private Boolean enableQuizMode;
+    private Boolean disableAttemptResume;
 
     /** Used to resolve relations */
     @Generated
@@ -100,7 +101,7 @@ public class Exam implements android.os.Parcelable {
     }
 
     @Generated
-    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock, Boolean showAnalytics, String instructions, Boolean hasAudioQuestions, String rankPublishingDate, Boolean enableQuizMode) {
+    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock, Boolean showAnalytics, String instructions, Boolean hasAudioQuestions, String rankPublishingDate, Boolean enableQuizMode, Boolean disableAttemptResume) {
         this.totalMarks = totalMarks;
         this.url = url;
         this.id = id;
@@ -138,6 +139,7 @@ public class Exam implements android.os.Parcelable {
         this.hasAudioQuestions = hasAudioQuestions;
         this.rankPublishingDate = rankPublishingDate;
         this.enableQuizMode = enableQuizMode;
+        this.disableAttemptResume = disableAttemptResume;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -441,6 +443,14 @@ public class Exam implements android.os.Parcelable {
 
     public void setEnableQuizMode(Boolean enableQuizMode) {
         this.enableQuizMode = enableQuizMode;
+    }
+
+    public Boolean getDisableAttemptResume() {
+        return disableAttemptResume;
+    }
+
+    public void setDisableAttemptResume(Boolean disableAttemptResume) {
+        this.disableAttemptResume = disableAttemptResume;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
