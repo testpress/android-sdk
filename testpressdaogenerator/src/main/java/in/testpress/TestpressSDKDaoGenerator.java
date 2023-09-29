@@ -436,15 +436,15 @@ public class TestpressSDKDaoGenerator {
     }
 
     private static Entity addLiveStream(Schema schema) {
-        Entity video = schema.addEntity("LiveStream");
-        video.addLongProperty("id").primaryKey();
-        video.addStringProperty("title");
-        video.addStringProperty("streamUrl");
-        video.addIntProperty("duration");
-        video.addStringProperty("status");
-        video.addBooleanProperty("showRecordedVideo");
-        video.addStringProperty("chatEmbedUrl");
-        return video;
+        Entity liveStream = schema.addEntity("LiveStream");
+        liveStream.addLongProperty("id").primaryKey();
+        liveStream.addStringProperty("title");
+        liveStream.addStringProperty("streamUrl");
+        liveStream.addIntProperty("duration");
+        liveStream.addStringProperty("status");
+        liveStream.addBooleanProperty("showRecordedVideo");
+        liveStream.addStringProperty("chatEmbedUrl");
+        return liveStream;
     }
 
     private static Entity addVideo(Schema schema) {
