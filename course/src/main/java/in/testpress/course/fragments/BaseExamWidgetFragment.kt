@@ -173,18 +173,18 @@ open class BaseExamWidgetFragment : Fragment() {
             startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(requireActivity(), exam.asGreenDaoModel(), startButton) {
-                showExamPopupOrStartExamInRegularMode(exam, hasMultipleLanguages = true, isPartial = false)
+                showExamModesOrStartExam(exam, hasMultipleLanguages = true, isPartial = false)
             }
         } else {
             startButton.setOnClickListener {
                 RetakeExamUtil.showRetakeOptions(context) { isPartial ->
-                    showExamPopupOrStartExamInRegularMode(exam, hasMultipleLanguages = false,isPartial)
+                    showExamModesOrStartExam(exam, hasMultipleLanguages = false,isPartial)
                 }
             }
         }
     }
 
-    private fun showExamPopupOrStartExamInRegularMode(
+    private fun showExamModesOrStartExam(
         exam: DomainExamContent,
         hasMultipleLanguages: Boolean,
         isPartial: Boolean
