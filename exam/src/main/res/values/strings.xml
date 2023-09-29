@@ -242,6 +242,10 @@
     <string name="testpress_attempt_sections_in_order">You need to attempt sections in order.</string>
     <string name="testpress_end_section">End current section</string>
 
+    <string name="exam_resume_disable_warning_description">Before you proceed, please be aware:\n\n<b>DO NOT CLOSE THIS APP:</b> Once you begin your exam, if you close or navigate away from this app, you will NOT be able to resume your attempt.\n\n<b>RESUME IS DISABLED:</b> The admin has disabled the resume feature for this exam. Once closed, your attempt will be permanently ended.\n\nEnsure you are ready to take the exam without interruptions. Double-check your internet connection and ensure your device is plugged in or adequately charged.</string>
+
+    <string name="exam_resume_disable_warning_title">"IMPORTANT NOTICE!"</string>
+
     <string name="testpress_retake_with">Retake with?</string>
     <string-array name="testpress_retake_options">
         <item>All Questions</item>

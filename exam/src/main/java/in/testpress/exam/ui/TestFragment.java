@@ -23,6 +23,7 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 import androidx.appcompat.app.AlertDialog;
 
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -712,7 +713,13 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         }
         if (progressDialog.isShowing()) {
             progressDialog.dismiss();
+            Log.d("TAG", "progressDialog: 1");
         }
+
+        if (true) {
+            showDisableResumeAttemptAlert();
+        }
+
         getLoaderManager().destroyLoader(loader.getId());
         //noinspection ThrowableResultOfMethodCallIgnored
         TestpressException exception = ((ThrowableLoader<List<AttemptItem>>) loader).clearException();
@@ -804,6 +811,16 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
         questionsListProgressBar.setVisibility(View.GONE);
         isNextPageQuestionsBeingFetched = false;
+    }
+
+    private void showDisableResumeAttemptAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle);
+        builder.setTitle(R.string.exam_resume_disable_warning_title);
+        builder.setMessage(R.string.exam_resume_disable_warning_description);
+        builder.setPositiveButton("OK", null);
+        builder.setNegativeButton("Cancel", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void initializeSectionSpinner() {
@@ -916,6 +933,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
                             if (action.equals(Action.PAUSE)) {
                                 progressDialog.dismiss();
+                                Log.d("TAG", "progressDialog: 2");
                                 returnToHistory();
                             } else if (action.equals(Action.END)) {
                                 endExam();
@@ -925,6 +943,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                                 if (progressDialog.isShowing()) {
                                     startCountDownTimer(millisRemaining);
                                     progressDialog.dismiss();
+                                    Log.d("TAG", "progressDialog: 3");
                                 }
                                 updatePanel();
                             }
@@ -937,6 +956,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             }
                             if (action.equals(Action.PAUSE)) {
                                 progressDialog.dismiss();
+                                Log.d("TAG", "progressDialog: 4");
                                 returnToHistory();
                                 return;
                             }
@@ -947,9 +967,11 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                                 clearAndLoadSameQuestion(position);
                                 saveAnswerAlertDialog = showMaxQuestionsAttemptedError(errorDetails);
                                 progressDialog.dismiss();
+                                Log.d("TAG", "progressDialog: 5");
                             } else {
                                 stopTimer();
                                 progressDialog.dismiss();
+                                Log.d("TAG", "progressDialog: 6");
                                 TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception) {
                                     @Override
                                     protected void onRetry() {
@@ -965,6 +987,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                     });
         } else if (action.equals(Action.PAUSE)) {
             progressDialog.dismiss();
+            Log.d("TAG", "progressDialog: 7");
             returnToHistory();
         }
     }
@@ -1106,6 +1129,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             logEvent(EventsTrackerFacade.ENDED_EXAM);
                             if (progressDialog.isShowing()) {
                                 progressDialog.dismiss();
+                                Log.d("TAG", "progressDialog: 8");
                             }
                             courseAttempt.saveInDB(getActivity(), courseContent);
                             showReview(ReviewStatsActivity.createIntent(getActivity(), exam,
@@ -1133,6 +1157,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             logEvent(EventsTrackerFacade.ENDED_EXAM);
                             if (progressDialog.isShowing()) {
                                 progressDialog.dismiss();
+                                Log.d("TAG", "progressDialog: 9");
                             }
                             TestFragment.this.attempt = attempt;
                             showReview(attempt);
@@ -1460,6 +1485,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                         TestFragment.this.attempt = attempt;
                         sections = attempt.getSections();
                         progressDialog.dismiss();
+                        Log.d("TAG", "progressDialog: 10");
                         startCountDownTimer();
                     }
 
@@ -1469,6 +1495,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             return;
                         }
                         progressDialog.dismiss();
+                        Log.d("TAG", "progressDialog: 11");
                         TestEngineAlertDialog alertDialogBuilder = new TestEngineAlertDialog(exception) {
                             @Override
                             protected void onRetry() {
