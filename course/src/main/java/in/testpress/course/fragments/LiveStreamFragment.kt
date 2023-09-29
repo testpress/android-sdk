@@ -8,6 +8,7 @@ import `in`.testpress.course.R
 import `in`.testpress.course.domain.getGreenDaoContent
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
+import `in`.testpress.fragments.WebViewFragment
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 
 
@@ -32,6 +33,12 @@ class LiveStreamFragment : BaseContentDetailFragment() {
     override fun display() {
         initializePlayerView()
         initializeExoPlayer()
+        setupChatWebView()
+
+        // Disabling swipe to refresh because  it prevents users from scrolling the chat
+        // and temporarily hiding the bottom navigation as it hides the chat's send button..
+        swipeRefresh.isEnabled = false
+        hideBottomNavigationBar()
     }
 
     private fun initializeExoplayerFullscreenHelper() {
@@ -51,6 +58,27 @@ class LiveStreamFragment : BaseContentDetailFragment() {
         exoPlayerUtil?.setContent(content.getGreenDaoContent(requireContext()))
         exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil)
         exoPlayerUtil?.initializePlayer()
+    }
+
+    private fun setupChatWebView() {
+        content.liveStream?.chatEmbedUrl?.let { embedUrl ->
+            val chatView = view?.findViewById<View>(R.id.chat_view_fragment)
+            chatView?.visibility = View.VISIBLE
+
+            val webViewFragment = WebViewFragment(
+                url = embedUrl,
+                webViewFragmentSettings = WebViewFragment.Settings(isSSORequired = false)
+            )
+
+            childFragmentManager.beginTransaction()
+                .replace(R.id.chat_view_fragment, webViewFragment)
+                .commit()
+        }
+    }
+
+    private fun hideBottomNavigationBar(){
+       val bottomNavigationBar =  view?.findViewById<View>(R.id.bottom_navigation_fragment)
+        bottomNavigationBar?.visibility = View.GONE
     }
 
     override fun onResume() {
