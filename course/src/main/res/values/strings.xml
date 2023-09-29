@@ -68,6 +68,12 @@
 
     <string name="testpress_open_bookmark_file">View</string>
 
+    <string name="live_stream_finished">Live Stream Finished</string>
+    <string name="waiting_for_live_stream_title">Waiting for the Live Stream</string>
+    <string name="waiting_for_live_stream_desc">Hang tight! The live stream will kick off in a few moments.</string>
+    <string name="live_stream_concluded_desc">The live stream has come to an end. Stay tuned, we\'ll have the recording ready for you shortly.</string>
+    <string name="live_stream_concluded_no_recording_desc">The live stream has ended. See you at the next one!</string>
+
     //
     <string name="testpress_running_contents">Running</string>
     <string name="no_running_contents">There are no currently available contents for you.</string>
