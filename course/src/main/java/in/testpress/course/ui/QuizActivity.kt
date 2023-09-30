@@ -21,7 +21,6 @@ import android.app.Dialog
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
@@ -116,8 +115,9 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
         toolbar.setTitleTextColor(resources.getColor(R.color.testpress_color_primary))
         supportActionBar!!.setDisplayHomeAsUpEnabled(false)
         showLogoInToolbar()
-        val closeButton = findViewById<ImageButton>(R.id.close)
+        val closeButton = findViewById<TextView>(R.id.close)
         closeButton.visibility = View.VISIBLE
+        closeButton.typeface = TestpressSdk.getRubikMediumFont(this)
         closeButton.setOnClickListener {
             showEndExamAlert()
         }

@@ -39,16 +39,17 @@
                 android:layout_gravity="center"
                 android:id="@+id/question_number" />
 
-            <ImageButton
+            <TextView
+                android:id="@+id/close"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/close"
-                android:layout_gravity="right|end"
-                android:background="@drawable/testpress_transparent"
-                android:tint="@color/testpress_color_primary"
-                android:paddingRight="10dp"
+                android:text="END"
+                android:textSize="16sp"
+                android:layout_marginEnd="16dp"
+                android:layout_gravity="end|right"
+                android:textColor="@color/testpress_color_primary"
                 android:visibility="gone"
-                android:src="@drawable/ic_close_black_24dp"/>
+                android:layout_centerVertical="true" />
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
