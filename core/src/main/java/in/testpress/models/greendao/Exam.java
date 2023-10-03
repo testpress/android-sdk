@@ -593,6 +593,8 @@ public class Exam implements android.os.Parcelable {
         rankPublishingDate = in.readString();
         byte tmpEnableQuizMode = in.readByte();
         enableQuizMode = tmpEnableQuizMode == 0 ? null : tmpEnableQuizMode == 1;
+        byte tmpDisableAttemptResume = in.readByte();
+        enableQuizMode = tmpDisableAttemptResume == 0 ? null : tmpDisableAttemptResume == 1;
     }
 
     @Override
@@ -674,6 +676,7 @@ public class Exam implements android.os.Parcelable {
         dest.writeString(instructions);
         dest.writeString(rankPublishingDate);
         dest.writeByte((byte) (enableQuizMode == null ? 0 : enableQuizMode ? 1 : 2));
+        dest.writeByte((byte) (disableAttemptResume == null ? 0 : disableAttemptResume ? 1 : 2));
     }
 
     @Override
