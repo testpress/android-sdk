@@ -107,7 +107,7 @@ class ZoomMeetHandler(
             MeetingStatus.MEETING_STATUS_FAILED -> {
                 val message =
                     if (errorCode == MeetingError.MEETING_ERROR_CLIENT_INCOMPATIBLE)
-                        "Version of ZoomSDK is too low!"
+                        "Version of ZoomSDK is too low! Please update your App"
                     else
                         "Could not join the meeting. Possibly meeting expired or ended"
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show()
