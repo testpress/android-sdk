@@ -140,6 +140,12 @@ public class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView
                     @Override
                     public void onClick(View v) {
                         //noinspection ConstantConditions
+
+                        if(mContent.getExam().getDisableAttemptResume()) {
+                            endExam();
+                            return;
+                        }
+
                         if (mContent.getExam().isQuizModeEnabled()) {
                             resumeExamBasedOnAttemptType();
                             return;
@@ -167,6 +173,14 @@ public class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView
                             TestpressExam.resumeCourseAttempt(mActivity, mContent, courseAttempt, false,
                                     TestpressSdk.getTestpressSession(mActivity));
                         }
+                    }
+
+                    private void endExam() {
+                        TestpressExam.endCourseAttempt(
+                                mActivity,
+                                mContent,
+                                courseAttempt,
+                                TestpressSdk.getTestpressSession(mActivity));
                     }
                 });
                 holder.resumeLabel.setVisibility(isGamificationEnabled ? View.GONE : View.VISIBLE);

@@ -232,6 +232,12 @@ open class BaseExamWidgetFragment : Fragment() {
         exam: DomainExamContent,
         pausedAttempt: DomainContentAttempt
     ) {
+        if (exam.disableAttemptResume!!){
+            startButton.setOnClickListener {
+                endExam(pausedAttempt)
+            }
+            return
+        }
         if (exam.templateType == IELTS_TEMPLATE || exam.hasAudioQuestions == true) {
             startButton.setOnClickListener { startExamInWebview(content) }
         } else if (contentAttempts.isEmpty()) {
@@ -243,6 +249,17 @@ open class BaseExamWidgetFragment : Fragment() {
                 resumeExamBasedOnAttemptType(exam, false, pausedAttempt)
             }
         }
+    }
+
+    private fun endExam(pausedCourseAttempt: DomainContentAttempt) {
+        val greenDaoContent = content.getGreenDaoContent(requireContext())
+        greenDaoContent?.exam?.refresh()
+        TestpressExam.endCourseAttempt(
+            requireActivity(),
+            greenDaoContent!!,
+            pausedCourseAttempt.getGreenDaoContentAttempt(requireContext())!!,
+            TestpressSdk.getTestpressSession(requireActivity())!!
+        )
     }
 
     private fun resumeExamBasedOnAttemptType(
