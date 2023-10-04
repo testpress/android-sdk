@@ -173,12 +173,12 @@ open class BaseExamWidgetFragment : Fragment() {
             startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(requireActivity(), exam.asGreenDaoModel(), startButton) {
-                showExamModesOrStartExam(exam, hasMultipleLanguages = true, isPartial = false)
+                showExamModesOrStartExam(exam, discardExamDetails = true, isPartial = false)
             }
         } else {
             startButton.setOnClickListener {
                 RetakeExamUtil.showRetakeOptions(context) { isPartial ->
-                    showExamModesOrStartExam(exam, hasMultipleLanguages = false,isPartial)
+                    showExamModesOrStartExam(exam, discardExamDetails = false,isPartial)
                 }
             }
         }
@@ -186,13 +186,13 @@ open class BaseExamWidgetFragment : Fragment() {
 
     private fun showExamModesOrStartExam(
         exam: DomainExamContent,
-        hasMultipleLanguages: Boolean,
+        discardExamDetails: Boolean,
         isPartial: Boolean
     ) {
         if (exam.isQuizModeEnabled()) {
-            showExamModeDialog(exam) { (startCourseExam(hasMultipleLanguages,isPartial)) }
+            showExamModeDialog(exam) { (startCourseExam(discardExamDetails,isPartial)) }
         } else {
-            startCourseExam(hasMultipleLanguages,isPartial)
+            startCourseExam(discardExamDetails,isPartial)
         }
     }
 
@@ -255,13 +255,13 @@ open class BaseExamWidgetFragment : Fragment() {
         }
     }
 
-    private fun startCourseExam(hasMultipleLanguages: Boolean, isPartial: Boolean) {
+    private fun startCourseExam(discardExamDetails: Boolean, isPartial: Boolean) {
         val greenDaoContent = content.getGreenDaoContent(requireContext())
         greenDaoContent?.exam?.refresh()
         val languages = content.exam?.languages
         greenDaoContent?.exam?.languages = languages?.toGreenDaoModels()
         TestpressExam.startCourseExam(
-            requireActivity(), greenDaoContent!!, hasMultipleLanguages, isPartial,
+            requireActivity(), greenDaoContent!!, discardExamDetails, isPartial,
             TestpressSdk.getTestpressSession(requireActivity())!!
         )
     }
