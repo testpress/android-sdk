@@ -79,4 +79,5 @@ open class SimpleInMeetingListener : InMeetingServiceListener {
     override fun onPermissionRequested(permissions: Array<String>) {}
     override fun onAllHandsLowered() {}
     override fun onLocalVideoOrderUpdated(localOrderList: List<Long>) {}
+    override fun onLocalRecordingPrivilegeRequested(p0: IRequestLocalRecordingPrivilegeHandler?) {}
 }
