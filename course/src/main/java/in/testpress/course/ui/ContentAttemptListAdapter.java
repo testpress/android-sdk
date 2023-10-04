@@ -141,7 +141,7 @@ public class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView
                     public void onClick(View v) {
                         //noinspection ConstantConditions
 
-                        if(mContent.getExam().getDisableAttemptResume()) {
+                        if(mContent.getExam().isAttemptResumeDisabled()) {
                             endExam();
                             return;
                         }

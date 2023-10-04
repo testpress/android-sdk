@@ -232,7 +232,7 @@ open class BaseExamWidgetFragment : Fragment() {
         exam: DomainExamContent,
         pausedAttempt: DomainContentAttempt
     ) {
-        if (exam.disableAttemptResume!!){
+        if (exam.isAttemptResumeDisabled()){
             startButton.setOnClickListener {
                 endExam(pausedAttempt)
             }
