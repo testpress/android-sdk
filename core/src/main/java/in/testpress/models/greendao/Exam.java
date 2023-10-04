@@ -594,7 +594,7 @@ public class Exam implements android.os.Parcelable {
         byte tmpEnableQuizMode = in.readByte();
         enableQuizMode = tmpEnableQuizMode == 0 ? null : tmpEnableQuizMode == 1;
         byte tmpDisableAttemptResume = in.readByte();
-        enableQuizMode = tmpDisableAttemptResume == 0 ? null : tmpDisableAttemptResume == 1;
+        disableAttemptResume = tmpDisableAttemptResume == 0 ? null : tmpDisableAttemptResume == 1;
     }
 
     @Override
