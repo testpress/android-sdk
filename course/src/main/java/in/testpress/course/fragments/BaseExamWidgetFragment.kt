@@ -173,7 +173,7 @@ open class BaseExamWidgetFragment : Fragment() {
             startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(requireActivity(), exam.asGreenDaoModel(), startButton) {
-                showExamModesOrStartExam(exam, discardExamDetails = true, isPartial = false)
+                showExamModesOrStartExam(exam, shouldShowExamDetails(exam), isPartial = false)
             }
         } else {
             startButton.setOnClickListener {
@@ -182,6 +182,12 @@ open class BaseExamWidgetFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun shouldShowExamDetails(exam: DomainExamContent): Boolean {
+        // If 'isAttemptResumeDisabled' is true, we return false to display the Exam Detail page.
+        // Otherwise, we return false to start the exam without displaying the Exam Detail page.
+        return !exam.isAttemptResumeDisabled()
     }
 
     private fun showExamModesOrStartExam(

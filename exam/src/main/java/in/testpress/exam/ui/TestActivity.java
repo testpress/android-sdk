@@ -2,10 +2,12 @@ package in.testpress.exam.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
@@ -396,7 +398,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                     new MultiLanguagesUtil.LanguageSelectionListener() {
                         @Override
                         public void onLanguageSelected() {
-                            startExam(false);
+                            showResumeDisabledWarningAlertOrStartExam();
                         }});
             examDuration.setText(exam.getDuration());
         } else {
@@ -433,6 +435,25 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         if (exam.getVariableMarkPerQuestion()) {
             marksPerQuestionLayout.setVisibility(View.GONE);
             negativeMarksLayout.setVisibility(View.GONE);
+        }
+    }
+
+    private void showResumeDisabledWarningAlertOrStartExam() {
+        if (exam.isAttemptResumeDisabled()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.TestpressAppCompatAlertDialogStyle);
+            builder.setTitle(R.string.exam_resume_disable_warning_title);
+            builder.setMessage(R.string.exam_resume_disable_warning_description);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    startExam(false);
+                }
+            });
+            builder.setNegativeButton("Cancel", null);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        } else {
+            startExam(false);
         }
     }
 

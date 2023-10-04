@@ -827,6 +827,9 @@ public class Exam implements android.os.Parcelable {
         return enableQuizMode != null && enableQuizMode;
     }
 
+    public boolean isAttemptResumeDisabled() {
+        return disableAttemptResume != null && disableAttemptResume;
+    }
     // KEEP METHODS END
 
 }

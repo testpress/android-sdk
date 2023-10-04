@@ -4,8 +4,7 @@ import `in`.testpress.models.greendao.Exam
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.TimeZone
+import java.util.*
 
 data class DomainExamContent(
     val id: Long,
@@ -85,6 +84,8 @@ data class DomainExamContent(
     fun hasMultipleLanguages() = languages.size > 1
 
     fun isQuizModeEnabled() = enableQuizMode != null && enableQuizMode == true
+
+    fun isAttemptResumeDisabled() = disableAttemptResume != null && disableAttemptResume
 }
 
 fun createDomainExamContent(exam: Exam): DomainExamContent {
