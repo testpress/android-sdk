@@ -11,7 +11,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -399,7 +398,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
                     new MultiLanguagesUtil.LanguageSelectionListener() {
                         @Override
                         public void onLanguageSelected() {
-                            showDisableResumeAttemptAlert();
+                            showResumeDisabledWarningAlertOrStartExam();
                         }});
             examDuration.setText(exam.getDuration());
         } else {
@@ -439,19 +438,23 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         }
     }
 
-    private void showDisableResumeAttemptAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.TestpressAppCompatAlertDialogStyle);
-        builder.setTitle(R.string.exam_resume_disable_warning_title);
-        builder.setMessage(R.string.exam_resume_disable_warning_description);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                startExam(false);
-            }
-        });
-        builder.setNegativeButton("Cancel", null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
+    private void showResumeDisabledWarningAlertOrStartExam() {
+        if (exam.isAttemptResumeDisabled()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.TestpressAppCompatAlertDialogStyle);
+            builder.setTitle(R.string.exam_resume_disable_warning_title);
+            builder.setMessage(R.string.exam_resume_disable_warning_description);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    startExam(false);
+                }
+            });
+            builder.setNegativeButton("Cancel", null);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        } else {
+            startExam(false);
+        }
     }
 
     private void endExam() {
