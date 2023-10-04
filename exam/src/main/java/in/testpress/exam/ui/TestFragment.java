@@ -621,7 +621,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     private void endExamAlert() {
-        if (exam == null){
+        if (exam == null || exam.isAttemptResumeDisabled()){
             showEndExamAlert();
         } else {
             AlertDialog.Builder dialogBuilder =
@@ -654,6 +654,10 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     void showPauseExamAlert() {
+        if (exam.isAttemptResumeDisabled()) {
+            showEndExamAlert();
+            return;
+        }
         pauseExamAlertDialog =
                 new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
                         .setMessage(R.string.testpress_pause_message)
