@@ -81,6 +81,35 @@
             android:includeFontPadding="false"
             android:textColor="#FFBEBEBE"/>
 
+        <RelativeLayout
+            android:id="@+id/live_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+
+            <View
+                android:id="@+id/redDot"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/red_dot_circle"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/redDot"
+                android:text="Live"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:includeFontPadding="false"
+                android:textColor="@android:color/white" />
+        </RelativeLayout>
+
+
+
         <Spinner android:id="@+id/exo_speed_rate_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
