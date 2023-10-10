@@ -5,6 +5,7 @@ import `in`.testpress.course.R
 import `in`.testpress.enums.Status
 import `in`.testpress.course.repository.QuizQuestionsRepository
 import `in`.testpress.course.viewmodels.QuizViewModel
+import `in`.testpress.exam.domain.DomainAnswer
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
 import `in`.testpress.exam.ui.view.WebView
 import `in`.testpress.models.InstituteSettings
@@ -111,7 +112,7 @@ class QuizQuestionFragment : Fragment() {
         htmlContent += "<div class='question' style='padding-bottom: 10px;'> ${question.questionHtml} </div></div>"
         if (question.type == "R" || question.type == "C") {
             // Add options
-            htmlContent += "<table width='100%' style='margin-top:0px; margin-bottom:20px; font-size:calc(12px + 1.5vw);'>"
+            htmlContent += "<table id='optionsTable' width='100%' style='margin-top:0px; margin-bottom:20px; font-size:calc(12px + 1.5vw);'>"
             for (answer in question.answers ?: listOf()) {
                 htmlContent += if (question.isSingleMCQType) {
                     "\n" + WebViewUtils.getRadioButtonOptionWithTags(
@@ -130,9 +131,60 @@ class QuizQuestionFragment : Fragment() {
             htmlContent += "<input class='edit_box' type='text' onpaste='return false'" +
                 "value='' oninput='onValueChange(this)' placeholder='YOUR ANSWER'>"
         }
+
+        // Add 50-50 helpline button
+        htmlContent += "<button id='changeOptionsButton' onclick='hideExtraOptions()'>Change Options</button>" +
+                "<script>\n" +
+                "    function hideExtraOptions() {\n" +
+                "        var optionsTable = document.getElementById('optionsTable');\n" +
+                "        var optionsRows = optionsTable.getElementsByTagName('tr');\n" +
+                get5050Options(question.answers) +
+                "    }\n" +
+                "</script>"
+
+        htmlContent += "    <table id=\"helplinesTable\" border=\"0\" style=\"width: 100%; height: 100px; border-collapse: collapse;\">\n" +
+                "        <tr>\n" +
+                "            <td>\n" +
+                "                <div style=\"text-align: center;\">\n" +
+                "                    <img src=\"https://static.testpress.in/static/img/5050.svg\" width=\"50\" height=\"50\">\n" +
+                "                    <br>\n" +
+                "                    <button style=\"display: block; margin: 0 auto;\">50/50</button>\n" +
+                "                </div>\n" +
+                "            </td>\n" +
+                "            <td>\n" +
+                "                <div style=\"text-align: center;\">\n" +
+                "                    <img src=\"https://static.testpress.in/static/img/5050.svg\" width=\"50\" height=\"50\">\n" +
+                "                    <br>\n" +
+                "                    <button style=\"display: block; margin: 0 auto;\">50/50</button>\n" +
+                "                </div>\n" +
+                "            </td>\n" +
+                "            <td>\n" +
+                "                <div style=\"text-align: center;\">\n" +
+                "                    <img src=\"https://static.testpress.in/static/img/5050.svg\" width=\"50\" height=\"50\">\n" +
+                "                    <br>\n" +
+                "                    <button style=\"display: block; margin: 0 auto;\">50/50</button>\n" +
+                "                </div>\n" +
+                "            </td>\n" +
+                "        </tr>\n" +
+                "    </table>\n"
+
         htmlContent += "</div>"
 
         return htmlContent
+    }
+
+    private fun get5050Options(answers: List<DomainAnswer>?) :String {
+        val halfOptions = answers?.size!! / 2
+        val incorrectIndices = answers.indices
+            .filter { answers[it].isCorrect == false }
+            .shuffled()
+            .take(halfOptions)
+            .sortedDescending()
+        var hideWrongOptionScript = ""
+        for (index in incorrectIndices){
+            hideWrongOptionScript += "optionsRows[$index].style.display = 'none';"
+        }
+        return hideWrongOptionScript
     }
 
     inner class OptionsSelectionListener {
