@@ -209,6 +209,6 @@ class QuizQuestionFragment : Fragment() {
     }
 }
 
-interface QuizOperationsCallback {
-    fun onSkip()
+interface QuizFragmentHandler {
+    fun changeFragment()
 }
