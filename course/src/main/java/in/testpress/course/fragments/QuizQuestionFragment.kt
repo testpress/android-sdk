@@ -11,6 +11,7 @@ import `in`.testpress.exam.ui.view.WebView
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.util.WebViewUtils
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -132,6 +133,8 @@ class QuizQuestionFragment : Fragment() {
                 "value='' oninput='onValueChange(this)' placeholder='YOUR ANSWER'>"
         }
 
+        htmlContent += "</div>"
+
         // Add 50-50 helpline button
         htmlContent += "<button id='changeOptionsButton' onclick='hideExtraOptions()'>Change Options</button>" +
                 "<script>\n" +
@@ -142,33 +145,21 @@ class QuizQuestionFragment : Fragment() {
                 "    }\n" +
                 "</script>"
 
-        htmlContent += "    <table id=\"helplinesTable\" border=\"0\" style=\"width: 100%; height: 100px; border-collapse: collapse;\">\n" +
-                "        <tr>\n" +
-                "            <td>\n" +
-                "                <div style=\"text-align: center;\">\n" +
-                "                    <img src=\"https://static.testpress.in/static/img/5050.svg\" width=\"50\" height=\"50\">\n" +
-                "                    <br>\n" +
-                "                    <button style=\"display: block; margin: 0 auto;\">50/50</button>\n" +
-                "                </div>\n" +
-                "            </td>\n" +
-                "            <td>\n" +
-                "                <div style=\"text-align: center;\">\n" +
-                "                    <img src=\"https://static.testpress.in/static/img/5050.svg\" width=\"50\" height=\"50\">\n" +
-                "                    <br>\n" +
-                "                    <button style=\"display: block; margin: 0 auto;\">50/50</button>\n" +
-                "                </div>\n" +
-                "            </td>\n" +
-                "            <td>\n" +
-                "                <div style=\"text-align: center;\">\n" +
-                "                    <img src=\"https://static.testpress.in/static/img/5050.svg\" width=\"50\" height=\"50\">\n" +
-                "                    <br>\n" +
-                "                    <button style=\"display: block; margin: 0 auto;\">50/50</button>\n" +
-                "                </div>\n" +
-                "            </td>\n" +
-                "        </tr>\n" +
-                "    </table>\n"
-
-        htmlContent += "</div>"
+        // Add Helpline options
+        htmlContent += "<div style=\" display: flex; flex-direction: row; align-items: center; justify-content: space-around;\">\n" +
+                "        <div style=\"display: flex; flex-direction: column; justify-content: space-between; padding: 0 20px 0 20px;\">\n" +
+                "            <img src=\"https://static.testpress.in/static/img/5050.svg\" alt=\"Image 1\" style=\"width: 75px !important; height: 75px !important;\">\n" +
+                "            <button>50/50</button>\n" +
+                "        </div>\n" +
+                "        <div style=\"display: flex; flex-direction: column; justify-content: space-between; padding: 0 20px 0 20px;\">\n" +
+                "            <img src=\"https://static.testpress.in/static/img/5050.svg\" alt=\"Image 2\" style=\"width: 75px !important; height: 75px !important;\">\n" +
+                "            <button>AUDIENCE</button>\n" +
+                "        </div>\n" +
+                "        <div style=\"display: flex; flex-direction: column; justify-content: space-between; padding: 0 20px 0 20px;\">\n" +
+                "            <img src=\"https://static.testpress.in/static/img/5050.svg\" alt=\"Image 3\" style=\"width: 75px !important; height: 75px !important;\">\n" +
+                "            <button>SKIP</button>\n" +
+                "        </div>\n" +
+                "    </div>\n"
 
         return htmlContent
     }
