@@ -142,6 +142,7 @@ class QuizQuestionFragment : Fragment() {
         return """
         <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-around;">
             ${get5050Options(answers)}
+            ${getSkipOptions()}
         </div>
     """
     }
@@ -172,6 +173,26 @@ class QuizQuestionFragment : Fragment() {
             .sortedDescending()
     }
 
+    private fun getSkipOptions(): String {
+        return """
+        <div style="display: flex; flex-direction: column; justify-content: space-between;">
+            <img src="https://static.testpress.in/static/img/skip.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
+            <button class='helpline-button' onclick='skipOptions()'>SKIP</button>
+            <script>
+                ${getSkipOptionScript()}
+            </script>
+        </div>
+    """
+    }
+
+    private fun getSkipOptionScript(): String{
+        return """
+        function skipOptions() {
+                OptionsSelectionListener.onSkip()
+        }
+    """.trimMargin()
+    }
+
     inner class OptionsSelectionListener {
         @JavascriptInterface
         fun onCheckedChange(id: String, checked: Boolean, radioOption: Boolean) {
@@ -184,6 +205,11 @@ class QuizQuestionFragment : Fragment() {
                 selectedOptions.remove(id.toInt())
             }
             viewModel.setAnswer(userSelectedAnswer.id!!, selectedOptions)
+        }
+
+        @JavascriptInterface
+        fun onSkip() {
+            quizFragmentHandler.changeFragment()
         }
     }
 }

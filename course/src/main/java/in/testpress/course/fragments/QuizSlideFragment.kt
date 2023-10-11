@@ -10,7 +10,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.button.MaterialButton
 
-class QuizSlideFragment: Fragment(), NextQuizHandler {
+class QuizSlideFragment: Fragment(), NextQuizHandler, SubmitButtonListener {
     private lateinit var submitButton: MaterialButton
 
     private lateinit var viewPager: ViewPager2
@@ -37,9 +37,7 @@ class QuizSlideFragment: Fragment(), NextQuizHandler {
             if (fragment.isQuestionFragment) {
                 fragment.submitAnswer()
                 fragment.changeFragment()
-                submitButton.text = "Continue"
             } else {
-                submitButton.text = "Check"
                 showNext()
             }
         }
@@ -76,6 +74,7 @@ class QuizSlideFragment: Fragment(), NextQuizHandler {
         override fun createFragment(position: Int): Fragment {
             val questionFragment = RootQuizFragment()
             questionFragment.nextQuizHandler = fragment as NextQuizHandler
+            questionFragment.submitButtonListener = fragment
             val bundle = Bundle().apply {
                 putInt("POSITION", position)
                 putLong("EXAM_ID", fragment.examId)
@@ -84,6 +83,10 @@ class QuizSlideFragment: Fragment(), NextQuizHandler {
             questionFragment.arguments = bundle
             return questionFragment
         }
+    }
+
+    override fun onSubmitClick(isQuestionFragment: Boolean) {
+        submitButton.text = if (isQuestionFragment) "Check" else "Continue"
     }
 }
 

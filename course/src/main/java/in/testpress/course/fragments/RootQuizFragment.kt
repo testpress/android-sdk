@@ -13,6 +13,7 @@ class RootQuizFragment: Fragment() {
     private lateinit var reviewFragment: QuizReviewFragment
 
     lateinit var nextQuizHandler: NextQuizHandler
+    lateinit var submitButtonListener: SubmitButtonListener
     private var position: Int = 0
     private var examId: Long = -1
     private var attemptId: Long = -1
@@ -40,6 +41,7 @@ class RootQuizFragment: Fragment() {
 
     private fun showQuestion() {
         isQuestionFragment = true
+        submitButtonListener.onSubmitClick(isQuestionFragment)
         questionFragment = QuizQuestionFragment()
         questionFragment.arguments = arguments
 
@@ -50,6 +52,7 @@ class RootQuizFragment: Fragment() {
 
     private fun showReviewFragment() {
         isQuestionFragment = false
+        submitButtonListener.onSubmitClick(isQuestionFragment)
         reviewFragment = QuizReviewFragment()
         reviewFragment.arguments = arguments
         reviewFragment.arguments?.apply {
@@ -66,4 +69,8 @@ class RootQuizFragment: Fragment() {
     fun changeFragment() {
         showReviewFragment()
     }
+}
+
+interface SubmitButtonListener {
+    fun onSubmitClick(isQuestionFragment: Boolean)
 }
