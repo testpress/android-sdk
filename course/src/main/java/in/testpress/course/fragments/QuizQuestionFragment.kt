@@ -135,29 +135,29 @@ class QuizQuestionFragment : Fragment() {
 
         htmlContent += "</div>"
 
-        // Add 50-50 helpline button
-        htmlContent += "<button id='changeOptionsButton' onclick='hideExtraOptions()'>Change Options</button>" +
-                "<script>\n" +
-                "    function hideExtraOptions() {\n" +
-                "        var optionsTable = document.getElementById('optionsTable');\n" +
-                "        var optionsRows = optionsTable.getElementsByTagName('tr');\n" +
-                get5050Options(question.answers) +
-                "    }\n" +
-                "</script>"
+//        // Add 50-50 helpline button
+//        htmlContent += "<button id='changeOptionsButton' onclick='hideExtraOptions()'>Change Options</button>" +
+//                "<script>\n" +
+//                "    function hideExtraOptions() {\n" +
+//                "        var optionsTable = document.getElementById('optionsTable');\n" +
+//                "        var optionsRows = optionsTable.getElementsByTagName('tr');\n" +
+//                get5050Options(question.answers) +
+//                "    }\n" +
+//                "</script>"
 
         // Add Helpline options
         htmlContent += "<div style=\" display: flex; flex-direction: row; align-items: center; justify-content: space-around;\">\n" +
-                "        <div style=\"display: flex; flex-direction: column; justify-content: space-between; padding: 0 20px 0 20px;\">\n" +
+                "        <div style=\"display: flex; flex-direction: column; justify-content: space-between;\">\n" +
                 "            <img src=\"https://static.testpress.in/static/img/5050.svg\" alt=\"Image 1\" style=\"width: 75px !important; height: 75px !important;\">\n" +
-                "            <button>50/50</button>\n" +
+                "            <button class ='helpline-button'>50/50</button>\n" +
                 "        </div>\n" +
-                "        <div style=\"display: flex; flex-direction: column; justify-content: space-between; padding: 0 20px 0 20px;\">\n" +
-                "            <img src=\"https://static.testpress.in/static/img/5050.svg\" alt=\"Image 2\" style=\"width: 75px !important; height: 75px !important;\">\n" +
-                "            <button>AUDIENCE</button>\n" +
+                "        <div style=\"display: flex; flex-direction: column; justify-content: space-between;\">\n" +
+                "            <img src=\"https://static.testpress.in/static/img/bar-chart.svg\" alt=\"Image 2\" style=\"width: 75px !important; height: 75px !important;\">\n" +
+                "            <button class ='helpline-button'>AUDIENCE</button>\n" +
                 "        </div>\n" +
-                "        <div style=\"display: flex; flex-direction: column; justify-content: space-between; padding: 0 20px 0 20px;\">\n" +
-                "            <img src=\"https://static.testpress.in/static/img/5050.svg\" alt=\"Image 3\" style=\"width: 75px !important; height: 75px !important;\">\n" +
-                "            <button>SKIP</button>\n" +
+                "        <div style=\"display: flex; flex-direction: column; justify-content: space-between;\">\n" +
+                "            <img src=\"https://static.testpress.in/static/img/skip.svg\" alt=\"Image 3\" style=\"width: 75px !important; height: 75px !important;\">\n" +
+                "            <button class ='helpline-button'>SKIP</button>\n" +
                 "        </div>\n" +
                 "    </div>\n"
 
