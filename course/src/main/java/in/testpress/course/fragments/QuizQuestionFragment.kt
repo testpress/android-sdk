@@ -11,6 +11,7 @@ import `in`.testpress.exam.ui.view.WebView
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.util.WebViewUtils
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
