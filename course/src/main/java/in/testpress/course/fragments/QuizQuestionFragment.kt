@@ -135,47 +135,50 @@ class QuizQuestionFragment : Fragment() {
 
         htmlContent += "</div>"
 
-//        // Add 50-50 helpline button
-//        htmlContent += "<button id='changeOptionsButton' onclick='hideExtraOptions()'>Change Options</button>" +
-//                "<script>\n" +
-//                "    function hideExtraOptions() {\n" +
-//                "        var optionsTable = document.getElementById('optionsTable');\n" +
-//                "        var optionsRows = optionsTable.getElementsByTagName('tr');\n" +
-//                get5050Options(question.answers) +
-//                "    }\n" +
-//                "</script>"
-
         // Add Helpline options
-        htmlContent += "<div style=\" display: flex; flex-direction: row; align-items: center; justify-content: space-around;\">\n" +
-                "        <div style=\"display: flex; flex-direction: column; justify-content: space-between;\">\n" +
-                "            <img src=\"https://static.testpress.in/static/img/5050.svg\" alt=\"Image 1\" style=\"width: 75px !important; height: 75px !important;\">\n" +
-                "            <button class ='helpline-button'>50/50</button>\n" +
-                "        </div>\n" +
-                "        <div style=\"display: flex; flex-direction: column; justify-content: space-between;\">\n" +
-                "            <img src=\"https://static.testpress.in/static/img/bar-chart.svg\" alt=\"Image 2\" style=\"width: 75px !important; height: 75px !important;\">\n" +
-                "            <button class ='helpline-button'>AUDIENCE</button>\n" +
-                "        </div>\n" +
-                "        <div style=\"display: flex; flex-direction: column; justify-content: space-between;\">\n" +
-                "            <img src=\"https://static.testpress.in/static/img/skip.svg\" alt=\"Image 3\" style=\"width: 75px !important; height: 75px !important;\">\n" +
-                "            <button class ='helpline-button'>SKIP</button>\n" +
-                "        </div>\n" +
-                "    </div>\n"
+        htmlContent += getHelplineOptions(question.answers)
 
         return htmlContent
     }
 
-    private fun get5050Options(answers: List<DomainAnswer>?) :String {
+    private fun getHelplineOptions(answers: List<DomainAnswer>?): String {
+        return """
+        <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-around;">
+            ${get5050Options(answers)}
+        </div>
+    """
+    }
+
+    private fun get5050Options(answers: List<DomainAnswer>?): String {
+        return """
+        <div style="display: flex; flex-direction: column; justify-content: space-between;">
+            <img src="https://static.testpress.in/static/img/5050.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
+            <button class='helpline-button' onclick='hideHalfOptions()'>50/50</button>
+            <script>
+                ${getHideHalfOptionsScript(answers)}
+            </script>
+        </div>
+    """
+    }
+
+    private fun getHideHalfOptionsScript(answers: List<DomainAnswer>?): String {
+        val incorrectIndices = getIncorrectIndices(answers)
+        return """
+        |function hideHalfOptions() {
+        |    var optionsTable = document.getElementById('optionsTable');
+        |    var optionsRows = optionsTable.getElementsByTagName('tr');
+        |    ${incorrectIndices.joinToString("\n    ") { "optionsRows[$it].style.display = 'none';" }}
+        |}
+    """.trimMargin()
+    }
+
+    private fun getIncorrectIndices(answers: List<DomainAnswer>?): List<Int> {
         val halfOptions = answers?.size!! / 2
-        val incorrectIndices = answers.indices
+        return answers.indices
             .filter { answers[it].isCorrect == false }
             .shuffled()
             .take(halfOptions)
             .sortedDescending()
-        var hideWrongOptionScript = ""
-        for (index in incorrectIndices){
-            hideWrongOptionScript += "optionsRows[$index].style.display = 'none';"
-        }
-        return hideWrongOptionScript
     }
 
     inner class OptionsSelectionListener {
