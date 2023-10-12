@@ -7,9 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.google.android.material.button.MaterialButton
 
-class RootQuizFragment: Fragment(), QuizFragmentHandler {
+class RootQuizFragment: Fragment() {
     private lateinit var questionFragment: QuizQuestionFragment
     private lateinit var reviewFragment: QuizReviewFragment
 
@@ -43,7 +42,6 @@ class RootQuizFragment: Fragment(), QuizFragmentHandler {
         isQuestionFragment = true
         questionFragment = QuizQuestionFragment()
         questionFragment.arguments = arguments
-        questionFragment.quizFragmentHandler = this
 
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.root_layout, questionFragment)
@@ -65,7 +63,7 @@ class RootQuizFragment: Fragment(), QuizFragmentHandler {
         transaction.commit()
     }
 
-    override fun changeFragment() {
+    fun changeFragment() {
         showReviewFragment()
     }
 }
