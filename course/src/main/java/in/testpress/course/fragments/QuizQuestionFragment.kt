@@ -153,24 +153,17 @@ class QuizQuestionFragment : Fragment() {
             <img src="https://static.testpress.in/static/img/5050.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
             <button class='helpline-button' onclick='hideHalfOptions()'>50/50</button>
             <script>
-                ${getHideHalfOptionsScript(answers)}
+                function hideHalfOptions() {
+                    var optionsTable = document.getElementById('optionsTable');
+                    var optionsRows = optionsTable.getElementsByTagName('tr');
+                    ${getIncorrectAnswerIndices(answers).joinToString("\n    ") { "optionsRows[$it].style.display = 'none';" }}
+                }
             </script>
         </div>
     """
     }
 
-    private fun getHideHalfOptionsScript(answers: List<DomainAnswer>?): String {
-        val incorrectIndices = getIncorrectIndices(answers)
-        return """
-        |function hideHalfOptions() {
-        |    var optionsTable = document.getElementById('optionsTable');
-        |    var optionsRows = optionsTable.getElementsByTagName('tr');
-        |    ${incorrectIndices.joinToString("\n    ") { "optionsRows[$it].style.display = 'none';" }}
-        |}
-    """.trimMargin()
-    }
-
-    private fun getIncorrectIndices(answers: List<DomainAnswer>?): List<Int> {
+    private fun getIncorrectAnswerIndices(answers: List<DomainAnswer>?): List<Int> {
         val halfOptions = answers?.size!! / 2
         return answers.indices
             .filter { answers[it].isCorrect == false }
