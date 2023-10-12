@@ -179,18 +179,12 @@ class QuizQuestionFragment : Fragment() {
             <img src="https://static.testpress.in/static/img/skip.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
             <button class='helpline-button' onclick='skipOptions()'>SKIP</button>
             <script>
-                ${getSkipOptionScript()}
+                function skipOptions() {
+                    OptionsSelectionListener.onSkip()
+                }
             </script>
         </div>
     """
-    }
-
-    private fun getSkipOptionScript(): String{
-        return """
-        function skipOptions() {
-                OptionsSelectionListener.onSkip()
-        }
-    """.trimMargin()
     }
 
     inner class OptionsSelectionListener {
