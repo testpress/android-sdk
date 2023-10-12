@@ -27,7 +27,6 @@ class QuizQuestionFragment : Fragment() {
     private lateinit var webViewUtils: WebViewUtils
     lateinit var viewModel: QuizViewModel
     private lateinit var userSelectedAnswer: DomainUserSelectedAnswer
-    lateinit var quizFragmentHandler: QuizFragmentHandler
     private lateinit var instituteSettings: InstituteSettings
 
     private var examId: Long = -1
@@ -187,8 +186,4 @@ class QuizQuestionFragment : Fragment() {
             viewModel.setAnswer(userSelectedAnswer.id!!, selectedOptions)
         }
     }
-}
-
-interface QuizFragmentHandler {
-    fun changeFragment()
 }
