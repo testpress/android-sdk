@@ -495,3 +495,15 @@ video {
 .upload-button, .clear-upload-button {
     margin-top: 10px;
 }
+
+.helpline-button {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    background: #fff;
+    color: #777;
+    border: 1px solid #777;
+    border-radius: 12px;
+    font-size: 12px;
+    padding: 3xp 8xp;
+}

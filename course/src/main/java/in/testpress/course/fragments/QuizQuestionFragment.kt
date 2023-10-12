@@ -5,6 +5,7 @@ import `in`.testpress.course.R
 import `in`.testpress.enums.Status
 import `in`.testpress.course.repository.QuizQuestionsRepository
 import `in`.testpress.course.viewmodels.QuizViewModel
+import `in`.testpress.exam.domain.DomainAnswer
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
 import `in`.testpress.exam.ui.view.WebView
 import `in`.testpress.models.InstituteSettings
@@ -111,7 +112,7 @@ class QuizQuestionFragment : Fragment() {
         htmlContent += "<div class='question' style='padding-bottom: 10px;'> ${question.questionHtml} </div></div>"
         if (question.type == "R" || question.type == "C") {
             // Add options
-            htmlContent += "<table width='100%' style='margin-top:0px; margin-bottom:20px; font-size:calc(12px + 1.5vw);'>"
+            htmlContent += "<table id='optionsTable' width='100%' style='margin-top:0px; margin-bottom:20px; font-size:calc(12px + 1.5vw);'>"
             for (answer in question.answers ?: listOf()) {
                 htmlContent += if (question.isSingleMCQType) {
                     "\n" + WebViewUtils.getRadioButtonOptionWithTags(
@@ -132,7 +133,44 @@ class QuizQuestionFragment : Fragment() {
         }
         htmlContent += "</div>"
 
+        // Add Helpline options
+        htmlContent += getHelplineOptions(question.answers)
+
         return htmlContent
+    }
+
+    private fun getHelplineOptions(answers: List<DomainAnswer>?): String {
+        return """
+        <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-around;">
+            ${get5050Options(answers)}
+        </div>
+    """
+    }
+
+    private fun get5050Options(answers: List<DomainAnswer>?): String {
+        val incorrectAnswers= getIncorrectAnswerIndices(answers)
+        return """
+        <div style="display: flex; flex-direction: column; justify-content: space-between;">
+            <img src="https://static.testpress.in/static/img/5050.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
+            <button class='helpline-button' onclick='hideHalfOptions()'>50/50</button>
+            <script>
+                function hideHalfOptions() {
+                    var optionsTable = document.getElementById('optionsTable');
+                    var optionsRows = optionsTable.getElementsByTagName('tr');
+                    ${incorrectAnswers.joinToString("\n    ") { "optionsRows[$it].style.display = 'none';" }}
+                }
+            </script>
+        </div>
+    """
+    }
+
+    private fun getIncorrectAnswerIndices(answers: List<DomainAnswer>?): List<Int> {
+        val halfOptions = answers?.size!! / 2
+        return answers.indices
+            .filter { answers[it].isCorrect == false }
+            .shuffled()
+            .take(halfOptions)
+            .sortedDescending()
     }
 
     inner class OptionsSelectionListener {
