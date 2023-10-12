@@ -27,7 +27,7 @@ class QuizQuestionFragment : Fragment() {
     private lateinit var webViewUtils: WebViewUtils
     lateinit var viewModel: QuizViewModel
     private lateinit var userSelectedAnswer: DomainUserSelectedAnswer
-    lateinit var quizSkipHandler: QuizSkipHandler
+    lateinit var quizSkipListener: QuizSkipListener
     private lateinit var instituteSettings: InstituteSettings
 
     private var examId: Long = -1
@@ -204,11 +204,11 @@ class QuizQuestionFragment : Fragment() {
 
         @JavascriptInterface
         fun onSkip() {
-            quizSkipHandler.onSkip()
+            quizSkipListener.onSkip()
         }
     }
 }
 
-interface QuizSkipHandler {
+interface QuizSkipListener {
     fun onSkip()
 }

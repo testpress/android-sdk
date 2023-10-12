@@ -13,7 +13,7 @@ class RootQuizFragment: Fragment() {
     private lateinit var reviewFragment: QuizReviewFragment
 
     lateinit var nextQuizHandler: NextQuizHandler
-    lateinit var quizSkipHandler: QuizSkipHandler
+    lateinit var quizSkipListener: QuizSkipListener
     private var position: Int = 0
     private var examId: Long = -1
     private var attemptId: Long = -1
@@ -43,7 +43,7 @@ class RootQuizFragment: Fragment() {
         isQuestionFragment = true
         questionFragment = QuizQuestionFragment()
         questionFragment.arguments = arguments
-        questionFragment.quizSkipHandler = quizSkipHandler
+        questionFragment.quizSkipListener = quizSkipListener
 
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.root_layout, questionFragment)

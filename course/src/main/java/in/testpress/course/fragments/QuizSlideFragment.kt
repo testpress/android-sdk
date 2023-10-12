@@ -10,7 +10,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.button.MaterialButton
 
-class QuizSlideFragment: Fragment(), NextQuizHandler, QuizSkipHandler {
+class QuizSlideFragment: Fragment(), NextQuizHandler, QuizSkipListener {
     private lateinit var submitButton: MaterialButton
 
     private lateinit var viewPager: ViewPager2
@@ -81,7 +81,7 @@ class QuizSlideFragment: Fragment(), NextQuizHandler, QuizSkipHandler {
         override fun createFragment(position: Int): Fragment {
             val questionFragment = RootQuizFragment()
             questionFragment.nextQuizHandler = fragment as NextQuizHandler
-            questionFragment.quizSkipHandler = fragment
+            questionFragment.quizSkipListener = fragment
             val bundle = Bundle().apply {
                 putInt("POSITION", position)
                 putLong("EXAM_ID", fragment.examId)
