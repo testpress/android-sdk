@@ -33,11 +33,11 @@ class QuizSlideFragment: Fragment(), NextQuizHandler, QuizSkipListener {
         submitButton.visibility = View.VISIBLE
 
         submitButton.setOnClickListener {
-            updateSolution()
+            changeFragment()
         }
     }
 
-    private fun updateSolution() {
+    private fun changeFragment() {
         val fragment =
             childFragmentManager.findFragmentByTag("f" + viewPager.currentItem) as RootQuizFragment
         if (fragment.isQuestionFragment) {
@@ -93,7 +93,7 @@ class QuizSlideFragment: Fragment(), NextQuizHandler, QuizSkipListener {
     }
 
     override fun onSkip() {
-        updateSolution()
+        changeFragment()
     }
 }
 
