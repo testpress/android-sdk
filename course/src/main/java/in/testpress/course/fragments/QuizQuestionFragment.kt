@@ -148,6 +148,7 @@ class QuizQuestionFragment : Fragment() {
     }
 
     private fun get5050Options(answers: List<DomainAnswer>?): String {
+        val incorrectAnswers= getIncorrectAnswerIndices(answers)
         return """
         <div style="display: flex; flex-direction: column; justify-content: space-between;">
             <img src="https://static.testpress.in/static/img/5050.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
@@ -156,7 +157,7 @@ class QuizQuestionFragment : Fragment() {
                 function hideHalfOptions() {
                     var optionsTable = document.getElementById('optionsTable');
                     var optionsRows = optionsTable.getElementsByTagName('tr');
-                    ${getIncorrectAnswerIndices(answers).joinToString("\n    ") { "optionsRows[$it].style.display = 'none';" }}
+                    ${incorrectAnswers.joinToString("\n    ") { "optionsRows[$it].style.display = 'none';" }}
                 }
             </script>
         </div>
