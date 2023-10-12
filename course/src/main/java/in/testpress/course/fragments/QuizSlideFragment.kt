@@ -10,7 +10,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.button.MaterialButton
 
-class QuizSlideFragment: Fragment(), NextQuizHandler, SubmitButtonListener {
+class QuizSlideFragment: Fragment(), NextQuizHandler, QuizSkipHandler {
     private lateinit var submitButton: MaterialButton
 
     private lateinit var viewPager: ViewPager2
@@ -33,13 +33,20 @@ class QuizSlideFragment: Fragment(), NextQuizHandler, SubmitButtonListener {
         submitButton.visibility = View.VISIBLE
 
         submitButton.setOnClickListener {
-            val fragment = childFragmentManager.findFragmentByTag("f" + viewPager.currentItem) as RootQuizFragment
-            if (fragment.isQuestionFragment) {
-                fragment.submitAnswer()
-                fragment.changeFragment()
-            } else {
-                showNext()
-            }
+            updateSolution()
+        }
+    }
+
+    private fun updateSolution() {
+        val fragment =
+            childFragmentManager.findFragmentByTag("f" + viewPager.currentItem) as RootQuizFragment
+        if (fragment.isQuestionFragment) {
+            fragment.submitAnswer()
+            fragment.changeFragment()
+            submitButton.text = "Continue"
+        } else {
+            showNext()
+            submitButton.text = "Check"
         }
     }
 
@@ -74,7 +81,7 @@ class QuizSlideFragment: Fragment(), NextQuizHandler, SubmitButtonListener {
         override fun createFragment(position: Int): Fragment {
             val questionFragment = RootQuizFragment()
             questionFragment.nextQuizHandler = fragment as NextQuizHandler
-            questionFragment.submitButtonListener = fragment
+            questionFragment.quizSkipHandler = fragment
             val bundle = Bundle().apply {
                 putInt("POSITION", position)
                 putLong("EXAM_ID", fragment.examId)
@@ -85,8 +92,8 @@ class QuizSlideFragment: Fragment(), NextQuizHandler, SubmitButtonListener {
         }
     }
 
-    override fun onSubmitClick(isQuestionFragment: Boolean) {
-        submitButton.text = if (isQuestionFragment) "Check" else "Continue"
+    override fun onSkip() {
+        updateSolution()
     }
 }
 
