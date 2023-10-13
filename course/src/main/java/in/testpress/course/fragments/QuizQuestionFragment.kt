@@ -1,25 +1,42 @@
 package `in`.testpress.course.fragments
 
+import `in`.testpress.core.TestpressCallback
+import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.enums.Status
 import `in`.testpress.course.repository.QuizQuestionsRepository
 import `in`.testpress.course.viewmodels.QuizViewModel
+import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.domain.DomainAnswer
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
+import `in`.testpress.exam.models.AudiencePollResponse
 import `in`.testpress.exam.ui.view.WebView
+import `in`.testpress.exam.util.GraphAxisLabelFormatter
 import `in`.testpress.models.InstituteSettings
+import `in`.testpress.util.UIUtils
 import `in`.testpress.util.WebViewUtils
+import android.app.ProgressDialog
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import java.util.ArrayList
+import com.github.testpress.mikephil.charting.charts.HorizontalBarChart
+import com.github.testpress.mikephil.charting.components.XAxis
+import com.github.testpress.mikephil.charting.data.BarData
+import com.github.testpress.mikephil.charting.data.BarDataSet
+import com.github.testpress.mikephil.charting.data.BarEntry
+import com.github.testpress.mikephil.charting.formatter.PercentFormatter
+import com.github.testpress.mikephil.charting.interfaces.datasets.IBarDataSet
 
 class QuizQuestionFragment : Fragment() {
     private lateinit var questionsView: WebView
@@ -34,6 +51,9 @@ class QuizQuestionFragment : Fragment() {
     private var attemptId: Long = -1
     private var position: Int = 0
     private var selectedOptions: ArrayList<Int> = arrayListOf()
+    private lateinit var audiencePollProgressDialog : ProgressDialog
+    private var audiencePollResponse: AudiencePollResponse? = null
+    private lateinit var chart: HorizontalBarChart
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -143,6 +163,7 @@ class QuizQuestionFragment : Fragment() {
         return """
         <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-around;">
             ${get5050Options(answers)}
+            ${getAudienceOption()}
             ${getSkipOptions()}
         </div>
     """
@@ -188,6 +209,163 @@ class QuizQuestionFragment : Fragment() {
     """
     }
 
+    private fun getAudienceOption(): String {
+        return """
+        <div style="display: flex; flex-direction: column; justify-content: space-between;">
+            <img src="https://static.testpress.in/static/img/bar-chart.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
+            <button class='helpline-button' onclick='audienceOptions()'>AUDIENCE</button>
+            <script>
+                function audienceOptions() {
+                    OptionsSelectionListener.onAudienceOptions()
+                }
+            </script>
+        </div>
+    """
+    }
+
+    private fun getAudiencePollResponse() {
+        if (audiencePollResponse != null) {
+            showAudiencePollDialog(audiencePollResponse!!)
+            return
+        }
+        showProgressDialog()
+        fetchAndShowAudiencePoll()
+    }
+
+    private fun showProgressDialog() {
+        audiencePollProgressDialog = ProgressDialog(requireContext())
+        audiencePollProgressDialog.setMessage("Please wait...")
+        audiencePollProgressDialog.setCancelable(false)
+        audiencePollProgressDialog.setIndeterminate(true)
+        UIUtils.setIndeterminateDrawable(requireContext(), audiencePollProgressDialog, 4)
+        audiencePollProgressDialog.show()
+    }
+
+    private fun fetchAndShowAudiencePoll() {
+        val apiClient = TestpressExamApiClient(requireContext())
+        apiClient.getAudiencePoll("api/v2.5/attempts/${attemptId}/questions/${userSelectedAnswer.questionId}/audience_poll/")
+            .enqueue(object : TestpressCallback<AudiencePollResponse>() {
+                override fun onSuccess(result: AudiencePollResponse?) {
+                    result?.let {
+                        audiencePollResponse = result
+                        showAudiencePollDialog(audiencePollResponse!!)
+                    }
+                    audiencePollProgressDialog.dismiss()
+                }
+
+                override fun onException(exception: TestpressException) {
+                    audiencePollProgressDialog.dismiss()
+                    Toast.makeText(
+                        requireContext(),
+                        "Audience poll not available for this question",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
+    }
+
+    private fun showAudiencePollDialog(audiencePollResponse: AudiencePollResponse) {
+        val builder = AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle)
+        val dialogView = View.inflate(requireContext(),R.layout.audience_poll_dialog_layout,null)
+        builder.setView(dialogView)
+            builder.setNegativeButton(
+                "Close"
+            ) { dialogInterface, i -> dialogInterface.dismiss() }
+        chart = dialogView.findViewById(R.id.chart)
+        populateChartValues(audiencePollResponse,chart)
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    private fun populateChartValues(audiencePollResponse: AudiencePollResponse, chart: HorizontalBarChart) {
+        val yValues = extractPollPercent(audiencePollResponse).reversed()
+        val xValues = (1..yValues.size).map { it.toFloat() }
+        val optionLabels = List(xValues.size) { index -> ('A'.code + index).toChar().toString() }.reversed()
+        val entries = xValues.mapIndexed { index, xValue -> BarEntry(xValue, yValues[index]) }
+        val barDataSet = BarDataSet(entries, "BarDataSet")
+        val iBarDataSets = ArrayList<IBarDataSet>()
+        iBarDataSets.add(barDataSet)
+        populateChart(chart,iBarDataSets,optionLabels)
+    }
+
+    private fun extractPollPercent(audiencePollResponse: AudiencePollResponse): List<Float> {
+        return audiencePollResponse.audience_poll?.map { it?.poll_percent?.toFloat()!! }!!
+    }
+
+    private fun populateChart(
+        chart: HorizontalBarChart,
+        sets: ArrayList<IBarDataSet>?,
+        optionLabels: List<String>
+    ) {
+        val data = BarData(sets)
+        val xAxis = chart.xAxis
+        val labels = ArrayList<String>()
+
+        // Customize X-axis
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.setLabelCount(optionLabels.size + 2, true)
+        xAxis.setDrawGridLines(false)
+        xAxis.textSize = 13f
+        xAxis.typeface = TestpressSdk.getRubikMediumFont(context!!)
+        xAxis.setAvoidFirstLastClipping(true)
+        xAxis.xOffset = 10f
+        xAxis.textColor = ContextCompat.getColor(activity!!, R.color.testpress_black)
+        xAxis.valueFormatter = GraphAxisLabelFormatter(labels, 1)
+        xAxis.setAxisMinValue(0f)
+        xAxis.setAxisMaxValue((optionLabels.size + 1).toFloat())
+        xAxis.axisLineColor = Color.parseColor("#cccccc")
+
+        // Populate labels
+        labels.add("")
+        labels.addAll(optionLabels)
+        labels.add("")
+
+        // Customize chart
+        chart.minimumHeight = UIUtils.getPixelFromDp(
+            requireContext(),
+            Math.max(200, (optionLabels.size + 2) * 50).toFloat()
+        ).toInt()
+        chart.setDrawValueAboveBar(true)
+        chart.setExtraOffsets(0f, 0f, 50f, 0f)
+        chart.setDescription("")
+        chart.setFitBars(true)
+        chart.setTouchEnabled(false)
+        chart.legend.isEnabled = false
+
+        // Customize data
+        data.barWidth = 0.4f
+        data.setValueTextSize(12f)
+        data.setValueFormatter(PercentFormatter())
+        data.setValueTypeface(TestpressSdk.getRubikMediumFont(context!!))
+
+        // Customize left axis
+        val leftAxis = chart.axisLeft
+        leftAxis.setDrawAxisLine(false)
+        leftAxis.setDrawLabels(false)
+        leftAxis.setDrawGridLines(false)
+        leftAxis.setAxisMinValue(0f)
+        leftAxis.setAxisMaxValue(100f)
+        leftAxis.spaceTop = 15f
+
+        // Customize right axis
+        val rightAxis = chart.axisRight
+        rightAxis.setAxisMinValue(0f)
+        rightAxis.setAxisMaxValue(100f)
+        rightAxis.setLabelCount(5, false)
+        rightAxis.textSize = 10f
+        rightAxis.setDrawLabels(true)
+        rightAxis.setDrawAxisLine(true)
+        rightAxis.setDrawGridLines(true)
+        rightAxis.typeface = TestpressSdk.getRubikRegularFont(context!!)
+        rightAxis.textColor = ContextCompat.getColor(activity!!, R.color.testpress_text_gray)
+        rightAxis.gridColor = Color.parseColor("#cccccc")
+
+        // Set data and animate chart
+        chart.data = data
+        chart.animateY(500)
+        chart.invalidate()
+    }
+
     inner class OptionsSelectionListener {
         @JavascriptInterface
         fun onCheckedChange(id: String, checked: Boolean, radioOption: Boolean) {
@@ -206,6 +384,12 @@ class QuizQuestionFragment : Fragment() {
         fun onSkip() {
             quizOperationsCallback.onSkip()
         }
+
+        @JavascriptInterface
+        fun onAudienceOptions() {
+            getAudiencePollResponse()
+        }
+
     }
 }
 
