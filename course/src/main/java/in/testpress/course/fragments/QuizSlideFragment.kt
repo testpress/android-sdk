@@ -10,7 +10,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.button.MaterialButton
 
-class QuizSlideFragment: Fragment(), NextQuizHandler {
+class QuizSlideFragment: Fragment(), NextQuizHandler, QuizOperationsCallback {
     private lateinit var submitButton: MaterialButton
 
     private lateinit var viewPager: ViewPager2
@@ -33,15 +33,20 @@ class QuizSlideFragment: Fragment(), NextQuizHandler {
         submitButton.visibility = View.VISIBLE
 
         submitButton.setOnClickListener {
-            val fragment = childFragmentManager.findFragmentByTag("f" + viewPager.currentItem) as RootQuizFragment
-            if (fragment.isQuestionFragment) {
-                fragment.submitAnswer()
-                fragment.changeFragment()
-                submitButton.text = "Continue"
-            } else {
-                submitButton.text = "Check"
-                showNext()
-            }
+            changeFragment()
+        }
+    }
+
+    private fun changeFragment() {
+        val fragment =
+            childFragmentManager.findFragmentByTag("f" + viewPager.currentItem) as RootQuizFragment
+        if (fragment.isQuestionFragment) {
+            fragment.submitAnswer()
+            fragment.changeFragment()
+            submitButton.text = "Continue"
+        } else {
+            showNext()
+            submitButton.text = "Check"
         }
     }
 
@@ -76,6 +81,7 @@ class QuizSlideFragment: Fragment(), NextQuizHandler {
         override fun createFragment(position: Int): Fragment {
             val questionFragment = RootQuizFragment()
             questionFragment.nextQuizHandler = fragment as NextQuizHandler
+            questionFragment.quizOperationsCallback = fragment
             val bundle = Bundle().apply {
                 putInt("POSITION", position)
                 putLong("EXAM_ID", fragment.examId)
@@ -84,6 +90,10 @@ class QuizSlideFragment: Fragment(), NextQuizHandler {
             questionFragment.arguments = bundle
             return questionFragment
         }
+    }
+
+    override fun onSkip() {
+        changeFragment()
     }
 }
 

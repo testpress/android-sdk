@@ -27,6 +27,7 @@ class QuizQuestionFragment : Fragment() {
     private lateinit var webViewUtils: WebViewUtils
     lateinit var viewModel: QuizViewModel
     private lateinit var userSelectedAnswer: DomainUserSelectedAnswer
+    lateinit var quizOperationsCallback: QuizOperationsCallback
     private lateinit var instituteSettings: InstituteSettings
 
     private var examId: Long = -1
@@ -142,6 +143,7 @@ class QuizQuestionFragment : Fragment() {
         return """
         <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-around;">
             ${get5050Options(answers)}
+            ${getSkipOptions()}
         </div>
     """
     }
@@ -172,6 +174,20 @@ class QuizQuestionFragment : Fragment() {
             .sortedDescending()
     }
 
+    private fun getSkipOptions(): String {
+        return """
+        <div style="display: flex; flex-direction: column; justify-content: space-between;">
+            <img src="https://static.testpress.in/static/img/skip.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
+            <button class='helpline-button' onclick='skipOptions()'>SKIP</button>
+            <script>
+                function skipOptions() {
+                    OptionsSelectionListener.onSkip()
+                }
+            </script>
+        </div>
+    """
+    }
+
     inner class OptionsSelectionListener {
         @JavascriptInterface
         fun onCheckedChange(id: String, checked: Boolean, radioOption: Boolean) {
@@ -185,5 +201,14 @@ class QuizQuestionFragment : Fragment() {
             }
             viewModel.setAnswer(userSelectedAnswer.id!!, selectedOptions)
         }
+
+        @JavascriptInterface
+        fun onSkip() {
+            quizOperationsCallback.onSkip()
+        }
     }
+}
+
+interface QuizOperationsCallback {
+    fun onSkip()
 }
