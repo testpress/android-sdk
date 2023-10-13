@@ -172,9 +172,9 @@ class QuizQuestionFragment : Fragment() {
     private fun get5050Options(answers: List<DomainAnswer>?): String {
         val incorrectAnswers= getIncorrectAnswerIndices(answers)
         return """
-        <div style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div onclick='hideHalfOptions()' style="display: flex; flex-direction: column; justify-content: space-between;">
             <img class="no-click-listener" src="https://static.testpress.in/static/img/5050.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
-            <button class='helpline-button' onclick='hideHalfOptions()'>50/50</button>
+            <button class='helpline-button'>50/50</button>
             <script>
                 function hideHalfOptions() {
                     var optionsTable = document.getElementById('optionsTable');
@@ -197,9 +197,9 @@ class QuizQuestionFragment : Fragment() {
 
     private fun getSkipOptions(): String {
         return """
-        <div style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div onclick='skipOptions()' style="display: flex; flex-direction: column; justify-content: space-between;">
             <img class="no-click-listener" src="https://static.testpress.in/static/img/skip.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
-            <button class='helpline-button' onclick='skipOptions()'>SKIP</button>
+            <button class='helpline-button'>SKIP</button>
             <script>
                 function skipOptions() {
                     OptionsSelectionListener.onSkip()
@@ -211,9 +211,9 @@ class QuizQuestionFragment : Fragment() {
 
     private fun getAudienceOption(): String {
         return """
-        <div style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div onclick='audienceOptions()' style="display: flex; flex-direction: column; justify-content: space-between;">
             <img class="no-click-listener" src="https://static.testpress.in/static/img/bar-chart.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
-            <button class='helpline-button' onclick='audienceOptions()'>AUDIENCE</button>
+            <button class='helpline-button'>AUDIENCE</button>
             <script>
                 function audienceOptions() {
                     OptionsSelectionListener.onAudienceOptions()
