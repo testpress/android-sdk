@@ -20,7 +20,6 @@ import `in`.testpress.models.greendao.UserSelectedAnswerDao
 import `in`.testpress.util.IntegerList
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import java.util.HashMap
@@ -153,11 +152,8 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
 
     private fun getUserSelectedAnswerID(endIndex: Int): Long {
         val id = Random.nextLong(99999, 9999999)
-        Log.d("TAG", "id: $id")
         val count = userSelectedAnswerDao.queryBuilder().where(UserSelectedAnswerDao.Properties.Id.between(id, id + endIndex)).count()
-        Log.d("TAG", "getUserSelectedAnswerID: $count")
         if (count > 0) {
-            Log.d("TAG", "if")
             getUserSelectedAnswerID(endIndex)
         }
 
