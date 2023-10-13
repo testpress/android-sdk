@@ -134,18 +134,13 @@ class QuizQuestionFragment : Fragment() {
             // Add options
             htmlContent += "<table id='optionsTable' width='100%' style='margin-top:0px; margin-bottom:20px; font-size:calc(12px + 1.5vw);'>"
             for (answer in question.answers ?: listOf()) {
-                val optionLabels = ('A'.code + question.answers?.indexOf(answer)!!).toChar().toString()
-                val modifiedText = answer.textHtml?.replace(Regex("<p>(.*?)</p>")) {
-                    val originalContent = it.groupValues[1]
-                    "<p>$optionLabels. $originalContent</p>"
-                }
                 htmlContent += if (question.isSingleMCQType) {
                     "\n" + WebViewUtils.getRadioButtonOptionWithTags(
-                        modifiedText, answer.id.toInt()
+                        answer.textHtml, answer.id.toInt()
                     )
                 } else {
                     "\n" + WebViewUtils.getCheckBoxOptionWithTags(
-                        modifiedText, answer.id.toInt()
+                        answer.textHtml, answer.id.toInt()
                     )
                 }
             }
@@ -234,7 +229,7 @@ class QuizQuestionFragment : Fragment() {
             return
         }
         showProgressDialog()
-        fetchAudiencePoll()
+        fetchAndShowAudiencePoll()
     }
 
     private fun showProgressDialog() {
@@ -246,7 +241,7 @@ class QuizQuestionFragment : Fragment() {
         audiencePollProgressDialog.show()
     }
 
-    private fun fetchAudiencePoll() {
+    private fun fetchAndShowAudiencePoll() {
         val apiClient = TestpressExamApiClient(requireContext())
         apiClient.getAudiencePoll("api/v2.5/attempts/${attemptId}/questions/${userSelectedAnswer.questionId}/audience_poll/")
             .enqueue(object : TestpressCallback<AudiencePollResponse>() {
