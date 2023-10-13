@@ -20,6 +20,7 @@ import android.app.ProgressDialog
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -135,13 +136,18 @@ class QuizQuestionFragment : Fragment() {
             // Add options
             htmlContent += "<table id='optionsTable' width='100%' style='margin-top:0px; margin-bottom:20px; font-size:calc(12px + 1.5vw);'>"
             for (answer in question.answers ?: listOf()) {
+                val optionLabels = ('A'.code + question.answers?.indexOf(answer)!!).toChar().toString()
+                val modifiedText = answer.textHtml?.replace(Regex("<p>(.*?)</p>")) {
+                    val originalContent = it.groupValues[1]
+                    "<p>$optionLabels. $originalContent</p>"
+                }
                 htmlContent += if (question.isSingleMCQType) {
                     "\n" + WebViewUtils.getRadioButtonOptionWithTags(
-                        answer.textHtml, answer.id.toInt()
+                        modifiedText, answer.id.toInt()
                     )
                 } else {
                     "\n" + WebViewUtils.getCheckBoxOptionWithTags(
-                        answer.textHtml, answer.id.toInt()
+                        modifiedText, answer.id.toInt()
                     )
                 }
             }
