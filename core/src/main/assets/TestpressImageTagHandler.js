@@ -2,5 +2,8 @@
 var images = document.getElementsByTagName("img");
 for (i = 0; i < images.length; i++) {
     var src = images[i].src;
-    images[i].setAttribute('onclick','ImageHandler.onClickImage(src)');
+        // Check if the image has the "no-click-listener" class
+        if (!images[i].classList.contains("no-click-listener")) {
+            images[i].setAttribute('onclick', 'ImageHandler.onClickImage(src)');
+        }
 }
