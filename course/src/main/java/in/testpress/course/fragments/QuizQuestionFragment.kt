@@ -174,7 +174,7 @@ class QuizQuestionFragment : Fragment() {
         val incorrectAnswers= getIncorrectAnswerIndices(answers)
         return """
         <div style="display: flex; flex-direction: column; justify-content: space-between;">
-            <img src="https://static.testpress.in/static/img/5050.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
+            <img class="no-click-listener" src="https://static.testpress.in/static/img/5050.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
             <button class='helpline-button' onclick='hideHalfOptions()'>50/50</button>
             <script>
                 function hideHalfOptions() {
@@ -199,7 +199,7 @@ class QuizQuestionFragment : Fragment() {
     private fun getSkipOptions(): String {
         return """
         <div style="display: flex; flex-direction: column; justify-content: space-between;">
-            <img src="https://static.testpress.in/static/img/skip.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
+            <img class="no-click-listener" src="https://static.testpress.in/static/img/skip.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
             <button class='helpline-button' onclick='skipOptions()'>SKIP</button>
             <script>
                 function skipOptions() {
@@ -213,7 +213,7 @@ class QuizQuestionFragment : Fragment() {
     private fun getAudienceOption(): String {
         return """
         <div style="display: flex; flex-direction: column; justify-content: space-between;">
-            <img src="https://static.testpress.in/static/img/bar-chart.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
+            <img class="no-click-listener" src="https://static.testpress.in/static/img/bar-chart.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
             <button class='helpline-button' onclick='audienceOptions()'>AUDIENCE</button>
             <script>
                 function audienceOptions() {
@@ -230,7 +230,7 @@ class QuizQuestionFragment : Fragment() {
             return
         }
         audiencePollProgressDialog = ProgressDialog(requireContext())
-        audiencePollProgressDialog.setMessage(resources.getString(R.string.testpress_mail_pdf))
+        audiencePollProgressDialog.setMessage("Please wait...")
         audiencePollProgressDialog.setCancelable(false)
         audiencePollProgressDialog.setIndeterminate(true)
         UIUtils.setIndeterminateDrawable(requireContext(), audiencePollProgressDialog, 4)
@@ -240,7 +240,7 @@ class QuizQuestionFragment : Fragment() {
 
     private fun getAudiencePollResponse() {
             val apiClient = TestpressExamApiClient(requireContext())
-        apiClient.getAudiencePoll("api/v2.2/attempts/${attemptId}/questions/${userSelectedAnswer.questionId}/audience_poll/")
+        apiClient.getAudiencePoll("api/v2.5/attempts/${attemptId}/questions/${userSelectedAnswer.questionId}/audience_poll/")
             .enqueue(object : TestpressCallback<AudiencePollResponse>() {
                 override fun onSuccess(result: AudiencePollResponse?) {
                     result?.let {
@@ -260,7 +260,7 @@ class QuizQuestionFragment : Fragment() {
     private fun showAudiencePollDialog(audiencePollResponse: AudiencePollResponse) {
         audiencePollProgressDialog.dismiss()
         val builder = AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle)
-        val dialogView = View.inflate(requireContext(),R.layout.dialog_layout,null)
+        val dialogView = View.inflate(requireContext(),R.layout.audience_poll_dialog_layout,null)
         builder.setView(dialogView)
             builder.setNegativeButton(
                 "Close"
