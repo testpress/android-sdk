@@ -1,11 +1,12 @@
 package `in`.testpress.course.fragments
 
+import `in`.testpress.core.TestpressCallback
+import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.enums.Status
 import `in`.testpress.course.repository.QuizQuestionsRepository
 import `in`.testpress.course.viewmodels.QuizViewModel
-import `in`.testpress.enums.Status
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.domain.DomainAnswer
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
@@ -386,6 +387,6 @@ class QuizQuestionFragment : Fragment() {
     }
 }
 
-interface QuizFragmentHandler {
-    fun changeFragment()
+interface QuizOperationsCallback {
+    fun onSkip()
 }
