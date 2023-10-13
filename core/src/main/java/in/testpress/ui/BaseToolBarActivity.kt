@@ -29,7 +29,7 @@ open class BaseToolBarActivity: AppCompatActivity() {
     }
 
     private var session: TestpressSession? = null
-    private lateinit var logo: ImageView
+    protected lateinit var logo: ImageView
     protected lateinit var toolbar: Toolbar
 
     override fun setContentView(layoutResId: Int) {

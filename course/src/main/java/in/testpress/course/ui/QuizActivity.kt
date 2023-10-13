@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -69,6 +70,7 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
         toolbar.setNavigationOnClickListener {
             showEndExamAlert()
         }
+        logo.isVisible = false
 
         viewModel.endAttemptState.observe(this) {
             dialog.hide()
