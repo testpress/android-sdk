@@ -9,15 +9,13 @@ import `in`.testpress.enums.Status
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.domain.DomainAnswer
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
-import `in`.testpress.exam.models.AudiencePoll
-import `in`.testpress.exam.ui.StrengthAnalyticsGraphFragment
+import `in`.testpress.exam.models.AudiencePollResponse
 import `in`.testpress.exam.ui.view.WebView
 import `in`.testpress.exam.util.GraphAxisLabelFormatter
-import `in`.testpress.exam.util.GraphAxisPercentValueFormatter
 import `in`.testpress.models.InstituteSettings
-import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.util.UIUtils
 import `in`.testpress.util.WebViewUtils
+import android.app.ProgressDialog
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
@@ -26,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -227,6 +226,139 @@ class QuizQuestionFragment : Fragment() {
     """.trimMargin()
     }
 
+    lateinit var audiencePollProgressDialog : ProgressDialog
+    private var audiencePollResponse: AudiencePollResponse? = null
+
+    private fun getAudiencepollData() {
+        if (audiencePollResponse != null) {
+            showAudiencePollDialog(audiencePollResponse!!)
+            return
+        }
+        audiencePollProgressDialog = ProgressDialog(requireContext())
+        audiencePollProgressDialog.setMessage(resources.getString(R.string.testpress_mail_pdf))
+        audiencePollProgressDialog.setCancelable(false)
+        audiencePollProgressDialog.setIndeterminate(true)
+        UIUtils.setIndeterminateDrawable(requireContext(), audiencePollProgressDialog, 4)
+        audiencePollProgressDialog.show()
+        getAudiencePollResponse()
+    }
+
+    private fun getAudiencePollResponse() {
+            val apiClient = TestpressExamApiClient(requireContext())
+        apiClient.getAudiencePoll("api/v2.2/attempts/${attemptId}/questions/${userSelectedAnswer.questionId}/audience_poll/")
+            .enqueue(object : TestpressCallback<AudiencePollResponse>() {
+                override fun onSuccess(result: AudiencePollResponse?) {
+                    result?.let {
+                        Toast.makeText(requireContext(),"onSuccess ${it.coins_changed}",Toast.LENGTH_SHORT).show()
+                        audiencePollResponse = result
+                        showAudiencePollDialog(result)
+                    }
+                }
+
+                override fun onException(exception: TestpressException) {
+                    Toast.makeText(requireContext(),"onException",Toast.LENGTH_SHORT).show()
+                }
+            })
+
+    }
+
+    private lateinit var chart: HorizontalBarChart
+
+    private fun showAudiencePollDialog(audiencePollResponse: AudiencePollResponse) {
+        audiencePollProgressDialog.dismiss()
+        val builder = AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle)
+        val dialogView = View.inflate(requireContext(),R.layout.dialog_layout,null)
+        builder.setView(dialogView)
+            builder.setNegativeButton(
+                "Close"
+            ) { dialogInterface, i -> dialogInterface.dismiss() }
+        chart = dialogView.findViewById(R.id.chart)
+        generateChart(audiencePollResponse,chart)
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    private fun generateChart(audiencePollResponse: AudiencePollResponse,chart: HorizontalBarChart) {
+        val yValues = extractPollPercent(audiencePollResponse).reversed()
+        val xValues = (1..yValues.size).map { it.toFloat() }
+        val optionLabels = List(xValues.size) { index -> ('A'.code + index).toChar().toString() }.reversed()
+        val entries = xValues.mapIndexed { index, xValue -> BarEntry(xValue, yValues[index]) }
+        val barDataSet = BarDataSet(entries, "BarDataSet")
+        val iBarDataSets = ArrayList<IBarDataSet>()
+        iBarDataSets.add(barDataSet)
+        populateChart(chart,iBarDataSets,optionLabels)
+    }
+
+    private fun extractPollPercent(audiencePollResponse: AudiencePollResponse): List<Float> {
+        return audiencePollResponse.audience_poll?.map { it?.poll_percent?.toFloat()!! }!!
+    }
+
+    private fun populateChart(
+        chart: HorizontalBarChart,
+        sets: ArrayList<IBarDataSet>?,
+        subjects: List<String>
+    ) {
+        val data = BarData(sets)
+        data.setValueTypeface(Typeface.DEFAULT_BOLD)
+        val xAxis = chart.xAxis
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.setLabelCount(subjects.size + 2, true)
+        xAxis.setDrawGridLines(false)
+        val labels = ArrayList<String>()
+        labels.add("")
+        for (subject in subjects) {
+            labels.add(subject)
+        }
+        labels.add("")
+        xAxis.textSize = 13f
+        xAxis.typeface = TestpressSdk.getRubikMediumFont(context!!)
+        xAxis.setAvoidFirstLastClipping(true)
+        xAxis.xOffset = 10f
+        xAxis.textColor = ContextCompat.getColor(activity!!, R.color.testpress_black)
+        xAxis.valueFormatter = GraphAxisLabelFormatter(labels, 1)
+        xAxis.setAxisMinValue(0f)
+        xAxis.setAxisMaxValue((subjects.size + 1).toFloat())
+        xAxis.axisLineColor = Color.parseColor("#cccccc")
+        chart.minimumHeight =
+            UIUtils.getPixelFromDp(requireContext(), Math.max(200, (subjects.size + 2) * 50).toFloat())
+                .toInt()
+        data.barWidth = 0.4f
+        val leftAxis = chart.axisLeft
+        leftAxis.setDrawAxisLine(false)
+        leftAxis.setDrawLabels(false)
+        leftAxis.setDrawGridLines(false)
+        leftAxis.setAxisMinValue(0f)
+        leftAxis.setAxisMaxValue(100f)
+        leftAxis.spaceTop = 15f
+        val rightAxis = chart.axisRight
+        rightAxis.setAxisMinValue(0f)
+        rightAxis.setAxisMaxValue(100f)
+
+        data.setValueTextSize(12f)
+        data.setValueFormatter(PercentFormatter())
+        xAxis.setDrawAxisLine(true)
+        rightAxis.setLabelCount(5, false)
+        rightAxis.textSize = 10f
+        rightAxis.setDrawLabels(true)
+        rightAxis.setDrawAxisLine(true)
+        rightAxis.setDrawGridLines(true)
+        rightAxis.typeface = TestpressSdk.getRubikRegularFont(context!!)
+        rightAxis.textColor =
+            ContextCompat.getColor(activity!!, R.color.testpress_text_gray)
+        rightAxis.gridColor = Color.parseColor("#cccccc")
+        chart.setDrawValueAboveBar(true)
+        chart.setExtraOffsets(0f, 0f, 50f, 0f)
+
+        data.setValueTypeface(TestpressSdk.getRubikMediumFont(context!!))
+        chart.data = data
+        chart.setDescription("")
+        chart.setFitBars(true)
+        chart.setTouchEnabled(false)
+        chart.legend.isEnabled = false
+        chart.animateY(500)
+        chart.invalidate()
+    }
+
     inner class OptionsSelectionListener {
         @JavascriptInterface
         fun onCheckedChange(id: String, checked: Boolean, radioOption: Boolean) {
@@ -248,119 +380,9 @@ class QuizQuestionFragment : Fragment() {
 
         @JavascriptInterface
         fun onAudienceOptions() {
-
-            	//https://lmsdemo.testpress.in/api/v2.2/attempts/53642/questions/491487/helplines/?option=audience
-
-            val apiClient = TestpressExamApiClient(requireContext())
-            apiClient.getAudiencePoll("api/v2.2/attempts/${attemptId}/questions/${userSelectedAnswer.id}/helplines/", mapOf("option" to "audience"))
-                .enqueue(object : TestpressCallback<AudiencePoll>() {
-                    override fun onSuccess(result: AudiencePoll?) {
-                        result?.let {
-                            Toast.makeText(requireContext(),"onSuccess",Toast.LENGTH_SHORT).show()
-                            view?.findViewById<HorizontalBarChart>(R.id.chart)?.visibility = View.VISIBLE
-                        }
-                    }
-
-                    override fun onException(exception: TestpressException) {
-                        Toast.makeText(requireContext(),"onException",Toast.LENGTH_SHORT).show()
-                    }
-                })
-
-
-            val builder =
-                android.app.AlertDialog.Builder(requireContext(), R.style.TestpressAppCompatAlertDialogStyle)
-            val view: View = layoutInflater.inflate(R.layout.dialog_layout, null)
-            val chart = view.findViewById<HorizontalBarChart>(R.id.chart)
-
-
-            val entries: MutableList<BarEntry> = ArrayList()
-            entries.add(BarEntry(1f, 42.40f))
-            entries.add(BarEntry(2f, 32.64f))
-            entries.add(BarEntry(3f, 6.94f))
-            entries.add(BarEntry(4f, 10.39f))
-            entries.add(BarEntry(5f, 7.62f))
-
-            val set = BarDataSet(entries, "BarDataSet")
-
-            val sets = ArrayList<IBarDataSet>()
-            sets.add(set)
-
-            populateChart(chart,sets)
-
-
-            builder.setView(view)
-                .setNegativeButton(
-                    "Close"
-                ) { dialogInterface, i -> dialogInterface.dismiss() }
-            val dialog = builder.create()
-            dialog.show()
+            getAudiencepollData()
         }
 
-        private fun populateChart(
-            chart: HorizontalBarChart,
-            sets: ArrayList<IBarDataSet>?
-        ) {
-            val subjects = listOf<String>("A","B","C","D","E")
-            val data = BarData(sets)
-            data.setValueTypeface(Typeface.DEFAULT_BOLD)
-            val xAxis = chart.xAxis
-            xAxis.position = XAxis.XAxisPosition.BOTTOM
-            xAxis.setLabelCount(subjects.size + 2, true)
-            xAxis.setDrawGridLines(false)
-            val labels = ArrayList<String>()
-            labels.add("")
-            for (subject in subjects) {
-                labels.add(subject)
-            }
-            labels.add("")
-            xAxis.textSize = 13f
-            xAxis.typeface = TestpressSdk.getRubikMediumFont(context!!)
-            xAxis.setAvoidFirstLastClipping(true)
-            xAxis.xOffset = 10f
-            xAxis.textColor = ContextCompat.getColor(activity!!, R.color.testpress_black)
-            xAxis.valueFormatter = GraphAxisLabelFormatter(labels, 1)
-            xAxis.setAxisMinValue(0f)
-            xAxis.setAxisMaxValue((subjects.size + 1).toFloat())
-            xAxis.axisLineColor = Color.parseColor("#cccccc")
-            chart.minimumHeight =
-                UIUtils.getPixelFromDp(context, Math.max(200, (subjects.size + 2) * 50).toFloat())
-                    .toInt()
-            data.barWidth = 0.4f
-            val leftAxis = chart.axisLeft
-            leftAxis.setDrawAxisLine(false)
-            leftAxis.setDrawLabels(false)
-            leftAxis.setDrawGridLines(false)
-            leftAxis.setAxisMinValue(0f)
-            leftAxis.setAxisMaxValue(100f)
-            leftAxis.spaceTop = 15f
-            val rightAxis = chart.axisRight
-            rightAxis.setAxisMinValue(0f)
-            rightAxis.setAxisMaxValue(100f)
-
-                data.setValueTextSize(12f)
-                data.setValueFormatter(PercentFormatter())
-                xAxis.setDrawAxisLine(true)
-                rightAxis.setLabelCount(5, false)
-                rightAxis.textSize = 10f
-                rightAxis.setDrawLabels(true)
-                rightAxis.setDrawAxisLine(true)
-                rightAxis.setDrawGridLines(true)
-                rightAxis.typeface = TestpressSdk.getRubikRegularFont(context!!)
-                rightAxis.textColor =
-                    ContextCompat.getColor(activity!!, R.color.testpress_text_gray)
-                rightAxis.gridColor = Color.parseColor("#cccccc")
-                chart.setDrawValueAboveBar(true)
-                chart.setExtraOffsets(0f, 0f, 50f, 0f)
-
-            data.setValueTypeface(TestpressSdk.getRubikMediumFont(context!!))
-            chart.data = data
-            chart.setDescription("")
-            chart.setFitBars(true)
-            chart.setTouchEnabled(false)
-            chart.legend.isEnabled = false
-            chart.animateY(500)
-            chart.invalidate()
-        }
     }
 }
 

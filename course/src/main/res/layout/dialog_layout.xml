@@ -4,25 +4,9 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/loading_layout"
-        android:layout_gravity="center">
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:indeterminate="true"
-            android:layout_gravity="center"
-            android:layout_marginRight="10dp"
-            android:layout_marginEnd="10dp" />
-    </LinearLayout>
-
     <com.github.testpress.mikephil.charting.charts.HorizontalBarChart
         android:id="@+id/chart"
-        android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>

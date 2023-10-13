@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import in.testpress.exam.models.AttemptItem;
-import in.testpress.exam.models.AudiencePoll;
+import in.testpress.exam.models.AudiencePollResponse;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.Comment;
 import in.testpress.exam.models.Permission;
@@ -157,10 +157,9 @@ public interface ExamService {
             @Path(value = "question_id",encoded = true) String questionId,
             @Body HashMap<String, Object> params);
 
-    @PUT("/{audience_poll_url}")
-    RetrofitCall<AudiencePoll> getAudiencePoll(
-            @Path(value = "audience_poll_url", encoded = true) String audiencePollUrl,
-            @QueryMap Map<String, String> options);
+    @GET("/{audience_poll_url}")
+    RetrofitCall<AudiencePollResponse> getAudiencePoll(
+            @Path(value = "audience_poll_url", encoded = true) String audiencePollUrl);
 
 }
 

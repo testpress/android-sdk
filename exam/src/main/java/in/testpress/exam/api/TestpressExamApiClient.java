@@ -9,7 +9,7 @@ import java.util.Map;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.models.AttemptItem;
-import in.testpress.exam.models.AudiencePoll;
+import in.testpress.exam.models.AudiencePollResponse;
 import in.testpress.exam.models.Category;
 import in.testpress.exam.models.Comment;
 import in.testpress.exam.models.Permission;
@@ -294,7 +294,7 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getExamService().reportQuestion(questionId,params);
     }
 
-    public RetrofitCall<AudiencePoll> getAudiencePoll(String audiencePollUrl, Map<String, String> queryParams) {
-        return getExamService().getAudiencePoll(audiencePollUrl, queryParams);
+    public RetrofitCall<AudiencePollResponse> getAudiencePoll(String audiencePollUrl) {
+        return getExamService().getAudiencePoll(audiencePollUrl);
     }
 }
