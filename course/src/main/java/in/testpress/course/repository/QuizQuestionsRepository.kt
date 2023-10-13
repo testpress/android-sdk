@@ -77,11 +77,11 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     }
 
     private fun getQuestionsFromDB(examId: Long, attemptId: Long): List<ExamQuestion>? {
-        //return //if (examId == -1L) {
-        return examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.AttemptId.eq(attemptId)).list()
-//        } else {
-//            examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.ExamId.eq(examId)).list()
-//        }
+        return if (examId == -1L) {
+            examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.AttemptId.eq(attemptId)).list()
+        } else {
+            examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.ExamId.eq(examId)).list()
+        }
     }
 
     private fun saveQuestionsToDB(response: NetworkExamQuestionResult?, examId: Long, attemptId: Long) {

@@ -52,6 +52,9 @@ class QuizQuestionFragment : Fragment() {
     private var attemptId: Long = -1
     private var position: Int = 0
     private var selectedOptions: ArrayList<Int> = arrayListOf()
+    private lateinit var audiencePollProgressDialog : ProgressDialog
+    private var audiencePollResponse: AudiencePollResponse? = null
+    private lateinit var chart: HorizontalBarChart
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -161,8 +164,8 @@ class QuizQuestionFragment : Fragment() {
         return """
         <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-around;">
             ${get5050Options(answers)}
-            ${getSkipOptions()}
             ${getAudienceOption()}
+            ${getSkipOptions()}
         </div>
     """
     }
@@ -213,24 +216,15 @@ class QuizQuestionFragment : Fragment() {
             <img src="https://static.testpress.in/static/img/bar-chart.svg" alt="Image 1" style="width: 75px !important; height: 75px !important;">
             <button class='helpline-button' onclick='audienceOptions()'>AUDIENCE</button>
             <script>
-                ${getAudienceOptionScript()}
+                function audienceOptions() {
+                    OptionsSelectionListener.onAudienceOptions()
+                }
             </script>
         </div>
     """
     }
 
-    private fun getAudienceOptionScript(): String{
-        return """
-        function audienceOptions() {
-                OptionsSelectionListener.onAudienceOptions()
-        }
-    """.trimMargin()
-    }
-
-    lateinit var audiencePollProgressDialog : ProgressDialog
-    private var audiencePollResponse: AudiencePollResponse? = null
-
-    private fun getAudiencepollData() {
+    private fun getAudiencePollData() {
         if (audiencePollResponse != null) {
             showAudiencePollDialog(audiencePollResponse!!)
             return
@@ -250,20 +244,18 @@ class QuizQuestionFragment : Fragment() {
             .enqueue(object : TestpressCallback<AudiencePollResponse>() {
                 override fun onSuccess(result: AudiencePollResponse?) {
                     result?.let {
-                        Toast.makeText(requireContext(),"onSuccess ${it.coins_changed}",Toast.LENGTH_SHORT).show()
                         audiencePollResponse = result
-                        showAudiencePollDialog(result)
+                        showAudiencePollDialog(audiencePollResponse!!)
                     }
                 }
 
                 override fun onException(exception: TestpressException) {
-                    Toast.makeText(requireContext(),"onException",Toast.LENGTH_SHORT).show()
+                    audiencePollProgressDialog.dismiss()
+                    Toast.makeText(requireContext(),"Audience poll not available for this question",Toast.LENGTH_SHORT).show()
                 }
             })
 
     }
-
-    private lateinit var chart: HorizontalBarChart
 
     private fun showAudiencePollDialog(audiencePollResponse: AudiencePollResponse) {
         audiencePollProgressDialog.dismiss()
@@ -381,7 +373,7 @@ class QuizQuestionFragment : Fragment() {
 
         @JavascriptInterface
         fun onAudienceOptions() {
-            getAudiencepollData()
+            getAudiencePollData()
         }
 
     }
