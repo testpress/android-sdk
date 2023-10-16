@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 64;
+    private static final int VERSION = 65;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -458,6 +458,7 @@ public class TestpressSDKDaoGenerator {
         video.addStringProperty("thumbnail");
         video.addStringProperty("thumbnailMedium");
         video.addStringProperty("thumbnailSmall");
+        video.addBooleanProperty("isViewsExhausted");
         video.implementsInterface("android.os.Parcelable");
         return video;
     }
@@ -593,6 +594,7 @@ public class TestpressSDKDaoGenerator {
                 "in.testpress.util.StringListConverter"
         );
         course.addBooleanProperty("allowCustomTestGeneration");
+        course.addIntProperty("maxAllowedViewsPerVideo");
         return course;
     }
 

@@ -18,6 +18,7 @@ data class DomainVideoContent(
     val thumbnail: String? = "",
     val thumbnailMedium: String? = "",
     val stream: DomainVideoStream? = null,
+    val isViewsExhausted: Boolean? = null,
     val streams: List<DomainVideoStream>? = arrayListOf<DomainVideoStream>()
 ) {
     fun getPlaybackURL(): String? {
@@ -63,6 +64,7 @@ fun createDomainVideoContent(video: Video): DomainVideoContent {
         thumbnail = video.thumbnail,
         thumbnailMedium = video.thumbnailMedium,
         thumbnailSmall = video.thumbnailSmall,
+        isViewsExhausted = video.isViewsExhausted,
         stream = video.stream?.asDomainStream()
     )
 }

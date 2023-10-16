@@ -29,6 +29,7 @@ public class Video implements android.os.Parcelable {
     private String thumbnail;
     private String thumbnailMedium;
     private String thumbnailSmall;
+    private Boolean isViewsExhausted;
     private Long streamId;
 
     /** Used to resolve relations */
@@ -62,7 +63,7 @@ public class Video implements android.os.Parcelable {
     }
 
     @Generated
-    public Video(String title, String url, Long id, String embedCode, String duration, Boolean isDomainRestricted, String thumbnail, String thumbnailMedium, String thumbnailSmall, Long streamId) {
+    public Video(String title, String url, Long id, String embedCode, String duration, Boolean isDomainRestricted, String thumbnail, String thumbnailMedium, String thumbnailSmall, Boolean isViewsExhausted, Long streamId) {
         this.title = title;
         this.url = url;
         this.id = id;
@@ -72,6 +73,7 @@ public class Video implements android.os.Parcelable {
         this.thumbnail = thumbnail;
         this.thumbnailMedium = thumbnailMedium;
         this.thumbnailSmall = thumbnailSmall;
+        this.isViewsExhausted = isViewsExhausted;
         this.streamId = streamId;
     }
 
@@ -152,6 +154,14 @@ public class Video implements android.os.Parcelable {
 
     public void setThumbnailSmall(String thumbnailSmall) {
         this.thumbnailSmall = thumbnailSmall;
+    }
+
+    public Boolean getIsViewsExhausted() {
+        return isViewsExhausted;
+    }
+
+    public void setIsViewsExhausted(Boolean isViewsExhausted) {
+        this.isViewsExhausted = isViewsExhausted;
     }
 
     public Long getStreamId() {
@@ -258,6 +268,8 @@ public class Video implements android.os.Parcelable {
         thumbnail = in.readString();
         thumbnailMedium = in.readString();
         thumbnailSmall = in.readString();
+        byte tmpIsViewsExhausted = in.readByte();
+        isViewsExhausted = tmpIsViewsExhausted == 0 ? null : tmpIsViewsExhausted == 1;
         streamId = in.readByte() == 0 ? null : in.readLong();
     }
 
@@ -294,6 +306,7 @@ public class Video implements android.os.Parcelable {
         dest.writeString(thumbnail);
         dest.writeString(thumbnailMedium);
         dest.writeString(thumbnailSmall);
+        dest.writeByte((byte) (isViewsExhausted == null ? 0 : isViewsExhausted ? 1 : 2));
         if (streamId == null) {
             dest.writeByte((byte) 0);
         } else {
