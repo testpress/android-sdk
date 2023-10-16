@@ -83,11 +83,25 @@ class EmptyViewFragment : Fragment() {
             }
         }
 
-        if (errorResponse?.has("detail") == true) {
+        if (isScheduledContent(errorResponse)) {
+            showScheduledContentMessage(errorResponse?.getString("message")!!)
+        } else if (errorResponse?.has("detail") == true) {
             showCustomPermissionDeniedMessage(errorResponse.getString("detail"))
         } else {
             showPermissionDeniedMessage()
         }
+    }
+
+    private fun isScheduledContent(errorResponse: JSONObject?) =
+        errorResponse?.has("error_code") == true && errorResponse.getString("error_code")
+            .equals("scheduled")
+
+    private fun showScheduledContentMessage(message: String){
+        setEmptyText(
+            R.string.content_scheduled,
+            message,
+            R.drawable.ic_error_outline_black_18dp
+        )
     }
 
     private fun showCustomPermissionDeniedMessage(message: String){
