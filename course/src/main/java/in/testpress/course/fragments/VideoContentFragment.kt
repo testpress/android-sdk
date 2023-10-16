@@ -194,6 +194,11 @@ class VideoContentFragment : BaseContentDetailFragment() {
     }
 
     override fun display() {
+        if (content.video?.isViewsExhausted == true) {
+            emptyViewFragment.showViewsExhaustedMessage()
+            setHasOptionsMenu(false)
+            return
+        }
         titleView.text = content.title
         videoWidgetFragment = VideoWidgetFragmentFactory.getWidget(content.video!!)
         videoWidgetFragment.arguments = arguments

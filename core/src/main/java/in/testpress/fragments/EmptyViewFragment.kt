@@ -14,6 +14,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.isVisible
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -136,6 +137,15 @@ class EmptyViewFragment : Fragment() {
         setEmptyText(R.string.testpress_error_loading_contents,
                 R.string.testpress_some_thing_went_wrong_try_again,
                 R.drawable.ic_error_outline_black_18dp)
+    }
+
+    fun showViewsExhaustedMessage(){
+        setEmptyText(
+            R.string.video_id_locked,
+            R.string.testpress_views_exhausted,
+            R.drawable.ic_error_outline_black_18dp
+        )
+        retryButton.isVisible = false
     }
 
     fun setEmptyText(title: Int, description : Int, leftDrawable: Int?) {
