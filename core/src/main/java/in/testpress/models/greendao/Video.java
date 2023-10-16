@@ -252,6 +252,13 @@ public class Video implements android.os.Parcelable {
         url = in.readString();
         id = in.readByte() == 0x00 ? null : in.readLong();
         embedCode = in.readString();
+        duration = in.readString();
+        byte tmpIsDomainRestricted = in.readByte();
+        isDomainRestricted = tmpIsDomainRestricted == 0 ? null : tmpIsDomainRestricted == 1;
+        thumbnail = in.readString();
+        thumbnailMedium = in.readString();
+        thumbnailSmall = in.readString();
+        streamId = in.readByte() == 0 ? null : in.readLong();
     }
 
     public String getHlsUrl() {
@@ -282,6 +289,17 @@ public class Video implements android.os.Parcelable {
             dest.writeLong(id);
         }
         dest.writeString(embedCode);
+        dest.writeString(duration);
+        dest.writeByte((byte) (isDomainRestricted == null ? 0 : isDomainRestricted ? 1 : 2));
+        dest.writeString(thumbnail);
+        dest.writeString(thumbnailMedium);
+        dest.writeString(thumbnailSmall);
+        if (streamId == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(streamId);
+        }
     }
 
     @SuppressWarnings("unused")
