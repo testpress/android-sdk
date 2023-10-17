@@ -1,5 +1,6 @@
 package `in`.testpress.course.fragments
 
+import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse.PRODUCT_SLUG
 import `in`.testpress.course.domain.DomainContent
@@ -9,6 +10,9 @@ import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.viewmodels.ContentViewModel
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
+import `in`.testpress.models.greendao.CourseAttempt
+import `in`.testpress.models.greendao.CourseAttemptDao
+import `in`.testpress.models.greendao.CourseDao
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -92,12 +96,20 @@ class ContentLoadingFragment : Fragment(),
         if(content.isLocked == true) return false
         return when(content.contentType) {
             "Exam" -> (content.exam != null) && (content.attemptsUrl != null)
-            "Video" -> content.video != null
+            "Video" -> content.video != null && !hasCourseVideoViewsLimit(content)
             "Attachment" -> content.attachment != null
             "Html", "Notes" -> content.htmlContent != null
             "Quiz" -> content.exam != null
             else -> true
         }
+    }
+
+    private fun hasCourseVideoViewsLimit(content: DomainContent): Boolean {
+        val courseDao = TestpressSDKDatabase.getCourseDao(requireContext())
+        val course =
+            courseDao.queryBuilder().where(CourseDao.Properties.Id.eq(content.courseId)).list()
+        val maxAllowedViewsPerVideo: Int? = course[0].maxAllowedViewsPerVideo
+        return maxAllowedViewsPerVideo != null && maxAllowedViewsPerVideo > 0
     }
 
     private fun refetchContent(id: Long) {
