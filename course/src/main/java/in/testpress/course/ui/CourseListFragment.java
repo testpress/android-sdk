@@ -10,6 +10,8 @@ import com.google.android.material.tabs.TabLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,34 +61,44 @@ public class CourseListFragment extends BaseFragment {
         if (session.getInstituteSettings().getStoreLabel() != null && !session.getInstituteSettings().getStoreLabel().isEmpty()) {
             storeLabel = session.getInstituteSettings().getStoreLabel();
         }
-        String[] credentials = CommonUtils.getUserCredentials(requireContext());
-        webViewFragment = new WebViewFragment(
-                "https://www.epratibha.net/mobile-login/?email=" + credentials[0] + "&pass=" + credentials[1],
-                "",
-                new WebViewFragment.Settings(
-                        true,
-                        false,
-                        true,
-                        false,
-                        true
-                )
-        );
-        adapter.addFragment(webViewFragment, storeLabel);
+        addStoreFragment(storeLabel);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
             @Override
             public void onPageSelected(int position) {
-                if (position == 1){
-                    isWebViewVisibleToUser = true;
-                } else {
-                    isWebViewVisibleToUser = false;
-                }
+                isWebViewVisibleToUser = (position == 1);
+                Log.d("TAG", "onPageSelected: "+isWebViewVisibleToUser);
             }
             @Override
             public void onPageScrollStateChanged(int state) {}
         });
+    }
+
+    private void addStoreFragment(String storeLabel) {
+        // Here we are adding Custom store WebView for EPratibhaApp
+        if (isEPratibhaApp()) {
+            String[] credentials = CommonUtils.getUserCredentials(requireContext());
+            webViewFragment = new WebViewFragment(
+                    "https://www.epratibha.net/mobile-login/?email=" + credentials[0] + "&pass=" + credentials[1],
+                    "",
+                    new WebViewFragment.Settings(
+                            true,
+                            false,
+                            true,
+                            false,
+                            true
+                    )
+            );
+            adapter.addFragment(webViewFragment, storeLabel);
+        } else {
+            adapter.addFragment(new AvailableCourseListFragment(), storeLabel);
+        }
+    }
+
+    private boolean isEPratibhaApp() {
+        return requireContext().getPackageName().equals("net.epratibha.www");
     }
 
     public Boolean onBackPress(){
