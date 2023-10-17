@@ -20,12 +20,16 @@ import java.util.List;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.course.R;
+import in.testpress.fragments.WebViewFragment;
 import in.testpress.store.TestpressStore;
 import in.testpress.ui.BaseFragment;
+import in.testpress.util.CommonUtils;
 
 public class CourseListFragment extends BaseFragment {
     private TabLayout tabs;
     private Adapter adapter;
+    private WebViewFragment webViewFragment;
+    private boolean isWebViewVisibleToUser = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,8 +59,52 @@ public class CourseListFragment extends BaseFragment {
         if (session.getInstituteSettings().getStoreLabel() != null && !session.getInstituteSettings().getStoreLabel().isEmpty()) {
             storeLabel = session.getInstituteSettings().getStoreLabel();
         }
-        adapter.addFragment(new AvailableCourseListFragment(), storeLabel);
+        addStoreFragment(storeLabel);
         viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+            @Override
+            public void onPageSelected(int position) {
+                isWebViewVisibleToUser = (position == 1);
+            }
+            @Override
+            public void onPageScrollStateChanged(int state) {}
+        });
+    }
+
+    private void addStoreFragment(String storeLabel) {
+        // Here we are adding Custom store WebView for EPratibha App
+        if (isEPratibhaApp()) {
+            String[] credentials = CommonUtils.getUserCredentials(requireContext());
+            webViewFragment = new WebViewFragment(
+                    "https://www.epratibha.net/mobile-login/?email=" + credentials[0] + "&pass=" + credentials[1],
+                    "",
+                    new WebViewFragment.Settings(
+                            true,
+                            false,
+                            true,
+                            false,
+                            true
+                    )
+            );
+            adapter.addFragment(webViewFragment, storeLabel);
+        } else {
+            adapter.addFragment(new AvailableCourseListFragment(), storeLabel);
+        }
+    }
+
+    private boolean isEPratibhaApp() {
+        return requireContext().getPackageName().equals("net.epratibha.www");
+    }
+
+    public Boolean onBackPress(){
+        if (webViewFragment != null && isWebViewVisibleToUser && webViewFragment.canGoBack()){
+            webViewFragment.goBack();
+            return false;
+        } else {
+            return true;
+        }
     }
 
     static class Adapter extends FragmentPagerAdapter {
