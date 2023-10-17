@@ -11,7 +11,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,7 +68,6 @@ public class CourseListFragment extends BaseFragment {
             @Override
             public void onPageSelected(int position) {
                 isWebViewVisibleToUser = (position == 1);
-                Log.d("TAG", "onPageSelected: "+isWebViewVisibleToUser);
             }
             @Override
             public void onPageScrollStateChanged(int state) {}
@@ -77,7 +75,7 @@ public class CourseListFragment extends BaseFragment {
     }
 
     private void addStoreFragment(String storeLabel) {
-        // Here we are adding Custom store WebView for EPratibhaApp
+        // Here we are adding Custom store WebView for EPratibha App
         if (isEPratibhaApp()) {
             String[] credentials = CommonUtils.getUserCredentials(requireContext());
             webViewFragment = new WebViewFragment(
