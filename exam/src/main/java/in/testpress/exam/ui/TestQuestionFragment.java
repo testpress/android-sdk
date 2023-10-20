@@ -30,6 +30,7 @@ import com.hbisoft.pickit.PickiTCallbacks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import in.testpress.core.TestpressCallback;
@@ -45,6 +46,7 @@ import in.testpress.models.FileDetails;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Language;
+import in.testpress.util.PermissionHandler;
 import in.testpress.util.ProgressDialog;
 import in.testpress.util.WebViewUtils;
 import pub.devrel.easypermissions.AppSettingsDialog;
@@ -339,19 +341,18 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
         @JavascriptInterface
         public void onFileUploadClick() {
             Log.d("TAG", "onFileUploadClick: ");
-            if (hasStoragePermission()) {
+            if (PermissionHandler.Companion.hasPermissions(
+                    requireActivity(),
+                    Arrays.asList(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
+            )) {
                 pickFile();
             } else {
-                EasyPermissions.requestPermissions(
-                        new PermissionRequest.Builder(requireActivity(), 200, FILE_PERMISSIONS)
-                                .setRationale("This app needs access to your storage to upload files.")
-                                .setPositiveButtonText("Ok")
-                                .setNegativeButtonText("Cancel")
-                                .setTheme(R.style.TestpressAppCompatAlertDialogStyle)
-                                .build()
-                        );
+                PermissionHandler.Companion.requestPermissionWithRationale(
+                        requireActivity(),
+                        Arrays.asList(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE),
+                        "This app needs access to your storage to upload files."
+                );
             }
-
         }
 
         @JavascriptInterface
@@ -368,10 +369,6 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
         public void onEssayValueChange(String value) {
             attemptItem.setLocalEssayText(value.trim());
         }
-    }
-
-    private boolean hasStoragePermission() {
-        return EasyPermissions.hasPermissions(requireContext(), FILE_PERMISSIONS);
     }
 
     void pickFile() {
