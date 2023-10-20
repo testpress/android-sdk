@@ -1,5 +1,7 @@
 package in.testpress.exam.ui;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.app.Activity.RESULT_OK;
 
 import android.annotation.SuppressLint;
@@ -30,6 +32,7 @@ import android.widget.TextView;
 
 import junit.framework.Assert;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import in.testpress.core.TestpressCallback;
@@ -50,6 +53,7 @@ import in.testpress.ui.WebViewActivity;
 import in.testpress.util.DateUtils;
 import in.testpress.util.FileDownloader;
 import in.testpress.util.FileType;
+import in.testpress.util.PermissionHandler;
 import in.testpress.util.PermissionsUtils;
 import in.testpress.util.StringUtils;
 import in.testpress.util.UIUtils;
@@ -119,7 +123,6 @@ public class ReviewStatsFragment extends BaseFragment {
     private ProgressDialog pdfGenerationProgressDialog;
     private LinearLayout rankPublishLayout;
     private TextView rankPublishDate;
-    private PermissionsUtils permissionsUtils;
 
     public static void showReviewStatsFragment(FragmentActivity activity, Exam exam, Attempt attempt,
                                                boolean showRetakeButton) {
@@ -234,7 +237,6 @@ public class ReviewStatsFragment extends BaseFragment {
                         accuracyLabel, examTitle, attemptDate, emptyDescView, maxRank
                 },
                 TestpressSdk.getRubikRegularFont(getContext()));
-        permissionsUtils = new PermissionsUtils(requireActivity(),view);
     }
 
     private void addClickListeners() {
@@ -669,10 +671,17 @@ public class ReviewStatsFragment extends BaseFragment {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                if (permissionsUtils.isStoragePermissionGranted()){
+                if (PermissionHandler.Companion.hasPermissions(
+                        requireActivity(),
+                        Arrays.asList(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
+                )) {
                     downloadPDFFile(filename);
                 } else {
-                    permissionsUtils.requestStoragePermissionWithSnackbar();
+                    PermissionHandler.Companion.requestPermissionWithRationale(
+                            requireActivity(),
+                            Arrays.asList(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE),
+                            "This app needs access to your storage to download files."
+                    );
                 }
             }
         };
