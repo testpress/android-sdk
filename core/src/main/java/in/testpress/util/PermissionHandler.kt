@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.google.android.material.snackbar.Snackbar
 
@@ -122,7 +121,7 @@ class PermissionHandler {
             }
 
             if (shouldShowRationale(activity, requiredPermissions)) {
-                showRationaleSnackbar(activity, rationaleMessage)
+                showInsufficientPermissionMessage(activity, rationaleMessage)
             } else {
                 requestPermission(activity, requiredPermissions)
             }
@@ -131,7 +130,7 @@ class PermissionHandler {
         private fun shouldShowRationale(activity: Activity, permissions: List<String>): Boolean =
             permissions.any { ActivityCompat.shouldShowRequestPermissionRationale(activity, it) }
 
-        private fun showRationaleSnackbar(activity: Activity, message: String) {
+        private fun showInsufficientPermissionMessage(activity: Activity, message: String) {
             Snackbar.make(
                 activity.findViewById(android.R.id.content),
                 message,
