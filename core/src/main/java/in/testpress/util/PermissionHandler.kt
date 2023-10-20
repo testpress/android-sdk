@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.google.android.material.snackbar.Snackbar
 
@@ -97,6 +98,66 @@ class PermissionHandler {
         val uri = Uri.fromParts("package", activity.packageName, null)
         intent.data = uri
         activity.startActivity(intent)
+    }
+
+    companion object {
+
+        private const val PERMISSION_REQUEST_CODE = 10000
+
+        fun hasPermissions(activity: Activity, permissions: List<String>): Boolean =
+            permissions.all {
+                ActivityCompat.checkSelfPermission(
+                    activity,
+                    it
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+
+        fun requestPermissionWithRationale(
+            activity: Activity,
+            permissions: List<String>,
+            rationaleMessage: String
+        ) {
+            val requiredPermissions = permissions.filter {
+                ActivityCompat.checkSelfPermission(activity, it) == PackageManager.PERMISSION_DENIED
+            }
+
+            if (shouldShowRationale(activity, requiredPermissions)) {
+                showRationaleSnackbar(activity, rationaleMessage)
+            } else {
+                requestPermission(activity, requiredPermissions)
+            }
+        }
+
+        private fun shouldShowRationale(activity: Activity, permissions: List<String>): Boolean =
+            permissions.any { ActivityCompat.shouldShowRequestPermissionRationale(activity, it) }
+
+        private fun showRationaleSnackbar(activity: Activity, message: String) {
+            Snackbar.make(
+                activity.findViewById(android.R.id.content),
+                message,
+                Snackbar.LENGTH_LONG
+            )
+                .setAction("Allow") {
+                    openAppSettings(activity)
+                }.show()
+        }
+
+        private fun requestPermission(activity: Activity, permissions: List<String>) {
+            ActivityCompat.requestPermissions(
+                activity,
+                permissions.toTypedArray(),
+                PERMISSION_REQUEST_CODE
+            )
+        }
+
+        private fun openAppSettings(activity: Activity) {
+            val intent = Intent()
+            intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            val uri = Uri.fromParts("package", activity.packageName, null)
+            intent.data = uri
+            activity.startActivity(intent)
+        }
+
     }
 
 }
