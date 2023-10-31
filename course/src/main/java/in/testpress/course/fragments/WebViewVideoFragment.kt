@@ -4,6 +4,7 @@ import `in`.testpress.WebViewConstants
 import `in`.testpress.course.R
 import `in`.testpress.course.api.TestpressCourseApiClient
 import `in`.testpress.course.domain.DomainContent
+import `in`.testpress.course.domain.DomainVideoContent
 import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.util.FullScreenChromeClient
@@ -22,6 +23,7 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
     protected lateinit var webView: WebView
     protected lateinit var webViewUtils: WebViewUtils
     protected lateinit var fullScreenChromeClient: FullScreenChromeClient
+    protected var video: DomainVideoContent? = null
     private var contentId: Long = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +46,7 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
         viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer {
             when (it?.status) {
                 Status.SUCCESS -> {
+                    video = it.data?.video
                     loadVideo(it.data!!)
                 }
             }
@@ -54,10 +57,11 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
         webView = view.findViewById(R.id.web_view)
         webViewUtils = HtmlViewUtils(webView)
         webView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
+        webView.setOnLongClickListener { true }
+        webView.isLongClickable = false
     }
 
     open fun loadVideo(content: DomainContent) {
-        val video = content.video
         val html = "<div style='margin-top: 15px padding-left: 20px padding-right: 20px'" +
             "class='videoWrapper'>" + video?.embedCode + "</div>"
 
@@ -90,11 +94,18 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
         }
 
         override fun shouldOverrideUrlLoading(activity: Activity?, url: String?): Boolean {
+            // Prevent users from navigating to other apps when the video is embedded from YouTube
+            if (isYoutubeEmbedCode(video?.embedCode)) return true
+
             if (url?.contains(TestpressCourseApiClient.EMBED_DOMAIN_RESTRICTED_VIDEO_PATH) == true) {
                 return false
             }
 
             return super.shouldOverrideUrlLoading(activity, url)
+        }
+
+        private fun isYoutubeEmbedCode(embedCode: String?): Boolean {
+            return embedCode?.contains("www.youtube.com/embed")?:false
         }
     }
 }
