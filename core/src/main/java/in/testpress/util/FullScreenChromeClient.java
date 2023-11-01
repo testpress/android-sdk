@@ -22,6 +22,7 @@ public class FullScreenChromeClient extends WebChromeClient {
     private int mOriginalSystemUiVisibility;
     private Activity activity;
     private ValueCallback<Uri[]> filePathCallback;
+    public boolean disableLongPress = false;
 
     public FullScreenChromeClient(Activity activity) {
         this.activity = activity;
@@ -60,6 +61,20 @@ public class FullScreenChromeClient extends WebChromeClient {
 
         // https://stackoverflow.com/a/38799514/5134215
         activity.getWindow().getDecorView().setSystemUiVisibility(3846);
+
+        disableLongPressForYouTubeEmbeddedContent();
+    }
+
+    private void disableLongPressForYouTubeEmbeddedContent() {
+        if (disableLongPress) {
+            activity.getWindow().getCurrentFocus().setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    return true;
+                }
+            });
+            activity.getWindow().getCurrentFocus().setLongClickable(false);
+        }
     }
 
     @Override
