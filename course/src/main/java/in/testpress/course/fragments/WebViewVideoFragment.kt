@@ -12,6 +12,7 @@ import `in`.testpress.util.WebViewUtils
 import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -53,6 +54,25 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
                 }
             }
         })
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // Load the video in fullscreen
+            enableFullscreen();
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            // Restore the WebView to its original size
+            disableFullscreen();
+        }
+    }
+
+    private fun enableFullscreen() {
+        webView.loadUrl("javascript:document.getElementsByTagName('iframe')[0].webkitRequestFullscreen();")
+    }
+
+    private fun disableFullscreen() {
+        webView.loadUrl("javascript:document.webkitExitFullscreen();")
     }
 
     fun initWebView(view: View) {

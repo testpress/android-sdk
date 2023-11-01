@@ -51,6 +51,7 @@ public class FullScreenChromeClient extends WebChromeClient {
             return;
         }
         mCustomView = paramView;
+        mCustomView.requestFocus();
         mOriginalSystemUiVisibility =
                 activity.getWindow().getDecorView().getSystemUiVisibility();
 
@@ -66,7 +67,7 @@ public class FullScreenChromeClient extends WebChromeClient {
     }
 
     private void disableLongPressForYouTubeEmbeddedContent() {
-        if (disableLongPress) {
+        if (disableLongPress && activity.getWindow().getCurrentFocus() != null) {
             activity.getWindow().getCurrentFocus().setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
