@@ -5,7 +5,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/progress_bar_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/black"
