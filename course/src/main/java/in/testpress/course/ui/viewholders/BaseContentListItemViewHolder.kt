@@ -50,6 +50,8 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
     private fun updateThumbnail(content: DomainContent) {
         if (!content.coverImageMedium.isNullOrEmpty()) {
             imageLoader.displayImage(content.coverImageMedium, thumbnail, imageOptions)
+        } else {
+            thumbnail.setImageDrawable(null)
         }
     }
 
