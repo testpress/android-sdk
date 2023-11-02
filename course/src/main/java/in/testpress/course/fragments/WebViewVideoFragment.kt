@@ -17,6 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
+import android.widget.ProgressBar
 import androidx.lifecycle.Observer
 
 open class WebViewVideoFragment : BaseVideoWidgetFragment() {
@@ -91,6 +92,7 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
         override fun onLoadFinished() {
             super.onLoadFinished()
             webView.visibility = View.VISIBLE
+            view?.findViewById<ProgressBar>(R.id.progress_bar)?.visibility = View.GONE
             viewModel.createContentAttempt(contentId)
         }
 
