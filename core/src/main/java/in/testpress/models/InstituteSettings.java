@@ -44,6 +44,7 @@ public class InstituteSettings {
     private String whiteLabeledHostUrl;
     private String currentPaymentApp;
     private Boolean enableCustomTest;
+    private Boolean storeEnabled;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -384,5 +385,13 @@ public class InstituteSettings {
 
     public void setEnableCustomTest(Boolean enableCustomTest) {
         this.enableCustomTest = enableCustomTest;
+    }
+
+    public Boolean getStoreEnabled() {
+        return storeEnabled != null && storeEnabled;
+    }
+
+    public void setStoreEnabled(Boolean storeEnabled) {
+        this.storeEnabled = storeEnabled;
     }
 }

@@ -30,11 +30,13 @@ public class CourseListFragment extends BaseFragment {
     private Adapter adapter;
     private WebViewFragment webViewFragment;
     private boolean isWebViewVisibleToUser = false;
+    private TestpressSession session;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        session = TestpressSdk.getTestpressSession(getContext());
     }
 
     @Override
@@ -54,7 +56,6 @@ public class CourseListFragment extends BaseFragment {
         adapter = new Adapter(getChildFragmentManager());
         adapter.addFragment(new MyCoursesFragment(), getString(R.string.my_course_title));
 
-        TestpressSession session = TestpressSdk.getTestpressSession(getContext());
         String storeLabel = "Available Courses";
         if (session.getInstituteSettings().getStoreLabel() != null && !session.getInstituteSettings().getStoreLabel().isEmpty()) {
             storeLabel = session.getInstituteSettings().getStoreLabel();
@@ -74,6 +75,9 @@ public class CourseListFragment extends BaseFragment {
     }
 
     private void addStoreFragment(String storeLabel) {
+        if (isStoreDisabled()) {
+            return;
+        }
         // Here we are adding Custom store WebView for EPratibha App
         if (isEPratibhaApp()) {
             String[] credentials = CommonUtils.getUserCredentials(requireContext());
@@ -92,6 +96,10 @@ public class CourseListFragment extends BaseFragment {
         } else {
             adapter.addFragment(new AvailableCourseListFragment(), storeLabel);
         }
+    }
+
+    private boolean isStoreDisabled() {
+        return session.getInstituteSettings() != null && !session.getInstituteSettings().getStoreEnabled();
     }
 
     private boolean isEPratibhaApp() {
