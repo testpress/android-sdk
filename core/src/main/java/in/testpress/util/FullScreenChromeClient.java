@@ -11,7 +11,9 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import in.testpress.WebViewConstants;
 
 public class FullScreenChromeClient extends WebChromeClient {
@@ -34,6 +36,7 @@ public class FullScreenChromeClient extends WebChromeClient {
 
     public void onHideCustomView()
     {
+        showSystemBars();
         ((FrameLayout) activity.getWindow().getDecorView()).removeView(mCustomView);
         mCustomView = null;
         activity.getWindow().getDecorView().setSystemUiVisibility(mOriginalSystemUiVisibility);
@@ -51,6 +54,7 @@ public class FullScreenChromeClient extends WebChromeClient {
             return;
         }
         mCustomView = paramView;
+        mCustomView.requestFocus();
         mOriginalSystemUiVisibility =
                 activity.getWindow().getDecorView().getSystemUiVisibility();
 
@@ -61,12 +65,26 @@ public class FullScreenChromeClient extends WebChromeClient {
 
         // https://stackoverflow.com/a/38799514/5134215
         activity.getWindow().getDecorView().setSystemUiVisibility(3846);
-
+        hideSystemBars();
         disableLongPressForYouTubeEmbeddedContent();
     }
 
+    private void hideSystemBars() {
+        WindowCompat.setDecorFitsSystemWindows(activity.getWindow(), false);
+        WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(activity.getWindow(), mCustomView);
+        controller.hide(WindowInsetsCompat.Type.systemBars());
+        controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+    }
+
+    private void showSystemBars() {
+        WindowCompat.setDecorFitsSystemWindows(activity.getWindow(), true);
+        WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(activity.getWindow(), mCustomView);
+        controller.show(WindowInsetsCompat.Type.systemBars());
+        controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_TOUCH);
+    }
+
     private void disableLongPressForYouTubeEmbeddedContent() {
-        if (disableLongPress) {
+        if (disableLongPress && activity.getWindow().getCurrentFocus() != null) {
             activity.getWindow().getCurrentFocus().setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {

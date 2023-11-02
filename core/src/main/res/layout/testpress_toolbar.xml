@@ -5,7 +5,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="UnusedResources"
-    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:theme="@style/TestpressTheme">
