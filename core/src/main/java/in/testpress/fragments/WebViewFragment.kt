@@ -26,7 +26,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     private var _layout: WebviewFragmentBinding? = null
     private val layout: WebviewFragmentBinding get() = _layout!!
     lateinit var webView: WebView
-    lateinit var instituteSettings: InstituteSettings
+    var instituteSettings: InstituteSettings? = null
     private var listener : Listener? = null
     var imagePath: String? = null
     var filePathCallback: ValueCallback<Array<Uri>?>? = null
@@ -41,7 +41,6 @@ class WebViewFragment : Fragment(), EmptyViewListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        instituteSettings = TestpressSdk.getTestpressSession(requireContext())?.instituteSettings!!
         parseArguments()
     }
 
@@ -123,10 +122,16 @@ class WebViewFragment : Fragment(), EmptyViewListener {
 
     private fun loadContent(){
         if (isSSORequired){
+            populateInstituteSettings()
             fetchSsoLink()
             return
         }
         loadContentInWebView(url = url, data = data)
+    }
+
+    private fun populateInstituteSettings() {
+        instituteSettings = TestpressSdk.getTestpressSession(requireContext())?.instituteSettings
+        checkNotNull(instituteSettings) { "InstituteSettings must not be null" }
     }
 
     private fun fetchSsoLink() {
@@ -134,7 +139,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         TestpressApiClient(requireContext(), TestpressSdk.getTestpressSession(requireContext())).ssourl
             .enqueue(object : TestpressCallback<SSOUrl>() {
                 override fun onSuccess(result: SSOUrl?) {
-                    url = "${instituteSettings.baseUrl}${result?.ssoUrl}&next=$url"
+                    url = "${instituteSettings?.baseUrl}${result?.ssoUrl}&next=$url"
                     loadContentInWebView(url = url)
                 }
 
@@ -212,6 +217,8 @@ class WebViewFragment : Fragment(), EmptyViewListener {
             loadContent()
         }
     }
+
+    fun isInstituteUrl(url: String?) = url != null && instituteSettings?.isInstituteUrl(url) == true
 
     interface Listener {
         fun onWebViewInitializationSuccess()
