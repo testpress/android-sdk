@@ -23,8 +23,7 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
     }
 
     private fun shouldLoadInWebView(url: String?):Boolean {
-        val isInstituteUrl = fragment.instituteSettings.isInstituteUrl(url)
-        return if (isInstituteUrl){
+        return if (fragment.isInstituteUrl(url)){
             true
         } else {
             fragment.allowNonInstituteUrlInWebView
