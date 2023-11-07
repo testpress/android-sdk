@@ -15,6 +15,7 @@ import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.util.ViewUtils;
 
+import static in.testpress.course.fragments.CourseContentListFragment.COURSE_CONTENT_TYPE;
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
 
 public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
@@ -79,8 +80,9 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                     @Override
                     public void onInputComplete(String inputText) {
                         Bundle bundle = new Bundle();
+                        bundle.putInt(COURSE_CONTENT_TYPE,type);
                         bundle.putString("courseId",inputText);
-                        CourseContentListFragment fragment = new CourseContentListFragment(type);
+                        CourseContentListFragment fragment = new CourseContentListFragment();
                         fragment.setArguments(bundle);
                         NavigationDrawerActivity.this.getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container,fragment)

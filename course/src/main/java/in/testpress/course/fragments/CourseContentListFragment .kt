@@ -3,9 +3,11 @@ package `in`.testpress.course.fragments
 import `in`.testpress.course.R
 import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.adapter.BaseListFooterAdapter
+import `in`.testpress.course.adapter.CourseContentListAdapter
 import `in`.testpress.course.databinding.BaseContentListLayoutBinding
 import `in`.testpress.course.repository.CourseContentsRepository
 import `in`.testpress.course.viewmodels.CourseContentListViewModel
+import `in`.testpress.database.entities.CourseContentType
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,16 +18,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import `in`.testpress.course.adapter.CourseContentListAdapter
-import `in`.testpress.database.entities.ContentEntityLite
-import `in`.testpress.database.entities.CourseContentType
 import kotlinx.coroutines.flow.collect
 
-class CourseContentListFragment(val type: Int): Fragment() {
+class CourseContentListFragment: Fragment() {
 
+    private var type: Int = 0
     private var courseId: Long = -1
     private lateinit var binding: BaseContentListLayoutBinding
     private lateinit var adapter: CourseContentListAdapter
@@ -47,6 +46,7 @@ class CourseContentListFragment(val type: Int): Fragment() {
     }
 
     private fun parseArguments() {
+        type = arguments!!.getInt(COURSE_CONTENT_TYPE)
         courseId = arguments!!.getString(TestpressCourse.COURSE_ID)?.toLong()!!
     }
 
@@ -165,6 +165,10 @@ class CourseContentListFragment(val type: Int): Fragment() {
                 resources.getString(`in`.testpress.R.string.testpress_content_not_available_description)
             retryButton.isVisible = true
         }
+    }
+
+    companion object {
+        const val COURSE_CONTENT_TYPE = "CourseContentType"
     }
 
 }
