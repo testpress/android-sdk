@@ -39,6 +39,7 @@ import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
+import static in.testpress.course.fragments.CourseContentListFragment.COURSE_CONTENT_TYPE;
 import static in.testpress.course.ui.ContentActivity.FORCE_REFRESH;
 import static in.testpress.course.ui.ContentActivity.GO_TO_MENU;
 import static in.testpress.course.ui.ContentActivity.TESTPRESS_CONTENT_SHARED_PREFS;
@@ -277,17 +278,21 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                         getString(R.string.testpress_learn)
                 )
         );
+        Bundle runningContentBundle = getIntent().getExtras();
+        runningContentBundle.putInt(COURSE_CONTENT_TYPE,CourseContentType.RUNNING_CONTENT.ordinal());
         fragments.add(
                 createFragment(
-                        new CourseContentListFragment(CourseContentType.RUNNING_CONTENT.ordinal()),
-                        getIntent().getExtras(),
+                        new CourseContentListFragment(),
+                        runningContentBundle,
                         getString(R.string.testpress_running_contents)
                 )
         );
+        Bundle upcomingContentBundle = getIntent().getExtras();
+        upcomingContentBundle.putInt(COURSE_CONTENT_TYPE,CourseContentType.UPCOMING_CONTENT.ordinal());
         fragments.add(
                 createFragment(
-                        new CourseContentListFragment(CourseContentType.UPCOMING_CONTENT.ordinal()),
-                        getIntent().getExtras(),
+                        new CourseContentListFragment(),
+                        upcomingContentBundle,
                         getString(R.string.testpress_upcoming_contents)
                 )
         );
