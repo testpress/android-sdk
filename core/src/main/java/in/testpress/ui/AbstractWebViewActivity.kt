@@ -40,24 +40,24 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
     }
 
     private fun initializeWebViewFragment() {
-        webViewFragment = WebViewFragment(
-            url = urlPath,
-            webViewFragmentSettings = getWebViewFragmentSettings()
-        )
+        webViewFragment = WebViewFragment()
+        webViewFragment.arguments = getWebViewArguments()
         webViewFragment.setListener(this)
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, webViewFragment)
             .commit()
     }
 
-    private fun getWebViewFragmentSettings():WebViewFragment.Settings {
-        return if (isSSORequired){
-            WebViewFragment.Settings()
-        } else {
-            WebViewFragment.Settings(
-                isSSORequired = false,
-                allowNonInstituteUrlInWebView = true
-            )
+    private fun getWebViewArguments(): Bundle {
+        return Bundle().apply {
+            this.putString(WebViewFragment.URL_TO_OPEN, urlPath)
+            if (isSSORequired) {
+                this.putBoolean(WebViewFragment.IS_SSO_REQUIRED, true)
+                this.putBoolean(WebViewFragment.ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, false)
+            } else {
+                this.putBoolean(WebViewFragment.IS_SSO_REQUIRED, false)
+                this.putBoolean(WebViewFragment.ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, true)
+            }
         }
     }
 

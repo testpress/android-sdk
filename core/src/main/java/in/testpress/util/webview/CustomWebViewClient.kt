@@ -27,12 +27,12 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
         return if (isInstituteUrl){
             true
         } else {
-            fragment.webViewFragmentSettings.allowNonInstituteUrlInWebView
+            fragment.allowNonInstituteUrlInWebView
         }
     }
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-        if (fragment.webViewFragmentSettings.showLoadingBetweenPages) fragment.showLoading()
+        if (fragment.showLoadingBetweenPages) fragment.showLoading()
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {

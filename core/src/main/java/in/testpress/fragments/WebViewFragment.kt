@@ -19,13 +19,8 @@ import android.webkit.*
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import kotlinx.parcelize.Parcelize
 
-class WebViewFragment(
-    var url: String = "",
-    val data: String = "",
-    val webViewFragmentSettings: Settings
-) : Fragment(),EmptyViewListener {
+class WebViewFragment : Fragment(), EmptyViewListener {
 
     val TAG = "WebViewFragment"
     private var _layout: WebviewFragmentBinding? = null
@@ -36,10 +31,18 @@ class WebViewFragment(
     var imagePath: String? = null
     var filePathCallback: ValueCallback<Array<Uri>?>? = null
     private lateinit var emptyViewFragment: EmptyViewFragment
+    private var url: String = ""
+    private var data: String = ""
+    var showLoadingBetweenPages: Boolean = false
+    private var isSSORequired: Boolean = true
+    var allowNonInstituteUrlInWebView: Boolean = false
+    private var allowZoomControl: Boolean = false
+    private var enableSwipeRefresh: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         instituteSettings = TestpressSdk.getTestpressSession(requireContext())?.instituteSettings!!
+        parseArguments()
     }
 
     override fun onCreateView(
@@ -69,8 +72,19 @@ class WebViewFragment(
         _layout = null
     }
 
+    private fun parseArguments() {
+        url = arguments?.getString(URL_TO_OPEN, "") ?: ""
+        data = arguments?.getString(DATA_TO_OPEN, "") ?: ""
+        showLoadingBetweenPages = arguments?.getBoolean(SHOW_LOADING_BETWEEN_PAGES) ?: false
+        isSSORequired = arguments?.getBoolean(IS_SSO_REQUIRED) ?: true
+        allowNonInstituteUrlInWebView =
+            arguments?.getBoolean(ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW) ?: false
+        allowZoomControl = arguments?.getBoolean(ALLOW_ZOOM_CONTROLS) ?: false
+        enableSwipeRefresh = arguments?.getBoolean(ENABLE_SWIPE_REFRESH) ?: false
+    }
+
     private fun initializedSwipeRefresh(){
-        layout.swipeRefreshLayout.isEnabled = webViewFragmentSettings.enableSwipeRefresh
+        layout.swipeRefreshLayout.isEnabled = enableSwipeRefresh
         layout.swipeRefreshLayout.setColorSchemeColors(
             ContextCompat.getColor(requireContext(), R.color.testpress_color_primary),
         )
@@ -102,13 +116,13 @@ class WebViewFragment(
         // Disable pinch to zoom without the zoom buttons
         webView.settings.builtInZoomControls = false
         webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
-        webView.settings.setSupportZoom(webViewFragmentSettings.allowZoomControl)
+        webView.settings.setSupportZoom(allowZoomControl)
         webView.webViewClient = CustomWebViewClient(this)
         webView.webChromeClient = CustomWebChromeClient(this)
     }
 
     private fun loadContent(){
-        if (webViewFragmentSettings.isSSORequired){
+        if (isSSORequired){
             fetchSsoLink()
             return
         }
@@ -199,17 +213,18 @@ class WebViewFragment(
         }
     }
 
-    @Parcelize
-    data class Settings(
-        val showLoadingBetweenPages: Boolean = false,
-        val isSSORequired: Boolean = true,
-        val allowNonInstituteUrlInWebView: Boolean = false,
-        val allowZoomControl: Boolean = false,
-        val enableSwipeRefresh: Boolean = false
-    ) : Parcelable
-
     interface Listener {
         fun onWebViewInitializationSuccess()
+    }
+
+    companion object {
+        const val URL_TO_OPEN = "URL_TO_OPEN"
+        const val DATA_TO_OPEN = "DATA_TO_OPEN"
+        const val IS_SSO_REQUIRED = "IS_SSO_REQUIRED"
+        const val SHOW_LOADING_BETWEEN_PAGES = "SHOW_LOADING_BETWEEN_PAGES"
+        const val ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW = "ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW"
+        const val ALLOW_ZOOM_CONTROLS = "ALLOW_ZOOM_CONTROLS"
+        const val ENABLE_SWIPE_REFRESH = "ENABLE_SWIPE_REFRESH"
     }
 
 }

@@ -1,5 +1,11 @@
 package in.testpress.course.ui;
 
+import static in.testpress.fragments.WebViewFragment.ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW;
+import static in.testpress.fragments.WebViewFragment.ENABLE_SWIPE_REFRESH;
+import static in.testpress.fragments.WebViewFragment.IS_SSO_REQUIRED;
+import static in.testpress.fragments.WebViewFragment.SHOW_LOADING_BETWEEN_PAGES;
+import static in.testpress.fragments.WebViewFragment.URL_TO_OPEN;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -80,22 +86,23 @@ public class CourseListFragment extends BaseFragment {
         }
         // Here we are adding Custom store WebView for EPratibha App
         if (isEPratibhaApp()) {
-            String[] credentials = CommonUtils.getUserCredentials(requireContext());
-            webViewFragment = new WebViewFragment(
-                    "https://www.epratibha.net/mobile-login/?email=" + credentials[0] + "&pass=" + credentials[1],
-                    "",
-                    new WebViewFragment.Settings(
-                            true,
-                            false,
-                            true,
-                            false,
-                            true
-                    )
-            );
-            adapter.addFragment(webViewFragment, storeLabel);
+            addEPratibhaWebViewFragment(storeLabel);
         } else {
             adapter.addFragment(new AvailableCourseListFragment(), storeLabel);
         }
+    }
+
+    private void addEPratibhaWebViewFragment(String storeLabel) {
+        String[] credentials = CommonUtils.getUserCredentials(requireContext());
+        WebViewFragment webViewFragment = new WebViewFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(URL_TO_OPEN, "https://www.epratibha.net/mobile-login/?email=" + credentials[0] + "&pass=" + credentials[1]);
+        bundle.putBoolean(SHOW_LOADING_BETWEEN_PAGES, true);
+        bundle.putBoolean(IS_SSO_REQUIRED, false);
+        bundle.putBoolean(ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, true);
+        bundle.putBoolean(ENABLE_SWIPE_REFRESH, true);
+        webViewFragment.setArguments(bundle);
+        adapter.addFragment(webViewFragment, storeLabel);
     }
 
     private boolean isStoreDisabled() {

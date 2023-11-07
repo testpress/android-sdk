@@ -9,6 +9,8 @@ import `in`.testpress.course.domain.getGreenDaoContent
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
 import `in`.testpress.fragments.WebViewFragment
+import `in`.testpress.fragments.WebViewFragment.Companion.IS_SSO_REQUIRED
+import `in`.testpress.fragments.WebViewFragment.Companion.URL_TO_OPEN
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
@@ -94,11 +96,12 @@ class LiveStreamFragment : BaseContentDetailFragment() {
             val chatView = view?.findViewById<View>(R.id.chat_view_fragment)
             chatView?.visibility = View.VISIBLE
 
-            val webViewFragment = WebViewFragment(
-                url = embedUrl,
-                webViewFragmentSettings = WebViewFragment.Settings(isSSORequired = false)
-            )
-
+            val webViewFragment = WebViewFragment()
+            val bundle = Bundle().apply {
+                this.putString(URL_TO_OPEN,embedUrl)
+                this.putBoolean(IS_SSO_REQUIRED,false)
+            }
+            webViewFragment.arguments = bundle
             childFragmentManager.beginTransaction()
                 .replace(R.id.chat_view_fragment, webViewFragment)
                 .commit()
