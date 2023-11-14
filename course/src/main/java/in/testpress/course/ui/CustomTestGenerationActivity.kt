@@ -5,6 +5,8 @@ import `in`.testpress.core.TestpressException
 import `in`.testpress.course.R
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.ui.TestFragment
+import `in`.testpress.exam.ui.TestFragment.DEFAULT_EXAM_TIME
+import `in`.testpress.exam.ui.TestFragment.INFINITE_EXAM_TIME
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.ui.AbstractWebViewActivity
 import `in`.testpress.util.BaseJavaScriptInterface
@@ -27,11 +29,12 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
         apiClient.startAttempt("api/v2.2/attempts/$attemptId/start/")
             .enqueue(object : TestpressCallback<Attempt>() {
                 override fun onSuccess(result: Attempt?) {
-                    // Attempt we are receiving here does not contain remaining time because its
-                    // infinite timing exam attempt. As our app doesn't support exams with infinite
-                    // timing, so we are set 24 hours for remainingTime in this attempt.
+                    // Check if the remaining time for the attempt is infinite we reset to default value of 24 hours.
+                    // This is done because our app doesn't support exams with infinite timing.
                     result?.let {
-                        it.remainingTime = "24:00:00"
+                        if (it.remainingTime == INFINITE_EXAM_TIME) {
+                            it.remainingTime = DEFAULT_EXAM_TIME
+                        }
                         startExam(result)
                     }
                 }

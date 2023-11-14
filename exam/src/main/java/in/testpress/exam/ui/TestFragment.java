@@ -80,6 +80,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         PlainSpinnerItemAdapter.SectionInfoClickListener, TestPanelListAdapter.ListItemClickListener {
 
     private static final int APP_BACKGROUND_DELAY = 60000; // 1m
+    public static final String DEFAULT_EXAM_TIME = "24:00:00";
+    public static final String INFINITE_EXAM_TIME = "0:00:00";
 
     static final String PARAM_EXAM = "exam";
     static final String PARAM_ATTEMPT = "attempt";
@@ -215,7 +217,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         if (exam != null && exam.hasMultipleLanguages()) {
             initializeLanguageFilter();
         }
-        if (exam == null) {
+        if (exam == null && attempt.getRemainingTime().equals(DEFAULT_EXAM_TIME)) {
             view.findViewById(R.id.timer).setVisibility(View.GONE);
         }
     }
