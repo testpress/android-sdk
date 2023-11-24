@@ -27,8 +27,10 @@ class ReportQuestionViewModel(
     ) {
         val params = HashMap<String, Any>()
         params["description"] = description
-        params["exam_id"] = examId.toString()
         params["type"] = type.toString()
+        if (examId != -1L) {
+            params["exam_id"] = examId.toString()
+        }
         reportQuestionRepository.submitReportQuestion(questionId.toString(), params)
     }
 }
