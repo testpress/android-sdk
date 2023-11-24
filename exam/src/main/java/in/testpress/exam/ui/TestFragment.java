@@ -536,7 +536,11 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         timer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showPauseExamAlert();
+                if (exam == null){
+                    endExamAlert();
+                } else {
+                    showPauseExamAlert();
+                }
             }
         });
     }
