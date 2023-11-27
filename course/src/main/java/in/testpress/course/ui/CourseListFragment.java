@@ -106,7 +106,9 @@ public class CourseListFragment extends BaseFragment {
     }
 
     private boolean isStoreDisabled() {
-        return session.getInstituteSettings() != null && !session.getInstituteSettings().getStoreEnabled();
+        return session.getInstituteSettings() != null
+                && (!session.getInstituteSettings().getStoreEnabled()
+                || session.getInstituteSettings().getDisableStoreInApp());
     }
 
     private boolean isEPratibhaApp() {

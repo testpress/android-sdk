@@ -45,6 +45,7 @@ public class InstituteSettings {
     private String currentPaymentApp;
     private Boolean enableCustomTest;
     private Boolean storeEnabled;
+    private Boolean disableStoreInApp;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -393,5 +394,14 @@ public class InstituteSettings {
 
     public void setStoreEnabled(Boolean storeEnabled) {
         this.storeEnabled = storeEnabled;
+    }
+
+    public Boolean getDisableStoreInApp() {
+        return disableStoreInApp != null && disableStoreInApp;
+    }
+
+    public InstituteSettings setDisableStoreInApp(Boolean disableStoreInApp) {
+        this.disableStoreInApp = disableStoreInApp;
+        return this;
     }
 }
