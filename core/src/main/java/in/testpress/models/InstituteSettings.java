@@ -337,16 +337,18 @@ public class InstituteSettings {
         return appName;
     }
 
-    public void setAppName(String appName) {
+    public InstituteSettings setAppName(String appName) {
         this.appName = appName;
+        return this;
     }
 
     public Boolean getIsCustomMeetingUIEnabled() {
         return this.isCustomMeetingUIEnabled;
     }
 
-    public void setIsCustomMeetingUIEnabled(Boolean customMeetingUIEnabled) {
+    public InstituteSettings setIsCustomMeetingUIEnabled(Boolean customMeetingUIEnabled) {
         this.isCustomMeetingUIEnabled = customMeetingUIEnabled;
+        return this;
     }
 
     public Integer getMaxAllowedDownloadedVideos() {
@@ -384,16 +386,18 @@ public class InstituteSettings {
         return enableCustomTest != null && enableCustomTest;
     }
 
-    public void setEnableCustomTest(Boolean enableCustomTest) {
+    public InstituteSettings setEnableCustomTest(Boolean enableCustomTest) {
         this.enableCustomTest = enableCustomTest;
+        return this;
     }
 
     public Boolean getStoreEnabled() {
         return storeEnabled != null && storeEnabled;
     }
 
-    public void setStoreEnabled(Boolean storeEnabled) {
+    public InstituteSettings setStoreEnabled(Boolean storeEnabled) {
         this.storeEnabled = storeEnabled;
+        return this;
     }
 
     public Boolean getDisableStoreInApp() {
