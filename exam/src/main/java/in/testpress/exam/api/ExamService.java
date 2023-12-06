@@ -79,6 +79,10 @@ public interface ExamService {
     RetrofitCall<Attempt> startAttempt(
             @Path(value = "start_attempt_url", encoded = true) String startAttemptUrlFrag);
 
+    @GET("/{get_attempt_url}")
+    RetrofitCall<Attempt> getAttempt(
+            @Path(value = "get_attempt_url", encoded = true) String startAttemptUrlFrag);
+
     @PUT("/{answer_url}")
     RetrofitCall<AttemptItem> postAnswer(
             @Path(value = "answer_url", encoded = true) String answerUrlFrag,

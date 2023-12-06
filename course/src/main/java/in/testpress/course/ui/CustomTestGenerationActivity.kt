@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.course.R
 import `in`.testpress.exam.api.TestpressExamApiClient
+import `in`.testpress.exam.ui.ReviewStatsActivity
 import `in`.testpress.exam.ui.TestFragment
 import `in`.testpress.exam.ui.TestFragment.DEFAULT_EXAM_TIME
 import `in`.testpress.exam.ui.TestFragment.INFINITE_EXAM_TIME
@@ -50,6 +51,33 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
             })
     }
 
+    fun getAttempt(attemptId: String) {
+        val apiClient = TestpressExamApiClient(this)
+        apiClient.getAttempt("api/v2.2/attempts/$attemptId/")
+            .enqueue(object : TestpressCallback<Attempt>() {
+                override fun onSuccess(result: Attempt?) {
+                    if (result != null){
+                        startActivity(ReviewStatsActivity.createIntent(this@CustomTestGenerationActivity,result))
+                        finish()
+                    } else {
+                        Toast.makeText(
+                            this@CustomTestGenerationActivity,
+                            "Review not found!, Please try again later",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                override fun onException(exception: TestpressException) {
+                    Toast.makeText(
+                        this@CustomTestGenerationActivity,
+                        "Review not found!, Please try again later",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
+    }
+
     private fun startExam(attempt: Attempt) {
         findViewById<Toolbar>(R.id.toolbar).isVisible = false
         val testFragment = TestFragment()
@@ -86,6 +114,11 @@ class JavaScriptInterface(val activity: CustomTestGenerationActivity):BaseJavaSc
         }
         activity.startActivity(intent)
         activity.finish()
+    }
+
+    @JavascriptInterface
+    fun showReview(attemptId: String) {
+        activity.getAttempt(attemptId)
     }
 
 }
