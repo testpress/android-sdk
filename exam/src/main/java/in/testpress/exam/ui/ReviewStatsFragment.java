@@ -30,7 +30,10 @@ import android.widget.TextView;
 
 import junit.framework.Assert;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
@@ -60,6 +63,7 @@ import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_ATTEMPT;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_COURSE_ATTEMPT;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_EXAM;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_PREVIOUS_ACTIVITY;
+import static in.testpress.exam.ui.TestFragment.INFINITE_EXAM_TIME;
 
 public class ReviewStatsFragment extends BaseFragment {
 
@@ -472,8 +476,34 @@ public class ReviewStatsFragment extends BaseFragment {
     private void setTotalTime() {
         if (isExamNotNull()){
             totalTime.setText(exam.getDuration());
+        } else if (!attempt.getRemainingTime().equals(INFINITE_EXAM_TIME)) {
+            totalTime.setText(addTimeStrings(attempt.getTimeTaken(),attempt.getRemainingTime()));
         } else {
             totalTime.setText("");
+        }
+    }
+
+    public String addTimeStrings(String timeTaken, String remainingTime) {
+        // Here, we add one second to totalTime because remainingTime is always one second less than the actual value.
+        long totalTime = formatMillisecond(timeTaken) + formatMillisecond(remainingTime) + 1000;
+        int hours = (int) (totalTime / (1000 * 60 * 60));
+        int minutes = (int) ((totalTime / (1000 * 60)) % 60);
+        int seconds = (int) ((totalTime / 1000) % 60);
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    long formatMillisecond(String inputString) {
+        if (inputString == null) {
+            return 0;
+        }
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            return simpleDateFormat.parse(inputString).getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 
