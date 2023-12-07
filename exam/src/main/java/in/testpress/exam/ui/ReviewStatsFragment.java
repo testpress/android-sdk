@@ -55,6 +55,7 @@ import in.testpress.util.FileDownloader;
 import in.testpress.util.FileType;
 import in.testpress.util.PermissionsUtils;
 import in.testpress.util.StringUtils;
+import in.testpress.util.TimeUtils;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 
@@ -477,33 +478,9 @@ public class ReviewStatsFragment extends BaseFragment {
         if (isExamNotNull()){
             totalTime.setText(exam.getDuration());
         } else if (!attempt.getRemainingTime().equals(INFINITE_EXAM_TIME)) {
-            totalTime.setText(addTimeStrings(attempt.getTimeTaken(),attempt.getRemainingTime()));
+            totalTime.setText(TimeUtils.INSTANCE.addTimeStrings(attempt.getTimeTaken(),attempt.getRemainingTime()));
         } else {
             totalTime.setText("");
-        }
-    }
-
-    public String addTimeStrings(String timeTaken, String remainingTime) {
-        // Here, we add one second to totalTime because remainingTime is always one second less than the actual value.
-        long totalTime = formatMillisecond(timeTaken) + formatMillisecond(remainingTime) + 1000;
-        int hours = (int) (totalTime / (1000 * 60 * 60));
-        int minutes = (int) ((totalTime / (1000 * 60)) % 60);
-        int seconds = (int) ((totalTime / 1000) % 60);
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    long formatMillisecond(String inputString) {
-        if (inputString == null) {
-            return 0;
-        }
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        try {
-            return simpleDateFormat.parse(inputString).getTime();
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return 0;
         }
     }
 
