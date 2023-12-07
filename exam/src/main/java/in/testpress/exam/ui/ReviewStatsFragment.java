@@ -30,10 +30,7 @@ import android.widget.TextView;
 
 import junit.framework.Assert;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.TimeZone;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
