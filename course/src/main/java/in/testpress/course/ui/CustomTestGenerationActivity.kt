@@ -11,11 +11,13 @@ import `in`.testpress.exam.ui.TestFragment.INFINITE_EXAM_TIME
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.ui.AbstractWebViewActivity
 import `in`.testpress.util.BaseJavaScriptInterface
+import `in`.testpress.util.extension.toast
 import android.content.Intent
 import android.os.Bundle
 import android.webkit.JavascriptInterface
 import android.widget.Toast
 import android.widget.Toolbar
+import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 
 
@@ -41,7 +43,7 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
                 }
 
                 override fun onException(exception: TestpressException) {
-                    showToast("Something went wrong, Please try again later")
+                    showErrorToast(exception)
                 }
             })
     }
@@ -51,22 +53,30 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
         apiClient.getAttempt("api/v2.2/attempts/$attemptId/")
             .enqueue(object : TestpressCallback<Attempt>() {
                 override fun onSuccess(result: Attempt?) {
-                    if (result != null){
-                        startActivity(ReviewStatsActivity.createIntent(this@CustomTestGenerationActivity,result))
+                    result?.let {
+                        startActivity(
+                            ReviewStatsActivity.createIntent(
+                                this@CustomTestGenerationActivity,
+                                result
+                            )
+                        )
                         finish()
-                    } else {
-                        showToast("Review not found, Please try again later")
                     }
                 }
 
                 override fun onException(exception: TestpressException) {
-                    showToast("Review not found, Please try again later")
+                    showErrorToast(exception)
                 }
             })
     }
 
-    private fun showToast(message: String) {
-        Toast.makeText(this@CustomTestGenerationActivity, message, Toast.LENGTH_SHORT).show()
+    fun showErrorToast(exception: TestpressException) {
+        when {
+            exception.isForbidden -> toast(R.string.custom_test_permission_error)
+            exception.isNetworkError -> toast(R.string.custom_test_network_error)
+            exception.isPageNotFound -> toast(R.string.custom_test_page_not_found_error)
+            else -> toast(R.string.custom_test_unknown_error)
+        }
         finish()
     }
 

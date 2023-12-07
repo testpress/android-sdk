@@ -80,6 +80,11 @@
 
     <string name="testpress_upcoming_contents">Upcoming</string>
     <string name="no_upcoming_contents">There are no upcoming scheduled contents for you..</string>
+    
+    <string name="custom_test_permission_error">Permission Denied, You do not have permission to take this exam.</string>
+    <string name="custom_test_network_error">Network Error, Please check your internet connection & try again.</string>
+    <string name="custom_test_page_not_found_error">Exam is no longer available, Create a new exam</string>
+    <string name="custom_test_unknown_error">Something went wrong, Please try again later</string>
 
     <string-array name="exo_speed_values">
         <item>0.5</item>
