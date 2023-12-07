@@ -4,7 +4,6 @@ import `in`.testpress.RequestCode
 import `in`.testpress.util.Permission
 import `in`.testpress.util.PermissionHandler
 import android.app.Activity
-import android.os.Message
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.app.ActivityCompat

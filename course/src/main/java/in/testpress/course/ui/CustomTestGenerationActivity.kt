@@ -15,9 +15,7 @@ import `in`.testpress.util.extension.toast
 import android.content.Intent
 import android.os.Bundle
 import android.webkit.JavascriptInterface
-import android.widget.Toast
 import android.widget.Toolbar
-import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 
 
