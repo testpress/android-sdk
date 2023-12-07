@@ -52,6 +52,7 @@ import in.testpress.util.FileDownloader;
 import in.testpress.util.FileType;
 import in.testpress.util.PermissionsUtils;
 import in.testpress.util.StringUtils;
+import in.testpress.util.TimeUtils;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 
@@ -60,6 +61,7 @@ import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_ATTEMPT;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_COURSE_ATTEMPT;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_EXAM;
 import static in.testpress.exam.ui.ReviewStatsActivity.PARAM_PREVIOUS_ACTIVITY;
+import static in.testpress.exam.ui.TestFragment.INFINITE_EXAM_TIME;
 
 public class ReviewStatsFragment extends BaseFragment {
 
@@ -472,6 +474,8 @@ public class ReviewStatsFragment extends BaseFragment {
     private void setTotalTime() {
         if (isExamNotNull()){
             totalTime.setText(exam.getDuration());
+        } else if (!attempt.getRemainingTime().equals(INFINITE_EXAM_TIME)) {
+            totalTime.setText(TimeUtils.INSTANCE.addTimeStrings(attempt.getTimeTaken(),attempt.getRemainingTime()));
         } else {
             totalTime.setText("");
         }
