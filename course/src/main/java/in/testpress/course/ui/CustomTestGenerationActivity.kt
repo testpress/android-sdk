@@ -24,7 +24,7 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
         webViewFragment.addJavascriptInterface(JavaScriptInterface(this),"AndroidInterface")
     }
 
-    fun getAttempt(attemptId: String) {
+    fun startAttempt(attemptId: String) {
         val apiClient = TestpressExamApiClient(this)
         apiClient.startAttempt("api/v2.2/attempts/$attemptId/start/")
             .enqueue(object : TestpressCallback<Attempt>() {
@@ -76,7 +76,7 @@ class JavaScriptInterface(val activity: CustomTestGenerationActivity):BaseJavaSc
 
     @JavascriptInterface
     fun startCustomTest(attemptId: String) {
-        activity.getAttempt(attemptId)
+        activity.startAttempt(attemptId)
     }
 
     @JavascriptInterface
