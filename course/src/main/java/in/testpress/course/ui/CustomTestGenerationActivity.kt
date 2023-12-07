@@ -41,12 +41,7 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
                 }
 
                 override fun onException(exception: TestpressException) {
-                    Toast.makeText(
-                        this@CustomTestGenerationActivity,
-                        "Something went wrong, Please try again later",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    finish()
+                    showToast("Something went wrong, Please try again later")
                 }
             })
     }
@@ -60,22 +55,19 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
                         startActivity(ReviewStatsActivity.createIntent(this@CustomTestGenerationActivity,result))
                         finish()
                     } else {
-                        Toast.makeText(
-                            this@CustomTestGenerationActivity,
-                            "Review not found!, Please try again later",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        showToast("Review not found!, Please try again later")
                     }
                 }
 
                 override fun onException(exception: TestpressException) {
-                    Toast.makeText(
-                        this@CustomTestGenerationActivity,
-                        "Review not found!, Please try again later",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    showToast("Review not found!, Please try again later")
                 }
             })
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this@CustomTestGenerationActivity, message, Toast.LENGTH_SHORT).show()
+        finish()
     }
 
     private fun startExam(attempt: Attempt) {
