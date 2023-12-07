@@ -55,12 +55,12 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
                         startActivity(ReviewStatsActivity.createIntent(this@CustomTestGenerationActivity,result))
                         finish()
                     } else {
-                        showToast("Review not found!, Please try again later")
+                        showToast("Review not found, Please try again later")
                     }
                 }
 
                 override fun onException(exception: TestpressException) {
-                    showToast("Review not found!, Please try again later")
+                    showToast("Review not found, Please try again later")
                 }
             })
     }
