@@ -4,16 +4,17 @@ import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.course.R
 import `in`.testpress.exam.api.TestpressExamApiClient
+import `in`.testpress.exam.ui.ReviewStatsActivity
 import `in`.testpress.exam.ui.TestFragment
 import `in`.testpress.exam.ui.TestFragment.DEFAULT_EXAM_TIME
 import `in`.testpress.exam.ui.TestFragment.INFINITE_EXAM_TIME
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.ui.AbstractWebViewActivity
 import `in`.testpress.util.BaseJavaScriptInterface
+import `in`.testpress.util.extension.toast
 import android.content.Intent
 import android.os.Bundle
 import android.webkit.JavascriptInterface
-import android.widget.Toast
 import android.widget.Toolbar
 import androidx.core.view.isVisible
 
@@ -40,14 +41,41 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
                 }
 
                 override fun onException(exception: TestpressException) {
-                    Toast.makeText(
-                        this@CustomTestGenerationActivity,
-                        "Something went wrong, Please try again later",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    finish()
+                    showErrorToast(exception)
                 }
             })
+    }
+
+    fun getAttempt(attemptId: String) {
+        val apiClient = TestpressExamApiClient(this)
+        apiClient.getAttempt("api/v2.2/attempts/$attemptId/")
+            .enqueue(object : TestpressCallback<Attempt>() {
+                override fun onSuccess(result: Attempt?) {
+                    result?.let {
+                        startActivity(
+                            ReviewStatsActivity.createIntent(
+                                this@CustomTestGenerationActivity,
+                                result
+                            )
+                        )
+                        finish()
+                    }
+                }
+
+                override fun onException(exception: TestpressException) {
+                    showErrorToast(exception)
+                }
+            })
+    }
+
+    fun showErrorToast(exception: TestpressException) {
+        when {
+            exception.isForbidden -> toast(R.string.custom_test_permission_error)
+            exception.isNetworkError -> toast(R.string.custom_test_network_error)
+            exception.isPageNotFound -> toast(R.string.custom_test_page_not_found_error)
+            else -> toast(R.string.custom_test_unknown_error)
+        }
+        finish()
     }
 
     private fun startExam(attempt: Attempt) {
@@ -86,6 +114,11 @@ class JavaScriptInterface(val activity: CustomTestGenerationActivity):BaseJavaSc
         }
         activity.startActivity(intent)
         activity.finish()
+    }
+
+    @JavascriptInterface
+    fun showReview(attemptId: String) {
+        activity.getAttempt(attemptId)
     }
 
 }

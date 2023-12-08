@@ -4,6 +4,8 @@ import `in`.testpress.RequestCode
 import `in`.testpress.util.Permission
 import `in`.testpress.util.PermissionHandler
 import android.app.Activity
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.core.app.ActivityCompat
 
 fun Activity.askAllPermissions() {
@@ -17,4 +19,8 @@ fun Activity.performActionIfPermissionsGranted(
     action: () -> Unit
 ) {
     PermissionHandler().performActionIfPermissionsGranted(this,requiredPermissions,action)
+}
+
+fun Activity.toast(@StringRes resId: Int) {
+    Toast.makeText(this, resId, Toast.LENGTH_SHORT).show()
 }
