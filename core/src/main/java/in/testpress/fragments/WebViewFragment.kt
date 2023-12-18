@@ -20,6 +20,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 
+const val CUSTOM_USER_AGENT = " TestpressAndroidApp/WebView"
+
 class WebViewFragment : Fragment(), EmptyViewListener {
 
     val TAG = "WebViewFragment"
@@ -118,6 +120,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         webView.settings.setSupportZoom(allowZoomControl)
         webView.webViewClient = CustomWebViewClient(this)
         webView.webChromeClient = CustomWebChromeClient(this)
+        webView.settings.userAgentString += CUSTOM_USER_AGENT
     }
 
     private fun loadContent(){
