@@ -94,7 +94,7 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
         if (testFragment != null) {
             testFragment.showEndExamAlert()
         } else {
-            super.onBackPressed()
+            this.finish()
         }
     }
 
