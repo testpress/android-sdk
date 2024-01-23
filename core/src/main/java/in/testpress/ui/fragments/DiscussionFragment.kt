@@ -101,7 +101,6 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
         }
     }
 
-    @ExperimentalPagingApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         slidingPaneLayout = view.findViewById(R.id.sliding_layout)
@@ -129,7 +128,7 @@ open class DiscussionFragment: Fragment(), DiscussionFilterListener {
         transaction.commit()
     }
 
-    @ExperimentalPagingApi
+    @OptIn(ExperimentalPagingApi::class)
     private fun fetchPosts() {
         lifecycleScope.launch {
             viewModel.discussions.collectLatest { pagingData ->
