@@ -3,9 +3,9 @@ package `in`.testpress.course.ui
 import `in`.testpress.core.TestpressSdk
 import android.view.View
 import android.view.WindowManager
-import us.zoom.sdk.MeetingActivity
+import us.zoom.sdk.NewMeetingActivity
 
-class ZoomMeetActivity: MeetingActivity() {
+class ZoomMeetActivity: NewMeetingActivity() {
     val session = TestpressSdk.getTestpressSession(this)
 
     override fun setContentView(layoutResID: Int) {

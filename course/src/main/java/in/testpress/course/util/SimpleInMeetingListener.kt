@@ -22,6 +22,7 @@ open class SimpleInMeetingListener : InMeetingServiceListener {
     override fun onMeetingUserJoin(list: List<Long>) {}
     override fun onMeetingUserLeave(list: List<Long>) {}
     override fun onMeetingUserUpdated(l: Long) {}
+    override fun onInMeetingUserAvatarPathUpdated(p0: Long) {}
     override fun onMeetingHostChanged(l: Long) {}
     override fun onMeetingCoHostChanged(l: Long) {}
     override fun onMeetingCoHostChange(userId: Long, isCoHost: Boolean) {}
@@ -80,4 +81,11 @@ open class SimpleInMeetingListener : InMeetingServiceListener {
     override fun onAllHandsLowered() {}
     override fun onLocalVideoOrderUpdated(localOrderList: List<Long>) {}
     override fun onLocalRecordingPrivilegeRequested(p0: IRequestLocalRecordingPrivilegeHandler?) {}
+    override fun onSuspendParticipantsActivities() {}
+    override fun onAllowParticipantsStartVideoNotification(p0: Boolean) {}
+    override fun onAllowParticipantsRenameNotification(p0: Boolean) {}
+    override fun onAllowParticipantsUnmuteSelfNotification(p0: Boolean) {}
+    override fun onAllowParticipantsShareWhiteBoardNotification(p0: Boolean) {}
+    override fun onMeetingLockStatus(p0: Boolean) {}
+    override fun onRequestLocalRecordingPriviligeChanged(p0: LocalRecordingRequestPrivilegeStatus?) {}
 }
