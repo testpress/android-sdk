@@ -42,7 +42,7 @@ public class WebViewUtils {
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setDatabaseEnabled(true);
         webSettings.setDomStorageEnabled(true);
-        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
     }
 

@@ -116,7 +116,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         webView.settings.domStorageEnabled = true
         // Disable pinch to zoom without the zoom buttons
         webView.settings.builtInZoomControls = false
-        webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
+        webView.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
         webView.settings.setSupportZoom(allowZoomControl)
         webView.webViewClient = CustomWebViewClient(this)
         webView.webChromeClient = CustomWebChromeClient(this)
