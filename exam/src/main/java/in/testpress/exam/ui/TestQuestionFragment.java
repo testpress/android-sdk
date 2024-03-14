@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.ChecksSdkIntAtLeast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -341,6 +342,19 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
         @JavascriptInterface
         public void onFileUploadClick() {
             Log.d("TAG", "onFileUploadClick: ");
+            if (isAndroid13OrHigher()) {
+                pickFile();
+            } else {
+                handlePermissionsForFilePick();
+            }
+        }
+
+        @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.TIRAMISU)
+        boolean isAndroid13OrHigher() {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU;
+        }
+
+        void handlePermissionsForFilePick() {
             if (PermissionHandler.Companion.hasPermissions(
                     requireActivity(),
                     Arrays.asList(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
