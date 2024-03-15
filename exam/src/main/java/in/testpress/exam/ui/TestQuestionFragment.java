@@ -47,6 +47,7 @@ import in.testpress.models.FileDetails;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Language;
+import in.testpress.util.Misc;
 import in.testpress.util.PermissionHandler;
 import in.testpress.util.ProgressDialog;
 import in.testpress.util.WebViewUtils;
@@ -342,16 +343,11 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
         @JavascriptInterface
         public void onFileUploadClick() {
             Log.d("TAG", "onFileUploadClick: ");
-            if (isAndroid13OrHigher()) {
+            if (Misc.INSTANCE.isAndroid13OrHigher()) {
                 pickFile();
             } else {
                 handlePermissionsForFilePick();
             }
-        }
-
-        @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.TIRAMISU)
-        boolean isAndroid13OrHigher() {
-            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU;
         }
 
         void handlePermissionsForFilePick() {
