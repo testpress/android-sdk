@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.os.Handler;
@@ -206,9 +207,14 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         initResolutionSelector();
         initializePinchToZoom();
 
-        // set activity as portrait mode at first
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        if(isLandscapeModeEnabled()){
+            openFullscreenDialog();
+        }
         activity.getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
+    }
+
+    private boolean isLandscapeModeEnabled() {
+        return activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
