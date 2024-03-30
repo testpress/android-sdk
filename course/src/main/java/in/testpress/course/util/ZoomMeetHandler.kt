@@ -5,6 +5,7 @@ import `in`.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE
 import `in`.testpress.course.domain.DomainVideoConferenceContent
 import `in`.testpress.course.domain.zoom.callbacks.MeetingCommonCallback
 import `in`.testpress.course.ui.CustomMeetingActivity
+import `in`.testpress.course.ui.ZoomMeetActivity
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.models.ProfileDetails
 import `in`.testpress.util.isEmailValid
@@ -177,6 +178,7 @@ class ZoomMeetHandler(
             getMeetingOptions()
         )
         zoomSDK.zoomUIService.hideMeetingInviteUrl(true)
+        zoomSDK.zoomUIService?.setNewMeetingUI(ZoomMeetActivity::class.java)
     }
 
     private fun getMeetingOptions(): JoinMeetingOptions {
