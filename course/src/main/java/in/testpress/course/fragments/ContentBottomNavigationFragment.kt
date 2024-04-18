@@ -110,6 +110,7 @@ class ContentBottomNavigationFragment : Fragment() {
                     viewModel.getContentsForChapter(content.chapterId!!)?.observe(
                             viewLifecycleOwner, contentsFromChapterObserver)
                 }
+                else -> {}
             }
         })
     }

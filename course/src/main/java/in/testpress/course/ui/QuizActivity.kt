@@ -83,6 +83,7 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
                 Status.ERROR -> {
                     handleExamEndError(it.exception!!)
                 }
+                else -> {}
             }
         }
 
@@ -100,6 +101,7 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
                 Status.ERROR -> {
                     handleExamEndError(it.exception!!)
                 }
+                else -> {}
             }
         })
     }

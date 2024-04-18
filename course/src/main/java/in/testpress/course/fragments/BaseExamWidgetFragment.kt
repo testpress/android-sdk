@@ -73,6 +73,7 @@ open class BaseExamWidgetFragment : Fragment() {
                     content = it.data!!
                     loadAttemptsAndUpdateStartButton()
                 }
+                else -> {}
             }
         })
     }
@@ -109,6 +110,7 @@ open class BaseExamWidgetFragment : Fragment() {
                         viewModel.getLanguages(exam.slug!!, exam.id)
                             .observe(viewLifecycleOwner, observer)
                     }
+                    else -> {}
                 }
             })
     }

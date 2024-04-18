@@ -104,6 +104,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
                         initializeBookmarkFragment()
                     }
                 }
+                else -> {}
             }
         })
     }
@@ -143,6 +144,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
                         Status.ERROR -> {
                             toast.show()
                         }
+                        else -> {}
                     }
                 }
             })
@@ -178,6 +180,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
             viewModel.getContent(content.nextContentId!!, forceRefresh = true).observe(viewLifecycleOwner, Observer {
                 when(it.status) {
                     Status.SUCCESS -> bottomNavigationFragment.initializeAndShowNavigationButtons()
+                    else -> {}
                 }
             })
         }

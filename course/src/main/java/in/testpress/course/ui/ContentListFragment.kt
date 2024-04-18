@@ -84,6 +84,7 @@ class ContentListFragment : BaseContentListFragment(), EmptyViewListener {
                         emptyViewFragment.displayError(resource.exception!!)
                     }
                 }
+                else -> {}
             }
         })
     }

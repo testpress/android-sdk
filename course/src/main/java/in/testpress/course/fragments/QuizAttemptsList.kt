@@ -59,6 +59,7 @@ class QuizAttemptsList : Fragment() {
                     content = it.data!!
                     loadAttempts()
                 }
+                else -> {}
             }
         })
     }
@@ -72,6 +73,7 @@ class QuizAttemptsList : Fragment() {
                         contentAttempts = resource.data!!
                         display()
                     }
+                    else -> {}
                 }
             })
     }

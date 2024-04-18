@@ -118,6 +118,7 @@ class ZoomMeetHandler(
                     showCustomMeetingUI(false)
                 }
             }
+            else -> {}
         }
     }
 
