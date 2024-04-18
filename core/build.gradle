@@ -62,9 +62,9 @@ android {
 
 dependencies {
     api rootProject.constraintLayout
-    def core_version = "1.2.0"
+    def core_version = "1.7.0"
     def core_testing_version = "2.1.0"
-    def room_version = "2.4.0"
+    def room_version = "2.4.3"
     def multi_dex_version = "2.0.1"
     def fragment_version = "1.4.1"
 

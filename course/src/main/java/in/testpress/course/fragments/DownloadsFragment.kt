@@ -157,6 +157,7 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
                     ).show()
                 }
                 Status.SUCCESS -> checkCourseRefreshDateAndDisplay()
+                else -> {}
             }
         })
     }

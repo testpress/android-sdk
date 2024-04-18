@@ -105,6 +105,7 @@ class QuizReviewFragment: Fragment() {
                     userSelectedAnswer = it.data?.sortedBy { it.order }?.get(position)!!
                     initWebview()
                 }
+                else -> {}
             }
         })
     }

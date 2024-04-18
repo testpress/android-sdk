@@ -52,6 +52,7 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
                     video = it.data?.video
                     loadVideo(it.data!!)
                 }
+                else -> {}
             }
         })
     }
