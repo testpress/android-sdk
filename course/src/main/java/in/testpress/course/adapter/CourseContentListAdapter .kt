@@ -75,7 +75,7 @@ open class BaseCourseContentItemViewHolder(binding: RunningUpcomingListItemBindi
 
     init {
         title.typeface = TestpressSdk.getRubikMediumFont(binding.root.context)
-        path.typeface = TestpressSdk.getRubikRegularFont(binding.root.context)
+        path.typeface = TestpressSdk.getRubikMediumFont(binding.root.context)
         date.typeface = TestpressSdk.getRubikMediumFont(binding.root.context)
     }
 

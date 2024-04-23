@@ -17,7 +17,7 @@ class UpcomingContentItemViewHolder(val binding: RunningUpcomingListItemBinding)
     }
 
     private fun showOrHideDate(content: DomainContent) {
-        binding.date.text = "Avaliable ${DateUtils.getRelativeTimeString(content.start, binding.root.context)} - "
+        binding.date.text = "Avaliable ${DateUtils.getRelativeTimeString(content.start, binding.root.context)}"
         val visibility = DateUtils.getRelativeTimeString(content.start, binding.root.context).isEmpty()
         ViewUtils.setGone(binding.date, visibility)
     }
