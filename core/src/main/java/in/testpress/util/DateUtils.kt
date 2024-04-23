@@ -106,7 +106,7 @@ object DateUtils {
         return mills
     }
 
-    fun convertDateFormat(dateString: String?): String { // output -> 30 Mar 2024, 11:04 am
+    fun convertDateFormat(dateString: String?): String { // output -> 30/04/24 03:30 pm
         if (dateString.isNullOrEmpty()) return "Nil"
         val regex = Regex(""".\d{6}""")
         val formattedDate = regex.replace(dateString, "")
@@ -115,7 +115,7 @@ object DateUtils {
         } else {
             SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZZ")
         }
-        val outputFormat = SimpleDateFormat("dd MMM yyyy, hh:mm a")
+        val outputFormat = SimpleDateFormat("dd/MM/yy hh:mm a")
 
         val date = try {
             inputFormat.parse(formattedDate)
