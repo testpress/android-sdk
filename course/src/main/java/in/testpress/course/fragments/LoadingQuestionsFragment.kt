@@ -96,6 +96,7 @@ class LoadingQuestionsFragment : Fragment(),
                         loadingLayout.visibility = View.GONE
                         emptyViewFragment.displayError(resource.exception!!)
                     }
+                    else -> {}
                 }
             })
         } else {
@@ -110,6 +111,7 @@ class LoadingQuestionsFragment : Fragment(),
                         loadingLayout.visibility = View.GONE
                         emptyViewFragment.displayError(resource.exception!!)
                     }
+                    else -> {}
                 }
             })
         }
@@ -130,6 +132,7 @@ class LoadingQuestionsFragment : Fragment(),
                     loadingLayout.visibility = View.GONE
                     emptyViewFragment.displayError(resource.exception!!)
                 }
+                else -> {}
             }
         })
     }

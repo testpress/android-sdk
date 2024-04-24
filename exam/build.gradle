@@ -60,7 +60,7 @@ dependencies {
     androidTestImplementation rootProject.espressoCore
     androidTestImplementation rootProject.uiautomator
     androidTestImplementation 'androidx.test:rules:1.2.0'
-    implementation "androidx.core:core-ktx:1.2.0"
+    implementation "androidx.core:core-ktx:1.7.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 

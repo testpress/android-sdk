@@ -46,6 +46,7 @@ class StartQuizFragment: BaseExamWidgetFragment() {
                     display()
                     loadAttemptsAndUpdateStartButton()
                 }
+                else -> {}
             }
         })
     }

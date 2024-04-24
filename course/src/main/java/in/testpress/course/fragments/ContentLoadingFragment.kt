@@ -88,6 +88,7 @@ class ContentLoadingFragment : Fragment(),
                     loadingLayout.visibility = View.GONE
                     emptyViewFragment.displayError(resource.exception!!)
                 }
+                else -> {}
             }
         })
     }
@@ -123,6 +124,7 @@ class ContentLoadingFragment : Fragment(),
                         loadingLayout.visibility = View.GONE
                         emptyViewFragment.displayError(resource.exception!!)
                     }
+                    else -> {}
                 }
             })
     }

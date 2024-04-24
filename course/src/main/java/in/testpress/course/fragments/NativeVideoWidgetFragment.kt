@@ -40,6 +40,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
                 Status.SUCCESS -> {
                     createAttemptAndInitializeExoplayer(it.data!!)
                 }
+                else -> {}
             }
         })
     }
