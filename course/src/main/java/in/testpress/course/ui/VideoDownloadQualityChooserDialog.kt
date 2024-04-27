@@ -86,7 +86,7 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = AppCompatDialog(activity, android.R.style.Theme_Material_Light_Dialog_Alert)
+        val dialog = AppCompatDialog(requireContext(), android.R.style.Theme_Material_Light_Dialog_Alert)
         dialog.setTitle("Choose Download Quality")
         return dialog
     }
