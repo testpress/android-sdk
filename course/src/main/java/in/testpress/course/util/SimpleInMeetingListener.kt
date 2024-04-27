@@ -87,5 +87,5 @@ open class SimpleInMeetingListener : InMeetingServiceListener {
     override fun onAllowParticipantsUnmuteSelfNotification(p0: Boolean) {}
     override fun onAllowParticipantsShareWhiteBoardNotification(p0: Boolean) {}
     override fun onMeetingLockStatus(p0: Boolean) {}
-    override fun onRequestLocalRecordingPriviligeChanged(p0: LocalRecordingRequestPrivilegeStatus?) {}
+    override fun onRequestLocalRecordingPrivilegeChanged(p0: LocalRecordingRequestPrivilegeStatus?) {}
 }

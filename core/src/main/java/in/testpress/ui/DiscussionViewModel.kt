@@ -49,7 +49,7 @@ class DiscussionViewModel(
     fun sortAndFilter(filters: HashMap<String, String>, search_query: String = "") {
         filters["search"] = search_query
         savedStateHandle.set("params", filters)
-        clearListChannel.offer(Unit)
+        clearListChannel.trySend(Unit).isSuccess
     }
 
     private fun refreshCategoriesFromRepository() {
