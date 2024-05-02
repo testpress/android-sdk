@@ -63,7 +63,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     private EditText phone;
     private TextView fillAllDetailsText;
     private Button continueButton;
-    private ProgressBar progressBar;
+    public ProgressBar progressBar;
     private RelativeLayout shippingDetails;
     private LinearLayout emptyView;
     private TextView emptyTitleView;
@@ -72,7 +72,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     private TextWatcher watcher = validationTextWatcher();
     private Product product;
     private List<OrderItem> orderItems;
-    private Order order;
+    public Order order;
     private OrderItem orderItem = new OrderItem();
     private StoreApiClient apiClient;
     private FBEventsTrackerFacade fbEventsLogger;
@@ -256,7 +256,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
                 });
     }
 
-    void showPaymentSuccessScreen() {
+    public void showPaymentSuccessScreen() {
         progressBar.setVisibility(View.GONE);
         logEvent(EventsTrackerFacade.PAYMENT_SUCCESS);
         Intent intent = new Intent(this, PaymentSuccessActivity.class);
@@ -305,7 +305,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
                 .show();
     }
 
-    private void logEvent(String eventName) {
+    public void logEvent(String eventName) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("product_name", product.getTitle());
         params.put("product_id", product.getId());
@@ -352,7 +352,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         refreshOrderStatus(false);
     }
 
-    void showPaymentFailedScreen() {
+    public void showPaymentFailedScreen() {
         progressBar.setVisibility(View.GONE);
         Intent intent = new Intent(this, PaymentFailureActivity.class);
         startActivityForResult(intent, STORE_REQUEST_CODE);
