@@ -123,7 +123,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
                 order = createdOrder;
                 progressBar.setVisibility(View.GONE);
                 if (createdOrder.getStatus().equals("Completed")) {
-                    showPaymentStatus();
+                    showPaymentSuccessScreen();
                 } else if(product.getRequiresShipping()) {
                     landmark.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                         public boolean onEditorAction(final TextView v, final int actionId,
@@ -256,7 +256,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
                 });
     }
 
-    void showPaymentStatus() {
+    void showPaymentSuccessScreen() {
         progressBar.setVisibility(View.GONE);
         logEvent(EventsTrackerFacade.PAYMENT_SUCCESS);
         Intent intent = new Intent(this, PaymentSuccessActivity.class);
@@ -329,7 +329,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
             @Override
             public void onSuccess(NetworkOrderStatus result) {
                 if (result.getStatus().equals("Completed")) {
-                    showPaymentStatus();
+                    showPaymentSuccessScreen();
                 } else {
                     showPaymentFailedScreen();
                 }
