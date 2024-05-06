@@ -19,9 +19,11 @@ class ZoomMeetActivity: NewMeetingActivity() {
     }
 
     private fun disableScreenRecording() {
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_SECURE,
-            WindowManager.LayoutParams.FLAG_SECURE
-        )
+        if (session != null && session.instituteSettings.isScreenshotDisabled) {
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_SECURE,
+                WindowManager.LayoutParams.FLAG_SECURE
+            )
+        }
     }
 }
