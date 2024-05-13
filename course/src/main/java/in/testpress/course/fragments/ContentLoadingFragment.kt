@@ -150,7 +150,7 @@ interface ContentFragmentChangeListener {
     fun changeFragment(content: DomainContent)
 }
 
-class ContentFragmentFactory {
+open class ContentFragmentFactory {
     companion object {
         fun getFragment(content: DomainContent): Fragment {
             return when (content.contentType) {
