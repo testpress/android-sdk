@@ -33,7 +33,7 @@ import androidx.lifecycle.ViewModelProvider
 import io.netopen.hotbitmapgg.library.view.RingProgressBar
 import java.util.regex.Pattern
 
-class VideoContentFragment : BaseContentDetailFragment() {
+open class VideoContentFragment : BaseContentDetailFragment() {
     private lateinit var titleView: TextView
     private lateinit var description: TextView
     private lateinit var titleLayout: LinearLayout
