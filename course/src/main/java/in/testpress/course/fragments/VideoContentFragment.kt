@@ -34,15 +34,15 @@ import io.netopen.hotbitmapgg.library.view.RingProgressBar
 import java.util.regex.Pattern
 
 open class VideoContentFragment : BaseContentDetailFragment() {
-    private lateinit var titleView: TextView
-    private lateinit var description: TextView
-    private lateinit var titleLayout: LinearLayout
-    private lateinit var videoWidgetFragment: BaseVideoWidgetFragment
-    private lateinit var offlineVideoViewModel: OfflineVideoViewModel
-    private lateinit var videoDownloadProgress: RingProgressBar
-    private lateinit var menu: Menu
-    private lateinit var instituteSettings: InstituteSettings;
-    private var remainingDownloadCount :Int? = null
+    protected lateinit var titleView: TextView
+    protected lateinit var description: TextView
+    protected lateinit var titleLayout: LinearLayout
+    protected lateinit var videoWidgetFragment: BaseVideoWidgetFragment
+    protected lateinit var offlineVideoViewModel: OfflineVideoViewModel
+    protected lateinit var videoDownloadProgress: RingProgressBar
+    protected lateinit var menu: Menu
+    protected lateinit var instituteSettings: InstituteSettings;
+    protected var remainingDownloadCount :Int? = null
 
     override var isBookmarkEnabled: Boolean
         get() = false
