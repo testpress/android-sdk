@@ -110,6 +110,10 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         if (getCourse() != null && isItemsEmpty()) {
             showLoadingPlaceholder();
         }
+
+        if (getCourse() != null) {
+            showOrHideCustomTestIconInAppBar();
+        }
     }
 
     private void fetchCourseAndShowChapters(String courseId) {
