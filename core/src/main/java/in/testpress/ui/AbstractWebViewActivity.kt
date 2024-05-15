@@ -14,7 +14,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
     protected lateinit var webViewFragment: WebViewFragment
     private lateinit var title: String
     private lateinit var urlPath: String
-    private var isSSORequired: Boolean = true
+    private var isAuthenticationRequired: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +36,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
     private fun parseArguments() {
         title = intent.getStringExtra(TITLE)!!
         urlPath = intent.getStringExtra(URL_TO_OPEN)!!
-        isSSORequired = intent.getBooleanExtra(IS_SSO_REQUIRED,true)
+        isAuthenticationRequired = intent.getBooleanExtra(IS_AUTHENTICATION_REQUIRED,true)
     }
 
     private fun initializeWebViewFragment() {
@@ -51,11 +51,11 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
     private fun getWebViewArguments(): Bundle {
         return Bundle().apply {
             this.putString(WebViewFragment.URL_TO_OPEN, urlPath)
-            if (isSSORequired) {
-                this.putBoolean(WebViewFragment.IS_SSO_REQUIRED, true)
+            if (isAuthenticationRequired) {
+                this.putBoolean(WebViewFragment.IS_AUTHENTICATION_REQUIRED, true)
                 this.putBoolean(WebViewFragment.ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, false)
             } else {
-                this.putBoolean(WebViewFragment.IS_SSO_REQUIRED, false)
+                this.putBoolean(WebViewFragment.IS_AUTHENTICATION_REQUIRED, false)
                 this.putBoolean(WebViewFragment.ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, true)
             }
         }
@@ -66,19 +66,19 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
     companion object {
         const val TITLE = "TITLE"
         const val URL_TO_OPEN = "URL"
-        const val IS_SSO_REQUIRED = "IS_SSO_REQUIRED"
+        const val IS_AUTHENTICATION_REQUIRED = "IS_AUTHENTICATION_REQUIRED"
 
         fun createIntent(
             currentContext: Context,
             title: String,
             urlPath: String,
-            isSSORequired: Boolean,
+            isAuthenticationRequired: Boolean,
             activityToOpen: Class<out AbstractWebViewActivity>
         ): Intent {
             return Intent(currentContext, activityToOpen).apply {
                 putExtra(TITLE, title)
                 putExtra(URL_TO_OPEN, urlPath)
-                putExtra(IS_SSO_REQUIRED, isSSORequired)
+                putExtra(IS_AUTHENTICATION_REQUIRED, isAuthenticationRequired)
             }
         }
     }
