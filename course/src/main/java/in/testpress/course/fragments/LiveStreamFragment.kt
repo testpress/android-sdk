@@ -9,7 +9,7 @@ import `in`.testpress.course.domain.getGreenDaoContent
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
 import `in`.testpress.fragments.WebViewFragment
-import `in`.testpress.fragments.WebViewFragment.Companion.IS_SSO_REQUIRED
+import `in`.testpress.fragments.WebViewFragment.Companion.IS_AUTHENTICATION_REQUIRED
 import `in`.testpress.fragments.WebViewFragment.Companion.URL_TO_OPEN
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -99,7 +99,7 @@ class LiveStreamFragment : BaseContentDetailFragment() {
             val webViewFragment = WebViewFragment()
             val bundle = Bundle().apply {
                 this.putString(URL_TO_OPEN,embedUrl)
-                this.putBoolean(IS_SSO_REQUIRED,false)
+                this.putBoolean(IS_AUTHENTICATION_REQUIRED,false)
             }
             webViewFragment.arguments = bundle
             childFragmentManager.beginTransaction()
