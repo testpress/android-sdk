@@ -104,7 +104,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     private fun setupCookieManager(){
         val cookieManager = CookieManager.getInstance()
         cookieManager.setAcceptCookie(true)
-        cookieManager.removeAllCookies(null)
+        cookieManager.removeSessionCookies(null)
     }
 
     private fun setupWebView() {
