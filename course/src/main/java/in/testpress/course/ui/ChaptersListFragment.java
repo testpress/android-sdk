@@ -110,7 +110,10 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         if (getCourse() != null && isItemsEmpty()) {
             showLoadingPlaceholder();
         }
-        setHasOptionsMenu(productSlug == null && isCustomTestGenerationEnabled());
+
+        if (getCourse() != null) {
+            showOrHideCustomTestIconInAppBar();
+        }
     }
 
     private void fetchCourseAndShowChapters(String courseId) {
@@ -123,6 +126,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
                         courseDao.insertOrReplace(course);
                         configureList(getActivity(), getListView());
                         refreshWithProgress();
+                        showOrHideCustomTestIconInAppBar();
                     }
 
                     @Override
@@ -130,6 +134,10 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
                         getErrorMessage(exception);
                     }
                 });
+    }
+
+    private void showOrHideCustomTestIconInAppBar(){
+        setHasOptionsMenu(productSlug == null && isCustomTestGenerationEnabled());
     }
 
     private void displayBuyNowButton() {
