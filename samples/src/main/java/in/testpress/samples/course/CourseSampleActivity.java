@@ -244,7 +244,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
         startActivity(WebViewWithSSOActivity.Companion.createIntent(
                         CourseSampleActivity.this,
                         "Test WebView",
-                        session.getInstituteSettings().getBaseUrl()+urlPath,
+                        session.getInstituteSettings().getBaseUrl() + urlPath,
                         true,
                         WebViewWithSSOActivity.class
                 )
