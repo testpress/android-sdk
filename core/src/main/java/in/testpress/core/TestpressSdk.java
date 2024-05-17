@@ -289,6 +289,7 @@ public final class TestpressSdk {
                         if (callback != null) {
                             callback.onSuccess(testpressSession);
                         }
+                        initSentry(context,instituteSettings.getAndroidSentryDns());
                     }
 
                     @Override
