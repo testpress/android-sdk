@@ -181,7 +181,7 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
                 CustomTestGenerationActivity.Companion.createIntent(
                         requireContext(),
                         "Custom Module",
-                        instituteSettings.getBaseUrl()+"/courses/custom_test_generation/?"+constrictQueryParamForAvailableCourses()+"%26testpress_app=android",
+                        instituteSettings.getBaseUrl()+"/courses/custom_test_generation/?"+constrictQueryParamForAvailableCourses()+"&testpress_app=android",
                         true,
                         CustomTestGenerationActivity.class
                 )
@@ -191,7 +191,7 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
     private String constrictQueryParamForAvailableCourses(){
         StringBuilder queryParam = new StringBuilder();
         for (Course course : getCourses()) {
-            queryParam.append("course_id=").append(course.getId()).append("%26");
+            queryParam.append("course_id=").append(course.getId()).append("&");
         }
         return queryParam.toString();
     }
