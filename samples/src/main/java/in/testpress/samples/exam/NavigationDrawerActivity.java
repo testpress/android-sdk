@@ -47,8 +47,8 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                     .setBookmarksEnabled(false)
                     .setCommentsVotingEnabled(false)
                     .setCoursesFrontend(false)
-                    .setCoursesGamificationEnabled(false)
-                    .setAndroidSentryDns("https://186f9948d5294b4c9c03aa9d2a11c982@sentry.testpress.in/3");
+                    .setAndroidSentryDns("https://186f9948d5294b4c9c03aa9d2a11c982@sentry.testpress.in/3")
+                    .setCoursesGamificationEnabled(false);
             TestpressSdk.setTestpressSession(this, session);
             if (position == 1) {
                 TestpressExam.show(this, R.id.fragment_container, session);
