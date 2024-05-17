@@ -46,6 +46,7 @@ public class InstituteSettings {
     private Boolean enableCustomTest;
     private Boolean storeEnabled;
     private Boolean disableStoreInApp;
+    private String androidSentryDns;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -406,6 +407,15 @@ public class InstituteSettings {
 
     public InstituteSettings setDisableStoreInApp(Boolean disableStoreInApp) {
         this.disableStoreInApp = disableStoreInApp;
+        return this;
+    }
+
+    public String getAndroidSentryDns() {
+        return androidSentryDns;
+    }
+
+    public InstituteSettings setAndroidSentryDns(String androidSentryDns) {
+        this.androidSentryDns = androidSentryDns;
         return this;
     }
 }

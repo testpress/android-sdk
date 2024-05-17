@@ -58,6 +58,7 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                     .setCoursesGamificationEnabled(false)
                     .setMaxAllowedDownloadedVideos(null)
                     .setWhiteLabeledHostUrl(session.getInstituteSettings().getBaseUrl())
+                    .setAndroidSentryDns("https://186f9948d5294b4c9c03aa9d2a11c982@sentry.testpress.in/3")
                     .setAppName(getString(R.string.app_name));
             TestpressSdk.setTestpressSession(this, session);
             if (position == 1) {
