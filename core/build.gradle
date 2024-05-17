@@ -85,6 +85,7 @@ dependencies {
     api "com.github.skydoves:powerspinner:1.1.9"
     api "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
     api 'org.jsoup:jsoup:1.13.1'
+    api 'io.sentry:sentry-android:6.4.2'
 
     testImplementation rootProject.junit
     testImplementation rootProject.mockito

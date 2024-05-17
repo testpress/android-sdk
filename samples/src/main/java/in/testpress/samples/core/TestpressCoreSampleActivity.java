@@ -147,6 +147,7 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
                         }
                     }
                 });
+        TestpressSdk.initSentry(this,"https://186f9948d5294b4c9c03aa9d2a11c982@sentry.testpress.in/3");
     }
 
     @Override

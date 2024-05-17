@@ -16,6 +16,7 @@ import in.testpress.network.TestpressApiClient;
 import in.testpress.R;
 import in.testpress.util.Assert;
 import in.testpress.util.UIUtils;
+import io.sentry.android.core.SentryAndroid;
 
 public final class TestpressSdk {
 
@@ -323,5 +324,14 @@ public final class TestpressSdk {
         if (context == null) {
             throw new IllegalArgumentException("Context must not be null.");
         }
+    }
+
+    public static void initSentry(Context context,String androidSentryDns) {
+        SentryAndroid.init(
+                context,
+                options -> {
+                    options.setDsn(androidSentryDns);
+                    options.setEnableAutoSessionTracking(true);
+                });
     }
 }
