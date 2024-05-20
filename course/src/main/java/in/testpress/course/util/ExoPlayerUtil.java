@@ -684,6 +684,13 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         errorMessageTextView.setVisibility(View.VISIBLE);
     }
 
+    private void displayError(String message) {
+        player.setPlayWhenReady(false);
+        player.getPlaybackState();
+        errorMessageTextView.setText(message);
+        errorMessageTextView.setVisibility(View.VISIBLE);
+    }
+
     private void hideError(@StringRes int message) {
         if (errorMessageTextView.getText().equals(activity.getString(message))) {
             errorMessageTextView.setVisibility(View.GONE);
@@ -692,10 +699,24 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         }
     }
 
-    private void handleError(boolean networkError) {
-        if (networkError) {
-            displayError(R.string.testpress_no_internet_try_again);
+    private void handleError(PlaybackException exception) {
+        String errorMessage = "";
+        if (1000 <= exception.errorCode && exception.errorCode < 2000) { // Miscellaneous errors
+            errorMessage = activity.getString(R.string.exoplayer_miscellaneous_error, exception.getErrorCodeName(), exception.errorCode);
+        } else if (2001 == exception.errorCode) { // No network error
+            errorMessage = activity.getString(R.string.testpress_no_internet_try_again);
+        } else if (2000 <= exception.errorCode && exception.errorCode <= 3000) { // Input/Output errors
+            errorMessage = activity.getString(R.string.exoplayer_input_or_output_error, exception.getErrorCodeName(), exception.errorCode);
+        } else if (3000 <= exception.errorCode && exception.errorCode <= 4000) { // Content parsing errors
+            errorMessage = activity.getString(R.string.exoplayer_content_parsing_error, exception.getErrorCodeName(), exception.errorCode);
+        } else if (4000 <= exception.errorCode && exception.errorCode <= 5000) { // Decoding errors
+            errorMessage = activity.getString(R.string.exoplayer_decoding_error, exception.getErrorCodeName(), exception.errorCode);
+        } else if (5000 <= exception.errorCode && exception.errorCode <= 6000) { // AudioTrack errors
+            errorMessage = activity.getString(R.string.exoplayer_audio_track_error, exception.getErrorCodeName(), exception.errorCode);
+        } else if (6000 <= exception.errorCode && exception.errorCode <= 7000) { // DRM errors
+            errorMessage = activity.getString(R.string.exoplayer_drm_error, exception.getErrorCodeName(), exception.errorCode);
         }
+        displayError(errorMessage);
     }
 
     private boolean isScreenCasted() {
@@ -791,7 +812,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                     displayError(R.string.license_request_failed);
                 }
             } else {
-                handleError(exception.errorCode == TYPE_SOURCE);
+                handleError(exception);
             }
         }
 
