@@ -113,4 +113,11 @@
         <item name="android:textColor">@color/testpress_black</item>
     </style>
 
+    <string name="exoplayer_miscellaneous_error">An unexpected error occurred. Please try again later.\n\n%1$s\n(Code: %2$d)</string>
+    <string name="exoplayer_input_or_output_error">A network error occurred. Please try again later.\n\n%1$s\n(Code: %2$d)</string>
+    <string name="exoplayer_content_parsing_error">A content parsing error occurred. Please try again later.\n\n%1$s\n(Code: %2$d)</string>
+    <string name="exoplayer_decoding_error">A decoding error occurred. Please try again later.\n\n%1$s\n(Code: %2$d)</string>
+    <string name="exoplayer_audio_track_error">An AudioTrack error occurred. Please try again later.\n\n%1$s\n(Code: %2$d)</string>
+    <string name="exoplayer_drm_error">A DRM error occurred. Please try again later.\n\n%1$s\n(Code: %2$d)</string>
+
 </resources>
