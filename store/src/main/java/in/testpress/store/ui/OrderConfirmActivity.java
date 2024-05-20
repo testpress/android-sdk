@@ -338,6 +338,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
 
             @Override
             public void onException(TestpressException exception) {
+                progressBar.setVisibility(View.GONE);
                 showPaymentFailedScreen();
             }
         });
