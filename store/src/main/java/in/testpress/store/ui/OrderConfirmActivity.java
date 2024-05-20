@@ -72,7 +72,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     private TextWatcher watcher = validationTextWatcher();
     private Product product;
     private List<OrderItem> orderItems;
-    private Order order;
+    public Order order;
     private OrderItem orderItem = new OrderItem();
     private StoreApiClient apiClient;
     private FBEventsTrackerFacade fbEventsLogger;
@@ -123,6 +123,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
                 order = createdOrder;
                 progressBar.setVisibility(View.GONE);
                 if (createdOrder.getStatus().equals("Completed")) {
+                    logEvent(EventsTrackerFacade.PAYMENT_SUCCESS);
                     showPaymentSuccessScreen();
                 } else if(product.getRequiresShipping()) {
                     landmark.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -256,9 +257,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
                 });
     }
 
-    void showPaymentSuccessScreen() {
-        progressBar.setVisibility(View.GONE);
-        logEvent(EventsTrackerFacade.PAYMENT_SUCCESS);
+    public void showPaymentSuccessScreen() {
         Intent intent = new Intent(this, PaymentSuccessActivity.class);
         intent.putExtra(ORDER, order);
         //noinspection ConstantConditions
@@ -328,7 +327,9 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         apiClient.refreshOrderStatus(order.getOrderId(), reconciliation).enqueue(new TestpressCallback<NetworkOrderStatus>() {
             @Override
             public void onSuccess(NetworkOrderStatus result) {
+                progressBar.setVisibility(View.GONE);
                 if (result.getStatus().equals("Completed")) {
+                    logEvent(EventsTrackerFacade.PAYMENT_SUCCESS);
                     showPaymentSuccessScreen();
                 } else {
                     showPaymentFailedScreen();
@@ -337,6 +338,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
 
             @Override
             public void onException(TestpressException exception) {
+                progressBar.setVisibility(View.GONE);
                 showPaymentFailedScreen();
             }
         });
@@ -352,8 +354,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         refreshOrderStatus(false);
     }
 
-    void showPaymentFailedScreen() {
-        progressBar.setVisibility(View.GONE);
+    public void showPaymentFailedScreen() {
         Intent intent = new Intent(this, PaymentFailureActivity.class);
         startActivityForResult(intent, STORE_REQUEST_CODE);
     }
@@ -367,6 +368,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     @Override
     public void onPaymentError(String errorMessage) {
         logEvent(EventsTrackerFacade.PAYMENT_FAILURE);
+        progressBar.setVisibility(View.GONE);
         showPaymentFailedScreen();
     }
 
@@ -379,6 +381,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     @Override
     public void onPaymentCancel() {
         logEvent(EventsTrackerFacade.CANCELLED_PAYMENT);
+        progressBar.setVisibility(View.GONE);
         showPaymentFailedScreen();
     }
 }
