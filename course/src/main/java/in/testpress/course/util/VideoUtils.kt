@@ -45,4 +45,11 @@ object VideoUtils {
         }
         return null
     }
+
+    fun generatePlayerIdString(): String {
+        return (1..10)
+            .map { ('a'..'z').toList() + ('0'..'9').toList() }
+            .map { it.random() }
+            .joinToString("")
+    }
 }
