@@ -245,7 +245,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
         startActivity(WebViewWithSSOActivity.Companion.createIntent(
                         CourseSampleActivity.this,
                         "Test WebView",
-                        urlPath,
+                        session.getInstituteSettings().getBaseUrl() + urlPath,
                         true,
                         WebViewWithSSOActivity.class
                 )
@@ -270,7 +270,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                                                 CustomTestGenerationActivity.Companion.createIntent(
                                                         CourseSampleActivity.this,
                                                         "Custom Module",
-                                                        "/courses/custom_test_generation/?course_id="+inputText+"%26testpress_app=android",
+                                                        session.getInstituteSettings().getBaseUrl()+"/courses/custom_test_generation/?course_id="+inputText+"&testpress_app=android",
                                                         true,
                                                         CustomTestGenerationActivity.class
                                                 )

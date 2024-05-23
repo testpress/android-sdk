@@ -4,14 +4,12 @@ import `in`.testpress.R
 import `in`.testpress.core.*
 import `in`.testpress.databinding.WebviewFragmentBinding
 import `in`.testpress.models.InstituteSettings
-import `in`.testpress.models.SSOUrl
-import `in`.testpress.network.TestpressApiClient
 import `in`.testpress.util.BaseJavaScriptInterface
+import `in`.testpress.util.UserAgentProvider
 import `in`.testpress.util.webview.*
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,10 +34,11 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     private var url: String = ""
     private var data: String = ""
     var showLoadingBetweenPages: Boolean = false
-    private var isSSORequired: Boolean = true
+    private var isAuthenticationRequired: Boolean = true
     var allowNonInstituteUrlInWebView: Boolean = false
     private var allowZoomControl: Boolean = false
     private var enableSwipeRefresh: Boolean = false
+    var session: TestpressSession? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +63,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         listener?.onWebViewInitializationSuccess()
         setupCookieManager()
         setupWebView()
+        populateInstituteSettings()
         loadContent()
     }
 
@@ -77,7 +77,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         url = arguments?.getString(URL_TO_OPEN, "") ?: ""
         data = arguments?.getString(DATA_TO_OPEN, "") ?: ""
         showLoadingBetweenPages = arguments?.getBoolean(SHOW_LOADING_BETWEEN_PAGES) ?: false
-        isSSORequired = arguments?.getBoolean(IS_SSO_REQUIRED) ?: true
+        isAuthenticationRequired = arguments?.getBoolean(IS_AUTHENTICATION_REQUIRED) ?: true
         allowNonInstituteUrlInWebView =
             arguments?.getBoolean(ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW) ?: false
         allowZoomControl = arguments?.getBoolean(ALLOW_ZOOM_CONTROLS) ?: false
@@ -123,34 +123,10 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         webView.settings.userAgentString += CUSTOM_USER_AGENT
     }
 
-    private fun loadContent(){
-        if (isSSORequired){
-            populateInstituteSettings()
-            fetchSsoLink()
-            return
-        }
-        loadContentInWebView(url = url, data = data)
-    }
-
     private fun populateInstituteSettings() {
-        instituteSettings = TestpressSdk.getTestpressSession(requireContext())?.instituteSettings
+        session = TestpressSdk.getTestpressSession(requireContext())
+        instituteSettings = session?.instituteSettings
         checkNotNull(instituteSettings) { "InstituteSettings must not be null" }
-    }
-
-    private fun fetchSsoLink() {
-        showLoading()
-        TestpressApiClient(requireContext(), TestpressSdk.getTestpressSession(requireContext())).ssourl
-            .enqueue(object : TestpressCallback<SSOUrl>() {
-                override fun onSuccess(result: SSOUrl?) {
-                    url = "${instituteSettings?.baseUrl}${result?.ssoUrl}&next=$url"
-                    loadContentInWebView(url = url)
-                }
-
-                override fun onException(exception: TestpressException?) {
-                    hideLoading()
-                    showErrorView(exception!!)
-                }
-            })
     }
 
     fun showLoading() {
@@ -164,15 +140,24 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         layout.webView.visibility = View.VISIBLE
     }
 
-    private fun loadContentInWebView(url: String = "", data: String = "") {
-        if (url.isNotEmpty()){
-            webView.loadUrl(url)
-        } else if (data.isNotEmpty()){
-            webView.loadData(data,"text/html", null)
+    private fun loadContent() {
+        if (url.isNotEmpty()) {
+            webView.loadUrl(url, generateHeadersMap())
+        } else if (data.isNotEmpty()) {
+            webView.loadData(data, "text/html", null)
         } else {
             // If both the URL and data are empty, pass an unexpected error
             showErrorView(TestpressException.unexpectedError(Exception("URL not found and data not found.")))
         }
+    }
+
+    private fun generateHeadersMap(): Map<String, String> {
+        val headersMap = mutableMapOf<String, String>()
+        if (isAuthenticationRequired){
+            headersMap["Authorization"] = "JWT ${session?.token}"
+            headersMap["User-Agent"] = UserAgentProvider.get(requireContext())
+        }
+        return headersMap
     }
 
     fun showErrorView(exception: TestpressException) {
@@ -230,7 +215,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     companion object {
         const val URL_TO_OPEN = "URL_TO_OPEN"
         const val DATA_TO_OPEN = "DATA_TO_OPEN"
-        const val IS_SSO_REQUIRED = "IS_SSO_REQUIRED"
+        const val IS_AUTHENTICATION_REQUIRED = "IS_AUTHENTICATION_REQUIRED"
         const val SHOW_LOADING_BETWEEN_PAGES = "SHOW_LOADING_BETWEEN_PAGES"
         const val ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW = "ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW"
         const val ALLOW_ZOOM_CONTROLS = "ALLOW_ZOOM_CONTROLS"
