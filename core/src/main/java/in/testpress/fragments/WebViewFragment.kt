@@ -61,7 +61,6 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         initializeEmptyViewFragment()
         webView = layout.webView
         listener?.onWebViewInitializationSuccess()
-        setupCookieManager()
         setupWebView()
         populateInstituteSettings()
         loadContent()
@@ -99,12 +98,6 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         childFragmentManager.beginTransaction()
             .replace(R.id.empty_view_container, emptyViewFragment)
             .commit()
-    }
-
-    private fun setupCookieManager(){
-        val cookieManager = CookieManager.getInstance()
-        cookieManager.setAcceptCookie(true)
-        cookieManager.removeAllCookies(null)
     }
 
     private fun setupWebView() {
