@@ -49,6 +49,7 @@ import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 import static in.testpress.store.TestpressStore.PAYMENT_SUCCESS;
 import static in.testpress.store.TestpressStore.PAYMENT_FAILURE;
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
+import static in.testpress.store.ui.ProductDetailsActivity.PRICE_ID;
 import static in.testpress.store.ui.ProductDetailsActivity.PRODUCT;
 
 
@@ -71,6 +72,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     private Button retryButton;
     private TextWatcher watcher = validationTextWatcher();
     private Product product;
+    private int priceId;
     private List<OrderItem> orderItems;
     public Order order;
     private OrderItem orderItem = new OrderItem();
@@ -104,7 +106,10 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         retryButton = (Button) findViewById(R.id.retry_button);
 
         product = getIntent().getParcelableExtra(PRODUCT);
+        priceId = getIntent().getIntExtra(PRICE_ID, product.getPrices().get(0).getId());
         orderItem.setProduct(product.getUrl());
+        orderItem.setPriceId(priceId);
+        orderItem.setProductSlug(product.getSlug());
         orderItem.setQuantity(1);
         orderItem.setPrice(product.getPrice());
         orderItems = new ArrayList<>();

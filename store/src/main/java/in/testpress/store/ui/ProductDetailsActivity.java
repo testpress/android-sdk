@@ -40,6 +40,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     public static final String PRODUCT_SLUG = "productSlug";
     public static final String PRODUCT = "product";
+    public static final String PRICE_ID = "price_id";
 
     private LinearLayout emptyView;
     private TextView emptyTitleView;

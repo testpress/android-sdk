@@ -8,6 +8,8 @@ public class OrderItem implements Parcelable {
     private String product;
     private Integer quantity;
     private String price;
+    private Integer priceId;
+    private String productSlug;
 
     public OrderItem(){}
 
@@ -16,6 +18,8 @@ public class OrderItem implements Parcelable {
         product  = parcel.readString();
         price    = parcel.readString();
         quantity = parcel.readInt();
+        priceId = parcel.readInt();
+        productSlug = parcel.readString();
     }
 
     @Override
@@ -28,6 +32,8 @@ public class OrderItem implements Parcelable {
         parcel.writeString(product);
         parcel.writeString(price);
         parcel.writeInt(quantity);
+        parcel.writeInt(priceId);
+        parcel.writeString(productSlug);
     }
 
     public static final Creator<OrderItem> CREATOR = new Creator<OrderItem>() {
@@ -92,6 +98,42 @@ public class OrderItem implements Parcelable {
      */
     public void setPrice(String price) {
         this.price = price;
+    }
+
+    /**
+     *
+     * @return
+     * The priceId
+     */
+    public Integer getPriceId() {
+        return priceId;
+    }
+
+    /**
+     *
+     * @param priceId
+     * The priceId
+     */
+    public void setPriceId(Integer priceId) {
+        this.priceId = priceId;
+    }
+
+    /**
+     *
+     * @return
+     * The productSlug
+     */
+    public String getProductSlug() {
+        return productSlug;
+    }
+
+    /**
+     *
+     * @param productSlug
+     * The productSlug
+     */
+    public void setProductSlug(String productSlug) {
+        this.productSlug = productSlug;
     }
 
 }
