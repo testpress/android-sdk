@@ -16,6 +16,7 @@ import com.google.android.exoplayer2.drm.DefaultDrmSessionManager
 import com.google.android.exoplayer2.drm.DrmInitData
 import com.google.android.exoplayer2.offline.DownloadHelper
 import com.google.android.exoplayer2.offline.DownloadRequest
+import com.google.android.exoplayer2.source.TrackGroup
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector
 import com.google.android.exoplayer2.util.Util
@@ -25,6 +26,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 
 import com.google.android.exoplayer2.source.TrackGroupArray
+import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 
 class VideoDownloadRequestCreationHandler(
     val context: Context,
@@ -77,7 +79,7 @@ class VideoDownloadRequestCreationHandler(
         listener?.onDownloadRequestHandlerPrepared(
             getMappedTrackInfo(),
             getRendererIndex(),
-            getTrackSelectionOverrides()
+            trackSelectionParameters.overrides
         )
     }
 
@@ -111,23 +113,20 @@ class VideoDownloadRequestCreationHandler(
         listener?.onDownloadRequestHandlerPrepareError(helper, e)
     }
 
-    fun buildDownloadRequest(overrides: List<DefaultTrackSelector.SelectionOverride>): DownloadRequest {
+    fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>): DownloadRequest {
         setSelectedTracks(overrides)
         val name = content.title ?: ""
         return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)
     }
 
-    private fun setSelectedTracks(overrides: List<DefaultTrackSelector.SelectionOverride>) {
-        val mappedTrackInfo = downloadHelper.getMappedTrackInfo(0)
+    private fun setSelectedTracks(overrides: MutableMap<TrackGroup, TrackSelectionOverride>) {
+        val builder = trackSelectionParameters.buildUpon()
+        builder.clearOverrides()
+        builder.addOverride(overrides.values.first())
+
         for (index in 0 until downloadHelper.periodCount) {
             downloadHelper.clearTrackSelections(index)
-            var builder = DownloadHelper.DEFAULT_TRACK_SELECTOR_PARAMETERS_WITHOUT_CONTEXT.buildUpon()
-            val videoRendererIndex = ExoPlayerUtil.getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
-            val trackGroupArray: TrackGroupArray = mappedTrackInfo.getTrackGroups(videoRendererIndex)
-            for (i in overrides.indices) {
-                builder.setSelectionOverride(videoRendererIndex, trackGroupArray, overrides[i])
-                downloadHelper.addTrackSelection(index, builder.build())
-            }
+            downloadHelper.addTrackSelection(index, builder.build())
         }
     }
 
@@ -135,7 +134,7 @@ class VideoDownloadRequestCreationHandler(
         fun onDownloadRequestHandlerPrepared(
             mappedTrackInfo: MappingTrackSelector.MappedTrackInfo,
             rendererIndex: Int,
-            overrides: List<DefaultTrackSelector.SelectionOverride>
+            overrides: MutableMap<TrackGroup, TrackSelectionOverride>
         )
 
         fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException)
@@ -146,7 +145,7 @@ class VideoDownloadRequestCreationHandler(
             listener?.onDownloadRequestHandlerPrepared(
                 getMappedTrackInfo(),
                 getRendererIndex(),
-                getTrackSelectionOverrides()
+                trackSelectionParameters.overrides
             )
         }
     }

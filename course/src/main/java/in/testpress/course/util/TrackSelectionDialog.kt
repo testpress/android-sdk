@@ -12,11 +12,15 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDialog
 import androidx.fragment.app.DialogFragment
 import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.Tracks
+import com.google.android.exoplayer2.source.TrackGroup
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector
+import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import com.google.android.exoplayer2.ui.TrackSelectionView
 
 open class TrackSelectionDialog(
+    private val tracks : Tracks,
     private val parameters: DefaultTrackSelector.Parameters,
     open val mappedTrackInfo: MappingTrackSelector.MappedTrackInfo
 ) : DialogFragment(),
@@ -27,17 +31,18 @@ open class TrackSelectionDialog(
     private var allowAdaptiveSelections = false
     private val rendererIndex = ExoPlayerUtil.getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
     private val trackGroup = mappedTrackInfo.getTrackGroups(rendererIndex)
-    var overrides: List<DefaultTrackSelector.SelectionOverride>
+    var overrides: MutableMap<TrackGroup, TrackSelectionOverride>
     var onClickListener: DialogInterface.OnClickListener? = null
 
-    constructor(trackSelector: DefaultTrackSelector) : this(
+    constructor(trackSelector: DefaultTrackSelector, tracks : Tracks) : this(
+        tracks,
         trackSelector.parameters,
         trackSelector.currentMappedTrackInfo!!
     )
 
     init {
-        val selectionOverrides = parameters.getSelectionOverride(rendererIndex, trackGroup)
-        overrides = selectionOverrides?.let { listOf(it) } ?: emptyList()
+        //val selectionOverrides = parameters.getSelectionOverride(rendererIndex, trackGroup)
+        overrides = parameters.overrides
     }
 
     override fun onCreateView(
@@ -73,7 +78,7 @@ open class TrackSelectionDialog(
         trackSelectionView.setAllowAdaptiveSelections(allowAdaptiveSelections)
         trackSelectionView.setAllowMultipleOverrides(false)
         trackSelectionView.setTrackNameProvider(ExoPlayerTrackNameProvider())
-        trackSelectionView.init(mappedTrackInfo, rendererIndex, false, overrides, null, this)
+        trackSelectionView.init(tracks.groups, false, overrides, null, this)
     }
 
     private fun setOnClickListeners() {
@@ -89,9 +94,18 @@ open class TrackSelectionDialog(
         allowAdaptiveSelections = allow
     }
 
+//    override fun onTrackSelectionChanged(
+//        isDisabled: Boolean,
+//        overrides: MutableList<DefaultTrackSelector.SelectionOverride>
+//    ) {
+//        overrides.let {
+//            this.overrides = it
+//        }
+//    }
+
     override fun onTrackSelectionChanged(
         isDisabled: Boolean,
-        overrides: MutableList<DefaultTrackSelector.SelectionOverride>
+        overrides: MutableMap<TrackGroup, TrackSelectionOverride>
     ) {
         overrides.let {
             this.overrides = it

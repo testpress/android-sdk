@@ -14,23 +14,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDialog
 import androidx.fragment.app.DialogFragment
+import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.offline.DownloadHelper
 import com.google.android.exoplayer2.offline.DownloadRequest
+import com.google.android.exoplayer2.source.TrackGroup
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector
+import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import com.google.android.exoplayer2.ui.TrackSelectionView
 import java.io.IOException
 
 typealias OnSubmitListener = (DownloadRequest) -> Unit
 
-class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFragment(),
+class VideoDownloadQualityChooserDialog(val content: DomainContent, private val tracks : Tracks,) : DialogFragment(),
     TrackSelectionView.TrackSelectionListener,
     VideoDownloadRequestCreationHandler.Listener {
     private var _binding: VideoDownloadDialogBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var trackSelectionView: TrackSelectionView
-    lateinit var overrides: List<DefaultTrackSelector.SelectionOverride>
+    lateinit var overrides: MutableMap<TrackGroup, TrackSelectionOverride>
     private var onSubmitListener: OnSubmitListener? = null
     lateinit var videoDownloadRequestCreateHandler: VideoDownloadRequestCreationHandler
 
@@ -94,12 +97,13 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
     override fun onDownloadRequestHandlerPrepared(
         mappedTrackInfo: MappingTrackSelector.MappedTrackInfo,
         rendererIndex: Int,
-        overrides: List<DefaultTrackSelector.SelectionOverride>
+        overrides: MutableMap<TrackGroup, TrackSelectionOverride>
     ) {
         hideLoading()
         trackSelectionView.visibility = View.VISIBLE
         this.overrides = overrides
-        trackSelectionView.init(mappedTrackInfo, rendererIndex, false, overrides, null, this)
+
+        trackSelectionView.init(overrides.keys.toList(),false, overrides, null, this)
     }
 
     override fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException) {
@@ -117,14 +121,21 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
         binding.loadingProgress.visibility = View.GONE
     }
 
-    override fun onTrackSelectionChanged(
-        isDisabled: Boolean,
-        selectedOverrides: MutableList<DefaultTrackSelector.SelectionOverride>
-    ) {
-        this.overrides = selectedOverrides
-    }
+//    override fun onTrackSelectionChanged(
+//        isDisabled: Boolean,
+//        selectedOverrides: MutableList<DefaultTrackSelector.SelectionOverride>
+//    ) {
+//        this.overrides = selectedOverrides
+//    }
 
     fun setOnSubmitListener(listener: OnSubmitListener) {
         onSubmitListener = listener
+    }
+
+    override fun onTrackSelectionChanged(
+        isDisabled: Boolean,
+        overrides: MutableMap<TrackGroup, TrackSelectionOverride>
+    ) {
+        this.overrides = overrides
     }
 }

@@ -59,6 +59,7 @@ import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.ExoTrackSelection;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelectionParameters;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
 
@@ -276,7 +277,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                                     && mappedTrackInfo.getTypeSupport(C.TRACK_TYPE_VIDEO)
                                     == MappingTrackSelector.MappedTrackInfo.RENDERER_SUPPORT_NO_TRACKS);
 
-                    trackSelectionDialog = new TrackSelectionDialog(trackSelector);
+                    trackSelectionDialog = new TrackSelectionDialog(trackSelector, player.getCurrentTracks());
                     trackSelectionDialog.setOnClickListener(trackSelectionListener());
                     trackSelectionDialog.show(((AppCompatActivity)activity).getSupportFragmentManager(), null);
                 }
@@ -398,14 +399,20 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 public void onClick(DialogInterface dialog, int which) {
                     MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
                     int rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo);
-                    DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
+
+                    TrackSelectionParameters trackSelectionParameters = player.getTrackSelectionParameters();
+                    //DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
                     if (trackSelectionDialog.getOverrides().isEmpty()) {
-                        parametersBuilder.clearSelectionOverrides(rendererIndex);
-                        trackSelector.setParameters(parametersBuilder.build());
+                        trackSelectionParameters.buildUpon().clearOverrides();
+                        player.setTrackSelectionParameters(trackSelectionParameters);
+//                        parametersBuilder.clearSelectionOverrides(rendererIndex);
+//                        trackSelector.setParameters(parametersBuilder.build());
                     } else {
-                        parametersBuilder.clearSelectionOverrides(rendererIndex)
-                                .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), trackSelectionDialog.getOverrides().get(0));
-                        trackSelector.setParameters(parametersBuilder.build());
+                        trackSelectionParameters.buildUpon().clearOverrides().setOverrideForType(trackSelectionDialog.getOverrides().get(0));
+                        player.setTrackSelectionParameters(trackSelectionParameters);
+//                        parametersBuilder.clearSelectionOverrides(rendererIndex)
+//                                .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), trackSelectionDialog.getOverrides().get(0));
+//                        trackSelector.setParameters(parametersBuilder.build());
                     }
                 }
             };
@@ -828,10 +835,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             startPosition = getCurrentPosition();
         }
 
-        @Override
-        public void onSeekProcessed() {
-            updateVideoAttempt();
-        }
+//        @Override
+//        public void onSeekProcessed() {
+//            updateVideoAttempt();
+//        }
 
         @Override
         public void onLicenseFetchSuccess(@NotNull byte[] keySetId) {
@@ -853,17 +860,18 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void playLowBitrateTrack() {
-        MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
-        if (mappedTrackInfo != null) {
-            int rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo);
-            TrackGroupArray trackGroups = mappedTrackInfo.getTrackGroups(rendererIndex);
-            Pair<Integer, Integer> pair = VideoUtils.getLowBitrateTrackIndex(trackGroups);
-            DefaultTrackSelector.SelectionOverride override = new DefaultTrackSelector.SelectionOverride(pair.getSecond(), pair.getFirst());
-            DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
-            parametersBuilder.clearSelectionOverrides(rendererIndex)
-                    .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), override);
-            trackSelector.setParameters(parametersBuilder.build());
-        }
+        player.setTrackSelectionParameters(TrackSelectionParameters.getDefaults(activity).buildUpon().setForceLowestBitrate(true).build());
+//        MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
+//        if (mappedTrackInfo != null) {
+//            int rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo);
+//            TrackGroupArray trackGroups = mappedTrackInfo.getTrackGroups(rendererIndex);
+//            Pair<Integer, Integer> pair = VideoUtils.getLowBitrateTrackIndex(trackGroups);
+//            DefaultTrackSelector.SelectionOverride override = new DefaultTrackSelector.SelectionOverride(pair.getSecond(), pair.getFirst());
+//            DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
+//            parametersBuilder.clearSelectionOverrides(rendererIndex)
+//                    .setSelectionOverride(rendererIndex, mappedTrackInfo.getTrackGroups(rendererIndex), override);
+//            trackSelector.setParameters(parametersBuilder.build());
+//        }
     }
     
     private boolean isDRMException(Throwable cause) {

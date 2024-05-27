@@ -162,7 +162,7 @@ open class VideoContentFragment : BaseContentDetailFragment() {
             return
         }
         val videoQualityChooserDialog =
-            VideoDownloadQualityChooserDialog(content)
+            VideoDownloadQualityChooserDialog(content,)
         videoQualityChooserDialog.show(childFragmentManager, null)
         videoQualityChooserDialog.setOnSubmitListener {downloadRequest ->
             DownloadTask(downloadRequest.uri.toString(), requireContext()).start(downloadRequest, content)
