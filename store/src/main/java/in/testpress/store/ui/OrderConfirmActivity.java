@@ -106,7 +106,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         retryButton = (Button) findViewById(R.id.retry_button);
 
         product = getIntent().getParcelableExtra(PRODUCT);
-        priceId = getIntent().getIntExtra(PRICE_ID, product.getPrices().get(0).getId());
+        priceId = getPriceId();
         orderItem.setProduct(product.getSlug());
         orderItem.setQuantity(1);
         orderItem.setPrice(priceId);
@@ -117,14 +117,20 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         order();
     }
 
+    private int getPriceId() {
+        try {
+            return getIntent().getIntExtra(PRICE_ID, product.getPrices().get(0).getId());
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
     void order() {
         progressBar.setVisibility(View.VISIBLE);
         emptyView.setVisibility(View.GONE);
         apiClient.order(orderItems).enqueue(new TestpressCallback<Order>() {
             @Override
             public void onSuccess(Order createdOrder) {
-                Log.d("TAG", "onSuccess: "+createdOrder);
-                Log.d("TAG", "onSuccess: "+createdOrder);
                 order = createdOrder;
                 progressBar.setVisibility(View.GONE);
                 if (createdOrder.getStatus().equals("Completed")) {
