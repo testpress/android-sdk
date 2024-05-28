@@ -107,11 +107,9 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
 
         product = getIntent().getParcelableExtra(PRODUCT);
         priceId = getIntent().getIntExtra(PRICE_ID, product.getPrices().get(0).getId());
-        orderItem.setProduct(product.getUrl());
-        orderItem.setPriceId(priceId);
-        orderItem.setProductSlug(product.getSlug());
+        orderItem.setProduct(product.getSlug());
         orderItem.setQuantity(1);
-        orderItem.setPrice(product.getPrice());
+        orderItem.setPrice(priceId);
         orderItems = new ArrayList<>();
         orderItems.add(orderItem);
         apiClient = new StoreApiClient(this);
@@ -125,6 +123,8 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         apiClient.order(orderItems).enqueue(new TestpressCallback<Order>() {
             @Override
             public void onSuccess(Order createdOrder) {
+                Log.d("TAG", "onSuccess: "+createdOrder);
+                Log.d("TAG", "onSuccess: "+createdOrder);
                 order = createdOrder;
                 progressBar.setVisibility(View.GONE);
                 if (createdOrder.getStatus().equals("Completed")) {

@@ -7,19 +7,15 @@ public class OrderItem implements Parcelable {
 
     private String product;
     private Integer quantity;
-    private String price;
-    private Integer priceId;
-    private String productSlug;
+    private Integer price;
 
     public OrderItem(){}
 
     // Parcelling part
     public OrderItem(Parcel parcel){
         product  = parcel.readString();
-        price    = parcel.readString();
+        price    = parcel.readInt();
         quantity = parcel.readInt();
-        priceId = parcel.readInt();
-        productSlug = parcel.readString();
     }
 
     @Override
@@ -30,10 +26,8 @@ public class OrderItem implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(product);
-        parcel.writeString(price);
+        parcel.writeInt(price);
         parcel.writeInt(quantity);
-        parcel.writeInt(priceId);
-        parcel.writeString(productSlug);
     }
 
     public static final Creator<OrderItem> CREATOR = new Creator<OrderItem>() {
@@ -87,7 +81,7 @@ public class OrderItem implements Parcelable {
      * @return
      * The price
      */
-    public String getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
@@ -96,44 +90,8 @@ public class OrderItem implements Parcelable {
      * @param price
      * The price
      */
-    public void setPrice(String price) {
+    public void setPrice(Integer price) {
         this.price = price;
-    }
-
-    /**
-     *
-     * @return
-     * The priceId
-     */
-    public Integer getPriceId() {
-        return priceId;
-    }
-
-    /**
-     *
-     * @param priceId
-     * The priceId
-     */
-    public void setPriceId(Integer priceId) {
-        this.priceId = priceId;
-    }
-
-    /**
-     *
-     * @return
-     * The productSlug
-     */
-    public String getProductSlug() {
-        return productSlug;
-    }
-
-    /**
-     *
-     * @param productSlug
-     * The productSlug
-     */
-    public void setProductSlug(String productSlug) {
-        this.productSlug = productSlug;
     }
 
 }
