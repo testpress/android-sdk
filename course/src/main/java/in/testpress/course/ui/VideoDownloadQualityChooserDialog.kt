@@ -6,6 +6,7 @@ import `in`.testpress.course.databinding.VideoDownloadDialogBinding
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.helpers.VideoDownloadRequestCreationHandler
 import `in`.testpress.course.util.ExoPlayerTrackNameProvider
+import `in`.testpress.course.util.TrackSelectionDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
@@ -26,7 +27,7 @@ import java.io.IOException
 
 typealias OnSubmitListener = (DownloadRequest) -> Unit
 
-class VideoDownloadQualityChooserDialog(val content: DomainContent, private val tracks : Tracks,) : DialogFragment(),
+class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFragment(),
     TrackSelectionView.TrackSelectionListener,
     VideoDownloadRequestCreationHandler.Listener {
     private var _binding: VideoDownloadDialogBinding? = null
@@ -96,14 +97,17 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent, private val 
 
     override fun onDownloadRequestHandlerPrepared(
         mappedTrackInfo: MappingTrackSelector.MappedTrackInfo,
+        tracks: Tracks?,
         rendererIndex: Int,
         overrides: MutableMap<TrackGroup, TrackSelectionOverride>
     ) {
         hideLoading()
         trackSelectionView.visibility = View.VISIBLE
         this.overrides = overrides
+        val l = mutableListOf<Tracks.Group>()
+        tracks?.groups?.asList()?.let { l.addAll(it) }
+        trackSelectionView.init(l,false, overrides, null, this)
 
-        trackSelectionView.init(overrides.keys.toList(),false, overrides, null, this)
     }
 
     override fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException) {

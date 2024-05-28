@@ -1,7 +1,6 @@
 package `in`.testpress.course.util
 
 import `in`.testpress.course.R
-import `in`.testpress.course.databinding.LayoutDocumentViewerBinding
 import `in`.testpress.course.databinding.TrackSelectionDialogBinding
 import android.app.Dialog
 import android.content.DialogInterface
@@ -18,6 +17,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import com.google.android.exoplayer2.ui.TrackSelectionView
+import com.google.common.collect.ImmutableList
 
 open class TrackSelectionDialog(
     private val tracks : Tracks,
@@ -78,8 +78,20 @@ open class TrackSelectionDialog(
         trackSelectionView.setAllowAdaptiveSelections(allowAdaptiveSelections)
         trackSelectionView.setAllowMultipleOverrides(false)
         trackSelectionView.setTrackNameProvider(ExoPlayerTrackNameProvider())
-        trackSelectionView.init(tracks.groups, false, overrides, null, this)
+        var trackGroups = ArrayList<Tracks.Group>()
+        for (trackType in SUPPORTED_TRACK_TYPES) {
+            trackGroups = ArrayList<Tracks.Group>()
+            for (trackGroup in tracks.groups) {
+                if (trackGroup.type == trackType) {
+                    trackGroups.add(trackGroup)
+                }
+            }
+        }
+        trackSelectionView.init(trackGroups, false, overrides, null, this)
     }
+
+    val SUPPORTED_TRACK_TYPES: ImmutableList<Int> =
+        ImmutableList.of(C.TRACK_TYPE_VIDEO, C.TRACK_TYPE_AUDIO, C.TRACK_TYPE_TEXT)
 
     private fun setOnClickListeners() {
         binding.okButton.setOnClickListener {

@@ -1,10 +1,7 @@
 package `in`.testpress.course.helpers
 
 import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.util.DRMLicenseFetchCallback
-import `in`.testpress.course.util.ExoPlayerDataSourceFactory
-import `in`.testpress.course.util.ExoPlayerUtil
-import `in`.testpress.course.util.OfflineDRMLicenseHelper
+import `in`.testpress.course.util.*
 import `in`.testpress.course.util.VideoUtils.getAudioOrVideoInfoWithDrmInitData
 import `in`.testpress.course.util.VideoUtils.getLowBitrateTrackIndex
 import android.content.Context
@@ -12,6 +9,7 @@ import android.widget.Toast
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager
 import com.google.android.exoplayer2.drm.DrmInitData
 import com.google.android.exoplayer2.offline.DownloadHelper
@@ -78,6 +76,7 @@ class VideoDownloadRequestCreationHandler(
 
         listener?.onDownloadRequestHandlerPrepared(
             getMappedTrackInfo(),
+            downloadHelper.getTracks(0),
             getRendererIndex(),
             trackSelectionParameters.overrides
         )
@@ -133,6 +132,7 @@ class VideoDownloadRequestCreationHandler(
     interface Listener {
         fun onDownloadRequestHandlerPrepared(
             mappedTrackInfo: MappingTrackSelector.MappedTrackInfo,
+            tracks : Tracks?,
             rendererIndex: Int,
             overrides: MutableMap<TrackGroup, TrackSelectionOverride>
         )
@@ -144,6 +144,7 @@ class VideoDownloadRequestCreationHandler(
         CoroutineScope(Dispatchers.Main).launch {
             listener?.onDownloadRequestHandlerPrepared(
                 getMappedTrackInfo(),
+                downloadHelper.getTracks(0),
                 getRendererIndex(),
                 trackSelectionParameters.overrides
             )
