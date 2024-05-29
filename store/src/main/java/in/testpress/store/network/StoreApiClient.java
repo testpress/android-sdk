@@ -35,6 +35,8 @@ public class StoreApiClient extends TestpressApiClient {
 
     public static final String PAYU_HASH_GENERATOR_PATH = "/api/v2.5/payu/dynamic_hash/";
 
+    public static final String v3_ORDERS_PATH = "/api/v3/orders/";
+
     public StoreApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
     }

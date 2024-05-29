@@ -31,6 +31,7 @@ public class Product implements Parcelable {
     private Boolean requiresShipping;
     private List<Exam> exams = new ArrayList<Exam>();
     private List<Notes> notes = new ArrayList<Notes>();
+    private List<PricesItem> prices = new ArrayList<PricesItem>();
 
     // Parcelling part
     public Product(Parcel parcel){
@@ -53,6 +54,7 @@ public class Product implements Parcelable {
         requiresShipping = parcel.readByte() != 0;
         parcel.readTypedList(exams, Exam.CREATOR);
         parcel.readTypedList(notes, Notes.CREATOR);
+        parcel.readTypedList(prices,PricesItem.CREATOR);
     }
 
     @Override
@@ -81,6 +83,7 @@ public class Product implements Parcelable {
         parcel.writeByte((byte) (requiresShipping ? 1 : 0));
         parcel.writeTypedList(exams);
         parcel.writeTypedList(notes);
+        parcel.writeTypedList(prices);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -445,6 +448,24 @@ public class Product implements Parcelable {
      */
     public void setNotes(List<Notes> notes) {
         this.notes = notes;
+    }
+
+    /**
+     *
+     * @return
+     * The prices
+     */
+    public List<PricesItem> getPrices() {
+        return prices;
+    }
+
+    /**
+     *
+     * @param prices
+     * The prices
+     */
+    public void setPrices(List<PricesItem> prices) {
+        this.prices = prices;
     }
 
 }

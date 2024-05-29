@@ -21,6 +21,7 @@ import static in.testpress.store.network.StoreApiClient.ORDER_API_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDER_CONFIRM_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDER_STATE_REFRESH_PATH;
 import static in.testpress.store.network.StoreApiClient.PAYU_HASH_GENERATOR_PATH;
+import static in.testpress.store.network.StoreApiClient.v3_ORDERS_PATH;
 
 public interface ProductService {
 
@@ -34,7 +35,7 @@ public interface ProductService {
     RetrofitCall<Product> getProductDetails(
             @Path(value = "product_slug", encoded = true) String productUrlFrag);
 
-    @POST(ORDERS_PATH)
+    @POST(v3_ORDERS_PATH)
     RetrofitCall<Order> order(@Body HashMap<String, Object> arguments);
 
     @PUT(ORDERS_PATH + "{order_id}" + ORDER_CONFIRM_PATH)

@@ -7,14 +7,14 @@ public class OrderItem implements Parcelable {
 
     private String product;
     private Integer quantity;
-    private String price;
+    private Integer price;
 
     public OrderItem(){}
 
     // Parcelling part
     public OrderItem(Parcel parcel){
         product  = parcel.readString();
-        price    = parcel.readString();
+        price    = parcel.readInt();
         quantity = parcel.readInt();
     }
 
@@ -26,7 +26,7 @@ public class OrderItem implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(product);
-        parcel.writeString(price);
+        parcel.writeInt(price);
         parcel.writeInt(quantity);
     }
 
@@ -81,7 +81,7 @@ public class OrderItem implements Parcelable {
      * @return
      * The price
      */
-    public String getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
@@ -90,7 +90,7 @@ public class OrderItem implements Parcelable {
      * @param price
      * The price
      */
-    public void setPrice(String price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 
