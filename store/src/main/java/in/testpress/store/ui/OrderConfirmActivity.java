@@ -109,7 +109,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         priceId = getPriceId();
         orderItem.setProduct(product.getSlug());
         orderItem.setQuantity(1);
-        orderItem.setPrice(priceId);
+        orderItem.setPrice(String.valueOf(priceId));
         orderItems = new ArrayList<>();
         orderItems.add(orderItem);
         apiClient = new StoreApiClient(this);
