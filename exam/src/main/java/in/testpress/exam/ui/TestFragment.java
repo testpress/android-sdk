@@ -292,10 +292,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
                             R.style.TestpressAppCompatAlertDialogStyle);
 
-                    if ((courseContent != null && courseContent.getAttemptsCount() <= 1) ||
-                            (courseContent == null && (exam.getAttemptsCount() == 0 ||
-                                    (exam.getAttemptsCount() == 1 && exam.getPausedAttemptsCount() == 1)))) {
-
+                    if (courseContent != null && exam != null && !exam.isPreemptiveSectionEndingEnabled()) {
                         builder.setTitle(R.string.testpress_cannot_switch);
                         builder.setMessage(R.string.testpress_cannot_switch_section);
                         builder.setPositiveButton(getString(R.string.testpress_ok), null);
@@ -635,7 +632,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             .setTitle(R.string.testpress_end_title)
                             .setMessage(R.string.testpress_end_message);
 
-            if (attempt.hasNoSectionalLock() || sections.size() < 2) {
+            if (exam.isPreemptiveSectionEndingEnabled() || sections.size() < 2) {
                 dialogBuilder
                         .setPositiveButton(R.string.testpress_end, new DialogInterface.OnClickListener() {
                             @Override
