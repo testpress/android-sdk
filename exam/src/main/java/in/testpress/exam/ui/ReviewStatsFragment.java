@@ -390,7 +390,7 @@ public class ReviewStatsFragment extends BaseFragment {
             analyticsButton.setVisibility(View.VISIBLE);
             timeAnalyticsButtonLayout.setVisibility(View.GONE);
         } else {
-            analyticsButton.setVisibility(View.VISIBLE);
+            analyticsButton.setVisibility(View.GONE);
             timeAnalyticsButtonLayout.setVisibility(View.GONE);
         }
     }
