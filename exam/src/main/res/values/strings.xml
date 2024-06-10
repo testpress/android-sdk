@@ -235,7 +235,7 @@
     <string name="testpress_loading_section_questions">Loading \"%s\" questions</string>
     <string name="testpress_ending_exam">Ending exam</string>
     <string name="testpress_cannot_switch">Can\'t Switch Section!</string>
-    <string name="testpress_cannot_switch_section">You can\'t switch sections in the first attempt.</string>
+    <string name="testpress_cannot_switch_section">Section is locked. Switching section is not allowed.</string>
     <string name="testpress_already_submitted">You have already submitted this section.</string>
     <string name="testpress_switch_section">Switch Section?</string>
     <string name="testpress_switch_section_message">Are you sure want to move to the next section? You won\'t be able to switch back to this section.</string>
