@@ -10,17 +10,22 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
 
     private var errorList = linkedMapOf<WebResourceRequest?,WebResourceResponse?>()
 
-    override fun shouldOverrideUrlLoading(
-        view: WebView?,
-        request: WebResourceRequest?
-    ): Boolean {
-        return if (shouldLoadInWebView(request?.url.toString())) {
-            false
-        } else {
-            fragment.openUrlInBrowser(request?.url.toString())
-            true
+    override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+        val url = request?.url.toString()
+        return when {
+            isPDFUrl(url) -> {
+                fragment.openUrlInBrowser(url)
+                true
+            }
+            shouldLoadInWebView(url) -> false
+            else -> {
+                fragment.openUrlInBrowser(url)
+                true
+            }
         }
     }
+
+    private fun isPDFUrl(url: String?) = url?.contains(".pdf") ?: false
 
     private fun shouldLoadInWebView(url: String?):Boolean {
         return if (fragment.isInstituteUrl(url)){
