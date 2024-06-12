@@ -24,13 +24,3 @@ data class OfflineAttemptItem(
     val files: List<OfflineUserUploadedFile> = ArrayList(),
     val unSyncedFiles: List<String> = ArrayList()
 )
-
-
-
-
-
-
-
-
-
-

@@ -19,9 +19,3 @@ data class Question(
     @Embedded
     val translations: ArrayList<Question> = ArrayList(),
 )
-
-
-
-
-
-

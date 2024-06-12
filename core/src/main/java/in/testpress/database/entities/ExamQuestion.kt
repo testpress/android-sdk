@@ -13,7 +13,3 @@ data class ExamQuestion(
     @Embedded
     val question: Question? = null
 )
-
-
-
-
