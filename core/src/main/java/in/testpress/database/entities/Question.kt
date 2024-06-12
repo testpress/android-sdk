@@ -15,9 +15,3 @@ data class Question(
     val directionId: Long? = null,
     val translations: ArrayList<Question> = arrayListOf(),
 )
-
-
-
-
-
-
