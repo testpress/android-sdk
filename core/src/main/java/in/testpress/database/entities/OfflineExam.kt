@@ -45,5 +45,5 @@ data class OfflineExam(
     val disableAttemptResume: Boolean? = null,
     val allowPreemptiveSectionEnding: Boolean? = null,
     @Embedded
-    val languages: List<OfflineLanguage>? = null
+    val languages: List<Language>? = null
 )
