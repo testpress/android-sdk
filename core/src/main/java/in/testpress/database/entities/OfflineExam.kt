@@ -44,6 +44,7 @@ data class OfflineExam(
     val enableQuizMode: Boolean? = null,
     val disableAttemptResume: Boolean? = null,
     val allowPreemptiveSectionEnding: Boolean? = null,
+    val examDataModifiedOn: String? = null,
     @Embedded
     val languages: List<Language>? = null
 )
