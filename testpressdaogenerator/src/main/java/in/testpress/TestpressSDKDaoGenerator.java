@@ -537,7 +537,7 @@ public class TestpressSDKDaoGenerator {
         exam.addBooleanProperty("enableQuizMode");
         exam.addBooleanProperty("disableAttemptResume");
         exam.addBooleanProperty("allowPreemptiveSectionEnding");
-        exam.addBooleanProperty("examDataModifiedOn");
+        exam.addStringProperty("examDataModifiedOn");
         exam.implementsInterface("android.os.Parcelable");
         return exam;
     }

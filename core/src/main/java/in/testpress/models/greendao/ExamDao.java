@@ -64,7 +64,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         public final static Property EnableQuizMode = new Property(36, Boolean.class, "enableQuizMode", false, "ENABLE_QUIZ_MODE");
         public final static Property DisableAttemptResume = new Property(37, Boolean.class, "disableAttemptResume", false, "DISABLE_ATTEMPT_RESUME");
         public final static Property AllowPreemptiveSectionEnding = new Property(38, Boolean.class, "allowPreemptiveSectionEnding", false, "ALLOW_PREEMPTIVE_SECTION_ENDING");
-        public final static Property ExamDataModifiedOn = new Property(39, Boolean.class, "examDataModifiedOn", false, "EXAM_DATA_MODIFIED_ON");
+        public final static Property ExamDataModifiedOn = new Property(39, String.class, "examDataModifiedOn", false, "EXAM_DATA_MODIFIED_ON");
     }
 
     private DaoSession daoSession;
@@ -123,7 +123,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
                 "\"ENABLE_QUIZ_MODE\" INTEGER," + // 36: enableQuizMode
                 "\"DISABLE_ATTEMPT_RESUME\" INTEGER," + // 37: disableAttemptResume
                 "\"ALLOW_PREEMPTIVE_SECTION_ENDING\" INTEGER," + // 38: allowPreemptiveSectionEnding
-                "\"EXAM_DATA_MODIFIED_ON\" INTEGER);"); // 39: examDataModifiedOn
+                "\"EXAM_DATA_MODIFIED_ON\" TEXT);"); // 39: examDataModifiedOn
     }
 
     /** Drops the underlying database table. */
@@ -331,9 +331,9 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             stmt.bindLong(39, allowPreemptiveSectionEnding ? 1L: 0L);
         }
  
-        Boolean examDataModifiedOn = entity.getExamDataModifiedOn();
+        String examDataModifiedOn = entity.getExamDataModifiedOn();
         if (examDataModifiedOn != null) {
-            stmt.bindLong(40, examDataModifiedOn ? 1L: 0L);
+            stmt.bindString(40, examDataModifiedOn);
         }
     }
 
@@ -536,9 +536,9 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             stmt.bindLong(39, allowPreemptiveSectionEnding ? 1L: 0L);
         }
  
-        Boolean examDataModifiedOn = entity.getExamDataModifiedOn();
+        String examDataModifiedOn = entity.getExamDataModifiedOn();
         if (examDataModifiedOn != null) {
-            stmt.bindLong(40, examDataModifiedOn ? 1L: 0L);
+            stmt.bindString(40, examDataModifiedOn);
         }
     }
 
@@ -595,7 +595,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             cursor.isNull(offset + 36) ? null : cursor.getShort(offset + 36) != 0, // enableQuizMode
             cursor.isNull(offset + 37) ? null : cursor.getShort(offset + 37) != 0, // disableAttemptResume
             cursor.isNull(offset + 38) ? null : cursor.getShort(offset + 38) != 0, // allowPreemptiveSectionEnding
-            cursor.isNull(offset + 39) ? null : cursor.getShort(offset + 39) != 0 // examDataModifiedOn
+            cursor.isNull(offset + 39) ? null : cursor.getString(offset + 39) // examDataModifiedOn
         );
         return entity;
     }
@@ -641,7 +641,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         entity.setEnableQuizMode(cursor.isNull(offset + 36) ? null : cursor.getShort(offset + 36) != 0);
         entity.setDisableAttemptResume(cursor.isNull(offset + 37) ? null : cursor.getShort(offset + 37) != 0);
         entity.setAllowPreemptiveSectionEnding(cursor.isNull(offset + 38) ? null : cursor.getShort(offset + 38) != 0);
-        entity.setExamDataModifiedOn(cursor.isNull(offset + 39) ? null : cursor.getShort(offset + 39) != 0);
+        entity.setExamDataModifiedOn(cursor.isNull(offset + 39) ? null : cursor.getString(offset + 39));
      }
     
     @Override

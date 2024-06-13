@@ -75,7 +75,7 @@ public class Exam implements android.os.Parcelable {
     private Boolean enableQuizMode;
     private Boolean disableAttemptResume;
     private Boolean allowPreemptiveSectionEnding;
-    private Boolean examDataModifiedOn;
+    private String examDataModifiedOn;
 
     /** Used to resolve relations */
     @Generated
@@ -103,7 +103,7 @@ public class Exam implements android.os.Parcelable {
     }
 
     @Generated
-    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock, Boolean showAnalytics, String instructions, Boolean hasAudioQuestions, String rankPublishingDate, Boolean enableQuizMode, Boolean disableAttemptResume, Boolean allowPreemptiveSectionEnding, Boolean examDataModifiedOn) {
+    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock, Boolean showAnalytics, String instructions, Boolean hasAudioQuestions, String rankPublishingDate, Boolean enableQuizMode, Boolean disableAttemptResume, Boolean allowPreemptiveSectionEnding, String examDataModifiedOn) {
         this.totalMarks = totalMarks;
         this.url = url;
         this.id = id;
@@ -465,11 +465,11 @@ public class Exam implements android.os.Parcelable {
         this.allowPreemptiveSectionEnding = allowPreemptiveSectionEnding;
     }
 
-    public Boolean getExamDataModifiedOn() {
+    public String getExamDataModifiedOn() {
         return examDataModifiedOn;
     }
 
-    public void setExamDataModifiedOn(Boolean examDataModifiedOn) {
+    public void setExamDataModifiedOn(String examDataModifiedOn) {
         this.examDataModifiedOn = examDataModifiedOn;
     }
 
@@ -617,6 +617,7 @@ public class Exam implements android.os.Parcelable {
         disableAttemptResume = tmpDisableAttemptResume == 0 ? null : tmpDisableAttemptResume == 1;
         byte tmpallowPreemptiveSectionEnding = in.readByte();
         allowPreemptiveSectionEnding = tmpallowPreemptiveSectionEnding == 0 ? null : tmpallowPreemptiveSectionEnding == 1;
+        examDataModifiedOn = in.readString();
     }
 
     @Override
@@ -700,6 +701,7 @@ public class Exam implements android.os.Parcelable {
         dest.writeByte((byte) (enableQuizMode == null ? 0 : enableQuizMode ? 1 : 2));
         dest.writeByte((byte) (disableAttemptResume == null ? 0 : disableAttemptResume ? 1 : 2));
         dest.writeByte((byte) (allowPreemptiveSectionEnding == null ? 0 : allowPreemptiveSectionEnding ? 1 : 2));
+        dest.writeString(examDataModifiedOn);
     }
 
     @Override

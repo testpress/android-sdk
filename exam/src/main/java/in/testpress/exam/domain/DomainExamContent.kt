@@ -43,7 +43,8 @@ data class DomainExamContent(
     val rankPublishingDate: String? = null,
     val enableQuizMode: Boolean? = null,
     val disableAttemptResume: Boolean? = null,
-    val allowPreemptiveSectionEnding: Boolean? = null
+    val allowPreemptiveSectionEnding: Boolean? = null,
+    val examDataModifiedOn: String? = null,
 ) {
     fun formattedDate(inputString: String): String {
         var date: Date? = null
@@ -173,7 +174,8 @@ fun createGreenDaoExamContent(exam: DomainExamContent): Exam {
         exam.rankPublishingDate,
         exam.enableQuizMode,
         exam.disableAttemptResume,
-        exam.allowPreemptiveSectionEnding
+        exam.allowPreemptiveSectionEnding,
+        exam.examDataModifiedOn
     )
     greenDaoexam.languages = exam.languages.toGreenDaoModels()
 
