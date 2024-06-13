@@ -7,5 +7,5 @@ data class Section(
     val duration: String?,
     val cutOff: Long?,
     val instructions: String?,
-    val parent: Any?
+    val parent: Long?
 )
