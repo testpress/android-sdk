@@ -1,6 +1,5 @@
 package `in`.testpress.database.entities
 
-import androidx.room.Embedded
 import androidx.room.Entity
 
 @Entity
@@ -44,7 +43,5 @@ data class OfflineExam(
     val enableQuizMode: Boolean? = null,
     val disableAttemptResume: Boolean? = null,
     val allowPreemptiveSectionEnding: Boolean? = null,
-    val examDataModifiedOn: String? = null,
-    @Embedded
-    val languages: List<Language>? = null
+    val examDataModifiedOn: String? = null
 )
