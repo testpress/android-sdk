@@ -42,8 +42,17 @@
             android:background="@drawable/testpress_green_curved_edge_background"
             android:gravity="center"
             android:text="Download Exam"
+            android:visibility="gone"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
+
+        <ProgressBar
+            android:id="@+id/loading_progress_bar"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 
 </LinearLayout>

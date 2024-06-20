@@ -9,6 +9,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.course.TestpressCourse;
 import in.testpress.course.ui.CustomTestGenerationActivity;
+import in.testpress.course.ui.OfflineExamListActivity;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
@@ -167,6 +168,13 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                 launchCustomTestGenerationActivity();
             }
         });
+
+        findViewById(R.id.offline_exam).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchOfflineExamActivity();
+            }
+        });
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -280,6 +288,11 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                                 });
                     }
                 });
+    }
+
+    private void launchOfflineExamActivity() {
+        Intent intent = new Intent(this, OfflineExamListActivity.class);
+        startActivity(intent);
     }
 
     @Override

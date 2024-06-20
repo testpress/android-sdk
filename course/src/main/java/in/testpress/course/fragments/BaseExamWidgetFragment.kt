@@ -30,6 +30,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -38,7 +40,8 @@ import androidx.lifecycle.ViewModelProvider
 
 open class BaseExamWidgetFragment : Fragment() {
     lateinit var startButton: Button
-    lateinit var downloadExamButton: Button
+    private lateinit var downloadExamButton: Button
+    private lateinit var loadingProgressBar: ProgressBar
     protected lateinit var viewModel: ExamContentViewModel
     protected lateinit var offlineExamViewModel: OfflineExamViewModel
     protected lateinit var content: DomainContent
@@ -77,6 +80,7 @@ open class BaseExamWidgetFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         startButton = view.findViewById(R.id.start_exam)
         downloadExamButton = view.findViewById(R.id.download_exam)
+        loadingProgressBar = view.findViewById(R.id.loading_progress_bar)
         contentId = requireArguments().getLong(ContentActivity.CONTENT_ID)
 
         viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer {
@@ -84,9 +88,48 @@ open class BaseExamWidgetFragment : Fragment() {
                 Status.SUCCESS -> {
                     content = it.data!!
                     loadAttemptsAndUpdateStartButton()
+                    checkExamIsDownloaded()
+                    observeViewModelLoading()
+                    observeDownloadComplete()
+                    downloadExamButton.setOnClickListener {
+                        offlineExamViewModel.downloadExam(contentId, content.exam?.id!!, content.exam?.slug!!)
+                    }
                 }
                 else -> {}
             }
+        })
+    }
+
+    private fun checkExamIsDownloaded() {
+        offlineExamViewModel.checkIfExamIsDownloaded(content.exam?.id!!)
+        offlineExamViewModel.isExamDownloaded.observe(viewLifecycleOwner, Observer { isDownloaded ->
+            if (isDownloaded) {
+                downloadExamButton.visibility =  View.VISIBLE
+                downloadExamButton.text = "Start Exam in Offline"
+            } else {
+                downloadExamButton.visibility =  View.VISIBLE
+            }
+        })
+    }
+
+    private fun observeViewModelLoading() {
+        offlineExamViewModel.isLoading.observe(requireActivity(), Observer { isLoading ->
+            loadingProgressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            downloadExamButton.visibility = if (isLoading) View.GONE else View.VISIBLE
+        })
+    }
+
+    private fun observeDownloadComplete() {
+        offlineExamViewModel.downloadComplete.observe(requireActivity(), Observer { result ->
+            val message = when (result.status) {
+                Status.SUCCESS -> {
+                    downloadExamButton.text = "Start Exam in Offline"
+                    "Download successful"
+                }
+                Status.ERROR -> "Download failed: ${result.exception?.message}"
+                Status.LOADING -> return@Observer
+            }
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
         })
     }
 
@@ -141,9 +184,6 @@ open class BaseExamWidgetFragment : Fragment() {
 
         updateStartButtonTextAndVisibility(exam, pausedAttempt)
         updateStartButtonListener(exam, pausedAttempt)
-        downloadExamButton.setOnClickListener {
-            offlineExamViewModel.fetch(contentId)
-        }
     }
 
     private fun updateStartButtonTextAndVisibility(exam: DomainExamContent, pausedAttempt: DomainContentAttempt?) {

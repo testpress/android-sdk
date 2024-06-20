@@ -1,8 +1,10 @@
 package `in`.testpress.course.network
 
 import `in`.testpress.database.ContentEntity
+import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.exam.network.NetworkExamContent
 import `in`.testpress.models.greendao.Content
+import android.util.Log
 
 data class NetworkContent(
     val id: Long,
@@ -139,5 +141,50 @@ fun NetworkContent.asGreenDaoModel(): Content {
         this.videoId,
         this.attachmentId,
         this.examId
+    )
+}
+
+fun NetworkContent.asOfflineExam(): OfflineExam {
+    return OfflineExam(
+        this.exam?.id,
+        this.exam?.totalMarks,
+        this.exam?.url,
+        this.exam?.attemptsCount,
+        this.exam?.pausedAttemptsCount,
+        this.exam?.title,
+        this.exam?.description,
+        this.exam?.startDate,
+        this.exam?.endDate,
+        this.exam?.duration,
+        this.exam?.numberOfQuestions,
+        this.exam?.negativeMarks,
+        this.exam?.markPerQuestion,
+        this.exam?.templateType,
+        this.exam?.allowRetake,
+        this.exam?.allowPdf,
+        this.exam?.showAnswers,
+        this.exam?.maxRetakes,
+        this.exam?.attemptsUrl,
+        this.exam?.deviceAccessControl,
+        this.exam?.commentsCount,
+        this.exam?.slug,
+        selectedLanguage = null,
+        this.exam?.variableMarkPerQuestion,
+        this.exam?.passPercentage,
+        this.exam?.enableRanks,
+        this.exam?.showScore,
+        this.exam?.showPercentile,
+        categories = null,
+        isDetailsFetched = null,
+        this.exam?.isGrowthHackEnabled,
+        this.exam?.shareTextForSolutionUnlock,
+        this.exam?.showAnalytics,
+        this.exam?.instructions,
+        this.exam?.hasAudioQuestions,
+        this.exam?.rankPublishingDate,
+        this.exam?.enableQuizMode,
+        this.exam?.disableAttemptResume,
+        this.exam?.allowPreemptiveSectionEnding,
+        examDataModifiedOn = null
     )
 }
