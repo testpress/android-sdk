@@ -130,4 +130,8 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
     suspend fun getUpcomingContents(courseId: Long, arguments: HashMap<String, Any>): ApiResponse<List<ContentEntityLite>> {
         return getCourseService().getUpcomingContents(courseId, arguments)
     }
+
+    fun getNetworkContentWithId(contentId: Long): RetrofitCall<NetworkContent> {
+        return getCourseService().getNetworkContent("https://lmsdemo.testpress.in/api/v2.4/contents/$contentId/")
+    }
 }

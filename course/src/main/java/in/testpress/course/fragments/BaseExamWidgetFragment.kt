@@ -14,10 +14,12 @@ import `in`.testpress.exam.domain.toGreenDaoModels
 import `in`.testpress.enums.Status
 import `in`.testpress.network.Resource
 import `in`.testpress.course.repository.ExamContentRepository
+import `in`.testpress.course.repository.OfflineExamRepository
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.QuizActivity
 import `in`.testpress.course.ui.WebViewWithSSO
 import `in`.testpress.course.viewmodels.ExamContentViewModel
+import `in`.testpress.course.viewmodels.OfflineExamViewModel
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.util.MultiLanguagesUtil
@@ -36,7 +38,9 @@ import androidx.lifecycle.ViewModelProvider
 
 open class BaseExamWidgetFragment : Fragment() {
     lateinit var startButton: Button
+    lateinit var downloadExamButton: Button
     protected lateinit var viewModel: ExamContentViewModel
+    protected lateinit var offlineExamViewModel: OfflineExamViewModel
     protected lateinit var content: DomainContent
     protected var contentId: Long = -1
     lateinit var contentAttempts: ArrayList<DomainContentAttempt>
@@ -51,6 +55,13 @@ open class BaseExamWidgetFragment : Fragment() {
                 ) as T
             }
         }).get(ExamContentViewModel::class.java)
+        offlineExamViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return OfflineExamViewModel(
+                    OfflineExamRepository(context!!)
+                ) as T
+            }
+        }).get(OfflineExamViewModel::class.java)
     }
 
     override fun onAttach(context: Context) {
@@ -65,6 +76,7 @@ open class BaseExamWidgetFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         startButton = view.findViewById(R.id.start_exam)
+        downloadExamButton = view.findViewById(R.id.download_exam)
         contentId = requireArguments().getLong(ContentActivity.CONTENT_ID)
 
         viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer {
@@ -129,6 +141,9 @@ open class BaseExamWidgetFragment : Fragment() {
 
         updateStartButtonTextAndVisibility(exam, pausedAttempt)
         updateStartButtonListener(exam, pausedAttempt)
+        downloadExamButton.setOnClickListener {
+            offlineExamViewModel.fetch(contentId)
+        }
     }
 
     private fun updateStartButtonTextAndVisibility(exam: DomainExamContent, pausedAttempt: DomainContentAttempt?) {
