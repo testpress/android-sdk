@@ -88,16 +88,7 @@ open class BaseExamWidgetFragment : Fragment() {
                 Status.SUCCESS -> {
                     content = it.data!!
                     loadAttemptsAndUpdateStartButton()
-                    checkExamIsDownloaded()
-                    observeViewModelLoading()
-                    observeDownloadComplete()
-                    downloadExamButton.setOnClickListener {
-                        if (downloadExamButton.text == "Start Exam in Offline"){
-                            Toast.makeText(requireContext(),"Exam already downloaded", Toast.LENGTH_SHORT).show()
-                        } else {
-                            offlineExamViewModel.downloadExam(contentId, content.exam?.id!!, content.exam?.slug!!)
-                        }
-                    }
+
                 }
                 else -> {}
             }
@@ -188,6 +179,19 @@ open class BaseExamWidgetFragment : Fragment() {
 
         updateStartButtonTextAndVisibility(exam, pausedAttempt)
         updateStartButtonListener(exam, pausedAttempt)
+
+
+        checkExamIsDownloaded()
+        observeViewModelLoading()
+        observeDownloadComplete()
+        downloadExamButton.setOnClickListener {
+            if (downloadExamButton.text == "Start Exam in Offline"){
+                Toast.makeText(requireContext(),"Exam already downloaded", Toast.LENGTH_SHORT).show()
+            } else {
+                offlineExamViewModel.downloadExam(contentId, content.exam?.id!!, content.exam?.slug!!)
+            }
+        }
+
     }
 
     private fun updateStartButtonTextAndVisibility(exam: DomainExamContent, pausedAttempt: DomainContentAttempt?) {
