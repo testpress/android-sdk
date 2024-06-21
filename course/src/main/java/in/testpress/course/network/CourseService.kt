@@ -5,7 +5,9 @@ import `in`.testpress.course.api.TestpressCourseApiClient
 import `in`.testpress.course.api.TestpressCourseApiClient.*
 import `in`.testpress.database.entities.ContentEntityLite
 import `in`.testpress.database.entities.ProductCategoryEntity
+import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.network.NetworkAttempt
+import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Course
 import `in`.testpress.network.RetrofitCall
@@ -78,6 +80,11 @@ interface CourseService {
     fun getNetworkContentWithId(
         @Path(value = "content_id", encoded = true) contentId: Long
     ): RetrofitCall<NetworkContent>
+
+    @GET("${TestpressExamApiClient.EXAMS_LIST_v2_3_PATH}{exam_slug}${TestpressExamApiClient.LANGUAGES_PATH}")
+    fun getLanguages(
+        @Path(value = "exam_slug", encoded = true) examSlug: String?
+    ): RetrofitCall<TestpressApiResponse<NetworkLanguage>>
 }
 
 
@@ -138,5 +145,9 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     fun getNetworkContentWithId(contentId: Long): RetrofitCall<NetworkContent> {
         return getCourseService().getNetworkContentWithId(contentId)
+    }
+
+    fun getLanguages(slug: String): RetrofitCall<TestpressApiResponse<NetworkLanguage>> {
+        return getCourseService().getLanguages(slug)
     }
 }
