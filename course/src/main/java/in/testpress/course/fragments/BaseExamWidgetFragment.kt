@@ -92,7 +92,11 @@ open class BaseExamWidgetFragment : Fragment() {
                     observeViewModelLoading()
                     observeDownloadComplete()
                     downloadExamButton.setOnClickListener {
-                        offlineExamViewModel.downloadExam(contentId, content.exam?.id!!, content.exam?.slug!!)
+                        if (downloadExamButton.text == "Start Exam in Offline"){
+                            Toast.makeText(requireContext(),"Exam already downloaded", Toast.LENGTH_SHORT).show()
+                        } else {
+                            offlineExamViewModel.downloadExam(contentId, content.exam?.id!!, content.exam?.slug!!)
+                        }
                     }
                 }
                 else -> {}

@@ -4,7 +4,6 @@ import `in`.testpress.course.repository.OfflineExamRepository
 import `in`.testpress.course.viewmodels.OfflineExamViewModel
 import `in`.testpress.database.entities.OfflineExam
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
@@ -12,11 +11,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import `in`.testpress.course.databinding.ActivityOfflineExamListBinding
 import `in`.testpress.course.databinding.ItemOfflineExamBinding
+import `in`.testpress.ui.BaseToolBarActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-class OfflineExamListActivity : AppCompatActivity() {
+class OfflineExamListActivity : BaseToolBarActivity() {
 
     private lateinit var binding: ActivityOfflineExamListBinding
     private lateinit var offlineExamViewModel: OfflineExamViewModel
@@ -27,13 +27,15 @@ class OfflineExamListActivity : AppCompatActivity() {
         binding = ActivityOfflineExamListBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initializeViewModel()
+        setActionBarTitle("Offline Exam")
 
         offlineExamAdapter = OfflineExamAdapter()
         binding.recyclerView.adapter = offlineExamAdapter
 
         offlineExamViewModel.getAllOfflineExams().observe(this) { exams ->
             offlineExamAdapter.submitList(exams)
-            binding.noDataTextView.visibility = if (exams.isEmpty()) View.VISIBLE else View.GONE
+            binding.recyclerView.visibility = if (exams.isEmpty()) View.GONE else View.VISIBLE
+            binding.noDataLayout.visibility = if (exams.isEmpty()) View.VISIBLE else View.GONE
         }
     }
 
