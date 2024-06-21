@@ -1,75 +1,88 @@
 package `in`.testpress.course.ui
 
-import `in`.testpress.course.R
 import `in`.testpress.course.repository.OfflineExamRepository
 import `in`.testpress.course.viewmodels.OfflineExamViewModel
 import `in`.testpress.database.entities.OfflineExam
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import `in`.testpress.course.databinding.ActivityOfflineExamListBinding
+import `in`.testpress.course.databinding.ItemOfflineExamBinding
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 
 class OfflineExamListActivity : AppCompatActivity() {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: OfflineExamAdapter
+    private lateinit var binding: ActivityOfflineExamListBinding
     private lateinit var offlineExamViewModel: OfflineExamViewModel
+    private lateinit var offlineExamAdapter: OfflineExamAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_offline_exam_list)
+        binding = ActivityOfflineExamListBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        initializeViewModel()
 
+        offlineExamAdapter = OfflineExamAdapter()
+        binding.recyclerView.adapter = offlineExamAdapter
+
+        offlineExamViewModel.getAllOfflineExams().observe(this) { exams ->
+            offlineExamAdapter.submitList(exams)
+            binding.noDataTextView.visibility = if (exams.isEmpty()) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun initializeViewModel() {
         offlineExamViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return OfflineExamViewModel(
                     OfflineExamRepository(this@OfflineExamListActivity)
                 ) as T
             }
-        }).get(OfflineExamViewModel::class.java)
-
-        recyclerView = findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = OfflineExamAdapter(emptyList())
-        recyclerView.adapter = adapter
-
-        offlineExamViewModel.getAllOfflineExams().observe(this) { exams ->
-            adapter = OfflineExamAdapter(exams)
-            recyclerView.adapter = adapter
-        }
+        })[OfflineExamViewModel::class.java]
     }
 
-    inner class OfflineExamAdapter(private val exams: List<OfflineExam>) : RecyclerView.Adapter<OfflineExamAdapter.ExamViewHolder>() {
+    inner class OfflineExamAdapter :
+        ListAdapter<OfflineExam, OfflineExamAdapter.ExamViewHolder>(EXAM_COMPARATOR) {
+
+        inner class ExamViewHolder(private val binding: ItemOfflineExamBinding) :
+            RecyclerView.ViewHolder(binding.root) {
+
+            fun bind(exam: OfflineExam) {
+                binding.titleTextView.text = "${exam.title} Qs"
+                binding.totalTime.text = exam.duration
+                binding.numberOfQuestions.text = exam.numberOfQuestions.toString()
+                binding.deleteButton.setOnClickListener {
+                    offlineExamViewModel.deleteExam(exam.id!!)
+                }
+            }
+        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExamViewHolder {
-            val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_offline_exam, parent, false)
-            return ExamViewHolder(itemView)
+            val binding =
+                ItemOfflineExamBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            return ExamViewHolder(binding)
         }
 
         override fun onBindViewHolder(holder: ExamViewHolder, position: Int) {
-            val exam = exams[position]
+            val exam = getItem(position)
             holder.bind(exam)
         }
+    }
 
-        override fun getItemCount(): Int {
-            return exams.size
-        }
+    companion object {
+        private val EXAM_COMPARATOR = object : DiffUtil.ItemCallback<OfflineExam>() {
+            override fun areItemsTheSame(oldItem: OfflineExam, newItem: OfflineExam): Boolean {
+                return oldItem.id == newItem.id
+            }
 
-        inner class ExamViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            private val titleTextView: TextView = itemView.findViewById(R.id.titleTextView)
-            private val totalTime: TextView = itemView.findViewById(R.id.total_time)
-            private val totalQuestion: TextView = itemView.findViewById(R.id.number_of_questions)
-
-            fun bind(exam: OfflineExam) {
-                titleTextView.text = exam.title
-                totalTime.text = exam.duration
-                totalQuestion.text = exam.numberOfQuestions.toString()
-                // Bind other properties of OfflineExam as needed
+            override fun areContentsTheSame(oldItem: OfflineExam, newItem: OfflineExam): Boolean {
+                return oldItem == newItem
             }
         }
     }

@@ -74,4 +74,8 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
     fun getAllOfflineExams(): LiveData<List<OfflineExam>> {
         return repository.getAllOfflineExams()
     }
+
+    fun deleteExam(examId: Long) {
+        repository.deleteExam(examId)
+    }
 }
