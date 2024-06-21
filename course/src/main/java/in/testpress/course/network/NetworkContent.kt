@@ -184,6 +184,6 @@ fun NetworkContent.asOfflineExam(): OfflineExam {
         this.exam?.enableQuizMode,
         this.exam?.disableAttemptResume,
         this.exam?.allowPreemptiveSectionEnding,
-        examDataModifiedOn = null
+        this.exam?.examDataModifiedOn
     )
 }
