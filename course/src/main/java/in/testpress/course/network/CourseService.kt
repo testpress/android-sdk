@@ -85,6 +85,12 @@ interface CourseService {
     fun getLanguages(
         @Path(value = "exam_slug", encoded = true) examSlug: String?
     ): RetrofitCall<TestpressApiResponse<NetworkLanguage>>
+
+    @GET("api/v2.4/exams/{exam_id}/questions/")
+    fun getQuestions(
+        @Path(value = "exam_id", encoded = true) examId: Long,
+        @QueryMap queryParams: HashMap<String, Any>
+    ): RetrofitCall<ApiResponse<NetworkOfflineQuestionResponse>>
 }
 
 
@@ -149,5 +155,12 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     fun getLanguages(slug: String): RetrofitCall<TestpressApiResponse<NetworkLanguage>> {
         return getCourseService().getLanguages(slug)
+    }
+
+    fun getQuestions(
+        examId: Long,
+        queryParams: HashMap<String, Any>
+    ): RetrofitCall<ApiResponse<NetworkOfflineQuestionResponse>> {
+        return getCourseService().getQuestions(examId, queryParams)
     }
 }

@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContent
+import `in`.testpress.course.network.NetworkOfflineQuestionResponse
 import `in`.testpress.course.network.asOfflineExam
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.exam.network.NetworkLanguage
@@ -12,6 +13,7 @@ import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.network.Resource
 import `in`.testpress.util.extension.isNotNull
 import `in`.testpress.util.extension.isNotNullAndNotEmpty
+import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -25,6 +27,7 @@ class OfflineExamRepository(val context: Context) {
     private val database = TestpressDatabase.invoke(context)
     private val offlineExamDao = database.offlineExamDao()
     private val languageDao = database.languageDao()
+    private val directionDao = database.directionDao()
 
     private val _downloadExamResult = MutableLiveData<Resource<Boolean>>()
     val downloadExamResult: LiveData<Resource<Boolean>> get() = _downloadExamResult
@@ -61,7 +64,7 @@ class OfflineExamRepository(val context: Context) {
                 override fun onSuccess(result: TestpressApiResponse<NetworkLanguage>) {
                     CoroutineScope(Dispatchers.IO).launch {
                         languageDao.insertAll(result.results.asRoomModels(examId))
-                        _downloadExamResult.postValue(Resource.success(true))
+                        downloadQuestions(examId)
                     }
                 }
 
@@ -70,6 +73,41 @@ class OfflineExamRepository(val context: Context) {
                 }
             })
     }
+
+    fun downloadQuestions(examId: Long) {
+        var page = 1
+
+        fun fetchQuestionsPage() {
+            val queryParams = hashMapOf<String, Any>("page" to page)
+            courseClient.getQuestions(examId, queryParams)
+                .enqueue(object : TestpressCallback<ApiResponse<NetworkOfflineQuestionResponse>>() {
+                    override fun onSuccess(result: ApiResponse<NetworkOfflineQuestionResponse>) {
+                        if (result.next != null) {
+                            // Save questions in db
+                            saveDataInLocalDb(result.results)
+                            page++
+                            fetchQuestionsPage()
+                        } else {
+                            // Save questions in db
+                            _downloadExamResult.postValue(Resource.success(true))
+                        }
+                    }
+
+                    override fun onException(exception: TestpressException) {
+                        handleDownloadError(exception)
+                    }
+                })
+        }
+
+        fetchQuestionsPage()
+    }
+
+    private fun saveDataInLocalDb(response: NetworkOfflineQuestionResponse){
+        CoroutineScope(Dispatchers.IO).launch {
+            directionDao.insertAll(response.directions)
+        }
+    }
+
 
     private fun handleDownloadError(exception: Exception) {
         _downloadExamResult.postValue(

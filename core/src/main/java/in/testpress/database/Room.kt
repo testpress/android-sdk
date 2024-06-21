@@ -71,7 +71,7 @@ abstract class TestpressDatabase : RoomDatabase() {
     abstract fun contentLiteRemoteKeyDao():ContentLiteRemoteKeyDao
     abstract fun offlineExamDao():OfflineExamDao
     abstract fun languageDao():LanguageDao
-
+    abstract fun directionDao():DirectionDao
     companion object {
         private lateinit var INSTANCE: TestpressDatabase
 
