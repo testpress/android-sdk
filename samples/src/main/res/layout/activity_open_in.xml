@@ -86,6 +86,11 @@
             android:text="Custom Test"
             android:id="@+id/custom_test_generation" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/Button"
+            android:text="Offline Exam"
+            android:id="@+id/offline_exam_download" />
+
     </LinearLayout>
 
     </ScrollView>

@@ -73,6 +73,11 @@ interface CourseService {
         @Path(value = "course_id", encoded = true) courseId: Long,
         @QueryMap queryParams: HashMap<String, Any>
     ): ApiResponse<List<ContentEntityLite>>
+
+    @GET("$CONTENTS_PATH_v2_4{content_id}/")
+    fun getNetworkContentWithId(
+        @Path(value = "content_id", encoded = true) contentId: Long
+    ): RetrofitCall<NetworkContent>
 }
 
 
@@ -129,5 +134,9 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     suspend fun getUpcomingContents(courseId: Long, arguments: HashMap<String, Any>): ApiResponse<List<ContentEntityLite>> {
         return getCourseService().getUpcomingContents(courseId, arguments)
+    }
+
+    fun getNetworkContentWithId(contentId: Long): RetrofitCall<NetworkContent> {
+        return getCourseService().getNetworkContentWithId(contentId)
     }
 }
