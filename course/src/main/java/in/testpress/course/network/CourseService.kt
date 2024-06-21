@@ -5,7 +5,9 @@ import `in`.testpress.course.api.TestpressCourseApiClient
 import `in`.testpress.course.api.TestpressCourseApiClient.*
 import `in`.testpress.database.entities.ContentEntityLite
 import `in`.testpress.database.entities.ProductCategoryEntity
+import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.network.NetworkAttempt
+import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Course
 import `in`.testpress.network.RetrofitCall
@@ -73,6 +75,22 @@ interface CourseService {
         @Path(value = "course_id", encoded = true) courseId: Long,
         @QueryMap queryParams: HashMap<String, Any>
     ): ApiResponse<List<ContentEntityLite>>
+
+    @GET("api/v2.4/exams/{exam_id}/questions/")
+    fun getQuestions(
+        @Path(value = "exam_id", encoded = true) examId: Long,
+        @QueryMap queryParams: HashMap<String, Any>
+    ): RetrofitCall<ApiResponse<NetworkOfflineQuestionResponse>>
+
+    @GET("${TestpressExamApiClient.EXAMS_LIST_v2_3_PATH}{exam_slug}${TestpressExamApiClient.LANGUAGES_PATH}")
+    fun getLanguages(
+        @Path(value = "exam_slug", encoded = true) examSlug: String?
+    ): RetrofitCall<TestpressApiResponse<NetworkLanguage>>
+
+    @GET("/api/v2.4/contents/{content_id}/")
+    fun getNetworkContentWithId(
+        @Path(value = "content_id", encoded = true) contentId: Long
+    ): RetrofitCall<NetworkContent>
 }
 
 
@@ -129,5 +147,20 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     suspend fun getUpcomingContents(courseId: Long, arguments: HashMap<String, Any>): ApiResponse<List<ContentEntityLite>> {
         return getCourseService().getUpcomingContents(courseId, arguments)
+    }
+
+    fun getNetworkContentWithId(contentId: Long): RetrofitCall<NetworkContent> {
+        return getCourseService().getNetworkContentWithId(contentId)
+    }
+
+    fun getQuestions(
+        examId: Long,
+        queryParams: HashMap<String, Any>
+    ): RetrofitCall<ApiResponse<NetworkOfflineQuestionResponse>> {
+        return getCourseService().getQuestions(examId, queryParams)
+    }
+
+    fun getLanguages(slug: String): RetrofitCall<TestpressApiResponse<NetworkLanguage>> {
+        return getCourseService().getLanguages(slug)
     }
 }
