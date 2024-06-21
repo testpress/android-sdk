@@ -2,6 +2,8 @@ package `in`.testpress.course.repository
 
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
+import `in`.testpress.core.TestpressSdk
+import `in`.testpress.core.TestpressSession
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkOfflineQuestionResponse
@@ -10,6 +12,7 @@ import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.exam.network.asRoomModels
+import `in`.testpress.models.InstituteSettings
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.network.Resource
 import `in`.testpress.v2_4.models.ApiResponse

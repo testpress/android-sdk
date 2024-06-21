@@ -86,6 +86,11 @@ interface CourseService {
     fun getLanguages(
         @Path(value = "exam_slug", encoded = true) examSlug: String?
     ): RetrofitCall<TestpressApiResponse<NetworkLanguage>>
+
+    @GET("/api/v2.4/contents/{content_id}/")
+    fun getNetworkContentWithId(
+        @Path(value = "content_id", encoded = true) contentId: Long
+    ): RetrofitCall<NetworkContent>
 }
 
 
@@ -145,7 +150,7 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
     }
 
     fun getNetworkContentWithId(contentId: Long): RetrofitCall<NetworkContent> {
-        return getCourseService().getNetworkContent("https://lmsdemo.testpress.in/api/v2.4/contents/$contentId/")
+        return getCourseService().getNetworkContentWithId(contentId)
     }
 
     fun getQuestions(
