@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Language(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     val id: Long? = null,
     val code: String? = null,
     val title: String? = null,

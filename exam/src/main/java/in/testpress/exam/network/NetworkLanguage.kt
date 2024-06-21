@@ -26,3 +26,17 @@ fun List<NetworkLanguage>.asGreenDaoModels(): List<Language> {
         createGreenDaoModel(it)
     }
 }
+
+fun List<NetworkLanguage>.asRoomModels(examId: Long): List<`in`.testpress.database.entities.Language>{
+    return this.map {
+        it.asRoomModel(examId)
+    }
+}
+
+fun NetworkLanguage.asRoomModel(examId: Long): `in`.testpress.database.entities.Language{
+    return `in`.testpress.database.entities.Language(
+        code = this.code,
+        title = this.title,
+        examId = examId
+    )
+}
