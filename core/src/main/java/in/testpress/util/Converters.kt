@@ -1,5 +1,6 @@
 package `in`.testpress.util
 
+import `in`.testpress.database.entities.Answer
 import `in`.testpress.database.entities.Question
 import androidx.room.TypeConverter
 import com.google.gson.Gson
@@ -54,6 +55,20 @@ object Converters {
     @JvmStatic
     fun toQuestionList(value: String?): ArrayList<Question>? {
         val listType = object : TypeToken<ArrayList<Question>>() {}.type
+        return Gson().fromJson(value, listType)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromAnswerList(value: ArrayList<Answer>?): String? {
+        val gson = Gson()
+        return gson.toJson(value)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toAnswerList(value: String?): ArrayList<Answer>? {
+        val listType = object : TypeToken<ArrayList<Answer>>() {}.type
         return Gson().fromJson(value, listType)
     }
 }

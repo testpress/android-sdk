@@ -28,6 +28,10 @@ class OfflineExamRepository(val context: Context) {
     private val offlineExamDao = database.offlineExamDao()
     private val languageDao = database.languageDao()
     private val directionDao = database.directionDao()
+    private val subjectDao = database.subjectDao()
+    private val sectionsDao = database.sectionsDao()
+    private val examQuestionDao = database.examQuestionDao()
+    private val questionDao = database.questionDao()
 
     private val _downloadExamResult = MutableLiveData<Resource<Boolean>>()
     val downloadExamResult: LiveData<Resource<Boolean>> get() = _downloadExamResult
@@ -83,12 +87,11 @@ class OfflineExamRepository(val context: Context) {
                 .enqueue(object : TestpressCallback<ApiResponse<NetworkOfflineQuestionResponse>>() {
                     override fun onSuccess(result: ApiResponse<NetworkOfflineQuestionResponse>) {
                         if (result.next != null) {
-                            // Save questions in db
-                            saveDataInLocalDb(result.results)
+                            saveQuestionsToDB(result.results)
                             page++
                             fetchQuestionsPage()
                         } else {
-                            // Save questions in db
+                            saveQuestionsToDB(result.results)
                             _downloadExamResult.postValue(Resource.success(true))
                         }
                     }
@@ -102,9 +105,13 @@ class OfflineExamRepository(val context: Context) {
         fetchQuestionsPage()
     }
 
-    private fun saveDataInLocalDb(response: NetworkOfflineQuestionResponse){
+    private fun saveQuestionsToDB(response: NetworkOfflineQuestionResponse){
         CoroutineScope(Dispatchers.IO).launch {
             directionDao.insertAll(response.directions)
+            subjectDao.insertAll(response.subjects)
+            sectionsDao.insertAll(response.sections)
+            examQuestionDao.insertAll(response.examQuestions)
+            questionDao.insertAll(response.questions)
         }
     }
 
