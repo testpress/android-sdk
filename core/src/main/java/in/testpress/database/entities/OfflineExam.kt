@@ -2,6 +2,8 @@ package `in`.testpress.database.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Entity
 data class OfflineExam(
@@ -45,5 +47,12 @@ data class OfflineExam(
     val enableQuizMode: Boolean? = null,
     val disableAttemptResume: Boolean? = null,
     val allowPreemptiveSectionEnding: Boolean? = null,
-    val examDataModifiedOn: String? = null
-)
+    val examDataModifiedOn: String? = null,
+    var isSyncRequired: Boolean = false,
+    val contentId: Long? = null
+) {
+    fun getExamDataModifiedOnAsDate(): Date? {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+        return dateFormat.parse(examDataModifiedOn)
+    }
+}

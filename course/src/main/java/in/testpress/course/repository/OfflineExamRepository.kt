@@ -7,6 +7,7 @@ import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkOfflineQuestionResponse
 import `in`.testpress.course.network.asOfflineExam
 import `in`.testpress.database.TestpressDatabase
+import `in`.testpress.database.entities.ExamModification
 import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.exam.network.asRoomModels
@@ -16,11 +17,13 @@ import `in`.testpress.util.extension.isNotNull
 import `in`.testpress.util.extension.isNotNullAndNotEmpty
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.log
 
 class OfflineExamRepository(val context: Context) {
 
@@ -130,10 +133,27 @@ class OfflineExamRepository(val context: Context) {
     }
 
     suspend fun deleteOfflineExam(examId: Long) {
-        offlineExamDao.deleteById(examId)
-        examQuestionDao.deleteByExamId(examId)
-        // Here we are deleting exam and exam question only
-        // Deleting Question, Direction, Section, Subject need to handle
+            offlineExamDao.deleteById(examId)
+            examQuestionDao.deleteByExamId(examId)
+            // Here we are deleting exam and exam question only
+            // Deleting Question, Direction, Section, Subject need to handle
     }
 
+    suspend fun fetchExamsModifiedDates() {
+        val list = listOf(
+            ExamModification(2101,"2024-06-23T16:43:35.498127+05:30"),
+            ExamModification(2358,"2024-06-23T16:43:35.498127+05:30")
+        )
+        updateSyncStatus(list)
+        // Make the network call to fetch the list of content IDs with last modified dates
+    }
+
+    private suspend fun updateSyncStatus(examModifications: List<ExamModification>) {
+        examModifications.forEach { modification ->
+            val exam = offlineExamDao.getById(modification.contentId)
+            if (exam?.getExamDataModifiedOnAsDate()?.before(modification.getLastModifiedAsDate()) == true) {
+                offlineExamDao.updateSyncRequired(modification.contentId, true)
+            }
+        }
+    }
 }
