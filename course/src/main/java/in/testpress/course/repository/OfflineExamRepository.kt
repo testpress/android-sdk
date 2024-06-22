@@ -7,6 +7,7 @@ import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkOfflineQuestionResponse
 import `in`.testpress.course.network.asOfflineExam
 import `in`.testpress.database.TestpressDatabase
+import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.exam.network.asRoomModels
 import `in`.testpress.models.TestpressApiResponse
@@ -122,5 +123,18 @@ class OfflineExamRepository(val context: Context) {
                 TestpressException.unexpectedError(exception), null
             )
         )
+    }
+
+    fun getAll():LiveData<List<OfflineExam>>{
+        return offlineExamDao.getAll()
+    }
+
+    fun deleteOfflineExam(examId: Long) {
+        CoroutineScope(Dispatchers.IO).launch {
+            offlineExamDao.deleteById(examId)
+            examQuestionDao.deleteByExamId(examId)
+            // Here we are deleting exam and exam question only
+            // Deleting Question, Direction, Section, Subject need to handle
+        }
     }
 }

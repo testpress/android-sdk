@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <include layout="@layout/testpress_toolbar" />
 
@@ -13,29 +14,54 @@
         android:layout_marginTop="5dp"
         android:theme="@style/TextInputLayoutTheme"
         tools:ignore="MissingConstraints">
+
         <androidx.appcompat.widget.AppCompatEditText
-            style="@style/EditTextStyle"
             android:id="@+id/edit_text"
+            style="@style/EditTextStyle"
+            android:hint="Enter the Content Id"
+            android:imeOptions="actionDone"
             android:inputType="number"
-            android:textSize="16sp"
             android:maxLines="6"
             android:textColor="@color/black"
-            android:hint="Enter the Content Id"
-            android:imeOptions="actionDone" />
+            android:textSize="16sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <ProgressBar
         android:id="@+id/loading_progress_bar"
-        android:layout_gravity="center"
-        android:visibility="gone"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/downloads"
         style="@style/Button"
-        android:text="Downloads"
-        android:layout_gravity="center"
         android:layout_width="wrap_content"
-        android:id="@+id/downloads" />
+        android:layout_gravity="center"
+        android:text="Downloads" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/sample_item_offline_exam" />
+
+        <TextView
+            android:id="@+id/noDataLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recyclerView"
+            android:text="No offline exams are available."
+            android:textSize="20sp" />
+
+    </RelativeLayout>
 
 </LinearLayout>
