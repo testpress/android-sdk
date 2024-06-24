@@ -29,27 +29,12 @@ class OfflineExamSampleActivity: BaseToolBarActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityOfflineExamSampleBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        initializeViewModel()
         setActionBarTitle("Offline Exam")
-
-        binding.downloads.setOnClickListener {
-            if (binding.editText.text.isNullOrEmpty()){
-                Toast.makeText(this,"Content Id required to download the exam",Toast.LENGTH_SHORT).show()
-            } else {
-                offlineExamViewModel.downloadExam(binding.editText.text.toString().toLong())
-            }
-        }
-
+        initializeViewModel()
+        initializeListAdapter()
+        initializeListView()
+        initializeOnClickListener()
         observeDownloadExamResult()
-
-        offlineExamAdapter = OfflineExamAdapter()
-        binding.recyclerView.adapter = offlineExamAdapter
-
-        offlineExamViewModel.getAll().observe(this) { exams ->
-            offlineExamAdapter.submitList(exams)
-            binding.recyclerView.visibility = if (exams.isEmpty()) View.GONE else View.VISIBLE
-            binding.noDataLayout.visibility = if (exams.isEmpty()) View.VISIBLE else View.GONE
-        }
     }
 
     private fun initializeViewModel() {
@@ -60,6 +45,30 @@ class OfflineExamSampleActivity: BaseToolBarActivity() {
                 ) as T
             }
         })[OfflineExamViewModel::class.java]
+    }
+
+    private fun initializeListAdapter() {
+        offlineExamAdapter = OfflineExamAdapter()
+        binding.recyclerView.adapter = offlineExamAdapter
+    }
+
+    private fun initializeListView() {
+        offlineExamViewModel.getAll().observe(this) { exams ->
+            offlineExamAdapter.submitList(exams)
+            binding.recyclerView.visibility = if (exams.isEmpty()) View.GONE else View.VISIBLE
+            binding.noDataLayout.visibility = if (exams.isEmpty()) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun initializeOnClickListener() {
+        binding.downloads.setOnClickListener {
+            if (binding.editText.text.isNullOrEmpty()) {
+                Toast.makeText(this, "Content Id required to download the exam", Toast.LENGTH_SHORT)
+                    .show()
+            } else {
+                offlineExamViewModel.downloadExam(binding.editText.text.toString().toLong())
+            }
+        }
     }
 
     private fun observeDownloadExamResult() {
