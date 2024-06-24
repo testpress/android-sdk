@@ -23,6 +23,7 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 import androidx.appcompat.app.AlertDialog;
 
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -894,6 +895,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
     private void saveResult(final int position, final Action action) {
+        Log.d("TAG", "saveResult: "+position);
         if (attemptItemList.size() <= position) {
             return;
         }
