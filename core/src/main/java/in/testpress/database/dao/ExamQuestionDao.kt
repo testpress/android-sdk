@@ -9,5 +9,5 @@ import androidx.room.Query
 interface ExamQuestionDao: BaseDao<ExamQuestion> {
 
     @Query("DELETE FROM ExamQuestion WHERE examId = :examId")
-    fun deleteByExamId(examId: Long)
+    suspend fun deleteByExamId(examId: Long)
 }

@@ -129,12 +129,11 @@ class OfflineExamRepository(val context: Context) {
         return offlineExamDao.getAll()
     }
 
-    fun deleteOfflineExam(examId: Long) {
-        CoroutineScope(Dispatchers.IO).launch {
-            offlineExamDao.deleteById(examId)
-            examQuestionDao.deleteByExamId(examId)
-            // Here we are deleting exam and exam question only
-            // Deleting Question, Direction, Section, Subject need to handle
-        }
+    suspend fun deleteOfflineExam(examId: Long) {
+        offlineExamDao.deleteById(examId)
+        examQuestionDao.deleteByExamId(examId)
+        // Here we are deleting exam and exam question only
+        // Deleting Question, Direction, Section, Subject need to handle
     }
+
 }

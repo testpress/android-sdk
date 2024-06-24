@@ -5,6 +5,8 @@ import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.network.Resource
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 class OfflineExamViewModel(private val repository: OfflineExamRepository) : ViewModel() {
 
@@ -19,8 +21,8 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
     }
 
     fun deleteOfflineExam(examId: Long) {
-        return repository.deleteOfflineExam(examId)
+        viewModelScope.launch {
+            repository.deleteOfflineExam(examId)
+        }
     }
-
-
 }
