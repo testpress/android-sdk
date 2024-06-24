@@ -35,15 +35,6 @@ class OfflineExamSampleActivity: BaseToolBarActivity() {
         initializeListView()
         initializeOnClickListener()
         observeDownloadExamResult()
-
-        offlineExamAdapter = OfflineExamAdapter()
-        binding.recyclerView.adapter = offlineExamAdapter
-
-        offlineExamViewModel.getAll().observe(this) { exams ->
-            offlineExamAdapter.submitList(exams)
-            binding.recyclerView.visibility = if (exams.isEmpty()) View.GONE else View.VISIBLE
-            binding.noDataLayout.visibility = if (exams.isEmpty()) View.VISIBLE else View.GONE
-        }
     }
 
     private fun initializeViewModel() {
