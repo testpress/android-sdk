@@ -69,6 +69,8 @@ import in.testpress.util.CommonUtils;
 import in.testpress.util.EventsTrackerFacade;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
+import kotlin.Pair;
+import kotlin.Triple;
 
 import static in.testpress.exam.ui.TestActivity.PARAM_COURSE_ATTEMPT;
 import static in.testpress.exam.ui.TestActivity.PARAM_COURSE_CONTENT;
@@ -128,7 +130,7 @@ public class TestFragment extends BaseFragment implements
      */
     private HashMap<String, Integer> plainSpinnerItemOffsets = new HashMap<>();
 
-    private enum Action { PAUSE, END, UPDATE_ANSWER, END_SECTION }
+    public static enum Action { PAUSE, END, UPDATE_ANSWER, END_SECTION }
     private RetrofitCall<Attempt> heartBeatApiRequest;
     private RetrofitCall<NetworkAttemptSection> endSectionApiRequest;
     private RetrofitCall<NetworkAttemptSection> startSectionApiRequest;
@@ -209,6 +211,7 @@ public class TestFragment extends BaseFragment implements
             view.findViewById(R.id.timer).setVisibility(View.GONE);
         }
         observeAttemptItemResources();
+        observeSaveAnswerResource();
     }
 
     private void initializeLanguageFilter() {
@@ -911,76 +914,91 @@ public class TestFragment extends BaseFragment implements
             if (action != Action.UPDATE_ANSWER) {
                 showProgress(R.string.testpress_saving_last_change);
             }
-            apiClient.postAnswer(attemptItem)
-                    .enqueue(new TestpressCallback<AttemptItem>() {
-                        @Override
-                        public void onSuccess(AttemptItem newAttemptItem) {
-                            if (getActivity() == null) {
-                                return;
-                            }
-                            attemptItem.setSelectedAnswers(newAttemptItem.getSelectedAnswers());
-                            attemptItem.setShortText(newAttemptItem.getShortText());
-                            attemptItem.setReview(newAttemptItem.getReview());
-                            attemptItem.setFiles(newAttemptItem.getFiles());
-                            attemptItem.setEssayText(newAttemptItem.getEssayText());
-
-                            if (isNonSectionalOrIBPSExam() || (attempt.hasSectionalLock() && sections.get(currentSectionPosition).equals("Running"))) {
-                                attemptItemList.set(position, attemptItem);
-                            }
-
-                            if (action.equals(Action.PAUSE)) {
-                                progressDialog.dismiss();
-                                returnToHistory();
-                            } else if (action.equals(Action.END)) {
-                                endExam();
-                            } else if (action.equals(Action.END_SECTION)) {
-                                endSection();
-                            } else {
-                                if (progressDialog.isShowing()) {
-                                    startCountDownTimer(millisRemaining);
-                                    progressDialog.dismiss();
-                                }
-                                updatePanel();
-                            }
-                        }
-
-                        @Override
-                        public void onException(TestpressException exception) {
-                            if (getActivity() == null) {
-                                return;
-                            }
-                            if (action.equals(Action.PAUSE)) {
-                                progressDialog.dismiss();
-                                returnToHistory();
-                                return;
-                            }
-
-                            TestpressError errorDetails = exception.getErrorBodyAs(exception.getResponse(), TestpressError.class);
-
-                            if (exception.isForbidden() && isMaxQuestionsAttemptedError(errorDetails)) {
-                                clearAndLoadSameQuestion(position);
-                                saveAnswerAlertDialog = showMaxQuestionsAttemptedError(errorDetails);
-                                progressDialog.dismiss();
-                            } else {
-                                stopTimer();
-                                progressDialog.dismiss();
-                                TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception) {
-                                    @Override
-                                    protected void onRetry() {
-                                        if (action == Action.UPDATE_ANSWER) {
-                                            showProgress(R.string.testpress_saving_last_change);
-                                        }
-                                        saveResult(position, action);
-                                    }
-                                };
-                                saveAnswerAlertDialog = alertDialog.show();
-                            }
-                        }
-                    });
+            attemptItemViewModel.saveAnswer(position,attemptItem,action);
         } else if (action.equals(Action.PAUSE)) {
             progressDialog.dismiss();
             returnToHistory();
         }
+    }
+
+    private void observeSaveAnswerResource() {
+        attemptItemViewModel.getSaveResultResource().observe(requireActivity(), new Observer<Resource<Triple<Integer, AttemptItem, Action>>>() {
+            @Override
+            public void onChanged(Resource<Triple<Integer, AttemptItem, Action>> hashMapResource) {
+                int position = hashMapResource.getData().getFirst();
+                AttemptItem newAttemptItem = hashMapResource.getData().getSecond();
+                Action action = hashMapResource.getData().getThird();
+                final AttemptItem attemptItem = attemptItemList.get(position);
+                TestpressException exception = hashMapResource.getException();
+                switch (hashMapResource.getStatus()) {
+                    case SUCCESS: {
+                        if (getActivity() == null) {
+                            return;
+                        }
+                        attemptItem.setSelectedAnswers(newAttemptItem.getSelectedAnswers());
+                        attemptItem.setShortText(newAttemptItem.getShortText());
+                        attemptItem.setReview(newAttemptItem.getReview());
+                        attemptItem.setFiles(newAttemptItem.getFiles());
+                        attemptItem.setEssayText(newAttemptItem.getEssayText());
+
+                        if (isNonSectionalOrIBPSExam() || (attempt.hasSectionalLock() && sections.get(attempt.getCurrentSectionPosition()).equals("Running"))) {
+                            attemptItemList.set(position, attemptItem);
+                        }
+
+                        if (action.equals(Action.PAUSE)) {
+                            progressDialog.dismiss();
+                            returnToHistory();
+                        } else if (action.equals(Action.END)) {
+                            endExam();
+                        } else if (action.equals(Action.END_SECTION)) {
+                            endSection();
+                        } else {
+                            if (progressDialog.isShowing()) {
+                                startCountDownTimer(millisRemaining);
+                                progressDialog.dismiss();
+                            }
+                            updatePanel();
+                        }
+                        break;
+                    }
+                    case LOADING: {
+                        break;
+                    }
+                    case ERROR: {
+                        if (getActivity() == null) {
+                            return;
+                        }
+                        if (action.equals(Action.PAUSE)) {
+                            progressDialog.dismiss();
+                            returnToHistory();
+                            return;
+                        }
+
+                        TestpressError errorDetails = exception.getErrorBodyAs(exception.getResponse(), TestpressError.class);
+
+                        if (exception.isForbidden() && isMaxQuestionsAttemptedError(errorDetails)) {
+                            clearAndLoadSameQuestion(position);
+                            saveAnswerAlertDialog = showMaxQuestionsAttemptedError(errorDetails);
+                            progressDialog.dismiss();
+                        } else {
+                            stopTimer();
+                            progressDialog.dismiss();
+                            TestEngineAlertDialog alertDialog = new TestEngineAlertDialog(exception) {
+                                @Override
+                                protected void onRetry() {
+                                    if (action == Action.UPDATE_ANSWER) {
+                                        showProgress(R.string.testpress_saving_last_change);
+                                    }
+                                    saveResult(position, action);
+                                }
+                            };
+                            saveAnswerAlertDialog = alertDialog.show();
+                        }
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     private boolean isMaxQuestionsAttemptedError(TestpressError errorDetails) {
