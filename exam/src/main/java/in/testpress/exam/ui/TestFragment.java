@@ -16,9 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.lifecycle.Observer;
-import androidx.loader.app.LoaderManager;
 import androidx.core.content.ContextCompat;
-import androidx.loader.content.Loader;
 import androidx.viewpager.widget.ViewPager;
 import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 import androidx.appcompat.app.AlertDialog;
@@ -53,9 +51,7 @@ import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.network.NetworkAttemptSection;
 import in.testpress.exam.network.NetworkAttemptSectionKt;
-import in.testpress.exam.pager.TestQuestionsPager;
 import in.testpress.exam.api.TestpressExamApiClient;
-import in.testpress.exam.ui.loaders.AttemptItemsLoader;
 import in.testpress.exam.ui.view.NonSwipeableViewPager;
 import in.testpress.exam.ui.viewmodel.AttemptItemViewModel;
 import in.testpress.models.InstituteSettings;
@@ -71,7 +67,6 @@ import in.testpress.ui.BaseFragment;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.CommonUtils;
 import in.testpress.util.EventsTrackerFacade;
-import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 
@@ -80,7 +75,7 @@ import static in.testpress.exam.ui.TestActivity.PARAM_COURSE_CONTENT;
 import static in.testpress.models.greendao.Attempt.COMPLETED;
 import static in.testpress.models.greendao.Attempt.NOT_STARTED;
 
-public class TestFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<List<AttemptItem>>,
+public class TestFragment extends BaseFragment implements
         PlainSpinnerItemAdapter.SectionInfoClickListener, TestPanelListAdapter.ListItemClickListener {
 
     private static final int APP_BACKGROUND_DELAY = 60000; // 1m
@@ -119,7 +114,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     private CourseAttempt courseAttempt;
     private int currentQuestionIndex;
     List<AttemptSection> sections = new ArrayList<>();
-    public TestQuestionsPager questionsResourcePager;
     List<AttemptItem> attemptItemList = new ArrayList<>();
     CountDownTimer countDownTimer;
     long millisRemaining = -1;
@@ -148,8 +142,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             stopTimerOnAppWentBackground();
         }
     };
-    public int totalQuestions = 0;
-    private boolean isNextPageQuestionsBeingFetched = false;
     private InstituteSettings instituteSettings;
     private EventsTrackerFacade eventsTrackerFacade;
     private AttemptItemViewModel attemptItemViewModel;
@@ -158,10 +150,10 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initializeAttemptAndExamVariables(savedInstanceState);
-        initializeResourcePager();
         instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
         eventsTrackerFacade = new EventsTrackerFacade(getContext());
         logEvent(EventsTrackerFacade.STARTED_EXAM);
+        apiClient = new TestpressExamApiClient(getActivity());
         attemptItemViewModel = AttemptItemViewModel.Companion.initializeViewModel(requireActivity());
     }
 
@@ -189,16 +181,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             attempt = savedInstanceState.getParcelable(PARAM_ATTEMPT);
         }
         sections = attempt.getSections();
-    }
-
-    private void initializeResourcePager() {
-//        String questionUrl = attempt.getQuestionsUrlFrag();
-//        if (attempt.hasSectionalLock()) {
-//            questionUrl = sections.get(attempt.getCurrentSectionPosition()).getQuestionsUrlFrag();
-//        }
-//        questionUrl = questionUrl.replace("v2.3", "v2.2.1");
-//        apiClient = new TestpressExamApiClient(getActivity());
-//        questionsResourcePager = new TestQuestionsPager(questionUrl, apiClient);
     }
 
     @Override
@@ -475,15 +457,15 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
             @Override
             public void onPageSelected(int position) {
+                attemptItemViewModel.setCurrentQuestionPosition(position);
                 if (
-                        (viewPagerAdapter.getCount() < totalQuestions)
-                        && ((viewPagerAdapter.getCount() - position) <= 4)
-                        && !isNextPageQuestionsBeingFetched
+                        (viewPagerAdapter.getCount() < attemptItemViewModel.getTotalQuestions())
+                                && ((viewPagerAdapter.getCount() - position) <= 4)
+                                && !attemptItemViewModel.isNextPageQuestionsBeingFetched()
                 ) {
-                    isNextPageQuestionsBeingFetched = true;
+                    attemptItemViewModel.setNextPageQuestionsBeingFetched(true);
                     questionsListProgressBar.setVisibility(View.VISIBLE);
                     fetchAttemptItems();
-                    //getLoaderManager().restartLoader(0, null, TestFragment.this);
                 }
                 goToQuestion(position, true);
             }
@@ -524,17 +506,16 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             @Override
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItems, int totalItems) {
 
-                boolean hasAllQuestionsFetched = (totalItems == totalQuestions);
-                if (hasAllQuestionsFetched || isNextPageQuestionsBeingFetched) {
+                boolean hasAllQuestionsFetched = (totalItems == attemptItemViewModel.getTotalQuestions());
+                if (hasAllQuestionsFetched || attemptItemViewModel.isNextPageQuestionsBeingFetched()) {
                     return;
                 }
 
                 if ((totalItems - firstVisibleItem) == visibleItems) {
-                    if (attemptItemList.size() < totalQuestions) {
-                        isNextPageQuestionsBeingFetched = true;
+                    if (attemptItemList.size() < attemptItemViewModel.getTotalQuestions()) {
+                        attemptItemViewModel.setNextPageQuestionsBeingFetched(true);
                         questionsListProgressBar.setVisibility(View.VISIBLE);
                         fetchAttemptItems();
-                        //getLoaderManager().restartLoader(0, null, TestFragment.this);
                     }
                 }
             }
@@ -582,7 +563,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         }
         currentQuestionIndex = position;
         questionsListAdapter.setCurrentAttemptItemIndex(position + 1);
-        if (slidingPaneLayout.isOpen() && !isNextPageQuestionsBeingFetched) {
+        if (slidingPaneLayout.isOpen() && !attemptItemViewModel.isNextPageQuestionsBeingFetched()) {
             slidingPaneLayout.closePane();
         }
         if(plainSpinnerAdapter != null && plainSpinnerAdapter.getCount() > 1) {
@@ -704,22 +685,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         saveResult(viewPager.getCurrentItem(), Action.PAUSE);
     }
 
-    @NonNull
-    @Override
-    public Loader<List<AttemptItem>> onCreateLoader(int id, final Bundle args) {
-        Log.d("TAG", "onCreateLoader: ");
-        if (attempt.hasSectionalLock()) {
-            progressDialog.setMessage(getString(R.string.testpress_loading_section_questions,
-                    sections.get(attempt.getCurrentSectionPosition()).getName()));
-
-            progressDialog.show();
-        } else {
-            showProgress(R.string.testpress_loading_questions);
-        }
-        boolean fetchSinglePageOnly = attempt.hasSectionalLock();
-        return new AttemptItemsLoader(getActivity(), this, fetchSinglePageOnly);
-    }
-
     private void observeAttemptItemResources(){
         attemptItemViewModel.getAttemptItemsResource().observe(requireActivity(), new Observer<Resource<List<AttemptItem>>>() {
             @Override
@@ -748,8 +713,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             return;
                         }
 
-                        attemptItemList.addAll(listResource.getData());
-                        Log.d("TAG", "onChanged: "+attemptItemList.size());
+                        attemptItemList = listResource.getData();
                         if (attempt.getRemainingTime() == null || attempt.getRemainingTime().equals("0:00:00")) {
                             endExam();
                             return;
@@ -764,7 +728,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                         questionsListAdapter.setItems(attemptItemList);
 
                         int currentQuestion = 0;
-                        if (isNextPageQuestionsBeingFetched) {
+                        if (attemptItemViewModel.isNextPageQuestionsBeingFetched()) {
                             if (viewPager != null) {
                                 currentQuestion = viewPager.getCurrentItem();
                             }
@@ -778,7 +742,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
 
                         viewPager.setAdapter(viewPagerAdapter);
 
-                        if (isNextPageQuestionsBeingFetched || viewPager.getCurrentItem() != 0) {
+                        if (attemptItemViewModel.isNextPageQuestionsBeingFetched() || viewPager.getCurrentItem() != 0) {
                             viewPager.setCurrentItem(currentQuestion);
                         } else {
                             goToQuestion(0, false);
@@ -790,7 +754,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                         }
 
                         questionsListProgressBar.setVisibility(View.GONE);
-                        isNextPageQuestionsBeingFetched = false;
+                        attemptItemViewModel.setNextPageQuestionsBeingFetched(false);
                         break;
                     }
                     case LOADING:{
@@ -812,7 +776,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 progressDialog.show();
                                 fetchAttemptItems();
-                                //getLoaderManager().restartLoader(loader.getId(), null, TestFragment.this);
                             }
                         });
                         if (listResource.getException().isUnauthenticated()) {
@@ -858,110 +821,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
         boolean fetchSinglePageOnly = attempt.hasSectionalLock();
 
         attemptItemViewModel.fetchAttemptItems(questionUrl, fetchSinglePageOnly);
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull final Loader<List<AttemptItem>> loader,
-                               final List<AttemptItem> items) {
-
-        if (getActivity() == null) {
-            return;
-        }
-        if (progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
-        getLoaderManager().destroyLoader(loader.getId());
-        //noinspection ThrowableResultOfMethodCallIgnored
-        TestpressException exception = ((ThrowableLoader<List<AttemptItem>>) loader).clearException();
-        if(exception != null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
-                    R.style.TestpressAppCompatAlertDialogStyle);
-            builder.setPositiveButton(R.string.testpress_retry_again, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    progressDialog.show();
-                    fetchAttemptItems();
-                    //getLoaderManager().restartLoader(loader.getId(), null, TestFragment.this);
-                }
-            });
-            if (exception.isUnauthenticated()) {
-                builder.setTitle(R.string.testpress_authentication_failed);
-                builder.setMessage(R.string.testpress_please_login);
-            } else if (exception.isNetworkError()) {
-                builder.setTitle(R.string.testpress_network_error);
-                builder.setMessage(R.string.testpress_no_internet_try_again);
-            } else {
-                builder.setTitle(R.string.testpress_error_loading_questions);
-                builder.setMessage(R.string.testpress_some_thing_went_wrong_try_again);
-            }
-            builder.setNegativeButton(R.string.testpress_cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    returnToHistory();
-                }
-            });
-            builder.setCancelable(false);
-            networkErrorAlertDialog = builder.show();
-            return;
-        }
-
-        if (items == null || items.isEmpty()) { // Display alert if no questions exist
-            new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
-                    .setTitle(R.string.testpress_no_questions)
-                    .setMessage(R.string.testpress_no_questions_message)
-                    .setCancelable(false)
-                    .setNeutralButton(R.string.testpress_ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            returnToHistory();
-                        }
-                    })
-                    .show();
-            return;
-        }
-
-        attemptItemList = items;
-        if (attempt.getRemainingTime() == null || attempt.getRemainingTime().equals("0:00:00")) {
-            endExam();
-            return;
-        }
-        if (exam != null){
-            initializeSectionSpinner();
-        }
-
-        for (int i = 0; i< attemptItemList.size(); i++) {
-            attemptItemList.get(i).setIndex(i + 1);
-        }
-        questionsListAdapter.setItems(attemptItemList);
-
-        int currentQuestion = 0;
-        if (isNextPageQuestionsBeingFetched) {
-            if (viewPager != null) {
-                currentQuestion = viewPager.getCurrentItem();
-            }
-            updatePanel();
-        } else {
-            questionsListView.setAdapter(questionsListAdapter);
-            startCountDownTimer();
-        }
-        viewPagerAdapter =
-                new TestQuestionPagerAdapter(getFragmentManager(), attemptItemList, selectedLanguage, exam);
-
-        viewPager.setAdapter(viewPagerAdapter);
-
-        if (isNextPageQuestionsBeingFetched || viewPager.getCurrentItem() != 0) {
-            viewPager.setCurrentItem(currentQuestion);
-        } else {
-            goToQuestion(0, false);
-        }
-
-        if (attempt.getLastViewedQuestionId() != null){
-            Integer position = getLastViewedQuestionIndex();
-            viewPager.setCurrentItem(position);
-        }
-
-        questionsListProgressBar.setVisibility(View.GONE);
-        isNextPageQuestionsBeingFetched = false;
     }
 
     private void initializeSectionSpinner() {
@@ -1022,10 +881,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             groupedAttemptItems.get(spinnerItem).add(attemptItem);
             spinnerItemsList.add(spinnerItem);
         }
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull final Loader<List<AttemptItem>> loader) {
     }
 
     private  void returnToHistory() {
@@ -1186,6 +1041,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                         AttemptSection greenDaoAttemptSection = NetworkAttemptSectionKt.createAttemptSection(attemptSection);
                         sections.set(greenDaoAttemptSection.getOrder(), greenDaoAttemptSection);
                         attempt.setSections(sections);
+                        attemptItemViewModel.resetPageCount();
                         onSectionEnded();
                     }
 
@@ -1227,12 +1083,8 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
                         attempt.setSections(sections);
                         String questionUrl = greenDaoAttemptSection.getQuestionsUrlFrag();
                         questionUrl = questionUrl.replace("2.3","2.2");
-                        questionsResourcePager =
-                                new TestQuestionsPager(questionUrl, apiClient);
-
-                        attemptItemList.clear();
-                        fetchAttemptItems();
-                        //getLoaderManager().restartLoader(0, null, TestFragment.this);
+                        attemptItemViewModel.clearAttemptItem();
+                        attemptItemViewModel.fetchAttemptItems(questionUrl, true);
                     }
 
                     @Override
@@ -1398,7 +1250,7 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             if(!attemptItem.getSelectedAnswers().isEmpty() || !attemptItem.getSavedAnswers().isEmpty()
                     || (attemptItem.getShortText() != null && !attemptItem.getShortText().isEmpty())
                     || (attemptItem.getCurrentShortText() != null
-                        && !attemptItem.getCurrentShortText().isEmpty())) {
+                    && !attemptItem.getCurrentShortText().isEmpty())) {
 
                 answeredItems.add(attemptItem);
             } else {
@@ -1440,7 +1292,6 @@ public class TestFragment extends BaseFragment implements LoaderManager.LoaderCa
             onRemainingTimeOver();
         } else if (attemptItemList.isEmpty()) {
             fetchAttemptItems();
-            //getLoaderManager().restartLoader(0, null, this);
         } else {
             startCountDownTimer(millisRemaining);
         }
