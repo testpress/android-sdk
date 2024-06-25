@@ -4,11 +4,11 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 data class ExamModification(
-    val contentId: Long,
-    val lastModified: String
+    val id: Long,
+    val examDataModifiedOn: String?
 ) {
     fun getLastModifiedAsDate(): Date? {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-        return dateFormat.parse(lastModified)
+        return examDataModifiedOn?.let { dateFormat.parse(it) }
     }
 }

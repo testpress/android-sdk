@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.api.TestpressCourseApiClient
 import `in`.testpress.course.api.TestpressCourseApiClient.*
 import `in`.testpress.database.entities.ContentEntityLite
+import `in`.testpress.database.entities.ExamModification
 import `in`.testpress.database.entities.ProductCategoryEntity
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.network.NetworkAttempt
@@ -91,6 +92,11 @@ interface CourseService {
         @Path(value = "exam_id", encoded = true) examId: Long,
         @QueryMap queryParams: HashMap<String, Any>
     ): RetrofitCall<ApiResponse<NetworkOfflineQuestionResponse>>
+
+    @GET("api/v3/exams/")
+    fun getLastModifiedDate(
+        @QueryMap queryParams: HashMap<String, Any>
+    ): RetrofitCall<ApiResponse<List<ExamModification>>>
 }
 
 
@@ -162,5 +168,11 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         queryParams: HashMap<String, Any>
     ): RetrofitCall<ApiResponse<NetworkOfflineQuestionResponse>> {
         return getCourseService().getQuestions(examId, queryParams)
+    }
+
+    fun getLastModifiedDate(
+        queryParams: HashMap<String, Any>
+    ): RetrofitCall<ApiResponse<List<ExamModification>>> {
+        return getCourseService().getLastModifiedDate(queryParams)
     }
 }

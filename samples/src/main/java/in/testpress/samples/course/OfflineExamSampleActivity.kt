@@ -95,7 +95,7 @@ class OfflineExamSampleActivity: BaseToolBarActivity() {
     }
 
     private fun syncOfflineExam(){
-        offlineExamViewModel.fetchExamsModifiedDates()
+        offlineExamViewModel.syncExamsModificationDates()
     }
 
     inner class OfflineExamAdapter :

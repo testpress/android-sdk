@@ -53,6 +53,6 @@ data class OfflineExam(
 ) {
     fun getExamDataModifiedOnAsDate(): Date? {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-        return dateFormat.parse(examDataModifiedOn)
+        return examDataModifiedOn?.let { dateFormat.parse(it) }
     }
 }

@@ -18,11 +18,13 @@ import `in`.testpress.util.extension.isNotNullAndNotEmpty
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.internal.wait
 import kotlin.math.log
 
 class OfflineExamRepository(val context: Context) {
@@ -133,26 +135,61 @@ class OfflineExamRepository(val context: Context) {
     }
 
     suspend fun deleteOfflineExam(examId: Long) {
-            offlineExamDao.deleteById(examId)
-            examQuestionDao.deleteByExamId(examId)
-            // Here we are deleting exam and exam question only
-            // Deleting Question, Direction, Section, Subject need to handle
+        offlineExamDao.deleteById(examId)
+        examQuestionDao.deleteByExamId(examId)
+        // Here we are deleting exam and exam question only
+        // Deleting Question, Direction, Section, Subject need to handle
     }
 
-    suspend fun fetchExamsModifiedDates() {
-        val list = listOf(
-            ExamModification(2101,"2024-06-23T16:43:35.498127+05:30"),
-            ExamModification(2358,"2024-06-23T16:43:35.498127+05:30")
-        )
-        updateSyncStatus(list)
-        // Make the network call to fetch the list of content IDs with last modified dates
+    suspend fun syncExamsModificationDates() {
+        var page = 1
+        val examIds = offlineExamDao.getAllIds()
+        if (examIds.isEmpty()) return
+        val examModifications = mutableListOf<ExamModification>()
+
+        fun fetchModificationDates() {
+            val queryParams =
+                hashMapOf<String, Any>("page" to page, "id" to examIds.joinToString(","))
+            courseClient.getLastModifiedDate(queryParams)
+                .enqueue(object : TestpressCallback<ApiResponse<List<ExamModification>>>() {
+                    override fun onSuccess(result: ApiResponse<List<ExamModification>>) {
+                        if (result.next != null) {
+                            examModifications.addAll(result.results)
+                            page++
+                            fetchModificationDates()
+                        } else {
+                            examModifications.addAll(result.results)
+                            CoroutineScope(Dispatchers.IO).launch {
+                                updateSyncStatus(examModifications)
+                            }
+                        }
+                    }
+
+                    override fun onException(exception: TestpressException) {
+                        when {
+                            exception.isNetworkError -> Toast.makeText(
+                                context,
+                                "Please check your internet connection",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            else -> Toast.makeText(
+                                context,
+                                "Please check your internet connection",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                })
+        }
+
+        fetchModificationDates()
     }
 
     private suspend fun updateSyncStatus(examModifications: List<ExamModification>) {
         examModifications.forEach { modification ->
-            val exam = offlineExamDao.getById(modification.contentId)
+            val exam = offlineExamDao.getById(modification.id)
             if (exam?.getExamDataModifiedOnAsDate()?.before(modification.getLastModifiedAsDate()) == true) {
-                offlineExamDao.updateSyncRequired(modification.contentId, true)
+                offlineExamDao.updateSyncRequired(modification.id, true)
             }
         }
     }
