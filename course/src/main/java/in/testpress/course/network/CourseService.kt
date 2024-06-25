@@ -4,10 +4,10 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.api.TestpressCourseApiClient
 import `in`.testpress.course.api.TestpressCourseApiClient.*
 import `in`.testpress.database.entities.ContentEntityLite
-import `in`.testpress.database.entities.ExamModification
 import `in`.testpress.database.entities.ProductCategoryEntity
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.network.NetworkAttempt
+import `in`.testpress.exam.network.NetworkExamContent
 import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Course
@@ -96,7 +96,7 @@ interface CourseService {
     @GET("api/v3/exams/")
     fun getLastModifiedDate(
         @QueryMap queryParams: HashMap<String, Any>
-    ): RetrofitCall<ApiResponse<List<ExamModification>>>
+    ): RetrofitCall<ApiResponse<List<NetworkExamContent>>>
 }
 
 
@@ -172,7 +172,7 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     fun getLastModifiedDate(
         queryParams: HashMap<String, Any>
-    ): RetrofitCall<ApiResponse<List<ExamModification>>> {
+    ): RetrofitCall<ApiResponse<List<NetworkExamContent>>> {
         return getCourseService().getLastModifiedDate(queryParams)
     }
 }

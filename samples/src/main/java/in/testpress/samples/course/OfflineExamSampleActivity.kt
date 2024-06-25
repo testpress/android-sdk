@@ -35,7 +35,7 @@ class OfflineExamSampleActivity: BaseToolBarActivity() {
         initializeListView()
         initializeOnClickListener()
         observeDownloadExamResult()
-        syncOfflineExam()
+        syncExamsModifiedDates()
     }
 
     private fun initializeViewModel() {
@@ -94,8 +94,8 @@ class OfflineExamSampleActivity: BaseToolBarActivity() {
         }
     }
 
-    private fun syncOfflineExam(){
-        offlineExamViewModel.syncExamsModificationDates()
+    private fun syncExamsModifiedDates(){
+        offlineExamViewModel.syncExamsModifiedDates()
     }
 
     inner class OfflineExamAdapter :

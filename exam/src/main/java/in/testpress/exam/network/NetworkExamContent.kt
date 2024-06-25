@@ -2,6 +2,8 @@ package `in`.testpress.exam.network
 
 import `in`.testpress.exam.network.NetworkSection
 import `in`.testpress.models.greendao.Exam
+import java.text.SimpleDateFormat
+import java.util.*
 
 data class NetworkExamContent(
     val id: Long,
@@ -95,4 +97,9 @@ fun NetworkExamContent.asGreenDaoModel(): Exam {
         this.allowPreemptiveSectionEnding,
         this.examDataModifiedOn
     )
+}
+
+fun NetworkExamContent.getLastModifiedAsDate(): Date? {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    return examDataModifiedOn?.let { dateFormat.parse(it) }
 }

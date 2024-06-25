@@ -26,9 +26,9 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
         }
     }
 
-    fun syncExamsModificationDates() {
+    fun syncExamsModifiedDates() {
         viewModelScope.launch {
-            repository.syncExamsModificationDates()
+            repository.syncExamsModifiedDates()
         }
     }
 
