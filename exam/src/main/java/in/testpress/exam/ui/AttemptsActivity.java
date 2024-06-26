@@ -34,7 +34,6 @@ import in.testpress.exam.pager.AttemptsPager;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.exam.util.RetakeExamUtil;
-import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Language;
@@ -44,6 +43,7 @@ import in.testpress.util.CommonUtils;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
+import in.testpress.v2_4.models.ApiResponse;
 
 import static in.testpress.Constants.DEFAULT_ATTEMPTS_TITLE;
 import static in.testpress.exam.TestpressExam.PARAM_EXAM_SLUG;
@@ -72,7 +72,7 @@ public class AttemptsActivity extends BaseToolBarActivity
     private List<Attempt> attempts = new ArrayList<>();
     private AttemptsPager pager;
     private RetrofitCall<Exam> examApiRequest;
-    private RetrofitCall<TestpressApiResponse<Language>> languagesApiRequest;
+    private RetrofitCall<ApiResponse<List<Language>>> languagesApiRequest;
 
     @SuppressWarnings({"ConstantConditions", "deprecation"})
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface", "DefaultLocale"})
@@ -263,9 +263,9 @@ public class AttemptsActivity extends BaseToolBarActivity
     void fetchLanguages() {
         progressBar.setVisibility(View.VISIBLE);
         languagesApiRequest = apiClient.getLanguages(exam.getSlug())
-                .enqueue(new TestpressCallback<TestpressApiResponse<Language>>() {
+                .enqueue(new TestpressCallback<ApiResponse<List<Language>>>() {
                     @Override
-                    public void onSuccess(TestpressApiResponse<Language> apiResponse) {
+                    public void onSuccess(ApiResponse<List<Language>> apiResponse) {
                         List<Language> languages = exam.getRawLanguages();
                         languages.addAll(apiResponse.getResults());
                         Map<String, Language> uniqueLanguages = new HashMap<>();

@@ -50,6 +50,7 @@ import in.testpress.util.FormatDate;
 import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
+import in.testpress.v2_4.models.ApiResponse;
 import retrofit2.Response;
 
 import static in.testpress.exam.api.TestpressExamApiClient.IS_PARTIAL;
@@ -99,7 +100,7 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private RetrofitCall<Exam> examApiRequest;
     private RetrofitCall<Permission> permissionsApiRequest;
     private RetrofitCall<TestpressApiResponse<Attempt>> attemptsApiRequest;
-    private RetrofitCall<TestpressApiResponse<Language>> languagesApiRequest;
+    private RetrofitCall<ApiResponse<List<Language>>> languagesApiRequest;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -270,9 +271,9 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         }
         progressBar.setVisibility(View.VISIBLE);
         languagesApiRequest = apiClient.getLanguages(exam.getSlug())
-                .enqueue(new TestpressCallback<TestpressApiResponse<Language>>() {
+                .enqueue(new TestpressCallback<ApiResponse<List<Language>>>() {
                     @Override
-                    public void onSuccess(TestpressApiResponse<Language> apiResponse) {
+                    public void onSuccess(ApiResponse<List<Language>> apiResponse) {
                         List<Language> languages = exam.getRawLanguages();
                         languages.addAll(apiResponse.getResults());
                         Map<String, Language> uniqueLanguages = new HashMap<>();

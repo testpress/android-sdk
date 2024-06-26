@@ -88,4 +88,8 @@ public class ApiResponse<T> {
         this.results = results;
     }
 
+    public boolean hasMore() {
+        return getNext() != null;
+    }
+
 }

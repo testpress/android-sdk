@@ -73,6 +73,7 @@ import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.ui.ExploreSpinnerAdapter;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
+import in.testpress.v2_4.models.ApiResponse;
 
 public class ReviewQuestionsActivity extends BaseToolBarActivity  {
 
@@ -120,7 +121,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
     protected Boolean spinnerDefaultCallback = true;
     protected int selectedItemPosition = -1;
     private RetrofitCall<TestpressApiResponse<ReviewItem>> reviewItemsLoader;
-    private RetrofitCall<TestpressApiResponse<Language>> languageApiRequest;
+    private RetrofitCall<ApiResponse<List<Language>>> languageApiRequest;
     private TestpressExamApiClient apiClient;
     private Menu optionsMenu;
     String reviewUrl;
@@ -542,9 +543,9 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
         if (exam == null) return;
         progressBar.setVisibility(View.VISIBLE);
         languageApiRequest = apiClient.getLanguages(exam.getSlug())
-                .enqueue(new TestpressCallback<TestpressApiResponse<Language>>() {
+                .enqueue(new TestpressCallback<ApiResponse<List<Language>>>() {
                     @Override
-                    public void onSuccess(TestpressApiResponse<Language> apiResponse) {
+                    public void onSuccess(ApiResponse<List<Language>> apiResponse) {
                         List<Language> languages = exam.getRawLanguages();
                         languages.addAll(apiResponse.getResults());
                         Map<String, Language> uniqueLanguages = new HashMap<>();
