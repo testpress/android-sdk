@@ -94,7 +94,7 @@ interface CourseService {
     ): RetrofitCall<ApiResponse<NetworkOfflineQuestionResponse>>
 
     @GET("api/v3/exams/")
-    fun getLastModifiedDate(
+    fun getExams(
         @QueryMap queryParams: HashMap<String, Any>
     ): RetrofitCall<ApiResponse<List<NetworkExamContent>>>
 }
@@ -170,9 +170,9 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         return getCourseService().getQuestions(examId, queryParams)
     }
 
-    fun getLastModifiedDate(
+    fun getExams(
         queryParams: HashMap<String, Any>
     ): RetrofitCall<ApiResponse<List<NetworkExamContent>>> {
-        return getCourseService().getLastModifiedDate(queryParams)
+        return getCourseService().getExams(queryParams)
     }
 }

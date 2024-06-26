@@ -148,7 +148,7 @@ class OfflineExamRepository(val context: Context) {
         fun fetchExamModifiedDate() {
             val queryParams =
                 hashMapOf<String, Any>("page" to page, "id" to examIds.joinToString(","))
-            courseClient.getLastModifiedDate(queryParams)
+            courseClient.getExams(queryParams)
                 .enqueue(object : TestpressCallback<ApiResponse<List<NetworkExamContent>>>() {
                     override fun onSuccess(result: ApiResponse<List<NetworkExamContent>>) {
                         if (result.next != null) {
