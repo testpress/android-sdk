@@ -33,7 +33,6 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
     }
 
     fun syncExam(offlineExam: OfflineExam) {
-        deleteOfflineExam(offlineExam.id!!)
         downloadExam(offlineExam.contentId!!)
     }
 
