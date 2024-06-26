@@ -5,6 +5,8 @@ import `in`.testpress.exam.network.NetworkAttemptSection
 import `in`.testpress.exam.repository.AttemptItemRepository
 import `in`.testpress.exam.ui.TestFragment
 import `in`.testpress.exam.ui.TestFragment.Action
+import `in`.testpress.models.greendao.Attempt
+import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.network.Resource
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
@@ -18,6 +20,12 @@ class AttemptItemViewModel(val repository: AttemptItemRepository) : ViewModel() 
     val saveResultResource: LiveData<Resource<Triple<Int, AttemptItem?, TestFragment.Action>>> get() = repository.saveResultResource
 
     val updateSectionResource: LiveData<Resource<Pair<NetworkAttemptSection?,Action>>> get() = repository.updateSectionResource
+
+    val endContentAttemptResource: LiveData<Resource<CourseAttempt>> get() = repository.endContentAttemptResource
+
+    val endAttemptResource: LiveData<Resource<Attempt>> get() = repository.endAttemptResource
+
+    val resumeAttemptResource: LiveData<Resource<Attempt>> get() = repository.resumeAttemptResource
 
     val totalQuestions: Int get() = repository.totalQuestions
 
@@ -34,6 +42,18 @@ class AttemptItemViewModel(val repository: AttemptItemRepository) : ViewModel() 
 
     fun updateSection(url: String, action: TestFragment.Action){
         repository.updateSection(url, action)
+    }
+
+    fun endContentAttempt(endAttemptUrl: String) {
+        repository.endContentAttempt(endAttemptUrl)
+    }
+
+    fun endAttempt(endUrlFrag: String) {
+        repository.endAttempt(endUrlFrag)
+    }
+
+    fun resumeExam(startUrlFrag: String){
+        repository.resumeExam(startUrlFrag)
     }
 
     fun clearAttemptItem() = repository.clearAttemptItem()
