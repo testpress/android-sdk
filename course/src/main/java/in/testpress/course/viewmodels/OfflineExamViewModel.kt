@@ -25,4 +25,15 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
             repository.deleteOfflineExam(examId)
         }
     }
+
+    fun syncExamsModifiedDates() {
+        viewModelScope.launch {
+            repository.syncExamsModifiedDates()
+        }
+    }
+
+    fun syncExam(offlineExam: OfflineExam) {
+        downloadExam(offlineExam.contentId!!)
+    }
+
 }

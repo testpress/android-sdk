@@ -7,6 +7,7 @@ import `in`.testpress.database.entities.ContentEntityLite
 import `in`.testpress.database.entities.ProductCategoryEntity
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.network.NetworkAttempt
+import `in`.testpress.exam.network.NetworkExamContent
 import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Course
@@ -91,6 +92,11 @@ interface CourseService {
         @Path(value = "exam_id", encoded = true) examId: Long,
         @QueryMap queryParams: HashMap<String, Any>
     ): RetrofitCall<ApiResponse<NetworkOfflineQuestionResponse>>
+
+    @GET("api/v3/exams/")
+    fun getExams(
+        @QueryMap queryParams: HashMap<String, Any>
+    ): RetrofitCall<ApiResponse<List<NetworkExamContent>>>
 }
 
 
@@ -162,5 +168,11 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         queryParams: HashMap<String, Any>
     ): RetrofitCall<ApiResponse<NetworkOfflineQuestionResponse>> {
         return getCourseService().getQuestions(examId, queryParams)
+    }
+
+    fun getExams(
+        queryParams: HashMap<String, Any>
+    ): RetrofitCall<ApiResponse<List<NetworkExamContent>>> {
+        return getCourseService().getExams(queryParams)
     }
 }

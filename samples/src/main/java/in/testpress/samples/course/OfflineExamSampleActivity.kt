@@ -35,6 +35,7 @@ class OfflineExamSampleActivity: BaseToolBarActivity() {
         initializeListView()
         initializeOnClickListener()
         observeDownloadExamResult()
+        syncExamsModifiedDates()
     }
 
     private fun initializeViewModel() {
@@ -93,6 +94,10 @@ class OfflineExamSampleActivity: BaseToolBarActivity() {
         }
     }
 
+    private fun syncExamsModifiedDates(){
+        offlineExamViewModel.syncExamsModifiedDates()
+    }
+
     inner class OfflineExamAdapter :
         ListAdapter<OfflineExam, OfflineExamAdapter.ExamViewHolder>(EXAM_COMPARATOR) {
 
@@ -103,6 +108,10 @@ class OfflineExamSampleActivity: BaseToolBarActivity() {
                 binding.titleTextView.text = exam.title
                 binding.deleteButton.setOnClickListener {
                     offlineExamViewModel.deleteOfflineExam(exam.id!!)
+                }
+                binding.syncButton.visibility = if (exam.isSyncRequired) View.VISIBLE else View.GONE
+                binding.syncButton.setOnClickListener {
+                    offlineExamViewModel.syncExam(exam)
                 }
             }
         }
