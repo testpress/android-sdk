@@ -3,14 +3,11 @@ package `in`.testpress.exam.repository
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.exam.api.TestpressExamApiClient
-import `in`.testpress.models.TestpressApiResponse
+import `in`.testpress.exam.models.Permission
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.models.greendao.Language
 import `in`.testpress.network.Resource
-import `in`.testpress.network.RetrofitCall
-import `in`.testpress.util.PagedApiFetcher
-import `in`.testpress.util.TestpressPagedApiFetcher
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -26,6 +23,9 @@ class ExamRepository(val context: Context) {
 
     private val _languageResource = MutableLiveData<Resource<List<Language>>>()
     val languageResource: LiveData<Resource<List<Language>>> get() = _languageResource
+
+    private val _permissionResource = MutableLiveData<Resource<Permission>>()
+    val permissionResource: LiveData<Resource<Permission>> get() = _permissionResource
 
     private val apiClient: TestpressExamApiClient = TestpressExamApiClient(context)
 
@@ -100,6 +100,30 @@ class ExamRepository(val context: Context) {
     }
 
     fun fetchLanguages(examSlug: String) {
+        _languageResource.postValue(Resource.loading(null))
+        apiClient.getLanguages(examSlug)
+            .enqueue(object : TestpressCallback<ApiResponse<List<Language>>>() {
+                override fun onSuccess(result: ApiResponse<List<Language>>) {
+                    _languageResource.postValue(Resource.success(result.results))
+                }
 
+                override fun onException(exception: TestpressException) {
+                    _languageResource.postValue(Resource.error(exception, null))
+                }
+            })
+    }
+
+    fun checkPermission(contentId: Long) {
+        apiClient.checkPermission(contentId)
+            .enqueue(object : TestpressCallback < Permission >() {
+                override fun onSuccess(result: Permission) {
+                    _permissionResource.postValue(Resource.success(result))
+                }
+
+                override fun onException(exception: TestpressException) {
+                    _permissionResource.postValue(Resource.error(exception, null))
+                }
+
+            })
     }
 }
