@@ -158,28 +158,8 @@ public class TestActivity extends BaseToolBarActivity  {
             public void onChanged(Resource<Attempt> attemptResource) {
                 switch (attemptResource.getStatus()){
                     case SUCCESS:{
-                        progressBar.setVisibility(View.GONE);
-                        fragmentContainer.setVisibility(View.VISIBLE);
-                        Attempt attempt = attemptResource.getData();
-                        if (attempt.getState().equals("Running")) {
-                            Bundle bundle = new Bundle();
-                            bundle.putParcelable(TestFragment.PARAM_ATTEMPT, attempt);
-                            bundle.putParcelable(TestFragment.PARAM_EXAM, exam);
-                            if (courseContent != null) {
-                                bundle.putParcelable(TestActivity.PARAM_COURSE_CONTENT, courseContent);
-                                bundle.putParcelable(TestActivity.PARAM_COURSE_ATTEMPT, courseAttempt);
-                            }
-                            bundle.putBoolean(PARAM_DISCARD_EXAM_DETAILS, discardExamDetails);
-                            displayTestFragment(bundle);
-                        } else {
-                            TestpressSession session = TestpressSdk.getTestpressSession(TestActivity.this);
-                            Assert.assertNotNull("TestpressSession must not be null.", session);
-                            if (courseAttempt == null) {
-                                TestpressExam.showAttemptReport(TestActivity.this, exam, attempt, session);
-                            } else {
-                                TestpressExam.showCourseAttemptReport(TestActivity.this, exam, courseAttempt, session);
-                            }
-                        }
+                        showFragment();
+                        handleSuccessAttempt(attemptResource.getData());
                         break;
                     }
                     case LOADING:{
@@ -187,6 +167,7 @@ public class TestActivity extends BaseToolBarActivity  {
                         break;
                     }
                     case ERROR:{
+                        progressBar.setVisibility(View.GONE);
                         handleError(attemptResource.getException(), R.string.testpress_error_loading_attempts);
                         retryButton.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -209,39 +190,17 @@ public class TestActivity extends BaseToolBarActivity  {
             public void onChanged(Resource<CourseAttempt> courseAttemptResource) {
                 switch (courseAttemptResource.getStatus()){
                     case SUCCESS:{
-                        progressBar.setVisibility(View.GONE);
-                        fragmentContainer.setVisibility(View.VISIBLE);
+                        showFragment();
+                        handleCourseAttemptSuccess(courseAttemptResource.getData());
                         courseAttempt = courseAttemptResource.getData();
-                        saveCourseAttemptInDB(courseAttempt, true);
-                        Attempt attempt = courseAttempt.getRawAssessment();
-                        if (attempt.getState().equals("Running") && attempt.getRemainingTime().equals("0:00:00")) {
-                            attempt.setRemainingTime(exam.getDuration());
-                        }
-                        if (attempt.getState().equals("Running")) {
-                            Bundle bundle = new Bundle();
-                            bundle.putParcelable(TestFragment.PARAM_ATTEMPT, attempt);
-                            bundle.putParcelable(TestFragment.PARAM_EXAM, exam);
-                            if (courseContent != null) {
-                                bundle.putParcelable(TestActivity.PARAM_COURSE_CONTENT, courseContent);
-                                bundle.putParcelable(TestActivity.PARAM_COURSE_ATTEMPT, courseAttempt);
-                            }
-                            bundle.putBoolean(PARAM_DISCARD_EXAM_DETAILS, discardExamDetails);
-                            displayTestFragment(bundle);
-                        } else {
-                            TestpressSession session = TestpressSdk.getTestpressSession(TestActivity.this);
-                            Assert.assertNotNull("TestpressSession must not be null.", session);
-                            if (courseAttempt == null) {
-                                TestpressExam.showAttemptReport(TestActivity.this, exam, attempt, session);
-                            } else {
-                                TestpressExam.showCourseAttemptReport(TestActivity.this, exam, courseAttempt, session);
-                            }
-                        }
+                        break;
                     }
                     case LOADING:{
                         progressBar.setVisibility(View.VISIBLE);
                         break;
                     }
                     case ERROR:{
+                        progressBar.setVisibility(View.GONE);
                         handleError(courseAttemptResource.getException(), R.string.testpress_error_loading_attempts);
                         retryButton.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -256,6 +215,44 @@ public class TestActivity extends BaseToolBarActivity  {
                 }
             }
         });
+    }
+
+    private void showFragment() {
+        progressBar.setVisibility(View.GONE);
+        fragmentContainer.setVisibility(View.VISIBLE);
+    }
+
+    private void handleCourseAttemptSuccess(CourseAttempt courseAttempt) {
+        showFragment();
+        this.courseAttempt = courseAttempt;
+        saveCourseAttemptInDB(courseAttempt, true);
+        Attempt attempt = courseAttempt.getRawAssessment();
+        if (attempt.getState().equals("Running") && attempt.getRemainingTime().equals("0:00:00")) {
+            attempt.setRemainingTime(exam.getDuration());
+        }
+        handleSuccessAttempt(attempt);
+    }
+
+    private void handleSuccessAttempt(Attempt attempt) {
+        if (attempt.getState().equals("Running")) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(TestFragment.PARAM_ATTEMPT, attempt);
+            bundle.putParcelable(TestFragment.PARAM_EXAM, exam);
+            if (courseContent != null) {
+                bundle.putParcelable(TestActivity.PARAM_COURSE_CONTENT, courseContent);
+                bundle.putParcelable(TestActivity.PARAM_COURSE_ATTEMPT, courseAttempt);
+            }
+            bundle.putBoolean(PARAM_DISCARD_EXAM_DETAILS, discardExamDetails);
+            displayTestFragment(bundle);
+        } else {
+            TestpressSession session = TestpressSdk.getTestpressSession(TestActivity.this);
+            Assert.assertNotNull("TestpressSession must not be null.", session);
+            if (courseAttempt == null) {
+                TestpressExam.showAttemptReport(TestActivity.this, exam, attempt, session);
+            } else {
+                TestpressExam.showCourseAttemptReport(TestActivity.this, exam, courseAttempt, session);
+            }
+        }
     }
 
     void onDataInitialized() {
