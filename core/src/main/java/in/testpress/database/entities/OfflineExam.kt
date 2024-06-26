@@ -52,7 +52,7 @@ data class OfflineExam(
     val contentId: Long? = null
 ) {
     fun getExamDataModifiedOnAsDate(): Date? {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX")
         return examDataModifiedOn?.let { dateFormat.parse(it) }
     }
 }

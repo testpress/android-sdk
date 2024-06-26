@@ -100,6 +100,6 @@ fun NetworkExamContent.asGreenDaoModel(): Exam {
 }
 
 fun NetworkExamContent.getLastModifiedAsDate(): Date? {
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX")
     return examDataModifiedOn?.let { dateFormat.parse(it) }
 }
