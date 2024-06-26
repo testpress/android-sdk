@@ -3,11 +3,16 @@ package `in`.testpress.exam.repository
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.exam.api.TestpressExamApiClient
+import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.CourseAttempt
+import `in`.testpress.models.greendao.Language
 import `in`.testpress.network.Resource
+import `in`.testpress.network.RetrofitCall
+import `in`.testpress.util.PagedApiFetcher
+import `in`.testpress.util.TestpressPagedApiFetcher
+import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
@@ -18,6 +23,9 @@ class TestRepository(val context: Context) {
 
     private val _contentAttemptResource = MutableLiveData<Resource<CourseAttempt>>()
     val contentAttemptResource: LiveData<Resource<CourseAttempt>> get() = _contentAttemptResource
+
+    private val _languageResource = MutableLiveData<Resource<List<Language>>>()
+    val languageResource: LiveData<Resource<List<Language>>> get() = _languageResource
 
     private val apiClient: TestpressExamApiClient = TestpressExamApiClient(context)
 
@@ -89,5 +97,9 @@ class TestRepository(val context: Context) {
                     _attemptResource.postValue(Resource.error(exception,null))
                 }
             })
+    }
+
+    fun fetchLanguages(examSlug: String) {
+
     }
 }
