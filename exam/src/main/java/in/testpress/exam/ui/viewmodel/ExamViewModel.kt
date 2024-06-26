@@ -3,6 +3,7 @@ package `in`.testpress.exam.ui.viewmodel
 import `in`.testpress.exam.repository.ExamRepository
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.CourseAttempt
+import `in`.testpress.models.greendao.Language
 import `in`.testpress.network.Resource
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
@@ -15,6 +16,8 @@ class ExamViewModel(val repository: ExamRepository) : ViewModel() {
     val attemptResource: LiveData<Resource<Attempt>> get() = repository.attemptResource
 
     val contentAttemptResource: LiveData<Resource<CourseAttempt>> get() = repository.contentAttemptResource
+
+    val languageResource: LiveData<Resource<List<Language>>> get() = repository.languageResource
 
     fun createContentAttempt(attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
         repository.createContentAttempt(attemptUrlFrag, queryParams)
@@ -34,6 +37,10 @@ class ExamViewModel(val repository: ExamRepository) : ViewModel() {
 
     fun endAttempt(attemptEndFrag: String) {
         repository.endAttempt(attemptEndFrag)
+    }
+
+    fun fetchLanguages(examSlug: String) {
+        repository.fetchLanguages(examSlug)
     }
 
     companion object {

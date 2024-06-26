@@ -151,6 +151,7 @@ public class TestActivity extends BaseToolBarActivity  {
         onDataInitialized();
         observeAttemptResources();
         observeContentAttemptResources();
+        observeLanguageResources();
     }
 
     void observeAttemptResources(){
@@ -252,6 +253,36 @@ public class TestActivity extends BaseToolBarActivity  {
                 TestpressExam.showCourseAttemptReport(TestActivity.this, exam, courseAttempt, session);
             }
         }
+    }
+
+    void observeLanguageResources(){
+        testViewModel.getLanguageResource().observe(this, new Observer<Resource<List<Language>>>() {
+            @Override
+            public void onChanged(Resource<List<Language>> listResource) {
+                switch (listResource.getStatus()){
+                    case SUCCESS:{
+                        List<Language> languages = exam.getRawLanguages();
+                        languages.addAll(listResource.getData());
+                        Map<String, Language> uniqueLanguages = new HashMap<>();
+                        for (Language language : languages) {
+                            uniqueLanguages.put(language.getCode(), language);
+                        }
+                        exam.setLanguages(new ArrayList<>(uniqueLanguages.values()));
+                        TestActivity.this.languages = exam.getRawLanguages();
+                        displayStartExamScreen();
+                        break;
+                    }
+                    case LOADING:{
+
+                        break;
+                    }
+                    case ERROR:{
+
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     void onDataInitialized() {
