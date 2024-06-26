@@ -192,7 +192,6 @@ public class TestActivity extends BaseToolBarActivity  {
                     case SUCCESS:{
                         showFragment();
                         handleCourseAttemptSuccess(courseAttemptResource.getData());
-                        courseAttempt = courseAttemptResource.getData();
                         break;
                     }
                     case LOADING:{
@@ -223,7 +222,6 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     private void handleCourseAttemptSuccess(CourseAttempt courseAttempt) {
-        showFragment();
         this.courseAttempt = courseAttempt;
         saveCourseAttemptInDB(courseAttempt, true);
         Attempt attempt = courseAttempt.getRawAssessment();
