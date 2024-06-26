@@ -1,8 +1,10 @@
 package `in`.testpress.exam.ui.viewmodel
 
 import `in`.testpress.exam.models.AttemptItem
+import `in`.testpress.exam.network.NetworkAttemptSection
 import `in`.testpress.exam.repository.AttemptItemRepository
 import `in`.testpress.exam.ui.TestFragment
+import `in`.testpress.exam.ui.TestFragment.Action
 import `in`.testpress.network.Resource
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
@@ -15,6 +17,8 @@ class AttemptItemViewModel(val repository: AttemptItemRepository) : ViewModel() 
 
     val saveResultResource: LiveData<Resource<Triple<Int, AttemptItem?, TestFragment.Action>>> get() = repository.saveResultResource
 
+    val updateSectionResource: LiveData<Resource<Pair<NetworkAttemptSection?,Action>>> get() = repository.updateSectionResource
+
     val totalQuestions: Int get() = repository.totalQuestions
 
     var isNextPageQuestionsBeingFetched: Boolean = false
@@ -26,6 +30,10 @@ class AttemptItemViewModel(val repository: AttemptItemRepository) : ViewModel() 
 
     fun saveAnswer(position: Int, attemptItem: AttemptItem, action: TestFragment.Action){
         repository.saveAnswer(position, attemptItem, action)
+    }
+
+    fun updateSection(url: String, action: TestFragment.Action){
+        repository.updateSection(url, action)
     }
 
     fun clearAttemptItem() = repository.clearAttemptItem()

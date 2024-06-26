@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.models.AttemptItem
+import `in`.testpress.exam.network.NetworkAttemptSection
 import `in`.testpress.exam.ui.TestFragment
 import `in`.testpress.exam.ui.TestFragment.Action
 import `in`.testpress.models.TestpressApiResponse
@@ -26,6 +27,8 @@ class AttemptItemRepository(val context: Context) {
     private val _saveResultResource = MutableLiveData<Resource<Triple<Int, AttemptItem?, Action>>>()
     val saveResultResource: LiveData<Resource<Triple<Int, AttemptItem?, Action>>> get() = _saveResultResource
 
+    private val _updateSectionResource = MutableLiveData<Resource<Pair<NetworkAttemptSection?,Action>>>()
+    val updateSectionResource: LiveData<Resource<Pair<NetworkAttemptSection?,Action>>> get() = _updateSectionResource
 
     fun fetchAttemptItems(questionsUrlFrag: String, fetchSinglePageOnly: Boolean) {
         _attemptItemsResource.postValue(Resource.loading(null))
@@ -75,6 +78,19 @@ class AttemptItemRepository(val context: Context) {
                         Triple(position, null, action)
                     )
                 )
+            }
+        })
+    }
+
+    fun updateSection(url: String, action: Action) {
+        _updateSectionResource.postValue(Resource.loading(Pair(null, action)))
+        apiClient.updateSection(url).enqueue(object : TestpressCallback<NetworkAttemptSection>() {
+            override fun onSuccess(result: NetworkAttemptSection) {
+                _updateSectionResource.postValue(Resource.success(Pair(result, action)))
+            }
+
+            override fun onException(exception: TestpressException) {
+                _updateSectionResource.postValue(Resource.error(exception, Pair(null, action)))
             }
         })
     }
