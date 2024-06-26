@@ -903,13 +903,10 @@ public class TestFragment extends BaseFragment implements
     }
 
     private void saveResult(final int position, final Action action) {
-        Log.d("TAG", "saveResult: "+position);
         if (attemptItemList.size() <= position) {
             return;
         }
         final AttemptItem attemptItem = attemptItemList.get(position);
-        final int currentSectionPosition = attempt.getCurrentSectionPosition();
-
         if (attemptItem.hasChanged()) {
             if (action != Action.UPDATE_ANSWER) {
                 showProgress(R.string.testpress_saving_last_change);
