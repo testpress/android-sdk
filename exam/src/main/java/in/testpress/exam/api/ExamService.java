@@ -1,6 +1,7 @@
 package in.testpress.exam.api;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import in.testpress.exam.models.AttemptItem;
@@ -20,6 +21,7 @@ import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Language;
 import in.testpress.models.greendao.ReviewItem;
 import in.testpress.network.RetrofitCall;
+import in.testpress.v2_4.models.ApiResponse;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
@@ -149,7 +151,7 @@ public interface ExamService {
             @Path(value = "content_id", encoded = true) long contentId);
 
     @GET(EXAMS_LIST_v2_3_PATH + "{exam_slug}" + LANGUAGES_PATH)
-    RetrofitCall<TestpressApiResponse<Language>> getLanguages(
+    RetrofitCall<ApiResponse<List<Language>>> getLanguages(
             @Path(value = "exam_slug", encoded = true) String examSlug);
 
     @GET(REPORT_QUESTION+"{question_id}"+REPORTEES)
