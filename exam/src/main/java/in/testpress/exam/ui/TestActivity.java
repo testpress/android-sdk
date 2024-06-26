@@ -494,7 +494,7 @@ public class TestActivity extends BaseToolBarActivity  {
         ViewUtils.setTypeface(new TextView[] {numberOfQuestions, examDuration, markPerQuestion,
                 negativeMarks, examTitle, date}, TestpressSdk.getRubikMediumFont(this));
         ViewUtils.setTypeface(new TextView[] {descriptionContent, questionsLabel, webOnlyLabel,
-                        durationLabel, markLabel, negativeMarkLabel, dateLabel, languageLabel },
+                durationLabel, markLabel, negativeMarkLabel, dateLabel, languageLabel },
                 TestpressSdk.getRubikRegularFont(this));
         examTitle.setText(exam.getTitle());
         numberOfQuestions.setText(exam.getNumberOfQuestions().toString());
