@@ -49,6 +49,7 @@ import in.testpress.util.Assert;
 import in.testpress.util.FormatDate;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
+import in.testpress.v2_4.models.ApiResponse;
 
 import static in.testpress.exam.api.TestpressExamApiClient.IS_PARTIAL;
 import static in.testpress.exam.ui.AccessCodeExamsFragment.ACCESS_CODE;
