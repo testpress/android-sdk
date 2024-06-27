@@ -47,8 +47,8 @@ class TestViewModel(val repository: TestRepository) : ViewModel() {
         repository.endAttempt(attemptEndFrag)
     }
 
-    fun fetchLanguages(examSlug: String) {
-        repository.fetchLanguages(examSlug)
+    fun fetchLanguages(examId: Long, examSlug: String) {
+        repository.fetchLanguages(examId, examSlug)
     }
 
     fun checkPermission(contentId: Long) {

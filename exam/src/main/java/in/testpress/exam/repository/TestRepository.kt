@@ -7,6 +7,7 @@ import `in`.testpress.database.entities.OfflineAttempt
 import `in`.testpress.database.entities.OfflineAttemptSection
 import `in`.testpress.database.entities.OfflineCourseAttempt
 import `in`.testpress.database.entities.Section
+import `in`.testpress.database.mapping.asGreenDaoModels
 import `in`.testpress.database.mapping.asGreenDoaModels
 import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.api.TestpressExamApiClient
@@ -36,6 +37,7 @@ class TestRepository(val context: Context) {
     private val offlineCourseAttemptDao = database.offlineCourseAttemptDao()
     private val offlineAttemptDao = database.offlineAttemptDao()
     private val offlineAttemptSectionDao = database.offlineAttemptSectionDao()
+    private val languageDao = database.languageDao()
 
     private val _attemptResource = MutableLiveData<Resource<Attempt>>()
     val attemptResource: LiveData<Resource<Attempt>> get() = _attemptResource
@@ -194,32 +196,43 @@ class TestRepository(val context: Context) {
             })
     }
 
-    fun fetchLanguages(examSlug: String) {
+    fun fetchLanguages(examId: Long, examSlug: String) {
         _languageResource.postValue(Resource.loading(null))
-        apiClient.getLanguages(examSlug)
-            .enqueue(object : TestpressCallback<ApiResponse<List<Language>>>() {
-                override fun onSuccess(result: ApiResponse<List<Language>>) {
-                    _languageResource.postValue(Resource.success(result.results))
-                }
+        if (isOfflineExam) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val languages = languageDao.getLanguagesByExamId(examId)
+                _languageResource.postValue(Resource.success(languages.asGreenDaoModels()))
+            }
+        } else {
+            apiClient.getLanguages(examSlug)
+                .enqueue(object : TestpressCallback<ApiResponse<List<Language>>>() {
+                    override fun onSuccess(result: ApiResponse<List<Language>>) {
+                        _languageResource.postValue(Resource.success(result.results))
+                    }
 
-                override fun onException(exception: TestpressException) {
-                    _languageResource.postValue(Resource.error(exception, null))
-                }
-            })
+                    override fun onException(exception: TestpressException) {
+                        _languageResource.postValue(Resource.error(exception, null))
+                    }
+                })
+        }
     }
 
     fun checkPermission(contentId: Long) {
         _permissionResource.postValue(Resource.loading(null))
-        apiClient.checkPermission(contentId)
-            .enqueue(object : TestpressCallback < Permission >() {
-                override fun onSuccess(result: Permission) {
-                    _permissionResource.postValue(Resource.success(result))
-                }
+        if(isOfflineExam){
+            _permissionResource.postValue(Resource.success(Permission(true,"0")))
+        } else {
+            apiClient.checkPermission(contentId)
+                .enqueue(object : TestpressCallback < Permission >() {
+                    override fun onSuccess(result: Permission) {
+                        _permissionResource.postValue(Resource.success(result))
+                    }
 
-                override fun onException(exception: TestpressException) {
-                    _permissionResource.postValue(Resource.error(exception, null))
-                }
+                    override fun onException(exception: TestpressException) {
+                        _permissionResource.postValue(Resource.error(exception, null))
+                    }
 
-            })
+                })
+        }
     }
 }

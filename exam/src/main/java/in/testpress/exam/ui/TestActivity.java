@@ -421,7 +421,7 @@ public class TestActivity extends BaseToolBarActivity  {
             displayStartExamScreen();
             return;
         }
-        examViewModel.fetchLanguages(exam.getSlug());
+        examViewModel.fetchLanguages(exam.getId(), exam.getSlug());
     }
 
     void checkStartExamScreenState() {
