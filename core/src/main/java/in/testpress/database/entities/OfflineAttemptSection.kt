@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class OfflineAttemptSection(
     var id: Long,
     @PrimaryKey(autoGenerate = true)
-    val attemptSectionId: Long,
+    val attemptSectionId: Long = 1,
     val state: String,
     val remainingTime: String? = null,
     val name: String,
