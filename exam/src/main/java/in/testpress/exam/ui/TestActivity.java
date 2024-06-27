@@ -5,11 +5,9 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.Loader;
+import androidx.lifecycle.Observer;
 
 import android.view.View;
 import android.widget.Button;
@@ -35,6 +33,7 @@ import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Permission;
 import in.testpress.exam.api.TestpressExamApiClient;
+import in.testpress.exam.ui.viewmodel.ExamViewModel;
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
@@ -43,15 +42,14 @@ import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Language;
+import in.testpress.network.Resource;
 import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.Assert;
 import in.testpress.util.FormatDate;
-import in.testpress.util.ThrowableLoader;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
-import retrofit2.Response;
 
 import static in.testpress.exam.api.TestpressExamApiClient.IS_PARTIAL;
 import static in.testpress.exam.ui.AccessCodeExamsFragment.ACCESS_CODE;
@@ -59,7 +57,7 @@ import static in.testpress.exam.ui.AccessCodeExamsFragment.ACCESS_CODE;
 /**
  * Activity of Test Engine
  */
-public class TestActivity extends BaseToolBarActivity implements LoaderManager.LoaderCallbacks<Attempt>  {
+public class TestActivity extends BaseToolBarActivity  {
 
     public static final String PARAM_EXAM_SLUG = "slug";
     public static final String PARAM_COURSE_CONTENT = "courseContent";
@@ -74,9 +72,6 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     public static final String PARAM_IS_PARTIAL_QUESTIONS = "isPartialQuestions";
     public static final String PARAM_ACTION = "action";
     public static final String PARAM_VALUE_ACTION_END = "end";
-    private static final int START_ATTEMPT_LOADER = 0;
-    private static final int RESUME_ATTEMPT_LOADER = 1;
-    private static final int END_ATTEMPT_LOADER = 2;
     private TestpressExamApiClient apiClient;
     Exam exam;
     Attempt attempt;
@@ -101,11 +96,13 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     private RetrofitCall<Permission> permissionsApiRequest;
     private RetrofitCall<TestpressApiResponse<Attempt>> attemptsApiRequest;
     private RetrofitCall<ApiResponse<List<Language>>> languagesApiRequest;
+    private ExamViewModel examViewModel;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_test);
+        examViewModel = ExamViewModel.Companion.initializeViewModel(this);
         examDetailsContainer = findViewById(R.id.exam_details);
         examDetailsContainer.setVisibility(View.GONE);
         fragmentContainer = findViewById(R.id.fragment_container);
@@ -152,6 +149,109 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         courseContent = data.getParcelable(PARAM_COURSE_CONTENT);
         courseAttempt = data.getParcelable(PARAM_COURSE_ATTEMPT);
         onDataInitialized();
+        observeAttemptResources();
+        observeContentAttemptResources();
+    }
+
+    void observeAttemptResources(){
+        examViewModel.getAttemptResource().observe(this, new Observer<Resource<Attempt>>() {
+            @Override
+            public void onChanged(Resource<Attempt> attemptResource) {
+                switch (attemptResource.getStatus()){
+                    case SUCCESS:{
+                        showFragment();
+                        handleSuccessAttempt(attemptResource.getData());
+                        break;
+                    }
+                    case LOADING:{
+                        progressBar.setVisibility(View.VISIBLE);
+                        break;
+                    }
+                    case ERROR:{
+                        progressBar.setVisibility(View.GONE);
+                        handleError(attemptResource.getException(), R.string.testpress_error_loading_attempts);
+                        retryButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                progressBar.setVisibility(View.VISIBLE);
+                                emptyView.setVisibility(View.GONE);
+                                createAttempt();
+                            }
+                        });
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    void observeContentAttemptResources(){
+        examViewModel.getContentAttemptResource().observe(this, new Observer<Resource<CourseAttempt>>() {
+            @Override
+            public void onChanged(Resource<CourseAttempt> courseAttemptResource) {
+                switch (courseAttemptResource.getStatus()){
+                    case SUCCESS:{
+                        showFragment();
+                        handleCourseAttemptSuccess(courseAttemptResource.getData());
+                        break;
+                    }
+                    case LOADING:{
+                        progressBar.setVisibility(View.VISIBLE);
+                        break;
+                    }
+                    case ERROR:{
+                        progressBar.setVisibility(View.GONE);
+                        handleError(courseAttemptResource.getException(), R.string.testpress_error_loading_attempts);
+                        retryButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                progressBar.setVisibility(View.VISIBLE);
+                                emptyView.setVisibility(View.GONE);
+                                createContentAttempt();
+                            }
+                        });
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    private void showFragment() {
+        progressBar.setVisibility(View.GONE);
+        fragmentContainer.setVisibility(View.VISIBLE);
+    }
+
+    private void handleCourseAttemptSuccess(CourseAttempt courseAttempt) {
+        this.courseAttempt = courseAttempt;
+        saveCourseAttemptInDB(courseAttempt, true);
+        Attempt attempt = courseAttempt.getRawAssessment();
+        if (attempt.getState().equals("Running") && attempt.getRemainingTime().equals("0:00:00")) {
+            attempt.setRemainingTime(exam.getDuration());
+        }
+        handleSuccessAttempt(attempt);
+    }
+
+    private void handleSuccessAttempt(Attempt attempt) {
+        if (attempt.getState().equals("Running")) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(TestFragment.PARAM_ATTEMPT, attempt);
+            bundle.putParcelable(TestFragment.PARAM_EXAM, exam);
+            if (courseContent != null) {
+                bundle.putParcelable(TestActivity.PARAM_COURSE_CONTENT, courseContent);
+                bundle.putParcelable(TestActivity.PARAM_COURSE_ATTEMPT, courseAttempt);
+            }
+            bundle.putBoolean(PARAM_DISCARD_EXAM_DETAILS, discardExamDetails);
+            displayTestFragment(bundle);
+        } else {
+            TestpressSession session = TestpressSdk.getTestpressSession(TestActivity.this);
+            Assert.assertNotNull("TestpressSession must not be null.", session);
+            if (courseAttempt == null) {
+                TestpressExam.showAttemptReport(TestActivity.this, exam, attempt, session);
+            } else {
+                TestpressExam.showCourseAttemptReport(TestActivity.this, exam, courseAttempt, session);
+            }
+        }
     }
 
     void onDataInitialized() {
@@ -359,9 +459,9 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
         }
         if (discardExamDetails) {
             if (attempt == null) {
-                getSupportLoaderManager().initLoader(START_ATTEMPT_LOADER, null, TestActivity.this);
+                startExam(false);
             } else {
-                getSupportLoaderManager().initLoader(RESUME_ATTEMPT_LOADER, null, TestActivity.this);
+                startExam(true);
             }
         } else {
             fetchLanguages();
@@ -460,69 +560,11 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
 
     private void endExam() {
         progressBar.setVisibility(View.VISIBLE);
-        getSupportLoaderManager().initLoader(END_ATTEMPT_LOADER, null, TestActivity.this);
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    @NonNull
-    @Override
-    public Loader<Attempt> onCreateLoader(final int id, final Bundle args) {
-        progressBar.setVisibility(View.VISIBLE);
-        return new ThrowableLoader<Attempt>(TestActivity.this, attempt) {
-            @Override
-            public Attempt loadData() throws TestpressException {
-                if (courseContent != null && id != RESUME_ATTEMPT_LOADER) {
-                    RetrofitCall<CourseAttempt> call = null;
-                    boolean createdNewAttempt = false;
-                    switch (id) {
-                        case START_ATTEMPT_LOADER:
-                            Map<String, Object> data = new HashMap<>();
-                            if (isPartialQuestions) {
-                                data.put(IS_PARTIAL, true);
-                            }
-                            String attemptsUrl = courseContent.getAttemptsUrl();
-                            attemptsUrl = attemptsUrl.replace("v2.3", "v2.2.1");
-                            call = apiClient
-                                    .createContentAttempt(attemptsUrl, data);
-                            createdNewAttempt = true;
-                            break;
-                        case END_ATTEMPT_LOADER:
-                            call = apiClient.endContentAttempt(courseAttempt.getEndAttemptUrl());
-                            createdNewAttempt = false;
-                            break;
-                    }
-                    courseAttempt = executeRetrofitCall(call);
-                    saveCourseAttemptInDB(courseAttempt, createdNewAttempt);
-                    Attempt attempt = courseAttempt.getRawAssessment();
-                    if (id == START_ATTEMPT_LOADER && attempt.getRemainingTime().equals("0:00:00")) {
-                        attempt.setRemainingTime(exam.getDuration());
-                    }
-                    return attempt;
-                } else {
-                    RetrofitCall<Attempt> call = null;
-                    switch (id) {
-                        case START_ATTEMPT_LOADER:
-                            Map<String, Object> data = new HashMap<>();
-                            String accessCode = getIntent().getStringExtra(ACCESS_CODE);
-                            if (accessCode != null) {
-                                data.put(ACCESS_CODE, accessCode);
-                            }
-                            if (isPartialQuestions) {
-                                data.put(IS_PARTIAL, true);
-                            }
-                            call = apiClient.createAttempt(exam.getAttemptsFrag(), data);
-                            break;
-                        case RESUME_ATTEMPT_LOADER:
-                            call = apiClient.startAttempt(attempt.getStartUrlFrag());
-                            break;
-                        case END_ATTEMPT_LOADER:
-                            call = apiClient.endAttempt(attempt.getEndUrlFrag());
-                            break;
-                    }
-                    return executeRetrofitCall(call);
-                }
-            }
-        };
+        if (courseContent != null){
+            examViewModel.endContentAttempt(courseAttempt.getEndAttemptUrl());
+        } else {
+            examViewModel.endAttempt(attempt.getEndUrlFrag());
+        }
     }
 
     private void saveCourseAttemptInDB(CourseAttempt courseAttempt, boolean createdNewAttempt) {
@@ -531,69 +573,6 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
             courseContent.setAttemptsCount(courseContent.getAttemptsCount() + 1);
             ContentDao contentDao = TestpressSDKDatabase.getContentDao(this);
             contentDao.insertOrReplace(courseContent);
-        }
-    }
-
-    private <T> T executeRetrofitCall(RetrofitCall<T> call) {
-        try {
-            if (call != null) {
-                Response<T> response = call.execute();
-                if (response.isSuccessful()) {
-                    return response.body();
-                } else {
-                    throw TestpressException.httpError(response);
-                }
-            } else {
-                throw new IllegalStateException("Invalid loader id");
-            }
-        } catch (TestpressException e) {
-            throw e;
-        } catch (IOException e) {
-            throw TestpressException.networkError(e);
-        } catch (Exception e) {
-            throw TestpressException.unexpectedError(e);
-        }
-    }
-
-    public void onLoadFinished(@NonNull final Loader<Attempt> loader, final Attempt attempt) {
-        if (progressBar.getVisibility() == View.GONE) {
-            return;
-        }
-        getSupportLoaderManager().destroyLoader(loader.getId());
-        progressBar.setVisibility(View.GONE);
-        //noinspection ThrowableResultOfMethodCallIgnored
-        TestpressException exception = ((ThrowableLoader<Attempt>) loader).clearException();
-        if(exception == null) {
-            fragmentContainer.setVisibility(View.VISIBLE);
-            if (attempt.getState().equals("Running")) {
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(TestFragment.PARAM_ATTEMPT, attempt);
-                bundle.putParcelable(TestFragment.PARAM_EXAM, exam);
-                if (courseContent != null) {
-                    bundle.putParcelable(TestActivity.PARAM_COURSE_CONTENT, courseContent);
-                    bundle.putParcelable(TestActivity.PARAM_COURSE_ATTEMPT, courseAttempt);
-                }
-                bundle.putBoolean(PARAM_DISCARD_EXAM_DETAILS, discardExamDetails);
-                displayTestFragment(bundle);
-            } else {
-                TestpressSession session = TestpressSdk.getTestpressSession(this);
-                Assert.assertNotNull("TestpressSession must not be null.", session);
-                if (courseAttempt == null) {
-                    TestpressExam.showAttemptReport(this, exam, attempt, session);
-                } else {
-                    TestpressExam.showCourseAttemptReport(this, exam, courseAttempt, session);
-                }
-            }
-        } else {
-            handleError(exception, R.string.testpress_error_loading_attempts);
-            retryButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    progressBar.setVisibility(View.VISIBLE);
-                    emptyView.setVisibility(View.GONE);
-                    getSupportLoaderManager().restartLoader(loader.getId(), null, TestActivity.this);
-                }
-            });
         }
     }
 
@@ -628,11 +607,6 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     }
 
     @Override
-    public void onLoaderReset(@NonNull final Loader<Attempt> loader) {
-        
-    }
-
-    @Override
     public void onBackPressed() {
         TestFragment testFragment = getCurrentFragment();
         if (testFragment != null) {
@@ -647,9 +621,39 @@ public class TestActivity extends BaseToolBarActivity implements LoaderManager.L
     }
 
     private void startExam(boolean resumeExam) {
-        int loaderId = resumeExam ? RESUME_ATTEMPT_LOADER : START_ATTEMPT_LOADER;
-        getSupportLoaderManager().initLoader(loaderId, null, TestActivity.this);
+        if (resumeExam){
+            examViewModel.startAttempt(attempt.getStartUrlFrag());
+        } else {
+            if (courseContent != null){
+                createContentAttempt();
+            } else {
+                createAttempt();
+            }
+        }
         examDetailsContainer.setVisibility(View.GONE);
+    }
+
+    private void createContentAttempt() {
+        HashMap<String, Object> data = new HashMap<>();
+
+        if (isPartialQuestions) {
+            data.put(IS_PARTIAL, true);
+        }
+        String attemptsUrl = courseContent.getAttemptsUrl();
+        attemptsUrl = attemptsUrl.replace("v2.3", "v2.2.1");
+        examViewModel.createContentAttempt(attemptsUrl, data);
+    }
+
+    private void createAttempt() {
+        HashMap<String, Object> data = new HashMap<>();
+        String accessCode = getIntent().getStringExtra(ACCESS_CODE);
+        if (accessCode != null) {
+            data.put(ACCESS_CODE, accessCode);
+        }
+        if (isPartialQuestions) {
+            data.put(IS_PARTIAL, true);
+        }
+        examViewModel.createAttempt(exam.getAttemptsFrag(), data);
     }
 
     protected void setEmptyText(final int title, final int description) {
