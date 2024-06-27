@@ -76,6 +76,7 @@ public class Exam implements android.os.Parcelable {
     private Boolean disableAttemptResume;
     private Boolean allowPreemptiveSectionEnding;
     private String examDataModifiedOn;
+    private Boolean isOfflineExam;
 
     /** Used to resolve relations */
     @Generated
@@ -103,7 +104,7 @@ public class Exam implements android.os.Parcelable {
     }
 
     @Generated
-    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock, Boolean showAnalytics, String instructions, Boolean hasAudioQuestions, String rankPublishingDate, Boolean enableQuizMode, Boolean disableAttemptResume, Boolean allowPreemptiveSectionEnding, String examDataModifiedOn) {
+    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock, Boolean showAnalytics, String instructions, Boolean hasAudioQuestions, String rankPublishingDate, Boolean enableQuizMode, Boolean disableAttemptResume, Boolean allowPreemptiveSectionEnding, String examDataModifiedOn, Boolean isOfflineExam) {
         this.totalMarks = totalMarks;
         this.url = url;
         this.id = id;
@@ -144,6 +145,7 @@ public class Exam implements android.os.Parcelable {
         this.disableAttemptResume = disableAttemptResume;
         this.allowPreemptiveSectionEnding = allowPreemptiveSectionEnding;
         this.examDataModifiedOn = examDataModifiedOn;
+        this.isOfflineExam = isOfflineExam;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -471,6 +473,14 @@ public class Exam implements android.os.Parcelable {
 
     public void setExamDataModifiedOn(String examDataModifiedOn) {
         this.examDataModifiedOn = examDataModifiedOn;
+    }
+
+    public Boolean getIsOfflineExam() {
+        return isOfflineExam;
+    }
+
+    public void setIsOfflineExam(Boolean isOfflineExam) {
+        this.isOfflineExam = isOfflineExam;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
