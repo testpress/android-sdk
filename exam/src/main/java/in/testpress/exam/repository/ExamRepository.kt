@@ -7,11 +7,10 @@ import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.network.Resource
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
-class TestRepository(val context: Context) {
+class ExamRepository(val context: Context) {
 
     private val _attemptResource = MutableLiveData<Resource<Attempt>>()
     val attemptResource: LiveData<Resource<Attempt>> get() = _attemptResource

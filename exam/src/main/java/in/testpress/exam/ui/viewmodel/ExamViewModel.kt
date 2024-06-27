@@ -1,6 +1,6 @@
 package `in`.testpress.exam.ui.viewmodel
 
-import `in`.testpress.exam.repository.TestRepository
+import `in`.testpress.exam.repository.ExamRepository
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.network.Resource
@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
 
-class TestViewModel(val repository: TestRepository) : ViewModel() {
+class ExamViewModel(val repository: ExamRepository) : ViewModel() {
 
     val attemptResource: LiveData<Resource<Attempt>> get() = repository.attemptResource
 
@@ -37,14 +37,14 @@ class TestViewModel(val repository: TestRepository) : ViewModel() {
     }
 
     companion object {
-        fun initializeViewModel(activity: AppCompatActivity): TestViewModel {
+        fun initializeViewModel(activity: AppCompatActivity): ExamViewModel {
             return ViewModelProvider(activity, object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return TestViewModel(
-                        TestRepository(activity)
+                    return ExamViewModel(
+                        ExamRepository(activity)
                     ) as T
                 }
-            }).get(TestViewModel::class.java)
+            }).get(ExamViewModel::class.java)
         }
     }
 }

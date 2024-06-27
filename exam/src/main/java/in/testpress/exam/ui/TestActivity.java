@@ -33,7 +33,7 @@ import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Permission;
 import in.testpress.exam.api.TestpressExamApiClient;
-import in.testpress.exam.ui.viewmodel.TestViewModel;
+import in.testpress.exam.ui.viewmodel.ExamViewModel;
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
@@ -96,13 +96,13 @@ public class TestActivity extends BaseToolBarActivity  {
     private RetrofitCall<Permission> permissionsApiRequest;
     private RetrofitCall<TestpressApiResponse<Attempt>> attemptsApiRequest;
     private RetrofitCall<ApiResponse<List<Language>>> languagesApiRequest;
-    private TestViewModel testViewModel;
+    private ExamViewModel examViewModel;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testpress_activity_test);
-        testViewModel = TestViewModel.Companion.initializeViewModel(this);
+        examViewModel = ExamViewModel.Companion.initializeViewModel(this);
         examDetailsContainer = findViewById(R.id.exam_details);
         examDetailsContainer.setVisibility(View.GONE);
         fragmentContainer = findViewById(R.id.fragment_container);
@@ -154,7 +154,7 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     void observeAttemptResources(){
-        testViewModel.getAttemptResource().observe(this, new Observer<Resource<Attempt>>() {
+        examViewModel.getAttemptResource().observe(this, new Observer<Resource<Attempt>>() {
             @Override
             public void onChanged(Resource<Attempt> attemptResource) {
                 switch (attemptResource.getStatus()){
@@ -186,7 +186,7 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     void observeContentAttemptResources(){
-        testViewModel.getContentAttemptResource().observe(this, new Observer<Resource<CourseAttempt>>() {
+        examViewModel.getContentAttemptResource().observe(this, new Observer<Resource<CourseAttempt>>() {
             @Override
             public void onChanged(Resource<CourseAttempt> courseAttemptResource) {
                 switch (courseAttemptResource.getStatus()){
@@ -561,9 +561,9 @@ public class TestActivity extends BaseToolBarActivity  {
     private void endExam() {
         progressBar.setVisibility(View.VISIBLE);
         if (courseContent != null){
-            testViewModel.endContentAttempt(courseAttempt.getEndAttemptUrl());
+            examViewModel.endContentAttempt(courseAttempt.getEndAttemptUrl());
         } else {
-            testViewModel.endAttempt(attempt.getEndUrlFrag());
+            examViewModel.endAttempt(attempt.getEndUrlFrag());
         }
     }
 
@@ -622,7 +622,7 @@ public class TestActivity extends BaseToolBarActivity  {
 
     private void startExam(boolean resumeExam) {
         if (resumeExam){
-            testViewModel.startAttempt(attempt.getStartUrlFrag());
+            examViewModel.startAttempt(attempt.getStartUrlFrag());
         } else {
             if (courseContent != null){
                 createContentAttempt();
@@ -641,7 +641,7 @@ public class TestActivity extends BaseToolBarActivity  {
         }
         String attemptsUrl = courseContent.getAttemptsUrl();
         attemptsUrl = attemptsUrl.replace("v2.3", "v2.2.1");
-        testViewModel.createContentAttempt(attemptsUrl, data);
+        examViewModel.createContentAttempt(attemptsUrl, data);
     }
 
     private void createAttempt() {
@@ -653,7 +653,7 @@ public class TestActivity extends BaseToolBarActivity  {
         if (isPartialQuestions) {
             data.put(IS_PARTIAL, true);
         }
-        testViewModel.createAttempt(exam.getAttemptsFrag(), data);
+        examViewModel.createAttempt(exam.getAttemptsFrag(), data);
     }
 
     protected void setEmptyText(final int title, final int description) {
