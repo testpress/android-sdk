@@ -149,8 +149,79 @@ public class TestActivity extends BaseToolBarActivity  {
         courseContent = data.getParcelable(PARAM_COURSE_CONTENT);
         courseAttempt = data.getParcelable(PARAM_COURSE_ATTEMPT);
         onDataInitialized();
-        observeAttemptResources();
+        observePermissionResources();
+        observeLanguageResources();
         observeContentAttemptResources();
+        observeAttemptResources();
+    }
+
+    void observePermissionResources(){
+        examViewModel.getPermissionResource().observe(this, new Observer<Resource<Permission>>() {
+            @Override
+            public void onChanged(Resource<Permission> permissionResource) {
+                switch (permissionResource.getStatus()){
+                    case SUCCESS:{
+                        TestActivity.this.permission = permissionResource.getData();
+                        checkStartExamScreenState();
+                        break;
+                    }
+                    case LOADING:{
+                        progressBar.setVisibility(View.VISIBLE);
+                        break;
+                    }
+                    case ERROR:{
+                        handleError(permissionResource.getException(), R.string.testpress_error_loading_permission);
+                        retryButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                progressBar.setVisibility(View.VISIBLE);
+                                emptyView.setVisibility(View.GONE);
+                                checkPermission();
+                            }
+                        });
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    void observeLanguageResources(){
+        examViewModel.getLanguageResource().observe(this, new Observer<Resource<List<Language>>>() {
+            @Override
+            public void onChanged(Resource<List<Language>> listResource) {
+                switch (listResource.getStatus()){
+                    case SUCCESS:{
+                        List<Language> languages = exam.getRawLanguages();
+                        languages.addAll(listResource.getData());
+                        Map<String, Language> uniqueLanguages = new HashMap<>();
+                        for (Language language : languages) {
+                            uniqueLanguages.put(language.getCode(), language);
+                        }
+                        exam.setLanguages(new ArrayList<>(uniqueLanguages.values()));
+                        TestActivity.this.languages = exam.getRawLanguages();
+                        displayStartExamScreen();
+                        break;
+                    }
+                    case LOADING:{
+                        progressBar.setVisibility(View.VISIBLE);
+                        break;
+                    }
+                    case ERROR:{
+                        handleError(listResource.getException(), R.string.testpress_error_loading_languages);
+                        retryButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                progressBar.setVisibility(View.VISIBLE);
+                                emptyView.setVisibility(View.GONE);
+                                fetchLanguages();
+                            }
+                        });
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     void observeAttemptResources(){
@@ -279,28 +350,7 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     void checkPermission() {
-        progressBar.setVisibility(View.VISIBLE);
-        permissionsApiRequest = apiClient.checkPermission(courseContent.getId())
-                .enqueue(new TestpressCallback<Permission>() {
-                    @Override
-                    public void onSuccess(Permission permission) {
-                        TestActivity.this.permission = permission;
-                        checkStartExamScreenState();
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        handleError(exception, R.string.testpress_error_loading_permission);
-                        retryButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                progressBar.setVisibility(View.VISIBLE);
-                                emptyView.setVisibility(View.GONE);
-                                checkPermission();
-                            }
-                        });
-                    }
-                });
+        examViewModel.checkPermission(courseContent.getId());
     }
 
     void loadExam(final String examSlug) {
@@ -369,39 +419,7 @@ public class TestActivity extends BaseToolBarActivity  {
             displayStartExamScreen();
             return;
         }
-        progressBar.setVisibility(View.VISIBLE);
-        languagesApiRequest = apiClient.getLanguages(exam.getSlug())
-                .enqueue(new TestpressCallback<ApiResponse<List<Language>>>() {
-                    @Override
-                    public void onSuccess(ApiResponse<List<Language>> apiResponse) {
-                        List<Language> languages = exam.getRawLanguages();
-                        languages.addAll(apiResponse.getResults());
-                        Map<String, Language> uniqueLanguages = new HashMap<>();
-                        for (Language language : languages) {
-                            uniqueLanguages.put(language.getCode(), language);
-                        }
-                        exam.setLanguages(new ArrayList<>(uniqueLanguages.values()));
-                        if (apiResponse.hasMore()) {
-                            fetchLanguages();
-                        } else {
-                            TestActivity.this.languages = exam.getRawLanguages();
-                            displayStartExamScreen();
-                        }
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        handleError(exception, R.string.testpress_error_loading_languages);
-                        retryButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                progressBar.setVisibility(View.VISIBLE);
-                                emptyView.setVisibility(View.GONE);
-                                fetchLanguages();
-                            }
-                        });
-                    }
-                });
+        examViewModel.fetchLanguages(exam.getSlug());
     }
 
     void checkStartExamScreenState() {
