@@ -661,7 +661,7 @@ public class TestActivity extends BaseToolBarActivity  {
         }
         String attemptsUrl = courseContent.getAttemptsUrl();
         attemptsUrl = attemptsUrl.replace("v2.3", "v2.2.1");
-        examViewModel.createContentAttempt(attemptsUrl, data);
+        examViewModel.createContentAttempt(exam, attemptsUrl, data);
     }
 
     private void createAttempt() {
@@ -673,7 +673,7 @@ public class TestActivity extends BaseToolBarActivity  {
         if (isPartialQuestions) {
             data.put(IS_PARTIAL, true);
         }
-        examViewModel.createAttempt(exam.getAttemptsFrag(), data);
+        examViewModel.createAttempt(exam, exam.getAttemptsFrag(), data);
     }
 
     protected void setEmptyText(final int title, final int description) {

@@ -8,6 +8,7 @@ import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.models.Permission
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.CourseAttempt
+import `in`.testpress.models.greendao.Exam
 import `in`.testpress.models.greendao.Language
 import `in`.testpress.network.Resource
 import `in`.testpress.v2_4.models.ApiResponse
@@ -47,19 +48,28 @@ class TestRepository(val context: Context) {
 
     private val apiClient: TestpressExamApiClient = TestpressExamApiClient(context)
 
-    fun createContentAttempt(examId: Long, attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
+    fun createContentAttempt(exam: Exam, attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
         _contentAttemptResource.postValue(Resource.loading(null))
         if (isOfflineExam) {
-            createContentAttemptOffline(examId)
+            createContentAttemptOffline(exam)
         } else {
             createContentAttemptOnline(attemptUrlFrag, queryParams)
         }
     }
 
-    private fun createContentAttemptOffline(examId: Long) {
+    private fun createContentAttemptOffline(exam: Exam) {
         CoroutineScope(Dispatchers.IO).launch {
+//            val offlineAttempt = OfflineAttempt(
+//                date = Date().toString(),
+//                totalQuestions = exam.numberOfQuestions,
+//                lastStartedTime = Date().toString(),
+//                remainingTime = exam.duration,
+//                timeTaken = "0:15:00",
+//                state = Attempt.RUNNING,
+//                lastViewedQuestionId =
+//            )
 
-            val sectionIds = examQuestionDao.getUniqueSectionIdsByExamId(examId)
+            val sectionIds = examQuestionDao.getUniqueSectionIdsByExamId(exam.id)
 
         }
     }
@@ -77,16 +87,16 @@ class TestRepository(val context: Context) {
             })
     }
 
-    fun createAttempt(examId: Long, attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
+    fun createAttempt(exam: Exam, attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
         _attemptResource.postValue(Resource.loading(null))
         if (isOfflineExam) {
-            createAttemptOffline(examId)
+            createAttemptOffline(exam)
         } else {
             createAttemptOnline(attemptUrlFrag, queryParams)
         }
     }
 
-    private fun createAttemptOffline(examId: Long) {
+    private fun createAttemptOffline(exam: Exam) {
 
 
     }

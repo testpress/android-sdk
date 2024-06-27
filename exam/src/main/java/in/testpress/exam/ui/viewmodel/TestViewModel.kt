@@ -4,6 +4,7 @@ import `in`.testpress.exam.models.Permission
 import `in`.testpress.exam.repository.TestRepository
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.CourseAttempt
+import `in`.testpress.models.greendao.Exam
 import `in`.testpress.models.greendao.Language
 import `in`.testpress.network.Resource
 import androidx.appcompat.app.AppCompatActivity
@@ -26,12 +27,12 @@ class TestViewModel(val repository: TestRepository) : ViewModel() {
         repository.isOfflineExam = isOfflineExam
     }
 
-    fun createContentAttempt(examId: Long, attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
-        repository.createContentAttempt(examId, attemptUrlFrag, queryParams)
+    fun createContentAttempt(exam: Exam, attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
+        repository.createContentAttempt(exam, attemptUrlFrag, queryParams)
     }
 
-    fun createAttempt(examId: Long, attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
-        repository.createAttempt(examId, attemptUrlFrag, queryParams)
+    fun createAttempt(exam: Exam, attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
+        repository.createAttempt(exam, attemptUrlFrag, queryParams)
     }
 
     fun startAttempt(attemptStartFrag: String) {
