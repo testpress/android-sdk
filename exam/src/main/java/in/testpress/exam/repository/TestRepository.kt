@@ -114,6 +114,7 @@ class TestRepository(val context: Context) {
     }
 
     fun checkPermission(contentId: Long) {
+        _permissionResource.postValue(Resource.loading(null))
         apiClient.checkPermission(contentId)
             .enqueue(object : TestpressCallback < Permission >() {
                 override fun onSuccess(result: Permission) {
