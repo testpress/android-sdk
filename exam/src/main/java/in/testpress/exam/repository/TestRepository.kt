@@ -3,7 +3,16 @@ package `in`.testpress.exam.repository
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.database.TestpressDatabase
+import `in`.testpress.database.dao.OfflineAttemptDao
+import `in`.testpress.database.dao.OfflineAttemptSectionDao
+import `in`.testpress.database.dao.OfflineCourseAttemptDao
 import `in`.testpress.database.entities.OfflineAttempt
+import `in`.testpress.database.entities.OfflineAttemptSection
+import `in`.testpress.database.entities.OfflineCourseAttempt
+import `in`.testpress.database.entities.Section
+import `in`.testpress.database.mapping.asGreenDoaModel
+import `in`.testpress.database.mapping.asGreenDoaModels
+import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.models.Permission
 import `in`.testpress.models.greendao.Attempt
@@ -26,13 +35,11 @@ class TestRepository(val context: Context) {
     var isOfflineExam = false
 
     private val database = TestpressDatabase.invoke(context)
-    //private val offlineExamDao = database.offlineExamDao()
-    //private val languageDao = database.languageDao()
-    //private val directionDao = database.directionDao()
-    //private val subjectDao = database.subjectDao()
-    //private val sectionsDao = database.sectionsDao()
+    private val sectionsDao = database.sectionsDao()
     private val examQuestionDao = database.examQuestionDao()
-    //private val questionDao = database.questionDao()
+    private val offlineCourseAttemptDao = database.offlineCourseAttemptDao()
+    private val offlineAttemptDao = database.offlineAttemptDao()
+    private val offlineAttemptSectionDao = database.offlineAttemptSectionDao()
 
     private val _attemptResource = MutableLiveData<Resource<Attempt>>()
     val attemptResource: LiveData<Resource<Attempt>> get() = _attemptResource
@@ -59,19 +66,61 @@ class TestRepository(val context: Context) {
 
     private fun createContentAttemptOffline(exam: Exam) {
         CoroutineScope(Dispatchers.IO).launch {
-//            val offlineAttempt = OfflineAttempt(
-//                date = Date().toString(),
-//                totalQuestions = exam.numberOfQuestions,
-//                lastStartedTime = Date().toString(),
-//                remainingTime = exam.duration,
-//                timeTaken = "0:15:00",
-//                state = Attempt.RUNNING,
-//                lastViewedQuestionId =
-//            )
-
+            val offlineAttempt = OfflineAttempt(
+                date = Date().toString(),
+                totalQuestions = exam.numberOfQuestions,
+                lastStartedTime = Date().toString(),
+                remainingTime = exam.duration,
+                timeTaken = "0:00:00",
+                state = Attempt.RUNNING,
+                attemptType = 0
+            )
+            val offlineCourseAttempt = OfflineCourseAttempt(assessmentId = offlineAttempt.id)
             val sectionIds = examQuestionDao.getUniqueSectionIdsByExamId(exam.id)
-
+            val sections = sectionsDao.getSectionsByIds(sectionIds)
+            val offlineAttemptSections = createAttemptSections(sections, offlineAttempt.id)
+            saveOfflineAttempts(offlineCourseAttempt,offlineAttempt,offlineAttemptSections)
+            createGreenDoaCourseAttempt(offlineCourseAttempt,offlineAttempt,offlineAttemptSections)
         }
+    }
+
+    private fun createAttemptSections(sections: List<Section>, offlineAttemptId: Long): List<OfflineAttemptSection> {
+        val attemptSections = mutableListOf<OfflineAttemptSection>()
+        sections.forEach { section ->
+            val attemptSection = OfflineAttemptSection(
+                id = section.order!!,
+                state = if(section.order!! == 0L) Attempt.RUNNING else Attempt.NOT_STARTED,
+                remainingTime = section.duration,
+                name = section.name!!,
+                duration = section.duration!!,
+                order = section.order!!.toInt(),
+                instructions = section.instructions,
+                attemptId = offlineAttemptId
+            )
+            attemptSections.add(attemptSection)
+        }
+        return attemptSections
+    }
+
+    private suspend fun saveOfflineAttempts(
+        offlineCourseAttempt: OfflineCourseAttempt,
+        offlineAttempt: OfflineAttempt,
+        offlineAttemptSections: List<OfflineAttemptSection>
+    ) {
+        offlineCourseAttemptDao.insert(offlineCourseAttempt)
+        offlineAttemptDao.insert(offlineAttempt)
+        offlineAttemptSectionDao.insertAll(offlineAttemptSections)
+    }
+
+    private fun createGreenDoaCourseAttempt(
+        offlineCourseAttempt: OfflineCourseAttempt,
+        offlineAttempt: OfflineAttempt,
+        offlineAttemptSections: List<OfflineAttemptSection>
+    ) {
+        val attemptSections = offlineAttemptSections.asGreenDoaModels()
+        val attempt = offlineAttempt.createGreenDoaModel(attemptSections)
+        val courseAttempt = offlineCourseAttempt.createGreenDoaModel(attempt)
+        _contentAttemptResource.postValue(Resource.success(courseAttempt))
     }
 
     private fun createContentAttemptOnline(attemptUrlFrag: String, queryParams: HashMap<String,Any>) {
