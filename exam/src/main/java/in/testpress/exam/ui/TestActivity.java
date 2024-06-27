@@ -329,7 +329,7 @@ public class TestActivity extends BaseToolBarActivity  {
         if (courseContent != null) {
             if (exam == null) {
                 exam = courseContent.getRawExam();
-                examViewModel.setOfflineExam(Boolean.TRUE.equals(exam.getIsOfflineExam()));
+                examViewModel.setExam(exam);
             }
             if (courseAttempt == null && permission == null) {
                 checkPermission();
@@ -340,7 +340,7 @@ public class TestActivity extends BaseToolBarActivity  {
                 checkStartExamScreenState();
             }
         } else if (exam != null) {
-            examViewModel.setOfflineExam(Boolean.TRUE.equals(exam.getIsOfflineExam()));
+            examViewModel.setExam(exam);
             checkStartExamScreenState();
         } else {
             String examSlug = getIntent().getStringExtra(PARAM_EXAM_SLUG);
@@ -421,7 +421,7 @@ public class TestActivity extends BaseToolBarActivity  {
             displayStartExamScreen();
             return;
         }
-        examViewModel.fetchLanguages(exam.getId(), exam.getSlug());
+        examViewModel.fetchLanguages(exam.getSlug());
     }
 
     void checkStartExamScreenState() {
@@ -661,7 +661,7 @@ public class TestActivity extends BaseToolBarActivity  {
         }
         String attemptsUrl = courseContent.getAttemptsUrl();
         attemptsUrl = attemptsUrl.replace("v2.3", "v2.2.1");
-        examViewModel.createContentAttempt(exam, attemptsUrl, data);
+        examViewModel.createContentAttempt(attemptsUrl, data);
     }
 
     private void createAttempt() {
@@ -673,7 +673,7 @@ public class TestActivity extends BaseToolBarActivity  {
         if (isPartialQuestions) {
             data.put(IS_PARTIAL, true);
         }
-        examViewModel.createAttempt(exam, exam.getAttemptsFrag(), data);
+        examViewModel.createAttempt(exam.getAttemptsFrag(), data);
     }
 
     protected void setEmptyText(final int title, final int description) {

@@ -23,16 +23,16 @@ class ExamViewModel(val repository: ExamRepository) : ViewModel() {
 
     val permissionResource: LiveData<Resource<Permission>> get() = repository.permissionResource
 
-    fun setOfflineExam(isOfflineExam: Boolean){
-        repository.isOfflineExam = isOfflineExam
+    fun setExam(exam: Exam){
+        repository.exam = exam
     }
 
-    fun createContentAttempt(exam: Exam, attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
-        repository.createContentAttempt(exam, attemptUrlFrag, queryParams)
+    fun createContentAttempt(attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
+        repository.createContentAttempt(attemptUrlFrag, queryParams)
     }
 
-    fun createAttempt(exam: Exam, attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
-        repository.createAttempt(exam, attemptUrlFrag, queryParams)
+    fun createAttempt(attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
+        repository.createAttempt(attemptUrlFrag, queryParams)
     }
 
     fun startAttempt(attemptStartFrag: String) {
@@ -47,8 +47,8 @@ class ExamViewModel(val repository: ExamRepository) : ViewModel() {
         repository.endAttempt(attemptEndFrag)
     }
 
-    fun fetchLanguages(examId: Long, examSlug: String) {
-        repository.fetchLanguages(examId, examSlug)
+    fun fetchLanguages(examSlug: String) {
+        repository.fetchLanguages(examSlug)
     }
 
     fun checkPermission(contentId: Long) {
