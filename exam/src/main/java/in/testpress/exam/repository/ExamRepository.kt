@@ -29,7 +29,8 @@ import kotlin.collections.HashMap
 
 class ExamRepository(val context: Context) {
 
-    var isOfflineExam = false
+    lateinit var exam : Exam
+    private val isOfflineExam: Boolean get() = exam.isOfflineExam
 
     private val database = TestpressDatabase.invoke(context)
     private val sectionsDao = database.sectionsDao()
@@ -53,18 +54,18 @@ class ExamRepository(val context: Context) {
 
     private val apiClient: TestpressExamApiClient = TestpressExamApiClient(context)
 
-    fun createContentAttempt(exam: Exam, attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
+    fun createContentAttempt(attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
         _contentAttemptResource.postValue(Resource.loading(null))
         if (isOfflineExam) {
-            createOfflineContentAttempt(exam)
+            createOfflineContentAttempt()
         } else {
             createOnlineContentAttempt(attemptUrlFrag, queryParams)
         }
     }
 
-    private fun createOfflineContentAttempt(exam: Exam) {
+    private fun createOfflineContentAttempt() {
         CoroutineScope(Dispatchers.IO).launch {
-            val (offlineAttempt, offlineCourseAttempt, offlineAttemptSections) = createOfflineAttempts(exam)
+            val (offlineAttempt, offlineCourseAttempt, offlineAttemptSections) = createOfflineAttempts()
             offlineCourseAttemptDao.insert(offlineCourseAttempt)
             offlineAttemptDao.insert(offlineAttempt)
             offlineAttemptSectionDao.insertAll(offlineAttemptSections)
@@ -88,18 +89,18 @@ class ExamRepository(val context: Context) {
             })
     }
 
-    fun createAttempt(exam: Exam, attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
+    fun createAttempt(attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
         _attemptResource.postValue(Resource.loading(null))
         if (isOfflineExam) {
-            createOfflineAttempt(exam)
+            createOfflineAttempt()
         } else {
             createOnlineAttempt(attemptUrlFrag, queryParams)
         }
     }
 
-    private fun createOfflineAttempt(exam: Exam) {
+    private fun createOfflineAttempt() {
         CoroutineScope(Dispatchers.IO).launch {
-            val (offlineAttempt, _, offlineAttemptSections) = createOfflineAttempts(exam)
+            val (offlineAttempt, _, offlineAttemptSections) = createOfflineAttempts()
             offlineAttemptDao.insert(offlineAttempt)
             offlineAttemptSectionDao.insertAll(offlineAttemptSections)
             val attemptSections = offlineAttemptSections.asGreenDoaModels()
@@ -121,7 +122,7 @@ class ExamRepository(val context: Context) {
             })
     }
 
-    private suspend fun createOfflineAttempts(exam: Exam): Triple<OfflineAttempt, OfflineCourseAttempt, List<OfflineAttemptSection>> {
+    private suspend fun createOfflineAttempts(): Triple<OfflineAttempt, OfflineCourseAttempt, List<OfflineAttemptSection>> {
         val offlineAttempt = OfflineAttempt(
             date = Date().toString(),
             totalQuestions = exam.numberOfQuestions,
@@ -196,11 +197,11 @@ class ExamRepository(val context: Context) {
             })
     }
 
-    fun fetchLanguages(examId: Long, examSlug: String) {
+    fun fetchLanguages(examSlug: String) {
         _languageResource.postValue(Resource.loading(null))
         if (isOfflineExam) {
             CoroutineScope(Dispatchers.IO).launch {
-                val languages = languageDao.getLanguagesByExamId(examId)
+                val languages = languageDao.getLanguagesByExamId(exam.id)
                 _languageResource.postValue(Resource.success(languages.asGreenDaoModels()))
             }
         } else {
