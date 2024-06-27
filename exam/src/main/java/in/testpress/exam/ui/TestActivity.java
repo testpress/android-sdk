@@ -9,6 +9,7 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.Observer;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -149,6 +150,7 @@ public class TestActivity extends BaseToolBarActivity  {
         courseContent = data.getParcelable(PARAM_COURSE_CONTENT);
         courseAttempt = data.getParcelable(PARAM_COURSE_ATTEMPT);
         onDataInitialized();
+        testViewModel.setOfflineExam(Boolean.TRUE.equals(exam.getIsOfflineExam()));
         observePermissionResources();
         observeLanguageResources();
         observeContentAttemptResources();
