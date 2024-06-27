@@ -2,6 +2,8 @@ package `in`.testpress.exam.repository
 
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
+import `in`.testpress.database.TestpressDatabase
+import `in`.testpress.database.entities.OfflineAttempt
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.models.Permission
 import `in`.testpress.models.greendao.Attempt
@@ -12,10 +14,24 @@ import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.collections.HashMap
 
 class TestRepository(val context: Context) {
 
     var isOfflineExam = false
+
+    private val database = TestpressDatabase.invoke(context)
+    //private val offlineExamDao = database.offlineExamDao()
+    //private val languageDao = database.languageDao()
+    //private val directionDao = database.directionDao()
+    //private val subjectDao = database.subjectDao()
+    //private val sectionsDao = database.sectionsDao()
+    private val examQuestionDao = database.examQuestionDao()
+    //private val questionDao = database.questionDao()
 
     private val _attemptResource = MutableLiveData<Resource<Attempt>>()
     val attemptResource: LiveData<Resource<Attempt>> get() = _attemptResource
@@ -31,17 +47,21 @@ class TestRepository(val context: Context) {
 
     private val apiClient: TestpressExamApiClient = TestpressExamApiClient(context)
 
-    fun createContentAttempt(attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
+    fun createContentAttempt(examId: Long, attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
         _contentAttemptResource.postValue(Resource.loading(null))
         if (isOfflineExam) {
-            createContentAttemptOffline()
+            createContentAttemptOffline(examId)
         } else {
             createContentAttemptOnline(attemptUrlFrag, queryParams)
         }
     }
 
-    private fun createContentAttemptOffline() {
+    private fun createContentAttemptOffline(examId: Long) {
+        CoroutineScope(Dispatchers.IO).launch {
 
+            val sectionIds = examQuestionDao.getUniqueSectionIdsByExamId(examId)
+
+        }
     }
 
     private fun createContentAttemptOnline(attemptUrlFrag: String, queryParams: HashMap<String,Any>) {
@@ -57,16 +77,17 @@ class TestRepository(val context: Context) {
             })
     }
 
-    fun createAttempt(attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
+    fun createAttempt(examId: Long, attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
         _attemptResource.postValue(Resource.loading(null))
         if (isOfflineExam) {
-            createAttemptOffline()
+            createAttemptOffline(examId)
         } else {
             createAttemptOnline(attemptUrlFrag, queryParams)
         }
     }
 
-    private fun createAttemptOffline() {
+    private fun createAttemptOffline(examId: Long) {
+
 
     }
 
