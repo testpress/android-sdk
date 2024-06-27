@@ -39,36 +39,43 @@ class AttemptRepository(val context: Context) {
 
     fun fetchAttemptItems(questionsUrlFrag: String, fetchSinglePageOnly: Boolean) {
         _attemptItemsResource.postValue(Resource.loading(null))
-        val queryParams = hashMapOf<String, Any>("page" to page)
-        apiClient.getQuestions(questionsUrlFrag, queryParams)
-            .enqueue(object : TestpressCallback<TestpressApiResponse<AttemptItem>>() {
-                override fun onSuccess(result: TestpressApiResponse<AttemptItem>) {
-                    if (fetchSinglePageOnly) {
-                        _totalQuestions = result.count
-                        attemptItem.addAll(result.results)
-                        _attemptItemsResource.postValue(Resource.success(attemptItem))
-                        if (result.hasMore()) {
-                            page++
+
+        if (isOfflineExam){
+            createOfflineAttemptItemItem()
+        } else {
+            val queryParams = hashMapOf<String, Any>("page" to page)
+            apiClient.getQuestions(questionsUrlFrag, queryParams)
+                .enqueue(object : TestpressCallback<TestpressApiResponse<AttemptItem>>() {
+                    override fun onSuccess(result: TestpressApiResponse<AttemptItem>) {
+                        if (fetchSinglePageOnly) {
+                            _totalQuestions = result.count
+                            attemptItem.addAll(result.results)
+                            _attemptItemsResource.postValue(Resource.success(attemptItem))
+                            if (result.hasMore()) {
+                                page++
+                            }
+                            return
                         }
-                        return
+                        if (result.hasMore()) {
+                            _totalQuestions = result.count
+                            attemptItem.addAll(result.results)
+                            page++
+                            fetchAttemptItems(questionsUrlFrag, fetchSinglePageOnly)
+                        } else {
+                            attemptItem.addAll(result.results)
+                            _attemptItemsResource.postValue(Resource.success(attemptItem))
+                        }
                     }
-                    if (result.hasMore()) {
-                        _totalQuestions = result.count
-                        attemptItem.addAll(result.results)
-                        page++
-                        fetchAttemptItems(questionsUrlFrag, fetchSinglePageOnly)
-                    } else {
-                        attemptItem.addAll(result.results)
-                        _attemptItemsResource.postValue(Resource.success(attemptItem))
+
+                    override fun onException(exception: TestpressException) {
+                        _attemptItemsResource.postValue(Resource.error(exception, null))
                     }
-                }
 
-                override fun onException(exception: TestpressException) {
-                    _attemptItemsResource.postValue(Resource.error(exception, null))
-                }
+                })
+        }
+    }
 
-            })
-
+    private fun createOfflineAttemptItemItem() {
 
     }
 
