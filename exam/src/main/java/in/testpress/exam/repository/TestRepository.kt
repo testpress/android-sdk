@@ -3,14 +3,10 @@ package `in`.testpress.exam.repository
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.database.TestpressDatabase
-import `in`.testpress.database.dao.OfflineAttemptDao
-import `in`.testpress.database.dao.OfflineAttemptSectionDao
-import `in`.testpress.database.dao.OfflineCourseAttemptDao
 import `in`.testpress.database.entities.OfflineAttempt
 import `in`.testpress.database.entities.OfflineAttemptSection
 import `in`.testpress.database.entities.OfflineCourseAttempt
 import `in`.testpress.database.entities.Section
-import `in`.testpress.database.mapping.asGreenDoaModel
 import `in`.testpress.database.mapping.asGreenDoaModels
 import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.api.TestpressExamApiClient
@@ -58,72 +54,26 @@ class TestRepository(val context: Context) {
     fun createContentAttempt(exam: Exam, attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
         _contentAttemptResource.postValue(Resource.loading(null))
         if (isOfflineExam) {
-            createContentAttemptOffline(exam)
+            createOfflineContentAttempt(exam)
         } else {
-            createContentAttemptOnline(attemptUrlFrag, queryParams)
+            createOnlineContentAttempt(attemptUrlFrag, queryParams)
         }
     }
 
-    private fun createContentAttemptOffline(exam: Exam) {
+    private fun createOfflineContentAttempt(exam: Exam) {
         CoroutineScope(Dispatchers.IO).launch {
-            val offlineAttempt = OfflineAttempt(
-                date = Date().toString(),
-                totalQuestions = exam.numberOfQuestions,
-                lastStartedTime = Date().toString(),
-                remainingTime = exam.duration,
-                timeTaken = "0:00:00",
-                state = Attempt.RUNNING,
-                attemptType = 0
-            )
-            val offlineCourseAttempt = OfflineCourseAttempt(assessmentId = offlineAttempt.id)
-            val sectionIds = examQuestionDao.getUniqueSectionIdsByExamId(exam.id)
-            val sections = sectionsDao.getSectionsByIds(sectionIds)
-            val offlineAttemptSections = createAttemptSections(sections, offlineAttempt.id)
-            saveOfflineAttempts(offlineCourseAttempt,offlineAttempt,offlineAttemptSections)
-            createGreenDoaCourseAttempt(offlineCourseAttempt,offlineAttempt,offlineAttemptSections)
+            val (offlineAttempt, offlineCourseAttempt, offlineAttemptSections) = createOfflineAttempts(exam)
+            offlineCourseAttemptDao.insert(offlineCourseAttempt)
+            offlineAttemptDao.insert(offlineAttempt)
+            offlineAttemptSectionDao.insertAll(offlineAttemptSections)
+            val attemptSections = offlineAttemptSections.asGreenDoaModels()
+            val attempt = offlineAttempt.createGreenDoaModel(attemptSections)
+            val courseAttempt = offlineCourseAttempt.createGreenDoaModel(attempt)
+            _contentAttemptResource.postValue(Resource.success(courseAttempt))
         }
     }
 
-    private fun createAttemptSections(sections: List<Section>, offlineAttemptId: Long): List<OfflineAttemptSection> {
-        val attemptSections = mutableListOf<OfflineAttemptSection>()
-        sections.forEach { section ->
-            val attemptSection = OfflineAttemptSection(
-                id = section.order!!,
-                state = if(section.order!! == 0L) Attempt.RUNNING else Attempt.NOT_STARTED,
-                remainingTime = section.duration,
-                name = section.name!!,
-                duration = section.duration!!,
-                order = section.order!!.toInt(),
-                instructions = section.instructions,
-                attemptId = offlineAttemptId
-            )
-            attemptSections.add(attemptSection)
-        }
-        return attemptSections
-    }
-
-    private suspend fun saveOfflineAttempts(
-        offlineCourseAttempt: OfflineCourseAttempt,
-        offlineAttempt: OfflineAttempt,
-        offlineAttemptSections: List<OfflineAttemptSection>
-    ) {
-        offlineCourseAttemptDao.insert(offlineCourseAttempt)
-        offlineAttemptDao.insert(offlineAttempt)
-        offlineAttemptSectionDao.insertAll(offlineAttemptSections)
-    }
-
-    private fun createGreenDoaCourseAttempt(
-        offlineCourseAttempt: OfflineCourseAttempt,
-        offlineAttempt: OfflineAttempt,
-        offlineAttemptSections: List<OfflineAttemptSection>
-    ) {
-        val attemptSections = offlineAttemptSections.asGreenDoaModels()
-        val attempt = offlineAttempt.createGreenDoaModel(attemptSections)
-        val courseAttempt = offlineCourseAttempt.createGreenDoaModel(attempt)
-        _contentAttemptResource.postValue(Resource.success(courseAttempt))
-    }
-
-    private fun createContentAttemptOnline(attemptUrlFrag: String, queryParams: HashMap<String,Any>) {
+    private fun createOnlineContentAttempt(attemptUrlFrag: String, queryParams: HashMap<String,Any>) {
         apiClient.createContentAttempt(attemptUrlFrag, queryParams)
             .enqueue(object : TestpressCallback<CourseAttempt>() {
                 override fun onSuccess(result: CourseAttempt) {
@@ -139,18 +89,24 @@ class TestRepository(val context: Context) {
     fun createAttempt(exam: Exam, attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
         _attemptResource.postValue(Resource.loading(null))
         if (isOfflineExam) {
-            createAttemptOffline(exam)
+            createOfflineAttempt(exam)
         } else {
-            createAttemptOnline(attemptUrlFrag, queryParams)
+            createOnlineAttempt(attemptUrlFrag, queryParams)
         }
     }
 
-    private fun createAttemptOffline(exam: Exam) {
-
-
+    private fun createOfflineAttempt(exam: Exam) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val (offlineAttempt, _, offlineAttemptSections) = createOfflineAttempts(exam)
+            offlineAttemptDao.insert(offlineAttempt)
+            offlineAttemptSectionDao.insertAll(offlineAttemptSections)
+            val attemptSections = offlineAttemptSections.asGreenDoaModels()
+            val attempt = offlineAttempt.createGreenDoaModel(attemptSections)
+            _attemptResource.postValue(Resource.success(attempt))
+        }
     }
 
-    private fun createAttemptOnline(attemptUrlFrag: String, queryParams: HashMap<String,Any>) {
+    private fun createOnlineAttempt(attemptUrlFrag: String, queryParams: HashMap<String,Any>) {
         apiClient.createAttempt(attemptUrlFrag, queryParams)
             .enqueue(object : TestpressCallback<Attempt>() {
                 override fun onSuccess(response: Attempt) {
@@ -161,6 +117,39 @@ class TestRepository(val context: Context) {
                     _attemptResource.postValue(Resource.error(exception,null))
                 }
             })
+    }
+
+    private suspend fun createOfflineAttempts(exam: Exam): Triple<OfflineAttempt, OfflineCourseAttempt, List<OfflineAttemptSection>> {
+        val offlineAttempt = OfflineAttempt(
+            date = Date().toString(),
+            totalQuestions = exam.numberOfQuestions,
+            lastStartedTime = Date().toString(),
+            remainingTime = exam.duration,
+            timeTaken = "0:00:00",
+            state = Attempt.RUNNING,
+            attemptType = 0
+        )
+        val offlineCourseAttempt = OfflineCourseAttempt(assessmentId = offlineAttempt.id)
+        val sectionIds = examQuestionDao.getUniqueSectionIdsByExamId(exam.id)
+        val sections = sectionsDao.getSectionsByIds(sectionIds)
+        val offlineAttemptSections = createAttemptSections(sections, offlineAttempt.id)
+        return Triple(offlineAttempt, offlineCourseAttempt, offlineAttemptSections)
+    }
+
+    private fun createAttemptSections(sections: List<Section>, offlineAttemptId: Long): List<OfflineAttemptSection> {
+        val attemptSections = sections.map { section ->
+            OfflineAttemptSection(
+                id = section.order!!,
+                state = if (section.order == 0L) Attempt.RUNNING else Attempt.NOT_STARTED,
+                remainingTime = section.duration,
+                name = section.name!!,
+                duration = section.duration!!,
+                order = section.order!!.toInt(),
+                instructions = section.instructions,
+                attemptId = offlineAttemptId
+            )
+        }
+        return attemptSections.sortedBy { it.order }
     }
 
     fun startAttempt(attemptStartFrag: String) {
