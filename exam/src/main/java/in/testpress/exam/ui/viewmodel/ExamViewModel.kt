@@ -1,9 +1,10 @@
 package `in`.testpress.exam.ui.viewmodel
 
-import `in`.testpress.exam.repository.ExamRepository
 import `in`.testpress.exam.models.Permission
+import `in`.testpress.exam.repository.ExamRepository
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.CourseAttempt
+import `in`.testpress.models.greendao.Exam
 import `in`.testpress.models.greendao.Language
 import `in`.testpress.network.Resource
 import androidx.appcompat.app.AppCompatActivity
@@ -22,12 +23,16 @@ class ExamViewModel(val repository: ExamRepository) : ViewModel() {
 
     val permissionResource: LiveData<Resource<Permission>> get() = repository.permissionResource
 
-    fun createContentAttempt(attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
-        repository.createContentAttempt(attemptUrlFrag, queryParams)
+    fun setOfflineExam(isOfflineExam: Boolean){
+        repository.isOfflineExam = isOfflineExam
     }
 
-    fun createAttempt(attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
-        repository.createAttempt(attemptUrlFrag, queryParams)
+    fun createContentAttempt(exam: Exam, attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
+        repository.createContentAttempt(exam, attemptUrlFrag, queryParams)
+    }
+
+    fun createAttempt(exam: Exam, attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
+        repository.createAttempt(exam, attemptUrlFrag, queryParams)
     }
 
     fun startAttempt(attemptStartFrag: String) {
@@ -42,8 +47,8 @@ class ExamViewModel(val repository: ExamRepository) : ViewModel() {
         repository.endAttempt(attemptEndFrag)
     }
 
-    fun fetchLanguages(examSlug: String) {
-        repository.fetchLanguages(examSlug)
+    fun fetchLanguages(examId: Long, examSlug: String) {
+        repository.fetchLanguages(examId, examSlug)
     }
 
     fun checkPermission(contentId: Long) {
