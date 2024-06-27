@@ -149,7 +149,6 @@ public class TestActivity extends BaseToolBarActivity  {
         courseContent = data.getParcelable(PARAM_COURSE_CONTENT);
         courseAttempt = data.getParcelable(PARAM_COURSE_ATTEMPT);
         onDataInitialized();
-        examViewModel.setOfflineExam(Boolean.TRUE.equals(exam.getIsOfflineExam()));
         observePermissionResources();
         observeLanguageResources();
         observeContentAttemptResources();
@@ -330,6 +329,7 @@ public class TestActivity extends BaseToolBarActivity  {
         if (courseContent != null) {
             if (exam == null) {
                 exam = courseContent.getRawExam();
+                examViewModel.setOfflineExam(Boolean.TRUE.equals(exam.getIsOfflineExam()));
             }
             if (courseAttempt == null && permission == null) {
                 checkPermission();
@@ -340,6 +340,7 @@ public class TestActivity extends BaseToolBarActivity  {
                 checkStartExamScreenState();
             }
         } else if (exam != null) {
+            examViewModel.setOfflineExam(Boolean.TRUE.equals(exam.getIsOfflineExam()));
             checkStartExamScreenState();
         } else {
             String examSlug = getIntent().getStringExtra(PARAM_EXAM_SLUG);
