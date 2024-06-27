@@ -33,6 +33,7 @@ import in.testpress.exam.R;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.models.Permission;
 import in.testpress.exam.api.TestpressExamApiClient;
+import in.testpress.exam.ui.viewmodel.ExamViewModel;
 import in.testpress.exam.util.MultiLanguagesUtil;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
@@ -49,7 +50,6 @@ import in.testpress.util.FormatDate;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
-import retrofit2.Response;
 
 import static in.testpress.exam.api.TestpressExamApiClient.IS_PARTIAL;
 import static in.testpress.exam.ui.AccessCodeExamsFragment.ACCESS_CODE;
