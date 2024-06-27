@@ -16,6 +16,7 @@ import androidx.lifecycle.MutableLiveData
 
 class AttemptRepository(val context: Context) {
 
+    var isOfflineExam = false
     var page = 1
     val attemptItem = mutableListOf<AttemptItem>()
     private var _totalQuestions = 0

@@ -27,6 +27,10 @@ class AttemptViewModel(val repository: AttemptRepository) : ViewModel() {
     var isNextPageQuestionsBeingFetched: Boolean = false
     var currentQuestionPosition = 0
 
+    fun setOfflineExam(isOfflineExam: Boolean){
+        repository.isOfflineExam = isOfflineExam
+    }
+
     fun fetchAttemptItems(questionsUrlFrag: String, fetchSinglePageOnly: Boolean){
         repository.fetchAttemptItems(questionsUrlFrag, fetchSinglePageOnly)
     }
