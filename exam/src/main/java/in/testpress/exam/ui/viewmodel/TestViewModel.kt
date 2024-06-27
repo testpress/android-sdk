@@ -22,6 +22,10 @@ class TestViewModel(val repository: TestRepository) : ViewModel() {
 
     val permissionResource: LiveData<Resource<Permission>> get() = repository.permissionResource
 
+    fun setOfflineExam(isOfflineExam: Boolean){
+        repository.isOfflineExam = isOfflineExam
+    }
+
     fun createContentAttempt(attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
         repository.createContentAttempt(attemptUrlFrag, queryParams)
     }

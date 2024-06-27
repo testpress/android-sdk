@@ -15,6 +15,8 @@ import androidx.lifecycle.MutableLiveData
 
 class TestRepository(val context: Context) {
 
+    var isOfflineExam = false
+
     private val _attemptResource = MutableLiveData<Resource<Attempt>>()
     val attemptResource: LiveData<Resource<Attempt>> get() = _attemptResource
 
@@ -31,6 +33,18 @@ class TestRepository(val context: Context) {
 
     fun createContentAttempt(attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
         _contentAttemptResource.postValue(Resource.loading(null))
+        if (isOfflineExam) {
+            createContentAttemptOffline()
+        } else {
+            createContentAttemptOnline(attemptUrlFrag, queryParams)
+        }
+    }
+
+    private fun createContentAttemptOffline() {
+
+    }
+
+    private fun createContentAttemptOnline(attemptUrlFrag: String, queryParams: HashMap<String,Any>) {
         apiClient.createContentAttempt(attemptUrlFrag, queryParams)
             .enqueue(object : TestpressCallback<CourseAttempt>() {
                 override fun onSuccess(result: CourseAttempt) {
@@ -45,6 +59,18 @@ class TestRepository(val context: Context) {
 
     fun createAttempt(attemptUrlFrag: String,queryParams: HashMap<String,Any>) {
         _attemptResource.postValue(Resource.loading(null))
+        if (isOfflineExam) {
+            createAttemptOffline()
+        } else {
+            createAttemptOnline(attemptUrlFrag, queryParams)
+        }
+    }
+
+    private fun createAttemptOffline() {
+
+    }
+
+    private fun createAttemptOnline(attemptUrlFrag: String, queryParams: HashMap<String,Any>) {
         apiClient.createAttempt(attemptUrlFrag, queryParams)
             .enqueue(object : TestpressCallback<Attempt>() {
                 override fun onSuccess(response: Attempt) {
