@@ -156,7 +156,7 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     void observePermissionResources(){
-        testViewModel.getPermissionResource().observe(this, new Observer<Resource<Permission>>() {
+        examViewModel.getPermissionResource().observe(this, new Observer<Resource<Permission>>() {
             @Override
             public void onChanged(Resource<Permission> permissionResource) {
                 switch (permissionResource.getStatus()){
@@ -187,7 +187,7 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     void observeLanguageResources(){
-        testViewModel.getLanguageResource().observe(this, new Observer<Resource<List<Language>>>() {
+        examViewModel.getLanguageResource().observe(this, new Observer<Resource<List<Language>>>() {
             @Override
             public void onChanged(Resource<List<Language>> listResource) {
                 switch (listResource.getStatus()){
@@ -350,7 +350,7 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     void checkPermission() {
-        testViewModel.checkPermission(courseContent.getId());
+        examViewModel.checkPermission(courseContent.getId());
     }
 
     void loadExam(final String examSlug) {
@@ -419,7 +419,7 @@ public class TestActivity extends BaseToolBarActivity  {
             displayStartExamScreen();
             return;
         }
-        testViewModel.fetchLanguages(exam.getSlug());
+        examViewModel.fetchLanguages(exam.getSlug());
     }
 
     void checkStartExamScreenState() {
