@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 24,
-    "identityHash": "22f5184f67554f8a292ec306cc1657e9",
+    "identityHash": "6beea8488ca928d005c91eea63344135",
     "entities": [
       {
         "tableName": "ContentEntity",
@@ -2742,7 +2742,7 @@
       },
       {
         "tableName": "OfflineAttempt",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` TEXT NOT NULL, `totalQuestions` INTEGER NOT NULL, `lastStartedTime` TEXT NOT NULL, `remainingTime` TEXT NOT NULL, `timeTaken` TEXT NOT NULL, `state` TEXT NOT NULL, `lastViewedQuestionId` INTEGER NOT NULL, `attemptType` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` TEXT NOT NULL, `totalQuestions` INTEGER NOT NULL, `lastStartedTime` TEXT NOT NULL, `remainingTime` TEXT NOT NULL, `timeTaken` TEXT NOT NULL, `state` TEXT NOT NULL, `attemptType` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -2784,12 +2784,6 @@
             "fieldPath": "state",
             "columnName": "state",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "lastViewedQuestionId",
-            "columnName": "lastViewedQuestionId",
-            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -2880,7 +2874,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '22f5184f67554f8a292ec306cc1657e9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6beea8488ca928d005c91eea63344135')"
     ]
   }
 }
