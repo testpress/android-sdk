@@ -1,7 +1,7 @@
 package `in`.testpress.exam.ui.viewmodel
 
-import `in`.testpress.exam.models.Permission
 import `in`.testpress.exam.repository.ExamRepository
+import `in`.testpress.exam.models.Permission
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.models.greendao.Exam
