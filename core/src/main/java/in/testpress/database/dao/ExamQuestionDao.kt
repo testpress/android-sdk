@@ -10,4 +10,7 @@ interface ExamQuestionDao: BaseDao<ExamQuestion> {
 
     @Query("DELETE FROM ExamQuestion WHERE examId = :examId")
     suspend fun deleteByExamId(examId: Long)
+
+    @Query("SELECT DISTINCT sectionId FROM ExamQuestion WHERE examId = :examId")
+    suspend fun getUniqueSectionIdsByExamId(examId: Long): List<Long?>
 }

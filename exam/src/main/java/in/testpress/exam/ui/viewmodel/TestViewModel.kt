@@ -26,12 +26,12 @@ class TestViewModel(val repository: TestRepository) : ViewModel() {
         repository.isOfflineExam = isOfflineExam
     }
 
-    fun createContentAttempt(attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
-        repository.createContentAttempt(attemptUrlFrag, queryParams)
+    fun createContentAttempt(examId: Long, attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
+        repository.createContentAttempt(examId, attemptUrlFrag, queryParams)
     }
 
-    fun createAttempt(attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
-        repository.createAttempt(attemptUrlFrag, queryParams)
+    fun createAttempt(examId: Long, attemptUrlFrag: String, queryParams: HashMap<String, Any>) {
+        repository.createAttempt(examId, attemptUrlFrag, queryParams)
     }
 
     fun startAttempt(attemptStartFrag: String) {
