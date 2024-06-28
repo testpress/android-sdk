@@ -35,6 +35,27 @@ public class AttemptItem implements Parcelable {
         savedAnswers = new ArrayList<Integer>();
     }
 
+    public AttemptItem(Integer id, String url, AttemptQuestion question, List<Integer> selectedAnswers,
+                       Boolean review, List<Integer> savedAnswers, Integer index, Boolean currentReview,
+                       String shortText, String currentShortText, AttemptSection attemptSection,
+                       String essayText, String localEssayText, List<UserUploadedFile> files, List<String> unSyncedFiles) {
+        this.id = id;
+        this.url = url;
+        this.question = question;
+        this.selectedAnswers = selectedAnswers;
+        this.review = review;
+        this.savedAnswers = savedAnswers;
+        this.index = index;
+        this.currentReview = currentReview;
+        this.shortText = shortText;
+        this.currentShortText = currentShortText;
+        this.attemptSection = attemptSection;
+        this.essayText = essayText;
+        this.localEssayText = localEssayText;
+        this.files = files;
+        this.unSyncedFiles = unSyncedFiles;
+    }
+
     // Parcelling part
     protected AttemptItem(Parcel in) {
         id = in.readInt();

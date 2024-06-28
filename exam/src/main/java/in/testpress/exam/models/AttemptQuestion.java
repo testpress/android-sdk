@@ -18,6 +18,21 @@ public class AttemptQuestion implements Parcelable {
     private String marks;
     private String negativeMarks;
 
+    public AttemptQuestion(String questionHtml, List<AttemptAnswer> answers, String subject,
+                           String direction, String type, String language,
+                           ArrayList<AttemptQuestion> translations, String marks,
+                           String negativeMarks) {
+        this.questionHtml = questionHtml;
+        this.answers = answers;
+        this.subject = subject;
+        this.direction = direction;
+        this.type = type;
+        this.language = language;
+        this.translations = translations;
+        this.marks = marks;
+        this.negativeMarks = negativeMarks;
+    }
+
     // Parcelling part
     public AttemptQuestion(Parcel parcel){
         answers = new ArrayList<AttemptAnswer>();

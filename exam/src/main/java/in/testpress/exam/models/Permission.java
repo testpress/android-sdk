@@ -8,6 +8,11 @@ public class Permission implements Parcelable {
     private boolean hasPermission;
     private String nextRetakeTime;
 
+    public Permission(boolean hasPermission, String nextRetakeTime) {
+        this.hasPermission = hasPermission;
+        this.nextRetakeTime = nextRetakeTime;
+    }
+
     protected Permission(Parcel in) {
         hasPermission = in.readByte() != 0;
         nextRetakeTime = in.readString();
