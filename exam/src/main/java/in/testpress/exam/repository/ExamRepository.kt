@@ -67,7 +67,6 @@ class ExamRepository(val context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             val (offlineAttempt, offlineCourseAttempt, offlineAttemptSections) = createOfflineAttempts()
             offlineCourseAttemptDao.insert(offlineCourseAttempt)
-            offlineAttemptDao.insert(offlineAttempt)
             offlineAttemptSectionDao.insertAll(offlineAttemptSections)
             val attemptSections = offlineAttemptSections.asGreenDoaModels()
             val attempt = offlineAttempt.createGreenDoaModel(attemptSections)
@@ -101,7 +100,6 @@ class ExamRepository(val context: Context) {
     private fun createOfflineAttempt() {
         CoroutineScope(Dispatchers.IO).launch {
             val (offlineAttempt, _, offlineAttemptSections) = createOfflineAttempts()
-            offlineAttemptDao.insert(offlineAttempt)
             offlineAttemptSectionDao.insertAll(offlineAttemptSections)
             val attemptSections = offlineAttemptSections.asGreenDoaModels()
             val attempt = offlineAttempt.createGreenDoaModel(attemptSections)
@@ -132,10 +130,11 @@ class ExamRepository(val context: Context) {
             state = Attempt.RUNNING,
             attemptType = 0
         )
-        val offlineCourseAttempt = OfflineCourseAttempt(assessmentId = offlineAttempt.id)
+        val offlineAttemptId = offlineAttemptDao.insert(offlineAttempt)
+        val offlineCourseAttempt = OfflineCourseAttempt(assessmentId = offlineAttemptId)
         val sectionIds = examQuestionDao.getUniqueSectionIdsByExamId(exam.id)
         val sections = sectionsDao.getSectionsByIds(sectionIds)
-        val offlineAttemptSections = createAttemptSections(sections, offlineAttempt.id)
+        val offlineAttemptSections = createAttemptSections(sections, offlineAttemptId)
         return Triple(offlineAttempt, offlineCourseAttempt, offlineAttemptSections)
     }
 
