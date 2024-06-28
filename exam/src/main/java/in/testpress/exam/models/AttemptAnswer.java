@@ -10,6 +10,11 @@ public class AttemptAnswer implements Parcelable {
 
     public AttemptAnswer() {}
 
+    public AttemptAnswer(String textHtml, Integer id) {
+        this.textHtml = textHtml;
+        this.id = id;
+    }
+
     // Parcelling part
     public AttemptAnswer(Parcel parcel){
         textHtml = parcel.readString();
