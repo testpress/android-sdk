@@ -1,6 +1,8 @@
 package `in`.testpress.util
 
 import `in`.testpress.database.entities.Answer
+import `in`.testpress.database.entities.OfflineAttemptSection
+import `in`.testpress.database.entities.OfflineUserUploadedFile
 import `in`.testpress.database.entities.Question
 import androidx.room.TypeConverter
 import com.google.gson.Gson
@@ -70,5 +72,47 @@ object Converters {
     fun toAnswerList(value: String?): ArrayList<Answer>? {
         val listType = object : TypeToken<ArrayList<Answer>>() {}.type
         return Gson().fromJson(value, listType)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromOfflineUserUploadedFileList(value: ArrayList<OfflineUserUploadedFile>?): String? {
+        val gson = Gson()
+        return gson.toJson(value)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toOfflineUserUploadedFileList(value: String?): ArrayList<OfflineUserUploadedFile>? {
+        val listType = object : TypeToken<ArrayList<OfflineUserUploadedFile>>() {}.type
+        return Gson().fromJson(value, listType)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromQuestion(value: Question?): String? {
+        val gson = Gson()
+        return gson.toJson(value)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toQuestion(value: String?): Question? {
+        val questionType = object : TypeToken<Question>() {}.type
+        return Gson().fromJson(value, questionType)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromOfflineAttemptSection(value: OfflineAttemptSection?): String? {
+        val gson = Gson()
+        return gson.toJson(value)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toOfflineAttemptSection(value: String?): OfflineAttemptSection? {
+        val offlineAttemptSectionType = object : TypeToken<OfflineUserUploadedFile>() {}.type
+        return Gson().fromJson(value, offlineAttemptSectionType)
     }
 }
