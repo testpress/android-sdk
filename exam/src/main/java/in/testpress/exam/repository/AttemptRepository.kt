@@ -9,6 +9,7 @@ import `in`.testpress.exam.ui.TestFragment.Action
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.CourseAttempt
+import `in`.testpress.models.greendao.Exam
 import `in`.testpress.network.Resource
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -16,7 +17,8 @@ import androidx.lifecycle.MutableLiveData
 
 class AttemptRepository(val context: Context) {
 
-    var isOfflineExam = false
+    lateinit var exam : Exam
+    private val isOfflineExam: Boolean get() = exam.isOfflineExam
     var page = 1
     val attemptItem = mutableListOf<AttemptItem>()
     private var _totalQuestions = 0
@@ -76,6 +78,9 @@ class AttemptRepository(val context: Context) {
     }
 
     private fun createOfflineAttemptItemItem() {
+
+
+
 
     }
 
