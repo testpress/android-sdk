@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class OfflineAttempt(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 1,
+    val id: Long = 0,
     val date: String,
     val totalQuestions: Int,
     val lastStartedTime: String,

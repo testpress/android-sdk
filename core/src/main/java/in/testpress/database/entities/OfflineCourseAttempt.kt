@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 @Entity
 data class OfflineCourseAttempt(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 1,
+    val id: Long = 0,
     val assessmentId: Long
 )
