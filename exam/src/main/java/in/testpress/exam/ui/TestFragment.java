@@ -149,12 +149,12 @@ public class TestFragment extends BaseFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        attemptViewModel = AttemptViewModel.Companion.initializeViewModel(requireActivity());
         initializeAttemptAndExamVariables(savedInstanceState);
         instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
         eventsTrackerFacade = new EventsTrackerFacade(getContext());
         logEvent(EventsTrackerFacade.STARTED_EXAM);
         apiClient = new TestpressExamApiClient(getActivity());
-        attemptViewModel = AttemptViewModel.Companion.initializeViewModel(requireActivity());
     }
 
     private void logEvent(String name) {
@@ -176,6 +176,7 @@ public class TestFragment extends BaseFragment implements
             attempt = getArguments().getParcelable(PARAM_ATTEMPT);
             exam = getArguments().getParcelable(PARAM_EXAM);
         }
+        exam.setIsOfflineExam(true);
         attemptViewModel.setExam(exam);
         if (savedInstanceState != null && savedInstanceState.getParcelable(PARAM_ATTEMPT) != null) {
             attempt = savedInstanceState.getParcelable(PARAM_ATTEMPT);
