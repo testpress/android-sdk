@@ -9,7 +9,7 @@ import `in`.testpress.exam.models.UserUploadedFile
 
 fun OfflineAttemptItem.asAttemptItem(subject: String, direction: String?): AttemptItem{
     return AttemptItem(
-        id,
+        id.toInt(),
         null,
         question.asAttemptQuestion(subject, direction),
         selectedAnswers,

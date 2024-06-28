@@ -6,17 +6,18 @@ import androidx.room.PrimaryKey
 @Entity
 data class OfflineAttemptItem(
     @PrimaryKey(autoGenerate = true)
-    var id: Int = 0,
-    val question: Question,
-    val selectedAnswers: List<Int> = arrayListOf(),
-    val review: Boolean? = null,
-    val savedAnswers: List<Int> = arrayListOf(),
-    val order: Int,
-    val shortText: String? = null,
-    val currentShortText: String? = null,
-    val attemptSection: OfflineAttemptSection? = null,
-    val essayText: String? = null,
-    val localEssayText: String? = null,
-    val files: ArrayList<OfflineUserUploadedFile> = arrayListOf(),
-    val unSyncedFiles: List<String> = arrayListOf()
+    var id: Long = 0,
+    var question: Question,
+    var selectedAnswers: List<Int> = arrayListOf(),
+    var review: Boolean? = null,
+    var savedAnswers: List<Int> = arrayListOf(),
+    var order: Int,
+    var shortText: String? = null,
+    var currentShortText: String? = null,
+    var attemptSection: OfflineAttemptSection? = null,
+    var essayText: String? = null,
+    var localEssayText: String? = null,
+    var files: ArrayList<OfflineUserUploadedFile> = arrayListOf(),
+    var unSyncedFiles: List<String> = arrayListOf(),
+    var attemptId: Long
 )
