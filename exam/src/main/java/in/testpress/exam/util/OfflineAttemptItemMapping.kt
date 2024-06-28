@@ -7,7 +7,7 @@ import `in`.testpress.exam.models.AttemptItem
 import `in`.testpress.exam.models.AttemptQuestion
 import `in`.testpress.exam.models.UserUploadedFile
 
-fun OfflineAttemptItem.asAttemptItem(subject: String, direction: String): AttemptItem{
+fun OfflineAttemptItem.asAttemptItem(subject: String, direction: String?): AttemptItem{
     return AttemptItem(
         id,
         null,
@@ -27,7 +27,7 @@ fun OfflineAttemptItem.asAttemptItem(subject: String, direction: String): Attemp
     )
 }
 
-fun Question.asAttemptQuestion(subject: String, direction: String): AttemptQuestion {
+fun Question.asAttemptQuestion(subject: String, direction: String?): AttemptQuestion {
     return AttemptQuestion(
         questionHtml,
         answers.asAttemptAnswers(),
@@ -41,7 +41,7 @@ fun Question.asAttemptQuestion(subject: String, direction: String): AttemptQuest
     )
 }
 
-fun List<Question>.asAttemptQuestions(subject: String, direction: String) = this.map { it.asAttemptQuestion(subject, direction) }
+fun List<Question>.asAttemptQuestions(subject: String, direction: String?) = this.map { it.asAttemptQuestion(subject, direction) }
 
 fun Answer.asAttemptAnswer(): AttemptAnswer {
     return AttemptAnswer(

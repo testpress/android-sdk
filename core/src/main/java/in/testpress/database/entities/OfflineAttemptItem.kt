@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class OfflineAttemptItem(
     @PrimaryKey(autoGenerate = true)
-    var id: Int = 1,
+    var id: Int = 0,
     val question: Question,
     val selectedAnswers: List<Int> = arrayListOf(),
     val review: Boolean? = null,

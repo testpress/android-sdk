@@ -119,11 +119,14 @@ class AttemptRepository(val context: Context) {
 
     private suspend fun createAttemptItem(offlineAttemptItems: List<OfflineAttemptItem>){
         val attemptItems = offlineAttemptItems.map { offlineAttemptItem ->
-            val subject = subjectDao.getSubjectById(offlineAttemptItem.question.subjectId!!)
-            val direction = directionDao.getDirectionById(offlineAttemptItem.question.directionId!!)
+
+            val subject = offlineAttemptItem.question.subjectId?.let { subjectDao.getSubjectById(it) }
+            val direction = offlineAttemptItem.question.directionId?.let { directionDao.getDirectionById(it) }
+            val subjectName = subject?.name ?: "Uncategorized"
+            val directionHtml = direction?.html
             offlineAttemptItem.asAttemptItem(
-                subject?.name!!,
-                direction?.html!!,
+                subjectName,
+                directionHtml,
             )
         }
         _attemptItemsResource.postValue(Resource.success(attemptItems))
