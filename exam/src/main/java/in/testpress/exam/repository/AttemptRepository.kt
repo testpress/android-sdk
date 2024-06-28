@@ -14,6 +14,7 @@ import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.Exam
 import `in`.testpress.network.Resource
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
@@ -90,11 +91,11 @@ class AttemptRepository(val context: Context) {
     private fun createOfflineAttemptItemItem() {
         CoroutineScope(Dispatchers.IO).launch {
             val hasSections = examQuestionDao.getUniqueSectionIdsByExamId(exam.id).count() > 1
-            if (hasSections){
+            //if (hasSections){
 
-            } else {
+            //} else {
                 createOfflineAttemptForAllQuestions()
-            }
+            //}
 
         }
     }
