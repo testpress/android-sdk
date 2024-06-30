@@ -7,6 +7,9 @@ import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkOfflineQuestionResponse
 import `in`.testpress.course.network.asOfflineExam
 import `in`.testpress.database.TestpressDatabase
+import `in`.testpress.database.entities.OfflineAttempt
+import `in`.testpress.database.entities.OfflineAttemptSection
+import `in`.testpress.database.entities.OfflineCourseAttempt
 import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.exam.network.NetworkExamContent
 import `in`.testpress.exam.network.NetworkLanguage
@@ -36,6 +39,9 @@ class OfflineExamRepository(val context: Context) {
     private val sectionsDao = database.sectionsDao()
     private val examQuestionDao = database.examQuestionDao()
     private val questionDao = database.questionDao()
+    private val offlineAttemptDao = database.offlineAttemptDao()
+    private val offlineCourseAttemptDao = database.offlineCourseAttemptDao()
+    private val offlineAttemptSectionDao = database.offlineAttemptSectionDao()
 
     private val _downloadExamResult = MutableLiveData<Resource<Boolean>>()
     val downloadExamResult: LiveData<Resource<Boolean>> get() = _downloadExamResult
@@ -92,10 +98,12 @@ class OfflineExamRepository(val context: Context) {
                     override fun onSuccess(result: ApiResponse<NetworkOfflineQuestionResponse>) {
                         if (result.next != null) {
                             saveQuestionsToDB(result.results)
+                            updateOfflineExamDownloadPercent(examId, result.results!!.questions.size.toLong())
                             page++
                             fetchQuestionsPage()
                         } else {
                             saveQuestionsToDB(result.results)
+                            updateOfflineExamDownloadPercent(examId, result.results!!.questions.size.toLong())
                             _downloadExamResult.postValue(Resource.success(true))
                         }
                     }
@@ -107,6 +115,12 @@ class OfflineExamRepository(val context: Context) {
         }
 
         fetchQuestionsPage()
+    }
+
+    private fun updateOfflineExamDownloadPercent(examId: Long, count: Long){
+        CoroutineScope(Dispatchers.IO).launch {
+            offlineExamDao.updateDownloadedQuestion(examId, count)
+        }
     }
 
     private fun saveQuestionsToDB(response: NetworkOfflineQuestionResponse){
@@ -130,6 +144,10 @@ class OfflineExamRepository(val context: Context) {
 
     fun getAll():LiveData<List<OfflineExam>>{
         return offlineExamDao.getAll()
+    }
+
+    fun  getOfflineExam(examId: Long): LiveData<OfflineExam?> {
+        return offlineExamDao.getOfflineExamById(examId)
     }
 
     suspend fun deleteOfflineExam(examId: Long) {
@@ -188,5 +206,17 @@ class OfflineExamRepository(val context: Context) {
                 offlineExamDao.updateSyncRequired(networkExam.id, true)
             }
         }
+    }
+
+    fun getOfflineAttemptsList(examId: Long): LiveData<List<OfflineAttempt>> {
+        return offlineAttemptDao.getOfflineAttemptsById(examId)
+    }
+
+    fun getOfflineContentAttemptsList(attemptId: Long): OfflineCourseAttempt? {
+        return offlineCourseAttemptDao.getById(attemptId)
+    }
+
+    fun getOfflineAttemptListList(attemptId: Long): List<OfflineAttemptSection> {
+        return offlineAttemptSectionDao.getByAttemptId(attemptId)
     }
 }

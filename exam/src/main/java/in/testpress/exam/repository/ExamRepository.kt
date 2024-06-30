@@ -19,6 +19,7 @@ import `in`.testpress.models.greendao.Language
 import `in`.testpress.network.Resource
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
@@ -30,7 +31,7 @@ import kotlin.collections.HashMap
 class ExamRepository(val context: Context) {
 
     lateinit var exam : Exam
-    private val isOfflineExam: Boolean get() = exam.isOfflineExam
+    private val isOfflineExam: Boolean get() = exam.isOfflineExam ?: false
 
     private val database = TestpressDatabase.invoke(context)
     private val sectionsDao = database.sectionsDao()
@@ -66,6 +67,7 @@ class ExamRepository(val context: Context) {
     private fun createOfflineContentAttempt() {
         CoroutineScope(Dispatchers.IO).launch {
             val (offlineAttempt, offlineCourseAttempt, offlineAttemptSections) = createOfflineAttempts()
+            Log.d("TAG", "createOfflineContentAttempt: ${offlineAttempt.id}")
             offlineCourseAttemptDao.insert(offlineCourseAttempt)
             offlineAttemptSectionDao.insertAll(offlineAttemptSections)
             val attemptSections = offlineAttemptSections.asGreenDoaModels()
@@ -128,14 +130,15 @@ class ExamRepository(val context: Context) {
             remainingTime = exam.duration,
             timeTaken = "0:00:00",
             state = Attempt.RUNNING,
-            attemptType = 0
+            attemptType = 0,
+            examId = exam.id
         )
         val offlineAttemptId = offlineAttemptDao.insert(offlineAttempt)
         val offlineCourseAttempt = OfflineCourseAttempt(assessmentId = offlineAttemptId)
         val sectionIds = examQuestionDao.getUniqueSectionIdsByExamId(exam.id)
         val sections = sectionsDao.getSectionsByIds(sectionIds)
         val offlineAttemptSections = createAttemptSections(sections, offlineAttemptId)
-        return Triple(offlineAttempt, offlineCourseAttempt, offlineAttemptSections)
+        return Triple(offlineAttemptDao.get(offlineAttemptId), offlineCourseAttempt, offlineAttemptSections)
     }
 
     private fun createAttemptSections(sections: List<Section>, offlineAttemptId: Long): List<OfflineAttemptSection> {
@@ -156,16 +159,42 @@ class ExamRepository(val context: Context) {
 
     fun startAttempt(attemptStartFrag: String) {
         _attemptResource.postValue(Resource.loading(null))
-        apiClient.startAttempt(attemptStartFrag).enqueue(object: TestpressCallback<Attempt>(){
-            override fun onSuccess(result: Attempt) {
-                _attemptResource.postValue(Resource.success(result))
+        if (isOfflineExam){
+            CoroutineScope(Dispatchers.IO).launch {
+                val offlineAttempt =
+                    getOfflineAttemptListById(exam.id).last { it.state == Attempt.RUNNING }
+                val offlineAttemptSectionList =getOfflineAttemptListList(offlineAttempt.id)
+                _attemptResource.postValue(Resource.success(
+                    offlineAttempt.createGreenDoaModel(offlineAttemptSectionList.asGreenDoaModels())
+                ))
             }
 
-            override fun onException(exception: TestpressException) {
-                _attemptResource.postValue(Resource.error(exception,null))
-            }
 
-        })
+        } else {
+            apiClient.startAttempt(attemptStartFrag).enqueue(object: TestpressCallback<Attempt>(){
+                override fun onSuccess(result: Attempt) {
+                    _attemptResource.postValue(Resource.success(result))
+                }
+
+                override fun onException(exception: TestpressException) {
+                    _attemptResource.postValue(Resource.error(exception,null))
+                }
+
+            })
+        }
+
+    }
+
+    suspend fun getOfflineAttemptListById(examId: Long): List<OfflineAttempt> {
+        return offlineAttemptDao.getOfflineAttemptListById(examId)
+    }
+
+    fun getOfflineContentAttemptsList(attemptId: Long): OfflineCourseAttempt? {
+        return offlineCourseAttemptDao.getById(attemptId)
+    }
+
+    fun getOfflineAttemptListList(attemptId: Long): List<OfflineAttemptSection> {
+        return offlineAttemptSectionDao.getByAttemptId(attemptId)
     }
 
     fun endContentAttempt(attemptEndFrag: String) {

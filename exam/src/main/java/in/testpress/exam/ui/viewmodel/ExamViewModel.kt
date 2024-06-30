@@ -1,5 +1,8 @@
 package `in`.testpress.exam.ui.viewmodel
 
+import `in`.testpress.database.entities.OfflineAttempt
+import `in`.testpress.database.entities.OfflineAttemptSection
+import `in`.testpress.database.entities.OfflineCourseAttempt
 import `in`.testpress.exam.repository.ExamRepository
 import `in`.testpress.exam.models.Permission
 import `in`.testpress.models.greendao.Attempt

@@ -37,7 +37,8 @@ class AttemptRepository(val context: Context) {
     private val offlineAttemptItemDao = database.offlineAttemptItemDoa()
     private val subjectDao = database.subjectDao()
     private val directionDao = database.directionDao()
-    private val languageDao = database.languageDao()
+    private val offlineAttemptDao = database.offlineAttemptDao()
+    private val offlineContentAttemptDao = database.offlineCourseAttemptDao()
 
 
     private val apiClient: TestpressExamApiClient = TestpressExamApiClient(context)
@@ -128,9 +129,9 @@ class AttemptRepository(val context: Context) {
         _attemptItemsResource.postValue(Resource.success(attemptItems))
     }
 
-    suspend fun saveAnswer(position: Int, attemptItem: AttemptItem, action: Action) {
+    suspend fun saveAnswer(position: Int, attemptItem: AttemptItem, action: Action, mills: String) {
         if (isOfflineExam){
-            updateLocalAttemptItem(attemptItem) { updateAttemptItem ->
+            updateLocalAttemptItem(attemptItem,mills) { updateAttemptItem ->
                 _saveResultResource.postValue(Resource.success(Triple(position, updateAttemptItem, action)))
             }
         } else {
@@ -153,10 +154,12 @@ class AttemptRepository(val context: Context) {
 
     private suspend fun updateLocalAttemptItem(
         attemptItem: AttemptItem,
+        mills: String,
         callback: (AttemptItem) -> Unit
     ) {
         val offlineAttemptItem =
             offlineAttemptItemDao.getAttemptItemById(attemptItem.id.toLong())
+        offlineAttemptDao.updateRemainingTime(offlineAttemptItem?.attemptId!!,mills);
         if (offlineAttemptItem != null) {
             if (attemptItem.attemptQuestion.type == "E") {
                 offlineAttemptItem.localEssayText = attemptItem.localEssayText

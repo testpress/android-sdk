@@ -4,7 +4,7 @@ import `in`.testpress.database.entities.OfflineAttempt
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.AttemptSection
 
-fun OfflineAttempt.createGreenDoaModel(attemptSections: List<AttemptSection>): Attempt {
+fun OfflineAttempt.createGreenDoaModel(attemptSections: List<AttemptSection?>): Attempt {
     val attempt = Attempt()
     attempt.url = null
     attempt.id = this.id

@@ -178,7 +178,6 @@ public class TestFragment extends BaseFragment implements
             attempt = getArguments().getParcelable(PARAM_ATTEMPT);
             exam = getArguments().getParcelable(PARAM_EXAM);
         }
-        exam.setIsOfflineExam(true);
         attemptViewModel.setExamAndAttempt(exam, attempt);
         if (savedInstanceState != null && savedInstanceState.getParcelable(PARAM_ATTEMPT) != null) {
             attempt = savedInstanceState.getParcelable(PARAM_ATTEMPT);
@@ -810,10 +809,14 @@ public class TestFragment extends BaseFragment implements
 
     private void fetchAttemptItems(){
         String questionUrl = attempt.getQuestionsUrlFrag();
-        if (attempt.hasSectionalLock()) {
-            questionUrl = sections.get(attempt.getCurrentSectionPosition()).getQuestionsUrlFrag();
+        if(exam.getIsOfflineExam() !=null && exam.getIsOfflineExam()){
+            questionUrl = "";
+        } else {
+            if (attempt.hasSectionalLock()) {
+                questionUrl = sections.get(attempt.getCurrentSectionPosition()).getQuestionsUrlFrag();
+            }
+            questionUrl = questionUrl.replace("v2.3", "v2.2.1");
         }
-        questionUrl = questionUrl.replace("v2.3", "v2.2.1");
 
         if (attempt.hasSectionalLock()) {
             progressDialog.setMessage(getString(R.string.testpress_loading_section_questions,
@@ -913,7 +916,7 @@ public class TestFragment extends BaseFragment implements
             if (action != Action.UPDATE_ANSWER) {
                 showProgress(R.string.testpress_saving_last_change);
             }
-            attemptViewModel.saveAnswer(position,attemptItem,action);
+            attemptViewModel.saveAnswer(position,attemptItem,action,formatTime(millisRemaining));
         } else if (action.equals(Action.PAUSE)) {
             progressDialog.dismiss();
             returnToHistory();
@@ -1320,6 +1323,7 @@ public class TestFragment extends BaseFragment implements
 
     private void updateTimeRemaining(long millisRemaining) {
         this.millisRemaining = millisRemaining;
+        Log.d("TAG", "updateTimeRemaining: ");
         String formattedTime = formatTime(millisRemaining);
         timer.setText(formattedTime);
     }

@@ -10,37 +10,61 @@ import `in`.testpress.exam.domain.ExamTemplateType.IELTS_TEMPLATE
 import `in`.testpress.exam.domain.asGreenDaoModel
 import `in`.testpress.course.domain.getGreenDaoContent
 import `in`.testpress.course.domain.getGreenDaoContentAttempt
+import `in`.testpress.course.network.asOfflineExam
 import `in`.testpress.exam.domain.toGreenDaoModels
 import `in`.testpress.enums.Status
 import `in`.testpress.network.Resource
 import `in`.testpress.course.repository.ExamContentRepository
+import `in`.testpress.course.repository.OfflineExamRepository
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.QuizActivity
 import `in`.testpress.course.ui.WebViewWithSSO
 import `in`.testpress.course.viewmodels.ExamContentViewModel
+import `in`.testpress.course.viewmodels.OfflineExamViewModel
+import `in`.testpress.database.entities.OfflineAttempt
+import `in`.testpress.database.entities.OfflineAttemptSection
+import `in`.testpress.database.entities.OfflineCourseAttempt
+import `in`.testpress.database.entities.OfflineExam
+import `in`.testpress.database.mapping.asGreenDoaModels
+import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
+import `in`.testpress.exam.network.NetworkExamContent
 import `in`.testpress.exam.util.MultiLanguagesUtil
 import `in`.testpress.exam.util.RetakeExamUtil
+import `in`.testpress.models.greendao.Attempt
+import `in`.testpress.models.greendao.Exam
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 open class BaseExamWidgetFragment : Fragment() {
     lateinit var startButton: Button
+    lateinit var downloadExamOffline: Button
+    lateinit var startExamOffline: Button
     protected lateinit var viewModel: ExamContentViewModel
     protected lateinit var content: DomainContent
     protected var contentId: Long = -1
     lateinit var contentAttempts: ArrayList<DomainContentAttempt>
     protected lateinit var examRefreshListener: ExamRefreshListener
+    protected lateinit var offlineViewModel: OfflineExamViewModel
+    var offlineExam: OfflineExam? = null
+    var offlineAttempt: OfflineAttempt? = null
+    var offlineContentAttempt: OfflineCourseAttempt? = null
+    var OfflineAttemptSectionList: List<OfflineAttemptSection>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +75,13 @@ open class BaseExamWidgetFragment : Fragment() {
                 ) as T
             }
         }).get(ExamContentViewModel::class.java)
+        offlineViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return OfflineExamViewModel(
+                    OfflineExamRepository(requireContext())
+                ) as T
+            }
+        }).get(OfflineExamViewModel::class.java)
     }
 
     override fun onAttach(context: Context) {
@@ -65,6 +96,8 @@ open class BaseExamWidgetFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         startButton = view.findViewById(R.id.start_exam)
+        downloadExamOffline = view.findViewById(R.id.download_Offline)
+        startExamOffline = view.findViewById(R.id.start_exam_offline)
         contentId = requireArguments().getLong(ContentActivity.CONTENT_ID)
 
         viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer {
@@ -113,6 +146,66 @@ open class BaseExamWidgetFragment : Fragment() {
                     else -> {}
                 }
             })
+
+        offlineViewModel.getOfflineExam(content.examId!!).observe(requireActivity()){
+            offlineExam = it
+            if (it == null){
+                downloadExamOffline.isVisible =  true
+                startExamOffline.isVisible = false
+            } else if (it.numberOfQuestions!! > (it.downloadedQuestionCount?.toInt() ?: 0)) {
+                downloadExamOffline.isVisible =  true
+                downloadExamOffline.text = "Downloading..."
+                downloadExamOffline.isClickable = false
+            } else if(it.numberOfQuestions!! == (it.downloadedQuestionCount?.toInt() ?: 0)) {
+                downloadExamOffline.isVisible =  false
+                startExamOffline.isVisible = true
+            }
+        }
+
+        offlineViewModel.getOfflineAttemptsList(content.examId!!).observe(requireActivity()) { list ->
+            val runningAttempts = list.filter { it.state==Attempt.RUNNING }
+            if (runningAttempts.isNotEmpty()){
+                startExamOffline.text = "Resume Offline Exam"
+                offlineAttempt = runningAttempts.last()
+                CoroutineScope(Dispatchers.IO).launch {
+                    OfflineAttemptSectionList = offlineViewModel.getOfflineAttemptListList(offlineAttempt!!.id)
+                    offlineContentAttempt = offlineViewModel.getOfflineContentAttemptsList(offlineAttempt!!.id)
+                }
+            }
+
+        }
+
+        buttonListner()
+    }
+
+    fun buttonListner(){
+        downloadExamOffline.setOnClickListener {
+            offlineViewModel.downloadExam(contentId)
+        }
+        startExamOffline.setOnClickListener {
+            val greenDaoContent = content.getGreenDaoContent(requireContext())
+            greenDaoContent?.exam = offlineExam?.asGreenDaoModel()
+            if (startExamOffline.text.toString() == "Resume Offline Exam"){
+                greenDaoContent?.exam?.pausedAttemptsCount = 1
+                TestpressExam.resumeCourseAttempt(
+                    requireActivity(),
+                    greenDaoContent!!,
+                    offlineContentAttempt?.createGreenDoaModel(
+                        offlineAttempt!!.createGreenDoaModel(
+                            OfflineAttemptSectionList!!.asGreenDoaModels()
+                        )
+                    )!!,
+                    false,
+                    TestpressSdk.getTestpressSession(requireActivity())!!
+                )
+            } else {
+
+                TestpressExam.startCourseExam(
+                    requireActivity(), greenDaoContent!!, false, false,
+                    TestpressSdk.getTestpressSession(requireActivity())!!
+                )
+            }
+        }
     }
 
     open fun updateStartButton(contentAttempts: ArrayList<DomainContentAttempt>) {
@@ -315,4 +408,50 @@ open class BaseExamWidgetFragment : Fragment() {
     }
 
     open fun display() {}
+}
+
+fun OfflineExam.asGreenDaoModel(): Exam {
+    return Exam(
+        totalMarks,
+        this.url,
+        this.id,
+        this.attemptsCount,
+        this.pausedAttemptsCount,
+        this.title,
+        this.description,
+        this.startDate,
+        this.endDate,
+        this.duration,
+        this.numberOfQuestions,
+        this.negativeMarks,
+        this.markPerQuestion,
+        this.templateType,
+        this.allowRetake,
+        this.allowPdf,
+        this.showAnswers,
+        this.maxRetakes,
+        this.attemptsUrl,
+        this.deviceAccessControl,
+        this.commentsCount,
+        this.slug,
+        null,
+        this.variableMarkPerQuestion,
+        this.passPercentage,
+        this.enableRanks,
+        this.showScore,
+        this.showPercentile,
+        null,
+        null,
+        this.isGrowthHackEnabled,
+        this.shareTextForSolutionUnlock,
+        this.showAnalytics,
+        this.instructions,
+        this.hasAudioQuestions,
+        this.rankPublishingDate,
+        this.enableQuizMode,
+        this.disableAttemptResume,
+        this.allowPreemptiveSectionEnding,
+        this.examDataModifiedOn,
+        true
+    )
 }

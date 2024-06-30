@@ -36,9 +36,9 @@ class AttemptViewModel(val repository: AttemptRepository) : ViewModel() {
         repository.fetchAttemptItems(questionsUrlFrag, fetchSinglePageOnly)
     }
 
-    fun saveAnswer(position: Int, attemptItem: AttemptItem, action: TestFragment.Action){
+    fun saveAnswer(position: Int, attemptItem: AttemptItem, action: TestFragment.Action, mills:String){
         viewModelScope.launch {
-            repository.saveAnswer(position, attemptItem, action)
+            repository.saveAnswer(position, attemptItem, action, mills)
         }
     }
 
