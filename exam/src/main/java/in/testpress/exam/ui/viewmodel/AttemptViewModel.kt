@@ -4,6 +4,7 @@ import `in`.testpress.exam.models.AttemptItem
 import `in`.testpress.exam.network.NetworkAttemptSection
 import `in`.testpress.exam.repository.AttemptRepository
 import `in`.testpress.exam.ui.TestFragment
+import `in`.testpress.models.greendao.Exam
 import `in`.testpress.network.Resource
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
@@ -22,6 +23,10 @@ class AttemptViewModel(val repository: AttemptRepository) : ViewModel() {
 
     var isNextPageQuestionsBeingFetched: Boolean = false
     var currentQuestionPosition = 0
+
+    fun setExam(exam: Exam){
+        repository.exam = exam
+    }
 
     fun fetchAttemptItems(questionsUrlFrag: String, fetchSinglePageOnly: Boolean){
         repository.fetchAttemptItems(questionsUrlFrag, fetchSinglePageOnly)
