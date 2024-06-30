@@ -1,17 +1,17 @@
 package `in`.testpress.exam.ui.viewmodel
 
+import `in`.testpress.core.TestpressCallback
+import `in`.testpress.core.TestpressException
 import `in`.testpress.exam.models.AttemptItem
 import `in`.testpress.exam.network.NetworkAttemptSection
 import `in`.testpress.exam.repository.AttemptRepository
 import `in`.testpress.exam.ui.TestFragment
 import `in`.testpress.models.greendao.Attempt
+import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.models.greendao.Exam
 import `in`.testpress.network.Resource
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 
 class AttemptViewModel(val repository: AttemptRepository) : ViewModel() {
@@ -21,6 +21,10 @@ class AttemptViewModel(val repository: AttemptRepository) : ViewModel() {
     val saveResultResource: LiveData<Resource<Triple<Int, AttemptItem?, TestFragment.Action>>> get() = repository.saveResultResource
 
     val updateSectionResource: LiveData<Resource<Pair<NetworkAttemptSection?, TestFragment.Action>>> get() = repository.updateSectionResource
+
+    val endContentAttemptResource: LiveData<Resource<CourseAttempt>> get() = repository.endContentAttemptResource
+
+    val endAttemptResource: LiveData<Resource<Attempt>> get() = repository.endAttemptResource
 
     val totalQuestions: Int get() = repository.totalQuestions
 
@@ -44,6 +48,14 @@ class AttemptViewModel(val repository: AttemptRepository) : ViewModel() {
 
     fun updateSection(url: String, action: TestFragment.Action){
         repository.updateSection(url, action)
+    }
+
+    fun endContentAttempt(attemptEndFrag: String) {
+        repository.endContentAttempt(attemptEndFrag)
+    }
+
+    fun endAttempt(attemptEndFrag: String) {
+        repository.endAttempt(attemptEndFrag)
     }
 
     fun clearAttemptItem() = repository.clearAttemptItem()

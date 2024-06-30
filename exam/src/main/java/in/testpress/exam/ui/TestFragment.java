@@ -213,6 +213,8 @@ public class TestFragment extends BaseFragment implements
         observeAttemptItemResources();
         observeSaveAnswerResource();
         observeUpdateSectionResource();
+        observeEndContentAttemptResources();
+        observeEndAttemptResources();
     }
 
     private void initializeLanguageFilter() {
@@ -1132,59 +1134,146 @@ public class TestFragment extends BaseFragment implements
         }
         showProgress(R.string.testpress_ending_exam);
         if (courseContent != null) {
-            endContentAttemptApiRequest = apiClient.endContentAttempt(courseAttempt.getEndAttemptUrl())
-                    .enqueue(new TestpressCallback<CourseAttempt>() {
-                        @Override
-                        public void onSuccess(CourseAttempt courseAttempt) {
-                            if (getActivity() == null) {
-                                return;
-                            }
-                            logEvent(EventsTrackerFacade.ENDED_EXAM);
-                            if (progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                            }
-                            courseAttempt.saveInDB(getActivity(), courseContent);
+            attemptViewModel.endContentAttempt(courseAttempt.getEndAttemptUrl());
+//            endContentAttemptApiRequest = apiClient.endContentAttempt(courseAttempt.getEndAttemptUrl())
+//                    .enqueue(new TestpressCallback<CourseAttempt>() {
+//                        @Override
+//                        public void onSuccess(CourseAttempt courseAttempt) {
+//                            if (getActivity() == null) {
+//                                return;
+//                            }
+//                            logEvent(EventsTrackerFacade.ENDED_EXAM);
+//                            if (progressDialog.isShowing()) {
+//                                progressDialog.dismiss();
+//                            }
+//                            courseAttempt.saveInDB(getActivity(), courseContent);
+//                            showReview(ReviewStatsActivity.createIntent(getActivity(), exam,
+//                                    courseAttempt));
+//                        }
+//
+//                        @Override
+//                        public void onException(TestpressException exception) {
+//                            showException(
+//                                    exception,
+//                                    R.string.testpress_exam_paused_check_internet_to_end,
+//                                    R.string.testpress_end,
+//                                    "endExam"
+//                            );
+//                        }
+//                    });
+        } else {
+            attemptViewModel.endAttempt(attempt.getEndUrlFrag());
+//            endAttemptApiRequest = apiClient.endExam(attempt.getEndUrlFrag())
+//                    .enqueue(new TestpressCallback<Attempt>() {
+//                        @Override
+//                        public void onSuccess(Attempt attempt) {
+//                            if (getActivity() == null) {
+//                                return;
+//                            }
+//                            logEvent(EventsTrackerFacade.ENDED_EXAM);
+//                            if (progressDialog.isShowing()) {
+//                                progressDialog.dismiss();
+//                            }
+//                            TestFragment.this.attempt = attempt;
+//                            showReview(attempt);
+//                        }
+//
+//                        @Override
+//                        public void onException(TestpressException exception) {
+//                            showException(
+//                                    exception,
+//                                    R.string.testpress_exam_paused_check_internet_to_end,
+//                                    R.string.testpress_end,
+//                                    "endExam"
+//                            );
+//                        }
+//                    });
+        }
+    }
+
+    private void observeEndContentAttemptResources(){
+        attemptViewModel.getEndContentAttemptResource().observe(requireActivity(), new Observer<Resource<CourseAttempt>>() {
+            @Override
+            public void onChanged(Resource<CourseAttempt> courseAttemptResource) {
+                switch (courseAttemptResource.getStatus()){
+                    case SUCCESS:{
+                        if (getActivity() == null) {
+                            return;
+                        }
+                        logEvent(EventsTrackerFacade.ENDED_EXAM);
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
+                        if (exam.getIsOfflineExam()){
+                            returnToHistory();
+                            return;
+                        }
+                        courseAttempt.saveInDB(getActivity(), courseContent);
                             showReview(ReviewStatsActivity.createIntent(getActivity(), exam,
                                     courseAttempt));
+                        break;
+                    }
+                    case LOADING:{
+                        showProgress(R.string.testpress_ending_exam);
+                        break;
+                    }
+                    case ERROR:{
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
                         }
+                        showException(
+                                courseAttemptResource.getException(),
+                                R.string.testpress_exam_paused_check_internet_to_end,
+                                R.string.testpress_end,
+                                "endExam"
+                        );
+                        break;
+                    }
+                }
+            }
+        });
+    }
 
-                        @Override
-                        public void onException(TestpressException exception) {
-                            showException(
-                                    exception,
-                                    R.string.testpress_exam_paused_check_internet_to_end,
-                                    R.string.testpress_end,
-                                    "endExam"
-                            );
+    private void observeEndAttemptResources() {
+        attemptViewModel.getEndAttemptResource().observe(requireActivity(), new Observer<Resource<Attempt>>() {
+            @Override
+            public void onChanged(Resource<Attempt> attemptResource) {
+                switch (attemptResource.getStatus()){
+                    case SUCCESS:{
+                        if (getActivity() == null) {
+                            return;
                         }
-                    });
-        } else {
-            endAttemptApiRequest = apiClient.endExam(attempt.getEndUrlFrag())
-                    .enqueue(new TestpressCallback<Attempt>() {
-                        @Override
-                        public void onSuccess(Attempt attempt) {
-                            if (getActivity() == null) {
-                                return;
-                            }
-                            logEvent(EventsTrackerFacade.ENDED_EXAM);
-                            if (progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                            }
-                            TestFragment.this.attempt = attempt;
-                            showReview(attempt);
+                        logEvent(EventsTrackerFacade.ENDED_EXAM);
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
                         }
-
-                        @Override
-                        public void onException(TestpressException exception) {
-                            showException(
-                                    exception,
-                                    R.string.testpress_exam_paused_check_internet_to_end,
-                                    R.string.testpress_end,
-                                    "endExam"
-                            );
+                        if (exam.getIsOfflineExam()){
+                            returnToHistory();
+                            return;
                         }
-                    });
-        }
+                        TestFragment.this.attempt = attempt;
+                        showReview(attempt);
+                        break;
+                    }
+                    case LOADING:{
+                        showProgress(R.string.testpress_ending_exam);
+                        break;
+                    }
+                    case ERROR:{
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
+                        showException(
+                                attemptResource.getException(),
+                                R.string.testpress_exam_paused_check_internet_to_end,
+                                R.string.testpress_end,
+                                "endExam"
+                        );
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     private void showReview(Attempt attempt) {

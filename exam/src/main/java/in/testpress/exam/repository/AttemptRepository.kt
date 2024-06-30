@@ -3,7 +3,11 @@ package `in`.testpress.exam.repository
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.database.TestpressDatabase
+import `in`.testpress.database.entities.OfflineAttempt
 import `in`.testpress.database.entities.OfflineAttemptItem
+import `in`.testpress.database.entities.OfflineAttemptSection
+import `in`.testpress.database.entities.OfflineCourseAttempt
+import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.models.AttemptItem
 import `in`.testpress.exam.network.NetworkAttemptSection
@@ -11,6 +15,7 @@ import `in`.testpress.exam.ui.TestFragment.Action
 import `in`.testpress.exam.util.asAttemptItem
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Attempt
+import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.models.greendao.Exam
 import `in`.testpress.network.Resource
 import android.content.Context
@@ -39,6 +44,7 @@ class AttemptRepository(val context: Context) {
     private val directionDao = database.directionDao()
     private val offlineAttemptDao = database.offlineAttemptDao()
     private val offlineContentAttemptDao = database.offlineCourseAttemptDao()
+    private val offlineAttemptSectionDao = database.offlineAttemptSectionDao()
 
 
     private val apiClient: TestpressExamApiClient = TestpressExamApiClient(context)
@@ -50,6 +56,61 @@ class AttemptRepository(val context: Context) {
 
     private val _updateSectionResource = MutableLiveData<Resource<Pair<NetworkAttemptSection?,Action>>>()
     val updateSectionResource: LiveData<Resource<Pair<NetworkAttemptSection?,Action>>> get() = _updateSectionResource
+
+
+    private val _endContentAttemptResource = MutableLiveData<Resource<CourseAttempt>>()
+    val endContentAttemptResource: LiveData<Resource<CourseAttempt>> get() = _endContentAttemptResource
+
+    private val _endAttemptResource = MutableLiveData<Resource<Attempt>>()
+    val endAttemptResource: LiveData<Resource<Attempt>> get() = _endAttemptResource
+
+
+    fun endContentAttempt(attemptEndFrag: String) {
+        _endContentAttemptResource.postValue(Resource.loading(null))
+        if (isOfflineExam) {
+            CoroutineScope(Dispatchers.IO).launch {
+                offlineAttemptDao.updateAttemptState(attempt.id,Attempt.COMPLETED)
+                val offlineCourseAttempt = getOfflineContentAttemptsList(attempt.id)
+                _endContentAttemptResource.postValue(Resource.success(offlineCourseAttempt!!.createGreenDoaModel(attempt)))
+            }
+        } else {
+            apiClient.endContentAttempt(attemptEndFrag)
+                .enqueue(object : TestpressCallback<CourseAttempt>() {
+                    override fun onSuccess(result: CourseAttempt) {
+                        _endContentAttemptResource.postValue(Resource.success(result))
+                    }
+
+                    override fun onException(exception: TestpressException) {
+                        _endContentAttemptResource.postValue(Resource.error(exception,null))
+                    }
+                })
+        }
+
+    }
+
+
+    fun getOfflineContentAttemptsList(attemptId: Long): OfflineCourseAttempt? {
+        return offlineContentAttemptDao.getById(attemptId)
+    }
+
+    fun endAttempt(attemptEndFrag: String) {
+        _endAttemptResource.postValue(Resource.loading(null))
+        if (isOfflineExam) {
+            _endAttemptResource.postValue(Resource.success(attempt))
+        } else {
+            apiClient.endAttempt(attemptEndFrag)
+                .enqueue(object : TestpressCallback<Attempt>() {
+                    override fun onSuccess(response: Attempt) {
+                        _endAttemptResource.postValue(Resource.success(response))
+                    }
+
+                    override fun onException(exception: TestpressException) {
+                        _endAttemptResource.postValue(Resource.error(exception,null))
+                    }
+                })
+        }
+
+    }
 
     fun fetchAttemptItems(questionsUrlFrag: String, fetchSinglePageOnly: Boolean) {
         _attemptItemsResource.postValue(Resource.loading(null))
