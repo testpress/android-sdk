@@ -148,7 +148,7 @@ class ExamRepository(val context: Context) {
                 state = if (section.order == 0L) Attempt.RUNNING else Attempt.NOT_STARTED,
                 remainingTime = section.duration,
                 name = section.name!!,
-                duration = section.duration!!,
+                duration = section.duration?:"00:00:00",
                 order = section.order!!.toInt(),
                 instructions = section.instructions,
                 attemptId = offlineAttemptId
