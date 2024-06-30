@@ -329,6 +329,7 @@ public class TestActivity extends BaseToolBarActivity  {
         if (courseContent != null) {
             if (exam == null) {
                 exam = courseContent.getRawExam();
+                examViewModel.setExam(exam);
             }
             if (courseAttempt == null && permission == null) {
                 checkPermission();
@@ -339,6 +340,7 @@ public class TestActivity extends BaseToolBarActivity  {
                 checkStartExamScreenState();
             }
         } else if (exam != null) {
+            examViewModel.setExam(exam);
             checkStartExamScreenState();
         } else {
             String examSlug = getIntent().getStringExtra(PARAM_EXAM_SLUG);
