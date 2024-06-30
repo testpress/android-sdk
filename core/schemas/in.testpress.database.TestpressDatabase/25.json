@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 25,
-    "identityHash": "ff6086100241b9a5f2bb3dc0ed7e1913",
+    "identityHash": "42001ecd253e6b0b9f7f18e4e51e27c3",
     "entities": [
       {
         "tableName": "ContentEntity",
@@ -2872,7 +2872,7 @@
       },
       {
         "tableName": "OfflineAttemptItem",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `question` TEXT NOT NULL, `selectedAnswers` TEXT NOT NULL, `review` INTEGER, `savedAnswers` TEXT NOT NULL, `order` INTEGER NOT NULL, `shortText` TEXT, `currentShortText` TEXT, `attemptSection` TEXT, `essayText` TEXT, `localEssayText` TEXT, `files` TEXT NOT NULL, `unSyncedFiles` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `question` TEXT NOT NULL, `selectedAnswers` TEXT NOT NULL, `review` INTEGER, `savedAnswers` TEXT NOT NULL, `order` INTEGER NOT NULL, `shortText` TEXT, `currentShortText` TEXT, `attemptSection` TEXT, `essayText` TEXT, `localEssayText` TEXT, `files` TEXT NOT NULL, `unSyncedFiles` TEXT NOT NULL, `attemptId` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -2951,6 +2951,12 @@
             "columnName": "unSyncedFiles",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "attemptId",
+            "columnName": "attemptId",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -2966,7 +2972,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ff6086100241b9a5f2bb3dc0ed7e1913')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '42001ecd253e6b0b9f7f18e4e51e27c3')"
     ]
   }
 }

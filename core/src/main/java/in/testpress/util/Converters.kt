@@ -42,8 +42,10 @@ object Converters {
 
     @TypeConverter
     @JvmStatic
-    fun toIntList(value: String?): List<Int>? {
-        return value?.split(",")?.map { it.toInt() }
+    fun toIntList(value: String?): List<Int> {
+        if (value == null) return listOf()
+        if (value.isEmpty()) return listOf()
+        return value.split(",").map { it.toInt() }
     }
 
     @TypeConverter

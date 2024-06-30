@@ -179,7 +179,7 @@ public class TestFragment extends BaseFragment implements
             exam = getArguments().getParcelable(PARAM_EXAM);
         }
         exam.setIsOfflineExam(true);
-        attemptViewModel.setExam(exam);
+        attemptViewModel.setExamAndAttempt(exam, attempt);
         if (savedInstanceState != null && savedInstanceState.getParcelable(PARAM_ATTEMPT) != null) {
             attempt = savedInstanceState.getParcelable(PARAM_ATTEMPT);
         }
