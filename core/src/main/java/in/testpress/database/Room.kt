@@ -29,8 +29,9 @@ import `in`.testpress.database.roommigration.RoomMigration20To21.MIGRATION_20_21
 import `in`.testpress.database.roommigration.RoomMigration21To22.MIGRATION_21_22
 import `in`.testpress.database.roommigration.RoomMigration22To23.MIGRATION_22_23
 import `in`.testpress.database.roommigration.RoomMigration23To24.MIGRATION_23_24
+import `in`.testpress.database.roommigration.RoomMigration24To25.MIGRATION_24_25
 
-@Database(version = 24,
+@Database(version = 25,
         entities = [
             ContentEntity::class,
             OfflineVideo::class,
@@ -59,7 +60,8 @@ import `in`.testpress.database.roommigration.RoomMigration23To24.MIGRATION_23_24
             OfflineExam::class,
             OfflineCourseAttempt::class,
             OfflineAttempt::class,
-            OfflineAttemptSection::class
+            OfflineAttemptSection::class,
+            OfflineAttemptItem::class
         ], exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class TestpressDatabase : RoomDatabase() {
@@ -84,6 +86,7 @@ abstract class TestpressDatabase : RoomDatabase() {
     abstract fun offlineCourseAttemptDao():OfflineCourseAttemptDao
     abstract fun offlineAttemptDao():OfflineAttemptDao
     abstract fun offlineAttemptSectionDao():OfflineAttemptSectionDao
+    abstract fun offlineAttemptItemDoa(): OfflineAttemptItemDao
 
     companion object {
         private lateinit var INSTANCE: TestpressDatabase
@@ -92,7 +95,8 @@ abstract class TestpressDatabase : RoomDatabase() {
             MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9,
             MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14,
             MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19,
-            MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24
+            MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24,
+            MIGRATION_24_25
         )
 
         operator fun invoke(context: Context): TestpressDatabase {
