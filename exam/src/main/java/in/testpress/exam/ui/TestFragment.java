@@ -1047,54 +1047,67 @@ public class TestFragment extends BaseFragment implements
         attemptViewModel.getUpdateSectionResource().observe(requireActivity(), new Observer<Resource<Pair<NetworkAttemptSection, Action>>>() {
             @Override
             public void onChanged(Resource<Pair<NetworkAttemptSection, Action>> pairResource) {
-                switch (pairResource.getStatus()){
-                    case SUCCESS:{
-                        if (getActivity() == null) {
-                            return;
-                        }
-                        AttemptSection greenDaoAttemptSection = NetworkAttemptSectionKt.createAttemptSection(pairResource.getData().getFirst());
-                        sections.set(greenDaoAttemptSection.getOrder(), greenDaoAttemptSection);
-                        attempt.setSections(sections);
-                        if (pairResource.getData().getSecond() == Action.END_SECTION){
-                            attemptViewModel.resetPageCount();
-                            onSectionEnded();
-                        } else {
-                            String questionUrl = greenDaoAttemptSection.getQuestionsUrlFrag();
-                            questionUrl = questionUrl.replace("2.3","2.2");
-                            attemptViewModel.clearAttemptItem();
-                            attemptViewModel.fetchAttemptItems(questionUrl, true);
-                        }
+                if (pairResource == null || getActivity() == null) {
+                    return;
+                }
+
+                switch (pairResource.getStatus()) {
+                    case SUCCESS:
+                        handleUpdateSectionSuccess(pairResource.getData().getFirst(), pairResource.getData().getSecond());
                         break;
-                    }
-                    case LOADING:{
-                        if (pairResource.getData().getSecond() == Action.END_SECTION){
-                            showProgress(R.string.testpress_ending_section);
-                        } else {
-                            showProgress(R.string.testpress_starting_section);
-                        }
+
+                    case LOADING:
+                        handleUpdateSectionLoading(pairResource.getData().getSecond());
                         break;
-                    }
-                    case ERROR:{
-                        if (pairResource.getData().getSecond() == Action.END_SECTION){
-                            showException(
-                                    pairResource.getException(),
-                                    R.string.testpress_exam_paused_check_internet_to_end,
-                                    R.string.testpress_end,
-                                    "endSection"
-                            );
-                        } else {
-                            showException(
-                                    pairResource.getException(),
-                                    R.string.testpress_exam_paused_check_internet,
-                                    R.string.testpress_resume,
-                                    "startSection"
-                            );
-                        }
+
+                    case ERROR:
+                        handleUpdateSectionError(pairResource.getException(), pairResource.getData().getSecond());
                         break;
-                    }
                 }
             }
         });
+    }
+
+    private void handleUpdateSectionSuccess(NetworkAttemptSection networkAttemptSection, Action action) {
+        AttemptSection greenDaoAttemptSection = NetworkAttemptSectionKt.createAttemptSection(networkAttemptSection);
+        sections.set(greenDaoAttemptSection.getOrder(), greenDaoAttemptSection);
+        attempt.setSections(sections);
+
+        if (action == Action.END_SECTION) {
+            attemptViewModel.resetPageCount();
+            onSectionEnded();
+        } else {
+            String questionUrl = greenDaoAttemptSection.getQuestionsUrlFrag();
+            questionUrl = questionUrl.replace("2.3","2.2");
+            attemptViewModel.clearAttemptItem();
+            attemptViewModel.fetchAttemptItems(questionUrl, true);
+        }
+    }
+
+    private void handleUpdateSectionLoading(Action action) {
+        if (action == Action.END_SECTION) {
+            showProgress(R.string.testpress_ending_section);
+        } else {
+            showProgress(R.string.testpress_starting_section);
+        }
+    }
+
+    private void handleUpdateSectionError(TestpressException exception, Action action) {
+        if (action == Action.END_SECTION) {
+            showException(
+                    exception,
+                    R.string.testpress_exam_paused_check_internet_to_end,
+                    R.string.testpress_end,
+                    "endSection"
+            );
+        } else {
+            showException(
+                    exception,
+                    R.string.testpress_exam_paused_check_internet,
+                    R.string.testpress_resume,
+                    "startSection"
+            );
+        }
     }
 
     void endSection() {
