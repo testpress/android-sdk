@@ -68,6 +68,7 @@ import in.testpress.util.CommonUtils;
 import in.testpress.util.EventsTrackerFacade;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
+import kotlin.Pair;
 import kotlin.Triple;
 
 import static in.testpress.exam.ui.TestActivity.PARAM_COURSE_ATTEMPT;
@@ -128,7 +129,7 @@ public class TestFragment extends BaseFragment implements
      */
     private HashMap<String, Integer> plainSpinnerItemOffsets = new HashMap<>();
 
-    public static enum Action { PAUSE, END, UPDATE_ANSWER, END_SECTION }
+    public static enum Action { PAUSE, END, UPDATE_ANSWER, END_SECTION, START_SECTION }
     private RetrofitCall<Attempt> heartBeatApiRequest;
     private RetrofitCall<NetworkAttemptSection> endSectionApiRequest;
     private RetrofitCall<NetworkAttemptSection> startSectionApiRequest;
@@ -210,6 +211,7 @@ public class TestFragment extends BaseFragment implements
         }
         observeAttemptItemResources();
         observeSaveAnswerResource();
+        observeUpdateSectionResource();
     }
 
     private void initializeLanguageFilter() {
@@ -1041,6 +1043,73 @@ public class TestFragment extends BaseFragment implements
                 .show();
     }
 
+    void observeUpdateSectionResource() {
+        attemptViewModel.getUpdateSectionResource().observe(requireActivity(), new Observer<Resource<Pair<NetworkAttemptSection, Action>>>() {
+            @Override
+            public void onChanged(Resource<Pair<NetworkAttemptSection, Action>> pairResource) {
+                if (pairResource == null || getActivity() == null) {
+                    return;
+                }
+
+                switch (pairResource.getStatus()) {
+                    case SUCCESS:
+                        handleUpdateSectionSuccess(pairResource.getData().getFirst(), pairResource.getData().getSecond());
+                        break;
+
+                    case LOADING:
+                        handleUpdateSectionLoading(pairResource.getData().getSecond());
+                        break;
+
+                    case ERROR:
+                        handleUpdateSectionError(pairResource.getException(), pairResource.getData().getSecond());
+                        break;
+                }
+            }
+        });
+    }
+
+    private void handleUpdateSectionSuccess(NetworkAttemptSection networkAttemptSection, Action action) {
+        AttemptSection greenDaoAttemptSection = NetworkAttemptSectionKt.createAttemptSection(networkAttemptSection);
+        sections.set(greenDaoAttemptSection.getOrder(), greenDaoAttemptSection);
+        attempt.setSections(sections);
+
+        if (action == Action.END_SECTION) {
+            attemptViewModel.resetPageCount();
+            onSectionEnded();
+        } else {
+            String questionUrl = greenDaoAttemptSection.getQuestionsUrlFrag();
+            questionUrl = questionUrl.replace("2.3","2.2");
+            attemptViewModel.clearAttemptItem();
+            attemptViewModel.fetchAttemptItems(questionUrl, true);
+        }
+    }
+
+    private void handleUpdateSectionLoading(Action action) {
+        if (action == Action.END_SECTION) {
+            showProgress(R.string.testpress_ending_section);
+        } else {
+            showProgress(R.string.testpress_starting_section);
+        }
+    }
+
+    private void handleUpdateSectionError(TestpressException exception, Action action) {
+        if (action == Action.END_SECTION) {
+            showException(
+                    exception,
+                    R.string.testpress_exam_paused_check_internet_to_end,
+                    R.string.testpress_end,
+                    "endSection"
+            );
+        } else {
+            showException(
+                    exception,
+                    R.string.testpress_exam_paused_check_internet,
+                    R.string.testpress_resume,
+                    "startSection"
+            );
+        }
+    }
+
     void endSection() {
         stopTimer();
         // Save attemptItem, if option or review is changed
@@ -1053,36 +1122,12 @@ public class TestFragment extends BaseFragment implements
             }
         }
 
-        showProgress(R.string.testpress_ending_section);
         AttemptSection section = sections.get(attempt.getCurrentSectionPosition());
         if (section.getState().equals(COMPLETED)) {
             onSectionEnded();
             return;
         }
-        endSectionApiRequest = apiClient.updateSection(section.getEndUrlFrag())
-                .enqueue(new TestpressCallback<NetworkAttemptSection>() {
-                    @Override
-                    public void onSuccess(NetworkAttemptSection attemptSection) {
-                        if (getActivity() == null) {
-                            return;
-                        }
-                        AttemptSection greenDaoAttemptSection = NetworkAttemptSectionKt.createAttemptSection(attemptSection);
-                        sections.set(greenDaoAttemptSection.getOrder(), greenDaoAttemptSection);
-                        attempt.setSections(sections);
-                        attemptViewModel.resetPageCount();
-                        onSectionEnded();
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        showException(
-                                exception,
-                                R.string.testpress_exam_paused_check_internet_to_end,
-                                R.string.testpress_end,
-                                "endSection"
-                        );
-                    }
-                });
+        attemptViewModel.updateSection(section.getEndUrlFrag(),Action.END_SECTION);
     }
 
     void onSectionEnded() {
@@ -1097,34 +1142,8 @@ public class TestFragment extends BaseFragment implements
     }
 
     void startSection() {
-        showProgress(R.string.testpress_starting_section);
         String sectionStartUrlFrag = sections.get(attempt.getCurrentSectionPosition()).getStartUrlFrag();
-        startSectionApiRequest = apiClient.updateSection(sectionStartUrlFrag)
-                .enqueue(new TestpressCallback<NetworkAttemptSection>() {
-                    @Override
-                    public void onSuccess(NetworkAttemptSection section) {
-                        if (getActivity() == null) {
-                            return;
-                        }
-                        AttemptSection greenDaoAttemptSection = NetworkAttemptSectionKt.createAttemptSection(section);
-                        sections.set(greenDaoAttemptSection.getOrder(),greenDaoAttemptSection);
-                        attempt.setSections(sections);
-                        String questionUrl = greenDaoAttemptSection.getQuestionsUrlFrag();
-                        questionUrl = questionUrl.replace("2.3","2.2");
-                        attemptViewModel.clearAttemptItem();
-                        attemptViewModel.fetchAttemptItems(questionUrl, true);
-                    }
-
-                    @Override
-                    public void onException(TestpressException exception) {
-                        showException(
-                                exception,
-                                R.string.testpress_exam_paused_check_internet,
-                                R.string.testpress_resume,
-                                "startSection"
-                        );
-                    }
-                });
+        attemptViewModel.updateSection(sectionStartUrlFrag,Action.START_SECTION);
     }
 
     void endExam() {
