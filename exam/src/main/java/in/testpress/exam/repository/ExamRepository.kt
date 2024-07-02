@@ -135,7 +135,7 @@ class ExamRepository(val context: Context) {
         val sectionIds = examQuestionDao.getUniqueSectionIdsByExamId(exam.id)
         val sections = sectionsDao.getSectionsByIds(sectionIds)
         val offlineAttemptSections = createAttemptSections(sections, offlineAttemptId)
-        return Triple(offlineAttempt, offlineCourseAttempt, offlineAttemptSections)
+        return Triple(offlineAttemptDao.getById(offlineAttemptId), offlineCourseAttempt, offlineAttemptSections)
     }
 
     private fun createAttemptSections(sections: List<Section>, offlineAttemptId: Long): List<OfflineAttemptSection> {
