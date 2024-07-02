@@ -7,6 +7,8 @@ import `in`.testpress.exam.models.AttemptItem
 import `in`.testpress.exam.network.NetworkAttemptSection
 import `in`.testpress.exam.ui.TestFragment.Action
 import `in`.testpress.models.TestpressApiResponse
+import `in`.testpress.models.greendao.Attempt
+import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.network.Resource
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -27,6 +29,12 @@ class AttemptRepository(val context: Context) {
 
     private val _updateSectionResource = MutableLiveData<Resource<Pair<NetworkAttemptSection?,Action>>>()
     val updateSectionResource: LiveData<Resource<Pair<NetworkAttemptSection?,Action>>> get() = _updateSectionResource
+
+    private val _endContentAttemptResource = MutableLiveData<Resource<CourseAttempt>>()
+    val endContentAttemptResource: LiveData<Resource<CourseAttempt>> get() = _endContentAttemptResource
+
+    private val _endAttemptResource = MutableLiveData<Resource<Attempt>>()
+    val endAttemptResource: LiveData<Resource<Attempt>> get() = _endAttemptResource
 
     fun fetchAttemptItems(questionsUrlFrag: String, fetchSinglePageOnly: Boolean) {
         _attemptItemsResource.postValue(Resource.loading(null))
@@ -91,6 +99,34 @@ class AttemptRepository(val context: Context) {
                 _updateSectionResource.postValue(Resource.error(exception, Pair(null, action)))
             }
         })
+    }
+
+    fun endContentAttempt(attemptEndFrag: String) {
+        _endContentAttemptResource.postValue(Resource.loading(null))
+        apiClient.endContentAttempt(attemptEndFrag)
+            .enqueue(object : TestpressCallback<CourseAttempt>() {
+                override fun onSuccess(result: CourseAttempt) {
+                    _endContentAttemptResource.postValue(Resource.success(result))
+                }
+
+                override fun onException(exception: TestpressException) {
+                    _endContentAttemptResource.postValue(Resource.error(exception, null))
+                }
+            })
+    }
+
+    fun endAttempt(attemptEndFrag: String) {
+        _endAttemptResource.postValue(Resource.loading(null))
+        apiClient.endAttempt(attemptEndFrag)
+            .enqueue(object : TestpressCallback<Attempt>() {
+                override fun onSuccess(response: Attempt) {
+                    _endAttemptResource.postValue(Resource.success(response))
+                }
+
+                override fun onException(exception: TestpressException) {
+                    _endAttemptResource.postValue(Resource.error(exception, null))
+                }
+            })
     }
 
     fun clearAttemptItem() {
