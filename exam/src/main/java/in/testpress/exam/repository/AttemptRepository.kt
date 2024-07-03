@@ -36,6 +36,7 @@ class AttemptRepository(val context: Context) {
     private val offlineAttemptItemDao = database.offlineAttemptItemDoa()
     private val subjectDao = database.subjectDao()
     private val directionDao = database.directionDao()
+    private val offlineAttemptSection = database.offlineAttemptSectionDao()
     private val languageDao = database.languageDao()
 
 
@@ -95,13 +96,7 @@ class AttemptRepository(val context: Context) {
 
     private fun createOfflineAttemptItemItem() {
         CoroutineScope(Dispatchers.IO).launch {
-            val hasSections = examQuestionDao.getUniqueSectionIdsByExamId(exam.id).count() > 1
-            if (hasSections){
-
-            } else {
-                createOfflineAttemptForAllQuestions()
-            }
-
+            createOfflineAttemptForAllQuestions()
         }
     }
 
@@ -111,6 +106,7 @@ class AttemptRepository(val context: Context) {
             OfflineAttemptItem(
                 question = questionDao.getQuestionById(examQuestion.questionId!!)!!,
                 order = examQuestion.order!!,
+                attemptSection = offlineAttemptSection.getById(examQuestion.sectionId)
             )
         }
         offlineAttemptItemDao.insertAll(offlineAttemptItems)

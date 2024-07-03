@@ -176,6 +176,7 @@ public class TestFragment extends BaseFragment implements
             attempt = getArguments().getParcelable(PARAM_ATTEMPT);
             exam = getArguments().getParcelable(PARAM_EXAM);
         }
+        exam.setIsOfflineExam(true);
         attemptViewModel.setExam(exam);
         if (savedInstanceState != null && savedInstanceState.getParcelable(PARAM_ATTEMPT) != null) {
             attempt = savedInstanceState.getParcelable(PARAM_ATTEMPT);
@@ -808,11 +809,14 @@ public class TestFragment extends BaseFragment implements
     }
 
     private void fetchAttemptItems(){
-        String questionUrl = attempt.getQuestionsUrlFrag();
-        if (attempt.hasSectionalLock()) {
-            questionUrl = sections.get(attempt.getCurrentSectionPosition()).getQuestionsUrlFrag();
+        String questionUrl = "";
+        if (!exam.getIsOfflineExam()){
+            questionUrl =  attempt.getQuestionsUrlFrag();
+            if (attempt.hasSectionalLock()) {
+                questionUrl = sections.get(attempt.getCurrentSectionPosition()).getQuestionsUrlFrag();
+            }
+            questionUrl = questionUrl.replace("v2.3", "v2.2.1");
         }
-        questionUrl = questionUrl.replace("v2.3", "v2.2.1");
 
         if (attempt.hasSectionalLock()) {
             progressDialog.setMessage(getString(R.string.testpress_loading_section_questions,
@@ -834,6 +838,7 @@ public class TestFragment extends BaseFragment implements
             HashMap<String, List<AttemptItem>> groupedAttemptItems = new HashMap<>();
             for (AttemptItem attemptItem : attemptItemList) {
                 if (attempt.hasNoSectionalLock()) {
+                    Log.d("TAG", "initializeSectionSpinner: "+attemptItem.getAttemptSection().getName());
                     String section = attemptItem.getAttemptSection().getName();
                     groupAttemptItems(section, attemptItem, spinnerItemsList, groupedAttemptItems);
                 } else {
