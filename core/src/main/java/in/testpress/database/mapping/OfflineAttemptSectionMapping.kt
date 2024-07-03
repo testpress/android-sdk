@@ -13,7 +13,10 @@ fun OfflineAttemptSection?.asGreenDoaModel(): AttemptSection? {
     attemptSection.startUrl = null
     attemptSection.endUrl = null
     attemptSection.remainingTime = this.remainingTime
+    Log.d("TAG", "asGreenDoaModel: ${attemptSection.name}")
     attemptSection.name = this.name
+    Log.d("TAG", "asGreenDoaModel: ${this.name}")
+    Log.d("TAG", "asGreenDoaModel: ${attemptSection.name}")
     attemptSection.duration = this.duration
     attemptSection.order = this.order
     attemptSection.instructions = this.instructions
