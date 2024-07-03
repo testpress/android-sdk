@@ -15,4 +15,5 @@ data class OfflineAttemptSection(
     val order: Int,
     val instructions: String? = null,
     val attemptId: Long,
+    val sectionId: Long? = null
 )

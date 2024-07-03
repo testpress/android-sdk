@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 25,
-    "identityHash": "e9671eb3293a1b7ddd7bbce5a65dadd5",
+    "identityHash": "1b70460797b531e1d7edd23fc3aaa178",
     "entities": [
       {
         "tableName": "ContentEntity",
@@ -2804,7 +2804,7 @@
       },
       {
         "tableName": "OfflineAttemptSection",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `attemptSectionId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `state` TEXT NOT NULL, `remainingTime` TEXT, `name` TEXT, `duration` TEXT, `order` INTEGER NOT NULL, `instructions` TEXT, `attemptId` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `attemptSectionId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `state` TEXT NOT NULL, `remainingTime` TEXT, `name` TEXT, `duration` TEXT, `order` INTEGER NOT NULL, `instructions` TEXT, `attemptId` INTEGER NOT NULL, `sectionId` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -2859,6 +2859,12 @@
             "columnName": "attemptId",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "sectionId",
+            "columnName": "sectionId",
+            "affinity": "INTEGER",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -2966,7 +2972,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e9671eb3293a1b7ddd7bbce5a65dadd5')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1b70460797b531e1d7edd23fc3aaa178')"
     ]
   }
 }
