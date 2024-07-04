@@ -9,5 +9,8 @@ import androidx.room.Query
 @Dao
 interface OfflineAttemptSectionDao: BaseDao<OfflineAttemptSection> {
     @Query("SELECT * FROM OfflineAttemptSection WHERE sectionId = :sectionId")
-    suspend fun getById(sectionId: Long?): OfflineAttemptSection?
+    suspend fun getBySectionId(sectionId: Long?): OfflineAttemptSection?
+
+    @Query("SELECT * FROM OfflineAttemptSection WHERE attemptId = :attemptId")
+    suspend fun getByAttemptId(attemptId: Long): List<OfflineAttemptSection>
 }

@@ -30,8 +30,9 @@ class AttemptViewModel(val repository: AttemptRepository) : ViewModel() {
     var isNextPageQuestionsBeingFetched: Boolean = false
     var currentQuestionPosition = 0
 
-    fun setExam(exam: Exam){
+    fun setExamAndAttempt(exam: Exam, attempt: Attempt){
         repository.exam = exam
+        repository.attempt = attempt
     }
 
     fun fetchAttemptItems(questionsUrlFrag: String, fetchSinglePageOnly: Boolean){
