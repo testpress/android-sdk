@@ -128,7 +128,8 @@ class ExamRepository(val context: Context) {
             remainingTime = exam.duration,
             timeTaken = "0:00:00",
             state = Attempt.RUNNING,
-            attemptType = 0
+            attemptType = 0,
+            examId = exam.id
         )
         val offlineAttemptId = offlineAttemptDao.insert(offlineAttempt)
         val offlineCourseAttempt = OfflineCourseAttempt(assessmentId = offlineAttemptId)
