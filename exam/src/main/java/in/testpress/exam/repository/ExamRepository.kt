@@ -128,7 +128,8 @@ class ExamRepository(val context: Context) {
             remainingTime = exam.duration,
             timeTaken = "0:00:00",
             state = Attempt.RUNNING,
-            attemptType = 0
+            attemptType = 0,
+            examId = exam.id
         )
         val offlineAttemptId = offlineAttemptDao.insert(offlineAttempt)
         val offlineCourseAttempt = OfflineCourseAttempt(assessmentId = offlineAttemptId)
@@ -144,11 +145,12 @@ class ExamRepository(val context: Context) {
                 id = section.order!!,
                 state = if (section.order == 0L) Attempt.RUNNING else Attempt.NOT_STARTED,
                 remainingTime = section.duration,
-                name = section.name!!,
-                duration = section.duration!!,
+                name = section.name,
+                duration = section.duration,
                 order = section.order!!.toInt(),
                 instructions = section.instructions,
-                attemptId = offlineAttemptId
+                attemptId = offlineAttemptId,
+                sectionId = section.id
             )
         }
         return attemptSections.sortedBy { it.order }

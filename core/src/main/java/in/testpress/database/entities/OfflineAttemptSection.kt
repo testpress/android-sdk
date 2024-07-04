@@ -10,9 +10,10 @@ data class OfflineAttemptSection(
     val attemptSectionId: Long = 0,
     val state: String,
     val remainingTime: String? = null,
-    val name: String,
-    val duration: String,
+    val name: String?,
+    val duration: String?,
     val order: Int,
     val instructions: String? = null,
     val attemptId: Long,
+    val sectionId: Long? = null
 )

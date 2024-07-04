@@ -13,5 +13,6 @@ data class OfflineAttempt(
     val remainingTime: String,
     val timeTaken: String,
     val state: String,
-    val attemptType: Int
+    val attemptType: Int,
+    val examId: Long
 )
