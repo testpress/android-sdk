@@ -18,5 +18,6 @@ data class OfflineAttemptItem(
     var essayText: String? = null,
     var localEssayText: String? = null,
     var files: ArrayList<OfflineUserUploadedFile> = arrayListOf(),
-    var unSyncedFiles: List<String> = arrayListOf()
+    var unSyncedFiles: List<String> = arrayListOf(),
+    var attemptId: Long
 )
