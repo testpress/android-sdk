@@ -838,7 +838,6 @@ public class TestFragment extends BaseFragment implements
             HashMap<String, List<AttemptItem>> groupedAttemptItems = new HashMap<>();
             for (AttemptItem attemptItem : attemptItemList) {
                 if (attempt.hasNoSectionalLock()) {
-                    Log.d("TAG", "initializeSectionSpinner: "+attemptItem.getAttemptSection().getName());
                     String section = attemptItem.getAttemptSection().getName();
                     groupAttemptItems(section, attemptItem, spinnerItemsList, groupedAttemptItems);
                 } else {

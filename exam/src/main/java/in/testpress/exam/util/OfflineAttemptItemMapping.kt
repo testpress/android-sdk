@@ -46,7 +46,7 @@ fun List<Question>.asAttemptQuestions(subject: String, direction: String?) = thi
 fun Answer.asAttemptAnswer(): AttemptAnswer {
     return AttemptAnswer(
         this.textHtml!!,
-        this.id?.toInt()
+        this.saveId?.toInt() ?: this.id?.toInt()
     )
 }
 

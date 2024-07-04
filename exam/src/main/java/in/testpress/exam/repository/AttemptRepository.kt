@@ -128,21 +128,52 @@ class AttemptRepository(val context: Context) {
         _attemptItemsResource.postValue(Resource.success(attemptItems))
     }
 
-    fun saveAnswer(position: Int, attemptItem: AttemptItem, action: Action) {
-        apiClient.postAnswer(attemptItem).enqueue(object : TestpressCallback<AttemptItem>() {
-            override fun onSuccess(result: AttemptItem) {
-                _saveResultResource.postValue(Resource.success(Triple(position, result, action)))
+    suspend fun saveAnswer(position: Int, attemptItem: AttemptItem, action: Action) {
+        if (isOfflineExam){
+            updateLocalAttemptItem(attemptItem) { updateAttemptItem ->
+                _saveResultResource.postValue(Resource.success(Triple(position, updateAttemptItem, action)))
             }
+        } else {
+            apiClient.postAnswer(attemptItem).enqueue(object : TestpressCallback<AttemptItem>() {
+                override fun onSuccess(result: AttemptItem) {
+                    _saveResultResource.postValue(Resource.success(Triple(position, result, action)))
+                }
 
-            override fun onException(exception: TestpressException) {
-                _saveResultResource.postValue(
-                    Resource.error(
-                        exception,
-                        Triple(position, null, action)
+                override fun onException(exception: TestpressException) {
+                    _saveResultResource.postValue(
+                        Resource.error(
+                            exception,
+                            Triple(position, null, action)
+                        )
                     )
-                )
+                }
+            })
+        }
+    }
+
+    private suspend fun updateLocalAttemptItem(
+        attemptItem: AttemptItem,
+        callback: (AttemptItem) -> Unit
+    ) {
+        val offlineAttemptItem =
+            offlineAttemptItemDao.getAttemptItemById(attemptItem.id.toLong())
+        if (offlineAttemptItem != null) {
+            if (attemptItem.attemptQuestion.type == "E") {
+                offlineAttemptItem.localEssayText = attemptItem.localEssayText
+            } else {
+                offlineAttemptItem.selectedAnswers = attemptItem.savedAnswers
+                offlineAttemptItem.savedAnswers = attemptItem.savedAnswers
+                offlineAttemptItem.currentShortText = attemptItem.currentShortText
             }
-        })
+            offlineAttemptItem.unSyncedFiles = attemptItem.unSyncedFiles
+            offlineAttemptItem.review = attemptItem.currentReview
+            offlineAttemptItemDao.update(offlineAttemptItem)
+        }
+        val updatedAttemptItem = offlineAttemptItem!!.asAttemptItem(
+            attemptItem.attemptQuestion.subject,
+            attemptItem.attemptQuestion.direction
+        )
+        callback.invoke(updatedAttemptItem)
     }
 
     fun updateSection(url: String, action: Action) {

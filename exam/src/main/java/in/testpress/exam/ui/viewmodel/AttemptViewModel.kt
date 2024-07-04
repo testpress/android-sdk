@@ -12,6 +12,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 class AttemptViewModel(val repository: AttemptRepository) : ViewModel() {
 
@@ -37,7 +39,9 @@ class AttemptViewModel(val repository: AttemptRepository) : ViewModel() {
     }
 
     fun saveAnswer(position: Int, attemptItem: AttemptItem, action: TestFragment.Action){
-        repository.saveAnswer(position, attemptItem, action)
+        viewModelScope.launch {
+            repository.saveAnswer(position, attemptItem, action)
+        }
     }
 
     fun updateSection(url: String, action: TestFragment.Action){
