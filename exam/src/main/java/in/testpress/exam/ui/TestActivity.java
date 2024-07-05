@@ -340,6 +340,7 @@ public class TestActivity extends BaseToolBarActivity  {
         if (courseContent != null) {
             if (exam == null) {
                 exam = courseContent.getRawExam();
+                exam.setIsOfflineExam(true);
                 examViewModel.setExam(exam);
             }
             if (courseAttempt == null && permission == null) {
@@ -351,6 +352,7 @@ public class TestActivity extends BaseToolBarActivity  {
                 checkStartExamScreenState();
             }
         } else if (exam != null) {
+            exam.setIsOfflineExam(true);
             examViewModel.setExam(exam);
             checkStartExamScreenState();
         } else {
