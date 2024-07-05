@@ -23,4 +23,7 @@ interface OfflineExamDao: BaseDao<OfflineExam> {
 
     @Query("SELECT id FROM OfflineExam")
     suspend fun getAllIds(): List<Long>
+
+    @Query("UPDATE OfflineExam SET downloadedQuestionCount = downloadedQuestionCount + :count WHERE id = :examId")
+    suspend fun updateDownloadedQuestion(examId: Long, count: Long)
 }
