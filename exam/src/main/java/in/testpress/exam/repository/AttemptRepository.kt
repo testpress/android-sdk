@@ -5,11 +5,14 @@ import `in`.testpress.core.TestpressException
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttemptItem
 import `in`.testpress.database.entities.OfflineCourseAttempt
+import `in`.testpress.database.mapping.asGreenDoaModel
 import `in`.testpress.database.mapping.asGreenDoaModels
 import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.models.AttemptItem
 import `in`.testpress.exam.network.NetworkAttemptSection
+import `in`.testpress.exam.network.asNetworkModel
+import `in`.testpress.exam.network.createAttemptSection
 import `in`.testpress.exam.ui.TestFragment.Action
 import `in`.testpress.exam.util.asAttemptItem
 import `in`.testpress.models.TestpressApiResponse
@@ -18,6 +21,7 @@ import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.models.greendao.Exam
 import `in`.testpress.network.Resource
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
@@ -102,8 +106,30 @@ class AttemptRepository(val context: Context) {
 
     private fun createOfflineAttemptItemItem() {
         CoroutineScope(Dispatchers.IO).launch {
-            createOfflineAttemptForAllQuestions()
+            if (attempt.hasSectionalLock()){
+                Log.d("TAG", "createOfflineAttemptItemItem: ${attempt.sections.size}")
+                Log.d("TAG", "createOfflineAttemptItemItem: ${attempt.sections[attempt.currentSectionPosition].attemptSectionId}")
+                createOfflineAttemptItemForSections(attempt.sections[attempt.currentSectionPosition].attemptSectionId)
+            } else {
+                createOfflineAttemptForAllQuestions()
+            }
         }
+    }
+
+    private suspend fun createOfflineAttemptItemForSections(attemptSectionId: Long) {
+        val offlineAttemptSection = offlineAttemptSectionDao.getByAttemptSectionId(attemptSectionId)
+        val examQuestions = examQuestionDao.getExamQuestionsByExamIdAndSectionId(exam.id, offlineAttemptSection?.sectionId!!)
+        Log.d("TAG", "createOfflineAttemptItemForSections: ${examQuestions.size}")
+        val offlineAttemptItems = examQuestions.map { examQuestion ->
+            OfflineAttemptItem(
+                question = questionDao.getQuestionById(examQuestion.questionId!!)!!,
+                order = examQuestion.order!!,
+                attemptSection = offlineAttemptSectionDao.getBySectionId(examQuestion.sectionId),
+                attemptId = attempt.id
+            )
+        }
+        offlineAttemptItemDao.insertAll(offlineAttemptItems)
+        createAttemptItem()
     }
 
     private suspend fun createOfflineAttemptForAllQuestions() {
@@ -121,7 +147,10 @@ class AttemptRepository(val context: Context) {
     }
 
     private suspend fun createAttemptItem(){
-        val offlineAttemptItems = offlineAttemptItemDao.getOfflineAttemptItemByAttemptId(attempt.id)
+        var offlineAttemptItems = offlineAttemptItemDao.getOfflineAttemptItemByAttemptId(attempt.id)
+        if (attempt.hasSectionalLock()){
+            offlineAttemptItems = offlineAttemptItems.filter { it.attemptSection!!.id.toInt() == attempt.currentSectionPosition  }
+        }
         val attemptItems = offlineAttemptItems.map { offlineAttemptItem ->
             val subject = offlineAttemptItem.question.subjectId?.let { subjectDao.getSubjectById(it) }
             val direction = offlineAttemptItem.question.directionId?.let { directionDao.getDirectionById(it) }
@@ -186,15 +215,41 @@ class AttemptRepository(val context: Context) {
 
     fun updateSection(url: String, action: Action) {
         _updateSectionResource.postValue(Resource.loading(Pair(null, action)))
-        apiClient.updateSection(url).enqueue(object : TestpressCallback<NetworkAttemptSection>() {
-            override fun onSuccess(result: NetworkAttemptSection) {
-                _updateSectionResource.postValue(Resource.success(Pair(result, action)))
+        if (isOfflineExam){
+            CoroutineScope(Dispatchers.IO).launch {
+                updateOfflineSection(action)
             }
+        } else {
+            apiClient.updateSection(url).enqueue(object : TestpressCallback<NetworkAttemptSection>() {
+                override fun onSuccess(result: NetworkAttemptSection) {
+                    _updateSectionResource.postValue(Resource.success(Pair(result, action)))
+                }
 
-            override fun onException(exception: TestpressException) {
-                _updateSectionResource.postValue(Resource.error(exception, Pair(null, action)))
+                override fun onException(exception: TestpressException) {
+                    _updateSectionResource.postValue(Resource.error(exception, Pair(null, action)))
+                }
+            })
+        }
+    }
+
+    private suspend fun updateOfflineSection(action: Action) {
+        when (action){
+            Action.END_SECTION -> {
+                val offlineAttemptSection = offlineAttemptSectionDao.getByAttemptIdAndId(attempt.id, attempt.currentSectionPosition.toLong())
+                offlineAttemptSection?.state = Attempt.COMPLETED
+                offlineAttemptSectionDao.update(offlineAttemptSection!!)
+                attemptItem.clear()
+                _updateSectionResource.postValue(Resource.success(Pair(offlineAttemptSection.asNetworkModel(), action)))
             }
-        })
+            Action.START_SECTION -> {
+                val offlineAttemptSection = offlineAttemptSectionDao.getByAttemptIdAndId(attempt.id, attempt.currentSectionPosition.toLong())
+                offlineAttemptSection?.state = Attempt.RUNNING
+                offlineAttemptSectionDao.update(offlineAttemptSection!!)
+                _updateSectionResource.postValue(Resource.success(Pair(offlineAttemptSection.asNetworkModel(), action)))
+            }
+            else -> {}
+        }
+
     }
 
     fun endContentAttempt(attemptEndFrag: String) {

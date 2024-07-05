@@ -8,8 +8,8 @@ data class OfflineAttemptSection(
     var id: Long,
     @PrimaryKey(autoGenerate = true)
     val attemptSectionId: Long = 0,
-    val state: String,
-    val remainingTime: String? = null,
+    var state: String,
+    var remainingTime: String? = null,
     val name: String?,
     val duration: String?,
     val order: Int,
