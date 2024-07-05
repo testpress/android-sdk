@@ -10,38 +10,50 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="8dp">
 
         <TextView
             android:id="@+id/titleTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:textSize="18sp"
             android:text="Exam Title 1"
             android:layout_weight="1"
             android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/downloading_button"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Downloading"
-            android:visibility="gone"/>
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/downloading_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Downloading"
+                android:visibility="gone"/>
 
-        <Button
-            android:id="@+id/sync_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sync"
-            android:visibility="gone"/>
+            <Button
+                android:id="@+id/sync_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sync"
+                android:visibility="gone"/>
 
-        <Button
-            android:id="@+id/delete_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Delete"
-            android:visibility="gone"/>
+            <Button
+                android:id="@+id/open_exam_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Open Exam"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/delete_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete"
+                android:visibility="gone"/>
+        </LinearLayout>
 
     </LinearLayout>
 

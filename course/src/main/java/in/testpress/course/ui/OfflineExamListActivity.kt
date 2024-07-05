@@ -69,12 +69,24 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                 binding.syncButton.setOnClickListener {
                     offlineExamViewModel.syncExam(exam)
                 }
+
+                binding.openExamDetail.setOnClickListener {
+                    startActivity(
+                        ContentActivity.createIntent(
+                            exam.contentId,
+                            this@OfflineExamListActivity,
+                            ""
+                        )
+                    )
+                }
                 if (exam.downloadedQuestionCount.toInt() == exam.numberOfQuestions){
                     binding.syncButton.isVisible = exam.isSyncRequired
+                    binding.openExamDetail.isVisible = !exam.isSyncRequired
                     binding.deleteButton.isVisible = true
                     binding.downloadingButton.isVisible = false
                 } else {
                     binding.syncButton.isVisible = false
+                    binding.openExamDetail.isVisible = false
                     binding.deleteButton.isVisible = false
                     binding.downloadingButton.isVisible = true
                 }
