@@ -42,8 +42,10 @@ object Converters {
 
     @TypeConverter
     @JvmStatic
-    fun toIntList(value: String?): List<Int>? {
-        return value?.split(",")?.map { it.toInt() }
+    fun toIntList(value: String?): List<Int> {
+        if (value == null) return listOf()
+        if (value.isEmpty()) return listOf()
+        return value.split(",").map { it.toInt() }
     }
 
     @TypeConverter
@@ -112,7 +114,7 @@ object Converters {
     @TypeConverter
     @JvmStatic
     fun toOfflineAttemptSection(value: String?): OfflineAttemptSection? {
-        val offlineAttemptSectionType = object : TypeToken<OfflineUserUploadedFile>() {}.type
+        val offlineAttemptSectionType = object : TypeToken<OfflineAttemptSection>() {}.type
         return Gson().fromJson(value, offlineAttemptSectionType)
     }
 }

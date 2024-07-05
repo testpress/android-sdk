@@ -6,11 +6,14 @@ import `in`.testpress.exam.repository.AttemptRepository
 import `in`.testpress.exam.ui.TestFragment
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.CourseAttempt
+import `in`.testpress.models.greendao.Exam
 import `in`.testpress.network.Resource
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 class AttemptViewModel(val repository: AttemptRepository) : ViewModel() {
 
@@ -27,12 +30,19 @@ class AttemptViewModel(val repository: AttemptRepository) : ViewModel() {
     var isNextPageQuestionsBeingFetched: Boolean = false
     var currentQuestionPosition = 0
 
+    fun setExamAndAttempt(exam: Exam, attempt: Attempt){
+        repository.exam = exam
+        repository.attempt = attempt
+    }
+
     fun fetchAttemptItems(questionsUrlFrag: String, fetchSinglePageOnly: Boolean){
         repository.fetchAttemptItems(questionsUrlFrag, fetchSinglePageOnly)
     }
 
     fun saveAnswer(position: Int, attemptItem: AttemptItem, action: TestFragment.Action){
-        repository.saveAnswer(position, attemptItem, action)
+        viewModelScope.launch {
+            repository.saveAnswer(position, attemptItem, action)
+        }
     }
 
     fun updateSection(url: String, action: TestFragment.Action){

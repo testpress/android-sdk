@@ -2,8 +2,10 @@ package `in`.testpress.database.mapping
 
 import `in`.testpress.database.entities.OfflineAttemptSection
 import `in`.testpress.models.greendao.AttemptSection
+import android.util.Log
 
-fun OfflineAttemptSection.asGreenDoaModel(): AttemptSection {
+fun OfflineAttemptSection?.asGreenDoaModel(): AttemptSection? {
+    if (this == null) return null
     val attemptSection = AttemptSection()
     attemptSection.id = this.id
     attemptSection.state = this.state
@@ -19,8 +21,8 @@ fun OfflineAttemptSection.asGreenDoaModel(): AttemptSection {
     return attemptSection
 }
 
-fun List<OfflineAttemptSection>.asGreenDoaModels(): List<AttemptSection> {
+fun List<OfflineAttemptSection?>.asGreenDoaModels(): List<AttemptSection?> {
     return this.map {
-        it.asGreenDoaModel()
+        it?.asGreenDoaModel()
     }
 }

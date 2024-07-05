@@ -148,12 +148,12 @@ public class TestFragment extends BaseFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        attemptViewModel = AttemptViewModel.Companion.initializeViewModel(requireActivity());
         initializeAttemptAndExamVariables(savedInstanceState);
         instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
         eventsTrackerFacade = new EventsTrackerFacade(getContext());
         logEvent(EventsTrackerFacade.STARTED_EXAM);
         apiClient = new TestpressExamApiClient(getActivity());
-        attemptViewModel = AttemptViewModel.Companion.initializeViewModel(requireActivity());
     }
 
     private void logEvent(String name) {
@@ -175,7 +175,7 @@ public class TestFragment extends BaseFragment implements
             attempt = getArguments().getParcelable(PARAM_ATTEMPT);
             exam = getArguments().getParcelable(PARAM_EXAM);
         }
-
+        attemptViewModel.setExamAndAttempt(exam, attempt);
         if (savedInstanceState != null && savedInstanceState.getParcelable(PARAM_ATTEMPT) != null) {
             attempt = savedInstanceState.getParcelable(PARAM_ATTEMPT);
         }
@@ -807,11 +807,14 @@ public class TestFragment extends BaseFragment implements
     }
 
     private void fetchAttemptItems(){
-        String questionUrl = attempt.getQuestionsUrlFrag();
-        if (attempt.hasSectionalLock()) {
-            questionUrl = sections.get(attempt.getCurrentSectionPosition()).getQuestionsUrlFrag();
+        String questionUrl = "";
+        if (!exam.getIsOfflineExam()){
+            questionUrl =  attempt.getQuestionsUrlFrag();
+            if (attempt.hasSectionalLock()) {
+                questionUrl = sections.get(attempt.getCurrentSectionPosition()).getQuestionsUrlFrag();
+            }
+            questionUrl = questionUrl.replace("v2.3", "v2.2.1");
         }
-        questionUrl = questionUrl.replace("v2.3", "v2.2.1");
 
         if (attempt.hasSectionalLock()) {
             progressDialog.setMessage(getString(R.string.testpress_loading_section_questions,
