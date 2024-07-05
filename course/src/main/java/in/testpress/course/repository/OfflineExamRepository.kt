@@ -92,10 +92,12 @@ class OfflineExamRepository(val context: Context) {
                     override fun onSuccess(result: ApiResponse<NetworkOfflineQuestionResponse>) {
                         if (result.next != null) {
                             saveQuestionsToDB(result.results)
+                            updateOfflineExamDownloadPercent(examId, result.results!!.questions.size.toLong())
                             page++
                             fetchQuestionsPage()
                         } else {
                             saveQuestionsToDB(result.results)
+                            updateOfflineExamDownloadPercent(examId, result.results!!.questions.size.toLong())
                             _downloadExamResult.postValue(Resource.success(true))
                         }
                     }
@@ -107,6 +109,12 @@ class OfflineExamRepository(val context: Context) {
         }
 
         fetchQuestionsPage()
+    }
+
+    private fun updateOfflineExamDownloadPercent(examId: Long, count: Long){
+        CoroutineScope(Dispatchers.IO).launch {
+            offlineExamDao.updateDownloadedQuestion(examId, count)
+        }
     }
 
     private fun saveQuestionsToDB(response: NetworkOfflineQuestionResponse){

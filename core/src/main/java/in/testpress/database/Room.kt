@@ -30,8 +30,9 @@ import `in`.testpress.database.roommigration.RoomMigration21To22.MIGRATION_21_22
 import `in`.testpress.database.roommigration.RoomMigration22To23.MIGRATION_22_23
 import `in`.testpress.database.roommigration.RoomMigration23To24.MIGRATION_23_24
 import `in`.testpress.database.roommigration.RoomMigration24To25.MIGRATION_24_25
+import `in`.testpress.database.roommigration.RoomMigration25To26.MIGRATION_25_26
 
-@Database(version = 25,
+@Database(version = 26,
         entities = [
             ContentEntity::class,
             OfflineVideo::class,
@@ -96,7 +97,7 @@ abstract class TestpressDatabase : RoomDatabase() {
             MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14,
             MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19,
             MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24,
-            MIGRATION_24_25
+            MIGRATION_24_25, MIGRATION_25_26
         )
 
         operator fun invoke(context: Context): TestpressDatabase {

@@ -104,6 +104,11 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/TestpressTheme" />
 
+        <activity
+            android:name=".ui.OfflineExamListActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@style/TestpressTheme" />
+
         <service
             android:name=".services.VideoDownloadService"
             android:exported="false">
