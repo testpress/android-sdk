@@ -43,6 +43,7 @@ const val isOfflineExamSupportEnables = false
 open class BaseExamWidgetFragment : Fragment() {
     lateinit var startButton: Button
     lateinit var downloadExam: Button
+    lateinit var startExamOffline: Button
     protected lateinit var viewModel: ExamContentViewModel
     protected lateinit var content: DomainContent
     protected var contentId: Long = -1
@@ -76,6 +77,7 @@ open class BaseExamWidgetFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         startButton = view.findViewById(R.id.start_exam)
         downloadExam = view.findViewById(R.id.download_exam)
+        startExamOffline = view.findViewById(R.id.start_exam_offline)
         contentId = requireArguments().getLong(ContentActivity.CONTENT_ID)
 
         viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer {
