@@ -39,7 +39,7 @@ open class BaseExamWidgetFragment : Fragment() {
     protected lateinit var viewModel: ExamContentViewModel
     protected lateinit var content: DomainContent
     protected var contentId: Long = -1
-    lateinit var contentAttempts: ArrayList<DomainContentAttempt>
+    var contentAttempts: ArrayList<DomainContentAttempt> = arrayListOf()
     protected lateinit var examRefreshListener: ExamRefreshListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,11 +71,40 @@ open class BaseExamWidgetFragment : Fragment() {
             when (it?.status) {
                 Status.SUCCESS -> {
                     content = it.data!!
-                    loadAttemptsAndUpdateStartButton()
+                    if (!isContentLoaded(it.data!!)) {
+                        refetchContent(it.data!!.id)
+                    } else {
+                        display()
+                        loadAttemptsAndUpdateStartButton()
+                    }
                 }
                 else -> {}
             }
         })
+    }
+
+    private fun isContentLoaded(content: DomainContent): Boolean {
+        if(content.isLocked == true) return false
+        return when(content.contentType) {
+            "Exam" -> (content.exam != null) && (content.attemptsUrl != null)
+            else -> true
+        }
+    }
+
+    private fun refetchContent(id: Long) {
+        viewModel.getContent(id, forceRefresh = true)
+            .observe(viewLifecycleOwner, Observer { resource ->
+                when (resource.status) {
+                    Status.SUCCESS -> {
+                        content = resource.data!!
+                        loadAttemptsAndUpdateStartButton()
+                    }
+                    Status.ERROR -> {
+                        display()
+                    }
+                    else -> {}
+                }
+            })
     }
 
     fun loadAttemptsAndUpdateStartButton() {
