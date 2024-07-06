@@ -30,7 +30,7 @@ import kotlin.collections.HashMap
 class ExamRepository(val context: Context) {
 
     lateinit var exam : Exam
-    private val isOfflineExam: Boolean get() = exam.isOfflineExam
+    private val isOfflineExam: Boolean get() = exam.isOfflineExam ?: false
 
     private val database = TestpressDatabase.invoke(context)
     private val sectionsDao = database.sectionsDao()
