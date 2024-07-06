@@ -4,15 +4,12 @@ import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttemptItem
-import `in`.testpress.database.entities.OfflineCourseAttempt
-import `in`.testpress.database.mapping.asGreenDoaModel
 import `in`.testpress.database.mapping.asGreenDoaModels
 import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.models.AttemptItem
 import `in`.testpress.exam.network.NetworkAttemptSection
 import `in`.testpress.exam.network.asNetworkModel
-import `in`.testpress.exam.network.createAttemptSection
 import `in`.testpress.exam.ui.TestFragment.Action
 import `in`.testpress.exam.util.asAttemptItem
 import `in`.testpress.models.TestpressApiResponse
@@ -21,7 +18,6 @@ import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.models.greendao.Exam
 import `in`.testpress.network.Resource
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
@@ -107,8 +103,6 @@ class AttemptRepository(val context: Context) {
     private fun createOfflineAttemptItemItem() {
         CoroutineScope(Dispatchers.IO).launch {
             if (attempt.hasSectionalLock()){
-                Log.d("TAG", "createOfflineAttemptItemItem: ${attempt.sections.size}")
-                Log.d("TAG", "createOfflineAttemptItemItem: ${attempt.sections[attempt.currentSectionPosition].attemptSectionId}")
                 createOfflineAttemptItemForSections(attempt.sections[attempt.currentSectionPosition].attemptSectionId)
             } else {
                 createOfflineAttemptForAllQuestions()
@@ -119,7 +113,6 @@ class AttemptRepository(val context: Context) {
     private suspend fun createOfflineAttemptItemForSections(attemptSectionId: Long) {
         val offlineAttemptSection = offlineAttemptSectionDao.getByAttemptSectionId(attemptSectionId)
         val examQuestions = examQuestionDao.getExamQuestionsByExamIdAndSectionId(exam.id, offlineAttemptSection?.sectionId!!)
-        Log.d("TAG", "createOfflineAttemptItemForSections: ${examQuestions.size}")
         val offlineAttemptItems = examQuestions.map { examQuestion ->
             OfflineAttemptItem(
                 question = questionDao.getQuestionById(examQuestion.questionId!!)!!,
