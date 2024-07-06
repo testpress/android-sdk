@@ -28,7 +28,7 @@ class AttemptRepository(val context: Context) {
 
     lateinit var exam : Exam
     lateinit var attempt : Attempt
-    private val isOfflineExam: Boolean get() = exam.isOfflineExam
+    private val isOfflineExam: Boolean get() = exam.isOfflineExam ?: false
     var page = 1
     val attemptItem = mutableListOf<AttemptItem>()
     private var _totalQuestions = 0
