@@ -19,10 +19,18 @@ import `in`.testpress.course.ui.QuizActivity
 import `in`.testpress.course.ui.WebViewWithSSO
 import `in`.testpress.course.viewmodels.ExamContentViewModel
 import `in`.testpress.course.viewmodels.OfflineExamViewModel
+import `in`.testpress.database.entities.OfflineAttempt
+import `in`.testpress.database.entities.OfflineAttemptSection
+import `in`.testpress.database.entities.OfflineCourseAttempt
+import `in`.testpress.database.entities.OfflineExam
+import `in`.testpress.database.mapping.asGreenDaoModel
+import `in`.testpress.database.mapping.asGreenDoaModels
+import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.util.MultiLanguagesUtil
 import `in`.testpress.exam.util.RetakeExamUtil
+import `in`.testpress.models.greendao.Attempt
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -36,6 +44,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 open class BaseExamWidgetFragment : Fragment() {
     lateinit var startButton: Button
@@ -48,6 +59,10 @@ open class BaseExamWidgetFragment : Fragment() {
     var contentAttempts: ArrayList<DomainContentAttempt> = arrayListOf()
     protected lateinit var examRefreshListener: ExamRefreshListener
     protected lateinit var offlineExamViewModel: OfflineExamViewModel
+    var offlineExam: OfflineExam? = null
+    var offlineAttempt: OfflineAttempt? = null
+    var offlineContentAttempt: OfflineCourseAttempt? = null
+    var offlineAttemptSectionList: List<OfflineAttemptSection>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,29 +102,36 @@ open class BaseExamWidgetFragment : Fragment() {
                     } else {
                         display()
                         loadAttemptsAndUpdateStartButton()
+                        initializeObserversForOfflineDownload()
                     }
                 }
                 else -> {}
             }
         })
-        initializeObserversForOfflineDownload()
         addOnClickListeners()
     }
 
     private fun initializeObserversForOfflineDownload() {
         offlineExamViewModel.get(contentId).observe(requireActivity()) { offlineExam ->
+            this.offlineExam = offlineExam
             if (offlineExam == null) {
                 downloadExam.isVisible = true
             } else if (offlineExam.numberOfQuestions != offlineExam.downloadedQuestionCount.toInt()) {
                 downloadExam.isVisible = true
                 downloadExam.text = "Downloading..."
-                downloadExam.isClickable = false
             } else {
                 downloadExam.isVisible = false
-                startExamOffline.isVisible = true
-                resumeExamOffline.isVisible = true
+                CoroutineScope(Dispatchers.IO).launch {
+                    offlineAttempt = offlineExamViewModel.getOfflineAttemptsByExamIdAndState(content.examId!!,Attempt.RUNNING).lastOrNull()
+                    offlineAttempt?.let {
+                        offlineAttemptSectionList = offlineExamViewModel.getOfflineAttemptSectionList(it.id)
+                        offlineContentAttempt = offlineExamViewModel.getOfflineContentAttempts(it.id)
+                    }
+                    showOfflineExamButtons()
+                }
             }
         }
+
         offlineExamViewModel.downloadExamResult.observe(requireActivity()) { it ->
             when (it.status){
                 Status.SUCCESS -> {}
@@ -122,19 +144,48 @@ open class BaseExamWidgetFragment : Fragment() {
         }
     }
 
+    private fun showOfflineExamButtons(){
+        requireActivity().runOnUiThread {
+            if (offlineAttempt == null){
+                startExamOffline.isVisible = true
+            } else {
+                resumeExamOffline.isVisible = true
+            }
+        }
+    }
+
     private fun addOnClickListeners(){
         downloadExam.setOnClickListener {
-            if (downloadExam.text == "Downloading...") {
+            if (downloadExam.text.toString() == "Downloading...") {
                 Toast.makeText(requireContext(),"Please Wait downloading exam",Toast.LENGTH_SHORT).show()
             } else {
                 offlineExamViewModel.downloadExam(contentId)
             }
         }
         startExamOffline.setOnClickListener {
-
+            val greenDaoContent = content.getGreenDaoContent(requireContext())
+            greenDaoContent?.exam = offlineExam?.asGreenDaoModel()
+            TestpressExam.startCourseExam(
+                requireActivity(), greenDaoContent!!, false, false,
+                TestpressSdk.getTestpressSession(requireActivity())!!
+            )
         }
         resumeExamOffline.setOnClickListener {
-
+            val greenDaoContent = content.getGreenDaoContent(requireContext())
+            greenDaoContent?.exam = offlineExam?.asGreenDaoModel()
+            greenDaoContent?.exam?.pausedAttemptsCount = 1
+            val a = offlineContentAttempt?.createGreenDoaModel(
+                offlineAttempt!!.createGreenDoaModel(
+                    offlineAttemptSectionList!!.asGreenDoaModels()
+                )
+            )!!
+            TestpressExam.resumeCourseAttempt(
+                requireActivity(),
+                greenDaoContent!!,
+                a,
+                false,
+                TestpressSdk.getTestpressSession(requireActivity())!!
+            )
         }
     }
 
@@ -159,6 +210,7 @@ open class BaseExamWidgetFragment : Fragment() {
                     }
                     else -> {}
                 }
+                initializeObserversForOfflineDownload()
             })
     }
 
