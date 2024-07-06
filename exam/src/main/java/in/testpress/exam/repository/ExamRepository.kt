@@ -158,16 +158,26 @@ class ExamRepository(val context: Context) {
 
     fun startAttempt(attemptStartFrag: String) {
         _attemptResource.postValue(Resource.loading(null))
-        apiClient.startAttempt(attemptStartFrag).enqueue(object: TestpressCallback<Attempt>(){
-            override fun onSuccess(result: Attempt) {
-                _attemptResource.postValue(Resource.success(result))
+        if (isOfflineExam){
+            CoroutineScope(Dispatchers.IO).launch {
+                val offlineAttempt = offlineAttemptDao.getOfflineAttemptsByExamIdAndState(exam.id, Attempt.RUNNING).last()
+                val offlineAttemptSectionList = offlineAttemptSectionDao.getByAttemptId(offlineAttempt.id).sortedBy { it.order }
+                _attemptResource.postValue(Resource.success(
+                    offlineAttempt.createGreenDoaModel(offlineAttemptSectionList.asGreenDoaModels())
+                ))
             }
+        } else {
+            apiClient.startAttempt(attemptStartFrag).enqueue(object : TestpressCallback<Attempt>() {
+                override fun onSuccess(result: Attempt) {
+                    _attemptResource.postValue(Resource.success(result))
+                }
 
-            override fun onException(exception: TestpressException) {
-                _attemptResource.postValue(Resource.error(exception,null))
-            }
+                override fun onException(exception: TestpressException) {
+                    _attemptResource.postValue(Resource.error(exception, null))
+                }
 
-        })
+            })
+        }
     }
 
     fun endContentAttempt(attemptEndFrag: String) {

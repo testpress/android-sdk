@@ -108,6 +108,7 @@ open class BaseExamWidgetFragment : Fragment() {
                 downloadExam.text = "Downloading..."
             } else {
                 downloadExam.isVisible = false
+                startExamOffline.isVisible = true
             }
         }
 
