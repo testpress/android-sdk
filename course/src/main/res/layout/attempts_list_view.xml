@@ -63,6 +63,20 @@
             android:textColor="@android:color/white"
             android:textSize="16sp" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/resume_exam_offline"
+            android:layout_width="match_parent"
+            android:layout_height="37dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="30dp"
+            android:background="@drawable/testpress_green_curved_edge_background"
+            android:gravity="center"
+            android:visibility="gone"
+            android:text="Resume Exam Offline"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
     </LinearLayout>
 
 </LinearLayout>
