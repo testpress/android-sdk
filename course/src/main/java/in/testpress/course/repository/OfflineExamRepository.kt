@@ -136,6 +136,10 @@ class OfflineExamRepository(val context: Context) {
         )
     }
 
+    fun get(contentId: Long):LiveData<OfflineExam?>{
+        return offlineExamDao.get(contentId)
+    }
+
     fun getAll():LiveData<List<OfflineExam>>{
         return offlineExamDao.getAll()
     }
