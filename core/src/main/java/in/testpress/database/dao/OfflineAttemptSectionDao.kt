@@ -1,7 +1,6 @@
 package `in`.testpress.database.dao
 
 import `in`.testpress.database.BaseDao
-import `in`.testpress.database.entities.OfflineAttempt
 import `in`.testpress.database.entities.OfflineAttemptSection
 import androidx.room.Dao
 import androidx.room.Query
@@ -23,4 +22,7 @@ interface OfflineAttemptSectionDao: BaseDao<OfflineAttemptSection> {
 
     @Update
     suspend fun update(offlineAttemptSection: OfflineAttemptSection)
+
+    @Query("SELECT * FROM OfflineAttemptSection WHERE attemptId = :attemptId AND state IN (:states)")
+    suspend fun getOfflineAttemptSectionsByAttemptIdAndStates(attemptId: Long, states: List<String>): List<OfflineAttemptSection>
 }

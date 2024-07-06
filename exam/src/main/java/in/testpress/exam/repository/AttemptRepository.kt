@@ -256,6 +256,7 @@ class AttemptRepository(val context: Context) {
         _endContentAttemptResource.postValue(Resource.loading(null))
         if (isOfflineExam) {
             CoroutineScope(Dispatchers.IO).launch {
+                endAllOfflineAttemptSection()
                 offlineAttemptDao.updateAttemptState(attempt.id,Attempt.COMPLETED)
                 val offlineCourseAttempt = offlineCourseAttemptDao.getById(attempt.id)
                 _endContentAttemptResource.postValue(Resource.success(offlineCourseAttempt!!.createGreenDoaModel(attempt)))
@@ -278,6 +279,7 @@ class AttemptRepository(val context: Context) {
         _endAttemptResource.postValue(Resource.loading(null))
         if (isOfflineExam) {
             CoroutineScope(Dispatchers.IO).launch {
+                endAllOfflineAttemptSection()
                 offlineAttemptDao.updateAttemptState(attempt.id,Attempt.COMPLETED)
                 val offlineAttempt = offlineAttemptDao.getById(attempt.id)
                 val offlineAttemptSections = offlineAttemptSectionDao.getByAttemptId(attempt.id)
@@ -294,6 +296,18 @@ class AttemptRepository(val context: Context) {
                         _endAttemptResource.postValue(Resource.error(exception, null))
                     }
                 })
+        }
+    }
+
+    private suspend fun endAllOfflineAttemptSection() {
+        val runningOfflineAttemptSection =
+            offlineAttemptSectionDao.getOfflineAttemptSectionsByAttemptIdAndStates(
+                attempt.id,
+                listOf(Attempt.NOT_STARTED, Attempt.RUNNING)
+            )
+        runningOfflineAttemptSection.forEach {
+            it.state = Attempt.COMPLETED
+            offlineAttemptSectionDao.update(it)
         }
     }
 
