@@ -1080,8 +1080,7 @@ public class TestFragment extends BaseFragment implements
             attemptViewModel.resetPageCount();
             onSectionEnded();
         } else {
-            String questionUrl = greenDaoAttemptSection.getQuestionsUrlFrag();
-            questionUrl = questionUrl.replace("2.3","2.2");
+            String questionUrl = (exam.getIsOfflineExam()) ? "" : greenDaoAttemptSection.getQuestionsUrlFrag().replace("2.3", "2.2");
             attemptViewModel.clearAttemptItem();
             attemptViewModel.fetchAttemptItems(questionUrl, true);
         }
@@ -1130,7 +1129,8 @@ public class TestFragment extends BaseFragment implements
             onSectionEnded();
             return;
         }
-        attemptViewModel.updateSection(section.getEndUrlFrag(),Action.END_SECTION);
+        String sectionEndUrlFrag = (exam.getIsOfflineExam()) ? "" : section.getEndUrlFrag();
+        attemptViewModel.updateSection(sectionEndUrlFrag,Action.END_SECTION);
     }
 
     void onSectionEnded() {
@@ -1145,7 +1145,7 @@ public class TestFragment extends BaseFragment implements
     }
 
     void startSection() {
-        String sectionStartUrlFrag = sections.get(attempt.getCurrentSectionPosition()).getStartUrlFrag();
+        String sectionStartUrlFrag = (exam.getIsOfflineExam()) ? "" : sections.get(attempt.getCurrentSectionPosition()).getStartUrlFrag();
         attemptViewModel.updateSection(sectionStartUrlFrag,Action.START_SECTION);
     }
 
