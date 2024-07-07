@@ -659,8 +659,7 @@ public class TestActivity extends BaseToolBarActivity  {
         if (isPartialQuestions) {
             data.put(IS_PARTIAL, true);
         }
-        String attemptsUrl = courseContent.getAttemptsUrl();
-        attemptsUrl = attemptsUrl.replace("v2.3", "v2.2.1");
+        String attemptsUrl = exam.getIsOfflineExam() ? "" : courseContent.getAttemptsUrl().replace("v2.3", "v2.2.1");
         examViewModel.createContentAttempt(attemptsUrl, data);
     }
 
