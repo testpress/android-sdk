@@ -314,7 +314,6 @@ open class BaseExamWidgetFragment : Fragment() {
         greenDaoContent?.exam?.refresh()
         val languages = content.exam?.languages
         greenDaoContent?.exam?.languages = languages?.toGreenDaoModels()
-        greenDaoContent?.exam?.isOfflineExam = true
         TestpressExam.startCourseExam(
             requireActivity(), greenDaoContent!!, discardExamDetails, isPartial,
             TestpressSdk.getTestpressSession(requireActivity())!!
