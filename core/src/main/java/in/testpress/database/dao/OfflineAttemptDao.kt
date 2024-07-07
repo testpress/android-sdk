@@ -17,4 +17,8 @@ interface OfflineAttemptDao: BaseDao<OfflineAttempt>{
 
     @Query("UPDATE OfflineAttempt SET state = :state WHERE id = :attemptId")
     suspend fun updateAttemptState(attemptId: Long, state: String)
+
+    @Query("UPDATE OfflineAttempt SET remainingTime = :remainingTime, lastStartedTime = :lastStartedTime WHERE id = :attemptId")
+    suspend fun updateRemainingTimeAndLastStartedTime(attemptId: Long, remainingTime: String, lastStartedTime: String)
+
 }
