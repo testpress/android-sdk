@@ -159,7 +159,14 @@ class AttemptRepository(val context: Context) {
 
     suspend fun saveAnswer(position: Int, attemptItem: AttemptItem, action: Action, remainingTime: String) {
         if (isOfflineExam){
-            offlineAttemptDao.updateRemainingTimeAndLastStartedTime(attempt.id, remainingTime, Date().toString())
+            if (attempt.hasSectionalLock()){
+                offlineAttemptSectionDao.getRemainingTimeByAttemptSectionId(
+                    attempt.sections[attempt.currentSectionPosition].attemptSectionId,
+                    remainingTime
+                )
+            } else {
+                offlineAttemptDao.updateRemainingTimeAndLastStartedTime(attempt.id, remainingTime, Date().toString())
+            }
             updateLocalAttemptItem(attemptItem) { updateAttemptItem ->
                 _saveResultResource.postValue(Resource.success(Triple(position, updateAttemptItem, action)))
             }

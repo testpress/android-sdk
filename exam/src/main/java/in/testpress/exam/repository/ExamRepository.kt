@@ -68,7 +68,7 @@ class ExamRepository(val context: Context) {
             val (offlineAttempt, offlineCourseAttempt, offlineAttemptSections) = createOfflineAttempts()
             offlineCourseAttemptDao.insert(offlineCourseAttempt)
             offlineAttemptSectionDao.insertAll(offlineAttemptSections)
-            val attemptSections = offlineAttemptSections.asGreenDoaModels()
+            val attemptSections = offlineAttemptSectionDao.getByAttemptId(offlineAttempt.id).asGreenDoaModels()
             val attempt = offlineAttempt.createGreenDoaModel(attemptSections)
             val courseAttempt = offlineCourseAttempt.createGreenDoaModel(attempt)
             _contentAttemptResource.postValue(Resource.success(courseAttempt))
@@ -101,7 +101,7 @@ class ExamRepository(val context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             val (offlineAttempt, _, offlineAttemptSections) = createOfflineAttempts()
             offlineAttemptSectionDao.insertAll(offlineAttemptSections)
-            val attemptSections = offlineAttemptSections.asGreenDoaModels()
+            val attemptSections = offlineAttemptSectionDao.getByAttemptId(offlineAttempt.id).asGreenDoaModels()
             val attempt = offlineAttempt.createGreenDoaModel(attemptSections)
             _attemptResource.postValue(Resource.success(attempt))
         }
