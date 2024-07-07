@@ -16,4 +16,7 @@ interface OfflineAttemptItemDao : BaseDao<OfflineAttemptItem> {
 
     @Query("SELECT * FROM OfflineAttemptItem WHERE attemptId = :attemptId")
     suspend fun getOfflineAttemptItemByAttemptId(attemptId: Long): List<OfflineAttemptItem>
+
+    @Query("SELECT COUNT(*) FROM OfflineAttemptItem WHERE attemptId = :attemptId")
+    suspend fun getOfflineAttemptItemCountByAttemptId(attemptId: Long): Int
 }
