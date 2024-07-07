@@ -67,6 +67,8 @@ class OfflineExamListActivity : BaseToolBarActivity() {
 
             fun bind(exam: OfflineExam) {
                 binding.titleTextView.text = exam.title
+                binding.duration.text = exam.duration
+                binding.numberOfQuestions.text = exam.numberOfQuestions.toString()
                 binding.deleteButton.setOnClickListener {
                     offlineExamViewModel.deleteOfflineExam(exam.id!!)
                 }
