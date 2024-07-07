@@ -163,6 +163,7 @@ public class AttemptSection implements android.os.Parcelable {
         } else {
             id = in.readLong();
         }
+        attemptSectionId = in.readLong();
         state = in.readString();
         questionsUrl = in.readString();
         startUrl = in.readString();
@@ -191,6 +192,7 @@ public class AttemptSection implements android.os.Parcelable {
             dest.writeByte((byte) 1);
             dest.writeLong(id);
         }
+        dest.writeLong(attemptSectionId);
         dest.writeString(state);
         dest.writeString(questionsUrl);
         dest.writeString(startUrl);
