@@ -145,10 +145,13 @@ open class BaseExamWidgetFragment : Fragment() {
     }
 
     private fun showOfflineExamButtons(){
+        if (!this.isAdded) return
         requireActivity().runOnUiThread {
             if (offlineAttempt == null){
+                resumeExamOffline.isVisible = false
                 startExamOffline.isVisible = true
             } else {
+                startExamOffline.isVisible = false
                 resumeExamOffline.isVisible = true
             }
         }
