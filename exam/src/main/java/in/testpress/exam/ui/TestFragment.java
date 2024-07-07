@@ -914,7 +914,7 @@ public class TestFragment extends BaseFragment implements
             if (action != Action.UPDATE_ANSWER) {
                 showProgress(R.string.testpress_saving_last_change);
             }
-            attemptViewModel.saveAnswer(position,attemptItem,action);
+            attemptViewModel.saveAnswer(position,attemptItem,action, formatTime(millisRemaining));
         } else if (action.equals(Action.PAUSE)) {
             progressDialog.dismiss();
             returnToHistory();

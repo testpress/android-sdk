@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 
 class AttemptRepository(val context: Context) {
 
@@ -134,8 +135,9 @@ class AttemptRepository(val context: Context) {
         _attemptItemsResource.postValue(Resource.success(attemptItems))
     }
 
-    suspend fun saveAnswer(position: Int, attemptItem: AttemptItem, action: Action) {
+    suspend fun saveAnswer(position: Int, attemptItem: AttemptItem, action: Action, remainingTime: String) {
         if (isOfflineExam){
+            offlineAttemptDao.updateRemainingTimeAndLastStartedTime(attempt.id, remainingTime, Date().toString())
             updateLocalAttemptItem(attemptItem) { updateAttemptItem ->
                 _saveResultResource.postValue(Resource.success(Triple(position, updateAttemptItem, action)))
             }
