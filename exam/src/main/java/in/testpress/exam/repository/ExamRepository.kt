@@ -166,6 +166,7 @@ class ExamRepository(val context: Context) {
             override fun onException(exception: TestpressException) {
                 _attemptResource.postValue(Resource.error(exception,null))
             }
+
         })
     }
 

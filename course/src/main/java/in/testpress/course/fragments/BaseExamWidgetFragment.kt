@@ -46,7 +46,7 @@ open class BaseExamWidgetFragment : Fragment() {
     protected lateinit var viewModel: ExamContentViewModel
     protected lateinit var content: DomainContent
     protected var contentId: Long = -1
-    lateinit var contentAttempts: ArrayList<DomainContentAttempt>
+    var contentAttempts: ArrayList<DomainContentAttempt> = arrayListOf()
     protected lateinit var examRefreshListener: ExamRefreshListener
     protected lateinit var offlineExamViewModel: OfflineExamViewModel
     var offlineExam: OfflineExam? = null
