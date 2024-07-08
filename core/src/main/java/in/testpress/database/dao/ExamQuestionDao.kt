@@ -16,4 +16,7 @@ interface ExamQuestionDao: BaseDao<ExamQuestion> {
 
     @Query("SELECT * FROM ExamQuestion WHERE examId = :examId ORDER BY `order`")
     suspend fun getExamQuestionsByExamId(examId: Long): List<ExamQuestion>
+
+    @Query("SELECT * FROM ExamQuestion WHERE examId = :examId AND sectionId = :sectionId ORDER BY `order`")
+    suspend fun getExamQuestionsByExamIdAndSectionId(examId: Long, sectionId: Long): List<ExamQuestion>
 }

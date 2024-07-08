@@ -4,12 +4,12 @@ import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttemptItem
-import `in`.testpress.database.entities.OfflineCourseAttempt
 import `in`.testpress.database.mapping.asGreenDoaModels
 import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.models.AttemptItem
 import `in`.testpress.exam.network.NetworkAttemptSection
+import `in`.testpress.exam.network.asNetworkModel
 import `in`.testpress.exam.ui.TestFragment.Action
 import `in`.testpress.exam.util.asAttemptItem
 import `in`.testpress.models.TestpressApiResponse
@@ -102,11 +102,30 @@ class AttemptRepository(val context: Context) {
 
     private fun createOfflineAttemptItemItem() {
         CoroutineScope(Dispatchers.IO).launch {
-            createOfflineAttemptForAllQuestions()
+            if (attempt.hasSectionalLock()){
+                createOfflineAttemptItemsForSections(attempt.sections[attempt.currentSectionPosition].attemptSectionId)
+            } else {
+                createOfflineAttemptItemsForAllQuestions()
+            }
         }
     }
 
-    private suspend fun createOfflineAttemptForAllQuestions() {
+    private suspend fun createOfflineAttemptItemsForSections(attemptSectionId: Long) {
+        val offlineAttemptSection = offlineAttemptSectionDao.getByAttemptSectionId(attemptSectionId)
+        val examQuestions = examQuestionDao.getExamQuestionsByExamIdAndSectionId(exam.id, offlineAttemptSection?.sectionId!!)
+        val offlineAttemptItems = examQuestions.map { examQuestion ->
+            OfflineAttemptItem(
+                question = questionDao.getQuestionById(examQuestion.questionId!!)!!,
+                order = examQuestion.order!!,
+                attemptSection = offlineAttemptSectionDao.getBySectionId(examQuestion.sectionId),
+                attemptId = attempt.id
+            )
+        }
+        offlineAttemptItemDao.insertAll(offlineAttemptItems)
+        createAttemptItems()
+    }
+
+    private suspend fun createOfflineAttemptItemsForAllQuestions() {
         val examQuestions = examQuestionDao.getExamQuestionsByExamId(exam.id)
         val offlineAttemptItems = examQuestions.map { examQuestion ->
             OfflineAttemptItem(
@@ -117,11 +136,14 @@ class AttemptRepository(val context: Context) {
             )
         }
         offlineAttemptItemDao.insertAll(offlineAttemptItems)
-        createAttemptItem()
+        createAttemptItems()
     }
 
-    private suspend fun createAttemptItem(){
-        val offlineAttemptItems = offlineAttemptItemDao.getOfflineAttemptItemByAttemptId(attempt.id)
+    private suspend fun createAttemptItems(){
+        var offlineAttemptItems = offlineAttemptItemDao.getOfflineAttemptItemByAttemptId(attempt.id)
+        if (attempt.hasSectionalLock()){
+            offlineAttemptItems = offlineAttemptItems.filter { it.attemptSection!!.id.toInt() == attempt.currentSectionPosition  }
+        }
         val attemptItems = offlineAttemptItems.map { offlineAttemptItem ->
             val subject = offlineAttemptItem.question.subjectId?.let { subjectDao.getSubjectById(it) }
             val direction = offlineAttemptItem.question.directionId?.let { directionDao.getDirectionById(it) }
@@ -137,7 +159,14 @@ class AttemptRepository(val context: Context) {
 
     suspend fun saveAnswer(position: Int, attemptItem: AttemptItem, action: Action, remainingTime: String) {
         if (isOfflineExam){
-            offlineAttemptDao.updateRemainingTimeAndLastStartedTime(attempt.id, remainingTime, Date().toString())
+            if (attempt.hasSectionalLock()){
+                offlineAttemptSectionDao.getRemainingTimeByAttemptSectionId(
+                    attempt.sections[attempt.currentSectionPosition].attemptSectionId,
+                    remainingTime
+                )
+            } else {
+                offlineAttemptDao.updateRemainingTimeAndLastStartedTime(attempt.id, remainingTime, Date().toString())
+            }
             updateLocalAttemptItem(attemptItem) { updateAttemptItem ->
                 _saveResultResource.postValue(Resource.success(Triple(position, updateAttemptItem, action)))
             }
@@ -186,21 +215,48 @@ class AttemptRepository(val context: Context) {
 
     fun updateSection(url: String, action: Action) {
         _updateSectionResource.postValue(Resource.loading(Pair(null, action)))
-        apiClient.updateSection(url).enqueue(object : TestpressCallback<NetworkAttemptSection>() {
-            override fun onSuccess(result: NetworkAttemptSection) {
-                _updateSectionResource.postValue(Resource.success(Pair(result, action)))
+        if (isOfflineExam){
+            CoroutineScope(Dispatchers.IO).launch {
+                updateOfflineSection(action)
             }
+        } else {
+            apiClient.updateSection(url).enqueue(object : TestpressCallback<NetworkAttemptSection>() {
+                override fun onSuccess(result: NetworkAttemptSection) {
+                    _updateSectionResource.postValue(Resource.success(Pair(result, action)))
+                }
 
-            override fun onException(exception: TestpressException) {
-                _updateSectionResource.postValue(Resource.error(exception, Pair(null, action)))
+                override fun onException(exception: TestpressException) {
+                    _updateSectionResource.postValue(Resource.error(exception, Pair(null, action)))
+                }
+            })
+        }
+    }
+
+    private suspend fun updateOfflineSection(action: Action) {
+        when (action){
+            Action.END_SECTION -> {
+                val offlineAttemptSection = offlineAttemptSectionDao.getByAttemptIdAndId(attempt.id, attempt.currentSectionPosition.toLong())
+                offlineAttemptSection?.state = Attempt.COMPLETED
+                offlineAttemptSectionDao.update(offlineAttemptSection!!)
+                attemptItem.clear()
+                _updateSectionResource.postValue(Resource.success(Pair(offlineAttemptSection.asNetworkModel(), action)))
             }
-        })
+            Action.START_SECTION -> {
+                val offlineAttemptSection = offlineAttemptSectionDao.getByAttemptIdAndId(attempt.id, attempt.currentSectionPosition.toLong())
+                offlineAttemptSection?.state = Attempt.RUNNING
+                offlineAttemptSectionDao.update(offlineAttemptSection!!)
+                _updateSectionResource.postValue(Resource.success(Pair(offlineAttemptSection.asNetworkModel(), action)))
+            }
+            else -> {}
+        }
+
     }
 
     fun endContentAttempt(attemptEndFrag: String) {
         _endContentAttemptResource.postValue(Resource.loading(null))
         if (isOfflineExam) {
             CoroutineScope(Dispatchers.IO).launch {
+                endAllOfflineAttemptSection()
                 offlineAttemptDao.updateAttemptState(attempt.id,Attempt.COMPLETED)
                 val offlineCourseAttempt = offlineCourseAttemptDao.getById(attempt.id)
                 _endContentAttemptResource.postValue(Resource.success(offlineCourseAttempt!!.createGreenDoaModel(attempt)))
@@ -223,6 +279,7 @@ class AttemptRepository(val context: Context) {
         _endAttemptResource.postValue(Resource.loading(null))
         if (isOfflineExam) {
             CoroutineScope(Dispatchers.IO).launch {
+                endAllOfflineAttemptSection()
                 offlineAttemptDao.updateAttemptState(attempt.id,Attempt.COMPLETED)
                 val offlineAttempt = offlineAttemptDao.getById(attempt.id)
                 val offlineAttemptSections = offlineAttemptSectionDao.getByAttemptId(attempt.id)
@@ -239,6 +296,18 @@ class AttemptRepository(val context: Context) {
                         _endAttemptResource.postValue(Resource.error(exception, null))
                     }
                 })
+        }
+    }
+
+    private suspend fun endAllOfflineAttemptSection() {
+        val runningOfflineAttemptSection =
+            offlineAttemptSectionDao.getOfflineAttemptSectionsByAttemptIdAndStates(
+                attempt.id,
+                listOf(Attempt.NOT_STARTED, Attempt.RUNNING)
+            )
+        runningOfflineAttemptSection.forEach {
+            it.state = Attempt.COMPLETED
+            offlineAttemptSectionDao.update(it)
         }
     }
 
