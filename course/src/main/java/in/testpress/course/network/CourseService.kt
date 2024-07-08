@@ -3,8 +3,7 @@ package `in`.testpress.course.network
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.api.TestpressCourseApiClient
 import `in`.testpress.course.api.TestpressCourseApiClient.*
-import `in`.testpress.database.entities.ContentEntityLite
-import `in`.testpress.database.entities.ProductCategoryEntity
+import `in`.testpress.database.entities.*
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.exam.network.NetworkExamContent
@@ -97,6 +96,12 @@ interface CourseService {
     fun getExams(
         @QueryMap queryParams: HashMap<String, Any>
     ): RetrofitCall<ApiResponse<List<NetworkExamContent>>>
+
+    @GET("/api/v3/exams/{exam_id}/submit-offline-exam-answers/")
+    fun updateOfflineAnswers(
+        @Path(value = "exam_id", encoded = true) examId: Long,
+        @Body arguments: HashMap<String, Any>
+    ): RetrofitCall<String>
 }
 
 
@@ -174,5 +179,17 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         queryParams: HashMap<String, Any>
     ): RetrofitCall<ApiResponse<List<NetworkExamContent>>> {
         return getCourseService().getExams(queryParams)
+    }
+
+    fun updateOfflineAnswers(
+        examId: Long,
+        offlineAttempt: OfflineAttemptDetail,
+        offlineAnswers: List<OfflineAnswer>
+    ): RetrofitCall<String> {
+        val body = hashMapOf(
+            "offline_attempt" to offlineAttempt,
+            "offline_answers" to offlineAnswers
+        )
+        return getCourseService().updateOfflineAnswers(examId, body)
     }
 }

@@ -23,4 +23,7 @@ interface OfflineAttemptDao: BaseDao<OfflineAttempt>{
 
     @Query("SELECT * FROM OfflineAttempt WHERE examId = :examId AND state = :state")
     suspend fun getOfflineAttemptsByExamIdAndState(examId: Long, state: String): List<OfflineAttempt>
+
+    @Query("SELECT * FROM OfflineAttempt WHERE state = :state")
+    suspend fun getOfflineAttemptsByState(state: String): List<OfflineAttempt>
 }

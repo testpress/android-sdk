@@ -7,15 +7,13 @@ import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkOfflineQuestionResponse
 import `in`.testpress.course.network.asOfflineExam
 import `in`.testpress.database.TestpressDatabase
-import `in`.testpress.database.entities.OfflineAttempt
-import `in`.testpress.database.entities.OfflineAttemptSection
-import `in`.testpress.database.entities.OfflineCourseAttempt
-import `in`.testpress.database.entities.OfflineExam
+import `in`.testpress.database.entities.*
 import `in`.testpress.exam.network.NetworkExamContent
 import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.exam.network.asRoomModels
 import `in`.testpress.exam.network.getLastModifiedAsDate
 import `in`.testpress.models.TestpressApiResponse
+import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.network.Resource
 import `in`.testpress.network.RetrofitCall
 import `in`.testpress.util.PagedApiFetcher
@@ -42,6 +40,7 @@ class OfflineExamRepository(val context: Context) {
     private val offlineAttemptDao = database.offlineAttemptDao()
     private val offlineCourseAttemptDao = database.offlineCourseAttemptDao()
     private val offlineAttemptSectionDao = database.offlineAttemptSectionDao()
+    private val offlineAttemptItemDao = database.offlineAttemptItemDoa()
 
     private val _downloadExamResult = MutableLiveData<Resource<Boolean>>()
     val downloadExamResult: LiveData<Resource<Boolean>> get() = _downloadExamResult
@@ -218,5 +217,39 @@ class OfflineExamRepository(val context: Context) {
 
     suspend fun getOfflineAttemptSectionList(attemptId: Long): List<OfflineAttemptSection> {
         return offlineAttemptSectionDao.getByAttemptId(attemptId)
+    }
+
+    suspend fun syncCompletedAttemptToBackEnd() {
+        val completedOfflineAttempts =
+            offlineAttemptDao.getOfflineAttemptsByState(Attempt.COMPLETED)
+        completedOfflineAttempts.forEach { completedOfflineAttempt ->
+            val attemptItems =
+                offlineAttemptItemDao.getOfflineAttemptItemByAttemptId(completedOfflineAttempt.id)
+            val attemptAnswers = attemptItems.map { attemptItem ->
+                OfflineAnswer(
+                    examQuestionId = examQuestionDao.getExamQuestionIbdByExamIdAndQuestionId(
+                        completedOfflineAttempt.examId,
+                        attemptItem.question.id!!
+                    ),
+                    duration = null,
+                    selectedAnswers = attemptItem.savedAnswers,
+                    essayText = attemptItem.essayText,
+                    shortText = attemptItem.shortText,
+                    files = attemptItem.files.map { file -> File(file.url, file.url) },
+                    gapFillResponses = null
+                )
+            }
+
+            val offlineAttempt = OfflineAttemptDetail(
+                chapterContentId = offlineExamDao.getContentIdByExamId(completedOfflineAttempt.examId),
+                startedOn = completedOfflineAttempt.date,
+                completedOn = completedOfflineAttempt.lastStartedTime
+            )
+            courseClient.updateOfflineAnswers(
+                completedOfflineAttempt.examId,
+                offlineAttempt,
+                attemptAnswers
+            )
+        }
     }
 }
