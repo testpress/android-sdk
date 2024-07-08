@@ -26,4 +26,7 @@ interface OfflineAttemptDao: BaseDao<OfflineAttempt>{
 
     @Query("SELECT * FROM OfflineAttempt WHERE state = :state")
     suspend fun getOfflineAttemptsByState(state: String): List<OfflineAttempt>
+
+    @Query("DELETE FROM OfflineAttempt WHERE id = :attemptId")
+    suspend fun deleteByAttemptId(attemptId: Long)
 }

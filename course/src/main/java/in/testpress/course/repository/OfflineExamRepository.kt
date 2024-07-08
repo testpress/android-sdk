@@ -255,7 +255,7 @@ class OfflineExamRepository(val context: Context) {
                 attemptAnswers
             ).enqueue(object : TestpressCallback<HashMap<String,String>>(){
                 override fun onSuccess(result: HashMap<String,String>) {
-                    Log.d("TAG", "onSuccess: ")
+                    deleteSyncedAttempt(completedOfflineAttempt.id)
                 }
 
                 override fun onException(exception: TestpressException?) {
@@ -264,6 +264,15 @@ class OfflineExamRepository(val context: Context) {
                 }
 
             })
+        }
+    }
+
+    private fun deleteSyncedAttempt(attemptId: Long) {
+        CoroutineScope(Dispatchers.IO).launch {
+            offlineAttemptDao.deleteByAttemptId(attemptId)
+            offlineAttemptSectionDao.deleteByAttemptId(attemptId)
+            offlineAttemptItemDao.deleteByAttemptId(attemptId)
+            offlineCourseAttemptDao.deleteByAttemptId(attemptId)
         }
     }
 

@@ -29,4 +29,7 @@ interface OfflineAttemptSectionDao: BaseDao<OfflineAttemptSection> {
     @Query("UPDATE OfflineAttemptSection SET remainingTime = :remainingTime WHERE attemptSectionId = :attemptSectionId")
     suspend fun getRemainingTimeByAttemptSectionId(attemptSectionId: Long, remainingTime: String)
 
+    @Query("DELETE FROM OfflineAttemptSection WHERE attemptId = :attemptId")
+    suspend fun deleteByAttemptId(attemptId: Long)
+
 }
