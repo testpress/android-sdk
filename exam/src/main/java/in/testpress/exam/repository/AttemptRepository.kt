@@ -103,14 +103,14 @@ class AttemptRepository(val context: Context) {
     private fun createOfflineAttemptItemItem() {
         CoroutineScope(Dispatchers.IO).launch {
             if (attempt.hasSectionalLock()){
-                createOfflineAttemptItemForSections(attempt.sections[attempt.currentSectionPosition].attemptSectionId)
+                createOfflineAttemptItemsForSections(attempt.sections[attempt.currentSectionPosition].attemptSectionId)
             } else {
-                createOfflineAttemptForAllQuestions()
+                createOfflineAttemptItemsForAllQuestions()
             }
         }
     }
 
-    private suspend fun createOfflineAttemptItemForSections(attemptSectionId: Long) {
+    private suspend fun createOfflineAttemptItemsForSections(attemptSectionId: Long) {
         val offlineAttemptSection = offlineAttemptSectionDao.getByAttemptSectionId(attemptSectionId)
         val examQuestions = examQuestionDao.getExamQuestionsByExamIdAndSectionId(exam.id, offlineAttemptSection?.sectionId!!)
         val offlineAttemptItems = examQuestions.map { examQuestion ->
@@ -122,10 +122,10 @@ class AttemptRepository(val context: Context) {
             )
         }
         offlineAttemptItemDao.insertAll(offlineAttemptItems)
-        createAttemptItem()
+        createAttemptItems()
     }
 
-    private suspend fun createOfflineAttemptForAllQuestions() {
+    private suspend fun createOfflineAttemptItemsForAllQuestions() {
         val examQuestions = examQuestionDao.getExamQuestionsByExamId(exam.id)
         val offlineAttemptItems = examQuestions.map { examQuestion ->
             OfflineAttemptItem(
@@ -136,10 +136,10 @@ class AttemptRepository(val context: Context) {
             )
         }
         offlineAttemptItemDao.insertAll(offlineAttemptItems)
-        createAttemptItem()
+        createAttemptItems()
     }
 
-    private suspend fun createAttemptItem(){
+    private suspend fun createAttemptItems(){
         var offlineAttemptItems = offlineAttemptItemDao.getOfflineAttemptItemByAttemptId(attempt.id)
         if (attempt.hasSectionalLock()){
             offlineAttemptItems = offlineAttemptItems.filter { it.attemptSection!!.id.toInt() == attempt.currentSectionPosition  }
