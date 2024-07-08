@@ -45,6 +45,7 @@ class AttemptRepository(val context: Context) {
     private val offlineAttemptDao = database.offlineAttemptDao()
     private val offlineCourseAttemptDao = database.offlineCourseAttemptDao()
 
+
     private val apiClient: TestpressExamApiClient = TestpressExamApiClient(context)
     private val _attemptItemsResource = MutableLiveData<Resource<List<AttemptItem>>>()
     val attemptItemsResource: LiveData<Resource<List<AttemptItem>>> get() = _attemptItemsResource
@@ -101,7 +102,7 @@ class AttemptRepository(val context: Context) {
 
     private fun createOfflineAttemptItemItem() {
         CoroutineScope(Dispatchers.IO).launch {
-            if (attempt.hasSectionalLock()) {
+            if (attempt.hasSectionalLock()){
                 createOfflineAttemptItemsForSections(attempt.sections[attempt.currentSectionPosition].attemptSectionId)
             } else {
                 createOfflineAttemptItemsForAllQuestions()

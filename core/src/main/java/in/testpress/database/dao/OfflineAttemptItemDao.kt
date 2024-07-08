@@ -16,5 +16,4 @@ interface OfflineAttemptItemDao : BaseDao<OfflineAttemptItem> {
 
     @Query("SELECT * FROM OfflineAttemptItem WHERE attemptId = :attemptId")
     suspend fun getOfflineAttemptItemByAttemptId(attemptId: Long): List<OfflineAttemptItem>
-
 }

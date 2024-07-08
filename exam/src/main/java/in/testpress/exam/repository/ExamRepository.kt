@@ -158,13 +158,13 @@ class ExamRepository(val context: Context) {
 
     fun startAttempt(attemptStartFrag: String) {
         _attemptResource.postValue(Resource.loading(null))
-        apiClient.startAttempt(attemptStartFrag).enqueue(object : TestpressCallback<Attempt>() {
+        apiClient.startAttempt(attemptStartFrag).enqueue(object: TestpressCallback<Attempt>(){
             override fun onSuccess(result: Attempt) {
                 _attemptResource.postValue(Resource.success(result))
             }
 
             override fun onException(exception: TestpressException) {
-                _attemptResource.postValue(Resource.error(exception, null))
+                _attemptResource.postValue(Resource.error(exception,null))
             }
         })
     }
