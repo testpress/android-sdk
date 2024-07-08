@@ -4,7 +4,6 @@ import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttemptItem
-import `in`.testpress.database.entities.OfflineCourseAttempt
 import `in`.testpress.database.mapping.asGreenDoaModels
 import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.api.TestpressExamApiClient
