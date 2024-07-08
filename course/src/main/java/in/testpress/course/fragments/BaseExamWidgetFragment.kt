@@ -2,14 +2,11 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
-import `in`.testpress.course.domain.DomainContent
-import `in`.testpress.course.domain.DomainContentAttempt
+import `in`.testpress.course.domain.*
 import `in`.testpress.exam.domain.DomainExamContent
 import `in`.testpress.exam.domain.DomainLanguage
 import `in`.testpress.exam.domain.ExamTemplateType.IELTS_TEMPLATE
 import `in`.testpress.exam.domain.asGreenDaoModel
-import `in`.testpress.course.domain.getGreenDaoContent
-import `in`.testpress.course.domain.getGreenDaoContentAttempt
 import `in`.testpress.exam.domain.toGreenDaoModels
 import `in`.testpress.enums.Status
 import `in`.testpress.network.Resource
@@ -180,7 +177,7 @@ open class BaseExamWidgetFragment : Fragment() {
             val greenDaoContent = content.getGreenDaoContent(requireContext())
             greenDaoContent?.exam = offlineExam?.asGreenDaoModel()
             greenDaoContent?.exam?.pausedAttemptsCount = 1
-            val a = offlineContentAttempt?.createGreenDoaModel(
+            val pausedCourseAttempt = offlineContentAttempt?.createGreenDoaModel(
                 offlineAttempt!!.createGreenDoaModel(
                     offlineAttemptSectionList!!.asGreenDoaModels()
                 )
@@ -188,7 +185,7 @@ open class BaseExamWidgetFragment : Fragment() {
             TestpressExam.resumeCourseAttempt(
                 requireActivity(),
                 greenDaoContent!!,
-                a,
+                pausedCourseAttempt,
                 false,
                 TestpressSdk.getTestpressSession(requireActivity())!!
             )
