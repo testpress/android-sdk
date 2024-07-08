@@ -20,6 +20,7 @@ import `in`.testpress.course.ui.WebViewWithSSO
 import `in`.testpress.course.viewmodels.ExamContentViewModel
 import `in`.testpress.course.viewmodels.OfflineExamViewModel
 import `in`.testpress.database.entities.OfflineExam
+import `in`.testpress.database.mapping.asGreenDaoModel
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.util.MultiLanguagesUtil
@@ -131,6 +132,14 @@ open class BaseExamWidgetFragment : Fragment() {
             } else {
                 offlineExamViewModel.downloadExam(contentId)
             }
+        }
+        startExamOffline.setOnClickListener {
+            val greenDaoContent = content.getGreenDaoContent(requireContext())
+            greenDaoContent?.exam = offlineExam?.asGreenDaoModel()
+            TestpressExam.startCourseExam(
+                requireActivity(), greenDaoContent!!, false, false,
+                TestpressSdk.getTestpressSession(requireActivity())!!
+            )
         }
     }
 

@@ -916,9 +916,6 @@ public class TestFragment extends BaseFragment implements
             }
             attemptViewModel.saveAnswer(position,attemptItem,action, formatTime(millisRemaining));
         } else if (action.equals(Action.PAUSE)) {
-            if (exam.getIsOfflineExam()){
-                attemptViewModel.saveAnswer(position,attemptItem,action, formatTime(millisRemaining));
-            }
             progressDialog.dismiss();
             returnToHistory();
         }
