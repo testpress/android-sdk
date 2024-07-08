@@ -1,13 +1,13 @@
 package `in`.testpress.course.viewmodels
 
 import `in`.testpress.course.repository.OfflineExamRepository
-import `in`.testpress.database.entities.OfflineAttempt
-import `in`.testpress.database.entities.OfflineAttemptSection
-import `in`.testpress.database.entities.OfflineCourseAttempt
 import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.network.Resource
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
 class OfflineExamViewModel(private val repository: OfflineExamRepository) : ViewModel() {
@@ -40,18 +40,6 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
 
     fun syncExam(offlineExam: OfflineExam) {
         downloadExam(offlineExam.contentId!!)
-    }
-
-    suspend fun getOfflineContentAttempts(attemptId: Long): OfflineCourseAttempt? {
-        return repository.getOfflineContentAttempts(attemptId)
-    }
-
-    suspend fun getOfflineAttemptSectionList(attemptId: Long): List<OfflineAttemptSection> {
-        return repository.getOfflineAttemptSectionList(attemptId)
-    }
-
-    suspend fun getOfflineAttemptsByExamIdAndState(examId: Long, state: String): List<OfflineAttempt> {
-        return repository.getOfflineAttemptsByExamIdAndState(examId, state)
     }
 
     companion object {

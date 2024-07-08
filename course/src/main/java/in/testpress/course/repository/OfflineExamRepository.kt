@@ -7,9 +7,6 @@ import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkOfflineQuestionResponse
 import `in`.testpress.course.network.asOfflineExam
 import `in`.testpress.database.TestpressDatabase
-import `in`.testpress.database.entities.OfflineAttempt
-import `in`.testpress.database.entities.OfflineAttemptSection
-import `in`.testpress.database.entities.OfflineCourseAttempt
 import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.exam.network.NetworkExamContent
 import `in`.testpress.exam.network.NetworkLanguage
@@ -39,9 +36,6 @@ class OfflineExamRepository(val context: Context) {
     private val sectionsDao = database.sectionsDao()
     private val examQuestionDao = database.examQuestionDao()
     private val questionDao = database.questionDao()
-    private val offlineAttemptDao = database.offlineAttemptDao()
-    private val offlineCourseAttemptDao = database.offlineCourseAttemptDao()
-    private val offlineAttemptSectionDao = database.offlineAttemptSectionDao()
 
     private val _downloadExamResult = MutableLiveData<Resource<Boolean>>()
     val downloadExamResult: LiveData<Resource<Boolean>> get() = _downloadExamResult
@@ -206,17 +200,5 @@ class OfflineExamRepository(val context: Context) {
                 offlineExamDao.updateSyncRequired(networkExam.id, true)
             }
         }
-    }
-
-    suspend fun getOfflineAttemptsByExamIdAndState(examId: Long, state: String): List<OfflineAttempt> {
-        return offlineAttemptDao.getOfflineAttemptsByExamIdAndState(examId,state)
-    }
-
-    suspend fun getOfflineContentAttempts(attemptId: Long): OfflineCourseAttempt? {
-        return offlineCourseAttemptDao.getById(attemptId)
-    }
-
-    suspend fun getOfflineAttemptSectionList(attemptId: Long): List<OfflineAttemptSection> {
-        return offlineAttemptSectionDao.getByAttemptId(attemptId)
     }
 }
