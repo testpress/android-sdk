@@ -16,6 +16,7 @@ import `in`.testpress.exam.network.NetworkExamContent
 import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.exam.network.asRoomModels
 import `in`.testpress.exam.network.getLastModifiedAsDate
+import `in`.testpress.exam.ui.view.WebView
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.Content
@@ -29,6 +30,9 @@ import `in`.testpress.util.extension.isNotNullAndNotEmpty
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
 import android.util.Log
+import android.webkit.DownloadListener
+import android.webkit.WebSettings
+import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -113,16 +117,22 @@ class OfflineExamRepository(val context: Context) {
 
         fun fetchQuestionsPage() {
             val queryParams = hashMapOf<String, Any>("page" to page)
+            val examResporsos = mutableListOf<String>()
             courseClient.getQuestions(examId, queryParams)
                 .enqueue(object : TestpressCallback<ApiResponse<NetworkOfflineQuestionResponse>>() {
                     override fun onSuccess(result: ApiResponse<NetworkOfflineQuestionResponse>) {
                         if (result.next != null) {
                             saveQuestionsToDB(result.results)
+                            examResporsos.addAll(result.results.extractUrls())
                             updateOfflineExamDownloadPercent(examId, result.results!!.questions.size.toLong())
                             page++
                             fetchQuestionsPage()
                         } else {
+                            Log.d("TAG", "onSuccess: ${result.results.extractUrls()}")
+                            Log.d("TAG", "onSuccess: ${result.results.extractUrls().size}")
                             saveQuestionsToDB(result.results)
+                            examResporsos.addAll(result.results.extractUrls())
+                            downloadResources(examResporsos)
                             updateOfflineExamDownloadPercent(examId, result.results!!.questions.size.toLong())
                             updateDownloadedState(examId)
                             _downloadExamResult.postValue(Resource.success(true))
@@ -136,6 +146,29 @@ class OfflineExamRepository(val context: Context) {
         }
 
         fetchQuestionsPage()
+    }
+
+    private fun downloadResources(urls: List<String>){
+        CoroutineScope(Dispatchers.Main).launch {
+            Log.d("TAG", "downloadResources: ")
+            val totalUrl = urls.size
+            var currentUrlIndex = 0
+            val webView = WebView(context)
+            webView.settings.javaScriptEnabled = true
+            webView.settings.domStorageEnabled = true
+            webView.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+            webView.webViewClient = object: WebViewClient() {
+                override fun onPageFinished(view: android.webkit.WebView?, url: String?) {
+                    currentUrlIndex++
+                    if (currentUrlIndex == totalUrl){
+                        Log.d("TAG", "downloadResources: complete")
+                        return
+                    }
+                    webView.loadData(urls[currentUrlIndex],"text/html", "utf-8")
+                }
+            }
+            webView.loadData(urls[currentUrlIndex],"text/html", "utf-8")
+        }
     }
 
     private fun updateOfflineExamDownloadPercent(examId: Long, count: Long){
