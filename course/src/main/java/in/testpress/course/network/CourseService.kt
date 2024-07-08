@@ -15,6 +15,7 @@ import `in`.testpress.network.TestpressApiClient
 import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.ContentsListResponse
 import android.content.Context
+import android.util.Log
 import retrofit2.http.*
 
 interface CourseService {
@@ -97,11 +98,11 @@ interface CourseService {
         @QueryMap queryParams: HashMap<String, Any>
     ): RetrofitCall<ApiResponse<List<NetworkExamContent>>>
 
-    @GET("/api/v3/exams/{exam_id}/submit-offline-exam-answers/")
+    @POST("/api/v3/exams/{exam_id}/submit-offline-exam-answers/")
     fun updateOfflineAnswers(
         @Path(value = "exam_id", encoded = true) examId: Long,
         @Body arguments: HashMap<String, Any>
-    ): RetrofitCall<String>
+    ): RetrofitCall<HashMap<String,String>>
 }
 
 
@@ -185,7 +186,7 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         examId: Long,
         offlineAttempt: OfflineAttemptDetail,
         offlineAnswers: List<OfflineAnswer>
-    ): RetrofitCall<String> {
+    ): RetrofitCall<HashMap<String,String>> {
         val body = hashMapOf(
             "offline_attempt" to offlineAttempt,
             "offline_answers" to offlineAnswers

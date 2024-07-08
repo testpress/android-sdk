@@ -54,6 +54,12 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
         return repository.getOfflineAttemptsByExamIdAndState(examId, state)
     }
 
+    fun syncCompletedAttemptToBackEnd(){
+        viewModelScope.launch {
+            repository.syncCompletedAttemptToBackEnd()
+        }
+    }
+
     companion object {
         fun initializeViewModel(activity: FragmentActivity): OfflineExamViewModel {
             return ViewModelProvider(activity, object : ViewModelProvider.Factory {

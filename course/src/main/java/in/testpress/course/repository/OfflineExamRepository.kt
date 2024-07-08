@@ -21,10 +21,15 @@ import `in`.testpress.util.extension.isNotNull
 import `in`.testpress.util.extension.isNotNullAndNotEmpty
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+import kotlin.collections.HashMap
 
 class OfflineExamRepository(val context: Context) {
 
@@ -239,17 +244,33 @@ class OfflineExamRepository(val context: Context) {
                     gapFillResponses = null
                 )
             }
-
             val offlineAttempt = OfflineAttemptDetail(
                 chapterContentId = offlineExamDao.getContentIdByExamId(completedOfflineAttempt.examId),
-                startedOn = completedOfflineAttempt.date,
-                completedOn = completedOfflineAttempt.lastStartedTime
+                startedOn = convertDateStringToISO8601(completedOfflineAttempt.date),
+                completedOn = convertDateStringToISO8601(completedOfflineAttempt.lastStartedTime)
             )
             courseClient.updateOfflineAnswers(
                 completedOfflineAttempt.examId,
                 offlineAttempt,
                 attemptAnswers
-            )
+            ).enqueue(object : TestpressCallback<HashMap<String,String>>(){
+                override fun onSuccess(result: HashMap<String,String>) {
+                    Log.d("TAG", "onSuccess: ")
+                }
+
+                override fun onException(exception: TestpressException?) {
+                    Log.d("TAG", "onException: ")
+
+                }
+
+            })
         }
+    }
+
+    private fun convertDateStringToISO8601(dateString: String): String {
+        val inputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+        val zonedDateTime = ZonedDateTime.parse(dateString, inputFormatter)
+        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        return zonedDateTime.format(outputFormatter)
     }
 }
