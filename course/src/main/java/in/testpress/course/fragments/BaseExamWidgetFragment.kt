@@ -44,6 +44,7 @@ import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val isOfflineExamSupportEnables = false
 
@@ -126,7 +127,9 @@ open class BaseExamWidgetFragment : Fragment() {
                         offlineAttemptSectionList = offlineExamViewModel.getOfflineAttemptSectionList(it.id)
                         offlineContentAttempt = offlineExamViewModel.getOfflineContentAttempts(it.id)
                     }
-                    showOfflineExamButtons()
+                    withContext(Dispatchers.Main) {
+                        showOfflineExamButtons()
+                    }
                 }
             }
         }
@@ -143,16 +146,14 @@ open class BaseExamWidgetFragment : Fragment() {
         }
     }
 
-    private fun showOfflineExamButtons(){
+    private fun showOfflineExamButtons() {
         if (!this.isAdded) return
-        requireActivity().runOnUiThread {
-            if (offlineAttempt == null){
-                resumeExamOffline.isVisible = false
-                startExamOffline.isVisible = true
-            } else {
-                startExamOffline.isVisible = false
-                resumeExamOffline.isVisible = true
-            }
+        if (offlineAttempt == null) {
+            resumeExamOffline.isVisible = false
+            startExamOffline.isVisible = true
+        } else {
+            startExamOffline.isVisible = false
+            resumeExamOffline.isVisible = true
         }
     }
 
