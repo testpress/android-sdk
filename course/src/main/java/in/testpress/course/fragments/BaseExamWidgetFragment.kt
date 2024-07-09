@@ -23,6 +23,7 @@ import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.database.mapping.asGreenDaoModel
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
+import `in`.testpress.exam.domain.ExamTemplateType.CTET_TEMPLATE
 import `in`.testpress.exam.util.MultiLanguagesUtil
 import `in`.testpress.exam.util.RetakeExamUtil
 import android.content.Context
@@ -261,7 +262,7 @@ open class BaseExamWidgetFragment : Fragment() {
     }
 
     private fun initStartForFreshExam(exam: DomainExamContent) {
-        if (exam.templateType == IELTS_TEMPLATE) {
+        if (exam.templateType in listOf(IELTS_TEMPLATE, CTET_TEMPLATE)) {
             startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(requireActivity(), exam.asGreenDaoModel(), startButton) {
@@ -330,7 +331,7 @@ open class BaseExamWidgetFragment : Fragment() {
             }
             return
         }
-        if (exam.templateType == IELTS_TEMPLATE || exam.hasAudioQuestions == true) {
+        if (exam.templateType in listOf(IELTS_TEMPLATE, CTET_TEMPLATE) || exam.hasAudioQuestions == true) {
             startButton.setOnClickListener { startExamInWebview(content) }
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
