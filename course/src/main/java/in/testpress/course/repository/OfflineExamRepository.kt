@@ -68,12 +68,16 @@ class OfflineExamRepository(val context: Context) {
     }
 
     private fun handleExamDownloadSuccess(result: NetworkContent) {
-        val offlineExam = result.asOfflineExam()
-        offlineExamDao.insert(offlineExam)
-        if (offlineExam.id.isNotNull() && offlineExam.slug.isNotNullAndNotEmpty()) {
-            downloadLanguages(offlineExam.id!!, offlineExam.slug!!)
-        } else {
-            handleDownloadError(Exception("Exam Id or Exam Slug is empty"))
+        CoroutineScope(Dispatchers.IO).launch {
+            val offlineExam = result.asOfflineExam()
+            val pausedAttemptCount = offlineAttemptDao.getOfflineAttemptsByExamIdAndState(offlineExam.id!!,Attempt.RUNNING).size ?:0
+            offlineExam.pausedAttemptsCount = pausedAttemptCount
+            offlineExamDao.insert(offlineExam)
+            if (offlineExam.id.isNotNull() && offlineExam.slug.isNotNullAndNotEmpty()) {
+                downloadLanguages(offlineExam.id!!, offlineExam.slug!!)
+            } else {
+                handleDownloadError(Exception("Exam Id or Exam Slug is empty"))
+            }
         }
     }
 

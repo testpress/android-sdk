@@ -104,23 +104,10 @@
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/open_exam_detail"
-                android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:paddingHorizontal="16dp"
-                android:background="@drawable/testpress_primary_color_curved_edge_background"
-                android:gravity="center"
-                android:text="Go to Exam"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:visibility="gone" />
-
-            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/downloading_button"
                 android:layout_width="wrap_content"
                 android:layout_height="24dp"
                 android:paddingHorizontal="16dp"
-                android:layout_marginLeft="8dp"
                 android:background="@drawable/testpress_primary_color_curved_edge_background"
                 android:gravity="center"
                 android:text="Downloading..."
@@ -134,10 +121,34 @@
                 android:layout_width="wrap_content"
                 android:layout_height="24dp"
                 android:paddingHorizontal="16dp"
-                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:background="@drawable/testpress_primary_color_curved_edge_background"
                 android:gravity="center"
                 android:text="Required Sync"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/start_exam_offline"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/testpress_primary_color_curved_edge_background"
+                android:gravity="center"
+                android:text="Start Exam"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/resume_exam_offline"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/testpress_primary_color_curved_edge_background"
+                android:gravity="center"
+                android:text="Resume Exam"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:visibility="gone" />

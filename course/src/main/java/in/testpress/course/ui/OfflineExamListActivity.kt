@@ -1,11 +1,19 @@
 package `in`.testpress.course.ui
 
+import `in`.testpress.core.TestpressSDKDatabase
+import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.databinding.OfflineExamListActivityBinding
 import `in`.testpress.course.databinding.OfflineExamListItemBinding
 import `in`.testpress.course.viewmodels.OfflineExamViewModel
 import `in`.testpress.database.entities.OfflineExam
+import `in`.testpress.database.mapping.asGreenDaoModel
+import `in`.testpress.database.mapping.asGreenDoaModels
+import `in`.testpress.database.mapping.createGreenDoaModel
+import `in`.testpress.exam.TestpressExam
+import `in`.testpress.models.greendao.Attempt
+import `in`.testpress.models.greendao.Content
+import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.ui.BaseToolBarActivity
-import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +22,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class OfflineExamListActivity : BaseToolBarActivity() {
@@ -66,43 +78,118 @@ class OfflineExamListActivity : BaseToolBarActivity() {
             RecyclerView.ViewHolder(binding.root) {
 
             fun bind(exam: OfflineExam) {
+                updateExamDetails(exam)
+                deleteOnClickListener(exam)
+                syncOnClickListener(exam)
+                startExamOnClickListener(exam)
+                resumeExamOnClickListener(exam)
+                updateButtonVisibility(exam)
+            }
+
+            private fun updateExamDetails(exam: OfflineExam) {
                 binding.titleTextView.text = exam.title
                 binding.duration.text = exam.duration
                 binding.numberOfQuestions.text = exam.numberOfQuestions.toString()
+            }
+
+            private fun deleteOnClickListener(exam: OfflineExam) {
                 binding.deleteButton.setOnClickListener {
                     offlineExamViewModel.deleteOfflineExam(exam.id!!)
                 }
+            }
 
+            private fun syncOnClickListener(exam: OfflineExam) {
                 binding.syncButton.setOnClickListener {
                     offlineExamViewModel.syncExam(exam)
                 }
+            }
 
-                binding.openExamDetail.setOnClickListener {
-                    startActivity(
-                        ContentActivity.createIntent(
-                            exam.contentId,
-                            this@OfflineExamListActivity,
-                            ""
-                        )
-                    )
-                }
-                if (exam.downloadedQuestionCount.toInt() == exam.numberOfQuestions){
-                    binding.syncButton.isVisible = exam.isSyncRequired
-                    binding.openExamDetail.isVisible = !exam.isSyncRequired
-                    binding.deleteButton.isVisible = true
-                    binding.downloadingButton.isVisible = false
-                } else {
-                    binding.syncButton.isVisible = false
-                    binding.openExamDetail.isVisible = false
-                    binding.deleteButton.isVisible = false
-                    binding.downloadingButton.isVisible = true
+            private fun startExamOnClickListener(exam: OfflineExam) {
+                binding.startExamOffline.setOnClickListener {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val greenDaoContent = getContentFromDB(exam.contentId!!)
+                        greenDaoContent?.exam = exam.asGreenDaoModel()
+                        withContext(Dispatchers.Main) {
+                            TestpressExam.startCourseExam(
+                                this@OfflineExamListActivity, greenDaoContent!!, false, false,
+                                TestpressSdk.getTestpressSession(this@OfflineExamListActivity)!!
+                            )
+                        }
+                    }
                 }
             }
+
+            private fun resumeExamOnClickListener(exam: OfflineExam) {
+                binding.resumeExamOffline.setOnClickListener {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val greenDaoContent = getContentFromDB(exam.contentId!!)
+                        greenDaoContent?.exam = exam.asGreenDaoModel()
+                        val offlineAttempt =
+                            offlineExamViewModel.getOfflineAttemptsByExamIdAndState(
+                                exam.id!!,
+                                Attempt.RUNNING
+                            ).lastOrNull()
+                        offlineAttempt?.let {
+                            val offlineAttemptSectionList =
+                                offlineExamViewModel.getOfflineAttemptSectionList(it.id)
+                            val offlineContentAttempt =
+                                offlineExamViewModel.getOfflineContentAttempts(it.id)
+                            val pausedCourseAttempt = offlineContentAttempt?.createGreenDoaModel(
+                                offlineAttempt.createGreenDoaModel(
+                                    offlineAttemptSectionList.asGreenDoaModels()
+                                )
+                            )!!
+                            withContext(Dispatchers.Main) {
+                                TestpressExam.resumeCourseAttempt(
+                                    this@OfflineExamListActivity,
+                                    greenDaoContent!!,
+                                    pausedCourseAttempt,
+                                    false,
+                                    TestpressSdk.getTestpressSession(this@OfflineExamListActivity)!!
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            private fun updateButtonVisibility(exam: OfflineExam) {
+                if (exam.downloadedQuestionCount.toInt() == exam.numberOfQuestions) {
+                    binding.syncButton.isVisible = exam.isSyncRequired
+                    binding.startExamOffline.isVisible =
+                        !exam.isSyncRequired && (exam.pausedAttemptsCount ?: 0) == 0
+                    binding.deleteButton.isVisible = true
+                    binding.downloadingButton.isVisible = false
+                    binding.resumeExamOffline.isVisible = (exam.pausedAttemptsCount ?: 0) > 0
+                } else {
+                    binding.syncButton.isVisible = false
+                    binding.startExamOffline.isVisible = false
+                    binding.deleteButton.isVisible = false
+                    binding.downloadingButton.isVisible = true
+                    binding.resumeExamOffline.isVisible = false
+                }
+            }
+
+            private fun getContentFromDB(contentId: Long): Content? {
+                val contentDao = TestpressSDKDatabase.getContentDao(this@OfflineExamListActivity)
+                val contents =
+                    contentDao.queryBuilder().where(ContentDao.Properties.Id.eq(contentId)).list()
+
+                if (contents.isEmpty()) {
+                    return null
+                }
+                return contents[0]
+            }
+
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExamViewHolder {
             val binding =
-                OfflineExamListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                OfflineExamListItemBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
             return ExamViewHolder(binding)
         }
 

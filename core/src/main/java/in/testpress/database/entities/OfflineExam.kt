@@ -12,7 +12,7 @@ data class OfflineExam(
     val totalMarks: String? = null,
     val url: String? = null,
     val attemptsCount: Int? = null,
-    val pausedAttemptsCount: Int? = null,
+    var pausedAttemptsCount: Int? = null,
     val title: String? = null,
     val description: String? = null,
     val startDate: String? = null,
