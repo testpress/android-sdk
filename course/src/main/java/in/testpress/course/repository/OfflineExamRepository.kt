@@ -37,7 +37,6 @@ class OfflineExamRepository(val context: Context) {
     private val examQuestionDao = database.examQuestionDao()
     private val questionDao = database.questionDao()
 
-
     private val _downloadExamResult = MutableLiveData<Resource<Boolean>>()
     val downloadExamResult: LiveData<Resource<Boolean>> get() = _downloadExamResult
 
