@@ -4,7 +4,6 @@ import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttemptItem
-import `in`.testpress.database.entities.OfflineCourseAttempt
 import `in`.testpress.database.mapping.asGreenDoaModels
 import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.api.TestpressExamApiClient
@@ -104,31 +103,39 @@ class AttemptRepository(val context: Context) {
 
     private fun createOfflineAttemptItemItem() {
         CoroutineScope(Dispatchers.IO).launch {
-            if (isAttemptItemAlreadyCreated()){
-                if (attempt.hasSectionalLock()){
-                    if (isAttemptItemAlreadyCreatedForSection()){
-                        createAttemptItems()
-                    } else {
-                        createOfflineAttemptItemsForSections(attempt.sections[attempt.currentSectionPosition].attemptSectionId)
-                    }
-                } else {
-                    createAttemptItems()
-                }
+            if (isAttemptItemsAlreadyCreated()) {
+                handleExistingAttemptItems()
             } else {
-                if (attempt.hasSectionalLock()){
-                    createOfflineAttemptItemsForSections(attempt.sections[attempt.currentSectionPosition].attemptSectionId)
-                } else {
-                    createOfflineAttemptItemsForAllQuestions()
-                }
+                handleNewAttemptItems()
             }
         }
     }
 
-    private suspend fun isAttemptItemAlreadyCreated():Boolean{
+    private suspend fun handleExistingAttemptItems() {
+        if (attempt.hasSectionalLock()) {
+            if (isAttemptItemsAlreadyCreatedForSection()) {
+                getAttemptItems()
+            } else {
+                createOfflineAttemptItemsForSections(attempt.sections[attempt.currentSectionPosition].attemptSectionId)
+            }
+        } else {
+            getAttemptItems()
+        }
+    }
+
+    private suspend fun handleNewAttemptItems() {
+        if (attempt.hasSectionalLock()) {
+            createOfflineAttemptItemsForSections(attempt.sections[attempt.currentSectionPosition].attemptSectionId)
+        } else {
+            createOfflineAttemptItemsForAllQuestions()
+        }
+    }
+
+    private suspend fun isAttemptItemsAlreadyCreated():Boolean{
         return offlineAttemptItemDao.getOfflineAttemptItemCountByAttemptId(attempt.id) != 0
     }
 
-    private suspend fun isAttemptItemAlreadyCreatedForSection():Boolean{
+    private suspend fun isAttemptItemsAlreadyCreatedForSection():Boolean{
         var offlineAttemptItems = offlineAttemptItemDao.getOfflineAttemptItemByAttemptId(attempt.id)
         if (attempt.hasSectionalLock()){
             offlineAttemptItems = offlineAttemptItems.filter { it.attemptSection!!.id.toInt() == attempt.currentSectionPosition  }
@@ -148,7 +155,7 @@ class AttemptRepository(val context: Context) {
             )
         }
         offlineAttemptItemDao.insertAll(offlineAttemptItems)
-        createAttemptItems()
+        getAttemptItems()
     }
 
     private suspend fun createOfflineAttemptItemsForAllQuestions() {
@@ -162,10 +169,10 @@ class AttemptRepository(val context: Context) {
             )
         }
         offlineAttemptItemDao.insertAll(offlineAttemptItems)
-        createAttemptItems()
+        getAttemptItems()
     }
 
-    private suspend fun createAttemptItems(){
+    private suspend fun getAttemptItems(){
         var offlineAttemptItems = offlineAttemptItemDao.getOfflineAttemptItemByAttemptId(attempt.id)
         if (attempt.hasSectionalLock()){
             offlineAttemptItems = offlineAttemptItems.filter { it.attemptSection!!.id.toInt() == attempt.currentSectionPosition  }
