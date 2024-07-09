@@ -20,6 +20,7 @@ import `in`.testpress.course.ui.WebViewWithSSO
 import `in`.testpress.course.viewmodels.ExamContentViewModel
 import `in`.testpress.course.viewmodels.OfflineExamViewModel
 import `in`.testpress.database.entities.OfflineExam
+import `in`.testpress.database.mapping.asGreenDaoModel
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.util.MultiLanguagesUtil
@@ -43,6 +44,7 @@ const val isOfflineExamSupportEnables = false
 open class BaseExamWidgetFragment : Fragment() {
     lateinit var startButton: Button
     lateinit var downloadExam: Button
+    lateinit var startExamOffline: Button
     protected lateinit var viewModel: ExamContentViewModel
     protected lateinit var content: DomainContent
     protected var contentId: Long = -1
@@ -76,6 +78,7 @@ open class BaseExamWidgetFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         startButton = view.findViewById(R.id.start_exam)
         downloadExam = view.findViewById(R.id.download_exam)
+        startExamOffline = view.findViewById(R.id.start_exam_offline)
         contentId = requireArguments().getLong(ContentActivity.CONTENT_ID)
 
         viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer {
@@ -106,6 +109,7 @@ open class BaseExamWidgetFragment : Fragment() {
                 downloadExam.text = "Downloading..."
             } else {
                 downloadExam.isVisible = false
+                startExamOffline.isVisible = true
             }
         }
 
@@ -128,6 +132,14 @@ open class BaseExamWidgetFragment : Fragment() {
             } else {
                 offlineExamViewModel.downloadExam(contentId)
             }
+        }
+        startExamOffline.setOnClickListener {
+            val greenDaoContent = content.getGreenDaoContent(requireContext())
+            greenDaoContent?.exam = offlineExam?.asGreenDaoModel()
+            TestpressExam.startCourseExam(
+                requireActivity(), greenDaoContent!!, false, false,
+                TestpressSdk.getTestpressSession(requireActivity())!!
+            )
         }
     }
 
