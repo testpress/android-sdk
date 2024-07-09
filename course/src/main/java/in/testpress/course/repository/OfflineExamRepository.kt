@@ -21,7 +21,6 @@ import `in`.testpress.util.extension.isNotNull
 import `in`.testpress.util.extension.isNotNullAndNotEmpty
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -240,7 +239,7 @@ class OfflineExamRepository(val context: Context) {
                     selectedAnswers = attemptItem.savedAnswers,
                     essayText = attemptItem.essayText,
                     shortText = attemptItem.shortText,
-                    files = attemptItem.files.map { file -> File(file.url, file.url) },
+                    files = null,
                     gapFillResponses = null
                 )
             }
@@ -259,7 +258,6 @@ class OfflineExamRepository(val context: Context) {
                 }
 
                 override fun onException(exception: TestpressException?) {
-                    Log.d("TAG", "onException: ")
 
                 }
 
