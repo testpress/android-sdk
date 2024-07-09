@@ -30,7 +30,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
@@ -264,7 +263,6 @@ open class BaseExamWidgetFragment : Fragment() {
 
     private fun initStartForFreshExam(exam: DomainExamContent) {
         if (exam.templateType in listOf(IELTS_TEMPLATE, CTET_TEMPLATE)) {
-
             startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(requireActivity(), exam.asGreenDaoModel(), startButton) {
