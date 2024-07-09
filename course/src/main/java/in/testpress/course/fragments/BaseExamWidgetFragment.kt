@@ -23,7 +23,6 @@ import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.database.mapping.asGreenDaoModel
 import `in`.testpress.database.mapping.asGreenDoaModels
 import `in`.testpress.database.mapping.createGreenDoaModel
-import `in`.testpress.database.mapping.asGreenDaoModel
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.util.MultiLanguagesUtil
