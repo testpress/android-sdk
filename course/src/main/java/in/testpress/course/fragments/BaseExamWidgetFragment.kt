@@ -23,12 +23,14 @@ import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.database.mapping.asGreenDaoModel
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
+import `in`.testpress.exam.domain.ExamTemplateType.CTET_TEMPLATE
 import `in`.testpress.exam.util.MultiLanguagesUtil
 import `in`.testpress.exam.util.RetakeExamUtil
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
@@ -261,7 +263,8 @@ open class BaseExamWidgetFragment : Fragment() {
     }
 
     private fun initStartForFreshExam(exam: DomainExamContent) {
-        if (exam.templateType == IELTS_TEMPLATE) {
+        if (exam.templateType in listOf(IELTS_TEMPLATE, CTET_TEMPLATE)) {
+
             startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(requireActivity(), exam.asGreenDaoModel(), startButton) {
@@ -330,7 +333,7 @@ open class BaseExamWidgetFragment : Fragment() {
             }
             return
         }
-        if (exam.templateType == IELTS_TEMPLATE || exam.hasAudioQuestions == true) {
+        if (exam.templateType in listOf(IELTS_TEMPLATE, CTET_TEMPLATE) || exam.hasAudioQuestions == true) {
             startButton.setOnClickListener { startExamInWebview(content) }
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {

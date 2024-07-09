@@ -191,4 +191,5 @@ fun DomainExamContent.asGreenDaoModel(): Exam {
 
 object ExamTemplateType{
     val IELTS_TEMPLATE  = 12
+    val CTET_TEMPLATE = 15
 }
