@@ -25,6 +25,7 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -254,7 +255,9 @@ class OfflineExamRepository(val context: Context) {
                 attemptAnswers
             ).enqueue(object : TestpressCallback<HashMap<String,String>>(){
                 override fun onSuccess(result: HashMap<String,String>) {
-                    deleteSyncedAttempt(completedOfflineAttempt.id)
+                    if (result.getValue("message") == "Exam answers are being processed"){
+                        deleteSyncedAttempt(completedOfflineAttempt.id)
+                    }
                 }
 
                 override fun onException(exception: TestpressException?) {
@@ -277,7 +280,8 @@ class OfflineExamRepository(val context: Context) {
     private fun convertDateStringToISO8601(dateString: String): String {
         val inputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
         val zonedDateTime = ZonedDateTime.parse(dateString, inputFormatter)
+        val utcDateTime = zonedDateTime.withZoneSameInstant(ZoneId.of("UTC"))
         val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
-        return zonedDateTime.format(outputFormatter)
+        return utcDateTime.format(outputFormatter)
     }
 }
