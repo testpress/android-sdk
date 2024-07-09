@@ -47,9 +47,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-const val isOfflineExamSupportEnables = true
-
-const val isOfflineExamSupportEnables = true
+const val isOfflineExamSupportEnables = false
 
 open class BaseExamWidgetFragment : Fragment() {
     lateinit var startButton: Button
