@@ -21,6 +21,7 @@ import `in`.testpress.util.extension.isNotNull
 import `in`.testpress.util.extension.isNotNullAndNotEmpty
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -227,9 +228,12 @@ class OfflineExamRepository(val context: Context) {
     suspend fun syncCompletedAttemptToBackEnd() {
         val completedOfflineAttempts =
             offlineAttemptDao.getOfflineAttemptsByState(Attempt.COMPLETED)
+
         completedOfflineAttempts.forEach { completedOfflineAttempt ->
+
             val attemptItems =
                 offlineAttemptItemDao.getOfflineAttemptItemByAttemptId(completedOfflineAttempt.id)
+
             val attemptAnswers = attemptItems.map { attemptItem ->
                 OfflineAnswer(
                     examQuestionId = examQuestionDao.getExamQuestionIbdByExamIdAndQuestionId(
@@ -244,26 +248,27 @@ class OfflineExamRepository(val context: Context) {
                     gapFillResponses = null
                 )
             }
+
             val offlineAttempt = OfflineAttemptDetail(
                 chapterContentId = offlineExamDao.getContentIdByExamId(completedOfflineAttempt.examId),
                 startedOn = convertDateStringToISO8601(completedOfflineAttempt.date),
                 completedOn = convertDateStringToISO8601(completedOfflineAttempt.lastStartedTime)
             )
+
             courseClient.updateOfflineAnswers(
                 completedOfflineAttempt.examId,
                 offlineAttempt,
                 attemptAnswers
-            ).enqueue(object : TestpressCallback<HashMap<String,String>>(){
-                override fun onSuccess(result: HashMap<String,String>) {
-                    if (result.getValue("message") == "Exam answers are being processed"){
+            ).enqueue(object : TestpressCallback<HashMap<String, String>>() {
+                override fun onSuccess(result: HashMap<String, String>) {
+                    if (result["message"] == "Exam answers are being processed") {
                         deleteSyncedAttempt(completedOfflineAttempt.id)
                     }
                 }
 
                 override fun onException(exception: TestpressException?) {
-
+                    Log.e("OfflineExamRepository", "Failed to update offline answers", exception)
                 }
-
             })
         }
     }
