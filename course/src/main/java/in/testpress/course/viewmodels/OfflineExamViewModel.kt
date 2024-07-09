@@ -2,10 +2,8 @@ package `in`.testpress.course.viewmodels
 
 import `in`.testpress.course.repository.OfflineExamRepository
 import `in`.testpress.database.entities.OfflineExam
-import `in`.testpress.exam.repository.ExamRepository
-import `in`.testpress.exam.ui.viewmodel.ExamViewModel
 import `in`.testpress.network.Resource
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -22,6 +20,10 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
 
     fun getAll(): LiveData<List<OfflineExam>>{
         return repository.getAll()
+    }
+
+    fun get(contentId: Long): LiveData<OfflineExam?> {
+        return repository.get(contentId)
     }
 
     fun deleteOfflineExam(examId: Long) {
@@ -41,7 +43,7 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
     }
 
     companion object {
-        fun initializeViewModel(activity: AppCompatActivity): OfflineExamViewModel {
+        fun initializeViewModel(activity: FragmentActivity): OfflineExamViewModel {
             return ViewModelProvider(activity, object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return OfflineExamViewModel(

@@ -18,6 +18,8 @@ import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.QuizActivity
 import `in`.testpress.course.ui.WebViewWithSSO
 import `in`.testpress.course.viewmodels.ExamContentViewModel
+import `in`.testpress.course.viewmodels.OfflineExamViewModel
+import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.util.MultiLanguagesUtil
@@ -28,19 +30,26 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
+const val isOfflineExamSupportEnables = false
+
 open class BaseExamWidgetFragment : Fragment() {
     lateinit var startButton: Button
+    lateinit var downloadExam: Button
     protected lateinit var viewModel: ExamContentViewModel
     protected lateinit var content: DomainContent
     protected var contentId: Long = -1
     var contentAttempts: ArrayList<DomainContentAttempt> = arrayListOf()
     protected lateinit var examRefreshListener: ExamRefreshListener
+    protected lateinit var offlineExamViewModel: OfflineExamViewModel
+    var offlineExam: OfflineExam? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +60,7 @@ open class BaseExamWidgetFragment : Fragment() {
                 ) as T
             }
         }).get(ExamContentViewModel::class.java)
+        offlineExamViewModel = OfflineExamViewModel.initializeViewModel(requireActivity())
     }
 
     override fun onAttach(context: Context) {
@@ -65,6 +75,7 @@ open class BaseExamWidgetFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         startButton = view.findViewById(R.id.start_exam)
+        downloadExam = view.findViewById(R.id.download_exam)
         contentId = requireArguments().getLong(ContentActivity.CONTENT_ID)
 
         viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer {
@@ -76,11 +87,48 @@ open class BaseExamWidgetFragment : Fragment() {
                     } else {
                         display()
                         loadAttemptsAndUpdateStartButton()
+                        initializeObserversForOfflineDownload()
                     }
                 }
                 else -> {}
             }
         })
+        addOnClickListeners()
+    }
+
+    private fun initializeObserversForOfflineDownload() {
+        offlineExamViewModel.get(contentId).observe(requireActivity()) { offlineExam ->
+            this.offlineExam = offlineExam
+            if (offlineExam == null) {
+                downloadExam.isVisible = true && isOfflineExamSupportEnables
+            } else if (offlineExam.numberOfQuestions != offlineExam.downloadedQuestionCount.toInt()) {
+                downloadExam.isVisible = true && isOfflineExamSupportEnables
+                downloadExam.text = "Downloading..."
+            } else {
+                downloadExam.isVisible = false
+            }
+        }
+
+        offlineExamViewModel.downloadExamResult.observe(requireActivity()) { it ->
+            when (it.status){
+                Status.SUCCESS -> {}
+                Status.LOADING -> {}
+                Status.ERROR -> {
+                    Toast.makeText(requireContext(),"Please check your internet connection",Toast.LENGTH_SHORT).show()
+                }
+                else -> {}
+            }
+        }
+    }
+
+    private fun addOnClickListeners(){
+        downloadExam.setOnClickListener {
+            if (downloadExam.text.toString() == "Downloading...") {
+                Toast.makeText(requireContext(),"Please Wait downloading exam",Toast.LENGTH_SHORT).show()
+            } else {
+                offlineExamViewModel.downloadExam(contentId)
+            }
+        }
     }
 
     private fun isContentLoaded(content: DomainContent): Boolean {
@@ -104,6 +152,7 @@ open class BaseExamWidgetFragment : Fragment() {
                     }
                     else -> {}
                 }
+                initializeObserversForOfflineDownload()
             })
     }
 

@@ -17,7 +17,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom">
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/start_exam"
@@ -33,5 +34,20 @@
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/download_exam"
+            android:layout_width="match_parent"
+            android:layout_height="37dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="30dp"
+            android:background="@drawable/testpress_green_curved_edge_background"
+            android:gravity="center"
+            android:visibility="gone"
+            android:text="Download Exam"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
     </LinearLayout>
 </LinearLayout>

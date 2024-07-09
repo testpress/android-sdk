@@ -12,6 +12,9 @@ interface OfflineExamDao: BaseDao<OfflineExam> {
     @Query("SELECT * FROM OfflineExam")
     fun getAll() : LiveData<List<OfflineExam>>
 
+    @Query("SELECT * FROM OfflineExam WHERE contentId = :contentId")
+    fun get(contentId: Long) : LiveData<OfflineExam?>
+
     @Query("DELETE FROM OfflineExam WHERE id = :examId")
     suspend fun deleteById(examId: Long)
 
