@@ -236,7 +236,7 @@ class OfflineExamRepository(val context: Context) {
 
             val attemptAnswers = attemptItems.map { attemptItem ->
                 OfflineAnswer(
-                    examQuestionId = examQuestionDao.getExamQuestionIbdByExamIdAndQuestionId(
+                    examQuestionId = examQuestionDao.getExamQuestionIdByExamIdAndQuestionId(
                         completedOfflineAttempt.examId,
                         attemptItem.question.id!!
                     ),

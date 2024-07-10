@@ -15,7 +15,6 @@ import `in`.testpress.network.TestpressApiClient
 import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.ContentsListResponse
 import android.content.Context
-import android.util.Log
 import retrofit2.http.*
 
 interface CourseService {
