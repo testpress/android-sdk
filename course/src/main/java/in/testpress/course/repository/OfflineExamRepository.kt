@@ -7,15 +7,13 @@ import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkOfflineQuestionResponse
 import `in`.testpress.course.network.asOfflineExam
 import `in`.testpress.database.TestpressDatabase
-import `in`.testpress.database.entities.OfflineAttempt
-import `in`.testpress.database.entities.OfflineAttemptSection
-import `in`.testpress.database.entities.OfflineCourseAttempt
-import `in`.testpress.database.entities.OfflineExam
+import `in`.testpress.database.entities.*
 import `in`.testpress.exam.network.NetworkExamContent
 import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.exam.network.asRoomModels
 import `in`.testpress.exam.network.getLastModifiedAsDate
 import `in`.testpress.models.TestpressApiResponse
+import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.network.Resource
 import `in`.testpress.network.RetrofitCall
 import `in`.testpress.util.PagedApiFetcher
@@ -23,10 +21,16 @@ import `in`.testpress.util.extension.isNotNull
 import `in`.testpress.util.extension.isNotNullAndNotEmpty
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+import kotlin.collections.HashMap
 
 class OfflineExamRepository(val context: Context) {
 
@@ -42,6 +46,7 @@ class OfflineExamRepository(val context: Context) {
     private val offlineAttemptDao = database.offlineAttemptDao()
     private val offlineCourseAttemptDao = database.offlineCourseAttemptDao()
     private val offlineAttemptSectionDao = database.offlineAttemptSectionDao()
+    private val offlineAttemptItemDao = database.offlineAttemptItemDoa()
 
     private val _downloadExamResult = MutableLiveData<Resource<Boolean>>()
     val downloadExamResult: LiveData<Resource<Boolean>> get() = _downloadExamResult
@@ -218,5 +223,70 @@ class OfflineExamRepository(val context: Context) {
 
     suspend fun getOfflineAttemptSectionList(attemptId: Long): List<OfflineAttemptSection> {
         return offlineAttemptSectionDao.getByAttemptId(attemptId)
+    }
+
+    suspend fun syncCompletedAttemptToBackEnd() {
+        val completedOfflineAttempts =
+            offlineAttemptDao.getOfflineAttemptsByState(Attempt.COMPLETED)
+
+        completedOfflineAttempts.forEach { completedOfflineAttempt ->
+
+            val attemptItems =
+                offlineAttemptItemDao.getOfflineAttemptItemByAttemptId(completedOfflineAttempt.id)
+
+            val attemptAnswers = attemptItems.map { attemptItem ->
+                OfflineAnswer(
+                    examQuestionId = examQuestionDao.getExamQuestionIdByExamIdAndQuestionId(
+                        completedOfflineAttempt.examId,
+                        attemptItem.question.id!!
+                    ),
+                    duration = null,
+                    selectedAnswers = attemptItem.savedAnswers,
+                    essayText = attemptItem.essayText,
+                    shortText = attemptItem.shortText,
+                    files = null,
+                    gapFillResponses = null
+                )
+            }
+
+            val offlineAttempt = OfflineAttemptDetail(
+                chapterContentId = offlineExamDao.getContentIdByExamId(completedOfflineAttempt.examId),
+                startedOn = convertDateStringToISO8601(completedOfflineAttempt.date),
+                completedOn = convertDateStringToISO8601(completedOfflineAttempt.lastStartedTime)
+            )
+
+            courseClient.updateOfflineAnswers(
+                completedOfflineAttempt.examId,
+                offlineAttempt,
+                attemptAnswers
+            ).enqueue(object : TestpressCallback<HashMap<String, String>>() {
+                override fun onSuccess(result: HashMap<String, String>) {
+                    if (result["message"] == "Exam answers are being processed") {
+                        deleteSyncedAttempt(completedOfflineAttempt.id)
+                    }
+                }
+
+                override fun onException(exception: TestpressException?) {
+                    Log.e("OfflineExamRepository", "Failed to update offline answers", exception)
+                }
+            })
+        }
+    }
+
+    private fun deleteSyncedAttempt(attemptId: Long) {
+        CoroutineScope(Dispatchers.IO).launch {
+            offlineAttemptDao.deleteByAttemptId(attemptId)
+            offlineAttemptSectionDao.deleteByAttemptId(attemptId)
+            offlineAttemptItemDao.deleteByAttemptId(attemptId)
+            offlineCourseAttemptDao.deleteByAttemptId(attemptId)
+        }
+    }
+
+    private fun convertDateStringToISO8601(dateString: String): String {
+        val inputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+        val zonedDateTime = ZonedDateTime.parse(dateString, inputFormatter)
+        val utcDateTime = zonedDateTime.withZoneSameInstant(ZoneId.of("UTC"))
+        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        return utcDateTime.format(outputFormatter)
     }
 }

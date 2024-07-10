@@ -19,4 +19,7 @@ interface OfflineAttemptItemDao : BaseDao<OfflineAttemptItem> {
 
     @Query("SELECT COUNT(*) FROM OfflineAttemptItem WHERE attemptId = :attemptId")
     suspend fun getOfflineAttemptItemCountByAttemptId(attemptId: Long): Int
+
+    @Query("DELETE FROM OfflineAttemptItem WHERE attemptId = :attemptId")
+    suspend fun deleteByAttemptId(attemptId: Long)
 }
