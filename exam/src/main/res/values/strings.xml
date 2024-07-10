@@ -60,7 +60,9 @@
     <string name="testpress_page_review">Marked for Review</string>
 
     <string name="testpress_pause">PAUSE</string>
+    <string name="testpress_resume_exam_online">RESUME EXAM ONLINE</string>
     <string name="testpress_resume">RESUME</string>
+    <string name="testpress_retake_exam_online">RETAKE EXAM ONLINE</string>
     <string name="testpress_retake">RETAKE</string>
     <string name="testpress_review">REVIEW</string>
     <string name="testpress_retake_exam">Retake Exam</string>
