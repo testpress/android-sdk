@@ -8,5 +8,5 @@ import androidx.room.Query
 @Dao
 interface OfflineCourseAttemptDao: BaseDao<OfflineCourseAttempt> {
     @Query("SELECT * FROM OfflineCourseAttempt WHERE assessmentId = :attemptId")
-    fun getById(attemptId: Long): OfflineCourseAttempt?
+    suspend fun getById(attemptId: Long): OfflineCourseAttempt?
 }
