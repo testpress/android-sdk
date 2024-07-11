@@ -33,6 +33,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -1166,6 +1167,7 @@ public class TestFragment extends BaseFragment implements
                             progressDialog.dismiss();
                         }
                         if (exam.getIsOfflineExam()){
+                            Toast.makeText(requireActivity(),"Connect you internet to know your results",Toast.LENGTH_SHORT).show();
                             returnToHistory();
                             return;
                         }
@@ -1209,6 +1211,7 @@ public class TestFragment extends BaseFragment implements
                             progressDialog.dismiss();
                         }
                         if (exam.getIsOfflineExam()){
+                            Toast.makeText(requireActivity(),"Connect you internet to know your results",Toast.LENGTH_SHORT).show();
                             returnToHistory();
                             return;
                         }
