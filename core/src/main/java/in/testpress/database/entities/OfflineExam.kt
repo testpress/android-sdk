@@ -56,4 +56,11 @@ data class OfflineExam(
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX")
         return examDataModifiedOn?.let { dateFormat.parse(it) }
     }
+
+    fun getDownloadProgress(): Int {
+        if (numberOfQuestions != null && numberOfQuestions > 0) {
+            return ((downloadedQuestionCount * 100) / numberOfQuestions).toInt()
+        }
+        return 0
+    }
 }
