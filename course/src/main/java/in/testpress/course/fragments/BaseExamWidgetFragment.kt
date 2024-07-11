@@ -103,7 +103,6 @@ open class BaseExamWidgetFragment : Fragment() {
                     } else {
                         display()
                         loadAttemptsAndUpdateStartButton()
-                        initializeObserversForOfflineDownload()
                     }
                 }
                 else -> {}
@@ -112,7 +111,7 @@ open class BaseExamWidgetFragment : Fragment() {
         addOnClickListeners()
     }
 
-    private fun initializeObserversForOfflineDownload() {
+    protected fun initializeObserversForOfflineDownload() {
         offlineExamViewModel.get(contentId).observe(requireActivity()) { offlineExam ->
             this.offlineExam = offlineExam
             if (offlineExam == null) {
@@ -214,7 +213,6 @@ open class BaseExamWidgetFragment : Fragment() {
                     }
                     else -> {}
                 }
-                initializeObserversForOfflineDownload()
             })
     }
 
@@ -226,6 +224,7 @@ open class BaseExamWidgetFragment : Fragment() {
                     var exam = content.exam!!
                     exam.languages = resource.data!!
                     content.exam = exam
+                    display()
                     updateStartButton(contentAttempts)
                 }
                 else -> {
@@ -244,7 +243,6 @@ open class BaseExamWidgetFragment : Fragment() {
                 when (resource.status) {
                     Status.SUCCESS -> {
                         contentAttempts = resource.data!!
-                        display()
                         val exam = content.exam!!
                         examRefreshListener.showOrHideRefresh(true)
                         viewModel.getLanguages(exam.slug!!, exam.id)

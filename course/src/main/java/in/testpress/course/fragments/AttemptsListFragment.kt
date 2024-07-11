@@ -30,6 +30,7 @@ open class AttemptsListFragment : BaseExamWidgetFragment() {
     }
 
     override fun display() {
+        initializeObserversForOfflineDownload()
         val greenDaoContent = content.getGreenDaoContent(requireContext())
         val attempts = content.getGreenDaoContentAttempts(requireContext())
         attemptList.isNestedScrollingEnabled = false
