@@ -8,6 +8,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import androidx.core.content.ContextCompat;
+
+import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -19,6 +21,9 @@ import android.webkit.WebViewClient;
 
 import java.util.List;
 
+import in.testpress.core.TestpressSdk;
+import in.testpress.core.TestpressSession;
+import in.testpress.models.InstituteSettings;
 import in.testpress.ui.ZoomableImageActivity;
 
 public class WebViewUtils {
@@ -357,6 +362,10 @@ public class WebViewUtils {
     }
 
     protected void onClickImage(String url, Activity activity) {
+        TestpressSession session = TestpressSdk.getTestpressSession(activity);
+        if (Boolean.TRUE.equals(session.getInstituteSettings().getDisableImageFullscreenZoomInExam())) {
+           return;
+        }
         activity.startActivity(ZoomableImageActivity.createIntent(url, activity));
     }
 
