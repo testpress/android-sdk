@@ -1167,7 +1167,7 @@ public class TestFragment extends BaseFragment implements
                             progressDialog.dismiss();
                         }
                         if (exam.getIsOfflineExam()){
-                            Toast.makeText(requireActivity(),"Connect you internet to know your results",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireActivity(),"Connect your internet to know your results.",Toast.LENGTH_SHORT).show();
                             returnToHistory();
                             return;
                         }
@@ -1211,7 +1211,7 @@ public class TestFragment extends BaseFragment implements
                             progressDialog.dismiss();
                         }
                         if (exam.getIsOfflineExam()){
-                            Toast.makeText(requireActivity(),"Connect you internet to know your results",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireActivity(),"Connect your internet to know your results.",Toast.LENGTH_SHORT).show();
                             returnToHistory();
                             return;
                         }
