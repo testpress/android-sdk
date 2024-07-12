@@ -5,6 +5,7 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.databinding.OfflineExamListActivityBinding
 import `in`.testpress.course.databinding.OfflineExamListItemBinding
+import `in`.testpress.course.util.SwipeToDeleteCallback
 import `in`.testpress.course.viewmodels.OfflineExamViewModel
 import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.database.mapping.asGreenDaoModel
@@ -51,7 +52,6 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         initializeListView()
         syncExamsModifiedDates()
         syncCompletedAttempts()
-
     }
 
     private fun initializeViewModel() {
@@ -61,79 +61,10 @@ class OfflineExamListActivity : BaseToolBarActivity() {
     private fun initializeListAdapter() {
         offlineExamAdapter = OfflineExamAdapter()
         binding.recyclerView.adapter = offlineExamAdapter
-        val itemTouchHelper = ItemTouchHelper(simpleCallback)
+        val deleteIcon = ContextCompat.getDrawable(this, R.drawable.ic_baseline_delete_forever_24)
+        val swipeToDeleteCallback = SwipeToDeleteCallback(offlineExamAdapter, deleteIcon!!)
+        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
         itemTouchHelper.attachToRecyclerView(binding.recyclerView)
-    }
-
-    private val simpleCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-
-        private val scaleFactor = 0.2f
-        private var scale = 0.0f
-
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder
-        ): Boolean {
-            return false
-        }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            val position = viewHolder.bindingAdapterPosition
-            offlineExamAdapter.removeItem(position)
-        }
-
-        override fun onChildDraw(
-            c: Canvas,
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            dX: Float,
-            dY: Float,
-            actionState: Int,
-            isCurrentlyActive: Boolean
-        ) {
-            val itemView = viewHolder.itemView
-            val background = ColorDrawable(Color.RED)
-            val iconMargin = (itemView.height - deleteIcon.intrinsicHeight) / 2
-
-            if (dX < 0) { // Swiping to the left
-                background.setBounds(
-                    itemView.right + dX.toInt(),
-                    itemView.top,
-                    itemView.right,
-                    itemView.bottom
-                )
-
-                val swipePercentage = kotlin.math.abs(dX) / viewHolder.itemView.width
-                scale = when {
-                    swipePercentage <= scaleFactor -> {
-                        swipePercentage / scaleFactor
-                    }
-                    else -> {
-                        1.0f
-                    }
-                }
-
-                deleteIcon.setBounds(
-                    itemView.right - iconMargin - (deleteIcon.intrinsicWidth * scale).toInt(),
-                    itemView.top + iconMargin + (deleteIcon.intrinsicHeight * (1 - scale) / 2).toInt(),
-                    itemView.right - iconMargin,
-                    itemView.bottom - iconMargin - (deleteIcon.intrinsicHeight * (1 - scale) / 2).toInt()
-                )
-            } else {
-                background.setBounds(0, 0, 0, 0)
-                deleteIcon.setBounds(0, 0, 0, 0)
-            }
-
-            background.draw(c)
-            deleteIcon.draw(c)
-
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-        }
-    }
-
-    private val deleteIcon: Drawable by lazy {
-        ContextCompat.getDrawable(this, R.drawable.ic_baseline_delete_forever_24)!!
     }
 
     private fun initializeListView() {
@@ -205,28 +136,14 @@ class OfflineExamListActivity : BaseToolBarActivity() {
 
             private fun resumeExam(exam: OfflineExam) {
                 CoroutineScope(Dispatchers.IO).launch {
-                    val greenDaoContent = getContentFromDB(exam.contentId!!)
-                    greenDaoContent?.exam = exam.asGreenDaoModel()
-                    val offlineAttempt =
-                        offlineExamViewModel.getOfflineAttemptsByExamIdAndState(
-                            exam.id!!,
-                            Attempt.RUNNING
-                        ).lastOrNull()
-                    offlineAttempt?.let {
-                        val offlineAttemptSectionList =
-                            offlineExamViewModel.getOfflineAttemptSectionList(it.id)
-                        val offlineContentAttempt =
-                            offlineExamViewModel.getOfflineContentAttempts(it.id)
-                        val pausedCourseAttempt = offlineContentAttempt?.createGreenDoaModel(
-                            offlineAttempt.createGreenDoaModel(
-                                offlineAttemptSectionList.asGreenDoaModels()
-                            )
-                        )!!
+                    val content = offlineExamViewModel.getOfflineExamContent(exam.contentId!!)
+                    val pausedAttempt = offlineExamViewModel.getOfflinePausedAttempt(exam.id!!)
+                    if (content != null && pausedAttempt != null) {
                         withContext(Dispatchers.Main) {
                             TestpressExam.resumeCourseAttempt(
                                 this@OfflineExamListActivity,
-                                greenDaoContent!!,
-                                pausedCourseAttempt,
+                                content,
+                                pausedAttempt,
                                 false,
                                 TestpressSdk.getTestpressSession(this@OfflineExamListActivity)!!
                             )
@@ -235,30 +152,18 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                 }
             }
 
-            private fun getContentFromDB(contentId: Long): Content? {
-                val contentDao = TestpressSDKDatabase.getContentDao(this@OfflineExamListActivity)
-                val contents =
-                    contentDao.queryBuilder().where(ContentDao.Properties.Id.eq(contentId)).list()
-
-                if (contents.isEmpty()) {
-                    return null
-                }
-                return contents[0]
-            }
-
             private fun startExam(exam: OfflineExam) {
                 CoroutineScope(Dispatchers.IO).launch {
-                    val greenDaoContent = getContentFromDB(exam.contentId!!)
-                    greenDaoContent?.exam = exam.asGreenDaoModel()
-                    withContext(Dispatchers.Main) {
-                        TestpressExam.startCourseExam(
-                            this@OfflineExamListActivity, greenDaoContent!!, false, false,
-                            TestpressSdk.getTestpressSession(this@OfflineExamListActivity)!!
-                        )
+                    offlineExamViewModel.getOfflineExamContent(exam.contentId!!)?.let { content ->
+                        withContext(Dispatchers.Main) {
+                            TestpressExam.startCourseExam(
+                                this@OfflineExamListActivity, content, false, false,
+                                TestpressSdk.getTestpressSession(this@OfflineExamListActivity)!!
+                            )
+                        }
                     }
                 }
             }
-
         }
     }
 
