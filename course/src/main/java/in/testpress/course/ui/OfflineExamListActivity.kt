@@ -26,6 +26,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -66,9 +67,8 @@ class OfflineExamListActivity : BaseToolBarActivity() {
 
     private val simpleCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
-        private val scaleFactor = 0.2f // Swipe distance percentage to trigger scale effect
-        private var scale = 0.0f // Initial scale value for pop-out animation
-
+        private val scaleFactor = 0.2f
+        private var scale = 0.0f
 
         override fun onMove(
             recyclerView: RecyclerView,
@@ -142,9 +142,6 @@ class OfflineExamListActivity : BaseToolBarActivity() {
             binding.recyclerView.visibility = if (exams.isEmpty()) View.GONE else View.VISIBLE
             binding.noDataLayout.visibility = if (exams.isEmpty()) View.VISIBLE else View.GONE
         }
-        binding.recyclerView.addItemDecoration(
-            DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        )
     }
 
     private fun syncExamsModifiedDates() {
@@ -203,6 +200,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                 binding.examTitle.text = exam.title
                 binding.duration.text = exam.duration
                 binding.numberOfQuestions.text = exam.numberOfQuestions.toString()
+                binding.examResumeState.isVisible = ((exam.pausedAttemptsCount ?: 0) > 0)
             }
 
             private fun resumeExam(exam: OfflineExam) {

@@ -79,25 +79,13 @@
 
     </LinearLayout>
 
-
     <ImageView
+        android:id="@+id/exam_resume_state"
         android:layout_width="5dp"
         android:layout_height="5dp"
+        android:visibility="gone"
         android:layout_alignParentRight="true"
         android:background="@drawable/orange_circle"
         android:layout_centerVertical="true"/>
-
-<!--    <TextView-->
-<!--        android:id="@+id/textView"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_alignParentRight="true"-->
-<!--        android:layout_centerVertical="true"-->
-<!--        android:textColor="@android:color/white"-->
-<!--        android:paddingHorizontal="4dp"-->
-<!--        android:textSize="14sp"-->
-<!--        android:text="15/80"-->
-<!--        android:background="@drawable/orange_circle"-->
-<!--    />-->
 
 </RelativeLayout>
