@@ -33,6 +33,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -808,7 +809,7 @@ public class TestFragment extends BaseFragment implements
 
     private void fetchAttemptItems(){
         String questionUrl = "";
-        if (!exam.getIsOfflineExam()){
+        if (!isOfflineExam()){
             questionUrl =  attempt.getQuestionsUrlFrag();
             if (attempt.hasSectionalLock()) {
                 questionUrl = sections.get(attempt.getCurrentSectionPosition()).getQuestionsUrlFrag();
@@ -916,7 +917,7 @@ public class TestFragment extends BaseFragment implements
             }
             attemptViewModel.saveAnswer(position,attemptItem,action, formatTime(millisRemaining));
         } else if (action.equals(Action.PAUSE)) {
-            if (exam.getIsOfflineExam()){
+            if (isOfflineExam()){
                 attemptViewModel.saveAnswer(position,attemptItem,action, formatTime(millisRemaining));
             }
             progressDialog.dismiss();
@@ -1083,7 +1084,7 @@ public class TestFragment extends BaseFragment implements
             attemptViewModel.resetPageCount();
             onSectionEnded();
         } else {
-            String questionUrl = (exam.getIsOfflineExam()) ? "" : greenDaoAttemptSection.getQuestionsUrlFrag().replace("2.3", "2.2");
+            String questionUrl = (isOfflineExam()) ? "" : greenDaoAttemptSection.getQuestionsUrlFrag().replace("2.3", "2.2");
             attemptViewModel.clearAttemptItem();
             attemptViewModel.fetchAttemptItems(questionUrl, true);
         }
@@ -1132,7 +1133,7 @@ public class TestFragment extends BaseFragment implements
             onSectionEnded();
             return;
         }
-        String sectionEndUrlFrag = (exam.getIsOfflineExam()) ? "" : section.getEndUrlFrag();
+        String sectionEndUrlFrag = (isOfflineExam()) ? "" : section.getEndUrlFrag();
         attemptViewModel.updateSection(sectionEndUrlFrag,Action.END_SECTION);
     }
 
@@ -1148,7 +1149,7 @@ public class TestFragment extends BaseFragment implements
     }
 
     void startSection() {
-        String sectionStartUrlFrag = (exam.getIsOfflineExam()) ? "" : sections.get(attempt.getCurrentSectionPosition()).getStartUrlFrag();
+        String sectionStartUrlFrag = (isOfflineExam()) ? "" : sections.get(attempt.getCurrentSectionPosition()).getStartUrlFrag();
         attemptViewModel.updateSection(sectionStartUrlFrag,Action.START_SECTION);
     }
 
@@ -1165,7 +1166,8 @@ public class TestFragment extends BaseFragment implements
                         if (progressDialog.isShowing()) {
                             progressDialog.dismiss();
                         }
-                        if (exam.getIsOfflineExam()){
+                        if (isOfflineExam()){
+                            Toast.makeText(requireActivity(),"Please connect to the internet to view your results.",Toast.LENGTH_SHORT).show();
                             returnToHistory();
                             return;
                         }
@@ -1208,7 +1210,8 @@ public class TestFragment extends BaseFragment implements
                         if (progressDialog.isShowing()) {
                             progressDialog.dismiss();
                         }
-                        if (exam.getIsOfflineExam()){
+                        if (isOfflineExam()){
+                            Toast.makeText(requireActivity(),"Please connect to the internet to view your results.",Toast.LENGTH_SHORT).show();
                             returnToHistory();
                             return;
                         }
@@ -1654,5 +1657,9 @@ public class TestFragment extends BaseFragment implements
         builder.setTitle("Instructions");
         builder.setMessage(Html.fromHtml(section.getInstructions()));
         builder.show();
+    }
+
+    private boolean isOfflineExam() {
+        return Boolean.TRUE.equals(exam.getIsOfflineExam());
     }
 }
