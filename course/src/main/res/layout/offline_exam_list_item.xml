@@ -85,7 +85,7 @@
         android:layout_height="5dp"
         android:visibility="gone"
         android:layout_alignParentRight="true"
-        android:background="@drawable/orange_circle"
+        android:background="@drawable/green_circle"
         android:layout_centerVertical="true"/>
 
 </RelativeLayout>
