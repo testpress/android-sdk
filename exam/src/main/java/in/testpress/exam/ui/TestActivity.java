@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -297,6 +298,7 @@ public class TestActivity extends BaseToolBarActivity  {
         this.courseAttempt = courseAttempt;
         if (isOfflineExamComplete(courseAttempt.getRawAssessment())){
             this.finish();
+            Toast.makeText(this,"Please connect to the internet to view your results.",Toast.LENGTH_SHORT).show();
             return;
         }
         saveCourseAttemptInDB(courseAttempt, true);
@@ -310,6 +312,7 @@ public class TestActivity extends BaseToolBarActivity  {
     private void handleSuccessAttempt(Attempt attempt) {
         if (isOfflineExamComplete(attempt)){
             this.finish();
+            Toast.makeText(this,"Please connect to the internet to view your results.",Toast.LENGTH_SHORT).show();
             return;
         }
         if (attempt.getState().equals("Running")) {
