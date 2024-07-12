@@ -93,6 +93,7 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
     }
 
     override fun display() {
+        initializeObserversForOfflineDownload()
         val exam = content.exam!!
         markPerQuestion.text = exam.markPerQuestion
         negativeMarks.text = exam.negativeMarks
