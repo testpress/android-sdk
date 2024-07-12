@@ -47,6 +47,7 @@ public class InstituteSettings {
     private Boolean storeEnabled;
     private Boolean disableStoreInApp;
     private String androidSentryDns;
+    private Boolean disableImageFullscreenZoomInExam;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -416,6 +417,15 @@ public class InstituteSettings {
 
     public InstituteSettings setAndroidSentryDns(String androidSentryDns) {
         this.androidSentryDns = androidSentryDns;
+        return this;
+    }
+
+    public Boolean getDisableImageFullscreenZoomInExam() {
+        return disableImageFullscreenZoomInExam;
+    }
+
+    public InstituteSettings setDisableImageFullscreenZoomInExam(Boolean disableImageFullscreenZoomInExam) {
+        this.disableImageFullscreenZoomInExam = disableImageFullscreenZoomInExam;
         return this;
     }
 }
