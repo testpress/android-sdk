@@ -272,13 +272,13 @@ open class BaseExamWidgetFragment : Fragment() {
     private fun updateStartButtonTextAndVisibility(exam: DomainExamContent, pausedAttempt: DomainContentAttempt?) {
         if (pausedAttempt == null && content.canAttemptExam()) {
             if (contentAttempts.isEmpty()) {
-                startButton.text = getString(R.string.testpress_start)
+                startButton.text = if(isOfflineExamSupportEnables) getString(R.string.testpress_start_exam_online) else getString(R.string.testpress_start)
             } else {
-                startButton.text = getString(R.string.testpress_retake)
+                startButton.text = if(isOfflineExamSupportEnables) getString(R.string.testpress_retake_exam_online) else getString(R.string.testpress_retake)
             }
             startButton.visibility = View.VISIBLE
         } else if (pausedAttempt != null && !exam.isWebOnly()) {
-            startButton.text = getString(R.string.testpress_resume)
+            startButton.text = if(isOfflineExamSupportEnables) getString(R.string.testpress_resume_exam_online) else getString(R.string.testpress_resume)
             startButton.visibility = View.VISIBLE
         } else {
             startButton.visibility = View.GONE
@@ -293,14 +293,14 @@ open class BaseExamWidgetFragment : Fragment() {
 
         if (pausedAttempt == null && content.canAttemptExam()) {
             if (contentAttempts.isEmpty()) {
-                startButton.text = getString(R.string.testpress_start)
+                startButton.text = if(isOfflineExamSupportEnables) getString(R.string.testpress_start_exam_online) else getString(R.string.testpress_start)
             } else {
-                startButton.text = getString(R.string.testpress_retake)
+                startButton.text = if(isOfflineExamSupportEnables) getString(R.string.testpress_retake_exam_online) else getString(R.string.testpress_retake)
             }
             initStartForFreshExam(exam)
             startButton.visibility = View.VISIBLE
         } else if (pausedAttempt != null && !exam.isWebOnly()) {
-            startButton.text = getString(R.string.testpress_resume)
+            startButton.text = if(isOfflineExamSupportEnables) getString(R.string.testpress_resume_exam_online) else getString(R.string.testpress_resume)
             initStartForResumeExam(exam, pausedAttempt)
             startButton.visibility = View.VISIBLE
         } else {
