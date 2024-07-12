@@ -295,6 +295,10 @@ public class TestActivity extends BaseToolBarActivity  {
 
     private void handleCourseAttemptSuccess(CourseAttempt courseAttempt) {
         this.courseAttempt = courseAttempt;
+        if (isOfflineExamComplete(courseAttempt.getRawAssessment())){
+            this.finish();
+            return;
+        }
         saveCourseAttemptInDB(courseAttempt, true);
         Attempt attempt = courseAttempt.getRawAssessment();
         if (attempt.getState().equals("Running") && attempt.getRemainingTime().equals("0:00:00")) {
@@ -304,6 +308,10 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     private void handleSuccessAttempt(Attempt attempt) {
+        if (isOfflineExamComplete(attempt)){
+            this.finish();
+            return;
+        }
         if (attempt.getState().equals("Running")) {
             Bundle bundle = new Bundle();
             bundle.putParcelable(TestFragment.PARAM_ATTEMPT, attempt);
@@ -581,9 +589,9 @@ public class TestActivity extends BaseToolBarActivity  {
     private void endExam() {
         progressBar.setVisibility(View.VISIBLE);
         if (courseContent != null){
-            examViewModel.endContentAttempt(courseAttempt.getEndAttemptUrl());
+            examViewModel.endContentAttempt(attempt.getId(), courseAttempt.getEndAttemptUrl());
         } else {
-            examViewModel.endAttempt(attempt.getEndUrlFrag());
+            examViewModel.endAttempt(attempt.getId(), attempt.getEndUrlFrag());
         }
     }
 
@@ -659,7 +667,7 @@ public class TestActivity extends BaseToolBarActivity  {
         if (isPartialQuestions) {
             data.put(IS_PARTIAL, true);
         }
-        String attemptsUrl = exam.getIsOfflineExam() ? "" : courseContent.getAttemptsUrl().replace("v2.3", "v2.2.1");
+        String attemptsUrl = isOfflineExam() ? "" : courseContent.getAttemptsUrl().replace("v2.3", "v2.2.1");
         examViewModel.createContentAttempt(attemptsUrl, data);
     }
 
@@ -738,6 +746,14 @@ public class TestActivity extends BaseToolBarActivity  {
         return new RetrofitCall[] {
                 examApiRequest, languagesApiRequest, attemptsApiRequest, permissionsApiRequest
         };
+    }
+
+    boolean isOfflineExamComplete(Attempt attempt) {
+        return isOfflineExam() && attempt.getState().equals(Attempt.COMPLETED);
+    }
+
+    boolean isOfflineExam() {
+        return Boolean.TRUE.equals(exam.getIsOfflineExam());
     }
 
 }

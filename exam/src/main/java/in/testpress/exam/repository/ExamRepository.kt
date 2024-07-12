@@ -39,6 +39,7 @@ class ExamRepository(val context: Context) {
     private val offlineAttemptDao = database.offlineAttemptDao()
     private val offlineAttemptSectionDao = database.offlineAttemptSectionDao()
     private val languageDao = database.languageDao()
+    private val offlineExamDao = database.offlineExamDao()
 
     private val _attemptResource = MutableLiveData<Resource<Attempt>>()
     val attemptResource: LiveData<Resource<Attempt>> get() = _attemptResource
@@ -180,32 +181,73 @@ class ExamRepository(val context: Context) {
         }
     }
 
-    fun endContentAttempt(attemptEndFrag: String) {
+    fun endContentAttempt(attemptId: Long, attemptEndFrag: String) {
         _contentAttemptResource.postValue(Resource.loading(null))
-        apiClient.endContentAttempt(attemptEndFrag)
-            .enqueue(object : TestpressCallback<CourseAttempt>() {
-                override fun onSuccess(result: CourseAttempt) {
-                    _contentAttemptResource.postValue(Resource.success(result))
-                }
+        if (isOfflineExam){
+            CoroutineScope(Dispatchers.IO).launch {
+                endAllOfflineAttemptSection(attemptId)
+                offlineAttemptDao.updateAttemptState(attemptId,Attempt.COMPLETED)
+                offlineExamDao.updatePausedAttemptCount(exam.id, 0L)
+                val offlineCourseAttempt = offlineCourseAttemptDao.getById(attemptId)
+                val offlineAttempt = offlineAttemptDao.getById(attemptId)
+                val offlineAttemptSections = offlineAttemptSectionDao.getByAttemptId(attemptId)
+                _contentAttemptResource.postValue(
+                    Resource.success(
+                        offlineCourseAttempt!!.createGreenDoaModel(
+                            offlineAttempt.createGreenDoaModel(offlineAttemptSections.asGreenDoaModels())
+                        )
+                    )
+                )
+            }
+        } else {
+            apiClient.endContentAttempt(attemptEndFrag)
+                .enqueue(object : TestpressCallback<CourseAttempt>() {
+                    override fun onSuccess(result: CourseAttempt) {
+                        _contentAttemptResource.postValue(Resource.success(result))
+                    }
 
-                override fun onException(exception: TestpressException) {
-                    _contentAttemptResource.postValue(Resource.error(exception,null))
-                }
-            })
+                    override fun onException(exception: TestpressException) {
+                        _contentAttemptResource.postValue(Resource.error(exception,null))
+                    }
+                })
+        }
     }
 
-    fun endAttempt(attemptEndFrag: String) {
+    fun endAttempt(attemptId: Long, attemptEndFrag: String) {
         _attemptResource.postValue(Resource.loading(null))
-        apiClient.endAttempt(attemptEndFrag)
-            .enqueue(object : TestpressCallback<Attempt>() {
-                override fun onSuccess(response: Attempt) {
-                    _attemptResource.postValue(Resource.success(response))
-                }
+        if (isOfflineExam){
+            CoroutineScope(Dispatchers.IO).launch {
+                endAllOfflineAttemptSection(attemptId)
+                offlineAttemptDao.updateAttemptState(attemptId,Attempt.COMPLETED)
+                offlineExamDao.updatePausedAttemptCount(exam.id, 0L)
+                val offlineAttempt = offlineAttemptDao.getById(attemptId)
+                val offlineAttemptSections = offlineAttemptSectionDao.getByAttemptId(attemptId)
+                _attemptResource.postValue(Resource.success(offlineAttempt.createGreenDoaModel(offlineAttemptSections.asGreenDoaModels())))
+            }
+        } else {
+            apiClient.endAttempt(attemptEndFrag)
+                .enqueue(object : TestpressCallback<Attempt>() {
+                    override fun onSuccess(response: Attempt) {
+                        _attemptResource.postValue(Resource.success(response))
+                    }
 
-                override fun onException(exception: TestpressException) {
-                    _attemptResource.postValue(Resource.error(exception,null))
-                }
-            })
+                    override fun onException(exception: TestpressException) {
+                        _attemptResource.postValue(Resource.error(exception,null))
+                    }
+                })
+        }
+    }
+
+    private suspend fun endAllOfflineAttemptSection(attemptId: Long) {
+        val runningOfflineAttemptSection =
+            offlineAttemptSectionDao.getOfflineAttemptSectionsByAttemptIdAndStates(
+                attemptId,
+                listOf(Attempt.NOT_STARTED, Attempt.RUNNING)
+            )
+        runningOfflineAttemptSection.forEach {
+            it.state = Attempt.COMPLETED
+            offlineAttemptSectionDao.update(it)
+        }
     }
 
     fun fetchLanguages(examSlug: String) {

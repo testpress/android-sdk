@@ -39,12 +39,12 @@ class ExamViewModel(val repository: ExamRepository) : ViewModel() {
         repository.startAttempt(attemptStartFrag)
     }
 
-    fun endContentAttempt(attemptEndFrag: String) {
-        repository.endContentAttempt(attemptEndFrag)
+    fun endContentAttempt(attemptId: Long, attemptEndFrag: String) {
+        repository.endContentAttempt(attemptId, attemptEndFrag)
     }
 
-    fun endAttempt(attemptEndFrag: String) {
-        repository.endAttempt(attemptEndFrag)
+    fun endAttempt(attemptId: Long, attemptEndFrag: String) {
+        repository.endAttempt(attemptId, attemptEndFrag)
     }
 
     fun fetchLanguages(examSlug: String) {
