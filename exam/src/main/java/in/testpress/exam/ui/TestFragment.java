@@ -736,7 +736,6 @@ public class TestFragment extends BaseFragment implements
                             if (viewPager != null) {
                                 currentQuestion = viewPager.getCurrentItem();
                             }
-                            updatePanel();
                         } else {
                             questionsListView.setAdapter(questionsListAdapter);
                             startCountDownTimer();
@@ -975,7 +974,6 @@ public class TestFragment extends BaseFragment implements
                 startCountDownTimer(millisRemaining);
                 progressDialog.dismiss();
             }
-            updatePanel();
         }
     }
 
