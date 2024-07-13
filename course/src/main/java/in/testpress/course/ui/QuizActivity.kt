@@ -42,7 +42,7 @@ class QuizActivity : BaseToolBarActivity(), ShowQuizHandler, ExamEndHanlder, Que
         super.onCreate(savedInstanceState)
         setContentView(R.layout.quiz_container_layout)
         examId = intent.getLongExtra("EXAM_ID", -1)
-        dialog = ProgressDialog.progressDialog(this, "Ending Exam")
+        dialog = ProgressDialog.create(this, "Ending Exam")
         bindViews()
         initializeViewModel()
         initializeListeners()

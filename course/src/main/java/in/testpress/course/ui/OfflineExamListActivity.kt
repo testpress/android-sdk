@@ -1,26 +1,16 @@
 package `in`.testpress.course.ui
 
-import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.databinding.OfflineExamListActivityBinding
 import `in`.testpress.course.databinding.OfflineExamListItemBinding
+import `in`.testpress.course.util.ProgressDialog
 import `in`.testpress.course.util.SwipeToDeleteCallback
 import `in`.testpress.course.viewmodels.OfflineExamViewModel
 import `in`.testpress.database.entities.OfflineExam
-import `in`.testpress.database.mapping.asGreenDaoModel
-import `in`.testpress.database.mapping.asGreenDoaModels
-import `in`.testpress.database.mapping.createGreenDoaModel
+import `in`.testpress.enums.Status
 import `in`.testpress.exam.TestpressExam
-import `in`.testpress.models.greendao.Attempt
-import `in`.testpress.models.greendao.Content
-import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.ui.BaseToolBarActivity
-import android.app.ProgressDialog
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -33,14 +23,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.Math.abs
-
 
 class OfflineExamListActivity : BaseToolBarActivity() {
 
     private lateinit var binding: OfflineExamListActivityBinding
     private lateinit var offlineExamViewModel: OfflineExamViewModel
     private lateinit var offlineExamAdapter: OfflineExamAdapter
+    private lateinit var progressDialog: ProgressDialog
+    private lateinit var onItemClickListener: OnItemClickListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,8 +38,10 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         setContentView(binding.root)
         setActionBarTitle("Offline Exam")
         initializeViewModel()
+        initializeOnItemClickListener()
         initializeListAdapter()
         initializeListView()
+        initializeProgressDialog()
         syncExamsModifiedDates()
         syncCompletedAttempts()
     }
@@ -58,8 +50,26 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         offlineExamViewModel = OfflineExamViewModel.initializeViewModel(this)
     }
 
+    private fun initializeOnItemClickListener() {
+        onItemClickListener = object : OnItemClickListener {
+            override fun onItemClick(exam: OfflineExam) {
+                if ((exam.pausedAttemptsCount ?: 0) > 0) {
+                    resumeExam(exam)
+                } else {
+                    if (exam.isSyncRequired) {
+                        observeDownloadExamResult(exam)
+                        observeOfflineExam(exam.contentId!!)
+                        offlineExamViewModel.downloadExam(exam.contentId!!)
+                    } else {
+                        startExam(exam)
+                    }
+                }
+            }
+        }
+    }
+
     private fun initializeListAdapter() {
-        offlineExamAdapter = OfflineExamAdapter()
+        offlineExamAdapter = OfflineExamAdapter(onItemClickListener)
         binding.recyclerView.adapter = offlineExamAdapter
         val deleteIcon = ContextCompat.getDrawable(this, R.drawable.ic_baseline_delete_forever_24)
         val swipeToDeleteCallback = SwipeToDeleteCallback(offlineExamAdapter, deleteIcon!!)
@@ -75,6 +85,14 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         }
     }
 
+    private fun initializeProgressDialog() {
+        progressDialog = ProgressDialog.create(
+            this,
+            "Syncing Exam...",
+            false
+        )
+    }
+
     private fun syncExamsModifiedDates() {
         offlineExamViewModel.syncExamsModifiedDates()
     }
@@ -83,7 +101,86 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         offlineExamViewModel.syncCompletedAttemptToBackEnd()
     }
 
-    inner class OfflineExamAdapter :
+    private fun resumeExam(exam: OfflineExam) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val content = offlineExamViewModel.getOfflineExamContent(exam.contentId!!)
+            val pausedAttempt = offlineExamViewModel.getOfflinePausedAttempt(exam.id!!)
+            if (content != null && pausedAttempt != null) {
+                withContext(Dispatchers.Main) {
+                    TestpressExam.resumeCourseAttempt(
+                        this@OfflineExamListActivity,
+                        content,
+                        pausedAttempt,
+                        false,
+                        TestpressSdk.getTestpressSession(this@OfflineExamListActivity)!!
+                    )
+                }
+            }
+        }
+    }
+
+    private fun startExam(exam: OfflineExam) {
+        CoroutineScope(Dispatchers.IO).launch {
+            offlineExamViewModel.getOfflineExamContent(exam.contentId!!)?.let { content ->
+                withContext(Dispatchers.Main) {
+                    TestpressExam.startCourseExam(
+                        this@OfflineExamListActivity, content, false, false,
+                        TestpressSdk.getTestpressSession(this@OfflineExamListActivity)!!
+                    )
+                }
+            }
+        }
+    }
+
+    private fun observeOfflineExam(contentId: Long) {
+        offlineExamViewModel.get(contentId)
+            .observe(this@OfflineExamListActivity) { offlineExam ->
+                if (offlineExam != null && ((offlineExam.numberOfQuestions
+                        ?: 0) >= offlineExam.downloadedQuestionCount.toInt())
+                ) {
+                    updateProgressDialog(offlineExam.getDownloadProgress())
+                }
+            }
+    }
+
+    private fun observeDownloadExamResult(offlineExam: OfflineExam) {
+        offlineExamViewModel.downloadExamResult.observe(this) { result ->
+            when (result.status) {
+                Status.SUCCESS -> {
+                    hideProgressDialog()
+                    startExam(offlineExam)
+                }
+                Status.LOADING -> {
+                    showProgressDialog()
+                }
+                Status.ERROR -> {
+                    hideProgressDialog()
+                    startExam(offlineExam)
+                }
+            }
+
+        }
+    }
+
+    private fun showProgressDialog() {
+        if (!progressDialog.isShowing) {
+            progressDialog.show()
+        }
+    }
+
+    private fun updateProgressDialog(progress: Int) {
+        if (progressDialog.isShowing) {
+            progressDialog.updateProgress(progress)
+        }
+    }
+
+    private fun hideProgressDialog() {
+        if (progressDialog.isShowing) {
+            progressDialog.dismiss()
+        }
+    }
+
+    inner class OfflineExamAdapter(private val clickListener: OnItemClickListener) :
         ListAdapter<OfflineExam, OfflineExamAdapter.ExamViewHolder>(EXAM_COMPARATOR) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExamViewHolder {
@@ -119,11 +216,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
             fun bind(exam: OfflineExam) {
                 updateExamDetails(exam)
                 itemView.setOnClickListener {
-                    if ((exam.pausedAttemptsCount ?: 0) > 0) {
-                        resumeExam(exam)
-                    } else {
-                        startExam(exam)
-                    }
+                    clickListener.onItemClick(exam)
                 }
             }
 
@@ -133,38 +226,11 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                 binding.numberOfQuestions.text = exam.numberOfQuestions.toString()
                 binding.examResumeState.isVisible = ((exam.pausedAttemptsCount ?: 0) > 0)
             }
-
-            private fun resumeExam(exam: OfflineExam) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    val content = offlineExamViewModel.getOfflineExamContent(exam.contentId!!)
-                    val pausedAttempt = offlineExamViewModel.getOfflinePausedAttempt(exam.id!!)
-                    if (content != null && pausedAttempt != null) {
-                        withContext(Dispatchers.Main) {
-                            TestpressExam.resumeCourseAttempt(
-                                this@OfflineExamListActivity,
-                                content,
-                                pausedAttempt,
-                                false,
-                                TestpressSdk.getTestpressSession(this@OfflineExamListActivity)!!
-                            )
-                        }
-                    }
-                }
-            }
-
-            private fun startExam(exam: OfflineExam) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    offlineExamViewModel.getOfflineExamContent(exam.contentId!!)?.let { content ->
-                        withContext(Dispatchers.Main) {
-                            TestpressExam.startCourseExam(
-                                this@OfflineExamListActivity, content, false, false,
-                                TestpressSdk.getTestpressSession(this@OfflineExamListActivity)!!
-                            )
-                        }
-                    }
-                }
-            }
         }
+    }
+
+    interface OnItemClickListener {
+        fun onItemClick(exam: OfflineExam)
     }
 
     companion object {
