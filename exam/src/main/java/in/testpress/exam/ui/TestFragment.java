@@ -626,7 +626,7 @@ public class TestFragment extends BaseFragment implements
                             .setTitle(R.string.testpress_end_title)
                             .setMessage(R.string.testpress_end_message);
 
-            if (exam.isPreemptiveSectionEndingEnabled() || sections.size() < 2) {
+            if (exam.isPreemptiveSectionEndingEnabled() ||(attempt.hasNoSectionalLock() || sections.size() < 2)) {
                 dialogBuilder
                         .setPositiveButton(R.string.testpress_end, new DialogInterface.OnClickListener() {
                             @Override
