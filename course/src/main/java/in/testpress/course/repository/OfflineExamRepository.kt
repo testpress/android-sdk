@@ -158,6 +158,13 @@ class OfflineExamRepository(val context: Context) {
     suspend fun deleteOfflineExam(examId: Long) {
         offlineExamDao.deleteById(examId)
         examQuestionDao.deleteByExamId(examId)
+        val attemptIds = offlineAttemptDao.getAttemptIdsByExamId(examId)
+        attemptIds.forEach { attemptId ->
+            offlineAttemptDao.deleteByAttemptId(attemptId)
+            offlineAttemptSectionDao.deleteByAttemptId(attemptId)
+            offlineAttemptItemDao.deleteByAttemptId(attemptId)
+            offlineCourseAttemptDao.deleteByAttemptId(attemptId)
+        }
         // Here we are deleting exam and exam question only
         // Deleting Question, Direction, Section, Subject need to handle
     }
