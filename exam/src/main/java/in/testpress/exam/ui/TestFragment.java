@@ -1165,7 +1165,6 @@ public class TestFragment extends BaseFragment implements
                             progressDialog.dismiss();
                         }
                         if (isOfflineExam()){
-                            Toast.makeText(requireActivity(),"Please connect to the internet to view your results.",Toast.LENGTH_SHORT).show();
                             returnToHistory();
                             return;
                         }
@@ -1209,7 +1208,6 @@ public class TestFragment extends BaseFragment implements
                             progressDialog.dismiss();
                         }
                         if (isOfflineExam()){
-                            Toast.makeText(requireActivity(),"Please connect to the internet to view your results.",Toast.LENGTH_SHORT).show();
                             returnToHistory();
                             return;
                         }

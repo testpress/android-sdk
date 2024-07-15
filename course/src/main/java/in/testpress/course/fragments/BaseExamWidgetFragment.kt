@@ -99,6 +99,7 @@ open class BaseExamWidgetFragment : Fragment() {
             when (it?.status) {
                 Status.SUCCESS -> {
                     content = it.data!!
+                    offlineExamViewModel.syncCompletedAttempt(content.examId!!)
                     if (!isContentLoaded(it.data!!)) {
                         refetchContent(it.data!!.id)
                     } else {
@@ -138,6 +139,16 @@ open class BaseExamWidgetFragment : Fragment() {
                 Status.ERROR -> {
                     downloadExam.text = "Download Exam"
                     Toast.makeText(requireContext(),"Please check your internet connection",Toast.LENGTH_SHORT).show()
+                }
+                else -> {}
+            }
+        }
+        offlineExamViewModel.syncCompletedAttempt.observe(requireActivity()) { it ->
+            when (it.status){
+                Status.SUCCESS -> {}
+                Status.LOADING -> {}
+                Status.ERROR -> {
+                    Toast.makeText(requireContext(),"Please connect to the internet to view your results.",Toast.LENGTH_SHORT).show()
                 }
                 else -> {}
             }
