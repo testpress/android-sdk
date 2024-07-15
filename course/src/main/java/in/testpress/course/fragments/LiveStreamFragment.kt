@@ -36,7 +36,13 @@ class LiveStreamFragment : BaseContentDetailFragment() {
 
     override fun display() {
         when (content.liveStream?.status) {
-            "Running" -> displayPlayerViewWithChat()
+            "Running" -> {
+                if (content.liveStream?.streamUrl.isNullOrEmpty()) {
+                    displayNotStartedNotice()
+                } else {
+                    displayPlayerViewWithChat()
+                }
+            }
             "Not Started" -> displayNotStartedNotice()
             "Completed" -> displayEndedNotice()
         }
