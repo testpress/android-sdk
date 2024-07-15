@@ -5,6 +5,8 @@ import `in`.testpress.database.entities.OfflineAttempt
 import `in`.testpress.database.entities.OfflineAttemptSection
 import `in`.testpress.database.entities.OfflineCourseAttempt
 import `in`.testpress.database.entities.OfflineExam
+import `in`.testpress.models.greendao.Content
+import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.network.Resource
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
@@ -58,6 +60,14 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
         viewModelScope.launch {
             repository.syncCompletedAttemptToBackEnd()
         }
+    }
+
+    suspend fun getOfflineExamContent(contentId: Long): Content? {
+        return repository.getOfflineExamContent(contentId)
+    }
+
+    suspend fun getOfflinePausedAttempt(examId: Long): CourseAttempt? {
+        return repository.getOfflinePausedAttempt(examId)
     }
 
     companion object {

@@ -1,60 +1,91 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    card_view:cardCornerRadius="8dp"
-    card_view:cardElevation="4dp">
+    android:background="?attr/colorSurface"
+    android:minHeight="72dp"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/exam_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="8dp">
+        android:layout_gravity="center_vertical"
+        android:maxLines="1"
+        android:text="Exam 1"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
+        android:textColor="?attr/colorOnSurface" />
 
-        <TextView
-            android:id="@+id/titleTextView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:textSize="18sp"
-            android:text="Exam Title 1"
-            android:layout_weight="1"
-            android:textStyle="bold" />
+    <LinearLayout
+        android:id="@+id/content_details_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/exam_title"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
 
         <LinearLayout
+            android:id="@+id/duration_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="25dp"
             android:orientation="horizontal">
-            <Button
-                android:id="@+id/downloading_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Downloading"
-                android:visibility="gone"/>
 
-            <Button
-                android:id="@+id/sync_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sync"
-                android:visibility="gone"/>
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="15dp"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/testpress_clock" />
 
-            <Button
-                android:id="@+id/open_exam_detail"
+            <TextView
+                android:id="@+id/duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Open Exam"
-                android:visibility="gone"/>
+                android:lineSpacingExtra="4dp"
+                android:maxLines="1"
+                android:text="3:00:00"
+                android:textColor="@color/testpress_text_gray_medium"
+                android:textSize="12sp" />
+        </LinearLayout>
 
-            <Button
-                android:id="@+id/delete_button"
-                android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/question_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="25dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/testpress_question_tag" />
+
+            <TextView
+                android:id="@+id/number_of_questions"
+                android:layout_width="40dp"
                 android:layout_height="wrap_content"
-                android:text="Delete"
-                android:visibility="gone"/>
+                android:ellipsize="end"
+                android:lineSpacingExtra="4dp"
+                android:maxLines="1"
+                android:text="50 Qs"
+                android:textColor="@color/testpress_text_gray_medium"
+                android:textSize="12sp" />
         </LinearLayout>
 
     </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+    <ImageView
+        android:id="@+id/exam_resume_state"
+        android:layout_width="5dp"
+        android:layout_height="5dp"
+        android:visibility="gone"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/green_circle"
+        android:layout_centerVertical="true"/>
+
+</RelativeLayout>

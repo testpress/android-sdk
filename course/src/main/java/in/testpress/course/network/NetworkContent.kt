@@ -149,7 +149,7 @@ fun NetworkContent.asOfflineExam(): OfflineExam {
         this.exam?.totalMarks,
         this.exam?.url,
         this.exam?.attemptsCount,
-        this.exam?.pausedAttemptsCount,
+        pausedAttemptsCount = 0,
         this.exam?.title,
         this.exam?.description,
         this.exam?.startDate,

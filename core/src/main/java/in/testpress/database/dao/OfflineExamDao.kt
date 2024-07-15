@@ -35,4 +35,7 @@ interface OfflineExamDao: BaseDao<OfflineExam> {
 
     @Query("SELECT contentId FROM OfflineExam WHERE id = :examId")
     suspend fun getContentIdByExamId(examId: Long): Long
+
+    @Query("SELECT * FROM OfflineExam WHERE contentId = :contentId")
+    suspend fun getByContentId(contentId: Long) : OfflineExam?
 }

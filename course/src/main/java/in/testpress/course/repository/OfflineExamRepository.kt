@@ -2,18 +2,25 @@ package `in`.testpress.course.repository
 
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
+import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkOfflineQuestionResponse
 import `in`.testpress.course.network.asOfflineExam
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.*
+import `in`.testpress.database.mapping.asGreenDaoModel
+import `in`.testpress.database.mapping.asGreenDoaModels
+import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.network.NetworkExamContent
 import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.exam.network.asRoomModels
 import `in`.testpress.exam.network.getLastModifiedAsDate
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Attempt
+import `in`.testpress.models.greendao.Content
+import `in`.testpress.models.greendao.ContentDao
+import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.network.Resource
 import `in`.testpress.network.RetrofitCall
 import `in`.testpress.util.PagedApiFetcher
@@ -68,12 +75,16 @@ class OfflineExamRepository(val context: Context) {
     }
 
     private fun handleExamDownloadSuccess(result: NetworkContent) {
-        val offlineExam = result.asOfflineExam()
-        offlineExamDao.insert(offlineExam)
-        if (offlineExam.id.isNotNull() && offlineExam.slug.isNotNullAndNotEmpty()) {
-            downloadLanguages(offlineExam.id!!, offlineExam.slug!!)
-        } else {
-            handleDownloadError(Exception("Exam Id or Exam Slug is empty"))
+        CoroutineScope(Dispatchers.IO).launch {
+            val offlineExam = result.asOfflineExam()
+            val pausedAttemptCount = offlineAttemptDao.getOfflineAttemptsByExamIdAndState(offlineExam.id!!,Attempt.RUNNING).size ?:0
+            offlineExam.pausedAttemptsCount = pausedAttemptCount
+            offlineExamDao.insert(offlineExam)
+            if (offlineExam.id.isNotNull() && offlineExam.slug.isNotNullAndNotEmpty()) {
+                downloadLanguages(offlineExam.id!!, offlineExam.slug!!)
+            } else {
+                handleDownloadError(Exception("Exam Id or Exam Slug is empty"))
+            }
         }
     }
 
@@ -295,5 +306,40 @@ class OfflineExamRepository(val context: Context) {
         val utcDateTime = zonedDateTime.withZoneSameInstant(ZoneId.of("UTC"))
         val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
         return utcDateTime.format(outputFormatter)
+    }
+
+    suspend fun getOfflineExamContent(contentId: Long): Content? {
+        getContentFromDB(contentId)?.let { content ->
+            offlineExamDao.getByContentId(contentId)?.let { offlineExam ->
+                content.exam = offlineExam.asGreenDaoModel()
+                return content
+            }
+        }
+        return null
+    }
+
+    suspend fun getOfflinePausedAttempt(examId: Long): CourseAttempt? {
+        getOfflineAttemptsByExamIdAndState(examId, Attempt.RUNNING).lastOrNull()
+            ?.let { offlineAttempt ->
+                val offlineAttemptSectionList = getOfflineAttemptSectionList(offlineAttempt.id)
+                val offlineContentAttempt = getOfflineContentAttempts(offlineAttempt.id)
+                return offlineContentAttempt?.createGreenDoaModel(
+                    offlineAttempt.createGreenDoaModel(
+                        offlineAttemptSectionList.asGreenDoaModels()
+                    )
+                )
+            }
+        return null
+    }
+
+    private fun getContentFromDB(contentId: Long): Content? {
+        val contentDao = TestpressSDKDatabase.getContentDao(context)
+        val contents =
+            contentDao.queryBuilder().where(ContentDao.Properties.Id.eq(contentId)).list()
+
+        if (contents.isEmpty()) {
+            return null
+        }
+        return contents[0]
     }
 }
