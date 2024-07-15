@@ -161,6 +161,7 @@ open class BaseExamWidgetFragment : Fragment() {
             if (downloadExam.text.toString() == "Downloading...") {
                 Toast.makeText(requireContext(),"Please Wait downloading exam",Toast.LENGTH_SHORT).show()
             } else {
+                downloadExam.text = "Downloading..."
                 offlineExamViewModel.downloadExam(contentId)
             }
         }
