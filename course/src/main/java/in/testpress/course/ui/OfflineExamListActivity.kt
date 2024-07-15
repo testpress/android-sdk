@@ -12,7 +12,6 @@ import `in`.testpress.enums.Status
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.ui.BaseToolBarActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -57,7 +56,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                     resumeExam(exam)
                 } else {
                     if (exam.isSyncRequired) {
-                        observeDownloadExamResult(exam)
+                        observeExamDownloadState(exam)
                         observeOfflineExam(exam.contentId!!)
                         offlineExamViewModel.downloadExam(exam.contentId!!)
                     } else {
@@ -72,7 +71,12 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         offlineExamAdapter = OfflineExamAdapter(onItemClickListener)
         binding.recyclerView.adapter = offlineExamAdapter
         val deleteIcon = ContextCompat.getDrawable(this, R.drawable.ic_baseline_delete_forever_24)
-        val swipeToDeleteCallback = SwipeToDeleteCallback(offlineExamAdapter, deleteIcon!!)
+        val swipeToDeleteCallback =
+            SwipeToDeleteCallback(deleteIcon!!, object : SwipeToDeleteCallback.OnSwipeListener {
+                override fun onSwiped(position: Int) {
+                    offlineExamAdapter.removeItem(position)
+                }
+            })
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
         itemTouchHelper.attachToRecyclerView(binding.recyclerView)
     }
@@ -143,7 +147,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
             }
     }
 
-    private fun observeDownloadExamResult(offlineExam: OfflineExam) {
+    private fun observeExamDownloadState(offlineExam: OfflineExam) {
         offlineExamViewModel.downloadExamResult.observe(this) { result ->
             when (result.status) {
                 Status.SUCCESS -> {

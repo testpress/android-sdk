@@ -1,6 +1,5 @@
 package `in`.testpress.course.util
 
-import `in`.testpress.course.ui.OfflineExamListActivity
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -10,8 +9,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
 class SwipeToDeleteCallback(
-    private val offlineExamAdapter: OfflineExamListActivity.OfflineExamAdapter,
-    private val deleteIcon: Drawable
+    private val deleteIcon: Drawable,
+    private val listener: OnSwipeListener
 ) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
     private val maxScaleFactor = 0.2f
@@ -27,7 +26,7 @@ class SwipeToDeleteCallback(
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         val position = viewHolder.bindingAdapterPosition
-        offlineExamAdapter.removeItem(position)
+        listener.onSwiped(position)
     }
 
     override fun onChildDraw(
@@ -99,5 +98,9 @@ class SwipeToDeleteCallback(
     private fun drawBackgroundAndIcon(canvas: Canvas, deleteBackground: ColorDrawable, deleteIcon: Drawable) {
         deleteBackground.draw(canvas)
         deleteIcon.draw(canvas)
+    }
+
+    interface OnSwipeListener {
+        fun onSwiped(position: Int)
     }
 }
