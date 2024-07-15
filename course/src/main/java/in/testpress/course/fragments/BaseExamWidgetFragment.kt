@@ -47,8 +47,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-const val isOfflineExamSupportEnables = false
-
 open class BaseExamWidgetFragment : Fragment() {
     lateinit var startButton: Button
     lateinit var downloadExam: Button
@@ -64,6 +62,7 @@ open class BaseExamWidgetFragment : Fragment() {
     var offlineAttempt: OfflineAttempt? = null
     var offlineContentAttempt: OfflineCourseAttempt? = null
     var offlineAttemptSectionList: List<OfflineAttemptSection>? = null
+    private var isOfflineExamSupportEnables = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +74,8 @@ open class BaseExamWidgetFragment : Fragment() {
             }
         }).get(ExamContentViewModel::class.java)
         offlineExamViewModel = OfflineExamViewModel.initializeViewModel(requireActivity())
+        val instituteSettings = TestpressSdk.getTestpressSession(requireContext())?.instituteSettings!!
+        isOfflineExamSupportEnables = instituteSettings.isOfflineExamEnabled
     }
 
     override fun onAttach(context: Context) {
