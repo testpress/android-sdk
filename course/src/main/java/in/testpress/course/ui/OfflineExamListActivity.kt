@@ -57,7 +57,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                 } else {
                     if (exam.isSyncRequired) {
                         observeExamDownloadState(exam)
-                        observeOfflineExam(exam.contentId!!)
+                        monitorAndShowExamDownloadProgress(exam.contentId!!)
                         offlineExamViewModel.downloadExam(exam.contentId!!)
                     } else {
                         startExam(exam)
@@ -136,7 +136,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         }
     }
 
-    private fun observeOfflineExam(contentId: Long) {
+    private fun monitorAndShowExamDownloadProgress(contentId: Long) {
         offlineExamViewModel.get(contentId)
             .observe(this@OfflineExamListActivity) { offlineExam ->
                 if (offlineExam != null && ((offlineExam.numberOfQuestions
