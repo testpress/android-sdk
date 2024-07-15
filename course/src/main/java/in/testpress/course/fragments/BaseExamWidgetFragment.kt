@@ -101,7 +101,6 @@ open class BaseExamWidgetFragment : Fragment() {
                     if (!isContentLoaded(it.data!!)) {
                         refetchContent(it.data!!.id)
                     } else {
-                        display()
                         loadAttemptsAndUpdateStartButton()
                     }
                 }
