@@ -32,6 +32,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -57,6 +58,9 @@ class OfflineExamRepository(val context: Context) {
 
     private val _downloadExamResult = MutableLiveData<Resource<Boolean>>()
     val downloadExamResult: LiveData<Resource<Boolean>> get() = _downloadExamResult
+
+    private val _syncCompletedAttempt = MutableLiveData<Resource<Boolean>>()
+    val syncCompletedAttempt: LiveData<Resource<Boolean>> get() = _syncCompletedAttempt
 
     fun downloadExam(contentId: Long) {
         _downloadExamResult.postValue(Resource.loading(null))
@@ -250,10 +254,20 @@ class OfflineExamRepository(val context: Context) {
         return offlineAttemptSectionDao.getByAttemptId(attemptId)
     }
 
-    suspend fun syncCompletedAttemptToBackEnd() {
+    suspend fun syncCompletedAttempt(examId: Long){
+        val completedOfflineAttempts = offlineAttemptDao.getOfflineAttemptsByExamIdAndState(examId, Attempt.COMPLETED)
+        updateCompletedAttempts(completedOfflineAttempts)
+    }
+
+    suspend fun syncCompletedAllAttemptToBackEnd() {
         val completedOfflineAttempts =
             offlineAttemptDao.getOfflineAttemptsByState(Attempt.COMPLETED)
+        updateCompletedAttempts(completedOfflineAttempts)
+    }
 
+    private suspend fun updateCompletedAttempts(completedOfflineAttempts: List<OfflineAttempt>){
+        val totalAttempts = completedOfflineAttempts.size
+        var currentAttemptSize = 0
         completedOfflineAttempts.forEach { completedOfflineAttempt ->
 
             val attemptItems =
@@ -288,11 +302,19 @@ class OfflineExamRepository(val context: Context) {
                 override fun onSuccess(result: HashMap<String, String>) {
                     if (result["message"] == "Exam answers are being processed") {
                         deleteSyncedAttempt(completedOfflineAttempt.id)
+                        currentAttemptSize++
+                        if (totalAttempts == currentAttemptSize){
+                            _syncCompletedAttempt.postValue(Resource.success(true))
+                        }
                     }
                 }
 
-                override fun onException(exception: TestpressException?) {
+                override fun onException(exception: TestpressException) {
                     Log.e("OfflineExamRepository", "Failed to update offline answers", exception)
+                    currentAttemptSize++
+                    if (totalAttempts == currentAttemptSize){
+                        _syncCompletedAttempt.postValue(Resource.error(exception, null))
+                    }
                 }
             })
         }
