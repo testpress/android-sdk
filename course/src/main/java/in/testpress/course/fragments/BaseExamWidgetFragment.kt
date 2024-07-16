@@ -113,12 +113,7 @@ open class BaseExamWidgetFragment : Fragment() {
     protected fun initializeObserversForOfflineDownload() {
         offlineExamViewModel.get(contentId).observe(requireActivity()) { offlineExam ->
             this.offlineExam = offlineExam
-            if (offlineExam == null) {
-                downloadExam.isVisible = true && isOfflineExamSupportEnables
-            } else if (offlineExam.numberOfQuestions != offlineExam.downloadedQuestionCount.toInt()) {
-                downloadExam.isVisible = true && isOfflineExamSupportEnables
-                downloadExam.text = "Downloading..."
-            } else {
+            if (offlineExam != null && offlineExam.downloadComplete) {
                 downloadExam.isVisible = false
                 CoroutineScope(Dispatchers.IO).launch {
                     offlineAttempt = offlineExamViewModel.getOfflineAttemptsByExamIdAndState(content.examId!!,Attempt.RUNNING).lastOrNull()
@@ -130,6 +125,8 @@ open class BaseExamWidgetFragment : Fragment() {
                         showOfflineExamButtons()
                     }
                 }
+            } else if (offlineExam == null) {
+                downloadExam.isVisible = true && isOfflineExamSupportEnables
             }
         }
 

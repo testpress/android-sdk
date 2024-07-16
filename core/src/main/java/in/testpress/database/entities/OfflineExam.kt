@@ -50,7 +50,8 @@ data class OfflineExam(
     val examDataModifiedOn: String? = null,
     var isSyncRequired: Boolean = false,
     val contentId: Long? = null,
-    val downloadedQuestionCount: Long = 0
+    val downloadedQuestionCount: Long = 0,
+    val downloadComplete: Boolean = false
 ) {
     fun getExamDataModifiedOnAsDate(): Date? {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX")
