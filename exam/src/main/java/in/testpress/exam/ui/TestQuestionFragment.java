@@ -121,6 +121,11 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
                 }
 
                 @Override
+                public boolean isOfflineExamMode() {
+                    return exam.getIsOfflineExam() != null && exam.getIsOfflineExam();
+                }
+
+                @Override
                 public String getJavascript(Context context) {
                     String javascript = super.getJavascript(context);
                     List<Integer> selectedAnswers = attemptItem.getSavedAnswers();
@@ -149,11 +154,15 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
     }
 
     private void setInitialDataToAttemptItem() {
+        Log.d("TAG", "setInitialDataToAttemptItem: "+""+index+""+attemptItem.getSelectedAnswers());
+        Log.d("TAG", "setInitialDataToAttemptItem: "+""+index+""+attemptItem.getSavedAnswers());
         attemptItem.saveAnswers(attemptItem.getSelectedAnswers());
         attemptItem.setCurrentShortText(attemptItem.getShortText());
         attemptItem.setCurrentReview(attemptItem.getReview());
         attemptItem.setLocalEssayText(attemptItem.getEssayText());
         attemptItem.setUnSyncedFiles(attemptItem.getFileURLs());
+        Log.d("TAG", "setInitialDataToAttemptItem: "+""+index+""+attemptItem.getSelectedAnswers());
+        Log.d("TAG", "setInitialDataToAttemptItem: "+""+index+""+attemptItem.getSavedAnswers());
     }
 
     private String getQuestionItemHtml() {
