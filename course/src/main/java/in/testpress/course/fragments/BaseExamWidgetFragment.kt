@@ -138,6 +138,7 @@ open class BaseExamWidgetFragment : Fragment() {
                 Status.SUCCESS -> {}
                 Status.LOADING -> {}
                 Status.ERROR -> {
+                    downloadExam.text = "Download Exam"
                     Toast.makeText(requireContext(),"Please check your internet connection",Toast.LENGTH_SHORT).show()
                 }
                 else -> {}
@@ -248,7 +249,9 @@ open class BaseExamWidgetFragment : Fragment() {
                         viewModel.getLanguages(exam.slug!!, exam.id)
                             .observe(viewLifecycleOwner, observer)
                     }
-                    else -> {}
+                    else -> {
+                        display()
+                    }
                 }
             })
     }
