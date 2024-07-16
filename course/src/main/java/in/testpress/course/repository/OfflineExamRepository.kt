@@ -120,6 +120,7 @@ class OfflineExamRepository(val context: Context) {
                         } else {
                             saveQuestionsToDB(result.results)
                             updateOfflineExamDownloadPercent(examId, result.results!!.questions.size.toLong())
+                            updateDownloadedState(examId)
                             _downloadExamResult.postValue(Resource.success(true))
                         }
                     }
@@ -136,6 +137,12 @@ class OfflineExamRepository(val context: Context) {
     private fun updateOfflineExamDownloadPercent(examId: Long, count: Long){
         CoroutineScope(Dispatchers.IO).launch {
             offlineExamDao.updateDownloadedQuestion(examId, count)
+        }
+    }
+
+    private fun updateDownloadedState(examId: Long){
+        CoroutineScope(Dispatchers.IO).launch {
+            offlineExamDao.updateDownloadedState(examId, true)
         }
     }
 
