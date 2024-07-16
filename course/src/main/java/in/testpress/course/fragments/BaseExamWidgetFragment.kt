@@ -101,7 +101,6 @@ open class BaseExamWidgetFragment : Fragment() {
                     if (!isContentLoaded(it.data!!)) {
                         refetchContent(it.data!!.id)
                     } else {
-                        display()
                         loadAttemptsAndUpdateStartButton()
                     }
                 }
@@ -139,6 +138,7 @@ open class BaseExamWidgetFragment : Fragment() {
                 Status.SUCCESS -> {}
                 Status.LOADING -> {}
                 Status.ERROR -> {
+                    downloadExam.text = "Download Exam"
                     Toast.makeText(requireContext(),"Please check your internet connection",Toast.LENGTH_SHORT).show()
                 }
                 else -> {}
@@ -162,6 +162,7 @@ open class BaseExamWidgetFragment : Fragment() {
             if (downloadExam.text.toString() == "Downloading...") {
                 Toast.makeText(requireContext(),"Please Wait downloading exam",Toast.LENGTH_SHORT).show()
             } else {
+                downloadExam.text = "Downloading..."
                 offlineExamViewModel.downloadExam(contentId)
             }
         }
@@ -248,7 +249,9 @@ open class BaseExamWidgetFragment : Fragment() {
                         viewModel.getLanguages(exam.slug!!, exam.id)
                             .observe(viewLifecycleOwner, observer)
                     }
-                    else -> {}
+                    else -> {
+                        display()
+                    }
                 }
             })
     }
