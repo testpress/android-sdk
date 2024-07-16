@@ -119,8 +119,8 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
     }
 
     private void authenticate(String userId, String accessToken, TestpressSdk.Provider provider) {
-        InstituteSettings instituteSettings = new InstituteSettings("https://lmsdemo.testpress.in");
-        instituteSettings.setWhiteLabeledHostUrl("https://lmsdemo.testpress.in");
+        InstituteSettings instituteSettings = new InstituteSettings("https://sandbox.testpress.in");
+        instituteSettings.setWhiteLabeledHostUrl("https://sandbox.testpress.in");
         instituteSettings.setAndroidSentryDns("https://186f9948d5294b4c9c03aa9d2a11c982@sentry.testpress.in/3");
         instituteSettings.setEnableOfflineExam(true);
         TestpressSdk.initialize(this, instituteSettings, userId, accessToken, provider,

@@ -267,6 +267,7 @@ class OfflineExamRepository(val context: Context) {
 
     private suspend fun updateCompletedAttempts(completedOfflineAttempts: List<OfflineAttempt>){
         if(completedOfflineAttempts.isEmpty()) return
+        Log.d("TAG", "updateCompletedAttempts: ${completedOfflineAttempts.size}")
         val totalAttempts = completedOfflineAttempts.size
         var currentAttemptSize = 0
         completedOfflineAttempts.forEach { completedOfflineAttempt ->
