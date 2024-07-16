@@ -141,6 +141,21 @@ open class BaseExamWidgetFragment : Fragment() {
                 else -> {}
             }
         }
+        offlineExamViewModel.syncCompletedAttempt(content.examId!!)
+        offlineExamViewModel.syncCompletedAttempt.observe(requireActivity()) { it ->
+            when (it.status){
+                Status.SUCCESS -> {
+                    if (!this.isAdded) return@observe
+                    Toast.makeText(requireContext(),"Answers submitted successfully. Results will be available shortly.",Toast.LENGTH_SHORT).show()
+                }
+                Status.LOADING -> {}
+                Status.ERROR -> {
+                    if (!this.isAdded) return@observe
+                    Toast.makeText(requireContext(),"Please connect to the internet to view your results.",Toast.LENGTH_SHORT).show()
+                }
+                else -> {}
+            }
+        }
     }
 
     private fun showOfflineExamButtons() {

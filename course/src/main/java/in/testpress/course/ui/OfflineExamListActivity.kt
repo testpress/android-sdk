@@ -102,7 +102,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
     }
 
     private fun syncCompletedAttempts() {
-        offlineExamViewModel.syncCompletedAttemptToBackEnd()
+        offlineExamViewModel.syncCompletedAllAttemptToBackEnd()
     }
 
     private fun resumeExam(exam: OfflineExam) {
