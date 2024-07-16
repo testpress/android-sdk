@@ -154,15 +154,11 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
     }
 
     private void setInitialDataToAttemptItem() {
-        Log.d("TAG", "setInitialDataToAttemptItem: "+""+index+""+attemptItem.getSelectedAnswers());
-        Log.d("TAG", "setInitialDataToAttemptItem: "+""+index+""+attemptItem.getSavedAnswers());
         attemptItem.saveAnswers(attemptItem.getSelectedAnswers());
         attemptItem.setCurrentShortText(attemptItem.getShortText());
         attemptItem.setCurrentReview(attemptItem.getReview());
         attemptItem.setLocalEssayText(attemptItem.getEssayText());
         attemptItem.setUnSyncedFiles(attemptItem.getFileURLs());
-        Log.d("TAG", "setInitialDataToAttemptItem: "+""+index+""+attemptItem.getSelectedAnswers());
-        Log.d("TAG", "setInitialDataToAttemptItem: "+""+index+""+attemptItem.getSavedAnswers());
     }
 
     private String getQuestionItemHtml() {
