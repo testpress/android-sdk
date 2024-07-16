@@ -7,5 +7,5 @@ import androidx.room.PrimaryKey
 data class Direction(
     @PrimaryKey
     val id: Long? = null,
-    val html: String? = null
+    var html: String? = null
 )
