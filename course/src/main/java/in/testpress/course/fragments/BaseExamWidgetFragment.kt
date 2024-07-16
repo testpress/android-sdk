@@ -47,7 +47,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-const val isOfflineExamSupportEnables = true
+const val isOfflineExamSupportEnables = false
 
 open class BaseExamWidgetFragment : Fragment() {
     lateinit var startButton: Button
@@ -98,7 +98,6 @@ open class BaseExamWidgetFragment : Fragment() {
             when (it?.status) {
                 Status.SUCCESS -> {
                     content = it.data!!
-                    offlineExamViewModel.syncCompletedAttempt(content.examId!!)
                     if (!isContentLoaded(it.data!!)) {
                         refetchContent(it.data!!.id)
                     } else {
@@ -142,11 +141,16 @@ open class BaseExamWidgetFragment : Fragment() {
                 else -> {}
             }
         }
+        offlineExamViewModel.syncCompletedAttempt(content.examId!!)
         offlineExamViewModel.syncCompletedAttempt.observe(requireActivity()) { it ->
             when (it.status){
-                Status.SUCCESS -> {}
+                Status.SUCCESS -> {
+                    if (!this.isAdded) return@observe
+                    Toast.makeText(requireContext(),"Answers submitted successfully. Results will be available shortly.",Toast.LENGTH_SHORT).show()
+                }
                 Status.LOADING -> {}
                 Status.ERROR -> {
+                    if (!this.isAdded) return@observe
                     Toast.makeText(requireContext(),"Please connect to the internet to view your results.",Toast.LENGTH_SHORT).show()
                 }
                 else -> {}
