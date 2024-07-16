@@ -124,12 +124,12 @@ class OfflineExamRepository(val context: Context) {
                 .enqueue(object : TestpressCallback<ApiResponse<NetworkOfflineQuestionResponse>>() {
                     override fun onSuccess(result: ApiResponse<NetworkOfflineQuestionResponse>) {
                         if (result.next != null) {
-                            handleSuccessResponse(result.results)
+                            handleSuccessResponse(examId, result.results)
                             updateOfflineExamDownloadPercent(examId, result.results!!.questions.size.toLong())
                             page++
                             fetchQuestionsPage()
                         } else {
-                            handleSuccessResponse(result.results, lastPage = true)
+                            handleSuccessResponse(examId, result.results, lastPage = true)
                             updateOfflineExamDownloadPercent(examId, result.results!!.questions.size.toLong())
                         }
                     }
@@ -156,6 +156,7 @@ class OfflineExamRepository(val context: Context) {
     }
 
     private fun handleSuccessResponse(
+        examId: Long,
         response: NetworkOfflineQuestionResponse,
         lastPage: Boolean = false
     ) {
