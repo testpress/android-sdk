@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class Question(
     @PrimaryKey
     val id: Long? = null,
-    val questionHtml: String? = null,
+    var questionHtml: String? = null,
     val directionId: Long? = null,
     val answers: ArrayList<Answer> = arrayListOf(),
     val language: String? = null,

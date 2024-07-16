@@ -60,4 +60,43 @@ class NetworkOfflineQuestionResponse(
 
         return urls
     }
+
+    fun replaceResourceUrlWithLocalUrl(urlToLocalPaths: HashMap<String, String>) {
+
+        urlToLocalPaths.map { urlToLocalPath ->
+
+            this.directions.forEach { direction ->
+                direction.html?.let { directionHtml ->
+                    direction.html = directionHtml.replace(urlToLocalPath.key, urlToLocalPath.value)
+                }
+            }
+
+            this.sections.forEach { section ->
+                section.instructions?.let { instructions ->
+                    section.instructions =
+                        instructions.replace(urlToLocalPath.key, urlToLocalPath.value)
+                }
+            }
+
+            this.questions.forEach { question ->
+                question.questionHtml?.let { questionHtml ->
+                    question.questionHtml =
+                        questionHtml.replace(urlToLocalPath.key, urlToLocalPath.value)
+                }
+
+                question.translations.forEach { translation ->
+                    translation.questionHtml?.let { translationHtml ->
+                        translation.questionHtml =
+                            translationHtml.replace(urlToLocalPath.key, urlToLocalPath.value)
+                    }
+                }
+
+                question.answers.forEach { answer ->
+                    answer.textHtml?.let { textHtml ->
+                        answer.textHtml = textHtml.replace(urlToLocalPath.key, urlToLocalPath.value)
+                    }
+                }
+            }
+        }
+    }
 }

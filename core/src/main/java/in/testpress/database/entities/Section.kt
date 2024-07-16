@@ -11,6 +11,6 @@ data class Section(
     val name: String?,
     val duration: String?,
     val cutOff: Long?,
-    val instructions: String?,
+    var instructions: String?,
     val parent: Long?
 )
