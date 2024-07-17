@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 class OfflineExamViewModel(private val repository: OfflineExamRepository) : ViewModel() {
 
     val downloadExamResult: LiveData<Resource<Boolean>> get() = repository.downloadExamResult
+    val offlineAttemptSyncResult: LiveData<Resource<Boolean>> get() = repository.offlineAttemptSyncResult
 
     fun downloadExam(courseId: Long) {
         repository.downloadExam(courseId)
@@ -56,9 +57,15 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
         return repository.getOfflineAttemptsByExamIdAndState(examId, state)
     }
 
-    fun syncCompletedAttemptToBackEnd(){
+    fun syncCompletedAllAttemptToBackEnd(){
         viewModelScope.launch {
-            repository.syncCompletedAttemptToBackEnd()
+            repository.syncCompletedAllAttemptToBackEnd()
+        }
+    }
+
+    fun syncCompletedAttempt(examId: Long){
+        viewModelScope.launch {
+            repository.syncCompletedAttempt(examId)
         }
     }
 
