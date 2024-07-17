@@ -48,6 +48,7 @@ public class InstituteSettings {
     private Boolean disableStoreInApp;
     private String androidSentryDns;
     private Boolean disableImageFullscreenZoomInExam;
+    private Boolean enableOfflineExam;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -426,6 +427,15 @@ public class InstituteSettings {
 
     public InstituteSettings setDisableImageFullscreenZoomInExam(Boolean disableImageFullscreenZoomInExam) {
         this.disableImageFullscreenZoomInExam = disableImageFullscreenZoomInExam;
+        return this;
+    }
+
+    public Boolean isOfflineExamEnabled() {
+        return enableOfflineExam != null && enableOfflineExam;
+    }
+
+    public InstituteSettings setEnableOfflineExam(Boolean enableOfflineExam) {
+        this.enableOfflineExam = enableOfflineExam;
         return this;
     }
 }
