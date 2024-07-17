@@ -289,17 +289,22 @@ class OfflineExamRepository(val context: Context) {
 
     suspend fun syncCompletedAttempt(examId: Long){
         val completedOfflineAttempts = offlineAttemptDao.getOfflineAttemptsByExamIdAndState(examId, Attempt.COMPLETED)
-        updateCompletedAttempts(completedOfflineAttempts)
+        updateCompletedAttempts(completedOfflineAttempts, forceSync = false)
     }
 
-    suspend fun syncCompletedAllAttemptToBackEnd() {
+    suspend fun syncCompletedAllAttemptToBackEnd(forceSync: Boolean) {
         val completedOfflineAttempts =
             offlineAttemptDao.getOfflineAttemptsByState(Attempt.COMPLETED)
-        updateCompletedAttempts(completedOfflineAttempts)
+        updateCompletedAttempts(completedOfflineAttempts, forceSync)
     }
 
-    private suspend fun updateCompletedAttempts(completedOfflineAttempts: List<OfflineAttempt>){
-        if(completedOfflineAttempts.isEmpty()) return
+    private suspend fun updateCompletedAttempts(completedOfflineAttempts: List<OfflineAttempt>, forceSync: Boolean){
+        if(completedOfflineAttempts.isEmpty()){
+            if (forceSync){
+                Toast.makeText(context,"Sync already completed",Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
         val totalAttempts = completedOfflineAttempts.size
         var currentAttemptSize = 0
         completedOfflineAttempts.forEach { completedOfflineAttempt ->

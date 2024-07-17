@@ -12,9 +12,8 @@ import `in`.testpress.enums.Status
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.ui.BaseToolBarActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.*
@@ -42,8 +41,29 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         initializeListView()
         initializeProgressDialog()
         syncExamsModifiedDates()
+        observeCompletedAttemptSyncResult()
+    }
+
+    override fun onResume() {
+        super.onResume()
         syncCompletedAttempts()
     }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.offline_attempt_sync, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.sync_completed_attempt -> {
+                syncCompletedAttempts(forceSync = true)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
 
     private fun initializeViewModel() {
         offlineExamViewModel = OfflineExamViewModel.initializeViewModel(this)
@@ -101,8 +121,31 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         offlineExamViewModel.syncExamsModifiedDates()
     }
 
-    private fun syncCompletedAttempts() {
-        offlineExamViewModel.syncCompletedAllAttemptToBackEnd()
+    private fun syncCompletedAttempts(forceSync: Boolean = false) {
+        offlineExamViewModel.syncCompletedAllAttemptToBackEnd(forceSync)
+    }
+
+    private fun observeCompletedAttemptSyncResult() {
+        offlineExamViewModel.syncCompletedAttempt.observe(this) { it ->
+            when (it.status) {
+                Status.SUCCESS -> {
+                    Toast.makeText(
+                        this,
+                        "Answers submitted successfully. To review the results, please visit the exam page within the course.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                Status.LOADING -> {}
+                Status.ERROR -> {
+                    Toast.makeText(
+                        this,
+                        "Please connect to internet to submit your answers.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                else -> {}
+            }
+        }
     }
 
     private fun resumeExam(exam: OfflineExam) {
