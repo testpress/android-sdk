@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.*
@@ -43,6 +44,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         initializeProgressDialog()
         syncExamsModifiedDates()
         syncCompletedAttempts()
+        observeOfflineAttemptSyncResult()
     }
 
     private fun initializeViewModel() {
@@ -103,6 +105,29 @@ class OfflineExamListActivity : BaseToolBarActivity() {
 
     private fun syncCompletedAttempts() {
         offlineExamViewModel.syncCompletedAllAttemptToBackEnd()
+    }
+
+    private fun observeOfflineAttemptSyncResult() {
+        offlineExamViewModel.offlineAttemptSyncResult.observe(this) { it ->
+            when (it.status) {
+                Status.SUCCESS -> {
+                    Toast.makeText(
+                        this,
+                        "Answers submitted successfully. To review the results, please visit the exam page within the course.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                Status.LOADING -> {}
+                Status.ERROR -> {
+                    Toast.makeText(
+                        this,
+                        "Please connect to the internet to submit your answers.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                else -> {}
+            }
+        }
     }
 
     private fun resumeExam(exam: OfflineExam) {

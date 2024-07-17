@@ -143,7 +143,7 @@ open class BaseExamWidgetFragment : Fragment() {
             }
         }
         offlineExamViewModel.syncCompletedAttempt(content.examId!!)
-        offlineExamViewModel.syncCompletedAttempt.observe(requireActivity()) { it ->
+        offlineExamViewModel.offlineAttemptSyncResult.observe(requireActivity()) { it ->
             when (it.status){
                 Status.SUCCESS -> {
                     if (!this.isAdded) return@observe

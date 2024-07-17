@@ -59,8 +59,8 @@ class OfflineExamRepository(val context: Context) {
     private val _downloadExamResult = MutableLiveData<Resource<Boolean>>()
     val downloadExamResult: LiveData<Resource<Boolean>> get() = _downloadExamResult
 
-    private val _syncCompletedAttempt = MutableLiveData<Resource<Boolean>>()
-    val syncCompletedAttempt: LiveData<Resource<Boolean>> get() = _syncCompletedAttempt
+    private val _offlineAttemptSyncResult = MutableLiveData<Resource<Boolean>>()
+    val offlineAttemptSyncResult: LiveData<Resource<Boolean>> get() = _offlineAttemptSyncResult
 
     fun downloadExam(contentId: Long) {
         _downloadExamResult.postValue(Resource.loading(null))
@@ -305,7 +305,7 @@ class OfflineExamRepository(val context: Context) {
                         deleteSyncedAttempt(completedOfflineAttempt.id)
                         currentAttemptSize++
                         if (totalAttempts == currentAttemptSize){
-                            _syncCompletedAttempt.postValue(Resource.success(true))
+                            _offlineAttemptSyncResult.postValue(Resource.success(true))
                         }
                     }
                 }
@@ -314,7 +314,7 @@ class OfflineExamRepository(val context: Context) {
                     Log.e("OfflineExamRepository", "Failed to update offline answers", exception)
                     currentAttemptSize++
                     if (totalAttempts == currentAttemptSize){
-                        _syncCompletedAttempt.postValue(Resource.error(exception, null))
+                        _offlineAttemptSyncResult.postValue(Resource.error(exception, null))
                     }
                 }
             })
