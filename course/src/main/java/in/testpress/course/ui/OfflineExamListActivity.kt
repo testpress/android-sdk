@@ -43,8 +43,12 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         initializeListView()
         initializeProgressDialog()
         syncExamsModifiedDates()
-        syncCompletedAttempts()
         observeOfflineAttemptSyncResult()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        syncCompletedAttempts()
     }
 
     private fun initializeViewModel() {
