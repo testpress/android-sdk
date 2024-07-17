@@ -100,7 +100,7 @@ class OfflineExamSampleActivity: BaseToolBarActivity() {
     }
 
     private fun syncCompletedAttempts() {
-        offlineExamViewModel.syncCompletedAllAttemptToBackEnd(forceSync = false)
+        offlineExamViewModel.syncCompletedAllAttemptToBackEnd()
     }
 
     inner class OfflineExamAdapter :

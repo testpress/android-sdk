@@ -29,6 +29,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
     private lateinit var offlineExamAdapter: OfflineExamAdapter
     private lateinit var progressDialog: ProgressDialog
     private lateinit var onItemClickListener: OnItemClickListener
+    private var isSyncButtonVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +42,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         initializeListView()
         initializeProgressDialog()
         syncExamsModifiedDates()
+        observeCompletedOfflineAttempt()
         observeCompletedAttemptSyncResult()
     }
 
@@ -57,13 +59,18 @@ class OfflineExamListActivity : BaseToolBarActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.sync_completed_attempt -> {
-                syncCompletedAttempts(forceSync = true)
+                syncCompletedAttempts()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val syncItem = menu.findItem(R.id.sync_completed_attempt)
+        syncItem?.isVisible = isSyncButtonVisible
+        return super.onPrepareOptionsMenu(menu)
+    }
 
     private fun initializeViewModel() {
         offlineExamViewModel = OfflineExamViewModel.initializeViewModel(this)
@@ -121,8 +128,15 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         offlineExamViewModel.syncExamsModifiedDates()
     }
 
-    private fun syncCompletedAttempts(forceSync: Boolean = false) {
-        offlineExamViewModel.syncCompletedAllAttemptToBackEnd(forceSync)
+    private fun syncCompletedAttempts() {
+        offlineExamViewModel.syncCompletedAllAttemptToBackEnd()
+    }
+
+    private fun observeCompletedOfflineAttempt() {
+        offlineExamViewModel.getOfflineAttemptsByCompleteState().observe(this) {
+            isSyncButtonVisible = it.isNotEmpty()
+            invalidateOptionsMenu()
+        }
     }
 
     private fun observeCompletedAttemptSyncResult() {

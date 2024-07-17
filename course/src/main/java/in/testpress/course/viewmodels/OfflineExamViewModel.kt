@@ -57,9 +57,9 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
         return repository.getOfflineAttemptsByExamIdAndState(examId, state)
     }
 
-    fun syncCompletedAllAttemptToBackEnd(forceSync: Boolean){
+    fun syncCompletedAllAttemptToBackEnd(){
         viewModelScope.launch {
-            repository.syncCompletedAllAttemptToBackEnd(forceSync)
+            repository.syncCompletedAllAttemptToBackEnd()
         }
     }
 
@@ -67,6 +67,10 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
         viewModelScope.launch {
             repository.syncCompletedAttempt(examId)
         }
+    }
+
+    fun getOfflineAttemptsByCompleteState(): LiveData<List<OfflineAttempt>> {
+        return repository.getOfflineAttemptsByCompleteState()
     }
 
     suspend fun getOfflineExamContent(contentId: Long): Content? {
