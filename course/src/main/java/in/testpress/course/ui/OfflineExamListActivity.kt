@@ -12,9 +12,7 @@ import `in`.testpress.enums.Status
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.ui.BaseToolBarActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -31,6 +29,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
     private lateinit var offlineExamAdapter: OfflineExamAdapter
     private lateinit var progressDialog: ProgressDialog
     private lateinit var onItemClickListener: OnItemClickListener
+    private var isSyncButtonVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,11 +43,33 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         initializeProgressDialog()
         syncExamsModifiedDates()
         observeOfflineAttemptSyncResult()
+        observeCompletedOfflineAttemptCount()
     }
 
     override fun onResume() {
         super.onResume()
         syncCompletedAttempts()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.offline_attempt_sync, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.sync_completed_attempt -> {
+                syncCompletedAttempts()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val syncItem = menu.findItem(R.id.sync_completed_attempt)
+        syncItem?.isVisible = isSyncButtonVisible
+        return super.onPrepareOptionsMenu(menu)
     }
 
     private fun initializeViewModel() {
@@ -109,6 +130,13 @@ class OfflineExamListActivity : BaseToolBarActivity() {
 
     private fun syncCompletedAttempts() {
         offlineExamViewModel.syncCompletedAllAttemptToBackEnd()
+    }
+
+    private fun observeCompletedOfflineAttemptCount() {
+        offlineExamViewModel.getOfflineAttemptsByCompleteState().observe(this) {
+            isSyncButtonVisible = it.isNotEmpty()
+            invalidateOptionsMenu()
+        }
     }
 
     private fun observeOfflineAttemptSyncResult() {
