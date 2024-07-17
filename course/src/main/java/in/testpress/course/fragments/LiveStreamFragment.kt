@@ -11,16 +11,22 @@ import `in`.testpress.course.util.ExoplayerFullscreenHelper
 import `in`.testpress.fragments.WebViewFragment
 import `in`.testpress.fragments.WebViewFragment.Companion.IS_AUTHENTICATION_REQUIRED
 import `in`.testpress.fragments.WebViewFragment.Companion.URL_TO_OPEN
+import `in`.testpress.util.makeHeadRequest
+import android.os.Handler
+import android.os.Looper
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import kotlinx.coroutines.*
+import java.lang.Runnable
 
 
-class LiveStreamFragment : BaseContentDetailFragment() {
+class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListener {
     override var isBookmarkEnabled: Boolean = false
     private lateinit var exoPlayerView: AspectRatioFrameLayout
     private lateinit var exoplayerFullscreenHelper: ExoplayerFullscreenHelper
     private var exoPlayerUtil: ExoPlayerUtil? = null
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,11 +43,7 @@ class LiveStreamFragment : BaseContentDetailFragment() {
     override fun display() {
         when (content.liveStream?.status) {
             "Running" -> {
-                if (content.liveStream?.streamUrl.isNullOrEmpty()) {
-                    displayNotStartedNotice()
-                } else {
-                    displayPlayerViewWithChat()
-                }
+                displayPlayerViewWithChat()
             }
             "Not Started" -> displayNotStartedNotice()
             "Completed" -> displayEndedNotice()
@@ -91,7 +93,7 @@ class LiveStreamFragment : BaseContentDetailFragment() {
 
     private fun initializeExoPlayer() {
         val streamUrl = content.liveStream?.streamUrl
-        exoPlayerUtil = ExoPlayerUtil(activity, exoPlayerView, streamUrl, 0F)
+        exoPlayerUtil = ExoPlayerUtil(activity, exoPlayerView, streamUrl, 0F, this)
         exoPlayerUtil?.setContent(content.getGreenDaoContent(requireContext()))
         exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil)
         exoPlayerUtil?.initializePlayer()
@@ -138,4 +140,47 @@ class LiveStreamFragment : BaseContentDetailFragment() {
         super.onDestroy()
         exoplayerFullscreenHelper?.disableOrientationListener()
     }
+
+    override fun onUrlNullOrEmpty() {
+        val handler = Handler(Looper.getMainLooper())
+        val reloadContent = Runnable {
+            if(this.isAdded){
+                forceReloadContent()
+            }
+        }
+        handler.postDelayed(reloadContent, 15000)
+    }
+
+    override fun onUrlReturnError(url: String) {
+        coroutineScope.launch {
+            requestWithRetry(url, 5000)
+        }
+    }
+
+    private suspend fun requestWithRetry(url: String, delay: Long) {
+        while (coroutineScope.isActive) {
+            try {
+                val responseCode = makeHeadRequest(url)
+                if (responseCode == 200) {
+                    withContext(Dispatchers.Main) {
+                        forceReloadContent()
+                    }
+                    return
+                }
+            } catch (e: Exception) {
+                println("Request failed: ${e.message}")
+            }
+            delay(delay)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        coroutineScope.cancel()
+    }
+}
+
+interface LiveStreamCallbackListener {
+    fun onUrlNullOrEmpty()
+    fun onUrlReturnError(url: String)
 }
