@@ -75,6 +75,7 @@ import in.testpress.core.TestpressSession;
 import in.testpress.core.TestpressUserDetails;
 import in.testpress.course.R;
 import in.testpress.course.api.TestpressCourseApiClient;
+import in.testpress.course.fragments.LiveStreamCallbackListener;
 import in.testpress.course.helpers.CustomHttpDrmMediaCallback;
 import in.testpress.course.helpers.DownloadTask;
 import in.testpress.course.helpers.VideoDownload;
@@ -118,6 +119,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private Dialog fullscreenDialog;
     private TrackSelectionDialog trackSelectionDialog;
     private YouTubeOverlay youtubeOverlay;
+    private LinearLayout noticeScreen;
+    private TextView noticeMessage;
     List<String[]> watchedTimeRanges = new ArrayList<>();
 
 
@@ -157,6 +160,13 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private VideoWatchDataRepository videoWatchDataRepository;
     private ScaleGestureDetector scaleGestureDetector;
     private PinchToZoomGesture pinchToZoomGesture;
+    private LiveStreamCallbackListener liveStreamCallbackListener;
+
+    public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
+                         float startPosition, LiveStreamCallbackListener liveStreamCallbackListener) {
+        this(activity, exoPlayerMainFrame, url, startPosition);
+        this.liveStreamCallbackListener = liveStreamCallbackListener;
+    }
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition) {
@@ -214,6 +224,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             openFullscreenDialog();
         }
         activity.getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
+        hideLiveStreamNotStartedScreen();
     }
 
     private boolean isLandscapeModeEnabled() {
@@ -232,6 +243,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         emailIdTextView = exoPlayerMainFrame.findViewById(R.id.email_id);
         emailIdLayout = exoPlayerMainFrame.findViewById(R.id.email_id_layout);
         youtubeOverlay = activity.findViewById(R.id.youtube_overlay);
+        noticeScreen = exoPlayerMainFrame.findViewById(R.id.notice_screen);
+        noticeMessage = exoPlayerMainFrame.findViewById(R.id.notice_message);
     }
 
     private void initFullscreenDialog() {
@@ -285,6 +298,12 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     public void initializePlayer() {
+        if (url == null || url.isEmpty()) {
+            progressBar.setVisibility(View.GONE);
+            liveStreamCallbackListener.onUrlNullOrEmpty();
+            showLiveStreamNotStartedScreen();
+            return;
+        }
         if (player == null) {
             progressBar.setVisibility(View.VISIBLE);
             buildPlayer();
@@ -294,6 +313,15 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         player.seekTo(getStartPositionInMilliSeconds());
         initializeUsernameOverlay();
         registerListeners();
+    }
+
+    private void showLiveStreamNotStartedScreen() {
+        noticeScreen.setVisibility(View.VISIBLE);
+        noticeMessage.setText(R.string.waiting_for_live_stream_desc);
+    }
+
+    private void hideLiveStreamNotStartedScreen() {
+        noticeScreen.setVisibility(View.GONE);
     }
 
     private void buildPlayer() {
@@ -803,6 +831,12 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             String playBackId = VideoUtils.INSTANCE.generatePlayerIdString();
             Throwable cause = exception.getCause();
 
+            if(isLivestreamNotStartedError(exception)){
+                showLiveStreamNotStartedScreen();
+                liveStreamCallbackListener.onUrlReturnError(url);
+                return;
+            }
+
             if (isDRMException(cause)) {
                 DownloadTask downloadTask = new DownloadTask(url, activity);
                 drmLicenseRetries += 1;
@@ -849,6 +883,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         @Override
         public void onLicenseFetchFailure() {
             displayError(R.string.license_error);
+        }
+
+        private boolean isLivestreamNotStartedError(PlaybackException exception){
+            return liveStreamCallbackListener != null && exception.errorCode == 2004;
         }
     }
 
