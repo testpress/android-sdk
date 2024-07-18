@@ -30,6 +30,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
     private lateinit var progressDialog: ProgressDialog
     private lateinit var onItemClickListener: OnItemClickListener
     private var isSyncButtonVisible = false
+    private var offlineExam: OfflineExam? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +45,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         syncExamsModifiedDates()
         observeOfflineAttemptSyncResult()
         observeCompletedOfflineAttemptCount()
+        observeExamDownloadState()
     }
 
     override fun onResume() {
@@ -79,15 +81,15 @@ class OfflineExamListActivity : BaseToolBarActivity() {
     private fun initializeOnItemClickListener() {
         onItemClickListener = object : OnItemClickListener {
             override fun onItemClick(exam: OfflineExam) {
+                offlineExam = exam
                 if ((exam.pausedAttemptsCount ?: 0) > 0) {
-                    resumeExam(exam)
+                    resumeExam()
                 } else {
                     if (exam.isSyncRequired) {
-                        observeExamDownloadState(exam)
                         monitorAndShowExamDownloadProgress(exam.contentId!!)
                         offlineExamViewModel.downloadExam(exam.contentId!!)
                     } else {
-                        startExam(exam)
+                        startExam()
                     }
                 }
             }
@@ -162,10 +164,10 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         }
     }
 
-    private fun resumeExam(exam: OfflineExam) {
+    private fun resumeExam() {
         CoroutineScope(Dispatchers.IO).launch {
-            val content = offlineExamViewModel.getOfflineExamContent(exam.contentId!!)
-            val pausedAttempt = offlineExamViewModel.getOfflinePausedAttempt(exam.id!!)
+            val content = offlineExamViewModel.getOfflineExamContent(offlineExam?.contentId!!)
+            val pausedAttempt = offlineExamViewModel.getOfflinePausedAttempt(offlineExam?.id!!)
             if (content != null && pausedAttempt != null) {
                 withContext(Dispatchers.Main) {
                     TestpressExam.resumeCourseAttempt(
@@ -180,9 +182,9 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         }
     }
 
-    private fun startExam(exam: OfflineExam) {
+    private fun startExam() {
         CoroutineScope(Dispatchers.IO).launch {
-            offlineExamViewModel.getOfflineExamContent(exam.contentId!!)?.let { content ->
+            offlineExamViewModel.getOfflineExamContent(offlineExam?.contentId!!)?.let { content ->
                 withContext(Dispatchers.Main) {
                     TestpressExam.startCourseExam(
                         this@OfflineExamListActivity, content, false, false,
@@ -204,19 +206,19 @@ class OfflineExamListActivity : BaseToolBarActivity() {
             }
     }
 
-    private fun observeExamDownloadState(offlineExam: OfflineExam) {
+    private fun observeExamDownloadState() {
         offlineExamViewModel.downloadExamResult.observe(this) { result ->
             when (result.status) {
                 Status.SUCCESS -> {
                     hideProgressDialog()
-                    startExam(offlineExam)
+                    startExam()
                 }
                 Status.LOADING -> {
                     showProgressDialog()
                 }
                 Status.ERROR -> {
                     hideProgressDialog()
-                    startExam(offlineExam)
+                    startExam()
                 }
             }
 

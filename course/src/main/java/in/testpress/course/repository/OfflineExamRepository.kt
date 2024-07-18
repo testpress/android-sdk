@@ -166,6 +166,7 @@ class OfflineExamRepository(val context: Context) {
 
 
     private fun handleDownloadError(exception: Exception) {
+        Log.d("TAG", "handleDownloadError: ")
         _downloadExamResult.postValue(
             Resource.error(
                 TestpressException.unexpectedError(exception), null
