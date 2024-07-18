@@ -16,48 +16,44 @@ class NetworkOfflineQuestionResponse(
         regexs.forEach { urlPattern ->
             this.directions.forEach { direction ->
                 direction.html?.let { html ->
-                    urlPattern.findAll(html).forEach { matchResult ->
-                        val url = matchResult.groupValues[1].trim()
-                        urls.add(url)
-                    }
+                    urls.addAll(findUrls(html, urlPattern))
                 }
             }
 
             this.sections.forEach { section ->
                 section.instructions?.let { instructions ->
-                    urlPattern.findAll(instructions).forEach { matchResult ->
-                        val url = matchResult.groupValues[1].trim()
-                        urls.add(url)
-                    }
+                    urls.addAll(findUrls(instructions, urlPattern))
                 }
             }
 
             this.questions.forEach { question ->
                 question.questionHtml?.let { questionHtml ->
-                    urlPattern.findAll(questionHtml).forEach { matchResult ->
-                        val url = matchResult.groupValues[1].trim()
-                        urls.add(url)
-                    }
+                    urls.addAll(findUrls(questionHtml, urlPattern))
                 }
                 question.translations.forEach { translation ->
                     translation.questionHtml?.let { translationHtml ->
-                        urlPattern.findAll(translationHtml).forEach { matchResult ->
-                            val url = matchResult.groupValues[1].trim()
-                            urls.add(url)
-                        }
+                        urls.addAll(findUrls(translationHtml, urlPattern))
                     }
                 }
                 question.answers.forEach { answer ->
                     answer.textHtml?.let { textHtml ->
-                        urlPattern.findAll(textHtml).forEach { matchResult ->
-                            val url = matchResult.groupValues[1].trim()
-                            urls.add(url)
-                        }
+                        urls.addAll(findUrls(textHtml, urlPattern))
                     }
                 }
             }
         }
 
+        return urls
+    }
+
+    private fun findUrls(html: String?, urlPattern: Regex): List<String> {
+        val urls = mutableListOf<String>()
+        html?.let {
+            urlPattern.findAll(it).forEach { matchResult ->
+                val url = matchResult.groupValues[1].trim()
+                urls.add(url)
+            }
+        }
         return urls
     }
 
