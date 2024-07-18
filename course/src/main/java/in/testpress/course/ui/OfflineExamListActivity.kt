@@ -13,6 +13,8 @@ import `in`.testpress.exam.TestpressExam
 import `in`.testpress.ui.BaseToolBarActivity
 import android.os.Bundle
 import android.view.*
+import android.view.animation.LinearInterpolator
+import android.view.animation.RotateAnimation
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -31,6 +33,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
     private lateinit var onItemClickListener: OnItemClickListener
     private var offlineExam: OfflineExam? = null
     private var isSyncButtonVisible = false
+    private var syncMenuItem: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +58,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.offline_attempt_sync, menu)
+        syncMenuItem = menu.findItem(R.id.sync_completed_attempt)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -131,7 +135,29 @@ class OfflineExamListActivity : BaseToolBarActivity() {
     }
 
     private fun syncCompletedAttempts() {
+        syncMenuItem?.let { rotateSyncButton(it, true) }
         offlineExamViewModel.syncCompletedAllAttemptToBackEnd()
+    }
+
+    private fun rotateSyncButton(item: MenuItem?, shouldRotate: Boolean) {
+        if (item == null) return
+        item.actionView = if (shouldRotate) {
+            val syncActionView = item.actionView!!
+            val rotateAnimation = RotateAnimation(
+                0f, 360f,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f
+            ).apply {
+                duration = 1000
+                interpolator = LinearInterpolator()
+                repeatCount = RotateAnimation.INFINITE
+            }
+            syncActionView.startAnimation(rotateAnimation)
+            syncActionView
+        } else {
+            item.actionView?.clearAnimation()
+            null
+        }
     }
 
     private fun observeCompletedOfflineAttemptCount() {
@@ -145,6 +171,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         offlineExamViewModel.offlineAttemptSyncResult.observe(this) { it ->
             when (it.status) {
                 Status.SUCCESS -> {
+                    rotateSyncButton(syncMenuItem,false)
                     Toast.makeText(
                         this,
                         "Answers submitted successfully. To review the results, please visit the exam page within the course.",
@@ -153,6 +180,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                 }
                 Status.LOADING -> {}
                 Status.ERROR -> {
+                    rotateSyncButton(syncMenuItem,false)
                     Toast.makeText(
                         this,
                         "Please connect to the internet to submit your answers.",
