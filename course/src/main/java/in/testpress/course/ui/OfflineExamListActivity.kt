@@ -142,7 +142,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
     private fun rotateSyncButton(item: MenuItem?, shouldRotate: Boolean) {
         if (item == null) return
         item.actionView = if (shouldRotate) {
-            val syncActionView = item.actionView!!
+            val syncActionView = LayoutInflater.from(this).inflate(R.layout.sync_action_view, null)
             val rotateAnimation = RotateAnimation(
                 0f, 360f,
                 RotateAnimation.RELATIVE_TO_SELF, 0.5f,
