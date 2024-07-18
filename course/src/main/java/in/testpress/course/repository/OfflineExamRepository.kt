@@ -7,7 +7,7 @@ import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkOfflineQuestionResponse
 import `in`.testpress.course.network.asOfflineExam
-import `in`.testpress.course.util.ResourcesDownloader
+import `in`.testpress.course.util.ResourceDownloader
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.*
 import `in`.testpress.database.mapping.asGreenDaoModel
@@ -184,8 +184,8 @@ class OfflineExamRepository(val context: Context) {
                 val examResourcesUrl =
                     result.extractUrls().toSet().toList().validateHttpAndHttpsUrls()
 
-                ResourcesDownloader(context).downloadResources(examResourcesUrl) { urlToLocalPaths ->
-                    result.replaceResourceUrlWithLocalUrl(urlToLocalPaths)
+                ResourceDownloader(context).downloadResources(examResourcesUrl) { urlToLocalPaths ->
+                    result.replaceNetworkUrlWithLocalUrl(urlToLocalPaths)
                     directionDao.insertAll(result.directions)
                     subjectDao.insertAll(result.subjects)
                     sectionsDao.insertAll(result.sections)

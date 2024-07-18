@@ -1,14 +1,13 @@
 package `in`.testpress.course.util
 
 import android.content.Context
-import android.util.Log
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import java.io.File
 import java.io.FileOutputStream
+import okhttp3.Request
 
-class ResourcesDownloader(val context: Context) {
+class ResourceDownloader(val context: Context) {
     private val client = OkHttpClient()
 
     fun downloadResources(
@@ -17,10 +16,6 @@ class ResourcesDownloader(val context: Context) {
     ) {
         val urlToLocalPathMap = HashMap<String, String>()
         val scope = CoroutineScope(Dispatchers.IO)
-
-        urls.forEach {
-            Log.d("TAG", "downloadResources: $it")
-        }
 
         scope.launch {
             val deferredDownloads = urls.map { url ->

@@ -61,7 +61,7 @@ class NetworkOfflineQuestionResponse(
         return urls
     }
 
-    fun replaceResourceUrlWithLocalUrl(urlToLocalPaths: HashMap<String, String>) {
+    fun replaceNetworkUrlWithLocalUrl(urlToLocalPaths: HashMap<String, String>) {
 
         urlToLocalPaths.map { urlToLocalPath ->
 
