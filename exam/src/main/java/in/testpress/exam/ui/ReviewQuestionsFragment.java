@@ -382,8 +382,6 @@ public class ReviewQuestionsFragment extends Fragment {
                 "Report Question" +
                 "</div>";
 
-        Log.d("TAG", "getHtml: "+html);
-
         // Add direction/passage
         if (directionHtml != null && !directionHtml.isEmpty()) {
             html += "<div class='question' style='padding-bottom: 0px;'>" +
