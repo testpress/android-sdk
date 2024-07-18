@@ -45,10 +45,6 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
         downloadExam(offlineExam.contentId!!)
     }
 
-    fun getOfflineAttemptsByCompleteState(): LiveData<List<OfflineAttempt>> {
-        return repository.getOfflineAttemptsByCompleteState()
-    }
-
     suspend fun getOfflineContentAttempts(attemptId: Long): OfflineCourseAttempt? {
         return repository.getOfflineContentAttempts(attemptId)
     }

@@ -150,10 +150,6 @@ class OfflineExamRepository(val context: Context) {
         }
     }
 
-    fun getOfflineAttemptsByCompleteState() :LiveData<List<OfflineAttempt>> {
-        return offlineAttemptDao.getOfflineAttemptsByCompleteState()
-    }
-
     private fun saveQuestionsToDB(response: NetworkOfflineQuestionResponse){
         CoroutineScope(Dispatchers.IO).launch {
             directionDao.insertAll(response.directions)
@@ -166,7 +162,6 @@ class OfflineExamRepository(val context: Context) {
 
 
     private fun handleDownloadError(exception: Exception) {
-        Log.d("TAG", "handleDownloadError: ")
         _downloadExamResult.postValue(
             Resource.error(
                 TestpressException.unexpectedError(exception), null
