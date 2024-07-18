@@ -16,6 +16,7 @@ public class UserUploadedFile {
     @Id
     private Long id;
     private String path;
+    private String pdfPreviewUrl;
     private String url;
     private Long reviewItemId;
 
@@ -31,9 +32,10 @@ public class UserUploadedFile {
     }
 
     @Generated
-    public UserUploadedFile(Long id, String path, String url, Long reviewItemId) {
+    public UserUploadedFile(Long id, String path, String pdfPreviewUrl, String url, Long reviewItemId) {
         this.id = id;
         this.path = path;
+        this.pdfPreviewUrl = pdfPreviewUrl;
         this.url = url;
         this.reviewItemId = reviewItemId;
     }
@@ -52,6 +54,14 @@ public class UserUploadedFile {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getPdfPreviewUrl() {
+        return pdfPreviewUrl;
+    }
+
+    public void setPdfPreviewUrl(String pdfPreviewUrl) {
+        this.pdfPreviewUrl = pdfPreviewUrl;
     }
 
     public String getUrl() {
