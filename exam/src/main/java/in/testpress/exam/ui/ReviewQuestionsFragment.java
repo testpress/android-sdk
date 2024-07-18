@@ -382,6 +382,8 @@ public class ReviewQuestionsFragment extends Fragment {
                 "Report Question" +
                 "</div>";
 
+        Log.d("TAG", "getHtml: "+html);
+
         // Add direction/passage
         if (directionHtml != null && !directionHtml.isEmpty()) {
             html += "<div class='question' style='padding-bottom: 0px;'>" +
@@ -458,7 +460,7 @@ public class ReviewQuestionsFragment extends Fragment {
         }
 
         if (reviewItem.getQuestion().getType().equals("F")) {
-            html += getUserUploadedFilesHtml(html);
+            html += getUserUploadedFilesHtml();
         } else if (reviewItem.getQuestion().getType().equals("A")) {
             html += getAudioTypeHtml(html);
         }
@@ -507,7 +509,7 @@ public class ReviewQuestionsFragment extends Fragment {
     }
 
     @NonNull
-    private String getUserUploadedFilesHtml(String html) {
+    private String getUserUploadedFilesHtml() {
         StringBuilder htmlBuilder = new StringBuilder("<div class='file-question'>");
         htmlBuilder.append("<label>Uploaded Files:</label>");
 
@@ -530,7 +532,7 @@ public class ReviewQuestionsFragment extends Fragment {
             htmlBuilder.append("</div>");
         }
         htmlBuilder.append("</div>");
-        return html + htmlBuilder;
+        return htmlBuilder.toString();
     }
 
     @NonNull
