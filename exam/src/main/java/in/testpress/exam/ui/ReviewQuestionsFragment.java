@@ -521,12 +521,6 @@ public class ReviewQuestionsFragment extends Fragment {
                         .append(reviewItem.getFiles().get(index).getPdfPreviewUrl())
                         .append("\")'>Preview</button>");
             }
-            // Add Download Button
-            if (reviewItem.getFiles().get(index).getUrl() != null) {
-                htmlBuilder.append("<button onclick='location.href=\"")
-                        .append(reviewItem.getFiles().get(index).getUrl())
-                        .append("\"'>Download</button>");
-            }
             htmlBuilder.append("</div>");
         }
         htmlBuilder.append("</div>");
