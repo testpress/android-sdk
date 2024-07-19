@@ -73,8 +73,8 @@ class OfflineExamListActivity : BaseToolBarActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        val syncItem = menu.findItem(R.id.sync_completed_attempt)
-        syncItem?.isVisible = isSyncButtonVisible
+        syncMenuItem = menu.findItem(R.id.sync_completed_attempt)
+        syncMenuItem?.isVisible = isSyncButtonVisible
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -140,7 +140,9 @@ class OfflineExamListActivity : BaseToolBarActivity() {
     }
 
     private fun rotateSyncButton(item: MenuItem?, shouldRotate: Boolean) {
-        if (item == null) return
+        if (item == null || !isSyncButtonVisible) return
+        item.actionView?.clearAnimation()
+        item.actionView = null
         item.actionView = if (shouldRotate) {
             val syncActionView = LayoutInflater.from(this).inflate(R.layout.sync_action_view, null)
             val rotateAnimation = RotateAnimation(
@@ -155,15 +157,15 @@ class OfflineExamListActivity : BaseToolBarActivity() {
             syncActionView.startAnimation(rotateAnimation)
             syncActionView
         } else {
-            item.actionView?.clearAnimation()
             null
         }
     }
 
     private fun observeCompletedOfflineAttemptCount() {
         offlineExamViewModel.getOfflineAttemptsByCompleteState().observe(this) {
+            val oldState = isSyncButtonVisible
             isSyncButtonVisible = it.isNotEmpty()
-            invalidateOptionsMenu()
+            if (oldState != isSyncButtonVisible) invalidateOptionsMenu()
         }
     }
 
@@ -171,7 +173,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         offlineExamViewModel.offlineAttemptSyncResult.observe(this) { it ->
             when (it.status) {
                 Status.SUCCESS -> {
-                    rotateSyncButton(syncMenuItem,false)
+                    syncMenuItem?.let { rotateSyncButton(it, false) }
                     Toast.makeText(
                         this,
                         "Answers submitted successfully. To review the results, please visit the exam page within the course.",
@@ -180,7 +182,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                 }
                 Status.LOADING -> {}
                 Status.ERROR -> {
-                    rotateSyncButton(syncMenuItem,false)
+                    syncMenuItem?.let { rotateSyncButton(it, false) }
                     Toast.makeText(
                         this,
                         "Please connect to the internet to submit your answers.",
