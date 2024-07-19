@@ -507,3 +507,24 @@ video {
     font-size: 12px;
     padding: 3xp 8xp;
 }
+
+
+.file-question {
+    margin-bottom: 10px;
+    margin-left: 10px;
+    color: #666;
+    font-family: 'PT-Serif-Regular', serif;
+    display: inline-block;
+}
+
+.file-entry {
+    margin-top: 5px;
+}
+
+.file-entry label {
+    margin-right: 10px;
+}
+
+.file-entry button {
+    margin-left: 5px;
+}

@@ -27,8 +27,9 @@ public class UserUploadedFileDao extends AbstractDao<UserUploadedFile, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "ID");
         public final static Property Path = new Property(1, String.class, "path", false, "PATH");
-        public final static Property Url = new Property(2, String.class, "url", false, "URL");
-        public final static Property ReviewItemId = new Property(3, Long.class, "reviewItemId", false, "REVIEW_ITEM_ID");
+        public final static Property PdfPreviewUrl = new Property(2, String.class, "pdfPreviewUrl", false, "PDF_PREVIEW_URL");
+        public final static Property Url = new Property(3, String.class, "url", false, "URL");
+        public final static Property ReviewItemId = new Property(4, Long.class, "reviewItemId", false, "REVIEW_ITEM_ID");
     }
 
     private Query<UserUploadedFile> reviewItem_FilesQuery;
@@ -47,8 +48,9 @@ public class UserUploadedFileDao extends AbstractDao<UserUploadedFile, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"USER_UPLOADED_FILE\" (" + //
                 "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"PATH\" TEXT," + // 1: path
-                "\"URL\" TEXT," + // 2: url
-                "\"REVIEW_ITEM_ID\" INTEGER);"); // 3: reviewItemId
+                "\"PDF_PREVIEW_URL\" TEXT," + // 2: pdfPreviewUrl
+                "\"URL\" TEXT," + // 3: url
+                "\"REVIEW_ITEM_ID\" INTEGER);"); // 4: reviewItemId
     }
 
     /** Drops the underlying database table. */
@@ -71,14 +73,19 @@ public class UserUploadedFileDao extends AbstractDao<UserUploadedFile, Long> {
             stmt.bindString(2, path);
         }
  
+        String pdfPreviewUrl = entity.getPdfPreviewUrl();
+        if (pdfPreviewUrl != null) {
+            stmt.bindString(3, pdfPreviewUrl);
+        }
+ 
         String url = entity.getUrl();
         if (url != null) {
-            stmt.bindString(3, url);
+            stmt.bindString(4, url);
         }
  
         Long reviewItemId = entity.getReviewItemId();
         if (reviewItemId != null) {
-            stmt.bindLong(4, reviewItemId);
+            stmt.bindLong(5, reviewItemId);
         }
     }
 
@@ -96,14 +103,19 @@ public class UserUploadedFileDao extends AbstractDao<UserUploadedFile, Long> {
             stmt.bindString(2, path);
         }
  
+        String pdfPreviewUrl = entity.getPdfPreviewUrl();
+        if (pdfPreviewUrl != null) {
+            stmt.bindString(3, pdfPreviewUrl);
+        }
+ 
         String url = entity.getUrl();
         if (url != null) {
-            stmt.bindString(3, url);
+            stmt.bindString(4, url);
         }
  
         Long reviewItemId = entity.getReviewItemId();
         if (reviewItemId != null) {
-            stmt.bindLong(4, reviewItemId);
+            stmt.bindLong(5, reviewItemId);
         }
     }
 
@@ -117,8 +129,9 @@ public class UserUploadedFileDao extends AbstractDao<UserUploadedFile, Long> {
         UserUploadedFile entity = new UserUploadedFile( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // path
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // url
-            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3) // reviewItemId
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // pdfPreviewUrl
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // url
+            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4) // reviewItemId
         );
         return entity;
     }
@@ -127,8 +140,9 @@ public class UserUploadedFileDao extends AbstractDao<UserUploadedFile, Long> {
     public void readEntity(Cursor cursor, UserUploadedFile entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setPath(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setUrl(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setReviewItemId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
+        entity.setPdfPreviewUrl(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setUrl(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setReviewItemId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
      }
     
     @Override

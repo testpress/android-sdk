@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 68;
+    private static final int VERSION = 69;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -102,6 +102,7 @@ public class TestpressSDKDaoGenerator {
         Entity userUploadedFile = schema.addEntity("UserUploadedFile");
         userUploadedFile.addLongProperty("id").primaryKey();
         userUploadedFile.addStringProperty("path");
+        userUploadedFile.addStringProperty("pdfPreviewUrl");
         userUploadedFile.addStringProperty("url");
         return userUploadedFile;
     }

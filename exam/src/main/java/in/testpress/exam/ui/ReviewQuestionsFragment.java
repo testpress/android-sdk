@@ -58,6 +58,7 @@ import in.testpress.models.greendao.ReviewQuestion;
 import in.testpress.models.greendao.ReviewQuestionTranslation;
 import in.testpress.models.greendao.UserUploadedFile;
 import in.testpress.network.RetrofitCall;
+import in.testpress.ui.WebViewWithSSOActivity;
 import in.testpress.ui.view.ClosableSpinner;
 import in.testpress.util.CommonUtils;
 import in.testpress.util.FullScreenChromeClient;
@@ -245,6 +246,7 @@ public class ReviewQuestionsFragment extends Fragment {
         };
         webView.addJavascriptInterface(new BookmarkListener(), "BookmarkListener");
         webView.addJavascriptInterface(new ReportListener(), "ReportListener");
+        webView.addJavascriptInterface(new FileListener(), "FileListener");
         webViewUtils.initWebView(getReviewItemAsHtml(), getActivity());
         FullScreenChromeClient fullScreenChromeClient = new FullScreenChromeClient(getActivity());
         webView.setWebChromeClient(fullScreenChromeClient);
@@ -456,7 +458,7 @@ public class ReviewQuestionsFragment extends Fragment {
         }
 
         if (reviewItem.getQuestion().getType().equals("F")) {
-            html += getUserUploadedFilesHtml(html);
+            html += getUserUploadedFilesHtml();
         } else if (reviewItem.getQuestion().getType().equals("A")) {
             html += getAudioTypeHtml(html);
         }
@@ -505,15 +507,24 @@ public class ReviewQuestionsFragment extends Fragment {
     }
 
     @NonNull
-    private String getUserUploadedFilesHtml(String html) {
-        int index = 1;
-        html += "<div>";
-        for(UserUploadedFile file: reviewItem.getFiles()) {
-            html += "<a href='" + file.getUrl() +"'>" + "File - " + index + "</a>";
-            index++;
+    private String getUserUploadedFilesHtml() {
+        StringBuilder htmlBuilder = new StringBuilder("<div class='file-question'>");
+        htmlBuilder.append("<label>Uploaded Files:</label>");
+
+        for (int index = 0; index < reviewItem.getFiles().size(); index++) {
+            String fileLabel = "File " + (index + 1);
+            htmlBuilder.append("<div class='file-entry'>");
+            htmlBuilder.append("<label>").append(fileLabel).append("</label>");
+            // Add Preview Button
+            if (reviewItem.getFiles().get(index).getPdfPreviewUrl() != null) {
+                htmlBuilder.append("<button onclick='onClickPreviewFile(\"")
+                        .append(reviewItem.getFiles().get(index).getPdfPreviewUrl())
+                        .append("\")'>Preview</button>");
+            }
+            htmlBuilder.append("</div>");
         }
-        html += "</div>";
-        return html;
+        htmlBuilder.append("</div>");
+        return htmlBuilder.toString();
     }
 
     @NonNull
@@ -794,4 +805,23 @@ public class ReviewQuestionsFragment extends Fragment {
         webViewUtils.loadHtml(getReviewItemAsHtml());
     }
 
+    private class FileListener {
+
+        @JavascriptInterface
+        public void onClickPreviewFile(String url) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    startActivity(WebViewWithSSOActivity.Companion.createIntent(
+                                    requireContext(),
+                                    "PDF Preview",
+                                    url,
+                                    false,
+                                    WebViewWithSSOActivity.class
+                            )
+                    );
+                }
+            });
+        }
+    }
 }
