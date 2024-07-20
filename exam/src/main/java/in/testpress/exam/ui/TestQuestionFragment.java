@@ -121,6 +121,11 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
                 }
 
                 @Override
+                public boolean isOfflineExamMode() {
+                    return exam.getIsOfflineExam() != null && exam.getIsOfflineExam();
+                }
+
+                @Override
                 public String getJavascript(Context context) {
                     String javascript = super.getJavascript(context);
                     List<Integer> selectedAnswers = attemptItem.getSavedAnswers();

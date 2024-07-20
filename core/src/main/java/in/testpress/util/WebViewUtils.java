@@ -92,7 +92,9 @@ public class WebViewUtils {
                     return;
                 }
                 onNetworkError();
-                hasError = true;
+                if (!isOfflineExamMode()){
+                    hasError = true;
+                }
             }
         });
         loadHtml(htmlContent);
@@ -249,6 +251,10 @@ public class WebViewUtils {
 
     public String getHeader() {
         return getBaseHeader();
+    }
+
+    public boolean isOfflineExamMode() {
+        return false;
     }
 
     public String getQuestionsHeader() {
