@@ -7,6 +7,7 @@ import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkOfflineQuestionResponse
 import `in`.testpress.course.network.asOfflineExam
+import `in`.testpress.course.util.ResourceDownloader
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.*
 import `in`.testpress.database.mapping.asGreenDaoModel
@@ -26,6 +27,7 @@ import `in`.testpress.network.RetrofitCall
 import `in`.testpress.util.PagedApiFetcher
 import `in`.testpress.util.extension.isNotNull
 import `in`.testpress.util.extension.isNotNullAndNotEmpty
+import `in`.testpress.util.extension.validateHttpAndHttpsUrls
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
 import android.util.Log
@@ -55,6 +57,11 @@ class OfflineExamRepository(val context: Context) {
     private val offlineCourseAttemptDao = database.offlineCourseAttemptDao()
     private val offlineAttemptSectionDao = database.offlineAttemptSectionDao()
     private val offlineAttemptItemDao = database.offlineAttemptItemDoa()
+    private val directions = mutableListOf<Direction>()
+    private val subjects = mutableListOf<Subject>()
+    private val sections = mutableListOf<Section>()
+    private val examQuestions = mutableListOf<ExamQuestion>()
+    private val questions = mutableListOf<Question>()
 
     private val _downloadExamResult = MutableLiveData<Resource<Boolean>>()
     val downloadExamResult: LiveData<Resource<Boolean>> get() = _downloadExamResult
@@ -117,14 +124,13 @@ class OfflineExamRepository(val context: Context) {
                 .enqueue(object : TestpressCallback<ApiResponse<NetworkOfflineQuestionResponse>>() {
                     override fun onSuccess(result: ApiResponse<NetworkOfflineQuestionResponse>) {
                         if (result.next != null) {
-                            saveQuestionsToDB(result.results)
+                            handleSuccessResponse(examId, result.results)
                             updateOfflineExamDownloadPercent(examId, result.results!!.questions.size.toLong())
                             page++
                             fetchQuestionsPage()
                         } else {
-                            saveQuestionsToDB(result.results)
+                            handleSuccessResponse(examId, result.results, lastPage = true)
                             updateOfflineExamDownloadPercent(examId, result.results!!.questions.size.toLong())
-                            updateDownloadedState(examId)
                             _downloadExamResult.postValue(Resource.success(true))
                         }
                     }
@@ -154,13 +160,41 @@ class OfflineExamRepository(val context: Context) {
         return offlineAttemptDao.getOfflineAttemptsByCompleteState()
     }
 
-    private fun saveQuestionsToDB(response: NetworkOfflineQuestionResponse){
-        CoroutineScope(Dispatchers.IO).launch {
-            directionDao.insertAll(response.directions)
-            subjectDao.insertAll(response.subjects)
-            sectionsDao.insertAll(response.sections)
-            examQuestionDao.insertAll(response.examQuestions)
-            questionDao.insertAll(response.questions)
+    private fun handleSuccessResponse(
+        examId: Long,
+        response: NetworkOfflineQuestionResponse,
+        lastPage: Boolean = false
+    ) {
+        directions.addAll(response.directions)
+        subjects.addAll(response.subjects)
+        sections.addAll(response.sections)
+        examQuestions.addAll(response.examQuestions)
+        questions.addAll(response.questions)
+
+        if (lastPage) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val result = NetworkOfflineQuestionResponse(
+                    directions,
+                    subjects,
+                    sections,
+                    examQuestions,
+                    questions,
+                )
+
+                val examResourcesUrl =
+                    result.extractUrls().toSet().toList().validateHttpAndHttpsUrls()
+
+                ResourceDownloader(context).downloadResources(examResourcesUrl) { urlToLocalPaths ->
+                    result.replaceNetworkUrlWithLocalUrl(urlToLocalPaths)
+                    directionDao.insertAll(result.directions)
+                    subjectDao.insertAll(result.subjects)
+                    sectionsDao.insertAll(result.sections)
+                    examQuestionDao.insertAll(result.examQuestions)
+                    questionDao.insertAll(result.questions)
+                    updateDownloadedState(examId)
+                    _downloadExamResult.postValue(Resource.success(true))
+                }
+            }
         }
     }
 
