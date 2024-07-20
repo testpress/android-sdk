@@ -12,9 +12,9 @@ import `in`.testpress.enums.Status
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.ui.BaseToolBarActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.animation.LinearInterpolator
+import android.view.animation.RotateAnimation
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -32,6 +32,8 @@ class OfflineExamListActivity : BaseToolBarActivity() {
     private lateinit var progressDialog: ProgressDialog
     private lateinit var onItemClickListener: OnItemClickListener
     private var offlineExam: OfflineExam? = null
+    private var isSyncButtonVisible = false
+    private var syncMenuItem: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,11 +48,34 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         syncExamsModifiedDates()
         observeOfflineAttemptSyncResult()
         observeExamDownloadState()
+        observeCompletedOfflineAttemptCount()
     }
 
     override fun onResume() {
         super.onResume()
         syncCompletedAttempts()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.offline_attempt_sync, menu)
+        syncMenuItem = menu.findItem(R.id.sync_completed_attempt)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.sync_completed_attempt -> {
+                syncCompletedAttempts()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        syncMenuItem = menu.findItem(R.id.sync_completed_attempt)
+        syncMenuItem?.isVisible = isSyncButtonVisible
+        return super.onPrepareOptionsMenu(menu)
     }
 
     private fun initializeViewModel() {
@@ -110,13 +135,45 @@ class OfflineExamListActivity : BaseToolBarActivity() {
     }
 
     private fun syncCompletedAttempts() {
+        syncMenuItem?.let { rotateSyncButton(it, true) }
         offlineExamViewModel.syncCompletedAllAttemptToBackEnd()
+    }
+
+    private fun rotateSyncButton(item: MenuItem?, shouldRotate: Boolean) {
+        if (item == null || !isSyncButtonVisible) return
+        item.actionView?.clearAnimation()
+        item.actionView = null
+        item.actionView = if (shouldRotate) {
+            val syncActionView = LayoutInflater.from(this).inflate(R.layout.refresh_action_view, null)
+            val rotateAnimation = RotateAnimation(
+                0f, 360f,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f
+            ).apply {
+                duration = 1000
+                interpolator = LinearInterpolator()
+                repeatCount = RotateAnimation.INFINITE
+            }
+            syncActionView.startAnimation(rotateAnimation)
+            syncActionView
+        } else {
+            null
+        }
+    }
+
+    private fun observeCompletedOfflineAttemptCount() {
+        offlineExamViewModel.getOfflineAttemptsByCompleteState().observe(this) {
+            val oldState = isSyncButtonVisible
+            isSyncButtonVisible = it.isNotEmpty()
+            if (oldState != isSyncButtonVisible) invalidateOptionsMenu()
+        }
     }
 
     private fun observeOfflineAttemptSyncResult() {
         offlineExamViewModel.offlineAttemptSyncResult.observe(this) { it ->
             when (it.status) {
                 Status.SUCCESS -> {
+                    syncMenuItem?.let { rotateSyncButton(it, false) }
                     Toast.makeText(
                         this,
                         "Answers submitted successfully. To review the results, please visit the exam page within the course.",
@@ -125,6 +182,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                 }
                 Status.LOADING -> {}
                 Status.ERROR -> {
+                    syncMenuItem?.let { rotateSyncButton(it, false) }
                     Toast.makeText(
                         this,
                         "Please connect to the internet to submit your answers.",

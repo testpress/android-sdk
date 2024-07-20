@@ -150,6 +150,10 @@ class OfflineExamRepository(val context: Context) {
         }
     }
 
+    fun getOfflineAttemptsByCompleteState() :LiveData<List<OfflineAttempt>> {
+        return offlineAttemptDao.getOfflineAttemptsByCompleteState()
+    }
+
     private fun saveQuestionsToDB(response: NetworkOfflineQuestionResponse){
         CoroutineScope(Dispatchers.IO).launch {
             directionDao.insertAll(response.directions)
