@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class ResourceDownloader(val context: Context) {
     private val client = OkHttpClient()
-    private val semaphore = Semaphore(5)
+    private val semaphore = Semaphore(10)
 
     suspend fun downloadResources(
         urls: List<String>,
