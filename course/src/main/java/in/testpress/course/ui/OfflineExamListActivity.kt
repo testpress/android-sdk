@@ -144,7 +144,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         item.actionView?.clearAnimation()
         item.actionView = null
         item.actionView = if (shouldRotate) {
-            val syncActionView = LayoutInflater.from(this).inflate(R.layout.sync_action_view, null)
+            val syncActionView = LayoutInflater.from(this).inflate(R.layout.refresh_action_view, null)
             val rotateAnimation = RotateAnimation(
                 0f, 360f,
                 RotateAnimation.RELATIVE_TO_SELF, 0.5f,
