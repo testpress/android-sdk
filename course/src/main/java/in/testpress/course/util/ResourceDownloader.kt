@@ -2,31 +2,35 @@ package `in`.testpress.course.util
 
 import android.content.Context
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Semaphore
 import okhttp3.OkHttpClient
 import java.io.File
 import java.io.FileOutputStream
 import okhttp3.Request
+import java.util.concurrent.ConcurrentHashMap
+
 
 class ResourceDownloader(val context: Context) {
     private val client = OkHttpClient()
+    private val semaphore = Semaphore(5)
 
-    fun downloadResources(
+    suspend fun downloadResources(
         urls: List<String>,
         onComplete: suspend (HashMap<String, String>) -> Unit
     ) {
-        val urlToLocalPathMap = HashMap<String, String>()
-        val scope = CoroutineScope(Dispatchers.IO)
-
-        scope.launch {
+        val urlToLocalPathMap = ConcurrentHashMap<String, String>()
+        coroutineScope {
             val deferredDownloads = urls.map { url ->
                 async {
-                    downloadResource(url)?.let { localPath ->
-                        urlToLocalPathMap[url] = localPath
+                    semaphore.withPermit {
+                        downloadResource(url)?.let { localPath ->
+                            urlToLocalPathMap[url] = localPath
+                        }
                     }
                 }
             }
             deferredDownloads.awaitAll()
-            onComplete(urlToLocalPathMap)
+            onComplete(HashMap(urlToLocalPathMap))
         }
     }
 
@@ -43,13 +47,24 @@ class ResourceDownloader(val context: Context) {
                     fos.use {
                         it.write(body.bytes())
                     }
+                    body.close()
                     return "file://${file.absolutePath}"
                 }
             }
+            response.close()
             null
         } catch (e: Exception) {
             e.printStackTrace()
             null
+        }
+    }
+
+    private suspend fun <T> Semaphore.withPermit(block: suspend () -> T): T {
+        acquire()
+        try {
+            return block()
+        } finally {
+            release()
         }
     }
 }
