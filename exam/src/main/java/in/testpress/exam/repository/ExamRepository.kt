@@ -24,7 +24,9 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.HashMap
 
 class ExamRepository(val context: Context) {
@@ -126,7 +128,7 @@ class ExamRepository(val context: Context) {
             date = Date().toString(),
             totalQuestions = exam.numberOfQuestions,
             lastStartedTime = Date().toString(),
-            remainingTime = exam.duration,
+            remainingTime = calculateRemainingTime(exam),
             timeTaken = "0:00:00",
             state = Attempt.RUNNING,
             attemptType = 0,
@@ -138,6 +140,27 @@ class ExamRepository(val context: Context) {
         val sections = sectionsDao.getSectionsByIds(sectionIds)
         val offlineAttemptSections = createAttemptSections(sections, offlineAttemptId)
         return Triple(offlineAttemptDao.getById(offlineAttemptId), offlineCourseAttempt, offlineAttemptSections)
+    }
+
+    private fun calculateRemainingTime(exam: Exam): String {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+        val examEndDate = dateFormat.parse(exam.endDate) ?: return exam.duration
+        val currentDate = Date()
+
+        val timeDiffMillis = examEndDate.time - currentDate.time
+
+        val (hours, minutes, seconds) = exam.duration.split(":").map { it.toInt() }
+        val examDurationMillis = TimeUnit.HOURS.toMillis(hours.toLong()) +
+                TimeUnit.MINUTES.toMillis(minutes.toLong()) +
+                TimeUnit.SECONDS.toMillis(seconds.toLong())
+
+        val remainingTimeMillis = minOf(timeDiffMillis, examDurationMillis)
+
+        val remainingHours = TimeUnit.MILLISECONDS.toHours(remainingTimeMillis)
+        val remainingMinutes = TimeUnit.MILLISECONDS.toMinutes(remainingTimeMillis) % 60
+        val remainingSeconds = TimeUnit.MILLISECONDS.toSeconds(remainingTimeMillis) % 60
+
+        return String.format("%02d:%02d:%02d", remainingHours, remainingMinutes, remainingSeconds)
     }
 
     private fun createAttemptSections(sections: List<Section>, offlineAttemptId: Long): List<OfflineAttemptSection> {
