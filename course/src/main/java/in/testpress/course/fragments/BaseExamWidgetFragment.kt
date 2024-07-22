@@ -123,10 +123,12 @@ open class BaseExamWidgetFragment : Fragment() {
                         offlineContentAttempt = offlineExamViewModel.getOfflineContentAttempts(it.id)
                     }
                     withContext(Dispatchers.Main) {
-                        showOfflineExamButtons()
+                        if (content.exam?.isEnded() == false){
+                            showOfflineExamButtons()
+                        }
                     }
                 }
-            } else if (offlineExam == null) {
+            } else if (offlineExam == null && content.exam?.isEnded() == false) {
                 downloadExam.isVisible = true && isOfflineExamSupportEnables
             }
         }
