@@ -34,6 +34,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import java.time.ZoneId
@@ -212,7 +213,7 @@ class OfflineExamRepository(val context: Context) {
     }
 
     fun getAll():LiveData<List<OfflineExam>>{
-        return offlineExamDao.getAll()
+        return offlineExamDao.getAll().map { it.filter { offlineExam -> !offlineExam.isEnded() } }
     }
 
     suspend fun deleteOfflineExam(examId: Long) {
@@ -304,7 +305,10 @@ class OfflineExamRepository(val context: Context) {
     }
 
     private suspend fun updateCompletedAttempts(completedOfflineAttempts: List<OfflineAttempt>){
-        if(completedOfflineAttempts.isEmpty()) return
+        if(completedOfflineAttempts.isEmpty()){
+            deleteEndedOfflineExam()
+            return
+        }
         val totalAttempts = completedOfflineAttempts.size
         var currentAttemptSize = 0
         completedOfflineAttempts.forEach { completedOfflineAttempt ->
@@ -344,6 +348,7 @@ class OfflineExamRepository(val context: Context) {
                         currentAttemptSize++
                         if (totalAttempts == currentAttemptSize){
                             _offlineAttemptSyncResult.postValue(Resource.success(true))
+                            deleteEndedOfflineExam()
                         }
                     }
                 }
@@ -356,6 +361,15 @@ class OfflineExamRepository(val context: Context) {
                     }
                 }
             })
+        }
+    }
+
+    private fun deleteEndedOfflineExam() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val endedExam = offlineExamDao.getAllOfflineExams().filter { it.isEnded() }
+            endedExam.forEach {
+                deleteOfflineExam(it.id!!)
+            }
         }
     }
 

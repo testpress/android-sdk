@@ -2,6 +2,7 @@ package `in`.testpress.database.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -63,5 +64,10 @@ data class OfflineExam(
             return ((downloadedQuestionCount * 100) / numberOfQuestions).toInt()
         }
         return 0
+    }
+
+    fun isEnded(): Boolean {
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+        return !endDate.isNullOrEmpty() && simpleDateFormat.parse(endDate)?.before(Date()) ?: false
     }
 }
