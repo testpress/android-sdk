@@ -143,6 +143,7 @@ class ExamRepository(val context: Context) {
     }
 
     private fun calculateRemainingTime(exam: Exam): String {
+        if (exam.endDate == null) return exam.duration
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
         val examEndDate = dateFormat.parse(exam.endDate) ?: return exam.duration
         val currentDate = Date()
