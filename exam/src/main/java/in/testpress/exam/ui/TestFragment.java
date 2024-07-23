@@ -22,7 +22,6 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 import androidx.appcompat.app.AlertDialog;
 
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -1431,7 +1430,7 @@ public class TestFragment extends BaseFragment implements
         final long WARNING_TIME_MS = 30000; // 30 seconds
         final long WARNING_RANGE_MS = 1000; // 1 second
 
-        if (instituteSettings.getShowOfflineExamEndToast() &&
+        if (instituteSettings.getShowOfflineExamEndingAlertToast() &&
                 millisUntilFinished > WARNING_TIME_MS - WARNING_RANGE_MS &&
                 millisUntilFinished < WARNING_TIME_MS + WARNING_RANGE_MS) {
             Toast.makeText(requireContext(), "Please connect to the internet. The exam will end in 30 seconds.", Toast.LENGTH_SHORT).show();
