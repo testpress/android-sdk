@@ -440,11 +440,11 @@ public class InstituteSettings {
         return this;
     }
 
-    public Boolean getShowOfflineExamEndingAlertToast() {
+    public Boolean getShowOfflineExamEndingAlert() {
         return showOfflineExamEndingAlertToast != null && showOfflineExamEndingAlertToast;
     }
 
-    public InstituteSettings setShowOfflineExamEndingAlertToast(Boolean showOfflineExamEndToast) {
+    public InstituteSettings setShowOfflineExamEndingAlert(Boolean showOfflineExamEndToast) {
         this.showOfflineExamEndingAlertToast = showOfflineExamEndToast;
         return this;
     }

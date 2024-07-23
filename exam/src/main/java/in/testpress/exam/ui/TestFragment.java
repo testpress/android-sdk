@@ -1430,7 +1430,7 @@ public class TestFragment extends BaseFragment implements
         final long WARNING_TIME_MS = 30000; // 30 seconds
         final long WARNING_RANGE_MS = 1000; // 1 second
 
-        if (isOfflineExam() && instituteSettings.getShowOfflineExamEndingAlertToast() &&
+        if (isOfflineExam() && instituteSettings.getShowOfflineExamEndingAlert() &&
                 millisUntilFinished > WARNING_TIME_MS - WARNING_RANGE_MS && millisUntilFinished < WARNING_TIME_MS + WARNING_RANGE_MS) {
             Toast.makeText(requireContext(), "Please connect to the internet. The exam will end in 30 seconds.", Toast.LENGTH_SHORT).show();
         }

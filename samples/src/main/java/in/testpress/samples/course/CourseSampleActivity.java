@@ -219,7 +219,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
             session.getInstituteSettings().setStoreEnabled(true);
             session.getInstituteSettings().setDisableStoreInApp(false);
             session.getInstituteSettings().setEnableOfflineExam(true);
-            session.getInstituteSettings().setShowOfflineExamEndingAlertToast(true);
+            session.getInstituteSettings().setShowOfflineExamEndingAlert(true);
             session.getInstituteSettings().setAppToolbarLogo("https://media.testpress.in/institute/elixir/institutes/elixir-neet-pg-preparation-app/9571158ee51b4c36b9dd14b9dae17452.png");
             session.getInstituteSettings().setAndroidSentryDns("https://186f9948d5294b4c9c03aa9d2a11c982@sentry.testpress.in/3");
 
