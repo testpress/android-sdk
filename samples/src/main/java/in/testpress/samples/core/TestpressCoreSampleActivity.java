@@ -123,6 +123,7 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
         instituteSettings.setWhiteLabeledHostUrl("https://sandbox.testpress.in");
         instituteSettings.setAndroidSentryDns("https://186f9948d5294b4c9c03aa9d2a11c982@sentry.testpress.in/3");
         instituteSettings.setEnableOfflineExam(true);
+        instituteSettings.setShowOfflineExamEndingAlert(true);
         TestpressSdk.initialize(this, instituteSettings, userId, accessToken, provider,
                 new TestpressCallback<TestpressSession>() {
                     @Override
