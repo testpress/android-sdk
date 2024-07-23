@@ -49,6 +49,7 @@ public class InstituteSettings {
     private String androidSentryDns;
     private Boolean disableImageFullscreenZoomInExam;
     private Boolean enableOfflineExam;
+    private Boolean showOfflineExamEndToast;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -436,6 +437,15 @@ public class InstituteSettings {
 
     public InstituteSettings setEnableOfflineExam(Boolean enableOfflineExam) {
         this.enableOfflineExam = enableOfflineExam;
+        return this;
+    }
+
+    public Boolean getShowOfflineExamEndToast() {
+        return showOfflineExamEndToast != null && showOfflineExamEndToast;
+    }
+
+    public InstituteSettings setShowOfflineExamEndToast(Boolean showOfflineExamEndToast) {
+        this.showOfflineExamEndToast = showOfflineExamEndToast;
         return this;
     }
 }

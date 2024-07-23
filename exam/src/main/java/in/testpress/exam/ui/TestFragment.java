@@ -22,6 +22,7 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 import androidx.appcompat.app.AlertDialog;
 
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -1406,6 +1407,7 @@ public class TestFragment extends BaseFragment implements
         countDownTimer = new CountDownTimer(millisInFuture, 1000) {
 
             public void onTick(long millisUntilFinished) {
+                showExamEndingMessage(millisUntilFinished);
                 updateTimeRemaining(millisUntilFinished);
             }
 
@@ -1423,6 +1425,17 @@ public class TestFragment extends BaseFragment implements
                 onRemainingTimeOver();
             }
         }.start();
+    }
+
+    void showExamEndingMessage(long millisUntilFinished) {
+        final long WARNING_TIME_MS = 30000; // 30 seconds
+        final long WARNING_RANGE_MS = 1000; // 1 second
+
+        if (instituteSettings.getShowOfflineExamEndToast() &&
+                millisUntilFinished > WARNING_TIME_MS - WARNING_RANGE_MS &&
+                millisUntilFinished < WARNING_TIME_MS + WARNING_RANGE_MS) {
+            Toast.makeText(requireContext(), "Please connect to the internet. The exam will end in 30 seconds.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     class TestEngineAlertDialog extends AlertDialog.Builder {
