@@ -27,6 +27,7 @@
             android:background="@color/testpress_gray_light" />
 
         <TextView
+            android:id="@+id/open_exam"
             style="@style/selectableTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,6 +36,7 @@
             android:text="Open Exam"/>
 
         <TextView
+            android:id="@+id/delete_exam"
             style="@style/selectableTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

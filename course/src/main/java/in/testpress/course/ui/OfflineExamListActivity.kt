@@ -328,6 +328,24 @@ class OfflineExamListActivity : BaseToolBarActivity() {
             private fun showBottomSheet(exam: OfflineExam) {
                 val bottomSheetFragment = OfflineExamOptionsBottomSheet()
                 bottomSheetFragment.offlineExam = exam
+                bottomSheetFragment.setOptionClickCallBacks(object :OfflineExamOptionsBottomSheet.OnOptionClick{
+                    override fun onOpenExam() {
+                        startActivity(
+                            ContentActivity.createIntent(
+                                exam.contentId,
+                                this@OfflineExamListActivity,
+                                ""
+                            )
+                        )
+                        bottomSheetFragment.dismiss()
+                    }
+
+                    override fun onDeleteExam() {
+                        offlineExamViewModel.deleteOfflineExam(exam.id!!)
+                        bottomSheetFragment.dismiss()
+                    }
+
+                })
                 bottomSheetFragment.show((itemView.context as AppCompatActivity).supportFragmentManager, bottomSheetFragment.tag)
             }
         }
