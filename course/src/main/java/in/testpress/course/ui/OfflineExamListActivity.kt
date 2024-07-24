@@ -93,7 +93,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                         monitorAndShowExamDownloadProgress(exam.contentId!!)
                         offlineExamViewModel.downloadExam(exam.contentId!!)
                     } else {
-                        startExam()
+                        handleExamAttempt()
                     }
                 }
             }
@@ -241,17 +241,29 @@ class OfflineExamListActivity : BaseToolBarActivity() {
             when (result.status) {
                 Status.SUCCESS -> {
                     hideProgressDialog()
-                    startExam()
+                    handleExamAttempt()
                 }
                 Status.LOADING -> {
                     showProgressDialog()
                 }
                 Status.ERROR -> {
                     hideProgressDialog()
-                    startExam()
+                    handleExamAttempt()
                 }
             }
 
+        }
+    }
+
+    private fun handleExamAttempt() {
+        if (offlineExam!!.canAttemptExam()) {
+            startExam()
+        } else {
+            Toast.makeText(
+                this@OfflineExamListActivity,
+                "You've already used all your attempts for this exam. To review your results, please visit the exam page.",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
