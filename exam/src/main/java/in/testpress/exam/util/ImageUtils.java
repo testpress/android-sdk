@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.fragment.app.Fragment;
-import androidx.core.content.FileProvider;
 import android.view.View;
 
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -25,6 +24,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.exam.R;
 import in.testpress.util.PermissionsUtils;
+import in.testpress.util.TestpressFileProvider;
 import in.testpress.util.ViewUtils;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
@@ -143,7 +143,7 @@ public class ImageUtils {
     }
 
     public static void shareImage(File file, Context context, String package_name) {
-        Uri uri = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+        Uri uri = TestpressFileProvider.getUriForFile(context, context.getPackageName() + ".testpressFileProvider", file);
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
         intent.setType("image/*");

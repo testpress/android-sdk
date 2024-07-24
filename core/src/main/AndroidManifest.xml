@@ -41,6 +41,17 @@
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
             </intent-filter>
         </receiver>
+
+        <provider
+            android:name=".util.TestpressFileProvider"
+            android:authorities="${applicationId}.testpressFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/testpress_provider_paths"/>
+        </provider>
+
     </application>
 
 </manifest>
