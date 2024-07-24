@@ -123,7 +123,7 @@ open class BaseExamWidgetFragment : Fragment() {
                         offlineContentAttempt = offlineExamViewModel.getOfflineContentAttempts(it.id)
                     }
                     withContext(Dispatchers.Main) {
-                        if (content.exam?.isEnded() == false){
+                        if (content.exam?.isEnded() == false && offlineExam.canAttemptExam()){
                             showOfflineExamButtons()
                         }
                     }
@@ -144,7 +144,6 @@ open class BaseExamWidgetFragment : Fragment() {
                 else -> {}
             }
         }
-        offlineExamViewModel.syncCompletedAttempt(content.examId!!)
         offlineExamViewModel.offlineAttemptSyncResult.observe(requireActivity()) { it ->
             when (it.status){
                 Status.SUCCESS -> {
@@ -471,4 +470,11 @@ open class BaseExamWidgetFragment : Fragment() {
     }
 
     open fun display() {}
+
+    override fun onResume() {
+        super.onResume()
+        if (::content.isInitialized){
+            offlineExamViewModel.syncCompletedAttempt(content.examId!!)
+        }
+    }
 }

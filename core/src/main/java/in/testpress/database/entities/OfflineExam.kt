@@ -2,6 +2,7 @@ package `in`.testpress.database.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -63,5 +64,42 @@ data class OfflineExam(
             return ((downloadedQuestionCount * 100) / numberOfQuestions).toInt()
         }
         return 0
+    }
+
+    fun canAttemptExam(): Boolean {
+        if (isEnded() || isWebOnly()) {
+            return false
+        }
+        return canRetakeExam() || hasNotAttempted()
+    }
+
+    fun isEnded(): Boolean {
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+        simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
+        try {
+            if(!endDate.isNullOrEmpty()) {
+                return simpleDateFormat.parse(endDate).before(Date())
+            }
+        } catch (e: ParseException) {
+            e.printStackTrace()
+        }
+        return false
+    }
+
+    private fun isWebOnly(): Boolean {
+        return deviceAccessControl != null && deviceAccessControl == "web"
+    }
+
+    private fun canRetakeExam(): Boolean {
+        if (allowRetake == true) {
+            return (attemptsCount!! <= maxRetakes!!) || (maxRetakes == -1)
+        }
+        return false
+    }
+
+    private fun hasNotAttempted() = !hasAttempted()
+
+    private fun hasAttempted(): Boolean {
+        return (attemptsCount ?: 0) > 0
     }
 }
