@@ -12,7 +12,6 @@ import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.FileProvider
 import java.io.File
 
 class FileDownloaderBroadcastReceiver: BroadcastReceiver() {
@@ -91,9 +90,9 @@ class FileDownloaderBroadcastReceiver: BroadcastReceiver() {
     }
     private fun getFileProviderUri(localFilePath: String): Uri {
         val file = File(Uri.parse(localFilePath).path.toString())
-        return FileProvider.getUriForFile(
+        return TestpressFileProvider.getUriForFile(
             context,
-            context.packageName + ".provider",
+            context.packageName + ".testpressFileProvider",
             file
         )
     }
