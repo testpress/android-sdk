@@ -295,6 +295,7 @@ class AttemptRepository(val context: Context) {
                 endAllOfflineAttemptSection()
                 offlineAttemptDao.updateAttemptState(attempt.id,Attempt.COMPLETED)
                 offlineExamDao.updatePausedAttemptCount(exam.id, 0L)
+                offlineExamDao.updateCompletedAttemptCount(exam.id, 1L)
                 val offlineCourseAttempt = offlineCourseAttemptDao.getById(attempt.id)
                 _endContentAttemptResource.postValue(Resource.success(offlineCourseAttempt!!.createGreenDoaModel(attempt)))
             }
@@ -319,6 +320,7 @@ class AttemptRepository(val context: Context) {
                 endAllOfflineAttemptSection()
                 offlineAttemptDao.updateAttemptState(attempt.id,Attempt.COMPLETED)
                 offlineExamDao.updatePausedAttemptCount(exam.id, 0L)
+                offlineExamDao.updateCompletedAttemptCount(exam.id, 1L)
                 val offlineAttempt = offlineAttemptDao.getById(attempt.id)
                 val offlineAttemptSections = offlineAttemptSectionDao.getByAttemptId(attempt.id)
                 _endAttemptResource.postValue(Resource.success(offlineAttempt.createGreenDoaModel(offlineAttemptSections.asGreenDoaModels())))
