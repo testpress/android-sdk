@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.databinding.OfflineExamListActivityBinding
 import `in`.testpress.course.databinding.OfflineExamListItemBinding
+import `in`.testpress.course.fragments.OfflineExamOptionsBottomSheet
 import `in`.testpress.course.util.ProgressDialog
 import `in`.testpress.course.util.SwipeToDeleteCallback
 import `in`.testpress.course.viewmodels.OfflineExamViewModel
@@ -16,6 +17,7 @@ import android.view.*
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.*
@@ -323,6 +325,9 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                 itemView.setOnClickListener {
                     clickListener.onItemClick(exam)
                 }
+                binding.menuButton.setOnClickListener {
+                    showBottomSheet(exam)
+                }
             }
 
             private fun updateExamDetails(exam: OfflineExam) {
@@ -330,6 +335,30 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                 binding.duration.text = exam.duration
                 binding.numberOfQuestions.text = exam.numberOfQuestions.toString()
                 binding.examResumeState.isVisible = ((exam.pausedAttemptsCount ?: 0) > 0)
+            }
+
+            private fun showBottomSheet(exam: OfflineExam) {
+                val bottomSheetFragment = OfflineExamOptionsBottomSheet()
+                bottomSheetFragment.offlineExam = exam
+                bottomSheetFragment.setBottomSheetListener(object :OfflineExamOptionsBottomSheet.BottomSheetListener{
+                    override fun onOpenExam() {
+                        startActivity(
+                            ContentActivity.createIntent(
+                                exam.contentId,
+                                this@OfflineExamListActivity,
+                                ""
+                            )
+                        )
+                        bottomSheetFragment.dismiss()
+                    }
+
+                    override fun onDeleteExam() {
+                        offlineExamViewModel.deleteOfflineExam(exam.id!!)
+                        bottomSheetFragment.dismiss()
+                    }
+
+                })
+                bottomSheetFragment.show((itemView.context as AppCompatActivity).supportFragmentManager, bottomSheetFragment.tag)
             }
         }
     }

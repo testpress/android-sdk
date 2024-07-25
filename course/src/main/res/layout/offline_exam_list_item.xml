@@ -84,8 +84,17 @@
         android:layout_width="5dp"
         android:layout_height="5dp"
         android:visibility="gone"
-        android:layout_alignParentRight="true"
+        android:layout_marginRight="16dp"
+        android:layout_toLeftOf="@id/menu_button"
         android:background="@drawable/green_circle"
         android:layout_centerVertical="true"/>
+
+    <ImageView
+        android:id="@+id/menu_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_baseline_more_vert_24" />
 
 </RelativeLayout>

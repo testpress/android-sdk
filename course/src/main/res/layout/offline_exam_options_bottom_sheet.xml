@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/standard_bottom_sheet"
+    android:background="#00000000"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/bottom_sheet_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="Bottom Sheet Title"
+            android:textAppearance="?attr/textAppearanceHeadline6" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/testpress_gray_light" />
+
+        <TextView
+            android:id="@+id/open_exam"
+            style="@style/selectableTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:drawableLeftCompat="@drawable/ic_baseline_open_in_new_24"
+            app:drawableStartCompat="@drawable/ic_baseline_open_in_new_24"
+            android:text="Open Exam"/>
+
+        <TextView
+            android:id="@+id/delete_exam"
+            style="@style/selectableTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:drawableLeftCompat="@drawable/ic_baseline_delete_forever_24"
+            app:drawableStartCompat="@drawable/ic_baseline_delete_forever_24"
+            android:text="Delete Exam"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
