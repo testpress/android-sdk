@@ -181,7 +181,7 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
                 CustomTestGenerationActivity.Companion.createIntent(
                         requireContext(),
                         "Custom Module",
-                        instituteSettings.getBaseUrl()+"/courses/custom_test_generation/?"+constrictQueryParamForAvailableCourses()+"&testpress_app=android",
+                        instituteSettings.getDomainUrl()+"/courses/custom_test_generation/?"+constrictQueryParamForAvailableCourses()+"&testpress_app=android",
                         true,
                         CustomTestGenerationActivity.class
                 )
