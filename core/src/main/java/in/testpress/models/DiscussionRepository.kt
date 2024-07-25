@@ -6,7 +6,7 @@ import `in`.testpress.database.entities.DiscussionPostEntity
 import `in`.testpress.database.entities.asDomainModels
 import `in`.testpress.network.APIClient
 import `in`.testpress.network.FORUM_CATEGORIES_URL
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +17,7 @@ import java.io.IOException
 
 class DiscussionRepository(val apiClient: APIClient, val database: TestpressDatabase) {
     private val categoryDao = database.categoryDao()
-    val categories = Transformations.map(categoryDao.getAll()) {
+    val categories = categoryDao.getAll().map {
         it.asDomainModels()
     }
 
