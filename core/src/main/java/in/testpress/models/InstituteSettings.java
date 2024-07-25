@@ -448,4 +448,8 @@ public class InstituteSettings {
         this.showOfflineExamEndingAlert = showOfflineExamEndingAlert;
         return this;
     }
+
+    public String getDomainUrl() {
+        return (whiteLabeledHostUrl != null && !whiteLabeledHostUrl.isEmpty()) ? whiteLabeledHostUrl : baseUrl;
+    }
 }
