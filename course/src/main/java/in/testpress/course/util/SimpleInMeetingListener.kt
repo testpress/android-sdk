@@ -88,4 +88,6 @@ open class SimpleInMeetingListener : InMeetingServiceListener {
     override fun onAllowParticipantsShareWhiteBoardNotification(p0: Boolean) {}
     override fun onMeetingLockStatus(p0: Boolean) {}
     override fun onRequestLocalRecordingPrivilegeChanged(p0: LocalRecordingRequestPrivilegeStatus?) {}
+    override fun onAICompanionActiveChangeNotice(p0: Boolean) {}
+    override fun onParticipantProfilePictureStatusChange(p0: Boolean) {}
 }
