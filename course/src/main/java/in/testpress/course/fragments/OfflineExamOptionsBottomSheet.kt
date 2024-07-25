@@ -13,7 +13,7 @@ class OfflineExamOptionsBottomSheet: BottomSheetDialogFragment() {
     private var _binding: OfflineExamOptionsBottomSheetBinding? = null
     private val binding get() = _binding!!
     var offlineExam: OfflineExam? = null
-    private var onOptionClick: OnOptionClick? = null
+    private var bottomSheetListener: BottomSheetListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,8 +26,8 @@ class OfflineExamOptionsBottomSheet: BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.bottomSheetTitle.text = offlineExam?.title
-        binding.openExam.setOnClickListener { onOptionClick?.onOpenExam() }
-        binding.deleteExam.setOnClickListener { onOptionClick?.onDeleteExam() }
+        binding.openExam.setOnClickListener { bottomSheetListener?.onOpenExam() }
+        binding.deleteExam.setOnClickListener { bottomSheetListener?.onDeleteExam() }
     }
 
     override fun onDestroyView() {
@@ -35,11 +35,11 @@ class OfflineExamOptionsBottomSheet: BottomSheetDialogFragment() {
         _binding = null
     }
 
-    fun setOptionClickCallBacks(onOptionClick: OnOptionClick) {
-        this.onOptionClick = onOptionClick
+    fun setBottomSheetListener(bottomSheetListener: BottomSheetListener) {
+        this.bottomSheetListener = bottomSheetListener
     }
 
-    interface OnOptionClick {
+    interface BottomSheetListener {
         fun onOpenExam()
         fun onDeleteExam()
     }

@@ -328,7 +328,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
             private fun showBottomSheet(exam: OfflineExam) {
                 val bottomSheetFragment = OfflineExamOptionsBottomSheet()
                 bottomSheetFragment.offlineExam = exam
-                bottomSheetFragment.setOptionClickCallBacks(object :OfflineExamOptionsBottomSheet.OnOptionClick{
+                bottomSheetFragment.setBottomSheetListener(object :OfflineExamOptionsBottomSheet.BottomSheetListener{
                     override fun onOpenExam() {
                         startActivity(
                             ContentActivity.createIntent(
