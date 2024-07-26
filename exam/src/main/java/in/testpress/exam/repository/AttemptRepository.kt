@@ -304,6 +304,9 @@ class AttemptRepository(val context: Context) {
                 .enqueue(object : TestpressCallback<CourseAttempt>() {
                     override fun onSuccess(result: CourseAttempt) {
                         _endContentAttemptResource.postValue(Resource.success(result))
+                        CoroutineScope(Dispatchers.IO).launch {
+                            offlineExamDao.updateCompletedAttemptCount(exam!!.id, 1L)
+                        }
                     }
 
                     override fun onException(exception: TestpressException) {
@@ -330,6 +333,9 @@ class AttemptRepository(val context: Context) {
                 .enqueue(object : TestpressCallback<Attempt>() {
                     override fun onSuccess(response: Attempt) {
                         _endAttemptResource.postValue(Resource.success(response))
+                        CoroutineScope(Dispatchers.IO).launch {
+                            offlineExamDao.updateCompletedAttemptCount(exam!!.id, 1L)
+                        }
                     }
 
                     override fun onException(exception: TestpressException) {

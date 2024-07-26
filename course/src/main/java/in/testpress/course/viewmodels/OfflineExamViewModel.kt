@@ -81,6 +81,12 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
         return repository.getOfflinePausedAttempt(examId)
     }
 
+    fun updateAttemptsCount(examId: Long, attemptsCount: Long, pausedAttemptsCount: Long){
+        viewModelScope.launch {
+            repository.updateAttemptsCount(examId, attemptsCount, pausedAttemptsCount)
+        }
+    }
+
     companion object {
         fun initializeViewModel(activity: FragmentActivity): OfflineExamViewModel {
             return ViewModelProvider(activity, object : ViewModelProvider.Factory {

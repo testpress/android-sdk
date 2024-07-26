@@ -97,7 +97,7 @@ data class OfflineExam(
         return false
     }
 
-    private fun hasNotAttempted() = !hasAttempted()
+    fun hasNotAttempted() = !hasAttempted()
 
     private fun hasAttempted(): Boolean {
         return (attemptsCount ?: 0) > 0

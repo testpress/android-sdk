@@ -410,4 +410,8 @@ class OfflineExamRepository(val context: Context) {
         }
         return contents[0]
     }
+
+    suspend fun updateAttemptsCount(examId: Long, attemptsCount: Long, pausedAttemptsCount: Long) {
+        offlineExamDao.updateAttemptsCount(examId, attemptsCount, pausedAttemptsCount)
+    }
 }
