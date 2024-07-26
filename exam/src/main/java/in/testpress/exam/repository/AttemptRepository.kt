@@ -27,9 +27,9 @@ import java.util.*
 
 class AttemptRepository(val context: Context) {
 
-    lateinit var exam : Exam
+    var exam : Exam? = null
     lateinit var attempt : Attempt
-    private val isOfflineExam: Boolean get() = exam.isOfflineExam ?: false
+    private val isOfflineExam: Boolean get() = exam?.isOfflineExam ?: false
     var page = 1
     val attemptItem = mutableListOf<AttemptItem>()
     private var _totalQuestions = 0
@@ -145,7 +145,7 @@ class AttemptRepository(val context: Context) {
 
     private suspend fun createOfflineAttemptItemsForSections(attemptSectionId: Long) {
         val offlineAttemptSection = offlineAttemptSectionDao.getByAttemptSectionId(attemptSectionId)
-        val examQuestions = examQuestionDao.getExamQuestionsByExamIdAndSectionId(exam.id, offlineAttemptSection?.sectionId!!)
+        val examQuestions = examQuestionDao.getExamQuestionsByExamIdAndSectionId(exam!!.id, offlineAttemptSection?.sectionId!!)
         val offlineAttemptItems = examQuestions.map { examQuestion ->
             OfflineAttemptItem(
                 question = questionDao.getQuestionById(examQuestion.questionId!!)!!,
@@ -159,7 +159,7 @@ class AttemptRepository(val context: Context) {
     }
 
     private suspend fun createOfflineAttemptItemsForAllQuestions() {
-        val examQuestions = examQuestionDao.getExamQuestionsByExamId(exam.id)
+        val examQuestions = examQuestionDao.getExamQuestionsByExamId(exam!!.id)
         val offlineAttemptItems = examQuestions.map { examQuestion ->
             OfflineAttemptItem(
                 question = questionDao.getQuestionById(examQuestion.questionId!!)!!,
@@ -201,7 +201,7 @@ class AttemptRepository(val context: Context) {
                 offlineAttemptDao.updateRemainingTimeAndLastStartedTime(attempt.id, remainingTime, Date().toString())
             }
             if (action == Action.PAUSE){
-                offlineExamDao.updatePausedAttemptCount(exam.id, 1L)
+                offlineExamDao.updatePausedAttemptCount(exam!!.id, 1L)
             }
             updateLocalAttemptItem(attemptItem) { updateAttemptItem ->
                 _saveResultResource.postValue(Resource.success(Triple(position, updateAttemptItem, action)))
@@ -294,8 +294,8 @@ class AttemptRepository(val context: Context) {
             CoroutineScope(Dispatchers.IO).launch {
                 endAllOfflineAttemptSection()
                 offlineAttemptDao.updateAttemptState(attempt.id,Attempt.COMPLETED)
-                offlineExamDao.updatePausedAttemptCount(exam.id, 0L)
-                offlineExamDao.updateCompletedAttemptCount(exam.id, 1L)
+                offlineExamDao.updatePausedAttemptCount(exam!!.id, 0L)
+                offlineExamDao.updateCompletedAttemptCount(exam!!.id, 1L)
                 val offlineCourseAttempt = offlineCourseAttemptDao.getById(attempt.id)
                 _endContentAttemptResource.postValue(Resource.success(offlineCourseAttempt!!.createGreenDoaModel(attempt)))
             }
@@ -319,8 +319,8 @@ class AttemptRepository(val context: Context) {
             CoroutineScope(Dispatchers.IO).launch {
                 endAllOfflineAttemptSection()
                 offlineAttemptDao.updateAttemptState(attempt.id,Attempt.COMPLETED)
-                offlineExamDao.updatePausedAttemptCount(exam.id, 0L)
-                offlineExamDao.updateCompletedAttemptCount(exam.id, 1L)
+                offlineExamDao.updatePausedAttemptCount(exam!!.id, 0L)
+                offlineExamDao.updateCompletedAttemptCount(exam!!.id, 1L)
                 val offlineAttempt = offlineAttemptDao.getById(attempt.id)
                 val offlineAttemptSections = offlineAttemptSectionDao.getByAttemptId(attempt.id)
                 _endAttemptResource.postValue(Resource.success(offlineAttempt.createGreenDoaModel(offlineAttemptSections.asGreenDoaModels())))
