@@ -88,7 +88,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         onItemClickListener = object : OnItemClickListener {
             override fun onItemClick(exam: OfflineExam) {
                 offlineExam = exam
-                if ((exam.pausedAttemptsCount ?: 0) > 0) {
+                if ((exam.pausedAttemptsCount ?: 0) > 0 && offlineExam?.canAttemptExam() == true) {
                     resumeExam()
                 } else {
                     if (exam.isSyncRequired) {
@@ -200,8 +200,8 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             val content = offlineExamViewModel.getOfflineExamContent(offlineExam?.contentId!!)
             val pausedAttempt = offlineExamViewModel.getOfflinePausedAttempt(offlineExam?.id!!)
-            if (content != null && pausedAttempt != null) {
-                withContext(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
+                if (content != null && pausedAttempt != null) {
                     TestpressExam.resumeCourseAttempt(
                         this@OfflineExamListActivity,
                         content,
@@ -209,8 +209,33 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                         false,
                         TestpressSdk.getTestpressSession(this@OfflineExamListActivity)!!
                     )
+                } else {
+                    if (offlineExam?.allowRetake == false) {
+                        Toast.makeText(
+                            this@OfflineExamListActivity,
+                            "You've already started your attempt online. Retake is disabled, so you cannot take the exam again.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else if (!canAttemptOfflineExam()) {
+                        Toast.makeText(
+                            this@OfflineExamListActivity,
+                            "Your last attempt was already started online, so you cannot take the exam again.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        handleExamAttempt()
+                    }
                 }
             }
+        }
+    }
+
+    private fun canAttemptOfflineExam(): Boolean {
+        return if (offlineExam?.allowRetake == true) {
+            val totalAttemptTaken = offlineExam?.attemptsCount!! + offlineExam?.pausedAttemptsCount!!
+            (totalAttemptTaken <= offlineExam?.maxRetakes!!) || (offlineExam?.maxRetakes == -1)
+        } else {
+            return offlineExam?.hasNotAttempted() == true && (offlineExam?.pausedAttemptsCount!! == 0)
         }
     }
 

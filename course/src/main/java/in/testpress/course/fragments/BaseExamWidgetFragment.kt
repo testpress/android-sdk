@@ -102,6 +102,7 @@ open class BaseExamWidgetFragment : Fragment() {
                     if (!isContentLoaded(it.data!!)) {
                         refetchContent(it.data!!.id)
                     } else {
+                        updateAttemptsCountToDownloadedOfflineExam()
                         loadAttemptsAndUpdateStartButton()
                     }
                 }
@@ -123,12 +124,12 @@ open class BaseExamWidgetFragment : Fragment() {
                         offlineContentAttempt = offlineExamViewModel.getOfflineContentAttempts(it.id)
                     }
                     withContext(Dispatchers.Main) {
-                        if (content.exam?.isEnded() == false && offlineExam.canAttemptExam()){
+                        if (content.exam?.isEnded() == false && canAttemptOfflineExam()){
                             showOfflineExamButtons()
                         }
                     }
                 }
-            } else if (offlineExam == null && content.exam?.isEnded() == false) {
+            } else if (offlineExam == null && content.exam?.isEnded() == false && canDownloadExam()) {
                 downloadExam.isVisible = true && isOfflineExamSupportEnables
             }
         }
@@ -157,6 +158,24 @@ open class BaseExamWidgetFragment : Fragment() {
                 }
                 else -> {}
             }
+        }
+    }
+
+    private fun canDownloadExam(): Boolean {
+        return if (content.exam?.allowRetake == true) {
+            val totalAttemptTaken = content.attemptsCount!! + content.exam?.pausedAttemptsCount!!
+            (totalAttemptTaken <= content.exam!!.maxRetakes!!) || (content.exam!!.maxRetakes == -1)
+        } else {
+            return content.hasNotAttempted() && (content.exam?.pausedAttemptsCount!! == 0)
+        }
+    }
+
+    private fun canAttemptOfflineExam(): Boolean {
+        return if (content.exam?.allowRetake == true) {
+            val totalAttemptTaken = content.attemptsCount!! + content.exam?.pausedAttemptsCount!!
+            (totalAttemptTaken <= content.exam!!.maxRetakes!!) || (content.exam!!.maxRetakes == -1)
+        } else {
+            return content.hasNotAttempted() && (content.exam?.pausedAttemptsCount!! == 0)
         }
     }
 
@@ -221,6 +240,7 @@ open class BaseExamWidgetFragment : Fragment() {
                 when (resource.status) {
                     Status.SUCCESS -> {
                         content = resource.data!!
+                        updateAttemptsCountToDownloadedOfflineExam()
                         loadAttemptsAndUpdateStartButton()
                     }
                     Status.ERROR -> {
@@ -229,6 +249,14 @@ open class BaseExamWidgetFragment : Fragment() {
                     else -> {}
                 }
             })
+    }
+
+    private fun updateAttemptsCountToDownloadedOfflineExam() {
+        offlineExamViewModel.updateAttemptsCount(
+            content.examId!!,
+            content.attemptsCount!!.toLong(),
+            content.exam?.pausedAttemptsCount!!.toLong()
+        )
     }
 
     fun loadAttemptsAndUpdateStartButton() {
