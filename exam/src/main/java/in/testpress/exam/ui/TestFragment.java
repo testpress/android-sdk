@@ -1667,6 +1667,6 @@ public class TestFragment extends BaseFragment implements
     }
 
     private boolean isOfflineExam() {
-        return Boolean.TRUE.equals(exam.getIsOfflineExam());
+        return exam != null && Boolean.TRUE.equals(exam.getIsOfflineExam());
     }
 }
