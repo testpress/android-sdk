@@ -113,6 +113,7 @@ open class BaseExamWidgetFragment : Fragment() {
     }
 
     protected fun initializeObserversForOfflineDownload() {
+        offlineExamViewModel.syncCompletedAttempt(content.examId!!)
         offlineExamViewModel.get(contentId).observe(requireActivity()) { offlineExam ->
             this.offlineExam = offlineExam
             if (offlineExam != null && offlineExam.downloadComplete) {

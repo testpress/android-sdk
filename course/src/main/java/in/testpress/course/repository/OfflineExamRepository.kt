@@ -36,10 +36,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
+import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.HashMap
 
 class OfflineExamRepository(val context: Context) {
@@ -293,14 +295,27 @@ class OfflineExamRepository(val context: Context) {
     }
 
     suspend fun syncCompletedAttempt(examId: Long){
+        updateAttemptStatusForEndedExam(offlineAttemptDao.getOfflineAttemptsByExamIdAndState(examId, Attempt.RUNNING))
         val completedOfflineAttempts = offlineAttemptDao.getOfflineAttemptsByExamIdAndState(examId, Attempt.COMPLETED)
         updateCompletedAttempts(completedOfflineAttempts)
     }
 
     suspend fun syncCompletedAllAttemptToBackEnd() {
+        updateAttemptStatusForEndedExam(offlineAttemptDao.getOfflineAttemptsByState(Attempt.RUNNING))
         val completedOfflineAttempts =
             offlineAttemptDao.getOfflineAttemptsByState(Attempt.COMPLETED)
         updateCompletedAttempts(completedOfflineAttempts)
+    }
+
+    private suspend fun updateAttemptStatusForEndedExam(pausedAttempts: List<OfflineAttempt>) {
+        pausedAttempts.forEach { pausedAttempt ->
+            val exam = offlineExamDao.getById(pausedAttempt.examId)
+            if (exam != null && exam.isEnded()) {
+                offlineAttemptDao.updateAttemptState(pausedAttempt.id, Attempt.COMPLETED)
+                offlineExamDao.updatePausedAttemptCount(exam.id!!, 0L)
+                offlineExamDao.updateCompletedAttemptCount(exam.id!!, 1L)
+            }
+        }
     }
 
     private suspend fun updateCompletedAttempts(completedOfflineAttempts: List<OfflineAttempt>){
@@ -391,6 +406,7 @@ class OfflineExamRepository(val context: Context) {
             ?.let { offlineAttempt ->
                 val offlineAttemptSectionList = getOfflineAttemptSectionList(offlineAttempt.id)
                 val offlineContentAttempt = getOfflineContentAttempts(offlineAttempt.id)
+                offlineAttempt.remainingTime = calculateRemainingTime(offlineExamDao.getById(examId)!!,offlineAttempt.remainingTime)
                 return offlineContentAttempt?.createGreenDoaModel(
                     offlineAttempt.createGreenDoaModel(
                         offlineAttemptSectionList.asGreenDoaModels()
@@ -398,6 +414,28 @@ class OfflineExamRepository(val context: Context) {
                 )
             }
         return null
+    }
+
+    private fun calculateRemainingTime(exam: OfflineExam, remainingTime: String): String {
+        if (exam.endDate.isNullOrEmpty()) return remainingTime
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+        val examEndDate = dateFormat.parse(exam.endDate!!) ?: return remainingTime
+        val currentDate = Date()
+
+        val timeDiffMillis = examEndDate.time - currentDate.time
+
+        val (hours, minutes, seconds) = remainingTime.split(":").map { it.toInt() }
+        val examDurationMillis = TimeUnit.HOURS.toMillis(hours.toLong()) +
+                TimeUnit.MINUTES.toMillis(minutes.toLong()) +
+                TimeUnit.SECONDS.toMillis(seconds.toLong())
+
+        val remainingTimeMillis = minOf(timeDiffMillis, examDurationMillis)
+
+        val remainingHours = TimeUnit.MILLISECONDS.toHours(remainingTimeMillis)
+        val remainingMinutes = TimeUnit.MILLISECONDS.toMinutes(remainingTimeMillis) % 60
+        val remainingSeconds = TimeUnit.MILLISECONDS.toSeconds(remainingTimeMillis) % 60
+
+        return String.format("%02d:%02d:%02d", remainingHours, remainingMinutes, remainingSeconds)
     }
 
     private fun getContentFromDB(contentId: Long): Content? {
