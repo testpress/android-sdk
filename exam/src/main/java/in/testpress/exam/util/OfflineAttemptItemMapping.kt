@@ -16,7 +16,7 @@ fun OfflineAttemptItem.asAttemptItem(subject: String, direction: String?): Attem
         review,
        savedAnswers,
         order,
-        null,
+        review,
         shortText,
         currentShortText,
         attemptSection?.asGreenDoaModel(),

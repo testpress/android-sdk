@@ -233,10 +233,12 @@ class AttemptRepository(val context: Context) {
         if (offlineAttemptItem != null) {
             if (attemptItem.attemptQuestion.type == "E") {
                 offlineAttemptItem.localEssayText = attemptItem.localEssayText
+                offlineAttemptItem.essayText = attemptItem.localEssayText
             } else {
                 offlineAttemptItem.selectedAnswers = attemptItem.savedAnswers
                 offlineAttemptItem.savedAnswers = attemptItem.savedAnswers
                 offlineAttemptItem.currentShortText = attemptItem.currentShortText
+                offlineAttemptItem.shortText = attemptItem.currentShortText
             }
             offlineAttemptItem.unSyncedFiles = attemptItem.unSyncedFiles
             offlineAttemptItem.review = attemptItem.currentReview
