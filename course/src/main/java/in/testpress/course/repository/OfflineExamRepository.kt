@@ -396,6 +396,7 @@ class OfflineExamRepository(val context: Context) {
         getContentFromDB(contentId)?.let { content ->
             offlineExamDao.getByContentId(contentId)?.let { offlineExam ->
                 content.exam = offlineExam.asGreenDaoModel()
+                content.exam.pausedAttemptsCount = offlineExam.offlinePausedAttemptsCount.toInt()
                 return content
             }
         }
