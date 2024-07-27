@@ -201,7 +201,7 @@ class AttemptRepository(val context: Context) {
                 offlineAttemptDao.updateRemainingTimeAndLastStartedTime(attempt.id, remainingTime, Date().toString())
             }
             if (action == Action.PAUSE){
-                offlineExamDao.updatePausedAttemptCount(exam!!.id!!, 1L)
+                offlineExamDao.updatePausedAttemptCount(exam!!.id, 1L)
                 offlineExamDao.updateOfflinePausedAttemptCount(exam!!.id, 1L)
             }
             updateLocalAttemptItem(attemptItem) { updateAttemptItem ->

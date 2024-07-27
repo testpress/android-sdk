@@ -244,7 +244,7 @@ class ExamRepository(val context: Context) {
             CoroutineScope(Dispatchers.IO).launch {
                 endAllOfflineAttemptSection(attemptId)
                 offlineAttemptDao.updateAttemptState(attemptId,Attempt.COMPLETED)
-                offlineExamDao.updatePausedAttemptCount(exam.id!!, 0L)
+                offlineExamDao.updatePausedAttemptCount(exam.id, 0L)
                 offlineExamDao.updateOfflinePausedAttemptCount(exam.id, 0L)
                 val offlineAttempt = offlineAttemptDao.getById(attemptId)
                 val offlineAttemptSections = offlineAttemptSectionDao.getByAttemptId(attemptId)

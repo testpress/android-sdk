@@ -13,7 +13,6 @@ import `in`.testpress.enums.Status
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.ui.BaseToolBarActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
@@ -89,7 +88,6 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         onItemClickListener = object : OnItemClickListener {
             override fun onItemClick(exam: OfflineExam) {
                 offlineExam = exam
-                Log.d("TAG", "onItemClick: ${exam.offlinePausedAttemptsCount}  ${offlineExam?.canAttemptExam() == true}")
                 if (exam.offlinePausedAttemptsCount > 0 && offlineExam?.canAttemptExam() == true) {
                     resumeExam()
                 } else {
