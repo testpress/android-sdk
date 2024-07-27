@@ -293,14 +293,25 @@ class OfflineExamRepository(val context: Context) {
     }
 
     suspend fun syncCompletedAttempt(examId: Long){
+        updateAttemptStatusForEndedExam(offlineAttemptDao.getOfflineAttemptsByExamIdAndState(examId, Attempt.RUNNING))
         val completedOfflineAttempts = offlineAttemptDao.getOfflineAttemptsByExamIdAndState(examId, Attempt.COMPLETED)
         updateCompletedAttempts(completedOfflineAttempts)
     }
 
     suspend fun syncCompletedAllAttemptToBackEnd() {
+        updateAttemptStatusForEndedExam(offlineAttemptDao.getOfflineAttemptsByState(Attempt.RUNNING))
         val completedOfflineAttempts =
             offlineAttemptDao.getOfflineAttemptsByState(Attempt.COMPLETED)
         updateCompletedAttempts(completedOfflineAttempts)
+    }
+
+    private suspend fun updateAttemptStatusForEndedExam(pausedAttempts: List<OfflineAttempt>) {
+        pausedAttempts.forEach { pausedAttempt ->
+            val exam = offlineExamDao.getById(pausedAttempt.examId)
+            if (exam?.isEnded() == true) {
+                offlineAttemptDao.updateAttemptState(pausedAttempt.id, Attempt.COMPLETED)
+            }
+        }
     }
 
     private suspend fun updateCompletedAttempts(completedOfflineAttempts: List<OfflineAttempt>){
