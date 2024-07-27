@@ -14,6 +14,7 @@ import `in`.testpress.exam.TestpressExam
 import `in`.testpress.ui.BaseToolBarActivity
 import android.os.Bundle
 import android.view.*
+import android.view.animation.AnimationUtils
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import android.widget.Toast
@@ -181,6 +182,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                         "Answers submitted successfully. To review the results, please visit the exam page within the course.",
                         Toast.LENGTH_SHORT
                     ).show()
+                    offlineExamAdapter.notifyDataSetChanged()
                 }
                 Status.LOADING -> {}
                 Status.ERROR -> {
@@ -359,7 +361,26 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                 binding.examTitle.text = exam.title
                 binding.duration.text = exam.duration
                 binding.numberOfQuestions.text = exam.numberOfQuestions.toString()
-                binding.examResumeState.isVisible = exam.getPausedAttemptAttemptCount() > 0
+                CoroutineScope(Dispatchers.IO).launch {
+                    val isCompletedAttemptNotSynced = offlineExamViewModel.isCompletedAttemptNotSynced(exam.id!!)
+                    withContext(Dispatchers.Main) {
+                        if (isCompletedAttemptNotSynced && exam.getPausedAttemptAttemptCount().toInt() == 0){
+                            binding.attemptState.isVisible = true
+                            binding.attemptState.setImageResource(R.drawable.ic_baseline_warning_24)
+                        } else if ((exam.attemptsCount ?: 0) > 0 && exam.getPausedAttemptAttemptCount().toInt() == 0){
+                            binding.attemptState.isVisible = true
+                            binding.attemptState.setImageResource(R.drawable.ic_baseline_check_circle_24)
+                        } else {
+                            binding.attemptState.isVisible = false
+                        }
+                    }
+                }
+                if (exam.getPausedAttemptAttemptCount() > 0){
+                    binding.attemptRunningState.isVisible = true
+                    binding.pingView.startAnimation(AnimationUtils.loadAnimation(this@OfflineExamListActivity, R.anim.ping_animation))
+                } else {
+                    binding.attemptRunningState.isVisible = false
+                }
             }
 
             private fun showBottomSheet(exam: OfflineExam) {

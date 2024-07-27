@@ -87,6 +87,10 @@ class OfflineExamViewModel(private val repository: OfflineExamRepository) : View
         }
     }
 
+    suspend fun isCompletedAttemptNotSynced(examId: Long): Boolean {
+        return repository.isCompletedAttemptNotSynced(examId)
+    }
+
     companion object {
         fun initializeViewModel(activity: FragmentActivity): OfflineExamViewModel {
             return ViewModelProvider(activity, object : ViewModelProvider.Factory {

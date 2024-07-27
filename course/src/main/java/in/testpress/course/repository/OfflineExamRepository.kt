@@ -454,4 +454,9 @@ class OfflineExamRepository(val context: Context) {
     suspend fun updateAttemptsCount(examId: Long, attemptsCount: Long, pausedAttemptsCount: Long) {
         offlineExamDao.updateAttemptsCount(examId, attemptsCount, pausedAttemptsCount)
     }
+
+    suspend fun isCompletedAttemptNotSynced(examId: Long): Boolean {
+        return offlineAttemptDao.getOfflineAttemptsByExamIdAndState(examId, Attempt.COMPLETED)
+            .isNotEmpty()
+    }
 }

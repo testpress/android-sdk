@@ -56,7 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginRight="25dp"
+            android:layout_marginRight="16dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -67,7 +67,7 @@
 
             <TextView
                 android:id="@+id/number_of_questions"
-                android:layout_width="40dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:lineSpacingExtra="4dp"
@@ -77,17 +77,46 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/attempt_state_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="8dp"
+            android:orientation="horizontal">
 
-    <ImageView
-        android:id="@+id/exam_resume_state"
-        android:layout_width="5dp"
-        android:layout_height="5dp"
-        android:visibility="gone"
-        android:layout_marginRight="16dp"
-        android:layout_toLeftOf="@id/menu_button"
-        android:background="@drawable/green_circle"
-        android:layout_centerVertical="true"/>
+            <ImageView
+                android:id="@+id/attempt_state"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_baseline_warning_24"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/attempt_running_state"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <View
+                android:id="@+id/ping_view"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/rounded_bg_testpress_green_light"
+                android:alpha="0.75" />
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/rounded_bg_testpress_green" />
+        </RelativeLayout>
+
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/menu_button"
