@@ -52,7 +52,8 @@ data class OfflineExam(
     var isSyncRequired: Boolean = false,
     val contentId: Long? = null,
     val downloadedQuestionCount: Long = 0,
-    val downloadComplete: Boolean = false
+    val downloadComplete: Boolean = false,
+    val offlinePausedAttemptsCount: Long = 0
 ) {
     fun getExamDataModifiedOnAsDate(): Date? {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX")
@@ -101,5 +102,9 @@ data class OfflineExam(
 
     private fun hasAttempted(): Boolean {
         return (attemptsCount ?: 0) > 0
+    }
+
+    fun getPausedAttemptAttemptCount(): Long {
+        return offlinePausedAttemptsCount + (pausedAttemptsCount ?: 0)
     }
 }

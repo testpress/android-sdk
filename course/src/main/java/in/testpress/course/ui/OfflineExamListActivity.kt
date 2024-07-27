@@ -88,7 +88,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
         onItemClickListener = object : OnItemClickListener {
             override fun onItemClick(exam: OfflineExam) {
                 offlineExam = exam
-                if ((exam.pausedAttemptsCount ?: 0) > 0 && offlineExam?.canAttemptExam() == true) {
+                if (exam.getPausedAttemptAttemptCount() > 0 && offlineExam?.canAttemptExam() == true) {
                     resumeExam()
                 } else {
                     if (exam.isSyncRequired) {
@@ -359,7 +359,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                 binding.examTitle.text = exam.title
                 binding.duration.text = exam.duration
                 binding.numberOfQuestions.text = exam.numberOfQuestions.toString()
-                binding.examResumeState.isVisible = ((exam.pausedAttemptsCount ?: 0) > 0)
+                binding.examResumeState.isVisible = exam.getPausedAttemptAttemptCount() > 0
             }
 
             private fun showBottomSheet(exam: OfflineExam) {
