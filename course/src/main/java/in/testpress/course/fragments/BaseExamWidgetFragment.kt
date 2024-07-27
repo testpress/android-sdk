@@ -116,6 +116,9 @@ open class BaseExamWidgetFragment : Fragment() {
         offlineExamViewModel.syncCompletedAttempt(content.examId!!)
         offlineExamViewModel.get(contentId).observe(requireActivity()) { offlineExam ->
             this.offlineExam = offlineExam
+            if (content.exam?.allowRetake == false && (offlineExam?.offlinePausedAttemptsCount ?: 0) > 0){
+                startButton.isVisible = false
+            }
             if (offlineExam != null && offlineExam.downloadComplete) {
                 downloadExam.isVisible = false
                 CoroutineScope(Dispatchers.IO).launch {

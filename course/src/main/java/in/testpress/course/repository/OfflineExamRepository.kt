@@ -313,6 +313,7 @@ class OfflineExamRepository(val context: Context) {
             if (exam != null && exam.isEnded()) {
                 offlineAttemptDao.updateAttemptState(pausedAttempt.id, Attempt.COMPLETED)
                 offlineExamDao.updatePausedAttemptCount(exam.id!!, 0L)
+                offlineExamDao.updateOfflinePausedAttemptCount(exam.id!!, 0L)
                 offlineExamDao.updateCompletedAttemptCount(exam.id!!, 1L)
             }
         }
