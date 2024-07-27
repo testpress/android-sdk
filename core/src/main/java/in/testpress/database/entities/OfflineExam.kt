@@ -103,4 +103,8 @@ data class OfflineExam(
     private fun hasAttempted(): Boolean {
         return (attemptsCount ?: 0) > 0
     }
+
+    fun getPausedAttemptAttemptCount(): Long {
+        return offlinePausedAttemptsCount + (pausedAttemptsCount ?: 0)
+    }
 }
