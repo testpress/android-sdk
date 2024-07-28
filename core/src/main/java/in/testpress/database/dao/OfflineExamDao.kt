@@ -50,4 +50,7 @@ interface OfflineExamDao: BaseDao<OfflineExam> {
 
     @Query("UPDATE OfflineExam SET attemptsCount = :attemptsCount, pausedAttemptsCount = :pausedAttemptsCount WHERE id = :examId")
     suspend fun updateAttemptsCount(examId: Long, attemptsCount: Long, pausedAttemptsCount: Long)
+
+    @Query("UPDATE OfflineExam SET attemptsCount = attemptsCount - :attemptsCount WHERE id = :examId")
+    suspend fun reduceAttemptCount(examId: Long, attemptsCount: Long)
 }

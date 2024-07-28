@@ -169,6 +169,7 @@ class OfflineExamListActivity : BaseToolBarActivity() {
             val oldState = isSyncButtonVisible
             isSyncButtonVisible = it.isNotEmpty()
             if (oldState != isSyncButtonVisible) invalidateOptionsMenu()
+            offlineExamAdapter.notifyDataSetChanged()
         }
     }
 

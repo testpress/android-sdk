@@ -317,6 +317,9 @@ class OfflineExamRepository(val context: Context) {
                 finalList.add(offlineAttempt)
             } else {
                 offlineAttemptDao.deleteByAttemptId(offlineAttempt.id)
+                // Here we are resetting the attempt count because if the user completed the exam offline,
+                // we increased the attempt count. When the attempt is deleted, we reduce the attempt count.
+                offlineExamDao.reduceAttemptCount(offlineAttempt.examId, 1)
             }
         }
         return finalList
