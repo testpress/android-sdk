@@ -66,6 +66,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         public final static Property AllowPreemptiveSectionEnding = new Property(38, Boolean.class, "allowPreemptiveSectionEnding", false, "ALLOW_PREEMPTIVE_SECTION_ENDING");
         public final static Property ExamDataModifiedOn = new Property(39, String.class, "examDataModifiedOn", false, "EXAM_DATA_MODIFIED_ON");
         public final static Property IsOfflineExam = new Property(40, Boolean.class, "isOfflineExam", false, "IS_OFFLINE_EXAM");
+        public final static Property GraceDurationForOfflineSubmission = new Property(41, Long.class, "graceDurationForOfflineSubmission", false, "GRACE_DURATION_FOR_OFFLINE_SUBMISSION");
     }
 
     private DaoSession daoSession;
@@ -125,7 +126,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
                 "\"DISABLE_ATTEMPT_RESUME\" INTEGER," + // 37: disableAttemptResume
                 "\"ALLOW_PREEMPTIVE_SECTION_ENDING\" INTEGER," + // 38: allowPreemptiveSectionEnding
                 "\"EXAM_DATA_MODIFIED_ON\" TEXT," + // 39: examDataModifiedOn
-                "\"IS_OFFLINE_EXAM\" INTEGER);"); // 40: isOfflineExam
+                "\"IS_OFFLINE_EXAM\" INTEGER," + // 40: isOfflineExam
+                "\"GRACE_DURATION_FOR_OFFLINE_SUBMISSION\" INTEGER);"); // 41: graceDurationForOfflineSubmission
     }
 
     /** Drops the underlying database table. */
@@ -342,6 +344,11 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (isOfflineExam != null) {
             stmt.bindLong(41, isOfflineExam ? 1L: 0L);
         }
+ 
+        Long graceDurationForOfflineSubmission = entity.getGraceDurationForOfflineSubmission();
+        if (graceDurationForOfflineSubmission != null) {
+            stmt.bindLong(42, graceDurationForOfflineSubmission);
+        }
     }
 
     @Override
@@ -552,6 +559,11 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (isOfflineExam != null) {
             stmt.bindLong(41, isOfflineExam ? 1L: 0L);
         }
+ 
+        Long graceDurationForOfflineSubmission = entity.getGraceDurationForOfflineSubmission();
+        if (graceDurationForOfflineSubmission != null) {
+            stmt.bindLong(42, graceDurationForOfflineSubmission);
+        }
     }
 
     @Override
@@ -608,7 +620,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             cursor.isNull(offset + 37) ? null : cursor.getShort(offset + 37) != 0, // disableAttemptResume
             cursor.isNull(offset + 38) ? null : cursor.getShort(offset + 38) != 0, // allowPreemptiveSectionEnding
             cursor.isNull(offset + 39) ? null : cursor.getString(offset + 39), // examDataModifiedOn
-            cursor.isNull(offset + 40) ? null : cursor.getShort(offset + 40) != 0 // isOfflineExam
+            cursor.isNull(offset + 40) ? null : cursor.getShort(offset + 40) != 0, // isOfflineExam
+            cursor.isNull(offset + 41) ? null : cursor.getLong(offset + 41) // graceDurationForOfflineSubmission
         );
         return entity;
     }
@@ -656,6 +669,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         entity.setAllowPreemptiveSectionEnding(cursor.isNull(offset + 38) ? null : cursor.getShort(offset + 38) != 0);
         entity.setExamDataModifiedOn(cursor.isNull(offset + 39) ? null : cursor.getString(offset + 39));
         entity.setIsOfflineExam(cursor.isNull(offset + 40) ? null : cursor.getShort(offset + 40) != 0);
+        entity.setGraceDurationForOfflineSubmission(cursor.isNull(offset + 41) ? null : cursor.getLong(offset + 41));
      }
     
     @Override

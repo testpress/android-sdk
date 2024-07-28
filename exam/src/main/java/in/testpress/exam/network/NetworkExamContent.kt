@@ -52,7 +52,8 @@ data class NetworkExamContent(
     val enableQuizMode: Boolean? = null,
     val disableAttemptResume: Boolean? = null,
     val examDataModifiedOn: String? = null,
-    val isOfflineExam: Boolean = false
+    val isOfflineExam: Boolean = false,
+    val graceDurationForOfflineSubmission: Long? = null
 )
 
 fun NetworkExamContent.asGreenDaoModel(): Exam {
@@ -97,7 +98,8 @@ fun NetworkExamContent.asGreenDaoModel(): Exam {
         this.disableAttemptResume,
         this.allowPreemptiveSectionEnding,
         this.examDataModifiedOn,
-        this.isOfflineExam
+        this.isOfflineExam,
+        this.graceDurationForOfflineSubmission
     )
 }
 
