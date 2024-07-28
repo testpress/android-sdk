@@ -640,6 +640,11 @@ public class Exam implements android.os.Parcelable {
         examDataModifiedOn = in.readString();
         byte tmpIsOfflineExam = in.readByte();
         isOfflineExam = tmpIsOfflineExam == 0 ? null : tmpIsOfflineExam == 1;
+        if (in.readByte() == 0) {
+            graceDurationForOfflineSubmission = null;
+        } else {
+            graceDurationForOfflineSubmission = in.readLong();
+        }
     }
 
     @Override
@@ -725,6 +730,12 @@ public class Exam implements android.os.Parcelable {
         dest.writeByte((byte) (allowPreemptiveSectionEnding == null ? 0 : allowPreemptiveSectionEnding ? 1 : 2));
         dest.writeString(examDataModifiedOn);
         dest.writeByte((byte) (isOfflineExam == null ? 0 : isOfflineExam ? 1 : 2));
+        if (graceDurationForOfflineSubmission == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(graceDurationForOfflineSubmission);
+        }
     }
 
     @Override
