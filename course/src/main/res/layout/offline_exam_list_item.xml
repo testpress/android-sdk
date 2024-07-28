@@ -89,32 +89,10 @@
                 android:id="@+id/attempt_state"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:src="@drawable/ic_baseline_warning_24"
+                android:src="@drawable/ic_round_warning_24"
                 android:visibility="gone" />
 
         </LinearLayout>
-
-
-        <RelativeLayout
-            android:id="@+id/attempt_running_state"
-            android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <View
-                android:id="@+id/ping_view"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_centerInParent="true"
-                android:background="@drawable/rounded_bg_testpress_green_light"
-                android:alpha="0.75" />
-
-            <View
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:layout_centerInParent="true"
-                android:background="@drawable/rounded_bg_testpress_green" />
-        </RelativeLayout>
 
     </LinearLayout>
 
@@ -125,5 +103,29 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:src="@drawable/ic_baseline_more_vert_24" />
+
+    <RelativeLayout
+        android:id="@+id/attempt_running_state"
+        android:visibility="gone"
+        android:layout_toLeftOf="@id/menu_button"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/ping_view"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/rounded_bg_sky_400"
+            android:alpha="0.75" />
+
+        <View
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/rounded_bg_sky_500" />
+    </RelativeLayout>
 
 </RelativeLayout>

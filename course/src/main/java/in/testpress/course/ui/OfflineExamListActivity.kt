@@ -366,10 +366,10 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                     withContext(Dispatchers.Main) {
                         if (isCompletedAttemptNotSynced && exam.getPausedAttemptAttemptCount().toInt() == 0){
                             binding.attemptState.isVisible = true
-                            binding.attemptState.setImageResource(R.drawable.ic_baseline_warning_24)
+                            binding.attemptState.setImageResource(R.drawable.ic_round_warning_24)
                         } else if ((exam.attemptsCount ?: 0) > 0 && exam.getPausedAttemptAttemptCount().toInt() == 0){
                             binding.attemptState.isVisible = true
-                            binding.attemptState.setImageResource(R.drawable.ic_baseline_check_circle_24)
+                            binding.attemptState.setImageResource(R.drawable.ic_round_check_circle_24)
                         } else {
                             binding.attemptState.isVisible = false
                         }
