@@ -77,6 +77,7 @@ public class Exam implements android.os.Parcelable {
     private Boolean allowPreemptiveSectionEnding;
     private String examDataModifiedOn;
     private Boolean isOfflineExam;
+    private Long graceDurationForOfflineSubmission;
 
     /** Used to resolve relations */
     @Generated
@@ -104,7 +105,7 @@ public class Exam implements android.os.Parcelable {
     }
 
     @Generated
-    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock, Boolean showAnalytics, String instructions, Boolean hasAudioQuestions, String rankPublishingDate, Boolean enableQuizMode, Boolean disableAttemptResume, Boolean allowPreemptiveSectionEnding, String examDataModifiedOn, Boolean isOfflineExam) {
+    public Exam(String totalMarks, String url, Long id, Integer attemptsCount, Integer pausedAttemptsCount, String title, String description, String startDate, String endDate, String duration, Integer numberOfQuestions, String negativeMarks, String markPerQuestion, Integer templateType, Boolean allowRetake, Boolean allowPdf, Boolean showAnswers, Integer maxRetakes, String attemptsUrl, String deviceAccessControl, Integer commentsCount, String slug, String selectedLanguage, Boolean variableMarkPerQuestion, Integer passPercentage, Boolean enableRanks, Boolean showScore, Boolean showPercentile, StringList categories, Boolean isDetailsFetched, Boolean isGrowthHackEnabled, String shareTextForSolutionUnlock, Boolean showAnalytics, String instructions, Boolean hasAudioQuestions, String rankPublishingDate, Boolean enableQuizMode, Boolean disableAttemptResume, Boolean allowPreemptiveSectionEnding, String examDataModifiedOn, Boolean isOfflineExam, Long graceDurationForOfflineSubmission) {
         this.totalMarks = totalMarks;
         this.url = url;
         this.id = id;
@@ -146,6 +147,7 @@ public class Exam implements android.os.Parcelable {
         this.allowPreemptiveSectionEnding = allowPreemptiveSectionEnding;
         this.examDataModifiedOn = examDataModifiedOn;
         this.isOfflineExam = isOfflineExam;
+        this.graceDurationForOfflineSubmission = graceDurationForOfflineSubmission;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -483,6 +485,14 @@ public class Exam implements android.os.Parcelable {
         this.isOfflineExam = isOfflineExam;
     }
 
+    public Long getGraceDurationForOfflineSubmission() {
+        return graceDurationForOfflineSubmission;
+    }
+
+    public void setGraceDurationForOfflineSubmission(Long graceDurationForOfflineSubmission) {
+        this.graceDurationForOfflineSubmission = graceDurationForOfflineSubmission;
+    }
+
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
     @Generated
     public List<Language> getLanguages() {
@@ -630,6 +640,11 @@ public class Exam implements android.os.Parcelable {
         examDataModifiedOn = in.readString();
         byte tmpIsOfflineExam = in.readByte();
         isOfflineExam = tmpIsOfflineExam == 0 ? null : tmpIsOfflineExam == 1;
+        if (in.readByte() == 0) {
+            graceDurationForOfflineSubmission = null;
+        } else {
+            graceDurationForOfflineSubmission = in.readLong();
+        }
     }
 
     @Override
@@ -715,6 +730,12 @@ public class Exam implements android.os.Parcelable {
         dest.writeByte((byte) (allowPreemptiveSectionEnding == null ? 0 : allowPreemptiveSectionEnding ? 1 : 2));
         dest.writeString(examDataModifiedOn);
         dest.writeByte((byte) (isOfflineExam == null ? 0 : isOfflineExam ? 1 : 2));
+        if (graceDurationForOfflineSubmission == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(graceDurationForOfflineSubmission);
+        }
     }
 
     @Override

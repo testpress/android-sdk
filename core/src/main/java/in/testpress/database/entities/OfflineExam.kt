@@ -53,7 +53,8 @@ data class OfflineExam(
     val contentId: Long? = null,
     val downloadedQuestionCount: Long = 0,
     val downloadComplete: Boolean = false,
-    val offlinePausedAttemptsCount: Long = 0
+    val offlinePausedAttemptsCount: Long = 0,
+    val graceDurationForOfflineSubmission: Long? = null
 ) {
     fun getExamDataModifiedOnAsDate(): Date? {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX")
@@ -106,5 +107,17 @@ data class OfflineExam(
 
     fun getPausedAttemptAttemptCount(): Long {
         return offlinePausedAttemptsCount + (pausedAttemptsCount ?: 0)
+    }
+
+    fun canSubmitOfflineAttempt(): Boolean {
+        if (endDate.isNullOrEmpty() || graceDurationForOfflineSubmission == null) return true
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+        simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
+        val examEndDate = simpleDateFormat.parse(endDate) ?: return true
+        val calendar = Calendar.getInstance()
+        calendar.time = examEndDate
+        calendar.add(Calendar.MINUTE, graceDurationForOfflineSubmission.toInt())
+        val gracedDate = calendar.time
+        return Date().before(gracedDate)
     }
 }

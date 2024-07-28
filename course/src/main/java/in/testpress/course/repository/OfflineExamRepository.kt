@@ -296,15 +296,33 @@ class OfflineExamRepository(val context: Context) {
 
     suspend fun syncCompletedAttempt(examId: Long){
         updateAttemptStatusForEndedExam(offlineAttemptDao.getOfflineAttemptsByExamIdAndState(examId, Attempt.RUNNING))
-        val completedOfflineAttempts = offlineAttemptDao.getOfflineAttemptsByExamIdAndState(examId, Attempt.COMPLETED)
+        val offlineAttempts = offlineAttemptDao.getOfflineAttemptsByExamIdAndState(examId, Attempt.COMPLETED)
+        val completedOfflineAttempts = removeInvalidAttempts(offlineAttempts)
         updateCompletedAttempts(completedOfflineAttempts)
     }
 
     suspend fun syncCompletedAllAttemptToBackEnd() {
         updateAttemptStatusForEndedExam(offlineAttemptDao.getOfflineAttemptsByState(Attempt.RUNNING))
-        val completedOfflineAttempts =
+        val offlineAttempts =
             offlineAttemptDao.getOfflineAttemptsByState(Attempt.COMPLETED)
+        val completedOfflineAttempts = removeInvalidAttempts(offlineAttempts)
         updateCompletedAttempts(completedOfflineAttempts)
+    }
+
+    private suspend fun removeInvalidAttempts(completedOfflineAttempts: List<OfflineAttempt>): List<OfflineAttempt> {
+        val finalList = mutableListOf<OfflineAttempt>()
+        completedOfflineAttempts.forEach { offlineAttempt ->
+            val exam = offlineExamDao.getById(offlineAttempt.examId)
+            if (exam != null && exam.canSubmitOfflineAttempt()){
+                finalList.add(offlineAttempt)
+            } else {
+                offlineAttemptDao.deleteByAttemptId(offlineAttempt.id)
+                // Here we are resetting the attempt count because if the user completed the exam offline,
+                // we increased the attempt count. When the attempt is deleted, we reduce the attempt count.
+                offlineExamDao.reduceAttemptCount(offlineAttempt.examId, 1)
+            }
+        }
+        return finalList
     }
 
     private suspend fun updateAttemptStatusForEndedExam(pausedAttempts: List<OfflineAttempt>) {
