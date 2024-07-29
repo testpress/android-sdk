@@ -1157,6 +1157,7 @@ public class TestFragment extends BaseFragment implements
             public void onChanged(Resource<CourseAttempt> courseAttemptResource) {
                 switch (courseAttemptResource.getStatus()){
                     case SUCCESS:{
+                        courseAttempt = courseAttemptResource.getData();
                         if (getActivity() == null) {
                             return;
                         }
@@ -1200,6 +1201,7 @@ public class TestFragment extends BaseFragment implements
             public void onChanged(Resource<Attempt> attemptResource) {
                 switch (attemptResource.getStatus()){
                     case SUCCESS:{
+                        attempt = attemptResource.getData();
                         if (getActivity() == null) {
                             return;
                         }
@@ -1211,7 +1213,6 @@ public class TestFragment extends BaseFragment implements
                             returnToHistory();
                             return;
                         }
-                        TestFragment.this.attempt = attempt;
                         showReview(attempt);
                         break;
                     }
