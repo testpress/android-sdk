@@ -338,8 +338,11 @@ class AttemptRepository(val context: Context) {
                 .enqueue(object : TestpressCallback<Attempt>() {
                     override fun onSuccess(response: Attempt) {
                         _endAttemptResource.postValue(Resource.success(response))
-                        CoroutineScope(Dispatchers.IO).launch {
-                            offlineExamDao.updateCompletedAttemptCount(exam!!.id, 1L)
+                        // Custom Test does not contain an exam object. If the exam is null, we ignore updating the attempt count.
+                        exam?.let {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                offlineExamDao.updateCompletedAttemptCount(exam!!.id, 1L)
+                            }
                         }
                     }
 
