@@ -308,9 +308,7 @@ class AttemptRepository(val context: Context) {
                 .enqueue(object : TestpressCallback<CourseAttempt>() {
                     override fun onSuccess(result: CourseAttempt) {
                         _endContentAttemptResource.postValue(Resource.success(result))
-                        CoroutineScope(Dispatchers.IO).launch {
-                            offlineExamDao.updateCompletedAttemptCount(exam!!.id, 1L)
-                        }
+                        updateCompletedAttemptCount()
                     }
 
                     override fun onException(exception: TestpressException) {
@@ -338,18 +336,23 @@ class AttemptRepository(val context: Context) {
                 .enqueue(object : TestpressCallback<Attempt>() {
                     override fun onSuccess(response: Attempt) {
                         _endAttemptResource.postValue(Resource.success(response))
-                        // Custom Test does not contain an exam object. If the exam is null, we ignore updating the attempt count.
-                        exam?.let {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                offlineExamDao.updateCompletedAttemptCount(exam!!.id, 1L)
-                            }
-                        }
+                        updateCompletedAttemptCount()
                     }
 
                     override fun onException(exception: TestpressException) {
                         _endAttemptResource.postValue(Resource.error(exception, null))
                     }
                 })
+        }
+    }
+
+    private fun updateCompletedAttemptCount() {
+        exam?.let { exam ->
+            CoroutineScope(Dispatchers.IO).launch {
+                offlineExamDao.getById(exam.id)?.let {
+                    offlineExamDao.updateCompletedAttemptCount(exam.id, 1L)
+                }
+            }
         }
     }
 
