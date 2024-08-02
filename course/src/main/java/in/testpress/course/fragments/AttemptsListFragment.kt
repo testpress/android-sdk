@@ -1,10 +1,12 @@
 package `in`.testpress.course.fragments
 
+import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.getGreenDaoContent
 import `in`.testpress.course.domain.getGreenDaoContentAttempts
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.ContentAttemptListAdapter
+import `in`.testpress.util.ViewUtils
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +29,10 @@ open class AttemptsListFragment : BaseExamWidgetFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         attemptList = view.findViewById(R.id.attempt_list)
+        ViewUtils.setTypeface(
+            arrayOf(attemptSyncText),
+            TestpressSdk.getRubikRegularFont(requireActivity())
+        )
     }
 
     override fun display() {

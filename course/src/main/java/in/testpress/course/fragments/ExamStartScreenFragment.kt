@@ -86,7 +86,8 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
                 durationLabel,
                 markLabel,
                 negativeMarkLabel,
-                dateLabel
+                dateLabel,
+                attemptSyncText
             ),
             TestpressSdk.getRubikRegularFont(requireActivity())
         )

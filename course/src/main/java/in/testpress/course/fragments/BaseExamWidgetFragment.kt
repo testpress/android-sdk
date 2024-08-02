@@ -35,6 +35,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
@@ -52,6 +53,7 @@ open class BaseExamWidgetFragment : Fragment() {
     lateinit var downloadExam: Button
     lateinit var startExamOffline: Button
     lateinit var resumeExamOffline: Button
+    lateinit var attemptSyncText: TextView
     protected lateinit var viewModel: ExamContentViewModel
     protected lateinit var content: DomainContent
     protected var contentId: Long = -1
@@ -63,6 +65,7 @@ open class BaseExamWidgetFragment : Fragment() {
     var offlineContentAttempt: OfflineCourseAttempt? = null
     var offlineAttemptSectionList: List<OfflineAttemptSection>? = null
     private var isOfflineExamSupportEnables = false
+    var offlineAttemptUploaded = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,6 +96,7 @@ open class BaseExamWidgetFragment : Fragment() {
         downloadExam = view.findViewById(R.id.download_exam)
         startExamOffline = view.findViewById(R.id.start_exam_offline)
         resumeExamOffline = view.findViewById(R.id.resume_exam_offline)
+        attemptSyncText = view.findViewById(R.id.attempt_sync_message)
         contentId = requireArguments().getLong(ContentActivity.CONTENT_ID)
 
         viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer {
@@ -114,7 +118,7 @@ open class BaseExamWidgetFragment : Fragment() {
 
     protected fun initializeObserversForOfflineDownload() {
         offlineExamViewModel.syncCompletedAttempt(content.examId!!)
-        offlineExamViewModel.get(contentId).observe(requireActivity()) { offlineExam ->
+        offlineExamViewModel.get(contentId).observe(viewLifecycleOwner) { offlineExam ->
             this.offlineExam = offlineExam
             if (content.exam?.allowRetake == false && (offlineExam?.offlinePausedAttemptsCount ?: 0) > 0){
                 startButton.isVisible = false
@@ -138,7 +142,7 @@ open class BaseExamWidgetFragment : Fragment() {
             }
         }
 
-        offlineExamViewModel.downloadExamResult.observe(requireActivity()) { it ->
+        offlineExamViewModel.downloadExamResult.observe(viewLifecycleOwner) { it ->
             when (it.status){
                 Status.SUCCESS -> {}
                 Status.LOADING -> {}
@@ -149,16 +153,29 @@ open class BaseExamWidgetFragment : Fragment() {
                 else -> {}
             }
         }
-        offlineExamViewModel.offlineAttemptSyncResult.observe(requireActivity()) { it ->
+        offlineExamViewModel.offlineAttemptSyncResult.observe(viewLifecycleOwner) { it ->
             when (it.status){
                 Status.SUCCESS -> {
                     if (!this.isAdded) return@observe
-                    Toast.makeText(requireContext(),"Answers submitted successfully. Results will be available shortly.",Toast.LENGTH_SHORT).show()
+                    offlineAttemptUploaded = true
+                    hideExamStartButtonsIsAttemptAlreadySynced()
                 }
-                Status.LOADING -> {}
+                Status.LOADING -> {
+                    startExamOffline.isVisible = false
+                    startButton.isVisible = false
+                }
                 Status.ERROR -> {
                     if (!this.isAdded) return@observe
-                    Toast.makeText(requireContext(),"Please connect to the internet to view your results.",Toast.LENGTH_SHORT).show()
+                    offlineExam?.let {
+                        if (it.allowRetake == false && it.attemptsCount == 1 && !offlineAttemptUploaded) {
+                            startExamOffline.isVisible = false
+                            startButton.isVisible = false
+                            attemptSyncText.setText(R.string.offline_answers_no_network_message)
+                            attemptSyncText.isVisible = true
+                        } else {
+                            attemptSyncText.isVisible = false
+                        }
+                    }
                 }
                 else -> {}
             }
@@ -191,6 +208,27 @@ open class BaseExamWidgetFragment : Fragment() {
         } else {
             startExamOffline.isVisible = false
             resumeExamOffline.isVisible = true
+        }
+        hideExamStartButtonsIsAttemptAlreadySynced()
+    }
+
+    private fun hideExamStartButtonsIsAttemptAlreadySynced() {
+        offlineExam?.let {
+            if (it.allowRetake == false && it.attemptsCount == 1) {
+                // Show a message when the user has no internet connection
+                startExamOffline.isVisible = false
+                startButton.isVisible = false
+                attemptSyncText.setText(R.string.offline_answers_no_network_message)
+                attemptSyncText.isVisible = true
+            } else if (it.allowRetake == false && offlineAttemptUploaded) {
+                // Show a message when the attempt has already been synced
+                startExamOffline.isVisible = false
+                startButton.isVisible = false
+                attemptSyncText.setText(R.string.offline_answers_submitted_message)
+                attemptSyncText.isVisible = true
+            } else {
+                attemptSyncText.isVisible = false
+            }
         }
     }
 
