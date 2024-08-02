@@ -88,7 +88,7 @@
     <string name="custom_test_unknown_error">Something went wrong, Please try again later</string>
 
     <string name="offline_answers_submitted_message">Your offline answers have been successfully submitted. Swipe down to refresh this page and view your results.</string>
-    <string name="offline_answers_no_network_message">Please connect to the internet to submit your answers.</string>
+    <string name="offline_answers_no_network_message">Please connect to the internet and refresh this page to submit your answers.</string>
 
     <string-array name="exo_speed_values">
         <item>0.5</item>
