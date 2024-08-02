@@ -214,7 +214,7 @@ open class BaseExamWidgetFragment : Fragment() {
 
     private fun hideExamStartButtonsIsAttemptAlreadySynced() {
         offlineExam?.let {
-            if (it.allowRetake == false && it.attemptsCount == 1){
+            if (it.allowRetake == false && it.attemptsCount == 1) {
                 // Show a message when the user has no internet connection
                 startExamOffline.isVisible = false
                 startButton.isVisible = false
