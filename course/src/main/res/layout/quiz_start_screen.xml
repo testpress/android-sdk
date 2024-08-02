@@ -77,5 +77,18 @@
             android:textColor="@android:color/white"
             android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/attempt_sync_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textColor="@color/testpress_black"
+            android:textSize="@dimen/testpress_text_size_medium"
+            android:textStyle="normal"
+            android:text="@string/offline_answers_submitted_message" />
+
     </LinearLayout>
 </LinearLayout>
