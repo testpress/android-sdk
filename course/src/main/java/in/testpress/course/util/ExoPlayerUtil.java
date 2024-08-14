@@ -748,7 +748,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             errorMessage = activity.getString(R.string.exoplayer_drm_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
         }
         displayError(errorMessage);
-        logPlaybackException(errorMessage, playbackId);
+        logPlaybackException(errorMessage, playbackId, exception);
     }
 
     private boolean isScreenCasted() {
@@ -850,7 +850,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 } else {
                     String licenseRequestFailedMessage = activity.getString(R.string.license_request_failed, exception.errorCode, playBackId);
                     displayError(licenseRequestFailedMessage);
-                    logPlaybackException(licenseRequestFailedMessage, playBackId);
+                    logPlaybackException(licenseRequestFailedMessage, playBackId, exception);
                 }
             } else {
                 handleError(exception,playBackId);
@@ -918,12 +918,28 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         return -1;
     }
 
-    private void logPlaybackException(String errorMessage, String playbackId) {
+    private void logPlaybackException(String errorMessage, String playbackId, PlaybackException exception) {
+        String cause = "Cause not found";
+        try {
+            cause = exception.getCause().toString();
+        } catch (Exception ignored){}
+        String finalCause = cause;
         Sentry.captureMessage(
                 errorMessage, new ScopeCallback() {
                     @Override
                     public void run(@org.jetbrains.annotations.NotNull Scope scope) {
                         scope.setTag("playback_id", playbackId);
+                        scope.setContexts(
+                                "Player Error",
+                                new HashMap<String, Object>() {{
+                                    put("Content Id", content.getId());
+                                    put("Playback Id", playbackId);
+                                    put("Error Code", exception.errorCode);
+                                    put("Error Message", exception.getMessage());
+                                    put("Error Cause", finalCause);
+                                }}
+                        );
+
                     }
                 }
         );
