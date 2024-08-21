@@ -18,7 +18,7 @@ android {
             storePassword "sample"
         }
     }
-    compileSdkVersion rootProject.compileSdkVersion
+    compileSdkVersion 34
     buildToolsVersion rootProject.buildToolsVersion
     defaultConfig {
         multiDexEnabled true
@@ -30,7 +30,7 @@ android {
         } else {
             minSdkVersion rootProject.minSdkVersion
         }
-        targetSdkVersion rootProject.targetSdkVersion
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
     }
