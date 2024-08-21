@@ -40,7 +40,6 @@ dependencies {
     api project(':core')
     api project(':exam')
     api project(':store')
-    implementation project(':commonlib')
     implementation project(':mobilertc')
     api rootProject.design
     api 'com.google.android.exoplayer:exoplayer-core:' + rootProject.exoPlayer

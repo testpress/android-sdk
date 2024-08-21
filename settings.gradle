@@ -1,3 +1,2 @@
 include ':core', ':samples', ':exam', ':course', ':store', ':testpressdaogenerator'
-include ':commonlib'
 include ':mobilertc'

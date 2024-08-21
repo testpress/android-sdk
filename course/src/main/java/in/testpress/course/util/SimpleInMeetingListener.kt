@@ -90,4 +90,10 @@ open class SimpleInMeetingListener : InMeetingServiceListener {
     override fun onRequestLocalRecordingPrivilegeChanged(p0: LocalRecordingRequestPrivilegeStatus?) {}
     override fun onAICompanionActiveChangeNotice(p0: Boolean) {}
     override fun onParticipantProfilePictureStatusChange(p0: Boolean) {}
+    override fun onCloudRecordingStorageFull(p0: Long) {}
+    override fun onUVCCameraStatusChange(p0: String?, p1: InMeetingServiceListener.UVCCameraStatus?) {}
+    override fun onFocusModeStateChanged(p0: Boolean) {}
+    override fun onFocusModeShareTypeChanged(p0: MobileRTCFocusModeShareType?) {}
+    override fun onVideoAlphaChannelStatusChanged(p0: Boolean) {}
+    override fun onAllowParticipantsRequestCloudRecording(p0: Boolean) {}
 }
