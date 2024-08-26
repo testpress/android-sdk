@@ -223,8 +223,15 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         if(isLandscapeModeEnabled()){
             openFullscreenDialog();
         }
-        activity.getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
+        preventScreenshot();
         hideLiveStreamNotStartedScreen();
+    }
+
+    private void preventScreenshot() {
+        TestpressSession session = TestpressSdk.getTestpressSession(activity);
+        if (session != null && session.getInstituteSettings().isScreenshotDisabled()) {
+            activity.getWindow().setFlags(FLAG_SECURE, FLAG_SECURE);
+        }
     }
 
     private boolean isLandscapeModeEnabled() {
