@@ -21,15 +21,11 @@ allprojects {
 
     repositories {
         google()
-        jcenter() {
-            content {
-                includeModule("com.google.android", "flexbox")
-                includeModule("com.theartofdev.edmodo", "android-image-cropper")
-            }
-        }
+        jcenter()
         mavenCentral()
         maven { url "https://jitpack.io" }
         maven {url "https://phonepe.mycloudrepo.io/public/repositories/phonepe-intentsdk-android"}
+        maven { url "https://github.com/testpress/Android-Image-Cropper/raw/main" }
     }
 }
 
@@ -67,7 +63,7 @@ ext {
     universalImageLoader = 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     chart = 'com.github.testpress:MPAndroidChart:v3.0.0-beta2'
     greendao = 'org.greenrobot:greendao:3.2.0'
-    imageCropper = 'com.theartofdev.edmodo:android-image-cropper:2.7.0'
+    imageCropper = 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
     lottie = 'com.airbnb.android:lottie:2.5.4'
     roboelectric = "org.robolectric:robolectric:4.3.1"
     androidxCore = 'androidx.test:core:1.4.0'
