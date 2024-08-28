@@ -15,7 +15,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
     private lateinit var title: String
     private lateinit var urlPath: String
     private var isAuthenticationRequired: Boolean = true
-    private var allowNonInstituteUrl: Boolean = false
+    private var allowNonInstituteUrl: Boolean = !isAuthenticationRequired
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
