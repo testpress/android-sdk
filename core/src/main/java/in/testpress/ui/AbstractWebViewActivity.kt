@@ -38,7 +38,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
         title = intent.getStringExtra(TITLE)!!
         urlPath = intent.getStringExtra(URL_TO_OPEN)!!
         isAuthenticationRequired = intent.getBooleanExtra(IS_AUTHENTICATION_REQUIRED,true)
-        allowNonInstituteUrl = intent.getBooleanExtra(IS_AUTHENTICATION_REQUIRED,false)
+        allowNonInstituteUrl = intent.getBooleanExtra(ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, !isAuthenticationRequired)
     }
 
     private fun initializeWebViewFragment() {
