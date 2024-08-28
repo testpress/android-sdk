@@ -817,6 +817,7 @@ public class ReviewQuestionsFragment extends Fragment {
                                     "PDF Preview",
                                     url,
                                     false,
+                                    true,
                                     WebViewWithSSOActivity.class
                             )
                     );

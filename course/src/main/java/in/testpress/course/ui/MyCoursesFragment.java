@@ -183,6 +183,7 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
                         "Custom Module",
                         instituteSettings.getDomainUrl()+"/courses/custom_test_generation/?"+constrictQueryParamForAvailableCourses()+"&testpress_app=android",
                         true,
+                        false,
                         CustomTestGenerationActivity.class
                 )
         );

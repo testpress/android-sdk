@@ -264,6 +264,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                         "Test WebView",
                         session.getInstituteSettings().getDomainUrl() + urlPath,
                         true,
+                        false,
                         WebViewWithSSOActivity.class
                 )
         );
@@ -289,6 +290,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                                                         "Custom Module",
                                                         session.getInstituteSettings().getDomainUrl()+"/courses/custom_test_generation/?course_id="+inputText+"&testpress_app=android",
                                                         true,
+                                                        false,
                                                         CustomTestGenerationActivity.class
                                                 )
                                         );
