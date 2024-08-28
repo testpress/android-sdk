@@ -15,7 +15,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
     private lateinit var title: String
     private lateinit var urlPath: String
     private var isAuthenticationRequired: Boolean = true
-    private var allowNonInstituteUrl: Boolean = !isAuthenticationRequired
+    private var allowNonInstituteUrl: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +38,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
         title = intent.getStringExtra(TITLE)!!
         urlPath = intent.getStringExtra(URL_TO_OPEN)!!
         isAuthenticationRequired = intent.getBooleanExtra(IS_AUTHENTICATION_REQUIRED,true)
-        allowNonInstituteUrl = intent.getBooleanExtra(ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, !isAuthenticationRequired)
+        allowNonInstituteUrl = intent.getBooleanExtra(ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, false)
     }
 
     private fun initializeWebViewFragment() {
@@ -71,31 +71,14 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
             title: String,
             urlPath: String,
             isAuthenticationRequired: Boolean,
-            activityToOpen: Class<out AbstractWebViewActivity>
-        ): Intent {
-            return createIntent(
-                currentContext,
-                title,
-                urlPath,
-                isAuthenticationRequired,
-                false,
-                activityToOpen
-            )
-        }
-
-        fun createIntent(
-            currentContext: Context,
-            title: String,
-            urlPath: String,
-            isAuthenticationRequired: Boolean,
-            allow_non_institute_url: Boolean,
+            allowNonInstituteUrl: Boolean = false,
             activityToOpen: Class<out AbstractWebViewActivity>
         ): Intent {
             return Intent(currentContext, activityToOpen).apply {
                 putExtra(TITLE, title)
                 putExtra(URL_TO_OPEN, urlPath)
                 putExtra(IS_AUTHENTICATION_REQUIRED, isAuthenticationRequired)
-                putExtra(ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, allow_non_institute_url)
+                putExtra(ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, allowNonInstituteUrl)
             }
         }
     }

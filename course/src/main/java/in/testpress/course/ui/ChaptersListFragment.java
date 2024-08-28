@@ -248,6 +248,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
                         "Custom Module",
                         instituteSettings.getDomainUrl()+"/courses/custom_test_generation/?course_id="+courseId+"&testpress_app=android",
                         true,
+                        false,
                         CustomTestGenerationActivity.class
                 )
         );
