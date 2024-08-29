@@ -50,7 +50,11 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
         request: WebResourceRequest?,
         error: WebResourceError?
     ) {
-        fragment.showErrorView(TestpressException.unexpectedError(Exception("WebView error")))
+        val requestUrl = request?.url.toString()
+        val currentWebViewUrl = fragment.webView.url.toString()
+        if (requestUrl == currentWebViewUrl) {
+            fragment.showErrorView(TestpressException.unexpectedError(Exception("WebView error")))
+        }
     }
 
     override fun onReceivedHttpError(
