@@ -2,7 +2,6 @@ package `in`.testpress.util
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.os.Build
 import java.net.URL
 import java.util.*
 import android.webkit.MimeTypeMap
@@ -37,6 +36,4 @@ object Misc {
         }
         return type
     }
-
-    fun isAndroid13OrHigher() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 }
