@@ -264,4 +264,5 @@
     <string name="testpress_advanced_analytics">Advanced Analytics</string>
 
     <string name="rank_will_be_published">Rank will be published %s</string>
+    <string name="storage_permission_to_upload_file">The photos and videos permission is required to upload files.</string>
 </resources>

@@ -46,13 +46,11 @@ import in.testpress.models.FileDetails;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Language;
-import in.testpress.util.Misc;
-import in.testpress.util.PermissionHandler;
 import in.testpress.util.ProgressDialog;
 import in.testpress.util.WebViewUtils;
+import in.testpress.util.extension.ActivityKt;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
-import pub.devrel.easypermissions.PermissionRequest;
 
 public class TestQuestionFragment extends Fragment implements PickiTCallbacks, EasyPermissions.PermissionCallbacks {
 
@@ -347,25 +345,10 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
         @JavascriptInterface
         public void onFileUploadClick() {
             Log.d("TAG", "onFileUploadClick: ");
-            if (Misc.INSTANCE.isAndroid13OrHigher()) {
+            if (ActivityKt.isStoragePermissionGranted(getActivity())) {
                 pickFile();
             } else {
-                handlePermissionsForFilePick();
-            }
-        }
-
-        void handlePermissionsForFilePick() {
-            if (PermissionHandler.Companion.hasPermissions(
-                    requireActivity(),
-                    Arrays.asList(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
-            )) {
-                pickFile();
-            } else {
-                PermissionHandler.Companion.requestPermissionWithRationale(
-                        requireActivity(),
-                        Arrays.asList(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE),
-                        "This app needs access to your storage to upload files."
-                );
+                ActivityKt.askStoragePermission(getActivity(),getString(R.string.storage_permission_to_upload_file));
             }
         }
 
