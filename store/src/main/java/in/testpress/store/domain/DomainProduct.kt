@@ -106,12 +106,12 @@ fun createDomainCourse(courseEntity: CourseEntity): DomainCourse {
     modified  = courseEntity.modified,
     videosCount = courseEntity.videosCount,
     externalContentLink = courseEntity.externalContentLink,
-    id = courseEntity.id
-//    attachmentsCount = courseEntity.attachmentsCount,
-//    slug = courseEntity.slug,
-//    htmlContentsCount = courseEntity.htmlContentsCount,
-//    order = courseEntity.order,
-//    externalLinkLabel = courseEntity.externalLinkLabel,
+    id = courseEntity.id,
+    attachmentsCount = courseEntity.attachmentsCount,
+    slug = courseEntity.slug,
+    htmlContentsCount = courseEntity.htmlContentsCount,
+    order = courseEntity.order,
+    externalLinkLabel = courseEntity.externalLinkLabel
     )
 }
 
