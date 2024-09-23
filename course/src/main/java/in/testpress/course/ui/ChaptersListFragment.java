@@ -45,6 +45,7 @@ import kotlin.jvm.functions.Function0;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
+import static in.testpress.course.TestpressCourse.SHOW_BUY_NOW_BUTTON;
 
 public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
@@ -54,6 +55,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     private ChapterDao chapterDao;
     private CourseDao courseDao;
     private String productSlug;
+    private boolean showBuyNowButton;
     private Course course;
     private RetrofitCall<Course> courseApiRequest;
     private InstituteSettings instituteSettings;
@@ -81,6 +83,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     private void storeArgs() {
         courseId = getArguments().getString(COURSE_ID);
         productSlug = getArguments().getString(PRODUCT_SLUG);
+        showBuyNowButton = getArguments().getBoolean(SHOW_BUY_NOW_BUTTON);
 
         if (getArguments().getString(PARENT_ID) != null) {
             parentId = getArguments().getString(PARENT_ID);
@@ -97,7 +100,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         super.onViewCreated(view, savedInstanceState);
         swipeRefreshLayout.setEnabled(false);
 
-        if (productSlug != null) {
+        if (productSlug != null && showBuyNowButton) {
             displayBuyNowButton();
         }
 
