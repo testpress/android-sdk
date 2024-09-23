@@ -38,7 +38,7 @@ open class BaseToolBarActivity: AppCompatActivity() {
         setupActionBar()
     }
 
-    override fun setContentView(view: View) {
+    override fun setContentView(view: View?) {
         super.setContentView(view)
         preventScreenshot()
         setupActionBar()
