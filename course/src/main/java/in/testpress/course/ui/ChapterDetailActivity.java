@@ -39,6 +39,7 @@ import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
+import static in.testpress.course.TestpressCourse.SHOW_BUY_NOW_BUTTON;
 import static in.testpress.course.fragments.CourseContentListFragment.COURSE_CONTENT_TYPE;
 import static in.testpress.course.ui.ContentActivity.FORCE_REFRESH;
 import static in.testpress.course.ui.ContentActivity.GO_TO_MENU;
@@ -64,13 +65,19 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     private RetrofitCall<Chapter> chapterApiRequest;
     private RetrofitCall<Course> courseApiRequest;
     private String productSlug;
+    private Boolean showBuyNowButton;
     InstituteSettings instituteSettings;
 
     public static Intent createIntent(String title, String courseId, Context context, String productSlug) {
+        return createIntent(title, courseId, context, productSlug, true);
+    }
+
+    public static Intent createIntent(String title, String courseId, Context context, String productSlug, boolean showBuyNowButton) {
         Intent intent = new Intent(context, ChapterDetailActivity.class);
         intent.putExtra(ACTIONBAR_TITLE, title);
         intent.putExtra(COURSE_ID, courseId);
         intent.putExtra(PRODUCT_SLUG, productSlug);
+        intent.putExtra(SHOW_BUY_NOW_BUTTON, showBuyNowButton);
         return intent;
     }
 
@@ -89,6 +96,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         prefs.edit().clear().apply();
         courseDao = TestpressSDKDatabase.getCourseDao(this);
         productSlug = getIntent().getStringExtra(PRODUCT_SLUG);
+        showBuyNowButton = getIntent().getBooleanExtra(SHOW_BUY_NOW_BUTTON,false);
         //noinspection ConstantConditions
         instituteSettings = TestpressSdk.getTestpressSession(this).getInstituteSettings();
         final String chapterUrl = getIntent().getStringExtra(CHAPTER_URL);
@@ -247,6 +255,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             getIntent().putExtra(COURSE_ID, chapter.getCourseId().toString());
             getIntent().putExtra(PARENT_ID, chapter.getId().toString());
             getIntent().putExtra(PRODUCT_SLUG, productSlug);
+            getIntent().putExtra(SHOW_BUY_NOW_BUTTON, showBuyNowButton);
             loadChildChapters();
         } else  {
             getIntent().putExtra(CONTENTS_URL_FRAG, chapter.getChapterContentsUrl());
@@ -379,6 +388,9 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
 
         if(productSlug != null) {
             data.putString(PRODUCT_SLUG, productSlug);
+        }
+        if (showBuyNowButton != null){
+            data.putBoolean(SHOW_BUY_NOW_BUTTON, showBuyNowButton);
         }
         return data;
     }
