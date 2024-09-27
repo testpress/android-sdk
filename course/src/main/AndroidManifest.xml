@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
 
     <uses-sdk tools:overrideLibrary="us.zoom.androidlib,us.zoom.videomeetings" />
 
@@ -112,8 +111,7 @@
 
         <service
             android:name=".services.VideoDownloadService"
-            android:exported="false"
-            android:foregroundServiceType="dataSync">
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.exoplayer.downloadService.action.RESTART" />
                 <category android:name="android.intent.category.DEFAULT" />
