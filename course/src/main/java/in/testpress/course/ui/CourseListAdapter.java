@@ -3,6 +3,8 @@ package in.testpress.course.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
+import android.widget.TextView;
+
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import java.util.List;
@@ -50,6 +52,7 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
         showChapterAndContentCounts(mActivity, course);
         showOrHideExternalLinkLabel(course);
         initializeItemClickListener(course);
+        showOrHideCourseValidity(course);
         // ToDo: Set completed percentage in the progress bar
         setGone(4, true);
     }
@@ -83,6 +86,11 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
                 openCourseContentsOrExternalLink(mActivity, course, !course.isCourseForRegistration());
             }
         });
+    }
+
+    private void showOrHideCourseValidity(Course course) {
+        setText(8, course.getFormattedExpiryDate());
+        setGone(8, course.getFormattedExpiryDate().isEmpty());
     }
 
     public void openCourseContentsOrExternalLink(Activity activity, Course course, boolean openCourseContent) {
