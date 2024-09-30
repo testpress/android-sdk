@@ -46,6 +46,7 @@ public class Course {
     private Integer videosCount;
     private Integer htmlContentsCount;
     private Integer attachmentsCount;
+    private String expiryDate;
 
     @Convert(converter = in.testpress.util.StringListConverter.class, columnType = String.class)
     private StringList tags;
@@ -83,7 +84,7 @@ public class Course {
     }
 
     @Generated
-    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount, Integer order, Boolean active, String external_content_link, String external_link_label, boolean childItemsLoaded, Boolean isProduct, Boolean isMyCourse, Integer examsCount, Integer videosCount, Integer htmlContentsCount, Integer attachmentsCount, StringList tags, Boolean allowCustomTestGeneration, Integer maxAllowedViewsPerVideo) {
+    public Course(Long id, String url, String title, String description, String image, String modified, Long modifiedDate, String contentsUrl, String chaptersUrl, String slug, Integer trophiesCount, Integer chaptersCount, Integer contentsCount, Integer order, Boolean active, String external_content_link, String external_link_label, boolean childItemsLoaded, Boolean isProduct, Boolean isMyCourse, Integer examsCount, Integer videosCount, Integer htmlContentsCount, Integer attachmentsCount, String expiryDate, StringList tags, Boolean allowCustomTestGeneration, Integer maxAllowedViewsPerVideo) {
         this.id = id;
         this.url = url;
         this.title = title;
@@ -108,6 +109,7 @@ public class Course {
         this.videosCount = videosCount;
         this.htmlContentsCount = htmlContentsCount;
         this.attachmentsCount = attachmentsCount;
+        this.expiryDate = expiryDate;
         this.tags = tags;
         this.allowCustomTestGeneration = allowCustomTestGeneration;
         this.maxAllowedViewsPerVideo = maxAllowedViewsPerVideo;
@@ -310,6 +312,14 @@ public class Course {
 
     public void setAttachmentsCount(Integer attachmentsCount) {
         this.attachmentsCount = attachmentsCount;
+    }
+
+    public String getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(String expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     public StringList getTags() {
