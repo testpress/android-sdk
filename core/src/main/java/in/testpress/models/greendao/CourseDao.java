@@ -49,9 +49,10 @@ public class CourseDao extends AbstractDao<Course, Long> {
         public final static Property VideosCount = new Property(21, Integer.class, "videosCount", false, "VIDEOS_COUNT");
         public final static Property HtmlContentsCount = new Property(22, Integer.class, "htmlContentsCount", false, "HTML_CONTENTS_COUNT");
         public final static Property AttachmentsCount = new Property(23, Integer.class, "attachmentsCount", false, "ATTACHMENTS_COUNT");
-        public final static Property Tags = new Property(24, String.class, "tags", false, "TAGS");
-        public final static Property AllowCustomTestGeneration = new Property(25, Boolean.class, "allowCustomTestGeneration", false, "ALLOW_CUSTOM_TEST_GENERATION");
-        public final static Property MaxAllowedViewsPerVideo = new Property(26, Integer.class, "maxAllowedViewsPerVideo", false, "MAX_ALLOWED_VIEWS_PER_VIDEO");
+        public final static Property ExpiryDate = new Property(24, String.class, "expiryDate", false, "EXPIRY_DATE");
+        public final static Property Tags = new Property(25, String.class, "tags", false, "TAGS");
+        public final static Property AllowCustomTestGeneration = new Property(26, Boolean.class, "allowCustomTestGeneration", false, "ALLOW_CUSTOM_TEST_GENERATION");
+        public final static Property MaxAllowedViewsPerVideo = new Property(27, Integer.class, "maxAllowedViewsPerVideo", false, "MAX_ALLOWED_VIEWS_PER_VIDEO");
     }
 
     private DaoSession daoSession;
@@ -95,9 +96,10 @@ public class CourseDao extends AbstractDao<Course, Long> {
                 "\"VIDEOS_COUNT\" INTEGER," + // 21: videosCount
                 "\"HTML_CONTENTS_COUNT\" INTEGER," + // 22: htmlContentsCount
                 "\"ATTACHMENTS_COUNT\" INTEGER," + // 23: attachmentsCount
-                "\"TAGS\" TEXT," + // 24: tags
-                "\"ALLOW_CUSTOM_TEST_GENERATION\" INTEGER," + // 25: allowCustomTestGeneration
-                "\"MAX_ALLOWED_VIEWS_PER_VIDEO\" INTEGER);"); // 26: maxAllowedViewsPerVideo
+                "\"EXPIRY_DATE\" TEXT," + // 24: expiryDate
+                "\"TAGS\" TEXT," + // 25: tags
+                "\"ALLOW_CUSTOM_TEST_GENERATION\" INTEGER," + // 26: allowCustomTestGeneration
+                "\"MAX_ALLOWED_VIEWS_PER_VIDEO\" INTEGER);"); // 27: maxAllowedViewsPerVideo
     }
 
     /** Drops the underlying database table. */
@@ -226,19 +228,24 @@ public class CourseDao extends AbstractDao<Course, Long> {
             stmt.bindLong(24, attachmentsCount);
         }
  
+        String expiryDate = entity.getExpiryDate();
+        if (expiryDate != null) {
+            stmt.bindString(25, expiryDate);
+        }
+ 
         StringList tags = entity.getTags();
         if (tags != null) {
-            stmt.bindString(25, tagsConverter.convertToDatabaseValue(tags));
+            stmt.bindString(26, tagsConverter.convertToDatabaseValue(tags));
         }
  
         Boolean allowCustomTestGeneration = entity.getAllowCustomTestGeneration();
         if (allowCustomTestGeneration != null) {
-            stmt.bindLong(26, allowCustomTestGeneration ? 1L: 0L);
+            stmt.bindLong(27, allowCustomTestGeneration ? 1L: 0L);
         }
  
         Integer maxAllowedViewsPerVideo = entity.getMaxAllowedViewsPerVideo();
         if (maxAllowedViewsPerVideo != null) {
-            stmt.bindLong(27, maxAllowedViewsPerVideo);
+            stmt.bindLong(28, maxAllowedViewsPerVideo);
         }
     }
 
@@ -362,19 +369,24 @@ public class CourseDao extends AbstractDao<Course, Long> {
             stmt.bindLong(24, attachmentsCount);
         }
  
+        String expiryDate = entity.getExpiryDate();
+        if (expiryDate != null) {
+            stmt.bindString(25, expiryDate);
+        }
+ 
         StringList tags = entity.getTags();
         if (tags != null) {
-            stmt.bindString(25, tagsConverter.convertToDatabaseValue(tags));
+            stmt.bindString(26, tagsConverter.convertToDatabaseValue(tags));
         }
  
         Boolean allowCustomTestGeneration = entity.getAllowCustomTestGeneration();
         if (allowCustomTestGeneration != null) {
-            stmt.bindLong(26, allowCustomTestGeneration ? 1L: 0L);
+            stmt.bindLong(27, allowCustomTestGeneration ? 1L: 0L);
         }
  
         Integer maxAllowedViewsPerVideo = entity.getMaxAllowedViewsPerVideo();
         if (maxAllowedViewsPerVideo != null) {
-            stmt.bindLong(27, maxAllowedViewsPerVideo);
+            stmt.bindLong(28, maxAllowedViewsPerVideo);
         }
     }
 
@@ -416,9 +428,10 @@ public class CourseDao extends AbstractDao<Course, Long> {
             cursor.isNull(offset + 21) ? null : cursor.getInt(offset + 21), // videosCount
             cursor.isNull(offset + 22) ? null : cursor.getInt(offset + 22), // htmlContentsCount
             cursor.isNull(offset + 23) ? null : cursor.getInt(offset + 23), // attachmentsCount
-            cursor.isNull(offset + 24) ? null : tagsConverter.convertToEntityProperty(cursor.getString(offset + 24)), // tags
-            cursor.isNull(offset + 25) ? null : cursor.getShort(offset + 25) != 0, // allowCustomTestGeneration
-            cursor.isNull(offset + 26) ? null : cursor.getInt(offset + 26) // maxAllowedViewsPerVideo
+            cursor.isNull(offset + 24) ? null : cursor.getString(offset + 24), // expiryDate
+            cursor.isNull(offset + 25) ? null : tagsConverter.convertToEntityProperty(cursor.getString(offset + 25)), // tags
+            cursor.isNull(offset + 26) ? null : cursor.getShort(offset + 26) != 0, // allowCustomTestGeneration
+            cursor.isNull(offset + 27) ? null : cursor.getInt(offset + 27) // maxAllowedViewsPerVideo
         );
         return entity;
     }
@@ -449,9 +462,10 @@ public class CourseDao extends AbstractDao<Course, Long> {
         entity.setVideosCount(cursor.isNull(offset + 21) ? null : cursor.getInt(offset + 21));
         entity.setHtmlContentsCount(cursor.isNull(offset + 22) ? null : cursor.getInt(offset + 22));
         entity.setAttachmentsCount(cursor.isNull(offset + 23) ? null : cursor.getInt(offset + 23));
-        entity.setTags(cursor.isNull(offset + 24) ? null : tagsConverter.convertToEntityProperty(cursor.getString(offset + 24)));
-        entity.setAllowCustomTestGeneration(cursor.isNull(offset + 25) ? null : cursor.getShort(offset + 25) != 0);
-        entity.setMaxAllowedViewsPerVideo(cursor.isNull(offset + 26) ? null : cursor.getInt(offset + 26));
+        entity.setExpiryDate(cursor.isNull(offset + 24) ? null : cursor.getString(offset + 24));
+        entity.setTags(cursor.isNull(offset + 25) ? null : tagsConverter.convertToEntityProperty(cursor.getString(offset + 25)));
+        entity.setAllowCustomTestGeneration(cursor.isNull(offset + 26) ? null : cursor.getShort(offset + 26) != 0);
+        entity.setMaxAllowedViewsPerVideo(cursor.isNull(offset + 27) ? null : cursor.getInt(offset + 27));
      }
     
     @Override
