@@ -2,20 +2,14 @@ package in.testpress.course.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
-
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.util.List;
-
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
 import in.testpress.ui.WebViewActivity;
 import in.testpress.models.greendao.Course;
-import in.testpress.models.greendao.CourseDao;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -50,49 +44,45 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
 
     @Override
     protected void update(final int position, final Course course) {
-
         setFont(new int[]{0, 2, 6, 7}, TestpressSdk.getRubikMediumFont(mActivity));
         setText(0, course.getTitle());
+        showOrHideCourseImage(course);
+        showChapterAndContentCounts(mActivity, course);
+        showOrHideExternalLinkLabel(course);
+        initializeItemClickListener(course);
+        // ToDo: Set completed percentage in the progress bar
+        setGone(4, true);
+    }
+
+    private void showOrHideCourseImage(Course course) {
         if (course.getImage() == null || course.getImage().isEmpty()) {
             setGone(1, true);
         } else {
             setGone(1, false);
             mImageLoader.displayImage(course.getImage(), imageView(1), mOptions);
         }
-        showCount(mActivity, course);
-
-        setTextToTextView(course.getExternal_link_label(), (TextView) view(5));
-        toggleTextViewVisibility(!course.isCourseForRegistration(), view(5));
-
-        view(3).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openCourseContentsOrExternalLink(mActivity, course, !course.isCourseForRegistration());
-            }
-        });
-        // ToDo: Set completed percentage in the progress bar
-        setGone(4, true);
     }
-
-    private void showCount(Activity activity, Course course) {
+    private void showChapterAndContentCounts(Activity activity, Course course) {
         setText(6,  activity.getResources().getQuantityString(R.plurals.chapters_count,
                 course.getChaptersCount(), course.getChaptersCount()));
         setText(7,  activity.getResources().getQuantityString(R.plurals.contents_count,
                 course.getContentsCount(), course.getContentsCount()));
     }
 
-    public void toggleTextViewVisibility(boolean toHide, View view) {
-        if (toHide) {
-            view.setVisibility(View.GONE);
-        } else {
-            view.setVisibility(View.VISIBLE);
+    private void showOrHideExternalLinkLabel(Course course) {
+        if (!course.getExternal_link_label().equals("")) {
+            setText(5, course.getExternal_link_label());
         }
+        setGone(5, !course.isCourseForRegistration());
     }
 
-    public void setTextToTextView(String textViewText, TextView textView) {
-        if (!textViewText.equals("")) {
-            textView.setText(textViewText);
-        }
+    private void initializeItemClickListener(Course course) {
+        view(3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openCourseContentsOrExternalLink(mActivity, course, !course.isCourseForRegistration());
+            }
+        });
     }
 
     public void openCourseContentsOrExternalLink(Activity activity, Course course, boolean openCourseContent) {
