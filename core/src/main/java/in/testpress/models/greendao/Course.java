@@ -2,10 +2,8 @@ package in.testpress.models.greendao;
 
 import org.greenrobot.greendao.annotation.*;
 
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import in.testpress.models.greendao.DaoSession;
@@ -18,7 +16,6 @@ import in.testpress.util.StringList;
 // KEEP INCLUDES - put your custom includes here
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.TimeZone;
 // KEEP INCLUDES END
 
 /**
