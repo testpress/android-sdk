@@ -3,8 +3,6 @@ package in.testpress.course.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
-import android.widget.TextView;
-
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import java.util.List;
