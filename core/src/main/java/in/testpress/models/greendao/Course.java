@@ -2,6 +2,9 @@ package in.testpress.models.greendao;
 
 import org.greenrobot.greendao.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import in.testpress.models.greendao.DaoSession;
 import org.greenrobot.greendao.DaoException;
@@ -466,6 +469,23 @@ public class Course {
             }
         }
         return filteredCourses;
+    }
+
+    public String getFormattedExpiryDate() {
+        if (expiryDate == null || expiryDate.isEmpty()) {
+            return "";
+        }
+
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy");
+            Date date = inputFormat.parse(expiryDate);
+            return "Valid till " + outputFormat.format(date);
+        } catch (ParseException e) {
+            // Handle parsing errors and return empty string in case of failure
+            System.out.println("Error parsing date: " + e.getMessage());
+            return "";
+        }
     }
     // KEEP METHODS END
 

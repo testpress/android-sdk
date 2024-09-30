@@ -38,18 +38,19 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     protected int[] getChildViewIds() {
         return new int[] { R.id.course_title, R.id.thumbnail_image, R.id.percentage,
                 R.id.course_item_layout,  R.id.progress_bar_layout, R.id.external_link_title,
-                R.id.total_chapters, R.id.total_contents
+                R.id.total_chapters, R.id.total_contents, R.id.validity
         };
     }
 
     @Override
     protected void update(final int position, final Course course) {
-        setFont(new int[]{0, 2, 6, 7}, TestpressSdk.getRubikMediumFont(mActivity));
+        setFont(new int[]{0, 2, 6, 7, 8}, TestpressSdk.getRubikMediumFont(mActivity));
         setText(0, course.getTitle());
         showOrHideCourseImage(course);
         showChapterAndContentCounts(mActivity, course);
         showOrHideExternalLinkLabel(course);
         initializeItemClickListener(course);
+        showOrHideCourseValidity(course);
         // ToDo: Set completed percentage in the progress bar
         setGone(4, true);
     }
@@ -83,6 +84,11 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
                 openCourseContentsOrExternalLink(mActivity, course, !course.isCourseForRegistration());
             }
         });
+    }
+
+    private void showOrHideCourseValidity(Course course) {
+        setText(8, course.getFormattedExpiryDate());
+        setGone(8, course.getFormattedExpiryDate().isEmpty());
     }
 
     public void openCourseContentsOrExternalLink(Activity activity, Course course, boolean openCourseContent) {
