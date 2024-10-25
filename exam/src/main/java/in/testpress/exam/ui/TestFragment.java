@@ -969,11 +969,6 @@ public class TestFragment extends BaseFragment implements
             endExam();
         } else if (action.equals(Action.END_SECTION)) {
             endSection();
-        } else {
-            if (progressDialog.isShowing()) {
-                startCountDownTimer(millisRemaining);
-                progressDialog.dismiss();
-            }
         }
     }
 
@@ -1404,6 +1399,11 @@ public class TestFragment extends BaseFragment implements
 
     void startCountDownTimer(long millisInFuture) {
         updateTimeRemaining(millisInFuture);
+
+        if (countDownTimer != null){
+            countDownTimer.cancel();
+            countDownTimer = null;
+        }
         countDownTimer = new CountDownTimer(millisInFuture, 1000) {
 
             public void onTick(long millisUntilFinished) {
