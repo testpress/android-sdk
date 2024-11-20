@@ -118,6 +118,7 @@
     </style>
 
     <string name="exoplayer_miscellaneous_error">An unexpected error occurred. Please try again later.\n\n%1$s\n(Code: %2$d, ID: %3$s)</string>
+    <string name="exoplayer_internet_error">Please check your internet connection &amp; try again.\n\n%1$s\n(Code: %2$d, ID: %3$s)</string>
     <string name="exoplayer_input_or_output_error">A network error occurred. Please try again later.\n\n%1$s\n(Code: %2$d, ID: %3$s)</string>
     <string name="exoplayer_content_parsing_error">A content parsing error occurred. Please try again later.\n\n%1$s\n(Code: %2$d, ID: %3$s)</string>
     <string name="exoplayer_decoding_error">A decoding error occurred. Please try again later.\n\n%1$s\n(Code: %2$d, ID: %3$s)</string>

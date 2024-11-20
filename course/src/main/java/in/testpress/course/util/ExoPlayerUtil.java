@@ -695,7 +695,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                         if (videoWatchDataRepository != null) {
                             videoWatchDataRepository.save(content, getVideoAttemptParameters());
                         }
-                        errorOnVideoAttemptUpdate = true;
+                        if (!exception.isNetworkError()){
+                            // Exclude network error
+                            errorOnVideoAttemptUpdate = true;
+                        }
                     }
                 });
     }
@@ -742,7 +745,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         if (1000 <= exception.errorCode && exception.errorCode < 2000) { // Miscellaneous errors
             errorMessage = activity.getString(R.string.exoplayer_miscellaneous_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
         } else if (2001 == exception.errorCode) { // No network error
-            errorMessage = activity.getString(R.string.testpress_no_internet_try_again);
+            errorMessage = activity.getString(R.string.exoplayer_internet_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
         } else if (2000 <= exception.errorCode && exception.errorCode <= 3000) { // Input/Output errors
             errorMessage = activity.getString(R.string.exoplayer_input_or_output_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
         } else if (3000 <= exception.errorCode && exception.errorCode <= 4000) { // Content parsing errors
