@@ -2,6 +2,8 @@ package in.testpress.core;
 
 import android.content.Context;
 
+import java.io.IOException;
+
 import in.testpress.models.ProfileDetails;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
@@ -61,6 +63,11 @@ public class TestpressUserDetails {
                     }
                 });
         return retrofitCall;
+    }
+
+    public ProfileDetails loadSync(Context context) throws IOException {
+        return new TestpressApiClient(context, TestpressSdk.getTestpressSession(context))
+                .getProfileDetails().execute().body();
     }
 
 }

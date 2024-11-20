@@ -17,6 +17,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class VideoConferenceFragment : BaseContentDetailFragment() {
     private lateinit var titleView: TextView
@@ -30,9 +34,6 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         profileDetails = TestpressUserDetails.getInstance().profileDetails
-        if (profileDetails == null) {
-            TestpressUserDetails.getInstance().load(requireContext())
-        }
     }
 
     override fun onCreateView(
@@ -62,8 +63,10 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
 
     override fun display() {
         val videoConference = content.videoConference
-        initializeVideoConferenceHandler(videoConference)
-
+        CoroutineScope(Dispatchers.Main).launch {
+            fetchProfileDetailsIfNull()
+            initializeVideoConferenceHandler(videoConference)
+        }
         titleView.text = content.title
         titleLayout.visibility = View.VISIBLE
         videoConference?.let {
@@ -74,6 +77,19 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         startButton.setOnClickListener {
             showLoadingAndDisableStartButton("JOINING")
             joinMeeting()
+        }
+        showLoadingAndDisableStartButton()
+    }
+
+    private fun fetchProfileDetailsIfNull() {
+        if(profileDetails==null){
+            runBlocking(Dispatchers.IO) {
+                profileDetails = try {
+                    TestpressUserDetails.getInstance().loadSync(requireContext())
+                } catch (e: Exception){
+                    null
+                }
+            }
         }
     }
 
@@ -90,16 +106,19 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     }
 
     private fun initializeVideoConferenceHandler(videoConference: DomainVideoConferenceContent?) {
-        showLoadingAndDisableStartButton()
         try {
             videoConferenceHandler =  VideoConferenceHandler(requireContext(), videoConference!!, profileDetails)
             videoConferenceHandler?.init(object: VideoConferenceInitializeListener {
                 override fun onSuccess() {
-                    hideLoadingAndEnableStartButton()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        hideLoadingAndEnableStartButton()
+                    }
                 }
 
                 override fun onFailure() {
-                    hideLoadingAndEnableStartButton()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        hideLoadingAndEnableStartButton()
+                    }
                 }
             })
         }
