@@ -2,6 +2,7 @@ package in.testpress.network;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Looper;
 import androidx.appcompat.app.AlertDialog;
 import android.os.Handler;
@@ -20,6 +21,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.X509TrustManager;
+
 import in.testpress.R;
 import in.testpress.core.TestpressSession;
 import in.testpress.models.AccountActivity;
@@ -29,8 +33,10 @@ import in.testpress.models.SSOUrl;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.ui.UserDevicesActivity;
 import in.testpress.util.Misc;
+import in.testpress.util.TrustFactory;
 import in.testpress.util.UIUtils;
 import in.testpress.util.UserAgentProvider;
+import kotlin.Pair;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -126,6 +132,12 @@ public class TestpressApiClient {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.connectTimeout(1, TimeUnit.MINUTES).readTimeout(1, TimeUnit.MINUTES);
         httpClient.addNetworkInterceptor(interceptor);
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+            Log.d("TAG", "TestpressApiClient: ");
+            Pair<SSLSocketFactory, X509TrustManager> pair = TrustFactory.Companion.getTrustFactoryManager(context);
+            httpClient.sslSocketFactory(pair.component1(), pair.component2());
+        }
 
         // Set log level
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
