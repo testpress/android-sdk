@@ -51,6 +51,10 @@ public class InstituteSettings {
     private Boolean enableOfflineExam;
     private Boolean showOfflineExamEndingAlert;
 
+    private String videoWatermarkType;
+
+    private String videoWatermarkPosition;
+
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
     }
@@ -451,5 +455,23 @@ public class InstituteSettings {
 
     public String getDomainUrl() {
         return (whiteLabeledHostUrl != null && !whiteLabeledHostUrl.isEmpty()) ? whiteLabeledHostUrl : baseUrl;
+    }
+
+    public String getVideoWatermarkType() {
+        return videoWatermarkType;
+    }
+
+    public InstituteSettings setVideoWatermarkType(String videoWatermarkType) {
+        this.videoWatermarkType = videoWatermarkType;
+        return this;
+    }
+
+    public String getVideoWatermarkPosition() {
+        return videoWatermarkPosition;
+    }
+
+    public InstituteSettings setVideoWatermarkPosition(String videoWatermarkPosition) {
+        this.videoWatermarkPosition = videoWatermarkPosition;
+        return this;
     }
 }

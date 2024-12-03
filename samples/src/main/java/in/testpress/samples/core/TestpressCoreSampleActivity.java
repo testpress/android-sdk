@@ -110,8 +110,8 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
             public void onClick(View view) {
                 if (!usernameEditText.getText().toString().trim().isEmpty() &&
                         !passwordEditText.getText().toString().trim().isEmpty()) {
-                    authenticate(usernameEditText.getText().toString().trim(),
-                            passwordEditText.getText().toString().trim(), TestpressSdk.Provider.TESTPRESS);
+                    authenticate("111",
+                            "111", TestpressSdk.Provider.TESTPRESS);
                 }
             }
         });
@@ -119,10 +119,14 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
     }
 
     private void authenticate(String userId, String accessToken, TestpressSdk.Provider provider) {
-        InstituteSettings instituteSettings = new InstituteSettings("https://sandbox.testpress.in");
-        instituteSettings.setWhiteLabeledHostUrl("https://sandbox.testpress.in");
+        InstituteSettings instituteSettings = new InstituteSettings("https://lmsdemo.testpress.in");
+        instituteSettings.setWhiteLabeledHostUrl("https://lmsdemo.testpress.in");
         instituteSettings.setAndroidSentryDns("https://186f9948d5294b4c9c03aa9d2a11c982@sentry.testpress.in/3");
         instituteSettings.setEnableOfflineExam(true);
+        //instituteSettings.setVideoWatermarkType("Hidden");
+        //instituteSettings.setVideoWatermarkType("Dynamic");
+        instituteSettings.setVideoWatermarkType("Static");
+        instituteSettings.setVideoWatermarkPosition("Top Right");
         instituteSettings.setShowOfflineExamEndingAlert(true);
         TestpressSdk.initialize(this, instituteSettings, userId, accessToken, provider,
                 new TestpressCallback<TestpressSession>() {
