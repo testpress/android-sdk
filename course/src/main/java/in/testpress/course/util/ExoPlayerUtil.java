@@ -315,30 +315,26 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void applyStaticOverlay() {
-        setStaticWatermarkPosition();
-    }
-
-    private void setStaticWatermarkPosition() {
         if (session != null && session.getInstituteSettings().getVideoWatermarkPosition() != null) {
             String watermarkPosition = session.getInstituteSettings().getVideoWatermarkPosition();
             switch (watermarkPosition) {
-                case "Top Left":
+                case "top-left":
                     emailIdLayout.setGravity(Gravity.TOP | Gravity.START);
                     break;
 
-                case "Top Right":
+                case "top-right":
                     emailIdLayout.setGravity(Gravity.TOP | Gravity.END);
                     break;
 
-                case "Bottom Left":
+                case "bottom-left":
                     emailIdLayout.setGravity(Gravity.BOTTOM | Gravity.START);
                     break;
 
-                case "Bottom Right":
+                case "bottom-right":
                     emailIdLayout.setGravity(Gravity.BOTTOM | Gravity.END);
                     break;
 
-                case "Middle":
+                case "middle":
                     emailIdLayout.setGravity(Gravity.CENTER);
                     break;
 

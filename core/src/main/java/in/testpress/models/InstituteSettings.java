@@ -50,9 +50,7 @@ public class InstituteSettings {
     private Boolean disableImageFullscreenZoomInExam;
     private Boolean enableOfflineExam;
     private Boolean showOfflineExamEndingAlert;
-
     private String videoWatermarkType;
-
     private String videoWatermarkPosition;
 
     public InstituteSettings(String baseUrl) {
