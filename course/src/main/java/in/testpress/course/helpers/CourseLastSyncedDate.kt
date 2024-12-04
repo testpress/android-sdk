@@ -7,12 +7,12 @@ import java.util.Date
 
 class CourseLastSyncedDate(val context: Context) {
     private val sharedPreferences = context.getSharedPreferences(COURSE_DATA, Context.MODE_PRIVATE)
-    private val instituteSettings = TestpressSdk.getTestpressSession(context)!!.instituteSettings
+    private val instituteSettings = TestpressSdk.getTestpressSession(context)?.instituteSettings
 
     fun hasExpired(): Boolean {
         val lastFetchTime = sharedPreferences.getLong(COURSE_REFRESH_TIME, 0)
         val now = Date()
-        if(lastFetchTime == 0L) {
+        if(lastFetchTime == 0L || instituteSettings == null) {
             return false
         }
         return DateUtils.difference(Date(lastFetchTime), now) > 2 && now.time > instituteSettings.serverTime
