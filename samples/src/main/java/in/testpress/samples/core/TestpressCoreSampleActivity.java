@@ -110,8 +110,8 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
             public void onClick(View view) {
                 if (!usernameEditText.getText().toString().trim().isEmpty() &&
                         !passwordEditText.getText().toString().trim().isEmpty()) {
-                    authenticate("111",
-                            "111", TestpressSdk.Provider.TESTPRESS);
+                    authenticate(usernameEditText.getText().toString().trim(),
+                            passwordEditText.getText().toString().trim(), TestpressSdk.Provider.TESTPRESS);
                 }
             }
         });
