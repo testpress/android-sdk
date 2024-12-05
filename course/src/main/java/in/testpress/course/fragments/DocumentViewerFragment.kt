@@ -47,6 +47,12 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         return binding.root
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        pdfDownloadManager.cancel()
+        pdfDownloadManager.cleanup()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
