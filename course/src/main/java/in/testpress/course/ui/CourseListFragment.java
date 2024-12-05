@@ -60,7 +60,7 @@ public class CourseListFragment extends BaseFragment {
 
     private void setupViewPager(ViewPager viewPager) {
         adapter = new Adapter(getChildFragmentManager());
-        adapter.addFragment(new MyCoursesFragment(), getString(R.string.my_course_title));
+        adapter.addFragment(getMyCoursesFragment(), getString(R.string.my_course_title));
 
         String storeLabel = "Available Courses";
         if (session.getInstituteSettings().getStoreLabel() != null && !session.getInstituteSettings().getStoreLabel().isEmpty()) {
@@ -78,6 +78,12 @@ public class CourseListFragment extends BaseFragment {
             @Override
             public void onPageScrollStateChanged(int state) {}
         });
+    }
+
+    private MyCoursesFragment getMyCoursesFragment() {
+        MyCoursesFragment myCoursesFragment = new MyCoursesFragment();
+        myCoursesFragment.setArguments(getArguments());
+        return myCoursesFragment;
     }
 
     private void addStoreFragment(String storeLabel) {
