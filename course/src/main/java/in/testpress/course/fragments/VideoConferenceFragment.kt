@@ -78,6 +78,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     }
 
     private fun hideLoadingAndEnableStartButton() {
+        if (!isVisible) return
         startButton.isEnabled = true
         startButton.text = "START"
         startButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.testpress_color_primary))
