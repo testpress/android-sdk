@@ -18,12 +18,15 @@ import in.testpress.course.ui.DownloadsActivity;
 import in.testpress.course.ui.MyCoursesFragment;
 import in.testpress.course.ui.LeaderboardActivity;
 import in.testpress.course.ui.LeaderboardFragment;
+import in.testpress.network.TestpressApiClient;
 import in.testpress.util.Assert;
 import in.testpress.util.ImageUtils;
 
 import static in.testpress.core.TestpressSdk.COURSE_CHAPTER_REQUEST_CODE;
 import static in.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE;
 import static in.testpress.core.TestpressSdk.COURSE_CONTENT_LIST_REQUEST_CODE;
+
+import java.util.ArrayList;
 
 public class TestpressCourse {
 
@@ -85,6 +88,34 @@ public class TestpressCourse {
 
         init(context.getApplicationContext(), testpressSession);
         Intent intent = new Intent(context, CourseListActivity.class);
+        context.startActivity(intent);
+    }
+
+    /**
+     * Use when testpress courses need to be open as a new Activity.
+     *
+     * <p> Usage example:
+     *
+     * <p> TestpressSdk.initialize(this, instituteSettings, "userId", "accessToken", provider,
+     * <p>             new TestpressCallback/<TestpressSession>() {
+     * <p>             @Override
+     * <p>             public void onSuccess(TestpressSession testpressSession) {
+     * <p>                  ArrayList<String> tags = new ArrayList<>();
+     * <p>                  tags.add("UPSC");
+     * <p>                 <b>TestpressCourse.show(this, testpressSession, tags);</b>
+     * <p>             }
+     * <p> });
+     *
+     * @param context Context to start the new activity.
+     * @param testpressSession TestpressSession got from the core module.
+     * @param tags A list of course tags used for filtering.
+     */
+    public static void show(@NonNull Context context, @NonNull TestpressSession testpressSession, @NonNull ArrayList<String> tags) {
+        Assert.assertNotNull("Context must not be null.", context);
+
+        init(context.getApplicationContext(), testpressSession);
+        Intent intent = new Intent(context, CourseListActivity.class);
+        intent.putStringArrayListExtra(TestpressApiClient.TAGS, tags);
         context.startActivity(intent);
     }
 
