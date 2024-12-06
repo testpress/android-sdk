@@ -969,6 +969,11 @@ public class TestFragment extends BaseFragment implements
             endExam();
         } else if (action.equals(Action.END_SECTION)) {
             endSection();
+        } else if(action.equals(Action.UPDATE_ANSWER)) {
+            if (progressDialog.isShowing()) {
+                startCountDownTimer(millisRemaining);
+                progressDialog.dismiss();
+            }
         }
     }
 
