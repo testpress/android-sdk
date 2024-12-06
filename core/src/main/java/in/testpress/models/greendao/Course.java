@@ -471,6 +471,20 @@ public class Course {
         return filteredCourses;
     }
 
+    public static List<Course> excludeCoursesByTags(List<Course> courses, List<String> tags) {
+        if (tags == null || tags.isEmpty()) {
+            return courses;
+        }
+
+        ArrayList<Course> filteredCourses = new ArrayList<Course>();
+        for (Course course : courses) {
+            if (!course.containsTags(tags)) {
+                filteredCourses.add(course);
+            }
+        }
+        return filteredCourses;
+    }
+
     public String getFormattedExpiryDate() {
         if (expiryDate == null || expiryDate.isEmpty()) {
             return "";
