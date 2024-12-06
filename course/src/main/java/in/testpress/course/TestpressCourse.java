@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
 import in.testpress.core.TestpressSdk;
@@ -110,12 +111,13 @@ public class TestpressCourse {
      * @param testpressSession TestpressSession got from the core module.
      * @param tags A list of course tags used for filtering.
      */
-    public static void show(@NonNull Context context, @NonNull TestpressSession testpressSession, @NonNull ArrayList<String> tags) {
+    public static void show(@NonNull Context context, @NonNull TestpressSession testpressSession, @Nullable ArrayList<String> tags, @Nullable ArrayList<String> excludeTags) {
         Assert.assertNotNull("Context must not be null.", context);
 
         init(context.getApplicationContext(), testpressSession);
         Intent intent = new Intent(context, CourseListActivity.class);
         intent.putStringArrayListExtra(TestpressApiClient.TAGS, tags);
+        intent.putStringArrayListExtra(TestpressApiClient.EXCLUDE_TAGS, excludeTags);
         context.startActivity(intent);
     }
 

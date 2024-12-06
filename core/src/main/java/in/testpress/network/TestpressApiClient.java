@@ -61,7 +61,7 @@ public class TestpressApiClient {
     public static final String PAGE_SIZE = "page_size";
     public static final String PARENT = "parent";
     public static final String TAGS = "tags";
-
+    public static final String EXCLUDE_TAGS = "excludeTags";
     public static final String SINCE = "since";
     public static final String UNTIL = "until";
     public static final String ORDER = "order";

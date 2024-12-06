@@ -34,6 +34,7 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
     private TestpressCourseApiClient mApiClient;
     private CourseDao courseDao;
     private ArrayList<String> tags = new ArrayList<String>();
+    private ArrayList<String> excludeTags = new ArrayList<String>();
     private InstituteSettings instituteSettings;
 
     public static void show(FragmentActivity activity, int containerViewId) {
@@ -60,6 +61,7 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
     private void initializeTags() {
         if (getArguments() != null) {
             tags = getArguments().getStringArrayList(TestpressApiClient.TAGS);
+            excludeTags = getArguments().getStringArrayList(TestpressApiClient.EXCLUDE_TAGS);
         }
     }
 
@@ -86,7 +88,8 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
                 .where(CourseDao.Properties.IsMyCourse.eq(true))
                 .orderAsc(CourseDao.Properties.Order)
                 .list();
-        return Course.filterByTags(courses, tags);
+        List<Course> remainingCourses = Course.excludeCoursesByTags(courses, excludeTags);
+        return Course.filterByTags(remainingCourses, tags);
     }
 
 
