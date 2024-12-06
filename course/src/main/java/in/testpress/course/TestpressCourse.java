@@ -110,6 +110,7 @@ public class TestpressCourse {
      * @param context Context to start the new activity.
      * @param testpressSession TestpressSession got from the core module.
      * @param tags A list of course tags used for filtering.
+     * @param excludeTags A list of course tags to exclude during filtering.
      */
     public static void show(@NonNull Context context, @NonNull TestpressSession testpressSession, @Nullable ArrayList<String> tags, @Nullable ArrayList<String> excludeTags) {
         Assert.assertNotNull("Context must not be null.", context);
