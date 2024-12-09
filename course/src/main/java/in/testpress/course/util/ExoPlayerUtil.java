@@ -627,8 +627,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         activity.findViewById(R.id.blank_layout).setVisibility(View.VISIBLE);
     }
 
-
-
     private void addPlayerLayoutToDialog() {
         exoPlayerMainFrame.removeView(exoPlayerLayout);
         fullscreenDialog.addContentView(exoPlayerLayout, new ViewGroup.LayoutParams(
