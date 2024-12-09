@@ -162,7 +162,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private ScaleGestureDetector scaleGestureDetector;
     private PinchToZoomGesture pinchToZoomGesture;
     private LiveStreamCallbackListener liveStreamCallbackListener;
-
+    boolean isDynamic = false;
     private TestpressSession session;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
@@ -216,7 +216,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
         ExoTrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory();
         trackSelector =  new DefaultTrackSelector(activity, videoTrackSelectionFactory);
-        initWatermarkOverlay();
         initFullscreenDialog();
         initResolutionSelector();
         initializePinchToZoom();
@@ -226,6 +225,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         }
         preventScreenshot();
         hideLiveStreamNotStartedScreen();
+        initWatermarkOverlay();
     }
 
     private void preventScreenshot() {
@@ -256,93 +256,89 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void initWatermarkOverlay() {
-        if (session != null && session.getInstituteSettings().getVideoWatermarkType() != null) {
-            String watermarkType = session.getInstituteSettings().getVideoWatermarkType();
-            switch (watermarkType) {
-                case "Dynamic":
-                case "Static": {
-                    setUserEmailOverlay(watermarkType);
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
+        if (session == null || session.getInstituteSettings().getVideoWatermarkType() == null) {
+            return;
         }
-    }
 
-    private void setUserEmailOverlay(String watermarkType) {
+        String watermarkType = session.getInstituteSettings().getVideoWatermarkType();
+        isDynamic = watermarkType.equals("Dynamic");
+        if (!watermarkType.equals("Dynamic") && !watermarkType.equals("Static")) {
+            return;
+        }
+
         ProfileDetails profileDetails = TestpressUserDetails.getInstance().getProfileDetails();
 
-        if (profileDetails != null) {
-            applyUserEmailOverlay(profileDetails, watermarkType);
+        if (profileDetails == null) {
+            handleProfileLoading();
         } else {
-            loadProfileDetailsAndApplyOverlay(watermarkType);
+            addWatermarkOverlay(profileDetails);
         }
     }
 
-    private void loadProfileDetailsAndApplyOverlay(final String watermarkType) {
+    private void handleProfileLoading() {
         TestpressUserDetails.getInstance().load(activity, new TestpressCallback<ProfileDetails>() {
             @Override
             public void onSuccess(ProfileDetails userDetails) {
-                applyUserEmailOverlay(userDetails, watermarkType);
+                addWatermarkOverlay(userDetails);
             }
 
             @Override
             public void onException(TestpressException exception) {
+                Log.e("Watermark", "Failed to load user details", exception);
             }
         });
     }
 
-    private void applyUserEmailOverlay(ProfileDetails profileDetails, String watermarkType) {
+    private void addWatermarkOverlay(ProfileDetails profileDetails) {
         String overlayText = (profileDetails.getEmail() != null && !profileDetails.getEmail().isEmpty())
                 ? profileDetails.getEmail()
                 : profileDetails.getUsername();
 
-        emailIdTextView.setText(overlayText);
+        FrameLayout parentLayout = getOrCreateParentLayout();
+        WatermarkOverlay watermark = createWatermark(overlayText);
 
-        if ("Dynamic".equals(watermarkType)) {
-            applyDynamicOverlay();
-        } else if ("Static".equals(watermarkType)) {
-            applyStaticOverlay();
+        parentLayout.addView(watermark);
+    }
+
+    private FrameLayout getOrCreateParentLayout() {
+        FrameLayout parent;
+
+        if (exoPlayerLayout.getParent() instanceof FrameLayout) {
+            Log.d("TAG", "Using existing parent layout");
+            parent = (FrameLayout) exoPlayerLayout.getParent();
+        } else {
+            Log.d("TAG", "Creating new parent layout");
+            parent = new FrameLayout(activity);
+            ViewGroup.LayoutParams layoutParams = exoPlayerLayout.getLayoutParams();
+            parent.setLayoutParams(layoutParams);
+
+            exoPlayerLayout.setLayoutParams(new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+            ));
+
+            parent.addView(exoPlayerLayout);
         }
+
+        return parent;
     }
 
-    private void applyDynamicOverlay() {
-        overlayPositionHandler = new Handler();
-        overlayPositionHandler.postDelayed(overlayPositionChangeTask, OVERLAY_POSITION_CHANGE_INTERVAL);
-        startOverlayMarquee();
-    }
+    private WatermarkOverlay createWatermark(String text) {
+        WatermarkOverlay watermark = new WatermarkOverlay(activity);
+        watermark.setWatermark(text);
 
-    private void applyStaticOverlay() {
-        if (session != null && session.getInstituteSettings().getVideoWatermarkPosition() != null) {
-            String watermarkPosition = session.getInstituteSettings().getVideoWatermarkPosition();
-            switch (watermarkPosition) {
-                case "top-left":
-                    emailIdLayout.setGravity(Gravity.TOP | Gravity.START);
-                    break;
-
-                case "top-right":
-                    emailIdLayout.setGravity(Gravity.TOP | Gravity.END);
-                    break;
-
-                case "bottom-left":
-                    emailIdLayout.setGravity(Gravity.BOTTOM | Gravity.START);
-                    break;
-
-                case "bottom-right":
-                    emailIdLayout.setGravity(Gravity.BOTTOM | Gravity.END);
-                    break;
-
-                case "middle":
-                    emailIdLayout.setGravity(Gravity.CENTER);
-                    break;
-
-                default:
-                    emailIdLayout.setGravity(Gravity.TOP | Gravity.START);
-                    break;
+        if (isDynamic) {
+            watermark.setDynamicWatermark();
+        } else {
+            String position = "top-right";
+            if (session == null || session.getInstituteSettings().getVideoWatermarkPosition() == null) {
+                position = "top-right";
+            } else {
+                position = session.getInstituteSettings().getVideoWatermarkPosition();
             }
+            watermark.setStaticWatermark(position);
         }
+        return watermark;
     }
 
     private void initFullscreenDialog() {
@@ -657,6 +653,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             setFullscreenIcon(R.drawable.testpress_fullscreen_exit);
             hideSystemBars();
             addPinchToZoom();
+            initWatermarkOverlay();
         }
     }
 
@@ -665,6 +662,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         playerView.setOnTouchListener(new VideoTouchDragHandler(playerView,pinchToZoomGesture,scaleGestureDetector));
         activity.findViewById(R.id.blank_layout).setVisibility(View.VISIBLE);
     }
+
+
 
     private void addPlayerLayoutToDialog() {
         exoPlayerMainFrame.removeView(exoPlayerLayout);
@@ -695,6 +694,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             removePlayerViewFromDialog();
             setFullscreenIcon(R.drawable.testpress_fullscreen);
             removePinchToZoom();
+            initWatermarkOverlay();
         }
     }
 
@@ -712,7 +712,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
     private void setFullscreenIcon(@DrawableRes int imageResId) {
         fullscreenIcon.setImageDrawable(ContextCompat.getDrawable(activity, imageResId));
-        initWatermarkOverlay();
     }
 
     Map<String, Object> getVideoAttemptParameters() {
