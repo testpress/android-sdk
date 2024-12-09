@@ -11,12 +11,9 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.media.MediaCodec;
-import android.os.Handler;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -66,7 +63,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
@@ -102,8 +98,6 @@ import static in.testpress.course.api.TestpressCourseApiClient.TIME_RANGES;
 import org.greenrobot.greendao.annotation.NotNull;
 
 public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerProvider {
-
-    private static final int OVERLAY_POSITION_CHANGE_INTERVAL = 15000; // 15s
     private static final int SEEK_TIME_IN_MILLISECOND = 15000; //15s
 
     private FrameLayout exoPlayerMainFrame;
@@ -111,8 +105,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private DoubleTapPlayerView playerView;
     private LottieAnimationView progressBar;
     private TextView errorMessageTextView;
-    private LinearLayout emailIdLayout;
-    private TextView emailIdTextView;
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     public ExoPlayer player;
     private ImageView fullscreenIcon;
@@ -140,14 +132,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private MediaRouter mediaRouter;
     private MediaRouteSelector mediaRouteSelector;
     private MediaRouter.Callback mediaRouterCallback;
-    private Handler overlayPositionHandler;
-    private Runnable overlayPositionChangeTask = new Runnable() {
-        @Override
-        public void run() {
-            displayOverlayText();
-            overlayPositionHandler.postDelayed(this, OVERLAY_POSITION_CHANGE_INTERVAL);
-        }
-    };
     private boolean fullscreen = false;
     private boolean errorOnVideoAttemptUpdate;
     private int drmLicenseRetries = 0;
@@ -161,6 +145,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private ScaleGestureDetector scaleGestureDetector;
     private PinchToZoomGesture pinchToZoomGesture;
     private LiveStreamCallbackListener liveStreamCallbackListener;
+    boolean isDynamic = false;
+    private TestpressSession session;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition, LiveStreamCallbackListener liveStreamCallbackListener) {
@@ -175,6 +161,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         this.exoPlayerMainFrame = exoPlayerMainFrame;
         this.url = url;
         this.startPosition = startPosition;
+        session = TestpressSdk.getTestpressSession(activity);
 
         initializeViews();
         exoPlayerLayout = exoPlayerMainFrame.findViewById(R.id.exo_player_layout);
@@ -182,10 +169,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         fullscreenIcon = exoPlayerMainFrame.findViewById(R.id.exo_fullscreen_icon);
         progressBar = exoPlayerMainFrame.findViewById(R.id.exo_player_progress);
         errorMessageTextView = exoPlayerMainFrame.findViewById(R.id.error_message);
-        TestpressSession session = TestpressSdk.getTestpressSession(activity);
-        if (session != null && session.getInstituteSettings().isDisplayUserEmailOnVideo()) {
-            setUserEmailOverlay();
-        }
         speedRateSpinner = exoPlayerMainFrame.findViewById(R.id.exo_speed_rate_spinner);
         String[] speedValues = activity.getResources().getStringArray(R.array.exo_speed_values);
         speedSpinnerAdapter =
@@ -225,6 +208,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         }
         preventScreenshot();
         hideLiveStreamNotStartedScreen();
+        initWatermarkOverlay();
     }
 
     private void preventScreenshot() {
@@ -247,11 +231,96 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void initializeViews() {
-        emailIdTextView = exoPlayerMainFrame.findViewById(R.id.email_id);
-        emailIdLayout = exoPlayerMainFrame.findViewById(R.id.email_id_layout);
         youtubeOverlay = activity.findViewById(R.id.youtube_overlay);
         noticeScreen = exoPlayerMainFrame.findViewById(R.id.notice_screen);
         noticeMessage = exoPlayerMainFrame.findViewById(R.id.notice_message);
+    }
+
+    private void initWatermarkOverlay() {
+        if (session == null || session.getInstituteSettings().getVideoWatermarkType() == null) {
+            return;
+        }
+
+        String watermarkType = session.getInstituteSettings().getVideoWatermarkType();
+        isDynamic = watermarkType.equals("Dynamic");
+        if (!watermarkType.equals("Dynamic") && !watermarkType.equals("Static")) {
+            return;
+        }
+
+        ProfileDetails profileDetails = TestpressUserDetails.getInstance().getProfileDetails();
+
+        if (profileDetails == null) {
+            fetchProfileDetails();
+        } else {
+            addWatermarkOverlay(profileDetails);
+        }
+    }
+
+    private void fetchProfileDetails() {
+        TestpressUserDetails.getInstance().load(activity, new TestpressCallback<ProfileDetails>() {
+            @Override
+            public void onSuccess(ProfileDetails userDetails) {
+                addWatermarkOverlay(userDetails);
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                Log.e("Watermark", "Failed to load user details", exception);
+            }
+        });
+    }
+
+    private void addWatermarkOverlay(ProfileDetails profileDetails) {
+        String overlayText = (profileDetails.getEmail() != null && !profileDetails.getEmail().isEmpty())
+                ? profileDetails.getEmail()
+                : profileDetails.getUsername();
+
+        FrameLayout parentLayout = getOrCreateParentLayout();
+        WatermarkOverlay watermark = createWatermark(overlayText);
+
+        parentLayout.addView(watermark);
+    }
+
+    private FrameLayout getOrCreateParentLayout() {
+        FrameLayout parent;
+
+        if (exoPlayerLayout.getParent() instanceof FrameLayout) {
+            Log.d("TAG", "Using existing parent layout");
+            parent = (FrameLayout) exoPlayerLayout.getParent();
+        } else {
+            Log.d("TAG", "Creating new parent layout");
+            parent = new FrameLayout(activity);
+            ViewGroup.LayoutParams layoutParams = exoPlayerLayout.getLayoutParams();
+            parent.setLayoutParams(layoutParams);
+
+            exoPlayerLayout.setLayoutParams(new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+            ));
+
+            parent.addView(exoPlayerLayout);
+        }
+
+        return parent;
+    }
+
+    private WatermarkOverlay createWatermark(String text) {
+        WatermarkOverlay watermark = new WatermarkOverlay(activity);
+        watermark.setWatermark(text);
+
+        if (isDynamic) {
+            watermark.setDynamicWatermark();
+        } else {
+            String position = getVideoWatermarkPosition();
+            watermark.setStaticWatermark(position);
+        }
+        return watermark;
+    }
+
+    private String getVideoWatermarkPosition() {
+        return session.getInstituteSettings().getVideoWatermarkPosition() != null
+                ? session.getInstituteSettings().getVideoWatermarkPosition()
+                : "top-right";
     }
 
     private void initFullscreenDialog() {
@@ -318,7 +387,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         }
         preparePlayer();
         player.seekTo(getStartPositionInMilliSeconds());
-        initializeUsernameOverlay();
         registerListeners();
     }
 
@@ -406,13 +474,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         player.prepare();
     }
 
-    private void initializeUsernameOverlay() {
-        if (overlayPositionHandler != null) {
-            overlayPositionHandler
-                    .postDelayed(overlayPositionChangeTask, OVERLAY_POSITION_CHANGE_INTERVAL);
-        }
-    }
-
     private void registerListeners() {
         registerUsbConnectionStateReceiver();
     }
@@ -458,9 +519,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             playWhenReady = player.getPlayWhenReady();
             player.release();
             player = null;
-            if (overlayPositionHandler != null) {
-                overlayPositionHandler.removeCallbacks(overlayPositionChangeTask);
-            }
         }
         if (usbConnectionStateReceiver != null) {
             try {
@@ -550,49 +608,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         }
     }
 
-    private void setUserEmailOverlay() {
-        ProfileDetails profileDetails = TestpressUserDetails.getInstance().getProfileDetails();
-        if (profileDetails != null) {
-            setUserEmailOverlay(profileDetails);
-        } else {
-            TestpressUserDetails.getInstance().load(activity, new TestpressCallback<ProfileDetails>() {
-                @Override
-                public void onSuccess(ProfileDetails userDetails) {
-                    setUserEmailOverlay(userDetails);
-                }
-
-                @Override
-                public void onException(TestpressException exception) {
-                }
-            });
-        }
-    }
-
-    private void setUserEmailOverlay(ProfileDetails profileDetails) {
-        String overlayText;
-        if (profileDetails.getEmail() != null && !profileDetails.getEmail().isEmpty()) {
-            overlayText = profileDetails.getEmail();
-        } else {
-            overlayText = profileDetails.getUsername();
-        }
-        emailIdTextView.setText(overlayText);
-        overlayPositionHandler = new Handler();
-        startOverlayMarquee();
-    }
-
-    private void startOverlayMarquee() {
-        Animation marquee = AnimationUtils.loadAnimation(activity, R.anim.testpress_marquee);
-        emailIdLayout.startAnimation(marquee);
-    }
-
-    private void displayOverlayText() {
-        int height = Math.max(emailIdLayout.getMeasuredHeight(), 1);
-        Random random = new Random();
-        float randomY = random.nextInt(height) + emailIdLayout.getY();
-        emailIdTextView.setY(randomY);
-        startOverlayMarquee();
-    }
-
     private void openFullscreenDialog() {
 
         if (!isopenFullscreenDialogCalled) {
@@ -603,6 +618,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             setFullscreenIcon(R.drawable.testpress_fullscreen_exit);
             hideSystemBars();
             addPinchToZoom();
+            initWatermarkOverlay();
         }
     }
 
@@ -641,6 +657,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             removePlayerViewFromDialog();
             setFullscreenIcon(R.drawable.testpress_fullscreen);
             removePinchToZoom();
+            initWatermarkOverlay();
         }
     }
 
@@ -658,7 +675,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
     private void setFullscreenIcon(@DrawableRes int imageResId) {
         fullscreenIcon.setImageDrawable(ContextCompat.getDrawable(activity, imageResId));
-        startOverlayMarquee();
     }
 
     Map<String, Object> getVideoAttemptParameters() {

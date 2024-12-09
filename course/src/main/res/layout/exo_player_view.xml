@@ -21,22 +21,6 @@
 
         <!-- Video surface will be inserted as the first child of the content frame. -->
 
-        <LinearLayout
-            android:id="@+id/email_id_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <TextView
-                android:id="@+id/email_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:textSize="12sp"
-                android:textColor="@color/testpress_black"
-                android:textStyle="bold"
-                android:background="@android:color/transparent"
-                />
-        </LinearLayout>
-
         <View android:id="@id/exo_shutter"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
