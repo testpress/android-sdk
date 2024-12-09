@@ -250,13 +250,13 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         ProfileDetails profileDetails = TestpressUserDetails.getInstance().getProfileDetails();
 
         if (profileDetails == null) {
-            handleProfileLoading();
+            fetchProfileDetails();
         } else {
             addWatermarkOverlay(profileDetails);
         }
     }
 
-    private void handleProfileLoading() {
+    private void fetchProfileDetails() {
         TestpressUserDetails.getInstance().load(activity, new TestpressCallback<ProfileDetails>() {
             @Override
             public void onSuccess(ProfileDetails userDetails) {
@@ -311,15 +311,16 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         if (isDynamic) {
             watermark.setDynamicWatermark();
         } else {
-            String position = "top-right";
-            if (session == null || session.getInstituteSettings().getVideoWatermarkPosition() == null) {
-                position = "top-right";
-            } else {
-                position = session.getInstituteSettings().getVideoWatermarkPosition();
-            }
+            String position = getVideoWatermarkPosition();
             watermark.setStaticWatermark(position);
         }
         return watermark;
+    }
+
+    private String getVideoWatermarkPosition() {
+        return session.getInstituteSettings().getVideoWatermarkPosition() != null
+                ? session.getInstituteSettings().getVideoWatermarkPosition()
+                : "top-right";
     }
 
     private void initFullscreenDialog() {
