@@ -11,13 +11,9 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.media.MediaCodec;
-import android.os.Handler;
-import android.view.Gravity;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -67,7 +63,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
@@ -103,8 +98,6 @@ import static in.testpress.course.api.TestpressCourseApiClient.TIME_RANGES;
 import org.greenrobot.greendao.annotation.NotNull;
 
 public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerProvider {
-
-    private static final int OVERLAY_POSITION_CHANGE_INTERVAL = 15000; // 15s
     private static final int SEEK_TIME_IN_MILLISECOND = 15000; //15s
 
     private FrameLayout exoPlayerMainFrame;
@@ -112,8 +105,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private DoubleTapPlayerView playerView;
     private LottieAnimationView progressBar;
     private TextView errorMessageTextView;
-    private LinearLayout emailIdLayout;
-    private TextView emailIdTextView;
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     public ExoPlayer player;
     private ImageView fullscreenIcon;
@@ -141,14 +132,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private MediaRouter mediaRouter;
     private MediaRouteSelector mediaRouteSelector;
     private MediaRouter.Callback mediaRouterCallback;
-    private Handler overlayPositionHandler;
-    private Runnable overlayPositionChangeTask = new Runnable() {
-        @Override
-        public void run() {
-            displayOverlayText();
-            overlayPositionHandler.postDelayed(this, OVERLAY_POSITION_CHANGE_INTERVAL);
-        }
-    };
     private boolean fullscreen = false;
     private boolean errorOnVideoAttemptUpdate;
     private int drmLicenseRetries = 0;
@@ -248,8 +231,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void initializeViews() {
-        emailIdTextView = exoPlayerMainFrame.findViewById(R.id.email_id);
-        emailIdLayout = exoPlayerMainFrame.findViewById(R.id.email_id_layout);
         youtubeOverlay = activity.findViewById(R.id.youtube_overlay);
         noticeScreen = exoPlayerMainFrame.findViewById(R.id.notice_screen);
         noticeMessage = exoPlayerMainFrame.findViewById(R.id.notice_message);
@@ -537,10 +518,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             playWhenReady = player.getPlayWhenReady();
             player.release();
             player = null;
-            if (overlayPositionHandler != null) {
-                overlayPositionHandler.removeCallbacks(overlayPositionChangeTask);
-                overlayPositionHandler = null;
-            }
         }
         if (usbConnectionStateReceiver != null) {
             try {
@@ -628,19 +605,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             updateVideoAttempt();
             releasePlayer();
         }
-    }
-
-    private void startOverlayMarquee() {
-        Animation marquee = AnimationUtils.loadAnimation(activity, R.anim.testpress_marquee);
-        emailIdLayout.startAnimation(marquee);
-    }
-
-    private void displayOverlayText() {
-        int height = Math.max(emailIdLayout.getMeasuredHeight(), 1);
-        Random random = new Random();
-        float randomY = random.nextInt(height) + emailIdLayout.getY();
-        emailIdTextView.setY(randomY);
-        startOverlayMarquee();
     }
 
     private void openFullscreenDialog() {
