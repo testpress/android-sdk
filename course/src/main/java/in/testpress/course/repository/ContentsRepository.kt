@@ -92,6 +92,7 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
     private fun getAll(): MutableList<Content>? {
         return contentDao.queryBuilder()
             .where(ContentDao.Properties.ChapterId.eq(chapterId))
+            .orderAsc(ContentDao.Properties.Order)
             .list()
     }
 
