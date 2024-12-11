@@ -341,6 +341,8 @@ public class TestActivity extends BaseToolBarActivity  {
             if (exam == null) {
                 exam = courseContent.getRawExam();
                 examViewModel.setExam(exam);
+            } else {
+                examViewModel.setExam(exam);
             }
             if (courseAttempt == null && permission == null) {
                 checkPermission();
@@ -373,6 +375,7 @@ public class TestActivity extends BaseToolBarActivity  {
                     @Override
                     public void onSuccess(Exam exam) {
                         TestActivity.this.exam = exam;
+                        examViewModel.setExam(TestActivity.this.exam);
                         if (exam.getPausedAttemptsCount() > 0) {
                             loadAttempts(exam.getAttemptsUrl());
                         } else {
