@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Search"
+        android:inputType="text"
+        android:textColor="@color/testpress_black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"/>
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/filter_chip_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/course"
+            style="@style/TestPressSearchFilterChipStyle"
+            android:text="Course" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chapter"
+            style="@style/TestPressSearchFilterChipStyle"
+            android:text="Chapter" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/content"
+            style="@style/TestPressSearchFilterChipStyle"
+            android:text="Content" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/exam"
+            style="@style/TestPressSearchFilterChipStyle"
+            android:text="Exam" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/video"
+            style="@style/TestPressSearchFilterChipStyle"
+            android:text="Video" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/quiz"
+            style="@style/TestPressSearchFilterChipStyle"
+            android:text="Quiz" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/attachment"
+            style="@style/TestPressSearchFilterChipStyle"
+            android:text="Attachment" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/notes"
+            style="@style/TestPressSearchFilterChipStyle"
+            android:text="Notes" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/video_conferences"
+            style="@style/TestPressSearchFilterChipStyle"
+            android:text="Video Conferences" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/live_stream"
+            style="@style/TestPressSearchFilterChipStyle"
+            android:text="Live Stream" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/discussion"
+            style="@style/TestPressSearchFilterChipStyle"
+            android:text="Discussion" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/discussion_category"
+            style="@style/TestPressSearchFilterChipStyle"
+            android:text="Discussion Category" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/post"
+            style="@style/TestPressSearchFilterChipStyle"
+            android:text="Post" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/product"
+            style="@style/TestPressSearchFilterChipStyle"
+            android:text="Product" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/doubts"
+            style="@style/TestPressSearchFilterChipStyle"
+            android:text="Doubts" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/results_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@layout/search_result_item"/>
+
+</LinearLayout>

@@ -13,6 +13,7 @@ import in.testpress.course.ui.OfflineExamListActivity;
 import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
+import in.testpress.ui.GlobalSearchActivity;
 import in.testpress.ui.WebViewWithSSOActivity;
 import in.testpress.ui.DiscussionActivity;
 //import in.testpress.ui.WebViewWithSSOActivity;
@@ -182,6 +183,13 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                 openSampleOfflineExamActivity();
             }
         });
+
+        findViewById(R.id.global_search_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openGlobalSearchActivity();
+            }
+        });
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -307,6 +315,10 @@ public class CourseSampleActivity extends BaseToolBarActivity {
 
     private void openSampleOfflineExamActivity() {
         startActivity(new Intent(this,OfflineExamSampleActivity.class));
+    }
+
+    private void openGlobalSearchActivity() {
+        startActivity(new Intent(this, GlobalSearchActivity.class));
     }
 
     @Override
