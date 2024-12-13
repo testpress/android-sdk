@@ -341,6 +341,8 @@ public class TestActivity extends BaseToolBarActivity  {
             if (exam == null) {
                 exam = courseContent.getRawExam();
                 examViewModel.setExam(exam);
+            } else {
+                examViewModel.setExam(exam);
             }
             if (courseAttempt == null && permission == null) {
                 checkPermission();
