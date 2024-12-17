@@ -2,6 +2,7 @@ package `in`.testpress.repository
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import `in`.testpress.models.SearchResult
 import `in`.testpress.network.APIClient
 
 class GlobalSearchPagingSource(

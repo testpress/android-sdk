@@ -24,12 +24,11 @@ import `in`.testpress.R
 import `in`.testpress.databinding.GlobalSearchFragmentLayoutBinding
 import `in`.testpress.databinding.SearchResultItemBinding
 import `in`.testpress.databinding.TestpressBaseListFooterAdapterBinding
+import `in`.testpress.models.SearchResult
 import `in`.testpress.network.APIClient
 import `in`.testpress.repository.GlobalSearchRepository
-import `in`.testpress.repository.GlobalSearchViewModel
-import `in`.testpress.repository.SearchResult
+import `in`.testpress.ui.viewmodel.GlobalSearchViewModel
 import kotlinx.coroutines.flow.collectLatest
-
 
 class GlobalSearchFragment:Fragment() {
 
@@ -245,7 +244,3 @@ class BaseListFooterViewHolder(
         }
     }
 }
-
-
-
-

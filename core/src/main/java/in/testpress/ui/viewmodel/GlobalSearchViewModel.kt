@@ -1,9 +1,11 @@
-package `in`.testpress.repository
+package `in`.testpress.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import `in`.testpress.models.SearchResult
+import `in`.testpress.repository.GlobalSearchRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
