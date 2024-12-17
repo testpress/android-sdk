@@ -13,11 +13,11 @@ import kotlinx.coroutines.flow.*
 class GlobalSearchViewModel(private val repository: GlobalSearchRepository) : ViewModel() {
 
     private val queryFlow = MutableStateFlow<Map<String, String>>(mapOf())
-    private val filterQueryFlow = MutableStateFlow<List<String>>(listOf())
+    private val filterQueryFlow = MutableStateFlow<Pair<List<String>, List<String>>>(Pair(listOf(), listOf()))
 
     data class SearchParams(
         val query: Map<String, String>,
-        val filters: List<String>
+        val filters: Pair<List<String>, List<String>>
     )
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -41,7 +41,7 @@ class GlobalSearchViewModel(private val repository: GlobalSearchRepository) : Vi
         queryFlow.value = newQuery
     }
 
-    fun updateFilterQuery(newFilters: List<String>) {
+    fun updateFilterQuery(newFilters: Pair<List<String>, List<String>>) {
         filterQueryFlow.value = newFilters
     }
 }

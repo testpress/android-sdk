@@ -8,7 +8,7 @@ import `in`.testpress.network.APIClient
 class GlobalSearchPagingSource(
     private val apiClient: APIClient,
     private val queryParams: Map<String, Any>,
-    private val filterQueryParams: List<String>
+    private val filterQueryParams: Pair<List<String>, List<String>>
 ) : PagingSource<Int, SearchResult>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, SearchResult> {

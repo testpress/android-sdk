@@ -34,7 +34,8 @@ interface TestpressAPIService {
     @GET(GLOBAL_SEARCH_PATH)
     suspend fun getGlobalSearch(
         @QueryMap queryParams: Map<String, Any>,
-        @Query("param") filterQueryParams: List<String>
+        @Query("param") filterParams: List<String>,
+        @Query("chaptercontent_content_type") filterContentTypes: List<String>
     ): SearchApiResponse
 }
 
@@ -54,7 +55,7 @@ open class APIClient(context: Context): TestpressApiClient(context, TestpressSdk
         return getService().getDiscussionAnswer(discussionId)
     }
 
-    suspend fun getGlobalSearch(queryParams: Map<String, Any>, filterQueryParams: List<String>): SearchApiResponse {
-        return getService().getGlobalSearch(queryParams, filterQueryParams)
+    suspend fun getGlobalSearch(queryParams: Map<String, Any>, filterQueryParams: Pair<List<String>,List<String>>): SearchApiResponse {
+        return getService().getGlobalSearch(queryParams, filterQueryParams.first,filterQueryParams.second)
     }
 }
