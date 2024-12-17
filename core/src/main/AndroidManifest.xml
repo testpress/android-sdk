@@ -35,10 +35,6 @@
             android:name=".ui.WebViewWithSSOActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" />
 
-        <activity
-            android:name=".ui.GlobalSearchActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize" />
-
         <receiver android:name=".util.FileDownloaderBroadcastReceiver"
             android:exported="true">
             <intent-filter>
