@@ -1,12 +1,8 @@
 package `in`.testpress.network
 
 import `in`.testpress.core.TestpressSdk
-import `in`.testpress.models.NetworkCategory
-import `in`.testpress.models.NetworkDiscussionThreadAnswer
-import `in`.testpress.models.NetworkForum
-import `in`.testpress.models.TestpressApiResponse
 import android.content.Context
-import `in`.testpress.repository.SearchApiResponse
+import `in`.testpress.models.*
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
