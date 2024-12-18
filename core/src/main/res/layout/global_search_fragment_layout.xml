@@ -102,6 +102,25 @@
 
     </com.google.android.material.chip.ChipGroup>
 
+    <!-- Loading View -->
+    <ProgressBar
+        android:id="@+id/loading_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <!-- No Data Found View -->
+    <TextView
+        android:id="@+id/no_data_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Search or type a command"
+        android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:visibility="gone" />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/results_list"

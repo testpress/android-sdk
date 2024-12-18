@@ -44,6 +44,8 @@ class GlobalSearchViewModel(private val repository: GlobalSearchRepository) : Vi
     fun updateFilterQuery(newFilters: Pair<List<String>, List<String>>) {
         filterQueryFlow.value = newFilters
     }
+
+    fun hasQuery(): Boolean = queryFlow.value.isNotEmpty()
 }
 
 

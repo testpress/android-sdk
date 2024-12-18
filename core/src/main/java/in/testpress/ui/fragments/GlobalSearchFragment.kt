@@ -5,10 +5,12 @@ import android.text.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
@@ -19,6 +21,7 @@ import `in`.testpress.repository.GlobalSearchRepository
 import `in`.testpress.ui.adapter.BaseListFooterAdapter
 import `in`.testpress.ui.adapter.GlobalSearchAdapter
 import `in`.testpress.ui.viewmodel.GlobalSearchViewModel
+import `in`.testpress.util.InternetConnectivityChecker
 import kotlinx.coroutines.flow.collectLatest
 
 class GlobalSearchFragment : Fragment() {
@@ -68,6 +71,27 @@ class GlobalSearchFragment : Fragment() {
             }
         )
 
+        lifecycleScope.launchWhenCreated {
+            adapter.loadStateFlow.collectLatest { loadStates ->
+
+                binding.loadingView.isVisible = loadStates.refresh is LoadState.Loading && adapter.itemCount == 0
+
+                binding.noDataView.visibility = if (loadStates.refresh is LoadState.NotLoading && adapter.itemCount == 0) View.VISIBLE else View.GONE
+                if (viewModel.hasQuery() && binding.noDataView.isVisible){
+                    binding.noDataView.text = "No data found"
+                } else {
+                    binding.noDataView.text = "Search or type a command"
+                }
+
+                if (loadStates.refresh is LoadState.Error){
+                    if (isNetworkError(loadStates.refresh as LoadState.Error)){
+                        binding.noDataView.isVisible = true
+                        binding.noDataView.text = "Please check your internet connection"
+                    }
+                }
+            }
+        }
+
         // Listen to global query text changes
         binding.searchBar.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -90,6 +114,12 @@ class GlobalSearchFragment : Fragment() {
                 search()
             }
         }
+    }
+
+    fun isNetworkError(error: LoadState.Error): Boolean {
+        val networkErrorMessage =
+            error.error.localizedMessage?.contains("Unable to resolve host", true) ?: false
+        return networkErrorMessage && !InternetConnectivityChecker.isConnected(requireContext())
     }
 
     private fun getAdapter(): GlobalSearchAdapter {
