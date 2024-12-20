@@ -142,6 +142,7 @@ class VideoDownloadRequestCreationHandler(
     }
 
     override fun onLicenseFetchSuccess(keySetId: ByteArray) {
+        this.keySetId = keySetId
         CoroutineScope(Dispatchers.Main).launch {
             listener?.onDownloadRequestHandlerPrepared(
                 getMappedTrackInfo(),
