@@ -1547,25 +1547,40 @@ public class TestFragment extends BaseFragment implements
         if (getActivity() == null) {
             return;
         }
-        resumeExamDialog =
-                new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
-                        .setCancelable(false)
-                        .setMessage(R.string.testpress_exam_paused)
-                        .setPositiveButton(R.string.testpress_resume,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        resumeExam();
-                                    }
-                                })
-                        .setNegativeButton(R.string.testpress_not_now,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        returnToHistory();
-                                    }
-                                })
-                        .show();
+        if (exam != null && exam.isAttemptResumeDisabled()) {
+            resumeExamDialog =
+                    new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
+                            .setCancelable(false)
+                            .setMessage(R.string.testpress_exam_ended_due_to_interruption)
+                            .setPositiveButton(R.string.testpress_ok,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            endExam();
+                                        }
+                                    })
+                            .show();
+        } else {
+            resumeExamDialog =
+                    new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
+                            .setCancelable(false)
+                            .setMessage(R.string.testpress_exam_paused)
+                            .setPositiveButton(R.string.testpress_resume,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            resumeExam();
+                                        }
+                                    })
+                            .setNegativeButton(R.string.testpress_not_now,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            returnToHistory();
+                                        }
+                                    })
+                            .show();
+        }
     }
 
     void resumeExam() {
