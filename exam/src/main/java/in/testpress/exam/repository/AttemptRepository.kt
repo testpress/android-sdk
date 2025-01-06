@@ -18,7 +18,6 @@ import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.models.greendao.Exam
 import `in`.testpress.network.Resource
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import `in`.testpress.exam.models.UserUploadedFile
@@ -36,9 +35,6 @@ class AttemptRepository(val context: Context) {
     val attemptItem = mutableListOf<AttemptItem>()
     private var _totalQuestions = 0
     val totalQuestions get() = _totalQuestions
-    var currentAttemptItemId = -1
-    var apiCount = 0
-    val maxApiCount = 3
 
     private val database = TestpressDatabase.invoke(context)
     private val examQuestionDao = database.examQuestionDao()
