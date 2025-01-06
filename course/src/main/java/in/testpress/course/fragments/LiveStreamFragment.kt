@@ -59,6 +59,7 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
         initializePlayerView()
         initializeExoPlayer()
         setupChatWebView()
+        viewModel.createContentAttempt(contentId)
 
         // Disabling swipe to refresh because  it prevents users from scrolling the chat
         // and temporarily hiding the bottom navigation as it hides the chat's send button..
