@@ -18,8 +18,10 @@ import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.models.greendao.Exam
 import `in`.testpress.network.Resource
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import `in`.testpress.exam.models.UserUploadedFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,6 +36,9 @@ class AttemptRepository(val context: Context) {
     val attemptItem = mutableListOf<AttemptItem>()
     private var _totalQuestions = 0
     val totalQuestions get() = _totalQuestions
+    var currentAttemptItemId = -1
+    var apiCount = 0
+    val maxApiCount = 3
 
     private val database = TestpressDatabase.invoke(context)
     private val examQuestionDao = database.examQuestionDao()
@@ -214,12 +219,39 @@ class AttemptRepository(val context: Context) {
                 }
 
                 override fun onException(exception: TestpressException) {
+                    if (exception.isUnauthenticated && isExamEnded(exception.message)) {
+                        updateAttemptItem()
+                        _saveResultResource.postValue(
+                            Resource.success(
+                                Triple(
+                                    position,
+                                    attemptItem,
+                                    action
+                                )
+                            )
+                        )
+                        return
+                    }
                     _saveResultResource.postValue(
                         Resource.error(
                             exception,
                             Triple(position, null, action)
                         )
                     )
+                }
+
+                private fun isExamEnded(message: String?) = message?.contains("The exam has already ended") == true
+
+                private fun updateAttemptItem() {
+                    attemptItem.apply {
+                        selectedAnswers = savedAnswers
+                        review = currentReview
+                        shortText = currentShortText
+                        essayText = localEssayText
+                        unSyncedFiles.forEachIndexed { index, url ->
+                            files.add(UserUploadedFile(id = index.toLong(), path = url, url = url))
+                        }
+                    }
                 }
             })
         }
