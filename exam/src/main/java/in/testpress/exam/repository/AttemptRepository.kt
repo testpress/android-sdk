@@ -1,5 +1,6 @@
 package `in`.testpress.exam.repository
 
+import `in`.testpress.core.ErrorDetail
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.database.TestpressDatabase
@@ -215,7 +216,11 @@ class AttemptRepository(val context: Context) {
                 }
 
                 override fun onException(exception: TestpressException) {
-                    if (exception.isUnauthenticated && isExamEnded(exception.message)) {
+                    val errorDetail = exception.getErrorBodyAs(
+                        exception.response,
+                        ErrorDetail::class.java
+                    )
+                    if (exception.isUnauthenticated && isExamEnded(errorDetail.message)) {
                         updateAttemptItem()
                         _saveResultResource.postValue(
                             Resource.success(
