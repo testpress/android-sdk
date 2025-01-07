@@ -16,6 +16,7 @@ import in.testpress.exam.models.Permission;
 import in.testpress.exam.models.ReportQuestionResponse;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
+import in.testpress.exam.network.NetworkAttempt;
 import in.testpress.exam.network.NetworkAttemptSection;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
@@ -139,6 +140,10 @@ public class TestpressExamApiClient extends TestpressApiClient {
 
     public RetrofitCall<Attempt> startAttempt(String startAttemptUrlFrag) {
         return getExamService().startAttempt(startAttemptUrlFrag);
+    }
+
+    public RetrofitCall<NetworkAttempt> startAttempt1(String startAttemptUrlFrag) {
+        return getExamService().startAttempt1(startAttemptUrlFrag);
     }
 
     public RetrofitCall<Attempt> getAttempt(String getAttemptUrlFrag) {

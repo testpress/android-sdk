@@ -12,6 +12,7 @@ import in.testpress.exam.models.Permission;
 import in.testpress.exam.models.ReportQuestionResponse;
 import in.testpress.exam.models.Subject;
 import in.testpress.exam.models.Vote;
+import in.testpress.exam.network.NetworkAttempt;
 import in.testpress.exam.network.NetworkAttemptSection;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
@@ -79,6 +80,10 @@ public interface ExamService {
 
     @PUT("/{start_attempt_url}")
     RetrofitCall<Attempt> startAttempt(
+            @Path(value = "start_attempt_url", encoded = true) String startAttemptUrlFrag);
+
+    @PUT("/{start_attempt_url}")
+    RetrofitCall<NetworkAttempt> startAttempt1(
             @Path(value = "start_attempt_url", encoded = true) String startAttemptUrlFrag);
 
     @GET("/{get_attempt_url}")

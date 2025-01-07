@@ -19,6 +19,7 @@ import `in`.testpress.models.greendao.Language
 import `in`.testpress.network.Resource
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
@@ -194,6 +195,7 @@ class ExamRepository(val context: Context) {
         } else {
             apiClient.startAttempt(attemptStartFrag).enqueue(object : TestpressCallback<Attempt>() {
                 override fun onSuccess(result: Attempt) {
+                    Log.d("TAG", "onSuccess: result: "+result.hasSectionalLock())
                     _attemptResource.postValue(Resource.success(result))
                 }
 

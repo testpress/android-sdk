@@ -9,6 +9,7 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.Observer;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -318,6 +319,7 @@ public class TestActivity extends BaseToolBarActivity  {
         if (attempt.getState().equals("Running")) {
             Bundle bundle = new Bundle();
             bundle.putParcelable(TestFragment.PARAM_ATTEMPT, attempt);
+            Log.d("TAG", "handleSuccessAttempt: "+attempt.hasSectionalLock());
             bundle.putParcelable(TestFragment.PARAM_EXAM, exam);
             if (courseContent != null) {
                 bundle.putParcelable(TestActivity.PARAM_COURSE_CONTENT, courseContent);
@@ -655,6 +657,7 @@ public class TestActivity extends BaseToolBarActivity  {
 
     private void startExam(boolean resumeExam) {
         if (resumeExam){
+            Log.d("TAG", "resumeExam: attempt.getStartUrlFrag()" + attempt.getStartUrlFrag());
             examViewModel.startAttempt(attempt.getStartUrlFrag());
         } else {
             if (courseContent != null){
