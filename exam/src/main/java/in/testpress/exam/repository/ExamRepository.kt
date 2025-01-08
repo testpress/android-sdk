@@ -12,6 +12,7 @@ import `in`.testpress.database.mapping.asGreenDoaModels
 import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.models.Permission
+import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.CourseAttempt
 import `in`.testpress.models.greendao.Exam
@@ -21,6 +22,7 @@ import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import `in`.testpress.exam.network.asGreenDaoModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -192,9 +194,9 @@ class ExamRepository(val context: Context) {
                 ))
             }
         } else {
-            apiClient.startAttempt(attemptStartFrag).enqueue(object : TestpressCallback<Attempt>() {
-                override fun onSuccess(result: Attempt) {
-                    _attemptResource.postValue(Resource.success(result))
+            apiClient.startAttempt(attemptStartFrag).enqueue(object : TestpressCallback<NetworkAttempt>() {
+                override fun onSuccess(result: NetworkAttempt) {
+                    _attemptResource.postValue(Resource.success(result.asGreenDaoModel()))
                 }
 
                 override fun onException(exception: TestpressException) {

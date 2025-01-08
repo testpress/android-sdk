@@ -49,6 +49,8 @@ import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
+import in.testpress.exam.network.NetworkAttempt;
+import in.testpress.exam.network.NetworkAttemptKt;
 import in.testpress.exam.network.NetworkAttemptSection;
 import in.testpress.exam.network.NetworkAttemptSectionKt;
 import in.testpress.exam.api.TestpressExamApiClient;
@@ -134,7 +136,7 @@ public class TestFragment extends BaseFragment implements
     private RetrofitCall<Attempt> heartBeatApiRequest;
     private RetrofitCall<NetworkAttemptSection> endSectionApiRequest;
     private RetrofitCall<NetworkAttemptSection> startSectionApiRequest;
-    private RetrofitCall<Attempt> resumeExamApiRequest;
+    private RetrofitCall<NetworkAttempt> resumeExamApiRequest;
     private Handler appBackgroundStateHandler;
     private Runnable stopTimerTask = new Runnable() {
         @Override
@@ -1571,10 +1573,10 @@ public class TestFragment extends BaseFragment implements
     void resumeExam() {
         showProgress(R.string.testpress_please_wait);
         resumeExamApiRequest = apiClient.startAttempt(attempt.getStartUrlFrag())
-                .enqueue(new TestpressCallback<Attempt>() {
+                .enqueue(new TestpressCallback<NetworkAttempt>() {
                     @Override
-                    public void onSuccess(Attempt attempt) {
-                        TestFragment.this.attempt = attempt;
+                    public void onSuccess(NetworkAttempt networkAttempt) {
+                        TestFragment.this.attempt = NetworkAttemptKt.asGreenDaoModel(networkAttempt);
                         sections = attempt.getSections();
                         progressDialog.dismiss();
                         startCountDownTimer();

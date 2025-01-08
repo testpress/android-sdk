@@ -46,10 +46,10 @@ open class QuizExamRepository(val context: Context) {
     fun createAttempt(attemptId: Long): LiveData<Resource<DomainAttempt>> {
         val apiClient = TestpressExamApiClient(context)
         apiClient.startAttempt("api/v2.2/attempts/$attemptId/start/")
-            .enqueue(object: TestpressCallback<Attempt>() {
-                override fun onSuccess(result: Attempt?) {
-                    attemptDao.insertOrReplaceInTx(result)
-                    loadAttempt(result!!.id)
+            .enqueue(object: TestpressCallback<NetworkAttempt>() {
+                override fun onSuccess(result: NetworkAttempt) {
+                    attemptDao.insertOrReplaceInTx(result.asGreenDaoModel())
+                    loadAttempt(result.id)
                 }
 
                 override fun onException(exception: TestpressException?) {
