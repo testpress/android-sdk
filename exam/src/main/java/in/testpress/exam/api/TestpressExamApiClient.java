@@ -138,12 +138,8 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getExamService().createContentAttempt(attemptUrl, option);
     }
 
-    public RetrofitCall<Attempt> startAttempt(String startAttemptUrlFrag) {
+    public RetrofitCall<NetworkAttempt> startAttempt(String startAttemptUrlFrag) {
         return getExamService().startAttempt(startAttemptUrlFrag);
-    }
-
-    public RetrofitCall<NetworkAttempt> startAttempt1(String startAttemptUrlFrag) {
-        return getExamService().startAttempt1(startAttemptUrlFrag);
     }
 
     public RetrofitCall<Attempt> getAttempt(String getAttemptUrlFrag) {

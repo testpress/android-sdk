@@ -79,11 +79,7 @@ public interface ExamService {
             @Body Map<String, Object> options);
 
     @PUT("/{start_attempt_url}")
-    RetrofitCall<Attempt> startAttempt(
-            @Path(value = "start_attempt_url", encoded = true) String startAttemptUrlFrag);
-
-    @PUT("/{start_attempt_url}")
-    RetrofitCall<NetworkAttempt> startAttempt1(
+    RetrofitCall<NetworkAttempt> startAttempt(
             @Path(value = "start_attempt_url", encoded = true) String startAttemptUrlFrag);
 
     @GET("/{get_attempt_url}")

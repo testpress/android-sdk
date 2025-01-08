@@ -1576,7 +1576,7 @@ public class TestFragment extends BaseFragment implements
 
     void resumeExam() {
         showProgress(R.string.testpress_please_wait);
-        resumeExamApiRequest = apiClient.startAttempt1(attempt.getStartUrlFrag())
+        resumeExamApiRequest = apiClient.startAttempt(attempt.getStartUrlFrag())
                 .enqueue(new TestpressCallback<NetworkAttempt>() {
                     @Override
                     public void onSuccess(NetworkAttempt networkAttempt) {

@@ -17,6 +17,8 @@ import android.os.Bundle
 import android.webkit.JavascriptInterface
 import android.widget.Toolbar
 import androidx.core.view.isVisible
+import `in`.testpress.exam.network.NetworkAttempt
+import `in`.testpress.exam.network.createNetworkAttempt
 
 
 class CustomTestGenerationActivity: AbstractWebViewActivity() {
@@ -28,15 +30,16 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
     fun startAttempt(attemptId: String) {
         val apiClient = TestpressExamApiClient(this)
         apiClient.startAttempt("api/v2.2/attempts/$attemptId/start/")
-            .enqueue(object : TestpressCallback<Attempt>() {
-                override fun onSuccess(result: Attempt?) {
+            .enqueue(object : TestpressCallback<NetworkAttempt>() {
+                override fun onSuccess(result: NetworkAttempt) {
                     // Check if the remaining time for the attempt is infinite we reset to default value of 24 hours.
                     // This is done because our app doesn't support exams with infinite timing.
-                    result?.let {
+                    val attempt = createNetworkAttempt(result)
+                    attempt.let {
                         if (it.remainingTime == INFINITE_EXAM_TIME) {
                             it.remainingTime = DEFAULT_EXAM_TIME
                         }
-                        startExam(result)
+                        startExam(it)
                     }
                 }
 

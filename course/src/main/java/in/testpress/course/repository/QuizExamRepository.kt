@@ -20,6 +20,7 @@ import `in`.testpress.models.greendao.CourseAttemptDao
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import `in`.testpress.exam.network.createNetworkAttempt
 import kotlin.random.Random
 
 open class QuizExamRepository(val context: Context) {
@@ -46,10 +47,10 @@ open class QuizExamRepository(val context: Context) {
     fun createAttempt(attemptId: Long): LiveData<Resource<DomainAttempt>> {
         val apiClient = TestpressExamApiClient(context)
         apiClient.startAttempt("api/v2.2/attempts/$attemptId/start/")
-            .enqueue(object: TestpressCallback<Attempt>() {
-                override fun onSuccess(result: Attempt?) {
-                    attemptDao.insertOrReplaceInTx(result)
-                    loadAttempt(result!!.id)
+            .enqueue(object: TestpressCallback<NetworkAttempt>() {
+                override fun onSuccess(result: NetworkAttempt) {
+                    attemptDao.insertOrReplaceInTx(createNetworkAttempt(result))
+                    loadAttempt(result.id)
                 }
 
                 override fun onException(exception: TestpressException?) {
