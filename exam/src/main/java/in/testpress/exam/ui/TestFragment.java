@@ -22,7 +22,6 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 import androidx.appcompat.app.AlertDialog;
 
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,7 +82,7 @@ import static in.testpress.models.greendao.Attempt.NOT_STARTED;
 public class TestFragment extends BaseFragment implements
         PlainSpinnerItemAdapter.SectionInfoClickListener, TestPanelListAdapter.ListItemClickListener {
 
-    private static final int APP_BACKGROUND_DELAY = 5000; // 1m
+    private static final int APP_BACKGROUND_DELAY = 60000; // 1m
     public static final String DEFAULT_EXAM_TIME = "24:00:00";
     public static final String INFINITE_EXAM_TIME = "0:00:00";
 
@@ -172,7 +171,6 @@ public class TestFragment extends BaseFragment implements
     private void initializeAttemptAndExamVariables(Bundle savedInstanceState) {
         courseContent = getArguments().getParcelable(PARAM_COURSE_CONTENT);
         if (courseContent != null) {
-            Log.d("TAG", "initializeAttemptAndExamVariables: courseContent != null" + (courseContent != null));
             courseAttempt = getArguments().getParcelable(PARAM_COURSE_ATTEMPT);
             exam = courseContent.getRawExam();
             attempt = courseAttempt.getRawAssessment();
@@ -1369,14 +1367,12 @@ public class TestFragment extends BaseFragment implements
 
     void startCountDownTimer() {
         String remainingTime = attempt.getRemainingTime();
-        Log.d("TAG", "attempt.hasSectionalLock(): "+ attempt.hasSectionalLock());
         if (attempt.hasSectionalLock()) {
             AttemptSection section = sections.get(attempt.getCurrentSectionPosition());
             if (section.getState().equals(NOT_STARTED)) {
                 startSection();
                 return;
             }
-            Log.d("TAG", "startCountDownTimer: "+ section.getRemainingTime());
             remainingTime = section.getRemainingTime();
         }
         long millisRemainingFetchedInAttempt = formatMillisecond(remainingTime);
