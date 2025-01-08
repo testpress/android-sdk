@@ -85,6 +85,7 @@
     <string name="custom_test_permission_error">Permission Denied, You do not have permission to take this exam.</string>
     <string name="custom_test_network_error">Network Error, Please check your internet connection &amp; try again.</string>
     <string name="custom_test_page_not_found_error">Exam is no longer available, Create a new exam</string>
+    <string name="custom_test_server_error">Server Error, Unable to start the custom test. Please try again later.</string>
     <string name="custom_test_unknown_error">Something went wrong, Please try again later</string>
 
     <string name="offline_answers_submitted_message">Your offline answers have been successfully submitted. Swipe down to refresh this page and view your results.</string>
