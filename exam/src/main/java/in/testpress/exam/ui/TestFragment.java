@@ -1576,7 +1576,7 @@ public class TestFragment extends BaseFragment implements
                 .enqueue(new TestpressCallback<NetworkAttempt>() {
                     @Override
                     public void onSuccess(NetworkAttempt networkAttempt) {
-                        TestFragment.this.attempt = NetworkAttemptKt.createNetworkAttempt(networkAttempt);
+                        TestFragment.this.attempt = NetworkAttemptKt.asGreenDaoModel(networkAttempt);
                         sections = attempt.getSections();
                         progressDialog.dismiss();
                         startCountDownTimer();

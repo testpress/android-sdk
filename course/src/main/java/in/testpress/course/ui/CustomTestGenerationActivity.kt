@@ -18,7 +18,7 @@ import android.webkit.JavascriptInterface
 import android.widget.Toolbar
 import androidx.core.view.isVisible
 import `in`.testpress.exam.network.NetworkAttempt
-import `in`.testpress.exam.network.createNetworkAttempt
+import `in`.testpress.exam.network.asGreenDaoModel
 
 
 class CustomTestGenerationActivity: AbstractWebViewActivity() {
@@ -34,7 +34,7 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
                 override fun onSuccess(result: NetworkAttempt) {
                     // Check if the remaining time for the attempt is infinite we reset to default value of 24 hours.
                     // This is done because our app doesn't support exams with infinite timing.
-                    val attempt = createNetworkAttempt(result)
+                    val attempt = result.asGreenDaoModel()
                     attempt.let {
                         if (it.remainingTime == INFINITE_EXAM_TIME) {
                             it.remainingTime = DEFAULT_EXAM_TIME
