@@ -72,6 +72,7 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
             exception.isForbidden -> toast(R.string.custom_test_permission_error)
             exception.isNetworkError -> toast(R.string.custom_test_network_error)
             exception.isPageNotFound -> toast(R.string.custom_test_page_not_found_error)
+            exception.isServerError -> toast(R.string.custom_test_server_error)
             else -> toast(R.string.custom_test_unknown_error)
         }
         finish()
