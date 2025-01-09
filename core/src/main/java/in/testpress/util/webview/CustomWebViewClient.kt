@@ -53,7 +53,7 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
         val requestUrl = request?.url.toString()
         val currentWebViewUrl = fragment.webView.url.toString()
         if (requestUrl == currentWebViewUrl) {
-            fragment.showErrorView(TestpressException.unexpectedError(Exception("WebView error")))
+            fragment.showErrorView(TestpressException.unexpectedWebViewError(Exception("WebView error ${error?.errorCode}")))
         }
     }
 
