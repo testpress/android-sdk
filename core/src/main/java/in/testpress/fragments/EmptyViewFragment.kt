@@ -71,7 +71,7 @@ class EmptyViewFragment : Fragment() {
             exception.isForbidden -> handleForbidden(exception)
             exception.isNetworkError -> handleNetworkError()
             exception.isPageNotFound -> handleIsPageNotFound()
-            exception.isWebViewUnexpected -> handleWebViewUnknownError(exception)
+            exception.isWebViewUnexpectedError -> handleWebViewUnknownError(exception)
             else -> handleUnknownError()
         }
     }

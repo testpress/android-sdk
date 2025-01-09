@@ -113,7 +113,7 @@ public class TestpressException extends RuntimeException {
         return kind == Kind.NETWORK;
     }
 
-    public boolean isWebViewUnexpected() {
+    public boolean isWebViewUnexpectedError() {
         return kind == Kind.WEBVIEW_UNEXPECTED;
     }
 
