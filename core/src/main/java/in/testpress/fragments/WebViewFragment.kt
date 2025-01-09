@@ -114,6 +114,10 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         webView.webViewClient = CustomWebViewClient(this)
         webView.webChromeClient = CustomWebChromeClient(this)
         webView.settings.userAgentString += CUSTOM_USER_AGENT
+        webView.apply {
+            clearCache(true)
+            clearHistory()
+        }
     }
 
     private fun populateInstituteSettings() {
