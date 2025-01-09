@@ -71,6 +71,7 @@ class EmptyViewFragment : Fragment() {
             exception.isForbidden -> handleForbidden(exception)
             exception.isNetworkError -> handleNetworkError()
             exception.isPageNotFound -> handleIsPageNotFound()
+            exception.isWebViewUnexpected -> handleWebViewUnknownError(exception)
             else -> handleUnknownError()
         }
     }
@@ -131,6 +132,13 @@ class EmptyViewFragment : Fragment() {
         setEmptyText(R.string.testpress_content_not_available,
                 R.string.testpress_content_not_available_description,
                 R.drawable.ic_error_outline_black_18dp)
+    }
+
+    private fun handleWebViewUnknownError(exception: TestpressException) {
+        val message = exception.message ?: "Unknown WebView Error"
+        setEmptyText(R.string.testpress_error_loading_contents,
+            message,
+            R.drawable.ic_error_outline_black_18dp)
     }
 
     private fun handleUnknownError() {

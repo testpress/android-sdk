@@ -35,6 +35,10 @@ public class TestpressException extends RuntimeException {
         return new TestpressException(exception.getMessage(), null, Kind.UNEXPECTED, exception);
     }
 
+    public static TestpressException unexpectedWebViewError(Throwable exception) {
+        return new TestpressException(exception.getMessage(), null, Kind.WEBVIEW_UNEXPECTED, exception);
+    }
+
     /** Identifies the event kind which triggered a {@link TestpressException}. */
     public enum Kind {
         /** An {@link IOException} occurred while communicating to the server. */
@@ -45,7 +49,9 @@ public class TestpressException extends RuntimeException {
          * An internal error occurred while attempting to execute a request. It is best practice to
          * re-throw this exception so your application crashes.
          */
-        UNEXPECTED
+        UNEXPECTED,
+        /** An unexpected error occurred within the WebView. */
+        WEBVIEW_UNEXPECTED
     }
 
     private final Response response;
@@ -105,6 +111,10 @@ public class TestpressException extends RuntimeException {
 
     public boolean isNetworkError() {
         return kind == Kind.NETWORK;
+    }
+
+    public boolean isWebViewUnexpected() {
+        return kind == Kind.WEBVIEW_UNEXPECTED;
     }
 
     public boolean isPageNotFound() {

@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressException
 import `in`.testpress.fragments.WebViewFragment
 import `in`.testpress.util.extension.openUrlInBrowser
 import android.graphics.Bitmap
+import android.util.Log
 import android.webkit.*
 
 class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
@@ -50,10 +51,11 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
         request: WebResourceRequest?,
         error: WebResourceError?
     ) {
+        Log.d("TAG", "onReceivedError: ")
         val requestUrl = request?.url.toString()
         val currentWebViewUrl = fragment.webView.url.toString()
         if (requestUrl == currentWebViewUrl) {
-            fragment.showErrorView(TestpressException.unexpectedError(Exception("WebView error")))
+            fragment.showErrorView(TestpressException.unexpectedWebViewError(Exception("WebView error ${error?.errorCode}")))
         }
     }
 
