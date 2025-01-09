@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.webkit.CookieManager;
+import android.webkit.WebStorage;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -90,6 +92,10 @@ public final class TestpressSdk {
 
         SharedPreferences.Editor editor = getPreferenceEditor(context);
         editor.clear().commit();
+        // Clear webView session
+        CookieManager.getInstance().removeAllCookies(null);
+        CookieManager.getInstance().flush();
+        WebStorage.getInstance().deleteAllData();
     }
 
     public static boolean hasActiveSession(@NonNull Context context) {
