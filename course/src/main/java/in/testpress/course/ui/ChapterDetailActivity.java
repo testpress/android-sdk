@@ -40,8 +40,6 @@ import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 import static in.testpress.course.TestpressCourse.SHOW_BUY_NOW_BUTTON;
-import static in.testpress.course.api.TestpressCourseApiClient.CHAPTERS_PATH;
-import static in.testpress.course.api.TestpressCourseApiClient.COURSE_LIST_PATH;
 import static in.testpress.course.fragments.CourseContentListFragment.COURSE_CONTENT_TYPE;
 import static in.testpress.course.ui.ContentActivity.FORCE_REFRESH;
 import static in.testpress.course.ui.ContentActivity.GO_TO_MENU;

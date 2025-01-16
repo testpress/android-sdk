@@ -185,11 +185,9 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     @Override
     protected BaseResourcePager<Chapter> getPager() {
         if (pager == null) {
-            if (parentId != null){
-                pager = new ChapterPager(courseId, parentId, apiClient);
-            } else {
-                pager = new ChapterPager(courseId, apiClient);
-            }
+            pager = (parentId != null)
+                    ? new ChapterPager(courseId, parentId, apiClient)
+                    : new ChapterPager(courseId, apiClient);
         }
         return pager;
     }
@@ -199,33 +197,25 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         if (getCourse() == null) {
             return true;
         }
-        boolean a = false;
 
-        if (parentId != null){
-            a = Chapter.getChildrenChapters(requireActivity(), parentId).isEmpty();
-        } else {
-            a = getCourse().getRootChapters().isEmpty();
+        if (parentId != null) {
+            return Chapter.getChildrenChapters(requireActivity(), parentId).isEmpty();
         }
 
-        return a;
+        return getCourse().getRootChapters().isEmpty();
     }
 
     private void deleteExistingChapters() {
-        if (parentId != null){
-            getDao().queryBuilder()
-                    .where(ChapterDao.Properties.CourseId.eq(courseId))
-                    .where(ChapterDao.Properties.ParentId.eq(parentId))
-                    .buildDelete()
-                    .executeDeleteWithoutDetachingEntities();
-            getDao().detachAll();
-        } else {
-            getDao().queryBuilder()
-                    .where(ChapterDao.Properties.CourseId.eq(courseId))
-                    .where(ChapterDao.Properties.ParentId.isNull())
-                    .buildDelete()
-                    .executeDeleteWithoutDetachingEntities();
-            getDao().detachAll();
-        }
+        getDao().queryBuilder()
+                .where(ChapterDao.Properties.CourseId.eq(courseId))
+                .where(
+                        parentId != null
+                                ? ChapterDao.Properties.ParentId.eq(parentId)
+                                : ChapterDao.Properties.ParentId.isNull()
+                )
+                .buildDelete()
+                .executeDeleteWithoutDetachingEntities();
+        getDao().detachAll();
     }
 
     @Override
