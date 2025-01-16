@@ -40,9 +40,7 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
 
     private void loadChapters() {
         if (parentId != null) {
-            Chapter parentChapter = Chapter.get(activity, parentId);
-            parentChapter.resetChildren();
-            this.chapters = parentChapter.getChildren();
+            this.chapters = course.getChildrenChapters(parentId);
         } else if (course != null) {
             this.chapters = course.getRootChapters();
         }

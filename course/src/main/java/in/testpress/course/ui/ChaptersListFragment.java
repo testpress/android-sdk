@@ -185,7 +185,11 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     @Override
     protected BaseResourcePager<Chapter> getPager() {
         if (pager == null) {
-            pager = new ChapterPager(courseId, apiClient);
+            if (parentId != null){
+                pager = new ChapterPager(courseId, parentId, apiClient);
+            } else {
+                pager = new ChapterPager(courseId, apiClient);
+            }
         }
         return pager;
     }
@@ -195,15 +199,33 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         if (getCourse() == null) {
             return true;
         }
-        return getCourse().getRootChapters().isEmpty();
+        boolean a = false;
+
+        if (parentId != null){
+            a = getCourse().getChildrenChapters(parentId).isEmpty();
+        } else {
+            a = getCourse().getRootChapters().isEmpty();
+        }
+
+        return a;
     }
 
     private void deleteExistingChapters() {
-        getDao().queryBuilder()
-                .where(ChapterDao.Properties.CourseId.eq(courseId))
-                .buildDelete()
-                .executeDeleteWithoutDetachingEntities();
-        getDao().detachAll();
+        if (parentId != null){
+            getDao().queryBuilder()
+                    .where(ChapterDao.Properties.CourseId.eq(courseId))
+                    .where(ChapterDao.Properties.ParentId.eq(parentId))
+                    .buildDelete()
+                    .executeDeleteWithoutDetachingEntities();
+            getDao().detachAll();
+        } else {
+            getDao().queryBuilder()
+                    .where(ChapterDao.Properties.CourseId.eq(courseId))
+                    .where(ChapterDao.Properties.ParentId.isNull())
+                    .buildDelete()
+                    .executeDeleteWithoutDetachingEntities();
+            getDao().detachAll();
+        }
     }
 
     @Override

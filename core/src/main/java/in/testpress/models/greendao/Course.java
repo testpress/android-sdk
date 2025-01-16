@@ -453,6 +453,14 @@ public class Course {
                 .list();
     }
 
+    public List<Chapter> getChildrenChapters(String parentId) {
+        ChapterDao chapterDao = daoSession.getChapterDao();
+        return chapterDao.queryBuilder()
+                .where(ChapterDao.Properties.CourseId.eq(getId()), ChapterDao.Properties.ParentId.eq(parentId))
+                .orderAsc(ChapterDao.Properties.Order)
+                .list();
+    }
+
     public boolean containsTags(List<String> expectedTags) {
         return tags != null && !Collections.disjoint(tags, expectedTags);
     }
