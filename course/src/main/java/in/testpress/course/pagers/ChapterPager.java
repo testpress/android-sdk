@@ -39,6 +39,8 @@ public class ChapterPager extends BaseDatabaseModelPager<Chapter> {
         queryParams.put(TestpressApiClient.PAGE, page);
         if (parentId != null) {
             queryParams.put(PARENT, parentId);
+        } else {
+            queryParams.put(PARENT, "null");
         }
         return apiClient.getChapters(courseId, queryParams, latestModifiedDate).execute();
     }

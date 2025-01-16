@@ -380,7 +380,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         if (chapter != null) {
             Long parentId = chapter.getParentId();
             if (parentId != null) {
-                data.putString(CHAPTER_URL, chapter.getParentUrl());
+                data.putString(CHAPTER_URL, getParentChapterUrl());
             } else {
                 data.putInt(COURSE_ID, chapter.getCourseId().intValue());
             }
@@ -393,6 +393,10 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             data.putBoolean(SHOW_BUY_NOW_BUTTON, showBuyNowButton);
         }
         return data;
+    }
+
+    private String getParentChapterUrl() {
+        return instituteSettings.getBaseUrl() + "/api/2.4/chapters/" + chapter.getSlug();
     }
 
     @Override

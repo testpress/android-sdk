@@ -185,7 +185,9 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     @Override
     protected BaseResourcePager<Chapter> getPager() {
         if (pager == null) {
-            pager = new ChapterPager(courseId, apiClient);
+            pager = (parentId != null)
+                    ? new ChapterPager(courseId, parentId, apiClient)
+                    : new ChapterPager(courseId, apiClient);
         }
         return pager;
     }
@@ -195,12 +197,22 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         if (getCourse() == null) {
             return true;
         }
+
+        if (parentId != null) {
+            return Chapter.getChildrenChapters(requireActivity(), parentId).isEmpty();
+        }
+
         return getCourse().getRootChapters().isEmpty();
     }
 
     private void deleteExistingChapters() {
         getDao().queryBuilder()
                 .where(ChapterDao.Properties.CourseId.eq(courseId))
+                .where(
+                        parentId != null
+                                ? ChapterDao.Properties.ParentId.eq(parentId)
+                                : ChapterDao.Properties.ParentId.isNull()
+                )
                 .buildDelete()
                 .executeDeleteWithoutDetachingEntities();
         getDao().detachAll();

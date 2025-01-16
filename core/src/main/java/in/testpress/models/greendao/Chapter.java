@@ -398,11 +398,7 @@ public class Chapter {
     }
 
     public boolean hasChildren() {
-        if (childrenCount != null) {
-            return getChildrenCount() > 0;
-        }
-
-        return getChildren().size() > 0;
+        return !leaf;
     }
 
     public static Chapter get(Context context, String chapterId) {
@@ -414,6 +410,14 @@ public class Chapter {
         }
 
         return chapters.get(0);
+    }
+
+    public static List<Chapter> getChildrenChapters(Context context, String parentId) {
+        ChapterDao chapterDao = TestpressSDKDatabase.getChapterDao(context);
+        return chapterDao.queryBuilder()
+                .where(ChapterDao.Properties.ParentId.eq(parentId))
+                .orderAsc(ChapterDao.Properties.Order)
+                .list();
     }
 
     public String getChapterContentsUrl() {
