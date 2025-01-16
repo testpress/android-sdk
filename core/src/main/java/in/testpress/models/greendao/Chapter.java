@@ -416,6 +416,14 @@ public class Chapter {
         return chapters.get(0);
     }
 
+    public static List<Chapter> getChildrenChapters(Context context, String parentId) {
+        ChapterDao chapterDao = TestpressSDKDatabase.getChapterDao(context);
+        return chapterDao.queryBuilder()
+                .where(ChapterDao.Properties.ParentId.eq(parentId))
+                .orderAsc(ChapterDao.Properties.Order)
+                .list();
+    }
+
     public String getChapterContentsUrl() {
         return url + "contents/";
     }

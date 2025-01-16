@@ -202,7 +202,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         boolean a = false;
 
         if (parentId != null){
-            a = getCourse().getChildrenChapters(parentId).isEmpty();
+            a = Chapter.getChildrenChapters(requireActivity(), parentId).isEmpty();
         } else {
             a = getCourse().getRootChapters().isEmpty();
         }
