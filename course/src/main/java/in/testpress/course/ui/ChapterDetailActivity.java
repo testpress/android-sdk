@@ -40,6 +40,8 @@ import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 import static in.testpress.course.TestpressCourse.SHOW_BUY_NOW_BUTTON;
+import static in.testpress.course.api.TestpressCourseApiClient.CHAPTERS_PATH;
+import static in.testpress.course.api.TestpressCourseApiClient.COURSE_LIST_PATH;
 import static in.testpress.course.fragments.CourseContentListFragment.COURSE_CONTENT_TYPE;
 import static in.testpress.course.ui.ContentActivity.FORCE_REFRESH;
 import static in.testpress.course.ui.ContentActivity.GO_TO_MENU;
@@ -380,7 +382,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         if (chapter != null) {
             Long parentId = chapter.getParentId();
             if (parentId != null) {
-                data.putString(CHAPTER_URL, chapter.getParentUrl());
+                data.putString(CHAPTER_URL, getParentChapterUrl());
             } else {
                 data.putInt(COURSE_ID, chapter.getCourseId().intValue());
             }
@@ -393,6 +395,10 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
             data.putBoolean(SHOW_BUY_NOW_BUTTON, showBuyNowButton);
         }
         return data;
+    }
+
+    private String getParentChapterUrl() {
+        return instituteSettings.getBaseUrl() + "/api/2.4/chapters" + chapter.getSlug();
     }
 
     @Override

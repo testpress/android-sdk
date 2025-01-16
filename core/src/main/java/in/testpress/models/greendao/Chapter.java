@@ -3,6 +3,8 @@ package in.testpress.models.greendao;
 import org.greenrobot.greendao.annotation.*;
 
 import java.util.List;
+
+import in.testpress.BuildConfig;
 import in.testpress.models.greendao.DaoSession;
 import org.greenrobot.greendao.DaoException;
 
@@ -10,6 +12,8 @@ import org.greenrobot.greendao.DaoException;
 
 // KEEP INCLUDES - put your custom includes here
 import android.content.Context;
+import android.os.Build;
+
 import org.greenrobot.greendao.query.QueryBuilder;
 import org.greenrobot.greendao.query.WhereCondition;
 
@@ -398,11 +402,7 @@ public class Chapter {
     }
 
     public boolean hasChildren() {
-        if (childrenCount != null) {
-            return getChildrenCount() > 0;
-        }
-
-        return getChildren().size() > 0;
+        return !leaf;
     }
 
     public static Chapter get(Context context, String chapterId) {
