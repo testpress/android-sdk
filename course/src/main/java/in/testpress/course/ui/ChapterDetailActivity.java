@@ -396,7 +396,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     }
 
     private String getParentChapterUrl() {
-        return instituteSettings.getBaseUrl() + "/api/2.4/chapters" + chapter.getSlug();
+        return instituteSettings.getBaseUrl() + "/api/2.4/chapters/" + chapter.getSlug();
     }
 
     @Override
