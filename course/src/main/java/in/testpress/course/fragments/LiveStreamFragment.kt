@@ -108,7 +108,7 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
             val webViewFragment = WebViewFragment()
             val bundle = Bundle().apply {
                 this.putString(URL_TO_OPEN,embedUrl)
-                this.putBoolean(IS_AUTHENTICATION_REQUIRED,false)
+                this.putBoolean(IS_AUTHENTICATION_REQUIRED,true)
             }
             webViewFragment.arguments = bundle
             childFragmentManager.beginTransaction()
