@@ -363,7 +363,6 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
                 getIntent().getStringExtra(CONTENTS_URL_FRAG) != null) {
 
             prefs.edit().putBoolean(FORCE_REFRESH, false).apply();
-            loadContents();
         }
     }
 
