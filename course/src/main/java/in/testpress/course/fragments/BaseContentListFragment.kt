@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.facebook.shimmer.ShimmerFrameLayout
 
 abstract class BaseContentListFragment: Fragment(), EmptyViewListener {
@@ -20,6 +21,7 @@ abstract class BaseContentListFragment: Fragment(), EmptyViewListener {
     // Protected properties are used in sub classes
     protected lateinit var recyclerView: RecyclerView
     protected lateinit var emptyViewFragment: EmptyViewFragment
+    protected lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,6 +41,7 @@ abstract class BaseContentListFragment: Fragment(), EmptyViewListener {
         recyclerView = binding.recyclerView
         loadingPlaceholder = binding.shimmerViewContainer
         loadingPlaceholder.visibility = View.GONE
+        swipeRefreshLayout = binding.swipeContainer
         initializeEmptyViewFragment()
     }
 

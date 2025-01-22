@@ -55,6 +55,9 @@ class ContentListFragment : BaseContentListFragment(), EmptyViewListener {
         }
         initializeObservers()
         viewModel.loadContents()
+        swipeRefreshLayout.setOnRefreshListener {
+            viewModel.loadContents()
+        }
     }
 
     private fun initializeObservers() {
@@ -73,6 +76,7 @@ class ContentListFragment : BaseContentListFragment(), EmptyViewListener {
                     if (items.isEmpty()) showEmptyList(resources.getString(R.string.testpress_no_content))
                     mAdapter.contents = items
                     mAdapter.notifyDataSetChanged()
+                    swipeRefreshLayout.isRefreshing = false
                 }
                 Status.ERROR -> {
                     Log.d("ContentListFragment", "Got status ERROR")

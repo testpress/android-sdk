@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:ignore="MissingDefaultResource">
 
     <com.facebook.shimmer.ShimmerFrameLayout
@@ -16,55 +16,51 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
-            <include
-                layout="@layout/testpress_list_placholder">
-            </include>
-            <include
-                layout="@layout/testpress_list_placholder">
-            </include>
-            <include
-                layout="@layout/testpress_list_placholder">
-            </include>
-            <include
-                layout="@layout/testpress_list_placholder">
-            </include>
-            <include
-                layout="@layout/testpress_list_placholder">
-            </include>
-            <include
-                layout="@layout/testpress_list_placholder">
-            </include>
-            <include
-                layout="@layout/testpress_list_placholder">
-            </include>
-            <include
-                layout="@layout/testpress_list_placholder">
-            </include>
-            <include
-                layout="@layout/testpress_list_placholder">
-            </include>
+            <include layout="@layout/testpress_list_placholder"></include>
+
+            <include layout="@layout/testpress_list_placholder"></include>
+
+            <include layout="@layout/testpress_list_placholder"></include>
+
+            <include layout="@layout/testpress_list_placholder"></include>
+
+            <include layout="@layout/testpress_list_placholder"></include>
+
+            <include layout="@layout/testpress_list_placholder"></include>
+
+            <include layout="@layout/testpress_list_placholder"></include>
+
+            <include layout="@layout/testpress_list_placholder"></include>
+
+            <include layout="@layout/testpress_list_placholder"></include>
 
         </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/bottom_progress_bar"
-        tools:listitem="@layout/running_upcoming_list_item" />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/bottom_progress_bar"
+            tools:listitem="@layout/running_upcoming_list_item" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <ProgressBar
         android:id="@+id/bottom_progress_bar"
         android:layout_width="match_parent"
         android:layout_height="72dp"
+        android:layout_alignParentBottom="true"
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
-        android:visibility="gone"
-        android:layout_alignParentBottom="true"/>
+        android:visibility="gone" />
 
     <FrameLayout
         android:id="@+id/empty_view_fragment"
@@ -109,8 +105,8 @@
             style="@style/TestpressSmallButton"
             android:layout_gravity="center_horizontal"
             android:text="@string/testpress_tap_to_retry"
-            android:visibility="gone"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:visibility="gone" />
 
     </LinearLayout>
 
