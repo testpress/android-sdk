@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.media.MediaCodec;
+import android.os.Handler;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
@@ -810,7 +811,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
         @Override
         public void onPlayWhenReadyChanged(boolean playWhenReady, int reason) {
-            if (!playWhenReady) {
+            // Following code will execute when the user pauses the video
+            if (!playWhenReady && reason == Player.PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST) {
                 updateVideoAttempt();
             }
             Player.Listener.super.onPlayWhenReadyChanged(playWhenReady, reason);
@@ -885,9 +887,17 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             startPosition = getCurrentPosition();
         }
 
+        private final Handler seekHandler = new Handler();
+
         @Override
         public void onSeekProcessed() {
-            updateVideoAttempt();
+            // Cancel any pending seek-related operations
+            seekHandler.removeCallbacksAndMessages(null);
+
+            // Schedule a new operation with a debounce time
+            seekHandler.postDelayed(() -> {
+                updateVideoAttempt(); // API call to save the video status
+            }, 1000); // 1000ms debounce time
         }
 
         @Override
