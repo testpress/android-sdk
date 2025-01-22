@@ -69,6 +69,7 @@ class CourseContentListFragment: Fragment() {
         initializeListView()
         initializeListeners()
         showLoadingOrContentsList()
+        disableSwipeContainer()
     }
 
     private fun initializeListView() {
@@ -110,6 +111,10 @@ class CourseContentListFragment: Fragment() {
                 }
             }
         }
+    }
+
+    private fun disableSwipeContainer() {
+        binding.swipeContainer.isEnabled = false
     }
 
     private fun showOrHidePlaceHolder(showOrHide: Boolean) {
