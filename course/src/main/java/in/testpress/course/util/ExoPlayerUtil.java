@@ -148,7 +148,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private LiveStreamCallbackListener liveStreamCallbackListener;
     boolean isDynamic = false;
     private TestpressSession session;
-    boolean firstSeekCalled = false;
+    private boolean firstSeekCalled = false;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition, LiveStreamCallbackListener liveStreamCallbackListener) {
