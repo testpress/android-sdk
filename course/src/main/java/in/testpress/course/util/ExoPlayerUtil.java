@@ -134,7 +134,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private MediaRouteSelector mediaRouteSelector;
     private MediaRouter.Callback mediaRouterCallback;
     private boolean fullscreen = false;
-    private boolean errorOnVideoAttemptUpdate;
     private int drmLicenseRetries = 0;
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -706,7 +705,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                         if (videoAttempt != null) {
                             updateVideoWatchedPercentage(videoAttempt);
                         }
-                        errorOnVideoAttemptUpdate = false;
                     }
 
                     @Override
@@ -714,7 +712,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                         if (videoWatchDataRepository != null) {
                             videoWatchDataRepository.save(content, getVideoAttemptParameters());
                         }
-                        errorOnVideoAttemptUpdate = true;
                     }
                 });
     }
@@ -833,9 +830,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 displayError(R.string.testpress_usb_connected);
             } else {
                 hideError(R.string.testpress_usb_connected);
-                if (errorOnVideoAttemptUpdate) {
-                    errorMessageTextView.setVisibility(View.GONE);
-                } else if (playbackState == Player.STATE_READY) {
+                if (playbackState == Player.STATE_READY) {
                     errorMessageTextView.setVisibility(View.GONE);
                 }
             }
