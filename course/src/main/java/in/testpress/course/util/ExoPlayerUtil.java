@@ -149,6 +149,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     boolean isDynamic = false;
     private TestpressSession session;
     private boolean firstSeekCalled = false;
+    private final Handler seekHandler = new Handler();
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition, LiveStreamCallbackListener liveStreamCallbackListener) {
@@ -887,8 +888,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         public void onPositionDiscontinuity(int reason) {
             startPosition = getCurrentPosition();
         }
-
-        private final Handler seekHandler = new Handler();
 
         @Override
         public void onSeekProcessed() {
