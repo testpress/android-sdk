@@ -11,6 +11,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import retrofit2.Response;
 
@@ -109,6 +111,37 @@ public class TestpressException extends RuntimeException {
         return null;
     }
 
+    public long getThrottleTime() {
+        TestpressErrorDetail errorDetail = getErrorBodyAs(this.getResponse(), TestpressErrorDetail.class);
+
+        if (errorDetail == null || errorDetail.getDetail() == null) {
+            // If the response or its detail is null, return 0 as the default throttle time.
+            return 0;
+        }
+
+        String detail = errorDetail.getDetail();
+        String throttleTimeStr = extractThrottleTime(detail);
+
+        if (throttleTimeStr != null) {
+            try {
+                return (long) Double.parseDouble(throttleTimeStr);
+            } catch (NumberFormatException e) {
+                // If parsing fails, continue to return the default throttle duration.
+            }
+        }
+
+        // If the response detail is not null but parsing fails, return the default throttle duration of 60 seconds.
+        return 60;
+    }
+
+    private String extractThrottleTime(String detail) {
+        // Extracts the throttle time string using regex. The pattern matches "in X seconds"
+        // where X can be an integer or a decimal number.
+        Pattern pattern = Pattern.compile(".*in (\\d+\\.\\d+|\\d+) seconds.*");
+        Matcher matcher = pattern.matcher(detail);
+        return matcher.matches() ? matcher.group(1) : null;
+    }
+
     public boolean isNetworkError() {
         return kind == Kind.NETWORK;
     }
@@ -129,6 +162,9 @@ public class TestpressException extends RuntimeException {
         return statusCode == 403;
     }
 
+    public boolean isTooManyRequest() {
+        return statusCode == 429;
+    }
     public boolean isClientError() {
         return statusCode >= 400 && statusCode < 500 && statusCode != 403;
     }

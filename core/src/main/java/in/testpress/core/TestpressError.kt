@@ -8,3 +8,7 @@ data class ErrorDetail(
     val errorCode: String? = null,
     val message: String? = null
 )
+
+data class TestpressErrorDetail(
+    val detail: String? = null
+)

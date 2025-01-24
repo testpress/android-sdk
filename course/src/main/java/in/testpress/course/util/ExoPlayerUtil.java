@@ -149,6 +149,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private TestpressSession session;
     private boolean firstSeekCalled = false;
     private final Handler seekHandler = new Handler();
+    private long lastApiCallTime = System.currentTimeMillis() / 1000;
+    long throttleTimeRemaining = 0;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition, LiveStreamCallbackListener liveStreamCallbackListener) {
@@ -688,6 +690,12 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     public void updateVideoAttempt() {
+        android.util.Log.d("TAG", "updateVideoAttempt: "+throttleTimeRemaining);
+        long currentTime = System.currentTimeMillis() / 1000;  // Current time in seconds
+        if (currentTime - lastApiCallTime < throttleTimeRemaining) {
+            // If throttling is still in effect, don't make the API call
+            return;
+        }
         if (content.getContentType().equals("Live Stream") && content.getVideo() == null){
             return;
         }
@@ -705,12 +713,18 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                         if (videoAttempt != null) {
                             updateVideoWatchedPercentage(videoAttempt);
                         }
+                        lastApiCallTime = System.currentTimeMillis() / 1000;
+                        throttleTimeRemaining = 0;
                     }
 
                     @Override
                     public void onException(TestpressException exception) {
                         if (videoWatchDataRepository != null) {
                             videoWatchDataRepository.save(content, getVideoAttemptParameters());
+                        }
+                        if (exception.isTooManyRequest()){
+                            throttleTimeRemaining = exception.getThrottleTime();
+                            lastApiCallTime = System.currentTimeMillis() / 1000;
                         }
                     }
                 });
