@@ -119,6 +119,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
     public void refreshWithProgress() {
         pager.reset();
         super.refreshWithProgress();
+        refreshProductCategory();
     }
 
     private void refreshProductCategory(){
@@ -194,7 +195,6 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
         if(isItemsEmpty()) {
             setEmptyText();
         }
-        refreshProductCategory();
     }
 
 
