@@ -148,6 +148,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private LiveStreamCallbackListener liveStreamCallbackListener;
     boolean isDynamic = false;
     private TestpressSession session;
+    boolean firstSeekCalled = false;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition, LiveStreamCallbackListener liveStreamCallbackListener) {
@@ -891,6 +892,14 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
         @Override
         public void onSeekProcessed() {
+            // This method is triggered automatically during ExoPlayer initialization when the start position is set.
+            // Since the initial API call is unnecessary and redundant at this stage,
+            // we skip processing during the first invocation by checking if it is the first seek
+            // and proceed only with subsequent calls to update the user watching status.
+            if (!firstSeekCalled){
+                firstSeekCalled = true;
+                return;
+            }
             // Cancel any pending seek-related operations
             seekHandler.removeCallbacksAndMessages(null);
 
