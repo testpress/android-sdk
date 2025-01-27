@@ -19,7 +19,7 @@ class WatermarkOverlay @JvmOverloads constructor(
     private var watermarkText: String = ""
     private val textPaint = Paint().apply {
         color = Color.BLACK
-        textSize = 32f
+        textSize = 30f
         isAntiAlias = true
     }
 
@@ -76,7 +76,7 @@ class WatermarkOverlay @JvmOverloads constructor(
         dynamicY = Random.nextFloat() * (height - 50)
 
         animator = ValueAnimator.ofFloat(-textWidth, width.toFloat()).apply {
-            duration = 7500 // Animation duration
+            duration = 30000 // Animation duration
             repeatMode = ValueAnimator.REVERSE
             repeatCount = ValueAnimator.INFINITE
 
