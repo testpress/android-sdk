@@ -275,9 +275,9 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void addWatermarkOverlay(ProfileDetails profileDetails) {
-        String overlayText = (profileDetails.getEmail() != null && !profileDetails.getEmail().isEmpty())
-                ? profileDetails.getEmail()
-                : profileDetails.getUsername();
+        String overlayText = (profileDetails.getUsername() != null && !profileDetails.getUsername().isEmpty())
+                ? profileDetails.getUsername()
+                : profileDetails.getEmail();
 
         FrameLayout parentLayout = getOrCreateParentLayout();
         WatermarkOverlay watermark = createWatermark(overlayText);
