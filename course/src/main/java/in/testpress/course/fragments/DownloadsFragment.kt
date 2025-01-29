@@ -129,6 +129,9 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
                 handler.remove()
             }
 
+            adapter.offlineVideos = it
+            adapter.notifyDataSetChanged()
+
             hideLoadingPlaceholder()
             if (DateUtils.isAutoTimeUpdateDisabledInDevice(requireContext())) {
                 showEnableAutoTimeUpdateScreen()
@@ -138,8 +141,6 @@ class DownloadsFragment : Fragment(), EmptyViewListener {
                 showEmptyScreen()
             } else {
                 hideEmptyScreen()
-                adapter.offlineVideos = it
-                adapter.notifyDataSetChanged()
             }
         })
     }
