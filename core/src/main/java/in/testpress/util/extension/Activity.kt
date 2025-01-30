@@ -34,15 +34,11 @@ fun Activity.toast(@StringRes resId: Int) {
 }
 
 fun Activity.isStoragePermissionGranted(): Boolean {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) == PackageManager.PERMISSION_GRANTED
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED
-    } else {
+    return if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
         ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+    } else {
+        // On Android 13+ this permission is not required as we use the file picker
+        true
     }
 }
 
@@ -63,22 +59,7 @@ fun Activity.askStoragePermission(message: String) {
 }
 
 fun Activity.requestStoragePermission() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        ActivityCompat.requestPermissions(
-            this, arrayOf(
-                Manifest.permission.READ_MEDIA_IMAGES,
-                Manifest.permission.READ_MEDIA_VIDEO,
-                Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
-            ), RequestCode.PERMISSION
-        )
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        ActivityCompat.requestPermissions(
-            this, arrayOf(
-                Manifest.permission.READ_MEDIA_IMAGES,
-                Manifest.permission.READ_MEDIA_VIDEO
-            ), RequestCode.PERMISSION
-        )
-    } else {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2) {
         ActivityCompat.requestPermissions(
             this, arrayOf(
                 Manifest.permission.READ_EXTERNAL_STORAGE
@@ -88,15 +69,10 @@ fun Activity.requestStoragePermission() {
 }
 
 private fun Activity.shouldShowRequestPermissionRationale(): Boolean {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        shouldShowRequestPermissionRationale(Manifest.permission.READ_MEDIA_IMAGES) &&
-                shouldShowRequestPermissionRationale(Manifest.permission.READ_MEDIA_VIDEO) &&
-                shouldShowRequestPermissionRationale(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        shouldShowRequestPermissionRationale(Manifest.permission.READ_MEDIA_IMAGES) &&
-                shouldShowRequestPermissionRationale(Manifest.permission.READ_MEDIA_VIDEO)
-    } else {
+    return if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
         shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)
+    } else {
+        false
     }
 }
 

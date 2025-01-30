@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -345,10 +347,14 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
         @JavascriptInterface
         public void onFileUploadClick() {
             Log.d("TAG", "onFileUploadClick: ");
-            if (ActivityKt.isStoragePermissionGranted(getActivity())) {
-                pickFile();
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                if (ActivityKt.isStoragePermissionGranted(getActivity())) {
+                    pickFile();
+                } else {
+                    ActivityKt.askStoragePermission(getActivity(), getString(R.string.storage_permission_to_upload_file));
+                }
             } else {
-                ActivityKt.askStoragePermission(getActivity(),getString(R.string.storage_permission_to_upload_file));
+                pickFile();
             }
         }
 

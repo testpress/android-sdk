@@ -156,7 +156,7 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                             @Override
                             public void onInputComplete(String inputText) {
                                 text = inputText;
-                                launchWebViewWithSSOActivity(text);
+                                launchWebViewWithSSOActivity("/discussions/new/");
                             }
                         });
             }
