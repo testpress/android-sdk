@@ -49,7 +49,7 @@ public class PermissionsUtils {
     }
 
     public boolean isStoragePermissionGranted(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q){
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P){
             return ActivityCompat.checkSelfPermission(
                     activity,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
