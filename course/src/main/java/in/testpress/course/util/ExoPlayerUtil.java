@@ -411,7 +411,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             mediaSourceFactory.setDrmSessionManagerProvider(this);
         }
 
-        player = new ExoPlayer.Builder(activity, new DefaultRenderersFactory(activity))
+        DefaultRenderersFactory renderersFactory = new DefaultRenderersFactory(activity);
+        renderersFactory.setEnableDecoderFallback(true);
+
+        player = new ExoPlayer.Builder(activity, renderersFactory)
                 .setMediaSourceFactory(mediaSourceFactory)
                 .setSeekForwardIncrementMs(SEEK_TIME_IN_MILLISECOND)
                 .setSeekBackIncrementMs(SEEK_TIME_IN_MILLISECOND)
