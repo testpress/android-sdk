@@ -978,9 +978,9 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         String packageName = (activity != null) ? activity.getPackageName() : "Package name not available";
         long contentId = (content != null) ? content.getId() : -1;
         String cause = "Cause not found";
-        if (exception.getCause() != null) {
+        try {
             cause = exception.getCause().toString();
-        }
+        } catch (Exception ignored){}
         String finalCause = cause;
         Sentry.captureMessage(
                 errorMessage, new ScopeCallback() {
