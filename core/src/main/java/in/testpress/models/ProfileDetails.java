@@ -482,4 +482,14 @@ public class ProfileDetails implements Parcelable {
         this.phone = phone;
     }
 
+    public String getUsernameOrEmail() {
+        if (username != null && !username.isEmpty()){
+            return username;
+        }
+        if (email != null && !email.isEmpty()) {
+            return email;
+        }
+        return "null";
+    }
+
 }

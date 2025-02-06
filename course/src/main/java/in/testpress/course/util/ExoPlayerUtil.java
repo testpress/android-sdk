@@ -154,6 +154,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private final Handler seekHandler = new Handler();
     private long lastApiCallTime = System.currentTimeMillis() / 1000;
     long throttleTimeRemaining = 0;
+    private ProfileDetails profileDetails = null;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition, LiveStreamCallbackListener liveStreamCallbackListener) {
@@ -254,7 +255,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             return;
         }
 
-        ProfileDetails profileDetails = TestpressUserDetails.getInstance().getProfileDetails();
+        profileDetails = TestpressUserDetails.getInstance().getProfileDetails();
 
         if (profileDetails == null) {
             fetchProfileDetails();
@@ -267,6 +268,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         TestpressUserDetails.getInstance().load(activity, new TestpressCallback<ProfileDetails>() {
             @Override
             public void onSuccess(ProfileDetails userDetails) {
+                profileDetails = userDetails;
                 addWatermarkOverlay(userDetails);
             }
 
@@ -992,6 +994,9 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void logPlaybackException(String errorMessage, String playbackId, PlaybackException exception) {
+        String username = (profileDetails != null) ? profileDetails.getUsernameOrEmail() : "null";
+        String packageName = (activity != null) ? activity.getPackageName() : "Package name not available";
+        long contentId = (content != null) ? content.getId() : -1;
         String cause = "Cause not found";
         try {
             cause = exception.getCause().toString();
@@ -1002,10 +1007,12 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                     @Override
                     public void run(@org.jetbrains.annotations.NotNull Scope scope) {
                         scope.setTag("playback_id", playbackId);
+                        scope.setTag("package_name", packageName);
+                        scope.setTag("user_name", username);
                         scope.setContexts(
                                 "Player Error",
                                 new HashMap<String, Object>() {{
-                                    put("Content Id", content.getId());
+                                    put("Content Id", contentId);
                                     put("Playback Id", playbackId);
                                     put("Error Code", exception.errorCode);
                                     put("Error Message", exception.getMessage());
@@ -1017,5 +1024,4 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 }
         );
     }
-
 }
