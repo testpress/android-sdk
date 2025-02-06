@@ -974,7 +974,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void logPlaybackException(String errorMessage, String playbackId, PlaybackException exception) {
-        String username = getUsername(profileDetails, playbackId);
+        String username = (profileDetails != null) ? profileDetails.getUsernameOrEmail() : "null";
         String packageName = (activity != null) ? activity.getPackageName() : "Package name not available";
         long contentId = (content != null) ? content.getId() : -1;
         String cause = "Cause not found";
@@ -1003,19 +1003,5 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                     }
                 }
         );
-    }
-
-    private String getUsername(ProfileDetails profileDetails, String playbackId) {
-        if (profileDetails == null) return playbackId;
-
-        if (profileDetails.getUsername() != null && !profileDetails.getUsername().isEmpty()) {
-            return profileDetails.getUsername();
-        }
-
-        if (profileDetails.getEmail() != null && !profileDetails.getEmail().isEmpty()) {
-            return profileDetails.getEmail();
-        }
-
-        return playbackId;
     }
 }
