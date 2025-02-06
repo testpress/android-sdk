@@ -11,7 +11,10 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.media.MediaCodec;
+import android.os.Build;
 import android.os.Handler;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
@@ -755,11 +758,24 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         errorMessageTextView.setVisibility(View.VISIBLE);
     }
 
-    private void displayError(String message) {
+    private void displayError(String message,int errorCode) {
         player.setPlayWhenReady(false);
         player.getPlaybackState();
-        errorMessageTextView.setText(message);
+        if (errorCode == 4001 || errorCode == 4003){
+            setHtmlText(errorMessageTextView, message);
+        } else {
+            errorMessageTextView.setText(message);
+        }
         errorMessageTextView.setVisibility(View.VISIBLE);
+    }
+
+    public void setHtmlText(TextView textView, String message) {
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            textView.setText(Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            textView.setText(Html.fromHtml(message));
+        }
     }
 
     private void hideError(@StringRes int message) {
@@ -780,6 +796,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             errorMessage = activity.getString(R.string.exoplayer_input_or_output_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
         } else if (3000 <= exception.errorCode && exception.errorCode <= 4000) { // Content parsing errors
             errorMessage = activity.getString(R.string.exoplayer_content_parsing_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
+        } else if (4001 == exception.errorCode) {
+            errorMessage ="<html><body><p>An error occurred while playing the video. Try restarting your device or playing another video. More help <a href='https://tpstreams.com/help/troubleshooting-steps-for-error-code-4001'>click here</a>.<br> Player code: "+exception.errorCode+". Player Id: "+playbackId+"</p></body></html>";
+        } else if (4003 == exception.errorCode) {
+            errorMessage ="<html><body><p>An error occurred while playing the video. Try restarting your device or selecting a different resolution. More help <a href='https://tpstreams.com/help/troubleshooting-steps-for-error-code-4001'>click here</a>.<br> Player code: "+exception.errorCode+". Player Id: "+playbackId+"</p></body></html>";
         } else if (4000 <= exception.errorCode && exception.errorCode <= 5000) { // Decoding errors
             errorMessage = activity.getString(R.string.exoplayer_decoding_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
         } else if (5000 <= exception.errorCode && exception.errorCode <= 6000) { // AudioTrack errors
@@ -787,7 +807,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         } else if (6000 <= exception.errorCode && exception.errorCode <= 7000) { // DRM errors
             errorMessage = activity.getString(R.string.exoplayer_drm_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
         }
-        displayError(errorMessage);
+        displayError(errorMessage, exception.errorCode);
         logPlaybackException(errorMessage, playbackId, exception);
     }
 
@@ -888,7 +908,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                     displayError(R.string.syncing_video);
                 } else {
                     String licenseRequestFailedMessage = activity.getString(R.string.license_request_failed, exception.errorCode, playBackId);
-                    displayError(licenseRequestFailedMessage);
+                    displayError(licenseRequestFailedMessage, exception.errorCode);
                     logPlaybackException(licenseRequestFailedMessage, playBackId, exception);
                 }
             } else {
