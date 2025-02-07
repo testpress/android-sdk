@@ -5,20 +5,26 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.webkit.CookieManager;
 import android.webkit.WebStorage;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.HashMap;
+import java.util.Map;
 
+import in.testpress.BuildConfig;
 import in.testpress.models.InstituteSettings;
+import in.testpress.models.ProfileDetails;
 import in.testpress.network.AuthorizationErrorResponse;
 import in.testpress.network.TestpressApiClient;
 import in.testpress.R;
 import in.testpress.util.Assert;
 import in.testpress.util.UIUtils;
+import io.sentry.Sentry;
 import io.sentry.android.core.SentryAndroid;
+import io.sentry.protocol.User;
 
 public final class TestpressSdk {
 
@@ -340,5 +346,26 @@ public final class TestpressSdk {
                     options.setDsn(androidSentryDns);
                     options.setEnableAutoSessionTracking(true);
                 });
+        SetSentryUserDetails(context);
+    }
+
+    private static void SetSentryUserDetails(Context context) {
+        TestpressUserDetails.getInstance().load(context, new TestpressCallback<ProfileDetails>() {
+            @Override
+            public void onSuccess(ProfileDetails userDetails) {
+                User user = new User();
+                user.setId(userDetails.getId().toString());
+                user.setEmail(userDetails.getEmail());
+                user.setUsername(userDetails.getUsername());
+                Map<String,String> otherDetails = new HashMap<>();
+                otherDetails.put("package_name",context.getPackageName());
+                user.setOthers(otherDetails);
+                Sentry.setUser(user);
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+            }
+        });
     }
 }
