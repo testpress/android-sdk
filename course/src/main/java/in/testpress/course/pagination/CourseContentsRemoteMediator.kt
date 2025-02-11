@@ -69,7 +69,7 @@ class CourseContentsRemoteMediator(
     }
 
     private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, ContentEntityLite>): ContentEntityLiteRemoteKey? {
-        return state.pages.lastOrNull() { it.data.isNotEmpty() }?.data?.sortedByDescending { it.start }
+        return state.pages.lastOrNull() { it.data.isNotEmpty() }?.data
             ?.lastOrNull()
             ?.let { content ->
                 contentLiteRemoteKeyDao.remoteKeysContentId(content.id,type)
