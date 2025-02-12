@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity (tableName = "RunningContentEntity")
 data class ContentEntityLite(
-    @PrimaryKey(autoGenerate = true) val contentOrder: Int = 0,
+    @PrimaryKey(autoGenerate = true) val contentOrder: Long = 0,
     val id: Long,
     var type: Int = CourseContentType.RUNNING_CONTENT.ordinal
 ) : BaseContentEntity()
