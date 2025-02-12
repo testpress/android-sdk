@@ -9,10 +9,10 @@ import androidx.room.Query
 @Dao
 interface ContentLiteDao: BaseDao<ContentEntityLite> {
 
-    @Query("SELECT * FROM runningcontententity WHERE courseId = :courseId AND type = :type ORDER BY start DESC")
+    @Query("SELECT * FROM runningcontententity WHERE courseId = :courseId AND type = :type")
     fun getRunningContents(courseId: Long, type: Int): PagingSource<Int, ContentEntityLite>
 
-    @Query("SELECT * FROM runningcontententity WHERE courseId = :courseId AND type = :type ORDER BY start ASC")
+    @Query("SELECT * FROM runningcontententity WHERE courseId = :courseId AND type = :type")
     fun getUpcomingContents(courseId: Long, type: Int): PagingSource<Int, ContentEntityLite>
 
     @Query("delete from runningcontententity where courseId = :courseId AND type = :type")
