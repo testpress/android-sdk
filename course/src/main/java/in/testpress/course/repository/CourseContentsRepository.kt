@@ -16,7 +16,7 @@ class CourseContentsRepository(val context: Context, val courseId: Long = -1,val
 
     @OptIn(ExperimentalPagingApi::class)
     fun courseContentList() = Pager(
-        config = PagingConfig(pageSize = 20,initialLoadSize = 20),
+        config = PagingConfig(pageSize = 10, initialLoadSize = 20),
         remoteMediator = CourseContentsRemoteMediator(courseNetwork,database,courseId,type)
     ) {
         if (type == CourseContentType.RUNNING_CONTENT.ordinal){
