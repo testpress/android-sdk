@@ -302,7 +302,8 @@ public class TestActivity extends BaseToolBarActivity  {
             Toast.makeText(this,"Please connect to the internet to view your results.",Toast.LENGTH_SHORT).show();
             return;
         }
-        saveCourseAttemptInDB(courseAttempt);
+        saveCourseAttemptInDB(courseAttempt, true);
+        updatePauseAttemptCount();
         Attempt attempt = courseAttempt.getRawAssessment();
         if (attempt.getState().equals("Running") && attempt.getRemainingTime().equals("0:00:00")) {
             attempt.setRemainingTime(exam.getDuration());
@@ -601,8 +602,16 @@ public class TestActivity extends BaseToolBarActivity  {
         }
     }
 
-    private void saveCourseAttemptInDB(CourseAttempt courseAttempt) {
+    private void saveCourseAttemptInDB(CourseAttempt courseAttempt, boolean createdNewAttempt) {
         courseAttempt.saveInDB(this, courseContent);
+        if (createdNewAttempt) {
+            courseContent.setAttemptsCount(courseContent.getAttemptsCount() + 1);
+            ContentDao contentDao = TestpressSDKDatabase.getContentDao(this);
+            contentDao.insertOrReplace(courseContent);
+        }
+    }
+
+    private void updatePauseAttemptCount() {
         if (exam !=  null) {
             ExamDao examDao = TestpressSDKDatabase.getExamDao(this);
             exam.setPausedAttemptsCount(1);
