@@ -42,6 +42,7 @@ import in.testpress.models.greendao.Content;
 import in.testpress.models.greendao.ContentDao;
 import in.testpress.models.greendao.CourseAttempt;
 import in.testpress.models.greendao.Exam;
+import in.testpress.models.greendao.ExamDao;
 import in.testpress.models.greendao.Language;
 import in.testpress.network.Resource;
 import in.testpress.network.RetrofitCall;
@@ -302,6 +303,7 @@ public class TestActivity extends BaseToolBarActivity  {
             return;
         }
         saveCourseAttemptInDB(courseAttempt, true);
+        updatePauseAttemptCount();
         Attempt attempt = courseAttempt.getRawAssessment();
         if (attempt.getState().equals("Running") && attempt.getRemainingTime().equals("0:00:00")) {
             attempt.setRemainingTime(exam.getDuration());
@@ -606,6 +608,14 @@ public class TestActivity extends BaseToolBarActivity  {
             courseContent.setAttemptsCount(courseContent.getAttemptsCount() + 1);
             ContentDao contentDao = TestpressSDKDatabase.getContentDao(this);
             contentDao.insertOrReplace(courseContent);
+        }
+    }
+
+    private void updatePauseAttemptCount() {
+        if (exam !=  null) {
+            ExamDao examDao = TestpressSDKDatabase.getExamDao(this);
+            exam.setPausedAttemptsCount(1);
+            examDao.updateInTx(exam);
         }
     }
 
