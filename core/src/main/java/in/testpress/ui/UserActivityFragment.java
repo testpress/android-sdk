@@ -43,9 +43,11 @@ public class UserActivityFragment extends PagedItemFragment<AccountActivity> {
     protected void setEmptyText() {}
 
     public void refreshAdapter() {
-        items.clear();
-        getListAdapter().getWrappedAdapter().setItems(items);
-        refreshWithProgress();
+        if (getListAdapter() != null && getListAdapter().getWrappedAdapter() != null) {
+            items.clear();
+            getListAdapter().getWrappedAdapter().setItems(items);
+            refreshWithProgress();
+        }
     }
 
     @Override
