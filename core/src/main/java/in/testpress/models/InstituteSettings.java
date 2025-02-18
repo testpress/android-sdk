@@ -376,7 +376,9 @@ public class InstituteSettings {
     }
 
     public boolean isInstituteUrl(String url) {
-        return url.contains(baseUrl) || url.contains(whiteLabeledHostUrl);
+        return url != null &&
+                (baseUrl != null && url.contains(baseUrl) ||
+                        whiteLabeledHostUrl != null && url.contains(whiteLabeledHostUrl));
     }
 
     public String getCurrentPaymentApp() {
