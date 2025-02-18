@@ -17,6 +17,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import `in`.testpress.core.TestpressCallback
+import `in`.testpress.core.TestpressException
 
 class VideoConferenceFragment : BaseContentDetailFragment() {
     private lateinit var titleView: TextView
@@ -30,9 +32,6 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         profileDetails = TestpressUserDetails.getInstance().profileDetails
-        if (profileDetails == null) {
-            TestpressUserDetails.getInstance().load(requireContext())
-        }
     }
 
     override fun onCreateView(
@@ -92,9 +91,30 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
 
     private fun initializeVideoConferenceHandler(videoConference: DomainVideoConferenceContent?) {
         showLoadingAndDisableStartButton()
+        if (profileDetails == null) {
+            loadProfileAndInitializeConference(videoConference)
+        } else {
+            initVideoConferenceHandler(videoConference)
+        }
+    }
+
+    private fun loadProfileAndInitializeConference(videoConference: DomainVideoConferenceContent?) {
+        TestpressUserDetails.getInstance().load(requireContext(),object : TestpressCallback<ProfileDetails>(){
+            override fun onSuccess(result: ProfileDetails?) {
+                profileDetails = result
+                initVideoConferenceHandler(videoConference)
+            }
+
+            override fun onException(exception: TestpressException?) {
+                initVideoConferenceHandler(videoConference)
+            }
+        })
+    }
+
+    private fun initVideoConferenceHandler(videoConference: DomainVideoConferenceContent?) {
         try {
-            videoConferenceHandler =  VideoConferenceHandler(requireContext(), videoConference!!, profileDetails)
-            videoConferenceHandler?.init(object: VideoConferenceInitializeListener {
+            videoConferenceHandler = VideoConferenceHandler(requireContext(), videoConference!!, profileDetails)
+            videoConferenceHandler?.init(object : VideoConferenceInitializeListener {
                 override fun onSuccess() {
                     hideLoadingAndEnableStartButton()
                 }
@@ -103,11 +123,9 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                     hideLoadingAndEnableStartButton()
                 }
             })
-        }
-        catch(e: NoClassDefFoundError){
+        } catch (e: NoClassDefFoundError) {
             Toast.makeText(context, "Zoom integration is not enabled in the app, please contact admin", Toast.LENGTH_LONG).show()
         }
-
     }
 
     override fun onResume() {
