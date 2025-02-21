@@ -1,13 +1,5 @@
 package `in`.testpress.course.fragments
 
-import `in`.testpress.core.TestpressSdk
-import `in`.testpress.core.TestpressUserDetails
-import `in`.testpress.course.R
-import `in`.testpress.course.domain.DomainVideoConferenceContent
-import `in`.testpress.course.util.VideoConferenceHandler
-import `in`.testpress.course.util.VideoConferenceInitializeListener
-import `in`.testpress.models.ProfileDetails
-import `in`.testpress.util.ViewUtils
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +11,15 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
+import `in`.testpress.core.TestpressSdk
+import `in`.testpress.core.TestpressUserDetails
+import `in`.testpress.course.R
+import `in`.testpress.course.domain.DomainVideoConferenceContent
+import `in`.testpress.course.util.VideoConferenceHandler
+import `in`.testpress.course.util.VideoConferenceInitializeListener
+import `in`.testpress.models.ProfileDetails
+import `in`.testpress.util.ViewUtils
+import io.sentry.Sentry
 
 class VideoConferenceFragment : BaseContentDetailFragment() {
     private lateinit var titleView: TextView
@@ -125,6 +126,19 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
             })
         } catch (e: NoClassDefFoundError) {
             Toast.makeText(context, "Zoom integration is not enabled in the app, please contact admin", Toast.LENGTH_LONG).show()
+        } catch (e: NullPointerException) {
+            Sentry.captureException(e) { scope ->
+                scope.setTag("user_name", profileDetails?.username?:"")
+                scope.setContexts(
+                    "Video Conference Error",
+                    object : HashMap<String?, Any?>() {
+                        init {
+                            put("Content Id", contentId)
+                            put("Content Title", content.title)
+                        }
+                    }
+                )
+            }
         }
     }
 
