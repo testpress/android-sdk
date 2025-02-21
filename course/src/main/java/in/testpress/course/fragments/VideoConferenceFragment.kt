@@ -1,5 +1,13 @@
 package `in`.testpress.course.fragments
 
+import `in`.testpress.core.TestpressSdk
+import `in`.testpress.core.TestpressUserDetails
+import `in`.testpress.course.R
+import `in`.testpress.course.domain.DomainVideoConferenceContent
+import `in`.testpress.course.util.VideoConferenceHandler
+import `in`.testpress.course.util.VideoConferenceInitializeListener
+import `in`.testpress.models.ProfileDetails
+import `in`.testpress.util.ViewUtils
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,14 +19,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
-import `in`.testpress.core.TestpressSdk
-import `in`.testpress.core.TestpressUserDetails
-import `in`.testpress.course.R
-import `in`.testpress.course.domain.DomainVideoConferenceContent
-import `in`.testpress.course.util.VideoConferenceHandler
-import `in`.testpress.course.util.VideoConferenceInitializeListener
-import `in`.testpress.models.ProfileDetails
-import `in`.testpress.util.ViewUtils
 import io.sentry.Sentry
 
 class VideoConferenceFragment : BaseContentDetailFragment() {
