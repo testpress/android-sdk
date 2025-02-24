@@ -19,6 +19,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
+import io.sentry.Sentry
 
 class VideoConferenceFragment : BaseContentDetailFragment() {
     private lateinit var titleView: TextView
@@ -125,6 +126,19 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
             })
         } catch (e: NoClassDefFoundError) {
             Toast.makeText(context, "Zoom integration is not enabled in the app, please contact admin", Toast.LENGTH_LONG).show()
+        } catch (e: NullPointerException) {
+            Sentry.captureException(e) { scope ->
+                scope.setTag("user_name", profileDetails?.username?:"")
+                scope.setContexts(
+                    "Video Conference Error",
+                    object : HashMap<String?, Any?>() {
+                        init {
+                            put("Content Id", contentId)
+                            put("Content Title", content.title)
+                        }
+                    }
+                )
+            }
         }
     }
 
