@@ -30,6 +30,7 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
     public static final String CHAPTER_ID = "chapterId";
     public static final String POSITION = "position";
     public static final String HIDE_BOTTOM_NAVIGATION = "hideBottomNavigation";
+    public static final String FORCE_REFRESH_CONTENT = "forceRefreshContent";
 
     public static Intent createIntent(Long contentId, Context context, String productSlug) {
         Intent intent = new Intent(context, ContentActivity.class);
@@ -43,6 +44,15 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
         intent.putExtra(CONTENT_ID, contentId);
         intent.putExtra(PRODUCT_SLUG, productSlug);
         intent.putExtra(HIDE_BOTTOM_NAVIGATION,hideBottomNavigation);
+        return intent;
+    }
+
+    public static Intent createIntent(Long contentId, Context context, String productSlug,Boolean hideBottomNavigation,Boolean forceRefreshContent) {
+        Intent intent = new Intent(context, ContentActivity.class);
+        intent.putExtra(CONTENT_ID, contentId);
+        intent.putExtra(PRODUCT_SLUG, productSlug);
+        intent.putExtra(HIDE_BOTTOM_NAVIGATION,hideBottomNavigation);
+        intent.putExtra(FORCE_REFRESH_CONTENT,forceRefreshContent);
         return intent;
     }
 

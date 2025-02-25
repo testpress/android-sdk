@@ -9,8 +9,6 @@ import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.enums.Status
-import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
-import `in`.testpress.course.ui.ContentActivity.HIDE_BOTTOM_NAVIGATION
 import `in`.testpress.course.viewmodels.ContentViewModel
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
@@ -29,6 +27,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import `in`.testpress.course.ui.ContentActivity.*
 
 abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, ContentActivity.OnBackPressedListener,
     EmptyViewListener {
@@ -48,6 +47,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     open lateinit var viewModel: ContentViewModel
     private var hideBottomNavigation: Boolean = false
+    private var forceReloadContent: Boolean = false
 
     override val bookmarkId: Long?
         get() = if (!::content.isInitialized) null else content.bookmarkId
@@ -94,7 +94,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun loadContentAndInitializeBoomarkFragment() {
-        viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer { resource ->
+        viewModel.getContent(contentId, forceReloadContent).observe(viewLifecycleOwner, Observer { resource ->
             when (resource.status) {
                 Status.SUCCESS -> {
                     content = resource.data!!
@@ -126,6 +126,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
         contentId = requireArguments().getLong(CONTENT_ID, -1)
         productSlug = requireArguments().getString(PRODUCT_SLUG)
         hideBottomNavigation = requireArguments().getBoolean(HIDE_BOTTOM_NAVIGATION, false)
+        forceReloadContent = requireArguments().getBoolean(FORCE_REFRESH_CONTENT, false)
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
