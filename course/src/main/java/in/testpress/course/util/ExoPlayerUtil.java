@@ -355,7 +355,9 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     public void seekTo(Long milliSeconds) {
-        player.seekTo(milliSeconds);
+        if (player != null){
+            player.seekTo(milliSeconds);
+        }
     }
 
     private void initResolutionSelector() {
