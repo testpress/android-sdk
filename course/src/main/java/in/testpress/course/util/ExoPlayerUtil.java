@@ -734,8 +734,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                         }
                         if (exception.isTooManyRequest()){
                             throttleTimeRemaining = exception.getThrottleTime();
-                            lastApiCallTime = System.currentTimeMillis() / 1000;
+                        } else {
+                            throttleTimeRemaining = 60;
                         }
+                        lastApiCallTime = System.currentTimeMillis() / 1000;
                     }
                 });
     }
