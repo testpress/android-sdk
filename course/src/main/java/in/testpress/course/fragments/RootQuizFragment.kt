@@ -13,7 +13,7 @@ class RootQuizFragment: Fragment() {
     private lateinit var reviewFragment: QuizReviewFragment
 
     lateinit var nextQuizHandler: NextQuizHandler
-    lateinit var quizOperationsCallback: QuizOperationsCallback
+    var quizOperationsCallback: QuizOperationsCallback? = null
     private var position: Int = 0
     private var examId: Long = -1
     private var attemptId: Long = -1
