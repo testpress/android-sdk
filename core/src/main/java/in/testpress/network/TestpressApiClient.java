@@ -1,6 +1,7 @@
 package in.testpress.network;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Looper;
 import androidx.appcompat.app.AlertDialog;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import in.testpress.R;
+import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.models.AccountActivity;
 import in.testpress.models.FileDetails;
@@ -146,7 +148,13 @@ public class TestpressApiClient {
                             @Override
                             public void run() {
                                 try {
-                                    UIUtils.showAlert(context, "Session Cleared", context.getString(R.string.session_cleared_message));
+                                    UIUtils.showAlert(context, "Session Cleared", context.getString(R.string.session_cleared_message), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            Log.d("TAG", "onClick: "+(TestpressSdk.getSessionLogoutListener() == null));
+                                            TestpressSdk.getSessionLogoutListener().logOut();
+                                        }
+                                    });
                                 } catch (Exception ignore) {}
                             }
                         });

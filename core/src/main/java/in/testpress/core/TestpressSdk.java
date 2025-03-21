@@ -341,4 +341,14 @@ public final class TestpressSdk {
                     options.setEnableAutoSessionTracking(true);
                 });
     }
+
+    private static SessionLogoutListener sessionLogoutListener;
+
+    public static SessionLogoutListener getSessionLogoutListener(){
+        return sessionLogoutListener;
+    }
+
+    public static void setSessionLogoutListener(SessionLogoutListener sessionLogoutListener){
+        TestpressSdk.sessionLogoutListener = sessionLogoutListener;
+    }
 }
