@@ -82,6 +82,10 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     }
 
     public static Intent createIntent(String chaptersUrl, Context context, String productSlug) {
+        return ChapterDetailActivity.createIntent(chaptersUrl, context, productSlug, false);
+    }
+
+    public static Intent createIntent(String chaptersUrl, Context context, String productSlug, boolean showBuyNowButton) {
         Intent intent = new Intent(context, ChapterDetailActivity.class);
         intent.putExtra(CHAPTER_URL, chaptersUrl);
         intent.putExtra(PRODUCT_SLUG, productSlug);

@@ -12,6 +12,8 @@ import java.util.List;
 
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
+import in.testpress.course.ui.ChapterDetailActivity;
+import in.testpress.course.ui.CoursePreviewActivity;
 import in.testpress.models.greendao.Course;
 import in.testpress.models.greendao.CourseDao;
 import in.testpress.models.greendao.Product;
@@ -90,9 +92,22 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
     }
 
     private void showProductDetail(Product product) {
-        Intent intent = new Intent(activity, ProductDetailsActivity.class);
-        intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.getSlug());
-        activity.startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE);
+        if (product.getCourseIds().size() > 1) {
+            activity.startActivity(CoursePreviewActivity.createIntent(product.getCourseIds(), activity, product.getSlug()));
+        } else if (product.getCourseIds().size() == 1 ) {
+            openChapters(product, activity);
+        } else {
+            Intent intent = new Intent(activity, ProductDetailsActivity.class);
+            intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.getSlug());
+            activity.startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE);
+        }
+    }
+
+    private void openChapters(Product product, Activity activity) {
+        activity.startActivity(ChapterDetailActivity.createIntent(
+                product.getTitle(),
+                product.getCourseIds().get(0).toString(),
+                activity, product.getSlug()));
     }
 
 }
