@@ -1,7 +1,5 @@
 package in.testpress.course;
 
-import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
@@ -101,11 +99,8 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
         } else {
             Intent intent = new Intent(activity, ProductDetailsActivity.class);
             intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.getSlug());
-            activity.startActivityForResult(intent, STORE_REQUEST_CODE);
+            activity.startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE);
         }
-//        Intent intent = new Intent(activity, ProductDetailsActivity.class);
-//        intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.getSlug());
-//        activity.startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE);
     }
 
     private void openChapters(Product product, Activity activity) {
