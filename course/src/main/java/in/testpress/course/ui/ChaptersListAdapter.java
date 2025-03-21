@@ -100,7 +100,8 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
                     activity.startActivity(ChapterDetailActivity.createIntent(
                             chapter.getUrl(),
                             activity,
-                            productSlug)
+                            productSlug,
+                            !productSlug.isEmpty())
                     );
                 }
             });
