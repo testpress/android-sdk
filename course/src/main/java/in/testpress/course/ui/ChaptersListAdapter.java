@@ -101,7 +101,7 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
                             chapter.getUrl(),
                             activity,
                             productSlug,
-                            !productSlug.isEmpty())
+                            productSlug != null && !productSlug.isEmpty())
                     );
                 }
             });
