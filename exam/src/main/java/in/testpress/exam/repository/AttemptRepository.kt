@@ -1,6 +1,5 @@
 package `in`.testpress.exam.repository
 
-import `in`.testpress.core.ErrorDetail
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.database.TestpressDatabase
@@ -21,7 +20,6 @@ import `in`.testpress.network.Resource
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import `in`.testpress.exam.models.UserUploadedFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -216,43 +214,12 @@ class AttemptRepository(val context: Context) {
                 }
 
                 override fun onException(exception: TestpressException) {
-                    val errorDetail = exception.getErrorBodyAs(
-                        exception.response,
-                        ErrorDetail::class.java
-                    )
-                    if (exception.isUnauthenticated && isExamEnded(errorDetail.message)) {
-                        updateAttemptItem()
-                        _saveResultResource.postValue(
-                            Resource.success(
-                                Triple(
-                                    position,
-                                    attemptItem,
-                                    action
-                                )
-                            )
-                        )
-                        return
-                    }
                     _saveResultResource.postValue(
                         Resource.error(
                             exception,
                             Triple(position, null, action)
                         )
                     )
-                }
-
-                private fun isExamEnded(message: String?) = message?.contains("The exam has already ended") == true
-
-                private fun updateAttemptItem() {
-                    attemptItem.apply {
-                        selectedAnswers = savedAnswers
-                        review = currentReview
-                        shortText = currentShortText
-                        essayText = localEssayText
-                        unSyncedFiles.forEachIndexed { index, url ->
-                            files.add(UserUploadedFile(id = index.toLong(), path = url, url = url))
-                        }
-                    }
                 }
             })
         }
