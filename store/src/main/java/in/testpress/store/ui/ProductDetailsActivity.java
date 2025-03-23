@@ -50,6 +50,8 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     private Product product;
     private String productSlug;
     private EventsTrackerFacade eventsTrackerFacade;
+    private LinearLayout discountContainer;
+    private TextView discountPrompt;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -74,6 +76,21 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
             }
         });
         eventsTrackerFacade = new EventsTrackerFacade(getApplicationContext());
+
+        discountPrompt = findViewById(R.id.discount_prompt);
+        discountContainer = findViewById(R.id.discount_container);
+
+        discountPrompt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (discountContainer.getVisibility() == View.GONE) {
+                    discountContainer.setVisibility(View.VISIBLE);
+                    discountPrompt.setVisibility(View.GONE);
+                } else {
+                    discountContainer.setVisibility(View.GONE);
+                }
+            }
+        });
 
         loadProductDetails();
     }
