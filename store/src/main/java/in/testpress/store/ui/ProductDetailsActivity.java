@@ -1,5 +1,7 @@
 package in.testpress.store.ui;
 
+import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -9,6 +11,8 @@ import android.text.Html;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -20,7 +24,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
@@ -28,6 +36,8 @@ import in.testpress.core.TestpressSession;
 import in.testpress.exam.TestpressExam;
 import in.testpress.models.InstituteSettings;
 import in.testpress.store.R;
+import in.testpress.store.models.Order;
+import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
 import in.testpress.store.network.StoreApiClient;
 import in.testpress.ui.BaseToolBarActivity;
@@ -61,6 +71,11 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     private EditText couponEditText;
     private Button applyCouponButton;
 
+    private StoreApiClient apiClient;
+
+    private List<OrderItem> orderItems;
+    public Order order;
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,9 +104,9 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
             }
         });
         eventsTrackerFacade = new EventsTrackerFacade(getApplicationContext());
+        apiClient = new StoreApiClient(this);
 
         initOnClickListeners();
-
         loadProductDetails();
     }
 
@@ -126,8 +141,8 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         applyCouponButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                couponAppliedText.setVisibility(View.VISIBLE);
                 hideKeyboard();
+                createOrder();
             }
         });
     }
@@ -284,6 +299,79 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
         ProductDetailsActivity.this.product = product;
         logEvent(EventsTrackerFacade.VIEWED_PRODUCT_EVENT);
+    }
+
+    void createOrder() {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setProduct(product.getSlug());
+        orderItem.setQuantity(1);
+        orderItem.setPrice(String.valueOf(product.getPrices().get(0).getId()));
+        orderItems = new ArrayList<>();
+        orderItems.add(orderItem);
+
+        apiClient.order(orderItems).enqueue(new TestpressCallback<Order>() {
+            @Override
+            public void onSuccess(Order createdOrder) {
+                order = createdOrder;
+                applyCoupon((long)order.getId());
+
+                Log.d("TAG", "onSuccess: "+order);
+
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                if (exception.isNetworkError()) {
+                    setEmptyText(R.string.testpress_network_error,
+                            R.string.testpress_no_internet_try_again,
+                            R.drawable.ic_error_outline_black_18dp);
+
+                    retryButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            createOrder();
+                        }
+                    });
+                    retryButton.setVisibility(View.VISIBLE);
+                } else {
+                    setEmptyText(R.string.testpress_error_ordering,
+                            R.string.testpress_some_thing_went_wrong_try_again,
+                            R.drawable.ic_error_outline_black_18dp);
+                }
+            }
+        });
+    }
+
+    void applyCoupon(Long orderId) {
+        apiClient.applyCoupon(orderId, "test 123").enqueue(new TestpressCallback<Order>() {
+            @Override
+            public void onSuccess(Order createdOrder) {
+                //order = createdOrder;
+
+                Log.d("TAG", "onSuccess: "+createdOrder);
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                if (exception.isNetworkError()) {
+                    setEmptyText(R.string.testpress_network_error,
+                            R.string.testpress_no_internet_try_again,
+                            R.drawable.ic_error_outline_black_18dp);
+
+                    retryButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            //createOrder();
+                        }
+                    });
+                    retryButton.setVisibility(View.VISIBLE);
+                } else {
+                    setEmptyText(R.string.testpress_error_ordering,
+                            R.string.testpress_some_thing_went_wrong_try_again,
+                            R.drawable.ic_error_outline_black_18dp);
+                }
+            }
+        });
     }
 
     public void order() {
