@@ -1,5 +1,6 @@
 package in.testpress.store.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -88,6 +90,20 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
                     discountPrompt.setVisibility(View.GONE);
                 } else {
                     discountContainer.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        findViewById(R.id.apply_coupon).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                findViewById(R.id.coupon_applied_text).setVisibility(View.VISIBLE);
+
+                // Hide the soft keyboard
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                View currentFocus = getCurrentFocus();
+                if (currentFocus != null) {
+                    imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
                 }
             }
         });
