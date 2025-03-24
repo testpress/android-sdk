@@ -30,6 +30,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -86,7 +87,6 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     private StoreApiClient apiClient;
 
-    private List<OrderItem> orderItems;
     public Order order;
     ProgressDialog progressDialog;
     @Override
@@ -315,104 +315,129 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     }
 
     void createOrder() {
-        progressDialog.setMessage("Creating your order...");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
-        OrderItem orderItem = new OrderItem();
-        orderItem.setProduct(product.getSlug());
-        orderItem.setQuantity(1);
-        orderItem.setPrice(String.valueOf(product.getPrices().get(0).getId()));
-        orderItems = new ArrayList<>();
-        orderItems.add(orderItem);
+        showProgressDialog("Creating your order...");
 
-        if (order != null){
-            applyCoupon((long)order.getId());
+        if (order != null) {
+            applyCoupon((long) order.getId());
             return;
         }
+
+        OrderItem orderItem = createOrderItem();
+        List<OrderItem> orderItems = new ArrayList<>();
+        orderItems.add(orderItem);
 
         apiClient.order(orderItems).enqueue(new TestpressCallback<Order>() {
             @Override
             public void onSuccess(Order createdOrder) {
                 order = createdOrder;
-                applyCoupon((long)order.getId());
+                applyCoupon((long) order.getId());
             }
 
             @Override
             public void onException(TestpressException exception) {
-                progressDialog.dismiss();
-                if (exception.isNetworkError()) {
-                    Toast.makeText(ProductDetailsActivity.this, "Please check you internet connection", Toast.LENGTH_SHORT).show();
-                } else {
-                    String orderCreationId = UtilKt.generateRandom10CharString();
-                    Sentry.captureException(exception, new ScopeCallback() {
-                        @Override
-                        public void run(@NotNull Scope scope) {
-                            scope.setTag("orderCreationId", orderCreationId);
-                        }
-                    });
-                    Toast.makeText(ProductDetailsActivity.this, "Failed to create order. Please contact support with ID: " + orderCreationId, Toast.LENGTH_LONG).show();
-                }
+                handleOrderCreationFailure(exception);
             }
         });
     }
 
+    private void showProgressDialog(String message) {
+        progressDialog.setMessage(message);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+
+    private OrderItem createOrderItem() {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setProduct(product.getSlug());
+        orderItem.setQuantity(1);
+        orderItem.setPrice(String.valueOf(product.getPrices().get(0).getId()));
+        return orderItem;
+    }
+
+    private void handleOrderCreationFailure(TestpressException exception) {
+        progressDialog.dismiss();
+        if (exception.isNetworkError()) {
+            showToast("Please check your internet connection");
+        } else {
+            String orderCreationId = UtilKt.generateRandom10CharString();
+            Sentry.captureException(exception, scope -> scope.setTag("orderCreationId", orderCreationId));
+            showToast("Failed to create order. Please contact support with ID: " + orderCreationId);
+        }
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(ProductDetailsActivity.this, message, Toast.LENGTH_LONG).show();
+    }
+
     void applyCoupon(Long orderId) {
-        progressDialog.setMessage("Applying Coupon code...");
-        apiClient.applyCoupon(orderId, couponEditText.getText().toString()).enqueue(new TestpressCallback<Order>() {
+        showProgressDialog("Applying Coupon code...");
+
+        String couponCode = couponEditText.getText().toString();
+        apiClient.applyCoupon(orderId, couponCode).enqueue(new TestpressCallback<Order>() {
             @Override
             public void onSuccess(Order createdOrder) {
                 order = createdOrder;
-                couponAppliedText.setVisibility(View.VISIBLE);
-                couponAppliedText.setTextColor(ContextCompat.getColor(ProductDetailsActivity.this, R.color.testpress_text_gray));
-                couponAppliedText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_check_24, 0, 0, 0);
-
-                try {
-                    // Convert strings to double
-                    double value1 = Double.parseDouble(product.getPrice());
-                    double value2 = Double.parseDouble(createdOrder.getOrderItems().get(0).getPrice());
-
-                    // Subtract the values
-                    double result = value1 - value2;
-
-                    // Format the result to two decimal places
-                    couponAppliedText.setText(couponEditText.getText().toString() + " Applied! You have saved ₹" + result + " on this course.");
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
-                    couponAppliedText.setText(couponEditText.getText().toString() + " Applied! Discount has been applied successfully.");
-                }
-
-                TextView priceText = findViewById(R.id.price);
-
-                String newPrice = createdOrder.getOrderItems().get(0).getPrice();
-                String oldPrice = product.getPrice();
-
-                SpannableString oldPriceStrikethrough = new SpannableString(oldPrice);
-                oldPriceStrikethrough.setSpan(new StrikethroughSpan(), 0, oldPrice.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                SpannableStringBuilder finalText = new SpannableStringBuilder();
-                finalText.append(newPrice).append("  ").append(oldPriceStrikethrough);
-                priceText.setText(finalText);
-
+                updateCouponAppliedText(couponCode, createdOrder);
+                updatePriceDisplay(createdOrder);
                 progressDialog.dismiss();
             }
 
             @Override
             public void onException(TestpressException exception) {
-                TextView priceText = (TextView) findViewById(R.id.price);
-                priceText.setText(product.getPrice());
-
-                order = null;
-
-                if (exception.isNetworkError()) {
-                    Toast.makeText(ProductDetailsActivity.this,"Please check you internet connection", Toast.LENGTH_SHORT).show();
-                } else {
-                    couponAppliedText.setVisibility(View.VISIBLE);
-                    couponAppliedText.setText("Invalid coupon code.");
-                    couponAppliedText.setTextColor(Color.RED);
-                    couponAppliedText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-                }
-                progressDialog.dismiss();
+                handleCouponApplicationFailure(exception);
             }
         });
+    }
+
+    private void updateCouponAppliedText(String couponCode, Order createdOrder) {
+        couponAppliedText.setTextColor(ContextCompat.getColor(ProductDetailsActivity.this, R.color.testpress_text_gray));
+        couponAppliedText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_check_24, 0, 0, 0);
+
+        try {
+            double originalPrice = Double.parseDouble(product.getPrice());
+            double discountedPrice = Double.parseDouble(createdOrder.getOrderItems().get(0).getPrice());
+            double savings = originalPrice - discountedPrice;
+
+            couponAppliedText.setText(couponCode + " Applied! You have saved ₹" + savings + " on this course.");
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            couponAppliedText.setText(couponCode + " Applied! Discount has been applied successfully.");
+        }
+        couponAppliedText.setVisibility(View.VISIBLE);
+    }
+
+    private void updatePriceDisplay(Order createdOrder) {
+        TextView priceText = findViewById(R.id.price);
+        String newPrice = createdOrder.getOrderItems().get(0).getPrice();
+        String oldPrice = product.getPrice();
+
+        SpannableString oldPriceStrikethrough = new SpannableString(oldPrice);
+        oldPriceStrikethrough.setSpan(new StrikethroughSpan(), 0, oldPrice.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        SpannableStringBuilder finalText = new SpannableStringBuilder();
+        finalText.append(newPrice).append("  ").append(oldPriceStrikethrough);
+
+        priceText.setText(finalText);
+    }
+
+    private void handleCouponApplicationFailure(TestpressException exception) {
+        TextView priceText = findViewById(R.id.price);
+        priceText.setText(product.getPrice());
+        order = null;
+
+        if (exception.isNetworkError()) {
+            showToast("Please check your internet connection");
+        } else {
+            showInvalidCouponMessage();
+        }
+        progressDialog.dismiss();
+    }
+
+    private void showInvalidCouponMessage() {
+        couponAppliedText.setVisibility(View.VISIBLE);
+        couponAppliedText.setText("Invalid coupon code.");
+        couponAppliedText.setTextColor(Color.RED);
+        couponAppliedText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
     }
 
     public void order() {

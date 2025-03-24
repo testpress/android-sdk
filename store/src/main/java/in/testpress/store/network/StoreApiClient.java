@@ -37,7 +37,7 @@ public class StoreApiClient extends TestpressApiClient {
 
     public static final String v3_ORDERS_PATH = "/api/v3/orders/";
 
-    public static final String v2_4_PATH = "api/v2.4/orders/";
+    public static final String v2_4_ORDERS_PATH = "/api/v2.4/orders/";
 
     public static final String APPLY_COUPON_PATH = "/apply-coupon/";
 

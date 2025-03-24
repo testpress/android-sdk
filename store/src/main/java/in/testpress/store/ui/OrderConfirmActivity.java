@@ -118,7 +118,9 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         if (order == null){
             order();
         } else {
-            // If user Applied the Coupon Order is already created in Product Detail screen (Previous screen)
+            // If the user has already applied a coupon, the order was created on the
+            // Product Details screen (previous screen), so we proceed directly with
+            // order confirmation.
             confirmOrder();
         }
     }
