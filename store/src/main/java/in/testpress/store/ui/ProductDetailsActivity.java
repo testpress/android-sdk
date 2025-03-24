@@ -159,6 +159,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         View productDetailsView = findViewById(R.id.main_content);
         Button buyButton = (Button) findViewById(R.id.buy_button);
         progressBar.setVisibility(View.GONE);
+        findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.VISIBLE);
         productDetailsView.setVisibility(View.VISIBLE);
         buyButton.setOnClickListener(new View.OnClickListener() {
             @Override
