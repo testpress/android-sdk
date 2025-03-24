@@ -16,11 +16,14 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
+
+import static in.testpress.store.network.StoreApiClient.APPLY_COUPON_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDERS_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDER_API_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDER_CONFIRM_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDER_STATE_REFRESH_PATH;
 import static in.testpress.store.network.StoreApiClient.PAYU_HASH_GENERATOR_PATH;
+import static in.testpress.store.network.StoreApiClient.v2_4_ORDERS_PATH;
 import static in.testpress.store.network.StoreApiClient.v3_ORDERS_PATH;
 
 public interface ProductService {
@@ -37,6 +40,11 @@ public interface ProductService {
 
     @POST(v3_ORDERS_PATH)
     RetrofitCall<Order> order(@Body HashMap<String, Object> arguments);
+
+    @POST(v2_4_ORDERS_PATH + "{order_id}" + APPLY_COUPON_PATH)
+    RetrofitCall<Order> applyCoupon(
+            @Path(value = "order_id", encoded = true) Long orderId,
+            @Body HashMap<String, String> arguments);
 
     @PUT(ORDERS_PATH + "{order_id}" + ORDER_CONFIRM_PATH)
     RetrofitCall<Order> orderConfirm(
