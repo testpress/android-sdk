@@ -1,18 +1,20 @@
 package in.testpress.store.ui;
 
-import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
-
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
-import android.view.KeyEvent;
+import android.text.style.StrikethroughSpan;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -22,6 +24,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -40,6 +44,7 @@ import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
 import in.testpress.store.network.StoreApiClient;
+import in.testpress.store.util.UtilKt;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.EventsTrackerFacade;
 import in.testpress.util.ImageUtils;
@@ -47,14 +52,22 @@ import in.testpress.util.UILImageGetter;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 import in.testpress.util.ZoomableImageString;
+import io.sentry.Scope;
+import io.sentry.ScopeCallback;
+import io.sentry.Sentry;
 
 import static in.testpress.store.TestpressStore.PAYMENT_SUCCESS;
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
+
+import androidx.core.content.ContextCompat;
+
+import org.jetbrains.annotations.NotNull;
 
 public class ProductDetailsActivity extends BaseToolBarActivity {
 
     public static final String PRODUCT_SLUG = "productSlug";
     public static final String PRODUCT = "product";
+    public static final String ORDER = "order";
     public static final String PRICE_ID = "price_id";
 
     private LinearLayout emptyView;
@@ -75,7 +88,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     private List<OrderItem> orderItems;
     public Order order;
-
+    ProgressDialog progressDialog;
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +100,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         }
         progressBar = (ProgressBar) findViewById(R.id.pb_loading);
         UIUtils.setIndeterminateDrawable(this, progressBar, 4);
-
+        progressDialog = new ProgressDialog(this);
         emptyView = (LinearLayout) findViewById(R.id.empty_container);
         emptyTitleView = (TextView) findViewById(R.id.empty_title);
         emptyDescView = (TextView) findViewById(R.id.empty_description);
@@ -302,6 +315,9 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     }
 
     void createOrder() {
+        progressDialog.setMessage("Creating your order...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
         OrderItem orderItem = new OrderItem();
         orderItem.setProduct(product.getSlug());
         orderItem.setQuantity(1);
@@ -309,67 +325,92 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         orderItems = new ArrayList<>();
         orderItems.add(orderItem);
 
+        if (order != null){
+            applyCoupon((long)order.getId());
+            return;
+        }
+
         apiClient.order(orderItems).enqueue(new TestpressCallback<Order>() {
             @Override
             public void onSuccess(Order createdOrder) {
                 order = createdOrder;
                 applyCoupon((long)order.getId());
-
-                Log.d("TAG", "onSuccess: "+order);
-
             }
 
             @Override
             public void onException(TestpressException exception) {
+                progressDialog.dismiss();
                 if (exception.isNetworkError()) {
-                    setEmptyText(R.string.testpress_network_error,
-                            R.string.testpress_no_internet_try_again,
-                            R.drawable.ic_error_outline_black_18dp);
-
-                    retryButton.setOnClickListener(new View.OnClickListener() {
+                    Toast.makeText(ProductDetailsActivity.this, "Please check you internet connection", Toast.LENGTH_SHORT).show();
+                } else {
+                    String orderCreationId = UtilKt.generateRandom10CharString();
+                    Sentry.captureException(exception, new ScopeCallback() {
                         @Override
-                        public void onClick(View v) {
-                            createOrder();
+                        public void run(@NotNull Scope scope) {
+                            scope.setTag("orderCreationId", orderCreationId);
                         }
                     });
-                    retryButton.setVisibility(View.VISIBLE);
-                } else {
-                    setEmptyText(R.string.testpress_error_ordering,
-                            R.string.testpress_some_thing_went_wrong_try_again,
-                            R.drawable.ic_error_outline_black_18dp);
+                    Toast.makeText(ProductDetailsActivity.this, "Failed to create order. Please contact support with ID: " + orderCreationId, Toast.LENGTH_LONG).show();
                 }
             }
         });
     }
 
     void applyCoupon(Long orderId) {
-        apiClient.applyCoupon(orderId, "test 123").enqueue(new TestpressCallback<Order>() {
+        progressDialog.setMessage("Applying Coupon code...");
+        apiClient.applyCoupon(orderId, couponEditText.getText().toString()).enqueue(new TestpressCallback<Order>() {
             @Override
             public void onSuccess(Order createdOrder) {
-                //order = createdOrder;
+                order = createdOrder;
+                couponAppliedText.setVisibility(View.VISIBLE);
+                couponAppliedText.setTextColor(ContextCompat.getColor(ProductDetailsActivity.this, R.color.testpress_text_gray));
+                couponAppliedText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_check_24, 0, 0, 0);
 
-                Log.d("TAG", "onSuccess: "+createdOrder);
+                try {
+                    // Convert strings to double
+                    double value1 = Double.parseDouble(product.getPrice());
+                    double value2 = Double.parseDouble(createdOrder.getOrderItems().get(0).getPrice());
+
+                    // Subtract the values
+                    double result = value1 - value2;
+
+                    // Format the result to two decimal places
+                    couponAppliedText.setText(couponEditText.getText().toString() + " Applied! You have saved ₹" + result + " on this course.");
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    couponAppliedText.setText(couponEditText.getText().toString() + " Applied! Discount has been applied successfully.");
+                }
+
+                TextView priceText = findViewById(R.id.price);
+
+                String newPrice = createdOrder.getOrderItems().get(0).getPrice();
+                String oldPrice = product.getPrice();
+
+                SpannableString oldPriceStrikethrough = new SpannableString(oldPrice);
+                oldPriceStrikethrough.setSpan(new StrikethroughSpan(), 0, oldPrice.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                SpannableStringBuilder finalText = new SpannableStringBuilder();
+                finalText.append(newPrice).append("  ").append(oldPriceStrikethrough);
+                priceText.setText(finalText);
+
+                progressDialog.dismiss();
             }
 
             @Override
             public void onException(TestpressException exception) {
-                if (exception.isNetworkError()) {
-                    setEmptyText(R.string.testpress_network_error,
-                            R.string.testpress_no_internet_try_again,
-                            R.drawable.ic_error_outline_black_18dp);
+                TextView priceText = (TextView) findViewById(R.id.price);
+                priceText.setText(product.getPrice());
 
-                    retryButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            //createOrder();
-                        }
-                    });
-                    retryButton.setVisibility(View.VISIBLE);
+                order = null;
+
+                if (exception.isNetworkError()) {
+                    Toast.makeText(ProductDetailsActivity.this,"Please check you internet connection", Toast.LENGTH_SHORT).show();
                 } else {
-                    setEmptyText(R.string.testpress_error_ordering,
-                            R.string.testpress_some_thing_went_wrong_try_again,
-                            R.drawable.ic_error_outline_black_18dp);
+                    couponAppliedText.setVisibility(View.VISIBLE);
+                    couponAppliedText.setText("Invalid coupon code.");
+                    couponAppliedText.setTextColor(Color.RED);
+                    couponAppliedText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
                 }
+                progressDialog.dismiss();
             }
         });
     }
@@ -382,6 +423,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         if (this.product.getPaymentLink().isEmpty()) {
             Intent intent = new Intent(ProductDetailsActivity.this, OrderConfirmActivity.class);
             intent.putExtra(PRODUCT, product);
+            intent.putExtra(ORDER, order);
             startActivityForResult(intent, STORE_REQUEST_CODE);
         } else {
             Uri uri = Uri.parse(this.product.getPaymentLink());

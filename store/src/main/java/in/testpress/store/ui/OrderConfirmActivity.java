@@ -84,6 +84,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.testpress_shipping_address);
+        order = getIntent().getParcelableExtra(ORDER);
         address = (EditText) findViewById(R.id.address);
         zip = (EditText) findViewById(R.id.zip);
         landmark = (EditText) findViewById(R.id.landmark);
@@ -114,7 +115,12 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         orderItems.add(orderItem);
         apiClient = new StoreApiClient(this);
         eventsTrackerFacade = new EventsTrackerFacade(getApplicationContext());
-        order();
+        if (order == null){
+            order();
+        } else {
+            // If user Applied the Coupon Order is already created in Product Detail screen (Previous screen)
+            confirmOrder();
+        }
     }
 
     private int getPriceId() {
