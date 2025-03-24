@@ -21,7 +21,8 @@
         android:id="@+id/main_content"
         android:layout_below="@id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_above="@id/coupon_and_buy_button_container">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appbar"
@@ -72,24 +73,101 @@
 
         <include layout="@layout/testpress_product_details_content_scrolling" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:gravity="bottom"
-            android:layout_height="match_parent">
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/buy_button"
+    <LinearLayout
+        android:id="@+id/coupon_and_buy_button_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:elevation="5dp"
+        android:paddingTop="16dp"
+        android:background="@drawable/rounded_top_background"
+        android:visibility="gone"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/discount_prompt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="Have a discount code?"
+            android:textColor="@color/testpress_green"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:id="@+id/discount_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="Discount Coupon"
+                android:textColor="@color/testpress_black"
+                android:textSize="16sp" />
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/testpress_orange"
-                android:layout_marginTop="20dp"
-                android:text="Buy Now"
-                android:textAllCaps="true"
-                android:textColor="@color/testpress_white"
-                android:textSize="@dimen/testpress_text_size_xxlarge" />
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-        </RelativeLayout>
+                <EditText
+                    android:id="@+id/coupon"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/edittext_background"
+                    android:hint="Enter Coupon Code"
+                    android:imeOptions="actionDone"
+                    android:padding="12dp"
+                    android:textColor="@color/testpress_black"
+                    android:textSize="16sp" />
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+                <Button
+                    android:id="@+id/apply_coupon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/button_apply_coupon"
+                    android:padding="12dp"
+                    android:text="Apply"
+                    android:textAllCaps="true"
+                    android:enabled="false"
+                    android:textColor="@color/testpress_white" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/coupon_applied_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:drawableStart="@drawable/baseline_check_24"
+                android:drawablePadding="4dp"
+                android:text="TEST 123 Applied! You have saved ₹600 on this course."
+                android:textColor="@color/testpress_text_gray"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buy_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/testpress_orange"
+            android:text="Buy Now"
+            android:textAllCaps="true"
+            android:textColor="@color/testpress_white"
+            android:textSize="@dimen/testpress_text_size_xxlarge" />
+
+    </LinearLayout>
 
 </RelativeLayout>

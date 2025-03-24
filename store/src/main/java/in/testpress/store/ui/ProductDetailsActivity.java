@@ -1,13 +1,18 @@
 package in.testpress.store.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -50,6 +55,11 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     private Product product;
     private String productSlug;
     private EventsTrackerFacade eventsTrackerFacade;
+    private LinearLayout discountContainer;
+    private TextView discountPrompt;
+    private TextView couponAppliedText;
+    private EditText couponEditText;
+    private Button applyCouponButton;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -67,6 +77,11 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         emptyTitleView = (TextView) findViewById(R.id.empty_title);
         emptyDescView = (TextView) findViewById(R.id.empty_description);
         retryButton = (Button) findViewById(R.id.retry_button);
+        couponAppliedText = (TextView) findViewById(R.id.coupon_applied_text);
+        couponEditText = (EditText) findViewById(R.id.coupon);
+        applyCouponButton = (Button) findViewById(R.id.apply_coupon);
+        discountPrompt = findViewById(R.id.discount_prompt);
+        discountContainer = findViewById(R.id.discount_container);
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,7 +90,54 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         });
         eventsTrackerFacade = new EventsTrackerFacade(getApplicationContext());
 
+        initOnClickListeners();
+
         loadProductDetails();
+    }
+
+    void initOnClickListeners() {
+        discountPrompt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (discountContainer.getVisibility() == View.GONE) {
+                    discountContainer.setVisibility(View.VISIBLE);
+                    discountPrompt.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        couponEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (charSequence.toString().trim().length() > 0) {
+                    applyCouponButton.setEnabled(true);
+                } else {
+                    applyCouponButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+
+        applyCouponButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                couponAppliedText.setVisibility(View.VISIBLE);
+                hideKeyboard();
+            }
+        });
+    }
+
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        View currentFocus = getCurrentFocus();
+        if (currentFocus != null) {
+            imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
+        }
     }
 
     void loadProductDetails() {
@@ -126,6 +188,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         View productDetailsView = findViewById(R.id.main_content);
         Button buyButton = (Button) findViewById(R.id.buy_button);
         progressBar.setVisibility(View.GONE);
+        findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.VISIBLE);
         productDetailsView.setVisibility(View.VISIBLE);
         buyButton.setOnClickListener(new View.OnClickListener() {
             @Override
