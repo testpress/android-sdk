@@ -4,12 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -54,6 +57,9 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     private EventsTrackerFacade eventsTrackerFacade;
     private LinearLayout discountContainer;
     private TextView discountPrompt;
+    private TextView couponAppliedText;
+    private EditText couponEditText;
+    private Button applyCouponButton;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -71,6 +77,11 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         emptyTitleView = (TextView) findViewById(R.id.empty_title);
         emptyDescView = (TextView) findViewById(R.id.empty_description);
         retryButton = (Button) findViewById(R.id.retry_button);
+        couponAppliedText = (TextView) findViewById(R.id.coupon_applied_text);
+        couponEditText = (EditText) findViewById(R.id.coupon);
+        applyCouponButton = (Button) findViewById(R.id.apply_coupon);
+        discountPrompt = findViewById(R.id.discount_prompt);
+        discountContainer = findViewById(R.id.discount_container);
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,36 +90,54 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         });
         eventsTrackerFacade = new EventsTrackerFacade(getApplicationContext());
 
-        discountPrompt = findViewById(R.id.discount_prompt);
-        discountContainer = findViewById(R.id.discount_container);
+        initOnClickListeners();
 
+        loadProductDetails();
+    }
+
+    void initOnClickListeners() {
         discountPrompt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (discountContainer.getVisibility() == View.GONE) {
                     discountContainer.setVisibility(View.VISIBLE);
                     discountPrompt.setVisibility(View.GONE);
-                } else {
-                    discountContainer.setVisibility(View.GONE);
                 }
             }
         });
 
-        findViewById(R.id.apply_coupon).setOnClickListener(new View.OnClickListener() {
+        couponEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (charSequence.toString().trim().length() > 0) {
+                    applyCouponButton.setEnabled(true);
+                } else {
+                    applyCouponButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+
+        applyCouponButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                findViewById(R.id.coupon_applied_text).setVisibility(View.VISIBLE);
-
-                // Hide the soft keyboard
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                View currentFocus = getCurrentFocus();
-                if (currentFocus != null) {
-                    imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
-                }
+                couponAppliedText.setVisibility(View.VISIBLE);
+                hideKeyboard();
             }
         });
+    }
 
-        loadProductDetails();
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        View currentFocus = getCurrentFocus();
+        if (currentFocus != null) {
+            imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
+        }
     }
 
     void loadProductDetails() {
