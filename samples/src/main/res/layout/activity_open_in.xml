@@ -96,6 +96,11 @@
             android:text="Sample Offline Exam"
             android:id="@+id/sample_offline_exam_download" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/Button"
+            android:text="Global Search"
+            android:id="@+id/global_search_button" />
+
     </LinearLayout>
 
     </ScrollView>
