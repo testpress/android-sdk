@@ -30,6 +30,7 @@ dependencies {
     api 'in.payu:payu-checkout-pro:1.8.0'
     api 'in.payu:payu-gpay:1.4.0'
     api 'com.razorpay:checkout:1.6.33'
+    kapt "androidx.room:room-compiler:2.4.3"
 
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
