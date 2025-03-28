@@ -2,6 +2,7 @@ package `in`.testpress.store.data.database
 
 import android.content.Context
 import androidx.room.*
+import `in`.testpress.store.data.database.dao.ProductLiteEntityDao
 import `in`.testpress.store.data.database.model.ProductCategoryEntity
 import `in`.testpress.store.data.database.model.ProductLiteEntity
 
@@ -12,6 +13,8 @@ import `in`.testpress.store.data.database.model.ProductLiteEntity
     ], exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class TestpressStoreDatabase : RoomDatabase() {
+
+    abstract fun productLiteEntityDao(): ProductLiteEntityDao
 
     companion object {
         private lateinit var INSTANCE: TestpressStoreDatabase

@@ -8,6 +8,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
+import in.testpress.store.data.model.NetworkProductListResponse;
 import in.testpress.store.models.NetworkHash;
 import in.testpress.store.models.NetworkOrderStatus;
 import in.testpress.store.models.Order;
@@ -98,5 +99,9 @@ public class StoreApiClient extends TestpressApiClient {
         HashMap<String, Object> postData = new HashMap<String, Object>();
         postData.put("data", key);
         return getProductService().generateHash(postData);
+    }
+
+    public RetrofitCall<NetworkProductListResponse> getProductsV3(Map<String, Object> queryParams) {
+        return getProductService().getProductsV3(queryParams);
     }
 }
