@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
-import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.ProductLiteEntity
 import `in`.testpress.network.Resource
@@ -17,71 +16,86 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 class ProductRepository(val context: Context) {
-    val contentDao = TestpressSDKDatabase.getContentDao(context)
-    val chapterDao = TestpressSDKDatabase.getChapterDao(context)
     val storeApiClient = StoreApiClient(context)
     val database = TestpressDatabase.invoke(context)
     var page = 1
     val category = -1
-
+    private var isLoading = false
+    private var hasNextPage = true
 
     private var _productsResource: MutableLiveData<Resource<List<ProductLiteEntity>>> = MutableLiveData()
     val productsResource: LiveData<Resource<List<ProductLiteEntity>>>
         get() = _productsResource
 
     init {
-        loadItems()
+        loadFromDatabase()
     }
 
-    private fun loadItems() {
+    private fun loadFromDatabase() {
         _productsResource.postValue(Resource.loading(null))
+        CoroutineScope(Dispatchers.IO).launch {
+            val cachedProducts = database.productLiteEntityDao().getAll()
+            if (cachedProducts.isNotEmpty()) {
+                _productsResource.postValue(Resource.success(cachedProducts))
+            }
+            fetchFromNetwork()
+        }
+    }
+
+    private fun fetchFromNetwork() {
+        if (isLoading || !hasNextPage) return
+        isLoading = true
+
         val queryParams = hashMapOf<String, Any>("page" to page)
         storeApiClient.getProductsV3(queryParams)
             .enqueue(object : TestpressCallback<NetworkProductListResponse>(){
                 override fun onSuccess(result: NetworkProductListResponse) {
-                    handleFetchSuccess(result)
-                    updateProductsResource()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        handleFetchSuccess(result)
+                        isLoading = false
+                        hasNextPage = result.next != null
+                    }
                 }
 
                 override fun onException(exception: TestpressException?) {
-                    _productsResource.postValue(Resource.error(exception!!, null))
+                    isLoading = false
+                    if (_productsResource.value?.data.isNullOrEmpty()) {
+                        _productsResource.postValue(Resource.error(exception!!, null))
+                    }
                 }
             })
     }
 
     fun fetchNextPage() {
+        if (isLoading|| !hasNextPage) return
         page++
-        loadItems()
+        fetchFromNetwork()
     }
 
-    private fun handleFetchSuccess(response: NetworkProductListResponse) {
+    private suspend fun handleFetchSuccess(response: NetworkProductListResponse) {
         if (page == 1 && category == -1) {
-            // Delete all contents of chapter once first page is fetched
-            //deleteExistingProducts()
+            // Delete all Products once first page is fetched
+            deleteExistingProducts()
         }
 
         storeContent(response.results.products)
     }
 
-    private fun deleteExistingProducts() {
-        CoroutineScope(Dispatchers.IO).launch {
-            database.productLiteEntityDao().deleteAll()
-        }
+    private suspend fun deleteExistingProducts() {
+        database.productLiteEntityDao().deleteAll()
+        updateProductsResource()
     }
 
-    private fun updateProductsResource() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val products = database.productLiteEntityDao().getAll()
-            _productsResource.postValue(Resource.success(products))
-        }
+    private suspend fun updateProductsResource() {
+        val products = database.productLiteEntityDao().getAll()
+        if (products.isEmpty()) return
+        _productsResource.postValue(Resource.success(products))
     }
 
-    private fun storeContent(response: List<NetworkProductLite>) {
-        CoroutineScope(Dispatchers.IO).launch {
-            database.productLiteEntityDao().insertAll(response.asDomain())
-        }
+    private suspend fun storeContent(response: List<NetworkProductLite>) {
+        database.productLiteEntityDao().insertAll(response.asDomain())
+        updateProductsResource()
     }
 
 }

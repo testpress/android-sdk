@@ -3,6 +3,7 @@ package `in`.testpress.store.ui.adatper
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -28,8 +29,14 @@ class ProductListAdapter(context: Context) : ListAdapter<ProductLiteEntity, Prod
         fun bind(product: ProductLiteEntity) {
             binding.title.text = product.title
             binding.price.text = "₹ ${product.price}"
-            binding.totalChapters.text = "${product.chaptersCount} Chapters"
-            binding.totalContents.text = "${product.chaptersCount} Contents"
+            binding.totalChapters.apply {
+                text = "${product.chaptersCount} Chapters"
+                isVisible = product.chaptersCount > 0
+            }
+            binding.totalContents.apply {
+                text = "${product.contentsCount} Contents"
+                isVisible = product.contentsCount > 0
+            }
             imageLoader?.displayImage(product.images?.get(0)?.small, binding.thumbnailImage, ImageUtils.getPlaceholdersOption())
         }
     }

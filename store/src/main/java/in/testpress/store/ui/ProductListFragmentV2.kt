@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -64,9 +65,11 @@ class ProductListFragmentV2 : Fragment() {
         viewModel.products.observe(viewLifecycleOwner) { resource->
             when (resource?.status) {
                 Status.LOADING -> {
-
+                    binding.shimmerViewContainer.isVisible = true
                 }
                 Status.SUCCESS -> {
+                    binding.shimmerViewContainer.isVisible = false
+                    binding.productList.isVisible = true
                     adapter.submitList(resource.data)
                 }
                 Status.ERROR -> {
