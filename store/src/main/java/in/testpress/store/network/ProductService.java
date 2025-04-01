@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
+import in.testpress.store.data.model.NetworkProductListResponse;
 import in.testpress.store.models.NetworkHash;
 import in.testpress.store.models.NetworkOrderStatus;
 import in.testpress.store.models.Order;
@@ -61,6 +62,9 @@ public interface ProductService {
     RetrofitCall<NetworkOrderStatus> refreshOrderStatus(
             @Path(value = "order_id", encoded = true) String orderId,
             @Body HashMap<String, Boolean> arguments);
+
+    @GET("/api/v3/products/")
+    RetrofitCall<NetworkProductListResponse> getProductsV3(@QueryMap Map<String, Object> options);
 }
 
 

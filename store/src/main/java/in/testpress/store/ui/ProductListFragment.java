@@ -25,7 +25,7 @@ public class ProductListFragment extends PagedItemFragment<Product> {
 
     public static void show(FragmentActivity activity, int containerViewId) {
         activity.getSupportFragmentManager().beginTransaction()
-                .replace(containerViewId, new ProductListFragment())
+                .replace(containerViewId, new ProductListFragmentV2())
                 .commitAllowingStateLoss();
     }
 
