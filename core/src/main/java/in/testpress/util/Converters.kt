@@ -1,12 +1,9 @@
 package `in`.testpress.util
 
-import `in`.testpress.database.entities.Answer
-import `in`.testpress.database.entities.OfflineAttemptSection
-import `in`.testpress.database.entities.OfflineUserUploadedFile
-import `in`.testpress.database.entities.Question
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import `in`.testpress.database.entities.*
 
 object Converters {
     @TypeConverter
@@ -116,5 +113,19 @@ object Converters {
     fun toOfflineAttemptSection(value: String?): OfflineAttemptSection? {
         val offlineAttemptSectionType = object : TypeToken<OfflineAttemptSection>() {}.type
         return Gson().fromJson(value, offlineAttemptSectionType)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromImageList(value: List<Image>?): String? {
+        val gson = Gson()
+        return gson.toJson(value)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toImageList(value: String?): List<Image>? {
+        val listType = object : TypeToken<List<Image>>() {}.type
+        return Gson().fromJson(value, listType)
     }
 }

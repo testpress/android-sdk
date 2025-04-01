@@ -35,8 +35,9 @@ import `in`.testpress.database.roommigration.RoomMigration26To27.MIGRATION_26_27
 import `in`.testpress.database.roommigration.RoomMigration27To28.MIGRATION_27_28
 import `in`.testpress.database.roommigration.RoomMigration28To29.MIGRATION_28_29
 import `in`.testpress.database.roommigration.RoomMigration29To30.MIGRATION_29_30
+import `in`.testpress.database.roommigration.RoomMigration30To31.MIGRATION_30_31
 
-@Database(version = 30,
+@Database(version = 31,
         entities = [
             ContentEntity::class,
             OfflineVideo::class,
@@ -66,7 +67,8 @@ import `in`.testpress.database.roommigration.RoomMigration29To30.MIGRATION_29_30
             OfflineCourseAttempt::class,
             OfflineAttempt::class,
             OfflineAttemptSection::class,
-            OfflineAttemptItem::class
+            OfflineAttemptItem::class,
+            ProductLiteEntity::class
         ], exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class TestpressDatabase : RoomDatabase() {
@@ -102,7 +104,7 @@ abstract class TestpressDatabase : RoomDatabase() {
             MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19,
             MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24,
             MIGRATION_24_25, MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29,
-            MIGRATION_29_30
+            MIGRATION_29_30, MIGRATION_30_31
         )
 
         operator fun invoke(context: Context): TestpressDatabase {
