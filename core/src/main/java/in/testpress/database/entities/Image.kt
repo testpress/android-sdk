@@ -1,6 +1,6 @@
-package `in`.testpress.store.data.model
+package `in`.testpress.database.entities
 
-data class NetworkImage(
+data class Image(
     val original: String?,
     val medium: String?,
     val small: String?
