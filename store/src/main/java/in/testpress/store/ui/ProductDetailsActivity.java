@@ -227,8 +227,10 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
         ImageLoader imageLoader = ImageUtils.initImageLoader(this);
         DisplayImageOptions options = ImageUtils.getPlaceholdersOption();
-        imageLoader.displayImage(product.getImages().get(0).getOriginal(), image, options);
-
+        String productImageURL = (product.getImages() != null && !product.getImages().isEmpty())
+                ? product.getImages().get(0).getOriginal()
+                : "";
+        imageLoader.displayImage(productImageURL, image, options);
         titleText.setText(product.getTitle());
         buyButton.setText(product.getBuyNowText());
 
