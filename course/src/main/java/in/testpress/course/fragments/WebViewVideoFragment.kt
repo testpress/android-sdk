@@ -88,7 +88,7 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
     }
 
     open fun loadVideo(content: DomainContent) {
-        val html = if (video?.embedCode?.contains("class=\"fullscreenContent\"") == true) {
+        val html = if (video?.embedCode?.contains("class=\"fullscreen\"") == true) {
             video?.embedCode
         } else {
             "<div style='margin-top: 15px padding-left: 20px padding-right: 20px'" +
