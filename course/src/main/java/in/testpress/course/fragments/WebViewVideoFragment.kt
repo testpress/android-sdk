@@ -17,6 +17,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.CookieManager
 import android.webkit.WebView
 import android.widget.ProgressBar
 import androidx.lifecycle.Observer
@@ -82,6 +83,8 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
         webView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
         webView.setOnLongClickListener { true }
         webView.isLongClickable = false
+        // Enable third-party cookies for embedded code content
+        CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true)
     }
 
     open fun loadVideo(content: DomainContent) {
