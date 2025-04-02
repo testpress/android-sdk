@@ -88,8 +88,12 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
     }
 
     open fun loadVideo(content: DomainContent) {
-        val html = "<div style='margin-top: 15px padding-left: 20px padding-right: 20px'" +
-            "class='videoWrapper'>" + video?.embedCode + "</div>"
+        val html = if (video?.embedCode?.contains("class=\"fullscreenContent\"") == true) {
+            video?.embedCode
+        } else {
+            "<div style='margin-top: 15px padding-left: 20px padding-right: 20px'" +
+                    "class='videoWrapper'>" + video?.embedCode + "</div>"
+        }
 
         webViewUtils.initWebView(html, activity)
         webView.webChromeClient = fullScreenChromeClient
