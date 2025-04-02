@@ -41,7 +41,6 @@ import in.testpress.core.TestpressSession;
 import in.testpress.exam.TestpressExam;
 import in.testpress.models.InstituteSettings;
 import in.testpress.store.R;
-import in.testpress.store.models.Images;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
