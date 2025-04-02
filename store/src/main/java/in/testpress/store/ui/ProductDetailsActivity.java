@@ -41,6 +41,7 @@ import in.testpress.core.TestpressSession;
 import in.testpress.exam.TestpressExam;
 import in.testpress.models.InstituteSettings;
 import in.testpress.store.R;
+import in.testpress.store.models.Images;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
@@ -227,8 +228,10 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
         ImageLoader imageLoader = ImageUtils.initImageLoader(this);
         DisplayImageOptions options = ImageUtils.getPlaceholdersOption();
-        imageLoader.displayImage(product.getImages().get(0).getOriginal(), image, options);
-
+        String productImageURL = (product.getImages() != null && !product.getImages().isEmpty())
+                ? product.getImages().get(0).getOriginal()
+                : "";
+        imageLoader.displayImage(productImageURL, image, options);
         titleText.setText(product.getTitle());
         buyButton.setText(product.getBuyNowText());
 
