@@ -17,6 +17,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.CookieManager
 import android.webkit.WebView
 import android.widget.ProgressBar
 import androidx.lifecycle.Observer
@@ -82,11 +83,17 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
         webView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
         webView.setOnLongClickListener { true }
         webView.isLongClickable = false
+        // Enable third-party cookies for embedded code content
+        CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true)
     }
 
     open fun loadVideo(content: DomainContent) {
-        val html = "<div style='margin-top: 15px padding-left: 20px padding-right: 20px'" +
-            "class='videoWrapper'>" + video?.embedCode + "</div>"
+        val html = if (video?.embedCode?.contains("class=\"fullscreenContent\"") == true) {
+            video?.embedCode
+        } else {
+            "<div style='margin-top: 15px padding-left: 20px padding-right: 20px'" +
+                    "class='videoWrapper'>" + video?.embedCode + "</div>"
+        }
 
         webViewUtils.initWebView(html, activity)
         webView.webChromeClient = fullScreenChromeClient
