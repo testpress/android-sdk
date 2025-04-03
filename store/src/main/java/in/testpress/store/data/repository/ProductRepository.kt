@@ -20,7 +20,6 @@ class ProductRepository(val context: Context) {
     val storeApiClient = StoreApiClient(context)
     val database = TestpressDatabase.invoke(context)
     var page = 1
-    val category = -1
     private var isLoading = false
     private var hasNextPage = true
     private var lastFailedPage: Int? = null
@@ -85,7 +84,7 @@ class ProductRepository(val context: Context) {
     }
 
     private suspend fun handleFetchSuccess(response: NetworkProductListResponse) {
-        if (page == 1 && category == -1) {
+        if (page == 1) {
             // Delete all Products once first page is fetched
             deleteExistingProducts()
         }
