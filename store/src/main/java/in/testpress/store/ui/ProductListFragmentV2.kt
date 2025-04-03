@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -123,5 +124,13 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
 
     override fun onRetryClick() {
         viewModel.retryNextPage()
+    }
+
+    companion object {
+        fun show(activity: FragmentActivity, containerViewId: Int) {
+            activity.supportFragmentManager.beginTransaction()
+                .replace(containerViewId, ProductListFragmentV2())
+                .commitAllowingStateLoss()
+        }
     }
 }

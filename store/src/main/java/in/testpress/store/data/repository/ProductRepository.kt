@@ -97,15 +97,14 @@ class ProductRepository(val context: Context) {
         updateProductsResource()
     }
 
-    private suspend fun updateProductsResource() {
-        val products = database.productLiteEntityDao().getAll()
-        if (products.isEmpty()) return
-        _productsResource.postValue(Resource.success(products))
-    }
-
     private suspend fun storeContent(response: List<NetworkProductLite>) {
         database.productLiteEntityDao().insertAll(response.asDomain())
         updateProductsResource()
+    }
+
+    private suspend fun updateProductsResource() {
+        val products = database.productLiteEntityDao().getAll()
+        _productsResource.postValue(Resource.success(products))
     }
 
 }

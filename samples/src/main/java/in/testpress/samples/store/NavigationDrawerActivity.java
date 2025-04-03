@@ -9,6 +9,8 @@ import in.testpress.samples.BaseNavigationDrawerActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.store.TestpressStore;
+import in.testpress.store.ui.ProductListFragment;
+import in.testpress.store.ui.ProductListFragmentV2;
 
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
 
@@ -25,6 +27,9 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
             case R.id.store:
                 showSDK(R.id.store);
                 break;
+            case R.id.products:
+                showSDK(R.id.products);
+                break;
         }
         super.onDrawerItemSelected(menuItem);
     }
@@ -38,6 +43,12 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                 session.getInstituteSettings().setAccessCodeEnabled(true);
                 TestpressSdk.setTestpressSession(this, session);
                 TestpressStore.show(this, R.id.fragment_container, session);
+            } else if (position == R.id.products) {
+                TestpressSession session = TestpressSdk.getTestpressSession(this);
+                //noinspection ConstantConditions
+                session.getInstituteSettings().setAccessCodeEnabled(true);
+                TestpressSdk.setTestpressSession(this, session);
+                ProductListFragmentV2.Companion.show(this, R.id.fragment_container);
             }
         } else {
             Intent intent = new Intent(this, TestpressCoreSampleActivity.class);
