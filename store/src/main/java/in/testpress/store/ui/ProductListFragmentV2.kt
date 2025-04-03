@@ -14,8 +14,8 @@ import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import `in`.testpress.store.databinding.TestpressProductListFragmentBinding
-import `in`.testpress.store.ui.adatper.FooterState
-import `in`.testpress.store.ui.adatper.ProductListAdapter
+import `in`.testpress.store.ui.adapter.FooterState
+import `in`.testpress.store.ui.adapter.ProductListAdapter
 import `in`.testpress.store.ui.viewmodel.ProductListViewModel
 
 class ProductListFragmentV2 : Fragment(), EmptyViewListener {

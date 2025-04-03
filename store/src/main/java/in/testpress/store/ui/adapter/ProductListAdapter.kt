@@ -1,4 +1,4 @@
-package `in`.testpress.store.ui.adatper
+package `in`.testpress.store.ui.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
