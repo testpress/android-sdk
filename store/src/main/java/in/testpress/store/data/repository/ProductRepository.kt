@@ -15,7 +15,7 @@ import `in`.testpress.store.network.StoreApiClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.withContext
 class ProductRepository(val context: Context) {
     val storeApiClient = StoreApiClient(context)
     val database = TestpressDatabase.invoke(context)
@@ -23,6 +23,7 @@ class ProductRepository(val context: Context) {
     val category = -1
     private var isLoading = false
     private var hasNextPage = true
+    private var lastFailedPage: Int? = null
 
     private var _productsResource: MutableLiveData<Resource<List<ProductLiteEntity>>> = MutableLiveData()
     val productsResource: LiveData<Resource<List<ProductLiteEntity>>>
@@ -33,11 +34,13 @@ class ProductRepository(val context: Context) {
     }
 
     private fun loadFromDatabase() {
-        _productsResource.postValue(Resource.loading(null))
+        _productsResource.value = Resource.loading(null)
         CoroutineScope(Dispatchers.IO).launch {
             val cachedProducts = database.productLiteEntityDao().getAll()
             if (cachedProducts.isNotEmpty()) {
-                _productsResource.postValue(Resource.success(cachedProducts))
+                withContext(Dispatchers.Main){
+                    _productsResource.value = Resource.success(cachedProducts)
+                }
             }
             fetchFromNetwork()
         }
@@ -46,30 +49,38 @@ class ProductRepository(val context: Context) {
     private fun fetchFromNetwork() {
         if (isLoading || !hasNextPage) return
         isLoading = true
-
+        _productsResource.postValue(Resource.loading(null))
         val queryParams = hashMapOf<String, Any>("page" to page)
         storeApiClient.getProductsV3(queryParams)
             .enqueue(object : TestpressCallback<NetworkProductListResponse>(){
                 override fun onSuccess(result: NetworkProductListResponse) {
+                    isLoading = false
+                    hasNextPage = result.next != null
+                    lastFailedPage = null
                     CoroutineScope(Dispatchers.IO).launch {
                         handleFetchSuccess(result)
-                        isLoading = false
-                        hasNextPage = result.next != null
                     }
                 }
 
                 override fun onException(exception: TestpressException?) {
                     isLoading = false
+                    lastFailedPage = page
                     if (_productsResource.value?.data.isNullOrEmpty()) {
                         _productsResource.postValue(Resource.error(exception!!, null))
+                    } else {
+                        _productsResource.postValue(Resource.error(exception!!, _productsResource.value?.data))
                     }
                 }
             })
     }
 
     fun fetchNextPage() {
-        if (isLoading|| !hasNextPage) return
+        if (isLoading || !hasNextPage || lastFailedPage == page) return
         page++
+        fetchFromNetwork()
+    }
+
+    fun retryNextPage() {
         fetchFromNetwork()
     }
 

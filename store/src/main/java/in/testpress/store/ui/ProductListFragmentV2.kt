@@ -1,6 +1,7 @@
 package `in`.testpress.store.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,14 +9,19 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import `in`.testpress.R
 import `in`.testpress.enums.Status
+import `in`.testpress.fragments.EmptyViewFragment
+import `in`.testpress.fragments.EmptyViewListener
 import `in`.testpress.store.databinding.TestpressProductListFragmentBinding
+import `in`.testpress.store.ui.adatper.FooterState
 import `in`.testpress.store.ui.adatper.ProductListAdapter
 import `in`.testpress.store.ui.viewmodel.ProductListViewModel
 
-class ProductListFragmentV2 : Fragment() {
+class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     private var _binding: TestpressProductListFragmentBinding? = null
     private val binding get() = _binding!!
+    private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var viewModel: ProductListViewModel
     private lateinit var adapter: ProductListAdapter
 
@@ -34,12 +40,20 @@ class ProductListFragmentV2 : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initializeEmptyViewFragment()
         setupRecyclerView()
         observeViewModel()
     }
 
+    private fun initializeEmptyViewFragment() {
+        emptyViewFragment = EmptyViewFragment()
+        childFragmentManager.beginTransaction()
+            .replace(R.id.empty_view_container, emptyViewFragment)
+            .commit()
+    }
+
     private fun setupRecyclerView() {
-        adapter = ProductListAdapter(requireContext())
+        adapter = ProductListAdapter(requireContext()) { viewModel.retryNextPage() }
         val layoutManager = LinearLayoutManager(requireContext())
         binding.productList.layoutManager = layoutManager
         binding.productList.adapter = adapter
@@ -65,15 +79,33 @@ class ProductListFragmentV2 : Fragment() {
         viewModel.products.observe(viewLifecycleOwner) { resource->
             when (resource?.status) {
                 Status.LOADING -> {
-                    binding.shimmerViewContainer.isVisible = true
+                    Log.d("TAG", "observeViewModel: Status.LOADING")
+                    binding.emptyViewContainer.isVisible = false
+                    if (adapter.itemCount > 0){
+                        adapter.updateFooterState(FooterState.LOADING)
+                    } else {
+                        binding.shimmerViewContainer.isVisible = true
+                    }
                 }
                 Status.SUCCESS -> {
-                    binding.shimmerViewContainer.isVisible = false
+                    Log.d("TAG", "observeViewModel: Status.SUCCESS")
                     binding.productList.isVisible = true
+                    binding.emptyViewContainer.isVisible = false
+                    binding.shimmerViewContainer.isVisible = false
                     adapter.submitList(resource.data)
+                    adapter.updateFooterState(FooterState.HIDDEN)
                 }
                 Status.ERROR -> {
-
+                    Log.d("TAG", "observeViewModel: Status.ERROR")
+                    binding.shimmerViewContainer.isVisible = false
+                    if (adapter.itemCount > 0) {
+                        binding.productList.isVisible = true
+                        adapter.updateFooterState(FooterState.ERROR)
+                    } else {
+                        binding.productList.isVisible = false
+                        binding.emptyViewContainer.isVisible = true
+                        emptyViewFragment.displayError(resource.exception!!)
+                    }
                 }
                 else -> {}
             }
@@ -83,5 +115,9 @@ class ProductListFragmentV2 : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onRetryClick() {
+        viewModel.retryNextPage()
     }
 }

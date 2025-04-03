@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/shimmer_view_container"
         android:layout_width="match_parent"
@@ -49,12 +48,17 @@
         </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/product_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
         tools:listitem="@layout/testpress_product_list_item"/>
+
+    <FrameLayout
+        android:id="@+id/empty_view_container"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
