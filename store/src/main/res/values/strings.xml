@@ -61,4 +61,7 @@
 
     <string name="testpress_have_access_code">Have Access Code?</string>
 
+    <string name="no_course_title">No courses available to enroll right now</string>
+    <string name="no_course_description">Please do comeback later to see if there are any.</string>
+
 </resources>

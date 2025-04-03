@@ -1,6 +1,7 @@
 package `in`.testpress.store.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,11 +11,11 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import `in`.testpress.R
 import `in`.testpress.core.TestpressException
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
+import `in`.testpress.store.R
 import `in`.testpress.store.databinding.TestpressProductListFragmentBinding
 import `in`.testpress.store.ui.adapter.FooterState
 import `in`.testpress.store.ui.adapter.ProductListAdapter
@@ -90,11 +91,20 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
                     }
                 }
                 Status.SUCCESS -> {
-                    binding.productList.isVisible = true
-                    binding.emptyViewContainer.isVisible = false
-                    binding.shimmerViewContainer.isVisible = false
+                    Log.d("TAG", "observeViewModel: Status.SUCCESS")
                     adapter.submitList(resource.data)
                     adapter.updateFooterState(FooterState.HIDDEN)
+                    if (adapter.currentList.size == 0){
+                        binding.emptyViewContainer.isVisible = true
+                        showEmptyScreen()
+                    } else {
+                        binding.productList.isVisible = true
+                        binding.emptyViewContainer.isVisible = false
+                    }
+                    binding.shimmerViewContainer.isVisible = false
+                    Log.d("TAG", "observeViewModel: Status.SUCCESS adapter.currentList.size${adapter.currentList.size}")
+                    Log.d("TAG", "observeViewModel: Status.SUCCESS resource.data?.size${resource.data?.size}")
+                    Log.d("TAG", "observeViewModel: Status.SUCCESS adapter.itemCount${adapter.itemCount}")
                 }
                 Status.ERROR -> {
                     binding.shimmerViewContainer.isVisible = false
@@ -115,6 +125,12 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
                 else -> {}
             }
         }
+    }
+
+    private fun showEmptyScreen() {
+        emptyViewFragment.setEmptyText(R.string.no_course_title, R.string.no_course_description, null)
+        emptyViewFragment.setImage(R.drawable.empty_cart)
+        emptyViewFragment.showOrHideButton(false)
     }
 
     override fun onDestroyView() {
