@@ -1,12 +1,12 @@
 package `in`.testpress.store.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import `in`.testpress.R
@@ -55,6 +55,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     private fun setupRecyclerView() {
         adapter = ProductListAdapter(requireContext()) { viewModel.retryNextPage() }
         val layoutManager = LinearLayoutManager(requireContext())
+        binding.productList.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         binding.productList.layoutManager = layoutManager
         binding.productList.adapter = adapter
 
@@ -79,7 +80,6 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
         viewModel.products.observe(viewLifecycleOwner) { resource->
             when (resource?.status) {
                 Status.LOADING -> {
-                    Log.d("TAG", "observeViewModel: Status.LOADING")
                     binding.emptyViewContainer.isVisible = false
                     if (adapter.itemCount > 0){
                         adapter.updateFooterState(FooterState.LOADING)
@@ -88,7 +88,6 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
                     }
                 }
                 Status.SUCCESS -> {
-                    Log.d("TAG", "observeViewModel: Status.SUCCESS")
                     binding.productList.isVisible = true
                     binding.emptyViewContainer.isVisible = false
                     binding.shimmerViewContainer.isVisible = false
@@ -96,7 +95,6 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
                     adapter.updateFooterState(FooterState.HIDDEN)
                 }
                 Status.ERROR -> {
-                    Log.d("TAG", "observeViewModel: Status.ERROR")
                     binding.shimmerViewContainer.isVisible = false
                     if (adapter.itemCount > 0) {
                         binding.productList.isVisible = true
