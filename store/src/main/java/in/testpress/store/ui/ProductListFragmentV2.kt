@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import `in`.testpress.R
+import `in`.testpress.core.TestpressException
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
@@ -103,6 +104,11 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
                         binding.productList.isVisible = false
                         binding.emptyViewContainer.isVisible = true
                         emptyViewFragment.displayError(resource.exception!!)
+                        resource.exception?.let {
+                            emptyViewFragment.displayError(it)
+                        } ?: emptyViewFragment.displayError(
+                            TestpressException.unexpectedWebViewError(UnknownError())
+                        )
                     }
                 }
                 else -> {}

@@ -79,7 +79,7 @@ class ProductListAdapter(
                 isVisible = product.contentsCount > 0
             }
             imageLoader?.displayImage(
-                product.images?.get(0)?.small,
+                product.images?.firstOrNull()?.small,
                 binding.thumbnailImage,
                 ImageUtils.getPlaceholdersOption()
             )
