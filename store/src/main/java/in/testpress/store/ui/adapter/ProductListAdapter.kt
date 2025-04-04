@@ -19,65 +19,64 @@ class ProductListAdapter(
 ) : ListAdapter<ProductLiteEntity, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
 
     private val imageLoader: ImageLoader? = ImageUtils.initImageLoader(context)
-
-    private val ITEM_VIEW = 1
-    private val FOOTER_VIEW = 2
     private var footerState = FooterState.HIDDEN
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == currentList.size) FOOTER_VIEW else ITEM_VIEW
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return if (viewType == FOOTER_VIEW) {
-            val binding = ListViewFooterLoadingBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-            FooterViewHolder(binding, onRetry)
-        } else {
-            val binding = TestpressProductListItemBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-            ProductViewHolder(binding)
-        }
-    }
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is ProductViewHolder) {
-            holder.bind(getItem(position))
-        } else if (holder is FooterViewHolder) {
-            holder.bind(footerState)
-        }
-    }
-
-    fun updateFooterState(newState: FooterState) {
-        if (footerState == newState) return
-        footerState = newState
-        notifyItemChanged(currentList.size)
+        return if (position == currentList.size) VIEW_TYPE_FOOTER else VIEW_TYPE_ITEM
     }
 
     override fun getItemCount(): Int {
         return currentList.size + if (footerState == FooterState.HIDDEN) 0 else 1
     }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
 
-    inner class ProductViewHolder(private val binding: TestpressProductListItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+        return when (viewType) {
+            VIEW_TYPE_FOOTER -> {
+                val binding = ListViewFooterLoadingBinding.inflate(inflater, parent, false)
+                FooterViewHolder(binding, onRetry)
+            }
+            else -> {
+                val binding = TestpressProductListItemBinding.inflate(inflater, parent, false)
+                ProductViewHolder(binding, imageLoader)
+            }
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (holder) {
+            is ProductViewHolder -> holder.bind(getItem(position))
+            is FooterViewHolder -> holder.bind(footerState)
+        }
+    }
+
+    fun updateFooterState(newState: FooterState) {
+        if (footerState != newState) {
+            footerState = newState
+            notifyItemChanged(currentList.size)
+        }
+    }
+
+    private class ProductViewHolder(
+        private val binding: TestpressProductListItemBinding,
+        private val imageLoader: ImageLoader?
+    ) : RecyclerView.ViewHolder(binding.root) {
+
         fun bind(product: ProductLiteEntity) {
             binding.title.text = product.title
             binding.price.text = "₹ ${product.price}"
+
             binding.totalChapters.apply {
-                text = "${product.chaptersCount} Chapters"
                 isVisible = product.chaptersCount > 0
+                text = "${product.chaptersCount} Chapters"
             }
+
             binding.totalContents.apply {
-                text = "${product.contentsCount} Contents"
                 isVisible = product.contentsCount > 0
+                text = "${product.contentsCount} Contents"
             }
+
             imageLoader?.displayImage(
                 product.images?.firstOrNull()?.small,
                 binding.thumbnailImage,
@@ -86,34 +85,27 @@ class ProductListAdapter(
         }
     }
 
-    class FooterViewHolder(
+    private class FooterViewHolder(
         private val binding: ListViewFooterLoadingBinding,
         private val onRetry: () -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(state: FooterState) {
-            when (state) {
-                FooterState.LOADING -> {
-                    binding.progressBar.isVisible = true
-                    binding.errorMessageContainer.isVisible = false
-                    binding.retryButton.isVisible = false
-                }
-                FooterState.ERROR -> {
-                    binding.progressBar.isVisible = false
-                    binding.errorMessageContainer.isVisible = true
-                    binding.retryButton.isVisible = true
-                    binding.retryButton.setOnClickListener { onRetry() }
-                }
-                FooterState.HIDDEN -> {
-                    binding.progressBar.isVisible = false
-                    binding.errorMessageContainer.isVisible = false
-                    binding.retryButton.isVisible = false
-                }
+            binding.progressBar.isVisible = state == FooterState.LOADING
+            binding.errorMessageContainer.isVisible = state == FooterState.ERROR
+            binding.retryButton.isVisible = state == FooterState.ERROR
+
+            if (state == FooterState.ERROR) {
+                binding.retryButton.setOnClickListener { onRetry() }
             }
         }
     }
 
     companion object {
+
+        private const val VIEW_TYPE_ITEM = 1
+        private const val VIEW_TYPE_FOOTER = 2
+
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ProductLiteEntity>() {
             override fun areItemsTheSame(
                 oldItem: ProductLiteEntity,
