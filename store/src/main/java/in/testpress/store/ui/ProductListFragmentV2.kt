@@ -1,7 +1,6 @@
 package `in`.testpress.store.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -97,7 +96,6 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     }
 
     private fun handleLoadingState() {
-        Log.d("TAG", "handleLoadingState: ")
         binding.emptyViewContainer.isVisible = false
         if (productListAdapter.itemCount > 0) {
             productListAdapter.updateFooterState(FooterState.LOADING)
@@ -107,7 +105,6 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     }
 
     private fun handleSuccessState(data: List<ProductLiteEntity>?) {
-        Log.d("TAG", "handleSuccessState: ")
         productListAdapter.submitList(data)
         productListAdapter.updateFooterState(FooterState.HIDDEN)
         if (productListAdapter.itemCount == 0) {
@@ -118,11 +115,9 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
             binding.emptyViewContainer.isVisible = false
         }
         binding.shimmerViewContainer.isVisible = false
-        Log.d("TAG", "handleSuccessState: ${productListAdapter.itemCount}")
     }
 
     private fun handleErrorState(exception: TestpressException?) {
-        Log.d("TAG", "handleErrorState: ")
         binding.shimmerViewContainer.isVisible = false
         if (productListAdapter.itemCount > 0) {
             binding.productList.isVisible = true
