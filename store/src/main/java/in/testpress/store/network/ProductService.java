@@ -1,9 +1,11 @@
 package in.testpress.store.network;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
+import in.testpress.store.data.model.NetworkProductCategory;
 import in.testpress.store.data.model.NetworkProductListResponse;
 import in.testpress.store.models.NetworkHash;
 import in.testpress.store.models.NetworkOrderStatus;
@@ -24,6 +26,7 @@ import static in.testpress.store.network.StoreApiClient.ORDER_API_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDER_CONFIRM_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDER_STATE_REFRESH_PATH;
 import static in.testpress.store.network.StoreApiClient.PAYU_HASH_GENERATOR_PATH;
+import static in.testpress.store.network.StoreApiClient.V2_5_PRODUCTS_CATEGORIES_PATH;
 import static in.testpress.store.network.StoreApiClient.v2_4_ORDERS_PATH;
 import static in.testpress.store.network.StoreApiClient.v3_ORDERS_PATH;
 
@@ -65,6 +68,11 @@ public interface ProductService {
 
     @GET("/api/v3/products/")
     RetrofitCall<NetworkProductListResponse> getProductsV3(@QueryMap Map<String, Object> options);
+
+    @GET(V2_5_PRODUCTS_CATEGORIES_PATH)
+    RetrofitCall<ApiResponse<List<NetworkProductCategory>>> getProductsCategories(
+            @QueryMap Map<String, Object> options
+    );
 }
 
 
