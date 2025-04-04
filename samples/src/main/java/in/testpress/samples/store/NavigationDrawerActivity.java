@@ -9,7 +9,6 @@ import in.testpress.samples.BaseNavigationDrawerActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.store.TestpressStore;
-import in.testpress.store.ui.ProductListFragment;
 import in.testpress.store.ui.ProductListFragmentV2;
 
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
