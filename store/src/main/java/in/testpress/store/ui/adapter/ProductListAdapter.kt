@@ -52,10 +52,24 @@ class ProductListAdapter(
     }
 
     fun updateFooterState(newState: FooterState) {
-        if (footerState != newState) {
-            footerState = newState
-            notifyItemChanged(currentList.size)
+        if (footerState == newState) return
+
+        val oldState = footerState
+        footerState = newState
+
+        when {
+            isFooterBecomingVisible(oldState, newState) -> notifyItemInserted(currentList.size)
+            isFooterBecomingHidden(oldState, newState) -> notifyItemRemoved(currentList.size)
+            else -> notifyItemChanged(currentList.size)
         }
+    }
+
+    private fun isFooterBecomingVisible(oldState: FooterState, newState: FooterState): Boolean {
+        return oldState == FooterState.HIDDEN && newState != FooterState.HIDDEN
+    }
+
+    private fun isFooterBecomingHidden(oldState: FooterState, newState: FooterState): Boolean {
+        return oldState != FooterState.HIDDEN && newState == FooterState.HIDDEN
     }
 
     private class ProductViewHolder(
