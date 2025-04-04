@@ -16,15 +16,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 class ProductRepository(val context: Context) {
-    val storeApiClient = StoreApiClient(context)
-    val database = TestpressDatabase.invoke(context)
-    var page = 1
+
+    private val storeApiClient = StoreApiClient(context)
+    private val database = TestpressDatabase.invoke(context)
+
+    private var currentPage = 1
     private var isLoading = false
     private var hasNextPage = true
     private var lastFailedPage: Int? = null
 
-    private var _productsResource: MutableLiveData<Resource<List<ProductLiteEntity>>> = MutableLiveData()
+    private var _productsResource: MutableLiveData<Resource<List<ProductLiteEntity>>> =
+        MutableLiveData()
     val productsResource: LiveData<Resource<List<ProductLiteEntity>>>
         get() = _productsResource
 
@@ -37,7 +41,7 @@ class ProductRepository(val context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             val cachedProducts = database.productLiteEntityDao().getAll()
             if (cachedProducts.isNotEmpty()) {
-                withContext(Dispatchers.Main){
+                withContext(Dispatchers.Main) {
                     _productsResource.value = Resource.success(cachedProducts)
                 }
             }
@@ -45,37 +49,9 @@ class ProductRepository(val context: Context) {
         }
     }
 
-    private fun fetchFromNetwork() {
-        if (isLoading || !hasNextPage) return
-        isLoading = true
-        _productsResource.postValue(Resource.loading(null))
-        val queryParams = hashMapOf<String, Any>("page" to page)
-        storeApiClient.getProductsV3(queryParams)
-            .enqueue(object : TestpressCallback<NetworkProductListResponse>(){
-                override fun onSuccess(result: NetworkProductListResponse) {
-                    isLoading = false
-                    hasNextPage = result.next != null
-                    lastFailedPage = null
-                    CoroutineScope(Dispatchers.IO).launch {
-                        handleFetchSuccess(result)
-                    }
-                }
-
-                override fun onException(exception: TestpressException?) {
-                    isLoading = false
-                    lastFailedPage = page
-                    if (_productsResource.value?.data.isNullOrEmpty()) {
-                        _productsResource.postValue(Resource.error(exception!!, null))
-                    } else {
-                        _productsResource.postValue(Resource.error(exception!!, _productsResource.value?.data))
-                    }
-                }
-            })
-    }
-
     fun fetchNextPage() {
-        if (isLoading || !hasNextPage || lastFailedPage == page) return
-        page++
+        if (isLoading || !hasNextPage || lastFailedPage == currentPage) return
+        currentPage++
         fetchFromNetwork()
     }
 
@@ -83,28 +59,55 @@ class ProductRepository(val context: Context) {
         fetchFromNetwork()
     }
 
-    private suspend fun handleFetchSuccess(response: NetworkProductListResponse) {
-        if (page == 1) {
-            // Delete all Products once first page is fetched
-            deleteExistingProducts()
-        }
+    private fun fetchFromNetwork() {
+        if (isLoading || !hasNextPage) return
 
-        storeContent(response.results.products)
+        isLoading = true
+        _productsResource.postValue(Resource.loading(null))
+
+        val queryParams = hashMapOf<String, Any>("page" to currentPage)
+
+        storeApiClient.getProductsV3(queryParams)
+            .enqueue(object : TestpressCallback<NetworkProductListResponse>() {
+
+                override fun onSuccess(result: NetworkProductListResponse) {
+                    isLoading = false
+                    hasNextPage = result.next != null
+                    lastFailedPage = null
+                    CoroutineScope(Dispatchers.IO).launch {
+                        handleSuccessfulResponse(result)
+                    }
+                }
+
+                override fun onException(exception: TestpressException?) {
+                    isLoading = false
+                    lastFailedPage = currentPage
+
+                    val currentData = _productsResource.value?.data
+                    _productsResource.postValue(Resource.error(exception!!, currentData))
+                }
+            })
     }
 
-    private suspend fun deleteExistingProducts() {
+    private suspend fun handleSuccessfulResponse(response: NetworkProductListResponse) {
+        if (currentPage == 1) {
+            clearLocalProducts()
+        }
+        saveProductsToDatabase(response.results.products)
+        updateProductsResourceFromDatabase()
+    }
+
+    private suspend fun clearLocalProducts() {
         database.productLiteEntityDao().deleteAll()
     }
 
-    private suspend fun storeContent(response: List<NetworkProductLite>) {
-        database.productLiteEntityDao().insertAll(response.asDomain())
-        updateProductsResource()
+    private suspend fun saveProductsToDatabase(products: List<NetworkProductLite>) {
+        database.productLiteEntityDao().insertAll(products.asDomain())
     }
 
-    private suspend fun updateProductsResource() {
-        val products = database.productLiteEntityDao().getAll()
-        _productsResource.postValue(Resource.success(products))
+    private suspend fun updateProductsResourceFromDatabase() {
+        val updatedProducts = database.productLiteEntityDao().getAll()
+        _productsResource.postValue(Resource.success(updatedProducts))
     }
 
 }
-
