@@ -93,7 +93,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
                 Status.SUCCESS -> {
                     adapter.submitList(resource.data)
                     adapter.updateFooterState(FooterState.HIDDEN)
-                    if (adapter.currentList.size == 0){
+                    if (adapter.itemCount == 0){
                         binding.emptyViewContainer.isVisible = true
                         showEmptyScreen()
                     } else {
