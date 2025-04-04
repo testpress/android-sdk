@@ -15,6 +15,11 @@
             android:title="@string/store" />
 
         <item
+            android:id="@+id/products"
+            android:icon="@drawable/ic_store_black_24dp"
+            android:title="Products" />
+
+        <item
             android:id="@+id/logout"
             android:icon="@drawable/ic_power_settings_new_black_24dp"
             android:title="@string/logout" />

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:id="@+id/product_item_layout"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:paddingBottom="20dp"
+    android:paddingTop="20dp" >
+
+    <ImageView
+        android:id="@+id/thumbnail_image"
+        android:layout_width="160dp"
+        android:layout_height="90dp"
+        android:layout_marginRight="10dp"
+        android:background="@color/testpress_gray_light"
+        android:scaleType="fitCenter" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/title"
+            android:text=""
+            android:layout_width="match_parent"
+            android:textSize="16sp"
+            android:textColor="@color/testpress_black"
+            android:background="@color/testpress_gray_light"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:layout_marginBottom="5dp"
+            android:gravity="top"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/price"
+            android:text="                  "
+            android:layout_marginLeft="0dp"
+            android:textSize="16sp"
+            android:background="@color/testpress_gray_light"
+            android:gravity="top"
+            android:layout_width="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_height="wrap_content"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            android:weightSum="2"
+            android:id="@+id/counts" >
+
+            <TextView
+                android:id="@+id/total_chapters"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawablePadding="5dp"
+                android:background="@color/testpress_gray_light"
+                android:text="                                           "
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/total_contents"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="4dp"
+                android:drawablePadding="5dp"
+                android:background="@color/testpress_gray_light"
+                android:text="                                        "
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
