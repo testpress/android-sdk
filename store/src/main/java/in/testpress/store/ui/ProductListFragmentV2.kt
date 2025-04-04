@@ -91,7 +91,6 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
                     }
                 }
                 Status.SUCCESS -> {
-                    Log.d("TAG", "observeViewModel: Status.SUCCESS")
                     adapter.submitList(resource.data)
                     adapter.updateFooterState(FooterState.HIDDEN)
                     if (adapter.currentList.size == 0){
@@ -102,9 +101,6 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
                         binding.emptyViewContainer.isVisible = false
                     }
                     binding.shimmerViewContainer.isVisible = false
-                    Log.d("TAG", "observeViewModel: Status.SUCCESS adapter.currentList.size${adapter.currentList.size}")
-                    Log.d("TAG", "observeViewModel: Status.SUCCESS resource.data?.size${resource.data?.size}")
-                    Log.d("TAG", "observeViewModel: Status.SUCCESS adapter.itemCount${adapter.itemCount}")
                 }
                 Status.ERROR -> {
                     binding.shimmerViewContainer.isVisible = false

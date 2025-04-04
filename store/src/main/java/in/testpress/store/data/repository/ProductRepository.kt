@@ -94,7 +94,6 @@ class ProductRepository(val context: Context) {
 
     private suspend fun deleteExistingProducts() {
         database.productLiteEntityDao().deleteAll()
-        //updateProductsResource()
     }
 
     private suspend fun storeContent(response: List<NetworkProductLite>) {
