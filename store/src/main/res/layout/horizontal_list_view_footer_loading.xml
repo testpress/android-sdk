@@ -1,38 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="118dp"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:fitsSystemWindows="true"
-    android:padding="8dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="88dp"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
 
     <ProgressBar
         android:id="@+id/progress_bar"
         style="?android:attr/progressBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
+        android:layout_width="40dp"
+        android:layout_height="40dp"/>
 
-    <androidx.appcompat.widget.AppCompatButton
+    <com.google.android.material.chip.Chip
+        android:id="@+id/retry_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/testpress_tap_to_retry"
-        android:id="@+id/retry_button"
-        android:textSize="11sp"
-        android:textColor="@color/testpress_button_text_color"
-        android:layout_gravity="center_horizontal"
-        />
+        android:layout_margin="4dp"
+        android:text="Retry"
+        android:textColor="?attr/colorError"
+        app:chipBackgroundColor="@android:color/transparent"
+        app:chipIcon="@drawable/ic_refresh_black_18dp"
+        app:chipIconTint="?attr/colorError"
+        app:chipIconVisible="true"
+        app:chipStrokeColor="?attr/colorError"
+        app:chipStrokeWidth="1dp"
+        app:closeIconVisible="false"/>
 
 </LinearLayout>
-
-<!--<item name="android:layout_width">wrap_content</item>-->
-<!--<item name="android:layout_height">wrap_content</item>-->
-<!--<item name="android:textStyle">bold</item>-->
-<!--<item name="android:textSize">13sp</item>-->
-<!--<item name="textAllCaps">true</item>-->
-<!--<item name="android:gravity">center</item>-->
-<!--<item name="android:minHeight">0dp</item>-->
-<!--<item name="android:minWidth">80dp</item>-->
-<!--<item name="android:padding">12dp</item>-->
-<!--<item name="android:textColor">@color/testpress_button_text_color</item>-->

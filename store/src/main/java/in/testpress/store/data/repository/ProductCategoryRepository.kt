@@ -41,6 +41,7 @@ class ProductCategoryRepository(val context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             val cachedCategories = database.productCategoryDao().getAll()
             if (cachedCategories.isNotEmpty()) {
+                cachedCategories.add(0,ProductCategoryEntity(id = -1,name = "All Products"))
                 withContext(Dispatchers.Main) {
                     _categoriesResource.value = Resource.success(cachedCategories)
                 }
@@ -107,6 +108,7 @@ class ProductCategoryRepository(val context: Context) {
 
     private suspend fun updateProductsResourceFromDatabase() {
         val updatedProducts = database.productCategoryDao().getAll()
+        updatedProducts.add(0,ProductCategoryEntity(id = -1,name = "All Products"))
         _categoriesResource.postValue(Resource.success(updatedProducts))
     }
 

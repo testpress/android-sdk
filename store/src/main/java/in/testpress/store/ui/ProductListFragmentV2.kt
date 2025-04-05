@@ -71,7 +71,12 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
         }
         addPaginationScrollListener(layoutManager)
 
-        categoriesAdapter = ProductCategoryAdapter(requireContext()) { categoriesViewModel.retryNextPage() }
+        categoriesAdapter = ProductCategoryAdapter(
+            onRetry = { categoriesViewModel.retryNextPage() },
+            onCategorySelected = {
+                Log.d("TAG", "setupRecyclerView: ${it.name}")
+            }
+        )
         val layoutManager1 = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.productCategoriesList.apply {
             this.adapter = this@ProductListFragmentV2.categoriesAdapter

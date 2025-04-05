@@ -1,6 +1,5 @@
 package `in`.testpress.store.ui.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -9,15 +8,15 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import `in`.testpress.database.entities.ProductCategoryEntity
 import `in`.testpress.store.databinding.HorizontalListViewFooterLoadingBinding
-import `in`.testpress.store.databinding.ListViewFooterLoadingBinding
 import `in`.testpress.store.databinding.ProductCategoriesListItemBinding
 
 class ProductCategoryAdapter(
-    context: Context,
-    private val onRetry: () -> Unit
+    private val onRetry: () -> Unit,
+    private val onCategorySelected: (ProductCategoryEntity) -> Unit
 ) : ListAdapter<ProductCategoryEntity, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
 
     private var footerState = FooterState.HIDDEN
+    var selectedCategoryPosition = 0
 
     override fun getItemViewType(position: Int): Int {
         return if (position == currentList.size) VIEW_TYPE_FOOTER else VIEW_TYPE_ITEM
@@ -44,7 +43,7 @@ class ProductCategoryAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is ProductCategoriesViewHolder -> holder.bind(getItem(position))
+            is ProductCategoriesViewHolder -> holder.bind(getItem(position), position)
             is FooterViewHolder -> holder.bind(footerState)
         }
     }
@@ -70,13 +69,24 @@ class ProductCategoryAdapter(
         return oldState != FooterState.HIDDEN && newState == FooterState.HIDDEN
     }
 
-    private class ProductCategoriesViewHolder(
+    inner class ProductCategoriesViewHolder(
         private val binding: ProductCategoriesListItemBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(category: ProductCategoryEntity) {
+        fun bind(category: ProductCategoryEntity, position: Int) {
             binding.category.text = category.name
-            // TODO: Add Click listener
+            binding.category.isChecked = selectedCategoryPosition == position
+
+            binding.category.setOnClickListener {
+                if (selectedCategoryPosition != position) {
+                    val previousSelected = selectedCategoryPosition
+                    selectedCategoryPosition = position
+                    notifyItemChanged(previousSelected)
+                    notifyItemChanged(position)
+
+                    onCategorySelected(category)
+                }
+            }
         }
     }
 
