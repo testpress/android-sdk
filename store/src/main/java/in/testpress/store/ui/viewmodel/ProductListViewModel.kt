@@ -8,7 +8,7 @@ import `in`.testpress.store.data.repository.ProductRepository
 
 class ProductListViewModel(private val repository: ProductRepository) : ViewModel() {
 
-    val products = repository.productsResource
+    val products = repository.resource
 
     fun fetchNextPage() {
         repository.fetchNextPage()

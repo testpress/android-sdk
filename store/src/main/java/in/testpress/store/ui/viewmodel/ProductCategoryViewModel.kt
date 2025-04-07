@@ -7,7 +7,7 @@ import `in`.testpress.store.data.repository.ProductCategoryRepository
 
 class ProductCategoryViewModel(private val repository: ProductCategoryRepository) : ViewModel() {
 
-    val categories = repository.categoriesResource
+    val categories = repository.resource
 
     fun fetchNextPage() {
         repository.fetchNextPage()
