@@ -26,11 +26,7 @@ abstract class BasePaginatedRepository<NetworkResponseT, DomainEntityT>(
     protected val _resource = MutableLiveData<Resource<List<DomainEntityT>>>()
     val resource: LiveData<Resource<List<DomainEntityT>>> get() = _resource
 
-    init {
-        loadFromDatabase()
-    }
-
-    private fun loadFromDatabase() {
+    protected fun loadFromDatabase() {
         _resource.value = Resource.loading(null)
         scope.launch {
             val cached = getFromDb()
