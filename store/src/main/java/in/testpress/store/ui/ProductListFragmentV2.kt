@@ -25,12 +25,12 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     private var _binding: TestpressProductListFragmentBinding? = null
     private val binding get() = _binding!!
     private lateinit var emptyViewFragment: EmptyViewFragment
-    private lateinit var productListViewModel: ProductListViewModel
-    private lateinit var productListAdapter: ProductListAdapter
+    private lateinit var productsViewModel: ProductListViewModel
+    private lateinit var productsAdapter: ProductListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        productListViewModel = ProductListViewModel.init(requireActivity());
+        productsViewModel = ProductListViewModel.init(requireActivity());
     }
 
     override fun onCreateView(
@@ -44,8 +44,8 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupEmptyViewFragment()
-        setupRecyclerView()
-        observeViewModel()
+        setupProductList()
+        observeViewModels()
     }
 
     private fun setupEmptyViewFragment() {
@@ -55,82 +55,97 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
             .commit()
     }
 
-    private fun setupRecyclerView() {
-        productListAdapter = ProductListAdapter(requireContext()) { productListViewModel.retryNextPage() }
+    private fun setupProductList() {
+        productsAdapter = ProductListAdapter(requireContext()) {
+            productsViewModel.retryNextPage()
+        }
+
         val layoutManager = LinearLayoutManager(requireContext())
         binding.productList.apply {
-            adapter = productListAdapter
+            adapter = productsAdapter
             this.layoutManager = layoutManager
-            this.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+            addOnScrollListener(getPaginationScrollListener(layoutManager) {
+                productsViewModel.fetchNextPage()
+            })
         }
-        addPaginationScrollListener(layoutManager)
     }
 
-    private fun addPaginationScrollListener(layoutManager: LinearLayoutManager) {
-        binding.productList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (dy > 0 && isAtEndOfList(layoutManager)) {
-                    productListViewModel.fetchNextPage()
-                }
+    private fun getPaginationScrollListener(
+        layoutManager: LinearLayoutManager,
+        onEndReached: () -> Unit
+    ) = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            val scrollForward = dx > 0 || dy > 0
+            if (scrollForward && isEndOfListReached(layoutManager)) {
+                onEndReached()
             }
-        })
+        }
     }
 
-    private fun isAtEndOfList(layoutManager: LinearLayoutManager): Boolean {
+    private fun isEndOfListReached(layoutManager: LinearLayoutManager): Boolean {
         val visibleItemCount = layoutManager.childCount
         val totalItemCount = layoutManager.itemCount
         val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
-        return (visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0
+        return (visibleItemCount + firstVisibleItemPosition) >= totalItemCount &&
+                firstVisibleItemPosition >= 0
     }
 
-    private fun observeViewModel() {
-        productListViewModel.products.observe(viewLifecycleOwner) { resource ->
+    private fun observeViewModels() {
+        observeProducts()
+    }
+
+    private fun observeProducts() {
+        productsViewModel.products.observe(viewLifecycleOwner) { resource ->
             when (resource?.status) {
-                Status.LOADING -> handleLoadingState()
-                Status.SUCCESS -> handleSuccessState(resource.data)
-                Status.ERROR -> handleErrorState(resource.exception)
-                else -> { /* No-op */ }
+                Status.LOADING -> showProductLoading()
+                Status.SUCCESS -> showProductSuccess(resource.data)
+                Status.ERROR -> showProductError(resource.exception)
+                else -> Unit
             }
         }
     }
 
-    private fun handleLoadingState() {
+    private fun showProductLoading() {
         binding.emptyViewContainer.isVisible = false
-        if (productListAdapter.itemCount > 0) {
-            productListAdapter.updateFooterState(FooterState.LOADING)
+        if (productsAdapter.itemCount > 0) {
+            productsAdapter.updateFooterState(FooterState.LOADING)
         } else {
             binding.shimmerViewContainer.isVisible = true
         }
     }
 
-    private fun handleSuccessState(data: List<ProductLiteEntity>?) {
-        productListAdapter.submitList(data)
-        productListAdapter.updateFooterState(FooterState.HIDDEN)
-        if (productListAdapter.itemCount == 0) {
-            binding.emptyViewContainer.isVisible = true
-            displayEmptyScreen()
+    private fun showProductSuccess(products: List<ProductLiteEntity>?) {
+        productsAdapter.submitList(products)
+        productsAdapter.updateFooterState(FooterState.HIDDEN)
+
+        binding.shimmerViewContainer.isVisible = false
+        binding.emptyViewContainer.isVisible = products.isNullOrEmpty()
+
+        if (products.isNullOrEmpty()) {
+            showEmptyState()
         } else {
             binding.productList.isVisible = true
-            binding.emptyViewContainer.isVisible = false
         }
-        binding.shimmerViewContainer.isVisible = false
     }
 
-    private fun handleErrorState(exception: TestpressException?) {
+    private fun showProductError(exception: TestpressException?) {
         binding.shimmerViewContainer.isVisible = false
-        if (productListAdapter.itemCount > 0) {
+
+        if (productsAdapter.itemCount > 0) {
             binding.productList.isVisible = true
-            productListAdapter.updateFooterState(FooterState.ERROR)
+            productsAdapter.updateFooterState(FooterState.ERROR)
         } else {
             binding.productList.isVisible = false
             binding.emptyViewContainer.isVisible = true
-            val errorToDisplay = exception ?: TestpressException.unexpectedWebViewError(UnknownError())
-            emptyViewFragment.displayError(errorToDisplay)
+            emptyViewFragment.displayError(
+                exception ?: TestpressException.unexpectedWebViewError(UnknownError())
+            )
         }
     }
 
-    private fun displayEmptyScreen() {
+    private fun showEmptyState() {
         emptyViewFragment.apply {
             setEmptyText(R.string.no_course_title, R.string.no_course_description, null)
             setImage(R.drawable.empty_cart)
@@ -144,7 +159,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     }
 
     override fun onRetryClick() {
-        productListViewModel.retryNextPage()
+        productsViewModel.retryNextPage()
     }
 
     companion object {
