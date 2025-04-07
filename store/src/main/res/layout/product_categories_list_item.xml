@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:checkable="true"
-        android:text="ProductCategories"
+        android:text="@string/product_categories"
         android:textAppearance="@style/testpress_category_font_style"
         android:textColor="@drawable/testpress_category_chip_text_colour"
         app:checkedIconVisible="false"
