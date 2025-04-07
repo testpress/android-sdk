@@ -144,6 +144,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     }
 
     private fun showCategoryLoading() {
+        binding.productCategoriesLayout.isVisible = true
         if (categoriesAdapter.itemCount > 0) {
             categoriesAdapter.updateFooterState(FooterState.LOADING)
         } else {
@@ -152,6 +153,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     }
 
     private fun showCategorySuccess(categories: List<ProductCategoryEntity>?) {
+        binding.productCategoriesLayout.isVisible = true
         categoriesAdapter.submitList(categories)
         categoriesAdapter.updateFooterState(FooterState.HIDDEN)
         binding.productCategoriesList.isVisible = categoriesAdapter.itemCount > 0
@@ -164,11 +166,12 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
             binding.productCategoriesList.isVisible = true
             categoriesAdapter.updateFooterState(FooterState.ERROR)
         } else {
-            binding.productCategoriesList.isVisible = false
+            binding.productCategoriesLayout.isVisible = false
         }
     }
 
     private fun showProductLoading() {
+        binding.productsLayout.isVisible = true
         binding.emptyViewContainer.isVisible = false
         if (productsAdapter.itemCount > 0) {
             productsAdapter.updateFooterState(FooterState.LOADING)
@@ -178,6 +181,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     }
 
     private fun showProductSuccess(products: List<ProductLiteEntity>?) {
+        binding.productsLayout.isVisible = true
         productsAdapter.submitList(products)
         productsAdapter.updateFooterState(FooterState.HIDDEN)
 
@@ -198,7 +202,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
             binding.productList.isVisible = true
             productsAdapter.updateFooterState(FooterState.ERROR)
         } else {
-            binding.productList.isVisible = false
+            binding.productsLayout.isVisible = false
             binding.emptyViewContainer.isVisible = true
             emptyViewFragment.displayError(
                 exception ?: TestpressException.unexpectedWebViewError(UnknownError())
@@ -221,6 +225,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
 
     override fun onRetryClick() {
         productsViewModel.retryNextPage()
+        categoriesViewModel.retryNextPage()
     }
 
     companion object {

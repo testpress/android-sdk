@@ -22,14 +22,8 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    >
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
                     <include
                         layout="@layout/testpress_product_category_chip_placholder">
@@ -43,44 +37,6 @@
                     <include
                         layout="@layout/testpress_product_category_chip_placholder">
                     </include>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    >
-
-                    <include
-                        layout="@layout/testpress_list_placholder">
-                    </include>
-                    <include
-                        layout="@layout/testpress_list_placholder">
-                    </include>
-                    <include
-                        layout="@layout/testpress_list_placholder">
-                    </include>
-                    <include
-                        layout="@layout/testpress_list_placholder">
-                    </include>
-                    <include
-                        layout="@layout/testpress_list_placholder">
-                    </include>
-                    <include
-                        layout="@layout/testpress_list_placholder">
-                    </include>
-                    <include
-                        layout="@layout/testpress_list_placholder">
-                    </include>
-                    <include
-                        layout="@layout/testpress_list_placholder">
-                    </include>
-                    <include
-                        layout="@layout/testpress_list_placholder">
-                    </include>
-
-                </LinearLayout>
 
             </LinearLayout>
 
@@ -90,12 +46,14 @@
             android:id="@+id/product_categories_list"
             android:paddingStart="20dp"
             android:clipToPadding="false"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
     </androidx.cardview.widget.CardView>
 
     <LinearLayout
+        android:id="@+id/products_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
