@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import `in`.testpress.core.TestpressException
+import `in`.testpress.database.entities.ProductCategoryEntity
 import `in`.testpress.database.entities.ProductLiteEntity
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
@@ -18,7 +19,9 @@ import `in`.testpress.fragments.EmptyViewListener
 import `in`.testpress.store.R
 import `in`.testpress.store.databinding.TestpressProductListFragmentBinding
 import `in`.testpress.store.ui.adapter.FooterState
+import `in`.testpress.store.ui.adapter.ProductCategoryAdapter
 import `in`.testpress.store.ui.adapter.ProductListAdapter
+import `in`.testpress.store.ui.viewmodel.ProductCategoryViewModel
 import `in`.testpress.store.ui.viewmodel.ProductListViewModel
 
 class ProductListFragmentV2 : Fragment(), EmptyViewListener {
@@ -26,11 +29,14 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     private val binding get() = _binding!!
     private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var productsViewModel: ProductListViewModel
+    private lateinit var categoriesViewModel: ProductCategoryViewModel
     private lateinit var productsAdapter: ProductListAdapter
+    private lateinit var categoriesAdapter: ProductCategoryAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        productsViewModel = ProductListViewModel.init(requireActivity());
+        productsViewModel = ProductListViewModel.init(requireActivity())
+        categoriesViewModel = ProductCategoryViewModel.init(requireActivity())
     }
 
     override fun onCreateView(
@@ -44,6 +50,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupEmptyViewFragment()
+        setupCategoryList()
         setupProductList()
         observeViewModels()
     }
@@ -54,6 +61,23 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
             .replace(R.id.empty_view_container, emptyViewFragment)
             .commit()
     }
+
+    private fun setupCategoryList() {
+        categoriesAdapter = ProductCategoryAdapter(
+            onRetry = { categoriesViewModel.retryNextPage() },
+            onCategorySelected = {/* TODO: Add Filter option on category selection */ }
+        )
+
+        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.productCategoriesList.apply {
+            adapter = categoriesAdapter
+            this.layoutManager = layoutManager
+            addOnScrollListener(getPaginationScrollListener(layoutManager) {
+                categoriesViewModel.fetchNextPage()
+            })
+        }
+    }
+
 
     private fun setupProductList() {
         productsAdapter = ProductListAdapter(requireContext()) {
@@ -93,7 +117,19 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     }
 
     private fun observeViewModels() {
+        observeCategories()
         observeProducts()
+    }
+
+    private fun observeCategories() {
+        categoriesViewModel.categories.observe(viewLifecycleOwner) { resource ->
+            when (resource?.status) {
+                Status.LOADING -> showCategoryLoading()
+                Status.SUCCESS -> showCategorySuccess(resource.data)
+                Status.ERROR -> showCategoryError()
+                else -> Unit
+            }
+        }
     }
 
     private fun observeProducts() {
@@ -104,6 +140,31 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
                 Status.ERROR -> showProductError(resource.exception)
                 else -> Unit
             }
+        }
+    }
+
+    private fun showCategoryLoading() {
+        if (categoriesAdapter.itemCount > 0) {
+            categoriesAdapter.updateFooterState(FooterState.LOADING)
+        } else {
+            binding.productCategoryShimmerViewContainer.isVisible = true
+        }
+    }
+
+    private fun showCategorySuccess(categories: List<ProductCategoryEntity>?) {
+        categoriesAdapter.submitList(categories)
+        categoriesAdapter.updateFooterState(FooterState.HIDDEN)
+        binding.productCategoriesList.isVisible = categoriesAdapter.itemCount > 0
+        binding.productCategoryShimmerViewContainer.isVisible = false
+    }
+
+    private fun showCategoryError() {
+        binding.productCategoryShimmerViewContainer.isVisible = false
+        if (categoriesAdapter.itemCount > 0) {
+            binding.productCategoriesList.isVisible = true
+            categoriesAdapter.updateFooterState(FooterState.ERROR)
+        } else {
+            binding.productCategoriesList.isVisible = false
         }
     }
 
