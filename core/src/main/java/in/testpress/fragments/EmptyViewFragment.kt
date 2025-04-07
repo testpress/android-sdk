@@ -67,6 +67,7 @@ class EmptyViewFragment : Fragment() {
     }
 
     fun displayError(exception: TestpressException) {
+        Log.d("TAG", "displayError: ")
         when {
             exception.isForbidden -> handleForbidden(exception)
             exception.isNetworkError -> handleNetworkError()
@@ -123,6 +124,7 @@ class EmptyViewFragment : Fragment() {
     }
 
     private fun handleNetworkError() {
+        Log.d("TAG", "handleNetworkError: ")
         setEmptyText(R.string.testpress_network_error,
                 R.string.testpress_no_internet_try_again,
                 R.drawable.ic_error_outline_black_18dp)
@@ -157,6 +159,7 @@ class EmptyViewFragment : Fragment() {
     }
 
     fun setEmptyText(title: Int, description : Int, leftDrawable: Int?) {
+        Log.d("TAG", "setEmptyText: ")
         emptyContainer.visibility = View.VISIBLE
         emptyTitleView.setText(title)
         if (leftDrawable != null) {

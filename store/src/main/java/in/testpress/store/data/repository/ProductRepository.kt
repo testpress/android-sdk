@@ -14,7 +14,13 @@ class ProductRepository(context: Context) :
 
     private val apiClient = StoreApiClient(context)
 
-    override suspend fun getFromDb() = database.productLiteEntityDao().getAll()
+    init {
+        loadFromDatabase()
+    }
+
+    override suspend fun getFromDb(): List<ProductLiteEntity> {
+        return database.productLiteEntityDao().getAll()
+    }
 
     override suspend fun clearLocalDb() {
         database.productLiteEntityDao().deleteAll()
@@ -25,7 +31,7 @@ class ProductRepository(context: Context) :
     }
 
     override suspend fun updateLiveDataFromDb() {
-        _resource.postValue(Resource.success(database.productLiteEntityDao().getAll()))
+        _resource.postValue(Resource.success(getFromDb()))
     }
 
     override fun makeNetworkCall(queryParams: Map<String, Any>, callback: TestpressCallback<*>) {

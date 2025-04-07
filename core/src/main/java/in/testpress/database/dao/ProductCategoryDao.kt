@@ -12,5 +12,5 @@ interface ProductCategoryDao: BaseDao<ProductCategoryEntity>{
     suspend fun deleteAll()
 
     @Query("SELECT * FROM productcategoryentity")
-    fun getAll() : MutableList<ProductCategoryEntity>
+    suspend fun getAll() : MutableList<ProductCategoryEntity>
 }

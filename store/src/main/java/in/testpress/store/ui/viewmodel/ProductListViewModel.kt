@@ -18,6 +18,10 @@ class ProductListViewModel(private val repository: ProductRepository) : ViewMode
         repository.retryNextPage()
     }
 
+    fun resetPagination() {
+        repository.resetPagination()
+    }
+
     companion object {
         fun init(context: FragmentActivity): ProductListViewModel {
             return ViewModelProvider(context, object : ViewModelProvider.Factory {

@@ -1,6 +1,7 @@
 package `in`.testpress.data.repository
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import `in`.testpress.core.TestpressCallback
@@ -26,12 +27,8 @@ abstract class BasePaginatedRepository<NetworkResponseT, DomainEntityT>(
     protected val _resource = MutableLiveData<Resource<List<DomainEntityT>>>()
     val resource: LiveData<Resource<List<DomainEntityT>>> get() = _resource
 
-    init {
-        loadFromDatabase()
-    }
-
-    private fun loadFromDatabase() {
-        _resource.value = Resource.loading(null)
+    protected fun loadFromDatabase() {
+        _resource.value = Resource.loading(_resource.value?.data)
         scope.launch {
             val cached = getFromDb()
             if (cached.isNotEmpty()) {
@@ -50,14 +47,32 @@ abstract class BasePaginatedRepository<NetworkResponseT, DomainEntityT>(
     }
 
     fun retryNextPage() {
-        fetchFromNetwork()
+        if (currentPage == 1){
+            resetPagination()
+        } else {
+            fetchFromNetwork()
+        }
+    }
+
+    fun resetPagination() {
+        scope.launch {
+            clearLocalDb()
+            currentPage = 1
+            isLoading = false
+            hasNextPage = true
+            lastFailedPage = null
+            withContext(Dispatchers.Main) {
+                _resource.value = Resource.loading(null)
+            }
+            fetchFromNetwork()
+        }
     }
 
     private fun fetchFromNetwork() {
         if (isLoading || !hasNextPage) return
 
         isLoading = true
-        _resource.postValue(Resource.loading(null))
+        _resource.postValue(Resource.loading(_resource.value?.data))
 
         val queryParams = hashMapOf<String, Any>("page" to currentPage)
         makeNetworkCall(queryParams, object : TestpressCallback<Any>() {

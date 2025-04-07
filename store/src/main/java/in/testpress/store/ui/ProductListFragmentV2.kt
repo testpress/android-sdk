@@ -1,6 +1,7 @@
 package `in`.testpress.store.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,11 +65,15 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
 
     private fun setupCategoryList() {
         categoriesAdapter = ProductCategoryAdapter(
-            onRetry = { categoriesViewModel.retryNextPage() },
-            onCategorySelected = {/* TODO: Add Filter option on category selection */ }
+            onRetry = {
+                productsViewModel.retryNextPage()
+                categoriesViewModel.retryNextPage()
+            },
+            onCategorySelected = { productsViewModel.resetPagination() }
         )
 
-        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        val layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.productCategoriesList.apply {
             adapter = categoriesAdapter
             this.layoutManager = layoutManager
@@ -82,6 +87,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     private fun setupProductList() {
         productsAdapter = ProductListAdapter(requireContext()) {
             productsViewModel.retryNextPage()
+            categoriesViewModel.retryNextPage()
         }
 
         val layoutManager = LinearLayoutManager(requireContext())
@@ -124,7 +130,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     private fun observeCategories() {
         categoriesViewModel.categories.observe(viewLifecycleOwner) { resource ->
             when (resource?.status) {
-                Status.LOADING -> showCategoryLoading()
+                Status.LOADING -> showCategoryLoading(resource.data)
                 Status.SUCCESS -> showCategorySuccess(resource.data)
                 Status.ERROR -> showCategoryError()
                 else -> Unit
@@ -135,7 +141,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     private fun observeProducts() {
         productsViewModel.products.observe(viewLifecycleOwner) { resource ->
             when (resource?.status) {
-                Status.LOADING -> showProductLoading()
+                Status.LOADING -> showProductLoading(resource.data)
                 Status.SUCCESS -> showProductSuccess(resource.data)
                 Status.ERROR -> showProductError(resource.exception)
                 else -> Unit
@@ -143,8 +149,9 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
         }
     }
 
-    private fun showCategoryLoading() {
-        if (categoriesAdapter.itemCount > 0) {
+    private fun showCategoryLoading(categories: List<ProductCategoryEntity>?) {
+        categoriesAdapter.submitList(categories)
+        if (categories != null) {
             categoriesAdapter.updateFooterState(FooterState.LOADING)
         } else {
             binding.productCategoryShimmerViewContainer.isVisible = true
@@ -164,13 +171,15 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
             binding.productCategoriesList.isVisible = true
             categoriesAdapter.updateFooterState(FooterState.ERROR)
         } else {
-            binding.productCategoriesList.isVisible = false
+            binding.productCategoriesLayout.isVisible = false
         }
     }
 
-    private fun showProductLoading() {
+    private fun showProductLoading(products: List<ProductLiteEntity>?) {
+        Log.d("TAG", "showProductLoading: $products")
+        productsAdapter.submitList(products)
         binding.emptyViewContainer.isVisible = false
-        if (productsAdapter.itemCount > 0) {
+        if (products != null) {
             productsAdapter.updateFooterState(FooterState.LOADING)
         } else {
             binding.shimmerViewContainer.isVisible = true
@@ -192,18 +201,26 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     }
 
     private fun showProductError(exception: TestpressException?) {
+        Log.d("TAG", "showProductError: ${productsAdapter.itemCount}")
+        Log.d("TAG", "showProductError: exception $exception")
+        Log.d("TAG", "showProductError: exception?.isNetworkError ${exception?.isNetworkError}")
         binding.shimmerViewContainer.isVisible = false
 
         if (productsAdapter.itemCount > 0) {
+            Log.d("TAG", "showProductError: if")
             binding.productList.isVisible = true
             productsAdapter.updateFooterState(FooterState.ERROR)
         } else {
+            Log.d("TAG", "showProductError: else")
             binding.productList.isVisible = false
             binding.emptyViewContainer.isVisible = true
             emptyViewFragment.displayError(
-                exception ?: TestpressException.unexpectedWebViewError(UnknownError())
+                exception ?: TestpressException.unexpectedError(UnknownError())
             )
         }
+
+        Log.d("TAG", "showProductError: binding.productList.isVisible ${binding.productList.isVisible}")
+        Log.d("TAG", "showProductError: binding.emptyViewContainer.isVisible ${binding.emptyViewContainer.isVisible}")
     }
 
     private fun showEmptyState() {
@@ -221,6 +238,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
 
     override fun onRetryClick() {
         productsViewModel.retryNextPage()
+        categoriesViewModel.retryNextPage()
     }
 
     companion object {
