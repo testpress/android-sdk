@@ -12,8 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 abstract class BasePaginatedRepository<NetworkResponseT, DomainEntityT>(
@@ -22,7 +20,6 @@ abstract class BasePaginatedRepository<NetworkResponseT, DomainEntityT>(
 ) {
 
     protected val database = TestpressDatabase.invoke(context.applicationContext)
-    private val stateMutex = Mutex()
     private var currentPage = 1
     private var isLoading = false
     private var hasNextPage = true
@@ -45,13 +42,9 @@ abstract class BasePaginatedRepository<NetworkResponseT, DomainEntityT>(
     }
 
     fun fetchNextPage() {
-        scope.launch {
-            stateMutex.withLock {
-                if (isLoading || !hasNextPage || lastFailedPage == currentPage) return@launch
-                currentPage++
-                fetchFromNetwork()
-            }
-        }
+        if (isLoading || !hasNextPage || lastFailedPage == currentPage) return
+        currentPage++
+        fetchFromNetwork()
     }
 
     fun retryNextPage() {
@@ -63,34 +56,23 @@ abstract class BasePaginatedRepository<NetworkResponseT, DomainEntityT>(
     }
 
     private fun fetchFromNetwork() {
-        scope.launch {
-            stateMutex.withLock {
-                if (isLoading || !hasNextPage) return@launch
-                isLoading = true
-            }
-        }
+        if (isLoading || !hasNextPage) return
+        isLoading = true
+
         _resource.postValue(Resource.loading(null))
 
         val queryParams = hashMapOf<String, Any>("page" to currentPage)
         makeNetworkCall(queryParams, object : TestpressCallback<Any>() {
             override fun onSuccess(result: Any) {
-                scope.launch {
-                    stateMutex.withLock {
-                        isLoading = false
-                        lastFailedPage = null
-                        hasNextPage = extractNextPageAvailable(result)
-                    }
-                }
+                isLoading = false
+                lastFailedPage = null
+                hasNextPage = extractNextPageAvailable(result)
                 scope.launch { handleSuccess(result as NetworkResponseT) }
             }
 
             override fun onException(exception: TestpressException) {
-                scope.launch {
-                    stateMutex.withLock {
-                        isLoading = false
-                        lastFailedPage = currentPage
-                    }
-                }
+                isLoading = false
+                lastFailedPage = currentPage
                 _resource.postValue(Resource.error(exception, _resource.value?.data))
             }
         })
