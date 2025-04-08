@@ -1,5 +1,6 @@
 package `in`.testpress.store.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,12 +18,14 @@ import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import `in`.testpress.store.R
+import `in`.testpress.store.TestpressStore
 import `in`.testpress.store.databinding.TestpressProductListFragmentBinding
 import `in`.testpress.store.ui.adapter.FooterState
 import `in`.testpress.store.ui.adapter.ProductCategoryAdapter
 import `in`.testpress.store.ui.adapter.ProductListAdapter
 import `in`.testpress.store.ui.viewmodel.ProductCategoryViewModel
 import `in`.testpress.store.ui.viewmodel.ProductListViewModel
+
 
 class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     private var _binding: TestpressProductListFragmentBinding? = null
@@ -80,9 +83,15 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
 
 
     private fun setupProductList() {
-        productsAdapter = ProductListAdapter(requireContext()) {
-            productsViewModel.retryNextPage()
-        }
+        productsAdapter = ProductListAdapter(
+            requireContext(),
+            onRetry = { productsViewModel.retryNextPage() },
+            onItemClick = { product ->
+                val intent = Intent(requireContext(), ProductDetailsActivity::class.java)
+                intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.slug)
+                activity!!.startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE)
+            }
+        )
 
         val layoutManager = LinearLayoutManager(requireContext())
         binding.productList.apply {
