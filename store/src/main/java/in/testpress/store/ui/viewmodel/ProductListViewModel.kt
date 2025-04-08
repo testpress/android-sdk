@@ -8,7 +8,7 @@ import `in`.testpress.store.data.repository.ProductRepository
 
 class ProductListViewModel(private val repository: ProductRepository) : ViewModel() {
 
-    val products = repository.productsResource
+    val products = repository.resource
 
     fun fetchNextPage() {
         repository.fetchNextPage()
@@ -16,6 +16,12 @@ class ProductListViewModel(private val repository: ProductRepository) : ViewMode
 
     fun retryNextPage() {
         repository.retryNextPage()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // Cancel the repository's scope when the ViewModel is cleared
+        repository.cancelScope()
     }
 
     companion object {

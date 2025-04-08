@@ -1,11 +1,8 @@
 package `in`.testpress.store.data.repository
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import `in`.testpress.core.TestpressCallback
-import `in`.testpress.core.TestpressException
-import `in`.testpress.database.TestpressDatabase
+import `in`.testpress.data.repository.BasePaginatedRepository
 import `in`.testpress.database.entities.ProductCategoryEntity
 import `in`.testpress.network.Resource
 import `in`.testpress.store.data.model.NetworkProductCategory
@@ -14,102 +11,50 @@ import `in`.testpress.store.network.StoreApiClient
 import `in`.testpress.v2_4.models.ApiResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.SupervisorJob
 
-class ProductCategoryRepository(val context: Context) {
+class ProductCategoryRepository(
+    context: Context,
+    scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+) :
+    BasePaginatedRepository<ApiResponse<List<NetworkProductCategory>>, ProductCategoryEntity>(
+        context,
+        scope
+    ) {
 
-    private val storeApiClient = StoreApiClient(context)
-    private val database = TestpressDatabase.invoke(context)
-
-    private var currentPage = 1
-    private var isLoading = false
-    private var hasNextPage = true
-    private var lastFailedPage: Int? = null
-
-    private var _categoriesResource: MutableLiveData<Resource<List<ProductCategoryEntity>>> =
-        MutableLiveData()
-    val categoriesResource: LiveData<Resource<List<ProductCategoryEntity>>>
-        get() = _categoriesResource
+    private val apiClient = StoreApiClient(context)
 
     init {
         loadFromDatabase()
     }
 
-    private fun loadFromDatabase() {
-        _categoriesResource.value = Resource.loading(null)
-        CoroutineScope(Dispatchers.IO).launch {
-            val cachedCategories = database.productCategoryDao().getAll()
-            if (cachedCategories.isNotEmpty()) {
-                cachedCategories.add(0,ProductCategoryEntity(id = -1,name = "All Products"))
-                withContext(Dispatchers.Main) {
-                    _categoriesResource.value = Resource.success(cachedCategories)
-                }
-            }
-            fetchFromNetwork()
+    override suspend fun getFromDb(): List<ProductCategoryEntity> {
+        val data = database.productCategoryDao().getAll()
+        if (data.isNotEmpty()) {
+            data.add(0, ProductCategoryEntity(id = -1, name = "All Products"))
         }
+        return data
     }
 
-    fun fetchNextPage() {
-        if (isLoading || !hasNextPage || lastFailedPage == currentPage) return
-        currentPage++
-        fetchFromNetwork()
-    }
-
-    fun retryNextPage() {
-        fetchFromNetwork()
-    }
-
-    private fun fetchFromNetwork() {
-        if (isLoading || !hasNextPage) return
-
-        isLoading = true
-        _categoriesResource.postValue(Resource.loading(null))
-
-        val queryParams = hashMapOf<String, Any>("page" to currentPage)
-
-        storeApiClient.getProductsCategories(queryParams)
-            .enqueue(object : TestpressCallback<ApiResponse<List<NetworkProductCategory>>>() {
-
-                override fun onSuccess(result: ApiResponse<List<NetworkProductCategory>>) {
-                    isLoading = false
-                    hasNextPage = result.next != null
-                    lastFailedPage = null
-                    CoroutineScope(Dispatchers.IO).launch {
-                        handleSuccessfulResponse(result)
-                    }
-                }
-
-                override fun onException(exception: TestpressException?) {
-                    isLoading = false
-                    lastFailedPage = currentPage
-
-                    val currentData = _categoriesResource.value?.data
-                    _categoriesResource.postValue(Resource.error(exception!!, currentData))
-                }
-            })
-    }
-
-    private suspend fun handleSuccessfulResponse(response: ApiResponse<List<NetworkProductCategory>>) {
-        if (currentPage == 1) {
-            clearLocalProducts()
-        }
-        saveProductsToDatabase(response.results.asDomain())
-        updateProductsResourceFromDatabase()
-    }
-
-    private suspend fun clearLocalProducts() {
+    override suspend fun clearLocalDb() {
         database.productCategoryDao().deleteAll()
     }
 
-    private suspend fun saveProductsToDatabase(category: List<ProductCategoryEntity>) {
-        database.productCategoryDao().insertAll(category)
+    override suspend fun saveToDb(response: ApiResponse<List<NetworkProductCategory>>) {
+        database.productCategoryDao().insertAll(response.results.asDomain())
     }
 
-    private suspend fun updateProductsResourceFromDatabase() {
-        val updatedProducts = database.productCategoryDao().getAll()
-        updatedProducts.add(0,ProductCategoryEntity(id = -1,name = "All Products"))
-        _categoriesResource.postValue(Resource.success(updatedProducts))
+    override suspend fun updateLiveDataFromDb() {
+        _resource.postValue(Resource.success(getFromDb()))
     }
 
+    override fun makeNetworkCall(queryParams: Map<String, Any>, callback: TestpressCallback<*>) {
+        @Suppress("UNCHECKED_CAST")
+        apiClient.getProductsCategories(queryParams)
+            .enqueue(callback as TestpressCallback<ApiResponse<List<NetworkProductCategory>>>)
+    }
+
+    override fun extractNextPageAvailable(response: Any): Boolean {
+        return (response as ApiResponse<*>).next != null
+    }
 }
