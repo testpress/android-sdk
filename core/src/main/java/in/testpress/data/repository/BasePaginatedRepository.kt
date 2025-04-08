@@ -9,15 +9,17 @@ import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.network.Resource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 abstract class BasePaginatedRepository<NetworkResponseT, DomainEntityT>(
-    private val context: Context
+    private val context: Context,
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 ) {
 
-    private val scope = CoroutineScope(Dispatchers.IO)
-    protected val database = TestpressDatabase.invoke(context)
+    protected val database = TestpressDatabase.invoke(context.applicationContext)
     private var currentPage = 1
     private var isLoading = false
     private var hasNextPage = true
@@ -47,6 +49,10 @@ abstract class BasePaginatedRepository<NetworkResponseT, DomainEntityT>(
 
     fun retryNextPage() {
         fetchFromNetwork()
+    }
+
+    fun cancelScope() {
+        scope.cancel()
     }
 
     private fun fetchFromNetwork() {

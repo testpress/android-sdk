@@ -8,9 +8,15 @@ import `in`.testpress.network.Resource
 import `in`.testpress.store.data.model.NetworkProductListResponse
 import `in`.testpress.store.data.model.asDomain
 import `in`.testpress.store.network.StoreApiClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 
-class ProductRepository(context: Context) :
-    BasePaginatedRepository<NetworkProductListResponse, ProductLiteEntity>(context) {
+class ProductRepository(
+    context: Context,
+    scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+) :
+    BasePaginatedRepository<NetworkProductListResponse, ProductLiteEntity>(context, scope) {
 
     private val apiClient = StoreApiClient(context)
 

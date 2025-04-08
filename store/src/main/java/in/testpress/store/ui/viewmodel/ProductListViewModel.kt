@@ -18,6 +18,12 @@ class ProductListViewModel(private val repository: ProductRepository) : ViewMode
         repository.retryNextPage()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        // Cancel the repository's scope when the ViewModel is cleared
+        repository.cancelScope()
+    }
+
     companion object {
         fun init(context: FragmentActivity): ProductListViewModel {
             return ViewModelProvider(context, object : ViewModelProvider.Factory {
