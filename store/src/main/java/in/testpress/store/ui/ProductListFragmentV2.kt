@@ -65,7 +65,9 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     private fun setupCategoryList() {
         categoriesAdapter = ProductCategoryAdapter(
             onRetry = { categoriesViewModel.retryNextPage() },
-            onCategorySelected = {/* TODO: Add Filter option on category selection */ }
+            onCategorySelected = { category ->
+                category.id?.let { id -> productsViewModel.setCategoryId(id) }
+            }
         )
 
         val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)

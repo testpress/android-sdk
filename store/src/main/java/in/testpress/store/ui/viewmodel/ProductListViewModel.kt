@@ -18,6 +18,11 @@ class ProductListViewModel(private val repository: ProductRepository) : ViewMode
         repository.retryNextPage()
     }
 
+    fun setCategoryId(categoryId: Int) {
+        repository.setCategoryId(categoryId)
+        repository.resetPaginationAndFetch()
+    }
+
     override fun onCleared() {
         super.onCleared()
         // Cancel the repository's scope when the ViewModel is cleared
