@@ -89,7 +89,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
             onItemClick = { product ->
                 val intent = Intent(requireContext(), ProductDetailsActivity::class.java)
                 intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.slug)
-                activity!!.startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE)
+                requireActivity().startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE)
             }
         )
 
