@@ -124,7 +124,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     private fun observeCategories() {
         categoriesViewModel.categories.observe(viewLifecycleOwner) { resource ->
             when (resource?.status) {
-                Status.LOADING -> showCategoryLoading()
+                Status.LOADING -> showCategoryLoading(resource.data)
                 Status.SUCCESS -> showCategorySuccess(resource.data)
                 Status.ERROR -> showCategoryError()
                 else -> Unit
@@ -135,7 +135,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     private fun observeProducts() {
         productsViewModel.products.observe(viewLifecycleOwner) { resource ->
             when (resource?.status) {
-                Status.LOADING -> showProductLoading()
+                Status.LOADING -> showProductLoading(resource.data)
                 Status.SUCCESS -> showProductSuccess(resource.data)
                 Status.ERROR -> showProductError(resource.exception)
                 else -> Unit
@@ -143,8 +143,9 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
         }
     }
 
-    private fun showCategoryLoading() {
+    private fun showCategoryLoading(categories: List<ProductCategoryEntity>?) {
         binding.productCategoriesLayout.isVisible = true
+        categoriesAdapter.submitList(categories)
         if (categoriesAdapter.itemCount > 0) {
             categoriesAdapter.updateFooterState(FooterState.LOADING)
         } else {
@@ -170,8 +171,9 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
         }
     }
 
-    private fun showProductLoading() {
+    private fun showProductLoading(products: List<ProductLiteEntity>?) {
         binding.productsLayout.isVisible = true
+        productsAdapter.submitList(products)
         binding.emptyViewContainer.isVisible = false
         if (productsAdapter.itemCount > 0) {
             productsAdapter.updateFooterState(FooterState.LOADING)
