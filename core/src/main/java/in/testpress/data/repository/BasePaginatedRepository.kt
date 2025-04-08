@@ -70,10 +70,10 @@ abstract class BasePaginatedRepository<NetworkResponseT, DomainEntityT>(
                 scope.launch { handleSuccess(result as NetworkResponseT) }
             }
 
-            override fun onException(exception: TestpressException?) {
+            override fun onException(exception: TestpressException) {
                 isLoading = false
                 lastFailedPage = currentPage
-                _resource.postValue(Resource.error(exception!!, _resource.value?.data))
+                _resource.postValue(Resource.error(exception, _resource.value?.data))
             }
         })
     }
