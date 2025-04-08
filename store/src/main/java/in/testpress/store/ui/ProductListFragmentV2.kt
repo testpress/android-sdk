@@ -190,6 +190,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
 
         if (products.isNullOrEmpty()) {
             showEmptyState()
+            binding.productsLayout.isVisible = false
         } else {
             binding.productList.isVisible = true
         }
