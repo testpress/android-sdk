@@ -51,6 +51,14 @@ abstract class BasePaginatedRepository<NetworkResponseT, DomainEntityT>(
         fetchFromNetwork()
     }
 
+    fun resetPaginationAndFetch() {
+        currentPage = 1
+        isLoading = false
+        hasNextPage = true
+        lastFailedPage = null
+        loadFromDatabase()
+    }
+
     fun cancelScope() {
         scope.cancel()
     }

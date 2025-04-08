@@ -19,15 +19,30 @@ class ProductRepository(
     BasePaginatedRepository<NetworkProductListResponse, ProductLiteEntity>(context, scope) {
 
     private val apiClient = StoreApiClient(context)
+    private var categoryId = -1
 
     init {
         loadFromDatabase()
     }
 
-    override suspend fun getFromDb() = database.productLiteEntityDao().getAll()
+    fun setCategoryId(categoryId: Int) {
+        this.categoryId = categoryId
+    }
+
+    override suspend fun getFromDb(): List<ProductLiteEntity> {
+        return if (categoryId == -1) {
+            database.productLiteEntityDao().getAll()
+        } else {
+            database.productLiteEntityDao().getByCategoryId(categoryId)
+        }
+    }
 
     override suspend fun clearLocalDb() {
-        database.productLiteEntityDao().deleteAll()
+        if (categoryId == -1) {
+            database.productLiteEntityDao().deleteAll()
+        } else {
+            database.productLiteEntityDao().deleteByCategoryId(categoryId)
+        }
     }
 
     override suspend fun saveToDb(response: NetworkProductListResponse) {
@@ -39,8 +54,14 @@ class ProductRepository(
     }
 
     override fun makeNetworkCall(queryParams: Map<String, Any>, callback: TestpressCallback<*>) {
+        val updatedParams = queryParams.toMutableMap()
+
+        if (categoryId != -1) {
+            updatedParams["category"] = categoryId
+        }
+
         @Suppress("UNCHECKED_CAST")
-        apiClient.getProductsV3(queryParams)
+        apiClient.getProductsV3(updatedParams)
             .enqueue(callback as TestpressCallback<NetworkProductListResponse>)
     }
 
