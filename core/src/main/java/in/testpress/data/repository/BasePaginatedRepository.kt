@@ -63,10 +63,9 @@ abstract class BasePaginatedRepository<NetworkResponseT, DomainEntityT>(
     }
 
     private fun fetchFromNetwork() {
-        if (isLoading || !hasNextPage) return
-
         scope.launch {
             stateMutex.withLock {
+                if (isLoading || !hasNextPage) return
                 isLoading = true
             }
         }
