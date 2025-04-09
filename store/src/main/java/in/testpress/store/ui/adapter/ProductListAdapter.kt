@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.nostra13.universalimageloader.core.ImageLoader
+import `in`.testpress.database.entities.ProductCategoryEntity
 import `in`.testpress.database.entities.ProductLiteEntity
 import `in`.testpress.store.databinding.ListViewFooterLoadingBinding
 import `in`.testpress.store.databinding.TestpressProductListItemBinding
@@ -15,7 +16,8 @@ import `in`.testpress.util.ImageUtils
 
 class ProductListAdapter(
     context: Context,
-    private val onRetry: () -> Unit
+    private val onRetry: () -> Unit,
+    private val onItemClick: (ProductLiteEntity) -> Unit
 ) : ListAdapter<ProductLiteEntity, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
 
     private val imageLoader: ImageLoader? = ImageUtils.initImageLoader(context)
@@ -46,7 +48,7 @@ class ProductListAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is ProductViewHolder -> holder.bind(getItem(position))
+            is ProductViewHolder -> holder.bind(getItem(position), onItemClick)
             is FooterViewHolder -> holder.bind(footerState)
         }
     }
@@ -77,7 +79,7 @@ class ProductListAdapter(
         private val imageLoader: ImageLoader?
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(product: ProductLiteEntity) {
+        fun bind(product: ProductLiteEntity, onItemClick: (ProductLiteEntity) -> Unit) {
             binding.title.text = product.title
             binding.price.text = "₹ ${product.price}"
 
@@ -96,6 +98,8 @@ class ProductListAdapter(
                 binding.thumbnailImage,
                 ImageUtils.getPlaceholdersOption()
             )
+
+            binding.root.setOnClickListener { onItemClick(product) }
         }
     }
 
