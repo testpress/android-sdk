@@ -48,7 +48,7 @@ class NetworkBoundResourceTest {
 
         runBlocking {
             networkBoundResource = object : NetworkBoundResource<Foo, Foo>() {
-                override fun saveNetworkResponseToDB(item: Foo) {
+                override suspend fun saveNetworkResponseToDB(item: Foo) {
                     saveNetworkResponseToDBHandler(item)
                 }
 

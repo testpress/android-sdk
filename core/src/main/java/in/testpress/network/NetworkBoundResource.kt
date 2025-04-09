@@ -79,7 +79,7 @@ abstract class NetworkBoundResource<ResultDataType, NetworkDataType> {
         }
     }
 
-    protected abstract fun saveNetworkResponseToDB(item: NetworkDataType)
+    protected abstract suspend fun saveNetworkResponseToDB(item: NetworkDataType)
 
     protected abstract fun shouldFetch(data: ResultDataType?): Boolean
 

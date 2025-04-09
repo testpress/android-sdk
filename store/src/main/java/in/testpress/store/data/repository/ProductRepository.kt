@@ -2,13 +2,14 @@ package `in`.testpress.store.data.repository
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.DomainProduct
 import `in`.testpress.network.NetworkBoundResource
 import `in`.testpress.network.Resource
 import `in`.testpress.network.RetrofitCall
 import `in`.testpress.store.data.model.NetworkProduct
+import `in`.testpress.store.data.model.toPriceEntities
+import `in`.testpress.store.data.model.toProductEntity
 import `in`.testpress.store.network.StoreApiClient
 
 open class ProductRepository(
@@ -22,23 +23,21 @@ open class ProductRepository(
         forceRefresh: Boolean = false
     ): LiveData<Resource<DomainProduct>> {
         return object : NetworkBoundResource<DomainProduct, NetworkProduct>() {
-            override fun saveNetworkResponseToDB(item: NetworkProduct) {
-                // TODO: saveNetworkResponseToDB
+            override suspend fun saveNetworkResponseToDB(item: NetworkProduct) {
+                database.productEntityDao().insertProduct(item.toProductEntity())
+                database.productEntityDao().insertPrices(item.toPriceEntities())
             }
 
             override fun shouldFetch(data: DomainProduct?): Boolean {
-                // TODO: shouldFetch
-                return false
+                return forceRefresh || data == null
             }
 
             override fun loadFromDb(): LiveData<DomainProduct> {
-                // TODO: loadFromDb
-                return MutableLiveData()
+                return database.productEntityDao().getProduct(productId)
             }
 
             override fun createCall(): RetrofitCall<NetworkProduct> {
-                // TODO: createCall
-                return storeApiClient.getNetworkContent(contentUrl)
+                return storeApiClient.getProductDetailV3(productId)
             }
         }.asLiveData()
     }
