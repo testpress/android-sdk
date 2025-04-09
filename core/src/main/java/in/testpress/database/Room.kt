@@ -36,16 +36,12 @@ import `in`.testpress.database.roommigration.RoomMigration27To28.MIGRATION_27_28
 import `in`.testpress.database.roommigration.RoomMigration28To29.MIGRATION_28_29
 import `in`.testpress.database.roommigration.RoomMigration29To30.MIGRATION_29_30
 import `in`.testpress.database.roommigration.RoomMigration30To31.MIGRATION_30_31
+import `in`.testpress.database.roommigration.RoomMigration31To32.MIGRATION_31_32
 
-@Database(version = 31,
+@Database(version = 32,
         entities = [
             ContentEntity::class,
             OfflineVideo::class,
-            ProductEntity::class,
-            PriceEntity::class,
-            CourseEntity::class,
-            ProductCourseEntity::class,
-            ProductPriceEntity::class,
             CommentEntity::class,
             DiscussionPostEntity::class,
             LastLoadedPageData::class,
@@ -74,7 +70,6 @@ import `in`.testpress.database.roommigration.RoomMigration30To31.MIGRATION_30_31
 abstract class TestpressDatabase : RoomDatabase() {
     abstract fun contentDao(): ContentDao
     abstract fun offlineVideoDao(): OfflineVideoDao
-    abstract fun productDao(): ProductDao
     abstract fun commentDao(): CommentDao
     abstract fun forumDao(): DiscussionPostDao
     abstract fun lastLoadedPageDataDao(): LastLoadedPageDataDao
@@ -105,7 +100,7 @@ abstract class TestpressDatabase : RoomDatabase() {
             MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19,
             MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24,
             MIGRATION_24_25, MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29,
-            MIGRATION_29_30, MIGRATION_30_31
+            MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32
         )
 
         operator fun invoke(context: Context): TestpressDatabase {
