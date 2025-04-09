@@ -3,10 +3,10 @@ package `in`.testpress.store.ui.viewmodel
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import `in`.testpress.store.data.repository.ProductRepository
+import `in`.testpress.store.data.repository.ProductListRepository
 
 
-class ProductListViewModel(private val repository: ProductRepository) : ViewModel() {
+class ProductListViewModel(private val repository: ProductListRepository) : ViewModel() {
 
     val products = repository.resource
 
@@ -34,7 +34,7 @@ class ProductListViewModel(private val repository: ProductRepository) : ViewMode
             return ViewModelProvider(context, object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return ProductListViewModel(
-                        ProductRepository(context)
+                        ProductListRepository(context)
                     ) as T
                 }
             }).get(ProductListViewModel::class.java)
