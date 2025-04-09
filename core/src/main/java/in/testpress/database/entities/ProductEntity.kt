@@ -5,6 +5,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 
+typealias DomainProduct = ProductWithPrices
+
 @Entity
 data class ProductEntity(
     @PrimaryKey
