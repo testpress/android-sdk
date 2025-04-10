@@ -11,7 +11,7 @@ import `in`.testpress.store.data.repository.ProductRepository
 class ProductViewModel(private val repository: ProductRepository) : ViewModel() {
 
     fun loadProduct(
-        productId: Long,
+        productId: Int,
         forceRefresh: Boolean = false
     ): LiveData<Resource<DomainProduct>> {
         return repository.loadProduct(productId, forceRefresh)

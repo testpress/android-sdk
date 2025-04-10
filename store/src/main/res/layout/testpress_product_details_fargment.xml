@@ -5,8 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/testpress_toolbar" />
-
     <ProgressBar
         android:layout_width="45dp"
         android:layout_height="45dp"
@@ -71,7 +69,9 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <include layout="@layout/testpress_product_details_content_scrolling" />
+        <include
+            android:id="@+id/detail_layout"
+            layout="@layout/testpress_product_details_content_scrolling" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -169,5 +169,11 @@
             android:textSize="@dimen/testpress_text_size_xxlarge" />
 
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/empty_view_container"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </RelativeLayout>

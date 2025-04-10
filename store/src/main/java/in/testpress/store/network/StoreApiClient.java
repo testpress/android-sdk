@@ -111,7 +111,7 @@ public class StoreApiClient extends TestpressApiClient {
         return getProductService().getProductsCategories(queryParams);
     }
 
-    public RetrofitCall<NetworkProduct> getProductDetailV3(Long productId) {
+    public RetrofitCall<NetworkProduct> getProductDetailV3(int productId) {
         return getProductService().getProductDetailV3(productId);
     }
 }

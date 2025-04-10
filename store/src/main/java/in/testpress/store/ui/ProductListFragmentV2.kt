@@ -90,7 +90,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
             onRetry = { productsViewModel.retryNextPage() },
             onItemClick = { product ->
                 val intent = Intent(requireContext(), ProductDetailsActivityV2::class.java)
-                intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.id)
+                intent.putExtra(ProductDetailsActivityV2.PRODUCT_ID, product.id)
                 requireActivity().startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE)
             }
         )

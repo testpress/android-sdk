@@ -75,7 +75,7 @@ public interface ProductService {
 
     @GET(V3_PRODUCT_PATH + "{product_id}")
     RetrofitCall<NetworkProduct> getProductDetailV3(
-            @Path(value = "product_id", encoded = true) Long productId
+            @Path(value = "product_id", encoded = true) int productId
     );
 }
 
