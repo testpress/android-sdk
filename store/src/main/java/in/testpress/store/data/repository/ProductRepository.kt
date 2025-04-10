@@ -19,7 +19,7 @@ open class ProductRepository(
     private val storeApiClient = StoreApiClient(context)
 
     fun loadProduct(
-        productId: Long,
+        productId: Int,
         forceRefresh: Boolean = false
     ): LiveData<Resource<DomainProduct>> {
         return object : NetworkBoundResource<DomainProduct, NetworkProduct>() {
