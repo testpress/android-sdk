@@ -8,7 +8,9 @@ import androidx.core.content.ContextCompat;
 import android.text.Html;
 import android.view.View;
 
-import org.greenrobot.greendao.query.LazyList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
@@ -23,7 +25,7 @@ import in.testpress.util.SingleTypeAdapter;
 class BookmarksListAdapter extends SingleTypeAdapter<Bookmark> {
 
     private Activity activity;
-    private LazyList<Bookmark> bookmarks;
+    private List<Bookmark> bookmarks;
     private String currentFolder;
     private int backgroundShadePosition;
     private ObjectAnimator animator;
@@ -32,7 +34,7 @@ class BookmarksListAdapter extends SingleTypeAdapter<Bookmark> {
         super(activity.getLayoutInflater(), R.layout.testpress_bookmark_panel_list_item);
         this.currentFolder = currentFolder;
         this.activity = activity;
-        bookmarks = Bookmark.getQueryBuilderToDisplay(activity, currentFolder).listLazy();
+        bookmarks = Bookmark.getQueryBuilderToDisplay(activity, currentFolder).list();
     }
 
     @Override
@@ -55,9 +57,16 @@ class BookmarksListAdapter extends SingleTypeAdapter<Bookmark> {
         return bookmarks.size();
     }
 
-    @Override
     public void notifyDataSetChanged() {
-        bookmarks = Bookmark.getQueryBuilderToDisplay(activity, currentFolder).listLazy();
+        bookmarks = Bookmark.getQueryBuilderToDisplay(activity, currentFolder).list();
+        List<Bookmark> filteredBookmarks = new ArrayList<>();
+        for (Bookmark bookmark : bookmarks) {
+            Object object = bookmark.getBookmarkedObject();
+            if (object instanceof ReviewItem || object instanceof Content) {
+                filteredBookmarks.add(bookmark);
+            }
+        }
+        bookmarks = new ArrayList<>(filteredBookmarks);
         super.notifyDataSetChanged();
     }
 
