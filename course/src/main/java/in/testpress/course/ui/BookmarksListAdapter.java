@@ -59,14 +59,16 @@ class BookmarksListAdapter extends SingleTypeAdapter<Bookmark> {
 
     public void notifyDataSetChanged() {
         bookmarks = Bookmark.getQueryBuilderToDisplay(activity, currentFolder).list();
-        List<Bookmark> filteredBookmarks = new ArrayList<>();
+
+        List<Bookmark> filteredBookmarks = new ArrayList<>(bookmarks.size());
         for (Bookmark bookmark : bookmarks) {
             Object object = bookmark.getBookmarkedObject();
-            if (object instanceof ReviewItem || object instanceof Content) {
+            if ((object instanceof ReviewItem || object instanceof Content)) {
                 filteredBookmarks.add(bookmark);
             }
         }
-        bookmarks = new ArrayList<>(filteredBookmarks);
+        bookmarks = filteredBookmarks;
+
         super.notifyDataSetChanged();
     }
 
