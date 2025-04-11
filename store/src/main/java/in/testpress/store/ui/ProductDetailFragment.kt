@@ -3,6 +3,7 @@ package `in`.testpress.store.ui
 import android.os.Bundle
 import android.text.Html
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,7 +34,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         productId = requireArguments().getInt(ProductDetailsActivityV2.PRODUCT_ID)
-        productViewModel = ProductViewModel.init(requireActivity())
+        productViewModel = ProductViewModel.init(requireActivity(), productId)
     }
 
     override fun onCreateView(
@@ -61,16 +62,16 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     private fun observeProduct() {
         productViewModel.product.observe(viewLifecycleOwner) { resource ->
             when (resource?.status) {
-                Status.LOADING -> showLoadingState()
+                Status.LOADING -> showLoadingState(resource.data)
                 Status.SUCCESS -> renderProductDetails(resource.data)
                 Status.ERROR -> showErrorState(resource.exception)
                 else -> Unit
             }
         }
-        productViewModel.loadProduct(productId, forceRefresh = false)
     }
 
-    private fun showLoadingState() {
+    private fun showLoadingState(domainProduct: DomainProduct?) {
+        if (domainProduct != null) return
         binding.apply {
             emptyViewContainer.isVisible = false
             emptyViewFragment.hide()
@@ -146,7 +147,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     }
 
     override fun onRetryClick() {
-        productViewModel.loadProduct(productId, forceRefresh = true)
+        productViewModel.retry()
     }
 
     override fun onDestroyView() {

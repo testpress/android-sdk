@@ -19,6 +19,6 @@ interface ProductEntityDao {
     suspend fun insertPrices(obj: List<PriceEntity>)
 
     @Query("SELECT * FROM ProductEntity WHERE id=:productId")
-    fun getProduct(productId: Int): LiveData<DomainProduct>
+    fun getProduct(productId: Int): DomainProduct?
 
 }
