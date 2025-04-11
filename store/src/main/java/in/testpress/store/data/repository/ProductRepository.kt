@@ -12,20 +12,20 @@ import `in`.testpress.store.data.model.toPriceEntities
 import `in`.testpress.store.data.model.toProductEntity
 import `in`.testpress.store.network.StoreApiClient
 
-open class ProductRepository(
-    val context: Context
-) {
-    protected val database = TestpressDatabase.invoke(context.applicationContext)
-    private val storeApiClient = StoreApiClient(context)
+open class ProductRepository(context: Context) {
 
-    fun loadProduct(
-        productId: Int,
-        forceRefresh: Boolean = false
-    ): LiveData<Resource<DomainProduct>> {
+    private val appContext = context.applicationContext
+    private val database = TestpressDatabase.invoke(appContext)
+    private val apiClient = StoreApiClient(appContext)
+
+    fun loadProduct(productId: Int, forceRefresh: Boolean = false): LiveData<Resource<DomainProduct>> {
         return object : NetworkBoundResource<DomainProduct, NetworkProduct>() {
+
             override suspend fun saveNetworkResponseToDB(item: NetworkProduct) {
-                database.productEntityDao().insertProduct(item.toProductEntity())
-                database.productEntityDao().insertPrices(item.toPriceEntities())
+                database.productEntityDao().apply {
+                    insertProduct(item.toProductEntity())
+                    insertPrices(item.toPriceEntities())
+                }
             }
 
             override fun shouldFetch(data: DomainProduct?): Boolean {
@@ -37,8 +37,9 @@ open class ProductRepository(
             }
 
             override fun createCall(): RetrofitCall<NetworkProduct> {
-                return storeApiClient.getProductDetailV3(productId)
+                return apiClient.getProductDetailV3(productId)
             }
+
         }.asLiveData()
     }
 }

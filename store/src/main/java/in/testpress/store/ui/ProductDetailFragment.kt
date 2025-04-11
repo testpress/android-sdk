@@ -25,16 +25,15 @@ import `in`.testpress.util.ZoomableImageString
 class ProductDetailFragment : Fragment(), EmptyViewListener {
     private var _binding: TestpressProductDetailsFargmentBinding? = null
     private val binding get() = _binding!!
+
     private lateinit var emptyViewFragment: EmptyViewFragment
-    private lateinit var productsViewModel: ProductViewModel
-    private var productId: Int? = null
+    private lateinit var productViewModel: ProductViewModel
+    private var productId: Int = DEFAULT_PRODUCT_ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (arguments?.getInt(ProductDetailsActivityV2.PRODUCT_ID) != null) {
-            productId = arguments!!.getInt(ProductDetailsActivityV2.PRODUCT_ID)
-        }
-        productsViewModel = ProductViewModel.init(requireActivity())
+        productId = requireArguments().getInt(ProductDetailsActivityV2.PRODUCT_ID)
+        productViewModel = ProductViewModel.init(requireActivity())
     }
 
     override fun onCreateView(
@@ -47,11 +46,11 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupEmptyViewFragment()
-        observeViewModel()
+        initEmptyView()
+        observeProduct()
     }
 
-    private fun setupEmptyViewFragment() {
+    private fun initEmptyView() {
         emptyViewFragment = EmptyViewFragment()
         childFragmentManager.beginTransaction()
             .replace(R.id.empty_view_container, emptyViewFragment)
@@ -59,73 +58,95 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     }
 
 
-    private fun observeViewModel() {
-        productsViewModel.product.observe(viewLifecycleOwner) { resource ->
+    private fun observeProduct() {
+        productViewModel.product.observe(viewLifecycleOwner) { resource ->
             when (resource?.status) {
-                Status.LOADING -> showProductLoading()
-                Status.SUCCESS -> showProductSuccess(resource.data)
-                Status.ERROR -> showProductError(resource.exception)
+                Status.LOADING -> showLoadingState()
+                Status.SUCCESS -> renderProductDetails(resource.data)
+                Status.ERROR -> showErrorState(resource.exception)
                 else -> Unit
             }
         }
-        productsViewModel.load(productId!!, false)
+        productViewModel.loadProduct(productId, forceRefresh = false)
     }
 
-    private fun showProductLoading() {
-        binding.emptyViewContainer.isVisible = false
-        emptyViewFragment.hide()
-        binding.pbLoading.isVisible = true
-        binding.mainContent.isVisible = false
-        binding.buyButton.isVisible = false
-    }
-
-    private fun showProductSuccess(domainProduct: DomainProduct?) {
-        binding.emptyViewContainer.isVisible = false
-        emptyViewFragment.hide()
-        binding.pbLoading.isVisible = false
-        val imageLoader = ImageUtils.initImageLoader(requireContext())
-        val options = ImageUtils.getPlaceholdersOption()
-        val productImageURL =
-            if (domainProduct?.product?.images != null && domainProduct.product.images?.isNotEmpty() == true) domainProduct.product.images!![0].original else ""
-        imageLoader.displayImage(productImageURL, binding.thumbnailImage, options)
-        binding.mainContent.isVisible = true
-        binding.detailLayout.title.text = domainProduct?.product?.title
-        binding.buyButton.text = domainProduct?.product?.buyNowText
-        binding.buyButton.isVisible = true
-        binding.detailLayout.totalExamsContainer.isVisible = false
-        binding.detailLayout.totalNotesContainer.isVisible = false
-        binding.detailLayout.examsListContainer.isVisible = false
-        binding.detailLayout.notesListContainer.isVisible = false
-
-        binding.detailLayout.price.text = domainProduct?.product?.price
-
-        if (domainProduct?.product?.descriptionHtml?.isEmpty() == true) {
-            binding.detailLayout.descriptionContainer.isVisible = false
-            binding.detailLayout.descriptionLine.isVisible = false
-        } else {
-            binding.detailLayout.descriptionContainer.isVisible = true
-            binding.detailLayout.descriptionLine.isVisible = true
-            val html = Html.fromHtml(
-                domainProduct?.product?.descriptionHtml,
-                UILImageGetter(binding.detailLayout.description, requireActivity()), null
-            )
-
-            binding.detailLayout.description.setText(
-                ZoomableImageString.convertString(html, requireActivity(), false),
-                TextView.BufferType.SPANNABLE
-            )
-
-            binding.detailLayout.description.movementMethod = LinkMovementMethod.getInstance()
-            binding.detailLayout.description.isVisible = true
+    private fun showLoadingState() {
+        binding.apply {
+            emptyViewContainer.isVisible = false
+            emptyViewFragment.hide()
+            pbLoading.isVisible = true
+            mainContent.isVisible = false
+            buyButton.isVisible = false
         }
     }
 
-    private fun showProductError(exception: TestpressException?) {
+    private fun renderProductDetails(domainProduct: DomainProduct?) {
+        domainProduct ?: return
+
+        with(binding) {
+            emptyViewContainer.isVisible = false
+            emptyViewFragment.hide()
+            pbLoading.isVisible = false
+            mainContent.isVisible = true
+
+            val product = domainProduct.product
+            val imageUrl = product.images?.firstOrNull()?.original.orEmpty()
+
+            ImageUtils.initImageLoader(requireContext()).displayImage(
+                imageUrl, thumbnailImage, ImageUtils.getPlaceholdersOption()
+            )
+
+            detailLayout.apply {
+                title.text = product.title
+                price.text = product.price
+                totalExamsContainer.isVisible = false
+                totalNotesContainer.isVisible = false
+                examsListContainer.isVisible = false
+                notesListContainer.isVisible = false
+            }
+
+            buyButton.apply {
+                text = product.buyNowText
+                isVisible = true
+            }
+
+            renderDescription(product.descriptionHtml)
+        }
+    }
+
+    private fun renderDescription(descriptionHtml: String?) {
+        val hasDescription = !descriptionHtml.isNullOrEmpty()
+        binding.detailLayout.apply {
+            descriptionContainer.isVisible = hasDescription
+            descriptionLine.isVisible = hasDescription
+        }
+
+        if (hasDescription) {
+            val html = Html.fromHtml(
+                descriptionHtml,
+                UILImageGetter(binding.detailLayout.description, requireActivity()),
+                null
+            )
+
+            binding.detailLayout.description.apply {
+                setText(
+                    ZoomableImageString.convertString(html, requireActivity(), false),
+                    TextView.BufferType.SPANNABLE
+                )
+                movementMethod = LinkMovementMethod.getInstance()
+                isVisible = true
+            }
+        }
+    }
+
+    private fun showErrorState(exception: TestpressException?) {
         binding.pbLoading.isVisible = false
         binding.emptyViewContainer.isVisible = true
-        exception?.let {
-            emptyViewFragment.displayError(it)
-        }
+        exception?.let(emptyViewFragment::displayError)
+    }
+
+    override fun onRetryClick() {
+        productViewModel.loadProduct(productId, forceRefresh = true)
     }
 
     override fun onDestroyView() {
@@ -133,18 +154,17 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
         _binding = null
     }
 
-    override fun onRetryClick() {
-        productsViewModel.load(productId!!, true)
-    }
-
     companion object {
+
+        private const val DEFAULT_PRODUCT_ID = -1
         fun show(activity: FragmentActivity, containerViewId: Int, productId: Int) {
-            val productDetailFragment = ProductDetailFragment()
-            val bundle = Bundle()
-            bundle.putInt(ProductDetailsActivityV2.PRODUCT_ID, productId)
-            productDetailFragment.arguments = bundle
+            val fragment = ProductDetailFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(ProductDetailsActivityV2.PRODUCT_ID, productId)
+                }
+            }
             activity.supportFragmentManager.beginTransaction()
-                .replace(containerViewId, productDetailFragment)
+                .replace(containerViewId, fragment)
                 .commitAllowingStateLoss()
         }
     }

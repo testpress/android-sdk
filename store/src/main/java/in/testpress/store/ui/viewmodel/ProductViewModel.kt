@@ -3,27 +3,26 @@ package `in`.testpress.store.ui.viewmodel
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.liveData
+import androidx.lifecycle.switchMap
 import `in`.testpress.database.entities.DomainProduct
 import `in`.testpress.network.Resource
 import `in`.testpress.store.data.repository.ProductRepository
 
 class ProductViewModel(private val repository: ProductRepository) : ViewModel() {
 
-    private val _product = MutableLiveData<LiveData<Resource<DomainProduct>>>()
-    val product: LiveData<Resource<DomainProduct>> = Transformations.switchMap(_product) { it }
+    private val _productLiveData = MutableLiveData<LiveData<Resource<DomainProduct>>>()
+    val product: LiveData<Resource<DomainProduct>> = _productLiveData.switchMap { it }
 
-    fun load(productId: Int, forceRefresh: Boolean = false) {
-
-        _product.value = liveData {
-            Resource.loading(_product.value?.value?.data)
+    fun loadProduct(productId: Int, forceRefresh: Boolean = false) {
+        _productLiveData.value = liveData {
+            emit(Resource.loading(_productLiveData.value?.value?.data))
+            emitSource(repository.loadProduct(productId, forceRefresh))
         }
-
-        _product.value = repository.loadProduct(productId, forceRefresh)
     }
+
 
     companion object {
         fun init(context: FragmentActivity): ProductViewModel {
