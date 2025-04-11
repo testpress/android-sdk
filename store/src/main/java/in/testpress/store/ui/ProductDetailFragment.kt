@@ -16,14 +16,14 @@ import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import `in`.testpress.store.R
-import `in`.testpress.store.databinding.TestpressProductDetailsFargmentBinding
+import `in`.testpress.store.databinding.TestpressProductDetailsFragmentBinding
 import `in`.testpress.store.ui.viewmodel.ProductViewModel
 import `in`.testpress.util.ImageUtils
 import `in`.testpress.util.UILImageGetter
 import `in`.testpress.util.ZoomableImageString
 
 class ProductDetailFragment : Fragment(), EmptyViewListener {
-    private var _binding: TestpressProductDetailsFargmentBinding? = null
+    private var _binding: TestpressProductDetailsFragmentBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var emptyViewFragment: EmptyViewFragment
@@ -40,7 +40,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = TestpressProductDetailsFargmentBinding.inflate(inflater, container, false)
+        _binding = TestpressProductDetailsFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -165,7 +165,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
             }
             activity.supportFragmentManager.beginTransaction()
                 .replace(containerViewId, fragment)
-                .commitAllowingStateLoss()
+                .commit()
         }
     }
 }
