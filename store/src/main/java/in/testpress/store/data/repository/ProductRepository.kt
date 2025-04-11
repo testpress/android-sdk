@@ -11,6 +11,9 @@ import `in`.testpress.store.data.model.NetworkProduct
 import `in`.testpress.store.data.model.toPriceEntities
 import `in`.testpress.store.data.model.toProductEntity
 import `in`.testpress.store.network.StoreApiClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 open class ProductRepository(context: Context) {
 
@@ -21,10 +24,12 @@ open class ProductRepository(context: Context) {
     fun loadProduct(productId: Int, forceRefresh: Boolean = false): LiveData<Resource<DomainProduct>> {
         return object : NetworkBoundResource<DomainProduct, NetworkProduct>() {
 
-            override suspend fun saveNetworkResponseToDB(item: NetworkProduct) {
-                database.productEntityDao().apply {
-                    insertProduct(item.toProductEntity())
-                    insertPrices(item.toPriceEntities())
+            override fun saveNetworkResponseToDB(item: NetworkProduct) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    database.productEntityDao().apply {
+                        insertProduct(item.toProductEntity())
+                        insertPrices(item.toPriceEntities())
+                    }
                 }
             }
 

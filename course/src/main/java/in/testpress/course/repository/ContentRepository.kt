@@ -38,7 +38,7 @@ open class ContentRepository(
         forceRefresh: Boolean = false
     ): LiveData<Resource<DomainContent>> {
         return object : NetworkBoundResource<DomainContent, NetworkContent>() {
-            override suspend fun saveNetworkResponseToDB(item: NetworkContent) {
+            override fun saveNetworkResponseToDB(item: NetworkContent) {
                 roomContentDao.insert(item.asDatabaseModel())
                 storeContentAndItsRelationsToDB(item)
             }
