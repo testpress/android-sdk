@@ -75,6 +75,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
                 else -> Unit
             }
         }
+        productsViewModel.load(productId!!, false)
     }
 
     private fun showLoadingState() {
