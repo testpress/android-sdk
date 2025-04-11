@@ -15,7 +15,7 @@
         android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/buy_button_container"
+        android:layout_above="@id/buy_button"
         android:visibility="gone">
 
         <com.google.android.material.appbar.AppBarLayout
