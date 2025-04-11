@@ -28,7 +28,6 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var productsViewModel: ProductViewModel
     private var productId: Int? = null
-    //private val product: DomainProduct? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,29 +60,38 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
 
 
     private fun observeViewModel() {
-        productsViewModel.loadProduct(productId = productId!!).observe(viewLifecycleOwner) { resource ->
+        productsViewModel.product.observe(viewLifecycleOwner) { resource ->
             when (resource?.status) {
-                Status.LOADING -> showProductLoading(resource.data)
+                Status.LOADING -> showProductLoading()
                 Status.SUCCESS -> showProductSuccess(resource.data)
                 Status.ERROR -> showProductError(resource.exception)
                 else -> Unit
             }
         }
+        productsViewModel.load(productId!!, false)
     }
 
-    private fun showProductLoading(product: DomainProduct?) {
-        // TODO: Show Loading
+    private fun showProductLoading() {
+        binding.emptyViewContainer.isVisible = false
+        emptyViewFragment.hide()
+        binding.pbLoading.isVisible = true
+        binding.mainContent.isVisible = false
+        binding.buyButton.isVisible = false
     }
 
     private fun showProductSuccess(domainProduct: DomainProduct?) {
+        binding.emptyViewContainer.isVisible = false
+        emptyViewFragment.hide()
         binding.pbLoading.isVisible = false
         val imageLoader = ImageUtils.initImageLoader(requireContext())
         val options = ImageUtils.getPlaceholdersOption()
-        val productImageURL = if (domainProduct?.product?.images != null && domainProduct.product.images?.isNotEmpty() == true) domainProduct.product.images!![0].original else ""
+        val productImageURL =
+            if (domainProduct?.product?.images != null && domainProduct.product.images?.isNotEmpty() == true) domainProduct.product.images!![0].original else ""
         imageLoader.displayImage(productImageURL, binding.thumbnailImage, options)
         binding.mainContent.isVisible = true
         binding.detailLayout.title.text = domainProduct?.product?.title
         binding.buyButton.text = domainProduct?.product?.buyNowText
+        binding.buyButton.isVisible = true
         binding.detailLayout.totalExamsContainer.isVisible = false
         binding.detailLayout.totalNotesContainer.isVisible = false
         binding.detailLayout.examsListContainer.isVisible = false
@@ -91,7 +99,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
 
         binding.detailLayout.price.text = domainProduct?.product?.price
 
-        if (domainProduct?.product?.descriptionHtml?.isEmpty() == true ) {
+        if (domainProduct?.product?.descriptionHtml?.isEmpty() == true) {
             binding.detailLayout.descriptionContainer.isVisible = false
             binding.detailLayout.descriptionLine.isVisible = false
         } else {
@@ -113,7 +121,11 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     }
 
     private fun showProductError(exception: TestpressException?) {
-        // TODO: Show Error
+        binding.pbLoading.isVisible = false
+        binding.emptyViewContainer.isVisible = true
+        exception?.let {
+            emptyViewFragment.displayError(it)
+        }
     }
 
     override fun onDestroyView() {
@@ -122,7 +134,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     }
 
     override fun onRetryClick() {
-
+        productsViewModel.load(productId!!, true)
     }
 
     companion object {
