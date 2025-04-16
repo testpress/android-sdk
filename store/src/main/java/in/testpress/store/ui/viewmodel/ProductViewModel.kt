@@ -37,7 +37,7 @@ class ProductViewModel(private val repository: ProductDetailRepository) : ViewMo
     private fun createOrderItem(product: DomainProduct): OrderItem {
         val price = product.prices.find { it.price == product.product.price }
         val orderItem = OrderItem()
-        orderItem.product = currentProduct?.product?.slug
+        orderItem.product = product.product.slug
         orderItem.quantity = 1
         orderItem.price = price?.id.toString()
         return orderItem
