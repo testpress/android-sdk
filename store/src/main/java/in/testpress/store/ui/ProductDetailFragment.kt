@@ -1,9 +1,10 @@
 package `in`.testpress.store.ui
 
+import android.app.ProgressDialog
 import android.os.Bundle
-import android.text.Html
+import android.text.*
 import android.text.method.LinkMovementMethod
-import android.util.Log
+import android.text.style.StrikethroughSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,8 +17,8 @@ import `in`.testpress.database.entities.DomainProduct
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
-import `in`.testpress.store.R
 import `in`.testpress.store.databinding.TestpressProductDetailsFragmentBinding
+import `in`.testpress.store.models.Order
 import `in`.testpress.store.ui.viewmodel.ProductViewModel
 import `in`.testpress.util.ImageUtils
 import `in`.testpress.util.UILImageGetter
@@ -27,6 +28,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     private var _binding: TestpressProductDetailsFragmentBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var progressDialog: ProgressDialog
     private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var productViewModel: ProductViewModel
     private var productId: Int = DEFAULT_PRODUCT_ID
@@ -36,6 +38,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
         super.onCreate(savedInstanceState)
         productId = requireArguments().getInt(ProductDetailsActivityV2.PRODUCT_ID)
         productViewModel = ProductViewModel.init(requireActivity(), productId)
+        progressDialog = ProgressDialog(requireActivity());
     }
 
     override fun onCreateView(
@@ -55,7 +58,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     private fun initEmptyView() {
         emptyViewFragment = EmptyViewFragment()
         childFragmentManager.beginTransaction()
-            .replace(R.id.empty_view_container, emptyViewFragment)
+            .replace(binding.emptyViewContainer.id, emptyViewFragment)
             .commit()
     }
 
@@ -76,6 +79,30 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
             }
         }
         productsViewModel.load(productId!!, false)
+
+        productViewModel.orderStatus.observe(viewLifecycleOwner) { orderStatus ->
+            when (orderStatus?.status) {
+                Status.LOADING -> showProgressDialog("Creating your order...")
+                Status.SUCCESS -> applyCoupon(orderStatus.data)
+                Status.ERROR -> {
+                    // TODO: Handel Error
+                }
+                else -> Unit
+            }
+        }
+
+        productViewModel.couponStatus.observe(viewLifecycleOwner) { couponStatus ->
+            when (couponStatus?.status) {
+                Status.LOADING -> showProgressDialog("Applying Coupon code...")
+                Status.SUCCESS -> {
+                    // TODO: Update coupon UI and Product Price
+                }
+                Status.ERROR -> {
+                    // TODO: Handel Error
+                }
+                else -> Unit
+            }
+        }
     }
 
     private fun showLoadingState() {
@@ -85,7 +112,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
             emptyViewFragment.hide()
             pbLoading.isVisible = true
             mainContent.isVisible = false
-            buyButton.isVisible = false
+            couponAndBuyButtonContainer.isVisible = false
         }
     }
 
@@ -122,6 +149,34 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
                     }
                 }
 
+            discountPrompt.apply {
+                setOnClickListener {
+                    if (discountContainer.visibility == View.GONE) {
+                        discountContainer.visibility = View.VISIBLE;
+                        discountPrompt.visibility = View.GONE;
+                    }
+                }
+            }
+
+            coupon.apply {
+                addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                        applyCoupon.isEnabled = p0.toString().trim().isNotEmpty()
+                    }
+
+                    override fun afterTextChanged(p0: Editable?) {}
+
+                })
+                setOnClickListener {
+                    // TODO: Hide soft keyword
+                    // TODO: Create Order
+                }
+            }
+
+            couponAndBuyButtonContainer.isVisible = true
+
                 renderDescription(product.descriptionHtml)
             }
         }
@@ -157,6 +212,63 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
         binding.emptyViewContainer.isVisible = true
         exception?.let(emptyViewFragment::displayError)
     }
+
+    private fun showProgressDialog(message: String) {
+        progressDialog.setMessage(message)
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+    }
+
+    private fun applyCoupon(order: Order?){
+        productViewModel.applyCoupon(order, binding.coupon.toString())
+    }
+
+//    private fun updateApplyCouponUI(createdOrder: Order?){
+//        updateCouponAppliedText(binding.coupon.toString(), createdOrder);
+//        updatePriceDisplay(createdOrder);
+//        progressDialog.dismiss();
+//    }
+//
+//    private fun updateCouponAppliedText(couponCode: String, createdOrder: Order?) {
+//        binding.couponAppliedText.setTextColor(
+//            ContextCompat.getColor(
+//                requireContext(),
+//                `in`.testpress.store.R.color.testpress_text_gray
+//            )
+//        )
+//        binding.couponAppliedText.setCompoundDrawablesWithIntrinsicBounds(
+//            `in`.testpress.store.R.drawable.baseline_check_24,
+//            0,
+//            0,
+//            0
+//        )
+//        try {
+//            val originalPrice: Double = product.getPrice().toDouble()
+//            val discountedPrice = createdOrder.orderItems[0].price.toDouble()
+//            val savings = originalPrice - discountedPrice
+//            couponAppliedText.setText("$couponCode Applied! You have saved ₹$savings on this course.")
+//        } catch (e: NumberFormatException) {
+//            e.printStackTrace()
+//            couponAppliedText.setText("$couponCode Applied! Discount has been applied successfully.")
+//        }
+//        couponAppliedText.setVisibility(View.VISIBLE)
+//    }
+//
+//    private fun updatePriceDisplay(createdOrder: Order?) {
+//        val priceText: TextView = findViewById(R.id.price)
+//        val newPrice = createdOrder.orderItems[0].price
+//        val oldPrice: String = product.getPrice()
+//        val oldPriceStrikethrough = SpannableString(oldPrice)
+//        oldPriceStrikethrough.setSpan(
+//            StrikethroughSpan(),
+//            0,
+//            oldPrice.length,
+//            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+//        )
+//        val finalText = SpannableStringBuilder()
+//        finalText.append(newPrice).append("  ").append(oldPriceStrikethrough)
+//        priceText.text = finalText
+//    }
 
     override fun onRetryClick() {
         productViewModel.retry()
