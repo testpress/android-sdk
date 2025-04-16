@@ -11,9 +11,13 @@ import kotlin.Int
 
 class ProductViewModel(private val repository: ProductDetailRepository) : ViewModel() {
 
-    val product = repository.resource
+    val productStatus = repository.resource
     val orderStatus = repository.orderStatus
     val couponStatus = repository.couponStatus
+
+    val product get() = productStatus.value?.data
+    val order get() = orderStatus.value?.data
+    val couponOrder get() = couponStatus.value?.data
 
     fun refresh() {
         repository.loadFromDatabase()
@@ -23,14 +27,14 @@ class ProductViewModel(private val repository: ProductDetailRepository) : ViewMo
         repository.retry()
     }
 
-    fun createOrder(product: DomainProduct) {
-        val orderItem = createOrderItem(product)
+    fun createOrder() {
+        val orderItem = createOrderItem(product!!)
         val orderItems: MutableList<OrderItem> = ArrayList()
         orderItems.add(orderItem)
         repository.createOrder(orderItems)
     }
 
-    fun applyCoupon(order: Order?, couponString: String){
+    fun applyCoupon(couponString: String){
         repository.applyCoupon(order?.id?.toLong()?: -1L, couponString)
     }
 
