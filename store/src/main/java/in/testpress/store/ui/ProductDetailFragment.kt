@@ -1,6 +1,7 @@
 package `in`.testpress.store.ui
 
 import android.app.ProgressDialog
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.text.*
@@ -9,6 +10,7 @@ import android.text.style.StrikethroughSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -16,6 +18,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import `in`.testpress.core.TestpressException
+import `in`.testpress.database.entities.DomainProduct
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
@@ -36,7 +39,8 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var productViewModel: ProductViewModel
     private var productId: Int = DEFAULT_PRODUCT_ID
-    private var product: DomainProduct? = null
+    private var domainProduct: DomainProduct? = null
+    private var order: Order? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,36 +71,54 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     }
 
     private fun observeProduct() {
-        productViewModel.productStatus.observe(viewLifecycleOwner) { resource ->
+        productViewModel.product.observe(viewLifecycleOwner) { resource ->
             when (resource?.status) {
-                Status.LOADING -> showLoadingState(resource.data)
-                Status.SUCCESS -> renderProductDetails(resource.data)
+                Status.LOADING ->{
+                    this.domainProduct = resource.data
+                    showLoadingState()
+                }
+                Status.SUCCESS ->{
+                    this.domainProduct = resource.data
+                    renderProductDetails()
+                }
                 Status.ERROR -> showErrorState(resource.exception)
                 else -> Unit
             }
         }
 
-        productViewModel.orderStatus.observe(viewLifecycleOwner) { orderStatus ->
-            when (orderStatus?.status) {
+        productViewModel.order.observe(viewLifecycleOwner) { resource ->
+            when (resource?.status) {
                 Status.LOADING -> showProgressDialog("Creating your order...")
-                Status.SUCCESS -> applyCoupon()
-                Status.ERROR -> handleOrderCreationFailure(orderStatus.exception)
+                Status.SUCCESS -> {
+                    this.order = resource.data
+                    applyCoupon()
+                }
+                Status.ERROR ->{
+                    this.order = null
+                    handleOrderCreationFailure(resource.exception)
+                }
                 else -> Unit
             }
         }
 
-        productViewModel.couponStatus.observe(viewLifecycleOwner) { couponStatus ->
-            when (couponStatus?.status) {
+        productViewModel.coupon.observe(viewLifecycleOwner) { resource ->
+            when (resource?.status) {
                 Status.LOADING -> showProgressDialog("Applying Coupon code...")
-                Status.SUCCESS -> updateApplyCouponUI()
-                Status.ERROR -> handleCouponApplicationFailure(couponStatus.exception)
+                Status.SUCCESS -> {
+                    this.order = resource.data
+                    updateApplyCouponUI()
+                }
+                Status.ERROR ->{
+                    this.order = null
+                    handleCouponApplicationFailure(resource.exception)
+                }
                 else -> Unit
             }
         }
     }
 
     private fun showLoadingState() {
-        if (product != null) return
+        if (domainProduct != null) return
         binding.apply {
             emptyViewContainer.isVisible = false
             emptyViewFragment.hide()
@@ -107,7 +129,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     }
 
     private fun renderProductDetails() {
-        product?.let { domainProduct ->
+        domainProduct?.let { domainProduct ->
 
             val product = domainProduct.product
 
@@ -133,39 +155,40 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
 
                 buyButton.apply {
                     text = product.buyNowText
-                    isVisible = true
                     setOnClickListener {
                         // TODO: Open OrderConfirmActivity
                     }
                 }
 
-            discountPrompt.apply {
-                setOnClickListener {
-                    if (discountContainer.visibility == View.GONE) {
-                        discountContainer.visibility = View.VISIBLE;
-                        discountPrompt.visibility = View.GONE;
+                discountPrompt.apply {
+                    setOnClickListener {
+                        if (discountContainer.visibility == View.GONE) {
+                            discountContainer.visibility = View.VISIBLE;
+                            discountPrompt.visibility = View.GONE;
+                        }
                     }
                 }
-            }
 
-            coupon.apply {
-                addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                        applyCoupon.isEnabled = p0.toString().trim().isNotEmpty()
-                    }
-                    override fun afterTextChanged(p0: Editable?) {}
-                })
-            }
+                couponInputEditText.apply {
+                    addTextChangedListener(object : TextWatcher {
+                        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                            applyCouponButton.isEnabled = p0.toString().trim().isNotEmpty()
+                        }
+                        override fun afterTextChanged(p0: Editable?) {}
+                    })
+                }
 
-            applyCoupon.setOnClickListener {
-                productViewModel.createOrder()
-            }
+                applyCouponButton.setOnClickListener {
+                    hideKeyboard()
+                    productViewModel.createOrder(domainProduct)
+                }
 
-            couponAndBuyButtonContainer.isVisible = true
+                couponAndBuyButtonContainer.isVisible = true
 
                 renderDescription(product.descriptionHtml)
             }
+
         }
     }
 
@@ -207,7 +230,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     }
 
     private fun applyCoupon(){
-        productViewModel.applyCoupon(binding.coupon.text.toString())
+        productViewModel.applyCoupon(order?.id?.toLong()?: -1L, binding.couponInputEditText.text.toString())
     }
 
     private fun handleOrderCreationFailure(exception: TestpressException?) {
@@ -226,7 +249,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     }
 
     private fun updateApplyCouponUI(){
-        updateCouponAppliedText(binding.coupon.text.toString(), productViewModel.couponOrder)
+        updateCouponAppliedText(binding.couponInputEditText.text.toString(), order)
         updatePriceDisplay()
         progressDialog.dismiss()
     }
@@ -245,7 +268,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
             0
         )
         try {
-            val originalPrice: Double? = productViewModel.product?.product?.price?.toDouble()
+            val originalPrice: Double? = domainProduct?.product?.price?.toDouble()
             val discountedPrice = createdOrder?.orderItems?.get(0)?.price?.toDouble()
             val savings = (originalPrice ?: 0.0) - (discountedPrice ?: 0.0)
             binding.couponAppliedText.text = "$couponCode Applied! You have saved ₹$savings on this course."
@@ -257,8 +280,8 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     }
 
     private fun updatePriceDisplay() {
-        val newPrice = productViewModel.couponOrder?.orderItems?.get(0)?.price
-        val oldPrice: String = productViewModel.product?.product?.price ?: ""
+        val newPrice = order?.orderItems?.get(0)?.price
+        val oldPrice: String = domainProduct?.product?.price ?: ""
         val oldPriceStrikethrough = SpannableString(oldPrice)
         oldPriceStrikethrough.setSpan(
             StrikethroughSpan(),
@@ -272,7 +295,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     }
 
     private fun handleCouponApplicationFailure(exception: TestpressException?) {
-        binding.detailLayout.price.text = productViewModel.product?.product?.price
+        binding.detailLayout.price.text = domainProduct?.product?.price
         if (exception?.isNetworkError == true) {
             showToast("Please check your internet connection")
         } else {
@@ -291,6 +314,14 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
 
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun hideKeyboard() {
+        val imm: InputMethodManager? = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
+        val currentFocus = requireActivity().currentFocus
+        if (currentFocus != null) {
+            imm?.hideSoftInputFromWindow(currentFocus.windowToken, 0)
+        }
     }
 
     override fun onRetryClick() {
