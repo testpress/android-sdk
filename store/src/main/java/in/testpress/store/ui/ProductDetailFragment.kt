@@ -30,6 +30,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var productViewModel: ProductViewModel
     private var productId: Int = DEFAULT_PRODUCT_ID
+    private var product: DomainProduct? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,16 +63,22 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     private fun observeProduct() {
         productViewModel.product.observe(viewLifecycleOwner) { resource ->
             when (resource?.status) {
-                Status.LOADING -> showLoadingState(resource.data)
-                Status.SUCCESS -> renderProductDetails(resource.data)
+                Status.LOADING ->{
+                    this.product = resource.data
+                    showLoadingState()
+                }
+                Status.SUCCESS ->{
+                    this.product = resource.data
+                    renderProductDetails()
+                }
                 Status.ERROR -> showErrorState(resource.exception)
                 else -> Unit
             }
         }
     }
 
-    private fun showLoadingState(domainProduct: DomainProduct?) {
-        if (domainProduct != null) return
+    private fun showLoadingState() {
+        if (product != null) return
         binding.apply {
             emptyViewContainer.isVisible = false
             emptyViewFragment.hide()
@@ -81,37 +88,41 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
         }
     }
 
-    private fun renderProductDetails(domainProduct: DomainProduct?) {
-        domainProduct ?: return
-
-        with(binding) {
-            emptyViewContainer.isVisible = false
-            emptyViewFragment.hide()
-            pbLoading.isVisible = false
-            mainContent.isVisible = true
+    private fun renderProductDetails() {
+        product?.let { domainProduct ->
 
             val product = domainProduct.product
-            val imageUrl = product.images?.firstOrNull()?.original.orEmpty()
 
-            ImageUtils.initImageLoader(requireContext()).displayImage(
-                imageUrl, thumbnailImage, ImageUtils.getPlaceholdersOption()
-            )
+            with(binding) {
+                emptyViewContainer.isVisible = false
+                emptyViewFragment.hide()
+                pbLoading.isVisible = false
+                mainContent.isVisible = true
 
-            detailLayout.apply {
-                title.text = product.title
-                price.text = product.price
-                totalExamsContainer.isVisible = false
-                totalNotesContainer.isVisible = false
-                examsListContainer.isVisible = false
-                notesListContainer.isVisible = false
+                val imageUrl = product.images?.firstOrNull()?.original.orEmpty()
+                ImageUtils.initImageLoader(requireContext()).displayImage(
+                    imageUrl, thumbnailImage, ImageUtils.getPlaceholdersOption()
+                )
+
+                detailLayout.apply {
+                    title.text = product.title
+                    price.text = product.price
+                    totalExamsContainer.isVisible = false
+                    totalNotesContainer.isVisible = false
+                    examsListContainer.isVisible = false
+                    notesListContainer.isVisible = false
+                }
+
+                buyButton.apply {
+                    text = product.buyNowText
+                    isVisible = true
+                    setOnClickListener {
+                        // TODO: Open OrderConfirmActivity
+                    }
+                }
+
+                renderDescription(product.descriptionHtml)
             }
-
-            buyButton.apply {
-                text = product.buyNowText
-                isVisible = true
-            }
-
-            renderDescription(product.descriptionHtml)
         }
     }
 
