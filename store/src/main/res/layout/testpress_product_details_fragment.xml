@@ -117,7 +117,7 @@
                 android:orientation="horizontal">
 
                 <EditText
-                    android:id="@+id/coupon"
+                    android:id="@+id/coupon_input_edit_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -129,7 +129,7 @@
                     android:textSize="16sp" />
 
                 <Button
-                    android:id="@+id/apply_coupon"
+                    android:id="@+id/apply_coupon_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
