@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
+import in.testpress.store.data.model.NetworkProduct;
 import in.testpress.store.data.model.NetworkProductCategory;
 import in.testpress.store.data.model.NetworkProductListResponse;
 import in.testpress.store.models.NetworkHash;
@@ -26,6 +27,7 @@ import static in.testpress.store.network.StoreApiClient.ORDER_API_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDER_CONFIRM_PATH;
 import static in.testpress.store.network.StoreApiClient.ORDER_STATE_REFRESH_PATH;
 import static in.testpress.store.network.StoreApiClient.PAYU_HASH_GENERATOR_PATH;
+import static in.testpress.store.network.StoreApiClient.V3_PRODUCT_PATH;
 import static in.testpress.store.network.StoreApiClient.v2_4_ORDERS_PATH;
 import static in.testpress.store.network.StoreApiClient.v3_ORDERS_PATH;
 import static in.testpress.store.network.StoreApiClient.V2_5_PRODUCTS_CATEGORIES_PATH;
@@ -69,6 +71,11 @@ public interface ProductService {
     @GET(V2_5_PRODUCTS_CATEGORIES_PATH)
     RetrofitCall<ApiResponse<List<NetworkProductCategory>>> getProductsCategories(
             @QueryMap Map<String, Object> options
+    );
+
+    @GET(V3_PRODUCT_PATH + "{product_id}")
+    RetrofitCall<NetworkProduct> getProductDetailV3(
+            @Path(value = "product_id", encoded = true) int productId
     );
 }
 

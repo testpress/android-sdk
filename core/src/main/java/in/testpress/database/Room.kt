@@ -93,6 +93,7 @@ abstract class TestpressDatabase : RoomDatabase() {
     abstract fun offlineAttemptSectionDao():OfflineAttemptSectionDao
     abstract fun offlineAttemptItemDoa(): OfflineAttemptItemDao
     abstract fun productLiteEntityDao(): ProductLiteEntityDao
+    abstract fun productEntityDao(): ProductEntityDao
 
     companion object {
         private lateinit var INSTANCE: TestpressDatabase
