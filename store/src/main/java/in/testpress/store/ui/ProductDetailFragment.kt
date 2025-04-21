@@ -7,23 +7,30 @@ import android.os.Bundle
 import android.text.*
 import android.text.method.LinkMovementMethod
 import android.text.style.StrikethroughSpan
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import `in`.testpress.core.TestpressException
 import `in`.testpress.database.entities.DomainProduct
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
+import `in`.testpress.store.R
+import `in`.testpress.store.databinding.DialogProgressBinding
 import `in`.testpress.store.databinding.TestpressProductDetailsFragmentBinding
 import `in`.testpress.store.models.Order
 import `in`.testpress.store.ui.viewmodel.ProductViewModel
@@ -37,7 +44,10 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     private var _binding: TestpressProductDetailsFragmentBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var progressDialog: ProgressDialog
+    private var _dialogBinding: DialogProgressBinding? = null
+    private val dialogBinding get() = _dialogBinding!!
+
+    private var loadingDialog: AlertDialog? = null
     private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var productViewModel: ProductViewModel
     private var productId: Int = DEFAULT_PRODUCT_ID
@@ -48,7 +58,6 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
         super.onCreate(savedInstanceState)
         productId = requireArguments().getInt(ProductDetailsActivityV2.PRODUCT_ID)
         productViewModel = ProductViewModel.init(requireActivity(), productId)
-        progressDialog = ProgressDialog(requireActivity());
     }
 
     override fun onCreateView(
@@ -56,6 +65,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
         savedInstanceState: Bundle?
     ): View {
         _binding = TestpressProductDetailsFragmentBinding.inflate(inflater, container, false)
+        _dialogBinding = DialogProgressBinding.inflate(inflater)
         return binding.root
     }
 
@@ -225,19 +235,27 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     }
 
     private fun showProgressDialog(message: String) {
-        progressDialog.setMessage(message)
-        progressDialog.setCancelable(false)
-        progressDialog.show()
+        if (loadingDialog == null) {
+            loadingDialog = MaterialAlertDialogBuilder(requireContext())
+                .setView(dialogBinding.root)
+                .setCancelable(false)
+                .create()
+        }
+        dialogBinding.messageText.text = message
+        loadingDialog?.show()
     }
 
-    private fun applyCoupon(){
-        if (order != null) {
-            productViewModel.applyCoupon(order!!.id.toLong(), binding.couponInputEditText.text.toString())
+    private fun applyCoupon() {
+        order?.let { safeOrder ->
+            productViewModel.applyCoupon(
+                safeOrder.id.toLong(),
+                binding.couponInputEditText.text.toString()
+            )
         }
     }
 
     private fun handleOrderCreationFailure(exception: TestpressException?) {
-        progressDialog.dismiss()
+        loadingDialog?.dismiss()
         if (exception?.isNetworkError == true) {
             showToast("Please check your internet connection")
         } else {
@@ -254,7 +272,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     private fun updateApplyCouponUI(){
         updateCouponAppliedText(binding.couponInputEditText.text.toString(), order)
         updatePriceDisplay()
-        progressDialog.dismiss()
+        loadingDialog?.dismiss()
     }
 
     private fun updateCouponAppliedText(couponCode: String, createdOrder: Order?) {
@@ -283,7 +301,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     }
 
     private fun updatePriceDisplay() {
-        val newPrice = order?.orderItems?.get(0)?.price
+        val newPrice = order?.orderItems?.firstOrNull()?.price ?: return
         val oldPrice: String = domainProduct?.product?.price ?: ""
         val oldPriceStrikethrough = SpannableString(oldPrice)
         oldPriceStrikethrough.setSpan(
@@ -304,7 +322,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
         } else {
             showInvalidCouponMessage()
         }
-        progressDialog.dismiss()
+        loadingDialog?.dismiss()
     }
 
 
