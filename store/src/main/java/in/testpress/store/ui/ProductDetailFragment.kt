@@ -15,8 +15,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import `in`.testpress.core.TestpressException
 import `in`.testpress.database.entities.DomainProduct
 import `in`.testpress.enums.Status
@@ -41,8 +43,6 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     private var productId: Int = DEFAULT_PRODUCT_ID
     private var domainProduct: DomainProduct? = null
     private var order: Order? = null
-    private var appliedCoupon = ""
-    private var validCouponApplied = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,12 +108,10 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
                 Status.LOADING -> showProgressDialog("Applying Coupon code...")
                 Status.SUCCESS -> {
                     this.order = resource.data
-                    validCouponApplied = true
                     updateApplyCouponUI()
                 }
                 Status.ERROR ->{
                     this.order = null
-                    validCouponApplied = false
                     handleCouponApplicationFailure(resource.exception)
                 }
                 else -> Unit
@@ -173,29 +171,18 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
                     }
                 }
 
-                couponInputEditText.apply {
-                    addTextChangedListener(object : TextWatcher {
-                        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-                        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                            applyCouponButton.isEnabled = p0.toString().trim().isNotEmpty()
-                        }
-                        override fun afterTextChanged(p0: Editable?) {}
-                    })
-                }
+                couponInputEditText.addTextChangedListener(afterTextChanged = {
+                    applyCouponButton.isEnabled = it?.trim()?.isNotEmpty() == true
+                })
 
                 applyCouponButton.setOnClickListener {
                     val enteredCoupon = couponInputEditText.text.toString()
-                    if (appliedCoupon == enteredCoupon) {
-                        if (validCouponApplied){
-                            Toast.makeText(requireContext(),"This coupon is already applied.",Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(requireContext(),"This coupon was already tried and is invalid. Try a different one.",Toast.LENGTH_SHORT).show()
-                        }
-                        return@setOnClickListener
-                    }
                     hideKeyboard()
-                    appliedCoupon = enteredCoupon
-                    productViewModel.createOrder(domainProduct)
+                    if (order == null) {
+                        productViewModel.createOrder(domainProduct)
+                    } else {
+                        productViewModel.applyCoupon(order!!.id.toLong(), enteredCoupon)
+                    }
                 }
 
                 couponAndBuyButtonContainer.isVisible = true
@@ -244,7 +231,9 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     }
 
     private fun applyCoupon(){
-        productViewModel.applyCoupon(order?.id?.toLong()?: -1L, binding.couponInputEditText.text.toString())
+        if (order != null) {
+            productViewModel.applyCoupon(order!!.id.toLong(), binding.couponInputEditText.text.toString())
+        }
     }
 
     private fun handleOrderCreationFailure(exception: TestpressException?) {
