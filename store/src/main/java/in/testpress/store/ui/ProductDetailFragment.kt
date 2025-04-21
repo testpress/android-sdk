@@ -41,6 +41,8 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     private var productId: Int = DEFAULT_PRODUCT_ID
     private var domainProduct: DomainProduct? = null
     private var order: Order? = null
+    private var appliedCoupon = ""
+    private var validCouponApplied = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,10 +108,12 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
                 Status.LOADING -> showProgressDialog("Applying Coupon code...")
                 Status.SUCCESS -> {
                     this.order = resource.data
+                    validCouponApplied = true
                     updateApplyCouponUI()
                 }
                 Status.ERROR ->{
                     this.order = null
+                    validCouponApplied = false
                     handleCouponApplicationFailure(resource.exception)
                 }
                 else -> Unit
@@ -180,7 +184,17 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
                 }
 
                 applyCouponButton.setOnClickListener {
+                    val enteredCoupon = couponInputEditText.text.toString()
+                    if (appliedCoupon == enteredCoupon) {
+                        if (validCouponApplied){
+                            Toast.makeText(requireContext(),"This coupon is already applied.",Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(requireContext(),"This coupon was already tried and is invalid. Try a different one.",Toast.LENGTH_SHORT).show()
+                        }
+                        return@setOnClickListener
+                    }
                     hideKeyboard()
+                    appliedCoupon = enteredCoupon
                     productViewModel.createOrder(domainProduct)
                 }
 
