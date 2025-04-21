@@ -8,6 +8,7 @@ import in.testpress.core.TestpressSdk;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
+import in.testpress.store.data.model.NetworkProduct;
 import in.testpress.store.data.model.NetworkProductCategory;
 import in.testpress.store.data.model.NetworkProductListResponse;
 import in.testpress.store.models.NetworkHash;
@@ -44,6 +45,8 @@ public class StoreApiClient extends TestpressApiClient {
     public static final String APPLY_COUPON_PATH = "/apply-coupon/";
 
     public static final String V2_5_PRODUCTS_CATEGORIES_PATH = "/api/v2.5/products/categories/";
+
+    public static final String V3_PRODUCT_PATH = "/api/v3/products/";
 
     public StoreApiClient(final Context context) {
         super(context, checkTestpressSessionIsNull(TestpressSdk.getTestpressSession(context)));
@@ -106,5 +109,9 @@ public class StoreApiClient extends TestpressApiClient {
 
     public RetrofitCall<ApiResponse<List<NetworkProductCategory>>> getProductsCategories(Map<String, Object> queryParams) {
         return getProductService().getProductsCategories(queryParams);
+    }
+
+    public RetrofitCall<NetworkProduct> getProductDetailV3(int productId) {
+        return getProductService().getProductDetailV3(productId);
     }
 }

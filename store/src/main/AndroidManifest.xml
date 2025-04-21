@@ -16,6 +16,11 @@
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
+        <activity android:name=".ui.ProductDetailsActivityV2"
+            android:label="@string/testpress_products"
+            android:theme="@style/TestpressTheme"
+            android:configChanges="orientation|keyboard|screenSize" />
+
         <activity
             android:name=".ui.OrderConfirmActivity"
             android:label="@string/testpress_shipping_address"

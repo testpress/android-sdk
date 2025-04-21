@@ -89,11 +89,12 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
             requireContext(),
             onRetry = { productsViewModel.retryNextPage() },
             onItemClick = { product ->
-                val intent = Intent(requireContext(), ProductDetailsActivity::class.java)
-                intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.slug)
+                val intent = Intent(requireContext(), ProductDetailsActivityV2::class.java)
+                intent.putExtra(ProductDetailsActivityV2.PRODUCT_ID, product.id)
                 requireActivity().startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE)
             }
         )
+
 
         val layoutManager = LinearLayoutManager(requireContext())
         binding.productList.apply {
