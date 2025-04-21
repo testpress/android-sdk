@@ -290,9 +290,9 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
         )
         try {
             val originalPrice: Double? = domainProduct?.product?.price?.toDouble()
-            val discountedPrice = createdOrder?.orderItems?.get(0)?.price?.toDouble()
+            val discountedPrice = createdOrder?.orderItems?.firstOrNull()?.price?.toDouble()
             val savings = (originalPrice ?: 0.0) - (discountedPrice ?: 0.0)
-            binding.couponAppliedText.text = "$couponCode Applied! You have saved ₹$savings on this course."
+            binding.couponAppliedText.text = "$couponCode Applied! You have saved ₹${"%.2f".format(savings)} on this course."
         } catch (e: NumberFormatException) {
             e.printStackTrace()
             binding.couponAppliedText.text = "$couponCode Applied! Discount has been applied successfully."
@@ -351,6 +351,9 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        loadingDialog?.dismiss()
+        loadingDialog = null
+        _dialogBinding = null
         _binding = null
     }
 
