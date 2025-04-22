@@ -8,6 +8,8 @@ public class Images implements Parcelable {
     private String medium;
     private String small;
 
+    public Images(){}
+
     // Parcelling part
     public Images(Parcel parcel){
         original = parcel.readString();

@@ -33,6 +33,8 @@ public class Product implements Parcelable {
     private List<Notes> notes = new ArrayList<Notes>();
     private List<PricesItem> prices = new ArrayList<PricesItem>();
 
+    public Product(){}
+
     // Parcelling part
     public Product(Parcel parcel){
         url        = parcel.readString();
