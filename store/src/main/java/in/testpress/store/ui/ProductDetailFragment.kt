@@ -1,19 +1,17 @@
 package `in`.testpress.store.ui
 
-import android.app.ProgressDialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.text.*
 import android.text.method.LinkMovementMethod
 import android.text.style.StrikethroughSpan
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -23,13 +21,13 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import `in`.testpress.core.TestpressException
 import `in`.testpress.database.entities.DomainProduct
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
-import `in`.testpress.store.R
+import `in`.testpress.store.TestpressStore
+import `in`.testpress.store.data.model.mapping.asProduct
 import `in`.testpress.store.databinding.DialogProgressBinding
 import `in`.testpress.store.databinding.TestpressProductDetailsFragmentBinding
 import `in`.testpress.store.models.Order
@@ -168,7 +166,16 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
                 buyButton.apply {
                     text = product.buyNowText
                     setOnClickListener {
-                        // TODO: Open OrderConfirmActivity
+                        if (product.paymentLink.isNullOrEmpty()) {
+                            val intent = Intent(requireContext(), OrderConfirmActivity::class.java)
+                            intent.putExtra(ProductDetailsActivity.PRODUCT, domainProduct.asProduct())
+                            intent.putExtra(ProductDetailsActivity.ORDER, order)
+                            startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE)
+                        } else {
+                            val uri = Uri.parse(product.paymentLink)
+                            val intent = Intent(Intent.ACTION_VIEW, uri)
+                            startActivity(intent)
+                        }
                     }
                 }
 
