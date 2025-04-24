@@ -100,12 +100,4 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
             activity.startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE);
         }
     }
-
-    private void openChapters(Product product, Activity activity) {
-        activity.startActivity(ChapterDetailActivity.createIntent(
-                product.getTitle(),
-                product.getCourseIds().get(0).toString(),
-                activity, product.getSlug()));
-    }
-
 }
