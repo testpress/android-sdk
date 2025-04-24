@@ -92,10 +92,8 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
     }
 
     private void showProductDetail(Product product) {
-        if (product.getCourseIds().size() > 1) {
+        if (product.getCourseIds().size() >= 1) {
             activity.startActivity(CoursePreviewActivity.createIntent(product.getCourseIds(), activity, product.getSlug()));
-        } else if (product.getCourseIds().size() == 1 ) {
-            openChapters(product, activity);
         } else {
             Intent intent = new Intent(activity, ProductDetailsActivity.class);
             intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.getSlug());
