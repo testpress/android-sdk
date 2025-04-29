@@ -61,7 +61,6 @@ dependencies {
     testImplementation rootProject.mockServer
     testImplementation "androidx.arch.core:core-testing:2.1.0"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlin_coroutine_version"
-    testImplementation "com.github.nimbl3:robolectric.shadows-supportv4:4.1-SNAPSHOT"
     testImplementation (rootProject.powermockMockio) {
         exclude group: 'org.mockito'
     }
