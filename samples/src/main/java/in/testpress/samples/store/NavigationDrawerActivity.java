@@ -9,6 +9,7 @@ import in.testpress.samples.BaseNavigationDrawerActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.store.TestpressStore;
+import in.testpress.store.ui.ProductDetailFragmentV2;
 import in.testpress.store.ui.ProductListFragmentV2;
 
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
@@ -47,7 +48,7 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                 //noinspection ConstantConditions
                 session.getInstituteSettings().setAccessCodeEnabled(true);
                 TestpressSdk.setTestpressSession(this, session);
-                ProductListFragmentV2.Companion.show(this, R.id.fragment_container);
+                ProductDetailFragmentV2.Companion.show(this, R.id.fragment_container);
             }
         } else {
             Intent intent = new Intent(this, TestpressCoreSampleActivity.class);
