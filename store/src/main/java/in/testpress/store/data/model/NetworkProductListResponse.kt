@@ -9,5 +9,6 @@ data class NetworkProductListResponse(
 )
 
 data class Results(
-    val products: List<NetworkProductLite>
+    val products: List<NetworkProductLite>,
+    val courses: List<NetworkCourses>
 )

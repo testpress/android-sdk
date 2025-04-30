@@ -2,8 +2,10 @@ package `in`.testpress.store.data.repository
 
 import android.content.Context
 import `in`.testpress.core.TestpressCallback
+import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.data.repository.BasePaginatedRepository
 import `in`.testpress.database.entities.ProductLiteEntity
+import `in`.testpress.models.greendao.Course
 import `in`.testpress.network.Resource
 import `in`.testpress.store.data.model.NetworkProductListResponse
 import `in`.testpress.store.data.model.asDomain
@@ -13,7 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
 class ProductListRepository(
-    context: Context,
+    val context: Context,
     scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 ) :
     BasePaginatedRepository<NetworkProductListResponse, ProductLiteEntity>(context, scope) {
@@ -47,6 +49,8 @@ class ProductListRepository(
 
     override suspend fun saveToDb(response: NetworkProductListResponse) {
         database.productLiteEntityDao().insertAll(response.results.products.asDomain())
+        val courseDao = TestpressSDKDatabase.getCourseDao(context)
+        courseDao.insertOrReplaceInTx(response.results.courses.asDomain())
     }
 
     override suspend fun updateLiveDataFromDb() {

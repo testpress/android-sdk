@@ -35,6 +35,7 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
     private lateinit var categoriesViewModel: ProductCategoryViewModel
     private lateinit var productsAdapter: ProductListAdapter
     private lateinit var categoriesAdapter: ProductCategoryAdapter
+    private var onProductClickListener: OnProductClickListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,9 +90,14 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
             requireContext(),
             onRetry = { productsViewModel.retryNextPage() },
             onItemClick = { product ->
-                val intent = Intent(requireContext(), ProductDetailsActivityV2::class.java)
-                intent.putExtra(ProductDetailsActivityV2.PRODUCT_ID, product.id)
-                requireActivity().startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE)
+                if (onProductClickListener == null){
+                    val intent = Intent(requireContext(), ProductDetailsActivityV2::class.java)
+                    intent.putExtra(ProductDetailsActivityV2.PRODUCT_ID, product.id)
+                    requireActivity().startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE)
+                } else {
+                    onProductClickListener?.onClick(product)
+                }
+
             }
         )
 
@@ -243,11 +249,25 @@ class ProductListFragmentV2 : Fragment(), EmptyViewListener {
         categoriesViewModel.retryNextPage()
     }
 
+    fun setOnProductClickListener(onProductClickListener: OnProductClickListener?){
+        this.onProductClickListener = onProductClickListener
+    }
+
     companion object {
         fun show(activity: FragmentActivity, containerViewId: Int) {
+            show(activity, containerViewId,null)
+        }
+
+        fun show(activity: FragmentActivity, containerViewId: Int, onProductClickListener: OnProductClickListener?) {
+            val productListFragmentV2 = ProductListFragmentV2()
+            productListFragmentV2.setOnProductClickListener(onProductClickListener)
             activity.supportFragmentManager.beginTransaction()
-                .replace(containerViewId, ProductListFragmentV2())
+                .replace(containerViewId, productListFragmentV2)
                 .commitAllowingStateLoss()
         }
+    }
+
+    interface OnProductClickListener {
+        fun onClick(product: ProductLiteEntity)
     }
 }
