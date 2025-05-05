@@ -19,6 +19,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import `in`.testpress.database.entities.DomainProduct
 import `in`.testpress.enums.Status
+import `in`.testpress.store.R
 import `in`.testpress.store.data.repository.ProductDetailRepository
 import `in`.testpress.store.databinding.TestpressProductDetailsDescriptionFragmentBinding
 import `in`.testpress.store.databinding.TestpressProductDetailsFragmentV2Binding
@@ -33,7 +34,13 @@ class ProductDetailFragmentV2 : Fragment() {
     private var productId: Int = DEFAULT_PRODUCT_ID
     private var domainProduct: DomainProduct? = null
 
-    private val tabTitles = listOf("Description", "Course Curriculum")
+    private val tabTitles = listOf("Description", "Course Curriculum", "Subjects", "FAQ")
+    private val tabIcons = listOf(
+        R.drawable.baseline_description_24,
+        R.drawable.baseline_menu_book_24,
+        R.drawable.baseline_subject_24,
+        R.drawable.baseline_question_mark_24
+    )
 
     private val productViewModel: ProductViewModel by lazy {
         ViewModelProvider(requireActivity(), ProductViewModelFactory(requireContext(), productId))
@@ -61,6 +68,7 @@ class ProductDetailFragmentV2 : Fragment() {
 
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = tabTitles[position]
+            //tab.setIcon(tabIcons[position])
         }.attach()
     }
 
@@ -84,7 +92,7 @@ class ProductDetailFragmentV2 : Fragment() {
             imageUrl, binding.productThumbnail, ImageUtils.getPlaceholdersOption()
         )
         binding.title.text = domainProduct?.product?.title
-        binding.price.text = String.format("₹%s", domainProduct?.product?.price)
+        //binding.price.text = String.format("₹%s", domainProduct?.product?.price)
     }
 
     override fun onDestroyView() {
@@ -115,6 +123,8 @@ class ProductDetailFragmentV2 : Fragment() {
             return when (position) {
                 0 -> ProductDescriptionFragment()
                 1 -> ProductCurriculumFragment()
+                2-> ProductSubjectsFragment()
+                3 -> ProductFAQFragment()
                 else -> throw IllegalArgumentException("Invalid tab index")
             }
         }
@@ -215,6 +225,34 @@ class ProductCurriculumFragment : Fragment() {
     ): View? {
         val textView = TextView(requireContext())
         textView.text = "Curriculum Content"
+        textView.textSize = 18f
+        return NestedScrollView(requireContext()).apply {
+            addView(textView)
+        }
+    }
+}
+
+class ProductSubjectsFragment : Fragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val textView = TextView(requireContext())
+        textView.text = "Subjects"
+        textView.textSize = 18f
+        return NestedScrollView(requireContext()).apply {
+            addView(textView)
+        }
+    }
+}
+
+class ProductFAQFragment : Fragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val textView = TextView(requireContext())
+        textView.text = "FAQ"
         textView.textSize = 18f
         return NestedScrollView(requireContext()).apply {
             addView(textView)
