@@ -48,7 +48,7 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                 //noinspection ConstantConditions
                 session.getInstituteSettings().setAccessCodeEnabled(true);
                 TestpressSdk.setTestpressSession(this, session);
-                ProductDetailFragmentV2.Companion.show(this, R.id.fragment_container);
+                ProductListFragmentV2.Companion.show(this, R.id.fragment_container);
             }
         } else {
             Intent intent = new Intent(this, TestpressCoreSampleActivity.class);

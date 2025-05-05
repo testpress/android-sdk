@@ -25,17 +25,41 @@
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"/>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:weightSum="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Sociology Test Bundle Sociology Test Bundle Sociology Test Bundle"
+                    android:layout_weight="0.8"
+                    android:textColor="@color/testpress_black"
+                    android:textSize="26sp"/>
+
+                <TextView
+                    android:id="@+id/price"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.2"
+                    android:textColor="@color/testpress_black"
+                    android:text="$100.00"/>
+
+            </LinearLayout>
+
             <!-- TabLayout: Sticky behavior when scrolled -->
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tab_layout"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
-                android:background="?attr/colorPrimary"
-                app:tabMode="fixed"
-                app:tabGravity="fill"
-                app:tabTextColor="@android:color/white"
-                app:tabIndicatorColor="@android:color/white"
+                app:tabGravity="start"
+                app:tabTextColor="?attr/colorPrimary"
+                app:tabIndicatorColor="?attr/colorPrimary"
                 app:layout_scrollFlags="scroll|enterAlways|snap" />
 
             <!-- ViewPager2: For displaying fragments in tabs -->
