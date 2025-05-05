@@ -56,13 +56,9 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                 ProductListFragmentV2.Companion.show(this, R.id.fragment_container, new ProductListFragmentV2.OnProductClickListener() {
                     @Override
                     public void onClick(@NonNull ProductLiteEntity product) {
-                        ArrayList<Integer> courseIds = new ArrayList<>();
-                        courseIds.add(338);
-                        courseIds.add(378);
-                        courseIds.add(876);
                         NavigationDrawerActivity.this.startActivity(
                                 CoursePreviewActivity.createIntent(
-                                        courseIds,
+                                        new ArrayList<>(product.getCourseIds()),
                                         NavigationDrawerActivity.this,
                                         product.getSlug()
                                 )
