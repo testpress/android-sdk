@@ -1,5 +1,6 @@
 package `in`.testpress.store.data.model
 
+import com.google.gson.annotations.SerializedName
 import `in`.testpress.database.entities.ProductLiteEntity
 
 
@@ -8,6 +9,8 @@ data class NetworkProductLite(
     val title: String?,
     val slug: String?,
     val images: List<NetworkImage>? = null,
+    @SerializedName("courses")
+    val courseIds: List<Int>? = null,
     val categoryId: Int?,
     val contentsCount: Int = 0,
     val chaptersCount: Int = 0,
@@ -21,6 +24,7 @@ fun NetworkProductLite.asDomain(): ProductLiteEntity {
         this.title ?: "",
         this.slug ?: "",
         this.images?.asDomain(),
+        this.courseIds,
         this.categoryId,
         this.contentsCount,
         this.chaptersCount,

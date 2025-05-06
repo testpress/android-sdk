@@ -5,6 +5,8 @@ import android.view.MenuItem;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
+import in.testpress.course.ui.CoursePreviewActivity;
+import in.testpress.database.entities.ProductLiteEntity;
 import in.testpress.samples.BaseNavigationDrawerActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
@@ -12,6 +14,10 @@ import in.testpress.store.TestpressStore;
 import in.testpress.store.ui.ProductListFragmentV2;
 
 import static in.testpress.samples.core.TestpressCoreSampleActivity.AUTHENTICATE_REQUEST_CODE;
+
+import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
 
 public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
 
@@ -47,7 +53,18 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                 //noinspection ConstantConditions
                 session.getInstituteSettings().setAccessCodeEnabled(true);
                 TestpressSdk.setTestpressSession(this, session);
-                ProductListFragmentV2.Companion.show(this, R.id.fragment_container);
+                ProductListFragmentV2.Companion.show(this, R.id.fragment_container, new ProductListFragmentV2.OnProductClickListener() {
+                    @Override
+                    public void onClick(@NonNull ProductLiteEntity product) {
+                        NavigationDrawerActivity.this.startActivity(
+                                CoursePreviewActivity.createIntent(
+                                        new ArrayList<>(product.getCourseIds()),
+                                        NavigationDrawerActivity.this,
+                                        product.getSlug()
+                                )
+                        );
+                    }
+                });
             }
         } else {
             Intent intent = new Intent(this, TestpressCoreSampleActivity.class);

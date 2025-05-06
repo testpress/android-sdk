@@ -10,6 +10,7 @@ data class ProductLiteEntity(
     val title: String,
     val slug: String,
     val images: List<Image>? = null,
+    val courseIds: List<Int>? = null,
     val categoryId: Int?,
     val contentsCount: Int = 0,
     val chaptersCount: Int = 0,
