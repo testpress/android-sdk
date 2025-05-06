@@ -68,7 +68,7 @@ class ProductDetailFragmentV2 : Fragment() {
 
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = tabTitles[position]
-            //tab.setIcon(tabIcons[position])
+            tab.setIcon(tabIcons[position])
         }.attach()
     }
 
