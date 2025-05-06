@@ -377,7 +377,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         showProgressDialog("Applying Coupon code...");
 
         String couponCode = couponEditText.getText().toString();
-        apiClient.applyCoupon(orderId, couponCode, settings.getUseNewDiscountFeat()).enqueue(new TestpressCallback<Order>() {
+        apiClient.applyCoupon(orderId, couponCode, settings != null && settings.getUseNewDiscountFeat()).enqueue(new TestpressCallback<Order>() {
             @Override
             public void onSuccess(Order createdOrder) {
                 order = createdOrder;
