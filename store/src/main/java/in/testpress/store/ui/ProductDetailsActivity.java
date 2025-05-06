@@ -89,6 +89,9 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     public Order order;
     ProgressDialog progressDialog;
+    private InstituteSettings settings;
+    private TestpressSession session;
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +101,8 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         } else if (getIntent().getParcelableExtra(PRODUCT) != null) {
             productSlug = ((Product) getIntent().getParcelableExtra(PRODUCT)).getSlug();
         }
+        session = TestpressSdk.getTestpressSession(this);
+        settings = session.getInstituteSettings();
         progressBar = (ProgressBar) findViewById(R.id.pb_loading);
         UIUtils.setIndeterminateDrawable(this, progressBar, 4);
         progressDialog = new ProgressDialog(this);
@@ -240,9 +245,6 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
                     examsCount));
 
             TextView accessCodeButton = (TextView) findViewById(R.id.have_access_code);
-            final TestpressSession session = TestpressSdk.getTestpressSession(this);
-            //noinspection ConstantConditions
-            InstituteSettings settings = session.getInstituteSettings();
             if (settings.isAccessCodeEnabled()) {
                 accessCodeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -375,7 +377,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         showProgressDialog("Applying Coupon code...");
 
         String couponCode = couponEditText.getText().toString();
-        apiClient.applyCoupon(orderId, couponCode).enqueue(new TestpressCallback<Order>() {
+        apiClient.applyCoupon(orderId, couponCode, settings.getUseNewDiscountFeat()).enqueue(new TestpressCallback<Order>() {
             @Override
             public void onSuccess(Order createdOrder) {
                 order = createdOrder;

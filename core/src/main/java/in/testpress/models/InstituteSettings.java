@@ -52,6 +52,7 @@ public class InstituteSettings {
     private Boolean showOfflineExamEndingAlert;
     private String videoWatermarkType;
     private String videoWatermarkPosition;
+    private Boolean useNewDiscountFeat;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -472,6 +473,15 @@ public class InstituteSettings {
 
     public InstituteSettings setVideoWatermarkPosition(String videoWatermarkPosition) {
         this.videoWatermarkPosition = videoWatermarkPosition;
+        return this;
+    }
+
+    public Boolean getUseNewDiscountFeat() {
+        return useNewDiscountFeat != null && useNewDiscountFeat;
+    }
+
+    public InstituteSettings setUseNewDiscountFeat(Boolean useNewDiscountFeat) {
+        this.useNewDiscountFeat = useNewDiscountFeat;
         return this;
     }
 }
