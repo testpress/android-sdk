@@ -77,24 +77,12 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-    
-    <LinearLayout
+
+    <include
         android:id="@+id/button_container"
+        layout="@layout/coupon_and_buy_button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="300.00"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Buy now"/>
-
-    </LinearLayout>
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>
