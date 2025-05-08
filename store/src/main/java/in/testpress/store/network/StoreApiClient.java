@@ -44,6 +44,8 @@ public class StoreApiClient extends TestpressApiClient {
 
     public static final String APPLY_COUPON_PATH = "/apply-coupon/";
 
+    public static final String APPLY_DISCOUNT_PATH = "/apply-discount/";
+
     public static final String V2_5_PRODUCTS_CATEGORIES_PATH = "/api/v2.5/products/categories/";
 
     public static final String V3_PRODUCT_PATH = "/api/v3/products/";
@@ -74,10 +76,14 @@ public class StoreApiClient extends TestpressApiClient {
         return getProductService().order(orderParameters);
     }
 
-    public RetrofitCall<Order> applyCoupon(Long orderId,String couponCode) {
+    public RetrofitCall<Order> applyCoupon(Long orderId,String couponCode, Boolean useNewDiscountFeat) {
         HashMap<String, String> orderParameters = new HashMap<String, String>();
         orderParameters.put("code", couponCode);
-        return getProductService().applyCoupon(orderId, orderParameters);
+        if (Boolean.TRUE.equals(useNewDiscountFeat)){
+            return getProductService().applyDiscount(orderId, orderParameters);
+        } else {
+            return getProductService().applyCoupon(orderId, orderParameters);
+        }
     }
 
     public RetrofitCall<Order> orderConfirm(Order order) {

@@ -5,8 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
+import `in`.testpress.core.TestpressSdk
+import `in`.testpress.core.TestpressSession
 import `in`.testpress.data.repository.BaseDetailRepository
 import `in`.testpress.database.entities.DomainProduct
+import `in`.testpress.models.InstituteSettings
 import `in`.testpress.network.Resource
 import `in`.testpress.store.data.model.NetworkProduct
 import `in`.testpress.store.data.model.toPriceEntities
@@ -25,6 +28,9 @@ class ProductDetailRepository(context: Context, private val productId: Int) :
 
     private val _couponStatus = MutableLiveData<Resource<Order>>()
     val couponStatus: LiveData<Resource<Order>> = _couponStatus
+
+    private var session: TestpressSession? = TestpressSdk.getTestpressSession(context)
+    private var settings: InstituteSettings? = session?.instituteSettings
 
     init {
         loadFromDatabase()
@@ -66,7 +72,7 @@ class ProductDetailRepository(context: Context, private val productId: Int) :
 
     fun applyCoupon(orderId: Long, couponCode: String) {
         _couponStatus.postValue(Resource.loading(null))
-        apiClient.applyCoupon(orderId, couponCode).enqueue(object : TestpressCallback<Order>() {
+        apiClient.applyCoupon(orderId, couponCode, settings?.useNewDiscountFeat).enqueue(object : TestpressCallback<Order>() {
             override fun onSuccess(result: Order?) {
                 _couponStatus.postValue(Resource.success(result))
             }
