@@ -60,10 +60,10 @@
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tab_layout"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_scrollFlags="scroll|enterAlways|snap"
-                app:tabGravity="start"
+                app:tabGravity="center"
                 app:tabIconTint="@color/tab_icon_color"
                 app:tabIndicatorColor="?attr/colorPrimary"
                 app:tabMode="auto"

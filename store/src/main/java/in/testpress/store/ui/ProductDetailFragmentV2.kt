@@ -7,14 +7,19 @@ import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import `in`.testpress.database.entities.DomainProduct
@@ -34,12 +39,10 @@ class ProductDetailFragmentV2 : Fragment() {
     private var productId: Int = DEFAULT_PRODUCT_ID
     private var domainProduct: DomainProduct? = null
 
-    private val tabTitles = listOf("Description", "Course Curriculum", "Subjects", "FAQ")
+    private val tabTitles = listOf("Description", "Course Curriculum")
     private val tabIcons = listOf(
         R.drawable.baseline_description_24,
-        R.drawable.baseline_menu_book_24,
-        R.drawable.baseline_subject_24,
-        R.drawable.baseline_question_mark_24
+        R.drawable.baseline_menu_book_24
     )
 
     private val productViewModel: ProductViewModel by lazy {
@@ -92,7 +95,27 @@ class ProductDetailFragmentV2 : Fragment() {
             imageUrl, binding.productThumbnail, ImageUtils.getPlaceholdersOption()
         )
         binding.title.text = domainProduct?.product?.title
-        //binding.price.text = String.format("₹%s", domainProduct?.product?.price)
+
+        binding.buttonContainer.couponEditText.addTextChangedListener(afterTextChanged = {
+            binding.buttonContainer.applyCouponButton.isEnabled = it?.trim()?.isNotEmpty() == true
+        })
+
+        binding.buttonContainer.showCouponButton.apply {
+            setOnClickListener {
+                if (binding.buttonContainer.couponContainer.visibility == View.GONE) {
+                    binding.buttonContainer.couponContainer.visibility = View.VISIBLE
+                } else {
+                    binding.buttonContainer.couponContainer.visibility = View.GONE
+                }
+            }
+        }
+
+        binding.buttonContainer.applyCouponButton.setOnClickListener {
+            val enteredCoupon = binding.buttonContainer.couponEditText.text.toString()
+            Toast.makeText(requireContext(),"Apply Button Clicked",Toast.LENGTH_SHORT).show()
+        }
+
+        binding.buttonContainer.priceText.text = String.format("₹%s", domainProduct?.product?.price)
     }
 
     override fun onDestroyView() {
@@ -123,8 +146,6 @@ class ProductDetailFragmentV2 : Fragment() {
             return when (position) {
                 0 -> ProductDescriptionFragment()
                 1 -> ProductCurriculumFragment()
-                2-> ProductSubjectsFragment()
-                3 -> ProductFAQFragment()
                 else -> throw IllegalArgumentException("Invalid tab index")
             }
         }
@@ -204,32 +225,180 @@ class ProductDescriptionFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
-//    override fun onCreateView(
-//        inflater: LayoutInflater, container: ViewGroup?,
-//        savedInstanceState: Bundle?
-//    ): View? {
-//        val textView = TextView(requireContext())
-//        textView.text = "Product Overview"
-//        textView.textSize = 18f
-//        return NestedScrollView(requireContext()).apply {
-//            addView(textView)
-//        }
-//    }
 }
 
 class ProductCurriculumFragment : Fragment() {
+
+    private lateinit var adapter: NodeAdapter
+    private lateinit var courseData: Course
+    private lateinit var displayItems: List<DisplayItem>
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val textView = TextView(requireContext())
-        textView.text = "Curriculum Content"
-        textView.textSize = 18f
-        return NestedScrollView(requireContext()).apply {
-            addView(textView)
+    ): View {
+        val view = inflater.inflate(R.layout.fragment_product_curriculum, container, false)
+        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
+
+        courseData = getDummyCourse() // Replace with real API call
+        displayItems = flattenChapters(courseData.chapters)
+
+        adapter = NodeAdapter(courseData) { updatedList ->
+            displayItems = updatedList
+            adapter.updateData(displayItems)
+        }
+
+        adapter.updateData(displayItems)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = adapter
+
+        return view
+    }
+
+    private fun getDummyCourse(): Course {
+        val content1 = Content("c1", "Video 1")
+        val content2 = Content("c2", "PDF 1")
+        val content3 = Content("c3", "Exam 1")
+
+        val level3Chapter = Chapter("ch3", "Chapter 3", contentList = listOf(content1, content2, content3))
+        val level2Chapter = Chapter("ch2", "Chapter 2", children = listOf(level3Chapter))
+
+        // The top-level chapter (level 1) contains the rest
+        val level1Chapter = Chapter("ch1", "Chapter 1", children = listOf(level2Chapter))
+
+        // Now add some content to the root chapter (level 1)
+        val rootChapter = Chapter("ch0", "Root Chapter", children = listOf(level1Chapter))
+
+        return Course("course1", "Sample Course", listOf(rootChapter))
+    }
+
+    class NodeAdapter(
+        private val course: Course,
+        private val onDataUpdated: (List<DisplayItem>) -> Unit
+    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+        companion object {
+            private const val TYPE_CHAPTER = 0
+            private const val TYPE_CONTENT = 1
+        }
+
+        private var items: List<DisplayItem> = emptyList()
+
+        override fun getItemViewType(position: Int): Int {
+            return when (items[position]) {
+                is DisplayItem.ChapterItem -> TYPE_CHAPTER
+                is DisplayItem.ContentItem -> TYPE_CONTENT
+            }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+            val inflater = LayoutInflater.from(parent.context)
+            return when (viewType) {
+                TYPE_CHAPTER -> ChapterViewHolder(inflater.inflate(R.layout.item_chapter, parent, false))
+                TYPE_CONTENT -> ContentViewHolder(inflater.inflate(R.layout.item_content, parent, false))
+                else -> throw IllegalArgumentException("Invalid view type")
+            }
+        }
+
+        override fun getItemCount() = items.size
+
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            when (val item = items[position]) {
+                is DisplayItem.ChapterItem -> (holder as ChapterViewHolder).bind(item.chapter)
+                is DisplayItem.ContentItem -> (holder as ContentViewHolder).bind(item.content, item.level)
+            }
+        }
+
+        fun updateData(newItems: List<DisplayItem>) {
+            this.items = newItems
+            notifyDataSetChanged()
+        }
+
+        inner class ChapterViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            private val titleText = view.findViewById<TextView>(R.id.titleText)
+            private val indentView = view.findViewById<View>(R.id.indentView)
+            private val arrowIcon = view.findViewById<ImageView>(R.id.arrowIcon)
+
+            fun bind(chapter: Chapter) {
+                titleText.text = chapter.title
+                indentView.layoutParams.width = chapter.level * 40
+                indentView.requestLayout()
+
+                arrowIcon.setImageResource(
+                    if (chapter.isExpanded) R.drawable.ic_arrow_up else R.drawable.ic_arrow_down
+                )
+
+                itemView.setOnClickListener {
+                    chapter.isExpanded = !chapter.isExpanded
+                    val updatedItems = flattenChapters(course.chapters)
+                    onDataUpdated(updatedItems)
+                }
+            }
+
+            private fun flattenChapters(chapters: List<Chapter>, level: Int = 0): List<DisplayItem> {
+                val result = mutableListOf<DisplayItem>()
+                for (chapter in chapters) {
+                    chapter.level = level
+                    result.add(DisplayItem.ChapterItem(chapter))
+                    if (chapter.isExpanded) {
+                        result.addAll(flattenChapters(chapter.children, level + 1))
+                        chapter.contentList.forEach {
+                            result.add(DisplayItem.ContentItem(it, level + 1))
+                        }
+                    }
+                }
+                return result
+            }
+        }
+
+        inner class ContentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            private val titleText = view.findViewById<TextView>(R.id.titleText)
+            private val indentView = view.findViewById<View>(R.id.indentView)
+
+            fun bind(content: Content, level: Int) {
+                titleText.text = content.title
+                indentView.layoutParams.width = level * 40
+                indentView.requestLayout()
+            }
         }
     }
+
+    private fun flattenChapters(chapters: List<Chapter>, level: Int = 0): List<DisplayItem> {
+        val result = mutableListOf<DisplayItem>()
+        for (chapter in chapters) {
+            chapter.level = level
+            result.add(DisplayItem.ChapterItem(chapter))
+            if (chapter.isExpanded) {
+                result.addAll(flattenChapters(chapter.children, level + 1))
+                chapter.contentList.forEach {
+                    result.add(DisplayItem.ContentItem(it, level + 1))
+                }
+            }
+        }
+        return result
+    }
+
+    sealed class DisplayItem {
+        data class ChapterItem(val chapter: Chapter) : DisplayItem()
+        data class ContentItem(val content: Content, val level: Int) : DisplayItem()
+    }
+
+    data class Content(val id: String, val title: String)
+
+    data class Chapter(
+        val id: String,
+        val title: String,
+        val children: List<Chapter> = emptyList(),
+        val contentList: List<Content> = emptyList(),
+        var isExpanded: Boolean = false,
+        var level: Int = 0
+    )
+
+    data class Course(
+        val id: String,
+        val title: String,
+        val chapters: List<Chapter> = emptyList()
+    )
 }
 
 class ProductSubjectsFragment : Fragment() {

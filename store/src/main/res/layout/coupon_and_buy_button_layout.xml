@@ -11,23 +11,9 @@
         android:id="@+id/couponContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:orientation="vertical"
-        android:visibility="visible">
-
-        <!-- Close Icon Row -->
-<!--        <RelativeLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content">-->
-
-<!--            <ImageButton-->
-<!--                android:id="@+id/closeCoupon"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:src="@drawable/ic_close"-->
-<!--                android:layout_alignParentEnd="true"-->
-<!--                android:background="?attr/selectableItemBackgroundBorderless"-->
-<!--                android:contentDescription="Close" />-->
-<!--        </RelativeLayout>-->
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -39,10 +25,15 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Enter coupon code" />
+                android:background="@drawable/edittext_background"
+                android:hint="Enter Coupon Code"
+                android:imeOptions="actionDone"
+                android:padding="12dp"
+                android:textColor="@color/testpress_black"
+                android:textSize="16sp" />
 
             <Button
-                android:id="@+id/applyCoupon"
+                android:id="@+id/applyCouponButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -69,6 +60,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
+
+        <ImageButton
+            android:id="@+id/showCouponButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="16dp"
+            android:background="@color/testpress_white"
+            android:scaleType="fitCenter"
+            android:src="@drawable/coupon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/buyNowButton"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/buyNowButton"
