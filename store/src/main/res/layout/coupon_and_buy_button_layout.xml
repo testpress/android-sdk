@@ -77,7 +77,7 @@
             android:id="@+id/buyNowButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_orange_button"
+            android:background="@drawable/rounded_green_button"
             android:text="BUY NOW"
             android:textAllCaps="true"
             android:textColor="@color/testpress_white"

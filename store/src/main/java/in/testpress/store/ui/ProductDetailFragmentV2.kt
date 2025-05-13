@@ -1,9 +1,18 @@
 package `in`.testpress.store.ui
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Html
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
+import android.text.style.StrikethroughSpan
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +20,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.core.widget.NestedScrollView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -40,10 +48,6 @@ class ProductDetailFragmentV2 : Fragment() {
     private var domainProduct: DomainProduct? = null
 
     private val tabTitles = listOf("Description", "Course Curriculum")
-    private val tabIcons = listOf(
-        R.drawable.baseline_description_24,
-        R.drawable.baseline_menu_book_24
-    )
 
     private val productViewModel: ProductViewModel by lazy {
         ViewModelProvider(requireActivity(), ProductViewModelFactory(requireContext(), productId))
@@ -71,7 +75,6 @@ class ProductDetailFragmentV2 : Fragment() {
 
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = tabTitles[position]
-            tab.setIcon(tabIcons[position])
         }.attach()
     }
 
@@ -115,7 +118,39 @@ class ProductDetailFragmentV2 : Fragment() {
             Toast.makeText(requireContext(),"Apply Button Clicked",Toast.LENGTH_SHORT).show()
         }
 
-        binding.buttonContainer.priceText.text = String.format("₹%s", domainProduct?.product?.price)
+        displayFormattedPrice()
+    }
+
+    private fun displayFormattedPrice() {
+        val product = domainProduct?.product ?: return
+        val currentPrice = product.price ?: return
+        val strikePrice = product.strikeThroughPrice
+
+        val spanFlag = Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        val builder = SpannableStringBuilder()
+
+        // Current price span
+        builder.append(
+            SpannableString("₹$currentPrice").apply {
+                setSpan(StyleSpan(Typeface.BOLD), 0, length, spanFlag)
+                setSpan(RelativeSizeSpan(1.2f), 0, length, spanFlag)
+                setSpan(ForegroundColorSpan(Color.BLACK), 0, length, spanFlag)
+            }
+        )
+
+        // Optional strike price span
+        if (!strikePrice.isNullOrBlank()) {
+            builder.append("  ") // spacing
+            builder.append(
+                SpannableString("₹$strikePrice").apply {
+                    setSpan(StrikethroughSpan(), 0, length, spanFlag)
+                    setSpan(RelativeSizeSpan(0.8f), 0, length, spanFlag)
+                    setSpan(ForegroundColorSpan(Color.GRAY), 0, length, spanFlag)
+                }
+            )
+        }
+
+        binding.buttonContainer.priceText.text = builder
     }
 
     override fun onDestroyView() {
@@ -400,32 +435,3 @@ class ProductCurriculumFragment : Fragment() {
         val chapters: List<Chapter> = emptyList()
     )
 }
-
-class ProductSubjectsFragment : Fragment() {
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val textView = TextView(requireContext())
-        textView.text = "Subjects"
-        textView.textSize = 18f
-        return NestedScrollView(requireContext()).apply {
-            addView(textView)
-        }
-    }
-}
-
-class ProductFAQFragment : Fragment() {
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val textView = TextView(requireContext())
-        textView.text = "FAQ"
-        textView.textSize = 18f
-        return NestedScrollView(requireContext()).apply {
-            addView(textView)
-        }
-    }
-}
-

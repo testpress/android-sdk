@@ -60,15 +60,17 @@
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tab_layout"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_scrollFlags="scroll|enterAlways|snap"
-                app:tabGravity="center"
-                app:tabIconTint="@color/tab_icon_color"
                 app:tabIndicatorColor="?attr/colorPrimary"
                 app:tabMode="auto"
                 app:tabSelectedTextColor="?attr/colorPrimary"
                 app:tabTextColor="@color/testpress_text_gray" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#ccc" />
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.viewpager2.widget.ViewPager2
