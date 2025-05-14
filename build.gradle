@@ -70,6 +70,28 @@ ext {
     mockServer = 'com.squareup.okhttp3:mockwebserver:3.10.0'
     shimmer = 'com.facebook.shimmer:shimmer:0.5.0'
     pickiT = 'com.github.HBiSoft:PickiT:0.1.14'
+    easypermissions = "pub.devrel:easypermissions:3.0.0"
+    branchAndroidSDK = "io.branch.sdk.android:library:5.0.1"
+    facebookAndroidSdk = "com.facebook.android:facebook-android-sdk:5.15.3"
+    firebaseAnalytics = "com.google.firebase:firebase-analytics:17.4.0"
+    fragmentKotlinExtensions = "androidx.fragment:fragment-ktx:1.4.1"
+    powerSpinner = "com.github.skydoves:powerspinner:1.1.9"
+    lifecycleViewModelKotlinExtensions = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
+    jsoup = "org.jsoup:jsoup:1.13.1"
+    sentrySDK = "io.sentry:sentry-android:6.4.2"
+    androidArchRuntime = "androidx.arch.core:core-runtime:2.1.0"
+    coreKotlinExtensions = "androidx.core:core-ktx:1.7.0"
+    kotlinStdlibJdk7 = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0"
+    androidMultiDexLibrary = "androidx.multidex:multidex:2.0.1"
+    roomRuntime = "androidx.room:room-runtime:2.4.3"
+    roomKotlinExtensions = "androidx.room:room-ktx:2.4.3"
+    roomPaging = "androidx.room:room-paging:2.4.3"
+    roomCompiler = "androidx.room:room-compiler:2.4.3"
+    kotlinxCoroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3"
+    kotlinxCoroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.3"
+    androidCoreTesting = "androidx.arch.core:core-testing:2.1.0"
+    androidRoomTesting = "android.arch.persistence.room:testing:1.1.1"
+    jUnitJupiterAPI = "org.junit.jupiter:junit-jupiter-api:5.3.1"
 
     //AndroidX Dependencies
     pagingRuntime = 'androidx.paging:paging-runtime-ktx:'+ paging_version
