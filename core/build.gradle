@@ -62,12 +62,6 @@ android {
 
 dependencies {
     api rootProject.constraintLayout
-    def core_version = "1.7.0"
-    def core_testing_version = "2.1.0"
-    def room_version = "2.4.3"
-    def multi_dex_version = "2.0.1"
-    def fragment_version = "1.4.1"
-
     api rootProject.design
     api rootProject.retrofit2
     api rootProject.gsonConverter
@@ -76,16 +70,26 @@ dependencies {
     api rootProject.greendao
     api rootProject.shimmer
     api rootProject.junit
-    api 'pub.devrel:easypermissions:3.0.0'
-    api 'io.branch.sdk.android:library:5.0.1'
-    api 'com.facebook.android:facebook-android-sdk:5.15.3'
-    api 'com.google.firebase:firebase-analytics:17.4.0'
+    api rootProject.easypermissions
+    api rootProject.branchAndroidSDK
+    api rootProject.facebookAndroidSdk
+    api rootProject.firebaseAnalytics
     api rootProject.pagingRuntime
-    api "androidx.fragment:fragment-ktx:$fragment_version"
-    api "com.github.skydoves:powerspinner:1.1.9"
-    api "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
-    api 'org.jsoup:jsoup:1.13.1'
-    api 'io.sentry:sentry-android:6.4.2'
+    api rootProject.fragmentKotlinExtensions
+    api rootProject.powerSpinner
+    api rootProject.lifecycleViewModelKotlinExtensions
+    api rootProject.jsoup
+    api rootProject.sentrySDK
+    implementation rootProject.androidArchRuntime
+    implementation rootProject.coreKotlinExtensions
+    implementation rootProject.kotlinStdlibJdk7
+    implementation rootProject.androidMultiDexLibrary
+    api rootProject.roomRuntime
+    api rootProject.roomKotlinExtensions
+    api rootProject.roomPaging
+    kapt rootProject.roomCompiler
+    api rootProject.kotlinxCoroutinesCore
+    api rootProject.kotlinxCoroutinesAndroid
 
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
@@ -96,29 +100,16 @@ dependencies {
     testImplementation (rootProject.powermockMockio) {
         exclude group: 'org.mockito'
     }
-
+    testImplementation rootProject.androidCoreTesting
+    testImplementation rootProject.powermockJunit
+    testImplementation rootProject.androidxCore
+    testImplementation rootProject.mockServer
     androidTestImplementation rootProject.junit
     androidTestImplementation rootProject.testRunner
     androidTestImplementation rootProject.espressoCore
     androidTestImplementation rootProject.uiautomator
-    testImplementation "androidx.arch.core:core-testing:2.1.0"
-    testImplementation "org.robolectric:robolectric:4.9.2"
-    testImplementation rootProject.powermockJunit
-    testImplementation rootProject.androidxCore
-    testImplementation rootProject.mockServer
-    androidTestImplementation "androidx.arch.core:core-testing:$core_testing_version"
-    androidTestImplementation "android.arch.persistence.room:testing:1.1.1"
-    androidTestImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
-    implementation "androidx.arch.core:core-runtime:2.1.0"
-    implementation "androidx.core:core-ktx:$core_version"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "androidx.multidex:multidex:$multi_dex_version"
-    api "androidx.room:room-runtime:$room_version"
-    api "androidx.room:room-ktx:$room_version"
-    api "androidx.room:room-paging:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
-    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutine_version"
-    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutine_version"
+    androidTestImplementation rootProject.androidRoomTesting
+    androidTestImplementation rootProject.jUnitJupiterAPI
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-github-packages.gradle')
