@@ -41,55 +41,45 @@ dependencies {
     api project(':exam')
     api project(':store')
     implementation project(':mobilertc')
+
     api rootProject.design
-    api 'com.google.android.exoplayer:exoplayer-core:' + rootProject.exoPlayer
-    api 'com.google.android.exoplayer:exoplayer-ui:' + rootProject.exoPlayer
-    api 'com.google.android.exoplayer:exoplayer-hls:' + rootProject.exoPlayer
-    api 'com.google.android.exoplayer:exoplayer-dash:' + rootProject.exoPlayer
-    api 'com.google.android.exoplayer:extension-okhttp:' + rootProject.exoPlayer
+    api rootProject.exoPlayerCore
+    api rootProject.exoPlayerUI
+    api rootProject.exoPlayerHLS
+    api rootProject.exoPlayerDash
+    api rootProject.exoplayerExtensionOkHttp
     api rootProject.constraintLayout
     api rootProject.mediarouter
     api rootProject.shimmer
-    api 'com.github.HotBitmapGG:RingProgressBar:V1.2.3'
-    api "androidx.viewpager2:viewpager2:1.0.0"
-    api "com.google.android.flexbox:flexbox:3.0.0"
+    api rootProject.ringProgressBar
+    api rootProject.viewPager2
+    api rootProject.flexboxLayout
+    implementation rootProject.kotlinStdlibJdk7
+    implementation rootProject.androidLifecycleExtensions
+    api rootProject.androidPDFViewer
+    api rootProject.pRDownloader
+    implementation rootProject.androidMultiDexLibrary
+    api rootProject.doubleTapPlayerView
+    api rootProject.pagingRuntime
+    api rootProject.pagingCommon
+    debugImplementation rootProject.fragmentTestingExtensions
+
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
     testImplementation rootProject.powermockJunit
     testImplementation rootProject.roboelectric
     testImplementation rootProject.androidxCore
     testImplementation rootProject.mockServer
-    testImplementation "androidx.arch.core:core-testing:2.1.0"
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlin_coroutine_version"
+    testImplementation rootProject.androidCoreTesting
+    testImplementation rootProject.jUnitJupiterAPI
+    testImplementation rootProject.kotlinxCoroutinesTest
     testImplementation (rootProject.powermockMockio) {
         exclude group: 'org.mockito'
     }
-
     androidTestImplementation rootProject.junit
     androidTestImplementation rootProject.testRunner
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    api 'com.github.mhiew:android-pdf-viewer:3.2.0-beta.1'
-    api 'com.github.alexto9090:PRDownloader:1.0'
-
-    androidTestImplementation "androidx.test:core:1.4.0"
-    androidTestImplementation "androidx.test:rules:1.1.0"
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
-
-    // Allow methods more than 64K
-    implementation 'androidx.multidex:multidex:2.0.1'
-    api 'com.github.vkay94:DoubleTapPlayerView:1.0.0'
-
-    // Allow methods more than 64K
-    implementation 'androidx.multidex:multidex:2.0.1'
-
-    //Paging
-    api rootProject.pagingRuntime
-    api rootProject.pagingCommon
-
-    def fragment_version = "1.4.1"
-
-    debugImplementation "androidx.fragment:fragment-testing:$fragment_version"
+    androidTestImplementation rootProject.androidxCore
+    androidTestImplementation rootProject.androidXTestLibrary
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-github-packages.gradle')
