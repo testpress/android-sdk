@@ -482,7 +482,7 @@ class ApplyCouponBottomSheet : BottomSheetDialogFragment() {
 
         binding.couponEditText.addTextChangedListener(afterTextChanged = {
             binding.applyCouponButton.isEnabled = it?.trim()?.isNotEmpty() == true
-            if (it.toString() == productViewModel.currentCoupon){
+            if (it.toString() != "" && it.toString() == productViewModel.currentCoupon){
                 binding.applyCouponButton.text = "Remove"
                 binding.applyCouponButton.setBackgroundResource(R.drawable.rounded_orange_button)
             } else {
