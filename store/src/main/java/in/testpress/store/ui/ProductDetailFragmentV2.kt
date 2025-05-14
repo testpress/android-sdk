@@ -3,6 +3,7 @@ package `in`.testpress.store.ui
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Build
 import android.os.Bundle
 import android.text.Html
 import android.text.Spannable
@@ -16,9 +17,14 @@ import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -26,20 +32,28 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayoutMediator
 import `in`.testpress.database.entities.DomainProduct
 import `in`.testpress.enums.Status
 import `in`.testpress.store.R
 import `in`.testpress.store.data.repository.ProductDetailRepository
+import `in`.testpress.store.databinding.BottomSheetApplyCouponBinding
+import `in`.testpress.store.databinding.DialogProgressBinding
 import `in`.testpress.store.databinding.TestpressProductDetailsDescriptionFragmentBinding
 import `in`.testpress.store.databinding.TestpressProductDetailsFragmentV2Binding
 import `in`.testpress.store.ui.viewmodel.ProductViewModel
 import `in`.testpress.util.ImageUtils
 import `in`.testpress.util.UILImageGetter
 import `in`.testpress.util.ZoomableImageString
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class ProductDetailFragmentV2 : Fragment() {
     private var _binding: TestpressProductDetailsFragmentV2Binding? = null
@@ -90,6 +104,14 @@ class ProductDetailFragmentV2 : Fragment() {
                 else -> Unit
             }
         }
+
+        productViewModel.isCouponApplied.observe(viewLifecycleOwner) {
+            domainProduct?.product?.let { product ->
+                product.price?.let { price ->
+                    displayFormattedPrice(it, price, product.strikeThroughPrice)
+                }
+            }
+        }
     }
 
     private fun renderProductDetails() {
@@ -99,32 +121,21 @@ class ProductDetailFragmentV2 : Fragment() {
         )
         binding.title.text = domainProduct?.product?.title
 
-        binding.buttonContainer.couponEditText.addTextChangedListener(afterTextChanged = {
-            binding.buttonContainer.applyCouponButton.isEnabled = it?.trim()?.isNotEmpty() == true
-        })
-
         binding.buttonContainer.showCouponButton.apply {
             setOnClickListener {
-                if (binding.buttonContainer.couponContainer.visibility == View.GONE) {
-                    binding.buttonContainer.couponContainer.visibility = View.VISIBLE
-                } else {
-                    binding.buttonContainer.couponContainer.visibility = View.GONE
-                }
+                val bottomSheet = ApplyCouponBottomSheet()
+                bottomSheet.show(parentFragmentManager, ApplyCouponBottomSheet.TAG)
             }
         }
 
-        binding.buttonContainer.applyCouponButton.setOnClickListener {
-            val enteredCoupon = binding.buttonContainer.couponEditText.text.toString()
-            Toast.makeText(requireContext(),"Apply Button Clicked",Toast.LENGTH_SHORT).show()
+        domainProduct?.product?.let { product ->
+            product.price?.let { price ->
+                displayFormattedPrice(false, price,product.strikeThroughPrice)
+            }
         }
-
-        displayFormattedPrice()
     }
 
-    private fun displayFormattedPrice() {
-        val product = domainProduct?.product ?: return
-        val currentPrice = product.price ?: return
-        val strikePrice = product.strikeThroughPrice
+    private fun displayFormattedPrice(isCouponApplied: Boolean, currentPrice: String, strikePrice: String?) {
 
         val spanFlag = Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         val builder = SpannableStringBuilder()
@@ -146,6 +157,16 @@ class ProductDetailFragmentV2 : Fragment() {
                     setSpan(StrikethroughSpan(), 0, length, spanFlag)
                     setSpan(RelativeSizeSpan(0.8f), 0, length, spanFlag)
                     setSpan(ForegroundColorSpan(Color.GRAY), 0, length, spanFlag)
+                }
+            )
+        }
+
+        if (isCouponApplied){
+            builder.append("\n")
+            builder.append(
+                SpannableString("+${productViewModel.amountSaved} Saved").apply {
+                    setSpan(RelativeSizeSpan(0.8f), 0, length, spanFlag)
+                    setSpan(ForegroundColorSpan(Color.parseColor("#059669")), 0, length, spanFlag)
                 }
             )
         }
@@ -434,4 +455,111 @@ class ProductCurriculumFragment : Fragment() {
         val title: String,
         val chapters: List<Chapter> = emptyList()
     )
+}
+
+class ApplyCouponBottomSheet : BottomSheetDialogFragment() {
+
+    private var _binding: BottomSheetApplyCouponBinding? = null
+    private val binding get() = _binding!!
+
+    private var _dialogBinding: DialogProgressBinding? = null
+    private val dialogBinding get() = _dialogBinding!!
+
+    private var loadingDialog: AlertDialog? = null
+
+    private val productViewModel: ProductViewModel by activityViewModels()
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = BottomSheetApplyCouponBinding.inflate(inflater, container, false)
+        _dialogBinding = DialogProgressBinding.inflate(inflater)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.couponEditText.addTextChangedListener(afterTextChanged = {
+            binding.applyCouponButton.isEnabled = it?.trim()?.isNotEmpty() == true
+            if (it.toString() == productViewModel.currentCoupon){
+                binding.applyCouponButton.text = "Remove"
+                binding.applyCouponButton.setBackgroundResource(R.drawable.rounded_orange_button)
+            } else {
+                binding.applyCouponButton.text = "Apply"
+                binding.applyCouponButton.setBackgroundResource(R.drawable.button_apply_coupon)
+            }
+        })
+
+        binding.applyCouponButton.setOnClickListener {
+            val isApplied = productViewModel.isCouponApplied.value == true
+
+            hideKeyboard()
+            showProgressDialog(if (isApplied) "Removing" else "Applying")
+
+            lifecycleScope.launch {
+                delay(2000) // Simulate network delay
+                loadingDialog?.dismiss()
+
+                if (isApplied) {
+                    productViewModel.removeCoupon()
+                    productViewModel.currentCoupon = ""
+                    binding.couponAppliedText.isVisible = false
+                    binding.couponEditText.setText("")
+                    binding.applyCouponButton.text = "Apply"
+                    binding.applyCouponButton.setBackgroundResource(R.drawable.button_apply_coupon)
+                } else {
+                    val couponText = binding.couponEditText.text.toString()
+                    productViewModel.applyCoupon()
+                    productViewModel.currentCoupon = couponText
+
+                    val savedAmount = "%.2f".format(productViewModel.amountSaved)
+                    binding.couponAppliedText.text = "$couponText Applied! You have saved ₹$savedAmount on this course."
+                    binding.couponAppliedText.isVisible = true
+
+                    binding.applyCouponButton.text = "Remove"
+                    binding.applyCouponButton.setBackgroundResource(R.drawable.rounded_orange_button)
+                }
+            }
+        }
+
+        binding.cancelButton.setOnClickListener {
+            dismiss()
+        }
+
+        if (productViewModel.isCouponApplied.value == true){
+            binding.couponEditText.setText(productViewModel.currentCoupon)
+            binding.couponAppliedText.isVisible = true
+            binding.couponAppliedText.text = "${productViewModel.currentCoupon} Applied! You have saved ₹${"%.2f".format(productViewModel.amountSaved)} on this course."
+
+            binding.applyCouponButton.text = "Remove"
+            binding.applyCouponButton.setBackgroundResource(R.drawable.rounded_orange_button)
+        }
+    }
+
+    private fun hideKeyboard() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val view = dialog?.currentFocus ?: view ?: View(requireContext())
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    private fun showProgressDialog(message: String) {
+        if (loadingDialog == null) {
+            loadingDialog = MaterialAlertDialogBuilder(requireContext())
+                .setView(dialogBinding.root)
+                .setCancelable(false)
+                .create()
+        }
+        dialogBinding.messageText.text = message
+        loadingDialog?.show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    companion object {
+        const val TAG = "ApplyCouponBottomSheet"
+    }
 }
