@@ -107,7 +107,9 @@ ext {
     exoPlayerHLS = "com.google.android.exoplayer:exoplayer-hls:2.17.1"
     exoPlayerDash = "com.google.android.exoplayer:exoplayer-dash:2.17.1"
     exoplayerExtensionOkHttp = "com.google.android.exoplayer:extension-okhttp:2.17.1"
-
+    payUCheckoutPro = "in.payu:payu-checkout-pro:1.8.0"
+    payUGpay = "in.payu:payu-gpay:1.4.0"
+    razorpayAndroidCheckoutSDK = "com.razorpay:checkout:1.6.33"
 
     //AndroidX Dependencies
     pagingRuntime = 'androidx.paging:paging-runtime-ktx:'+ paging_version
