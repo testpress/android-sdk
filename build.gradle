@@ -69,6 +69,7 @@ ext {
     androidxCore = 'androidx.test:core:1.4.0'
     mockServer = 'com.squareup.okhttp3:mockwebserver:3.10.0'
     shimmer = 'com.facebook.shimmer:shimmer:0.5.0'
+    pickiT = 'com.github.HBiSoft:PickiT:0.1.14'
 
     //AndroidX Dependencies
     pagingRuntime = 'androidx.paging:paging-runtime-ktx:'+ paging_version

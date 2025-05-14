@@ -41,7 +41,7 @@ dependencies {
     api rootProject.chart
     api rootProject.imageCropper
     api rootProject.lottie
-    api 'com.github.HBiSoft:PickiT:0.1.14'
+    api rootProject.pickiT
     api rootProject.constraintLayout
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
