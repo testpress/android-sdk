@@ -64,7 +64,6 @@ android {
 dependencies {
     api project(':course')
     api project(':store')
-    api rootProject.appcompat
     api rootProject.design
     implementation 'io.branch.sdk.android:library:5.0.1'
     // Facebook sdk may use the different version of customtabs, To avoid the lint errors & crashes
