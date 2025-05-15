@@ -55,7 +55,6 @@ dependencies {
     api rootProject.viewPager2
     api rootProject.flexboxLayout
     implementation rootProject.kotlinStdlibJdk7
-    implementation rootProject.androidLifecycleExtensions
     api rootProject.androidPDFViewer
     api rootProject.pRDownloader
     implementation rootProject.androidMultiDexLibrary
