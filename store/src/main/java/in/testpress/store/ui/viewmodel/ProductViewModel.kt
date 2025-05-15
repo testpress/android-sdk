@@ -1,6 +1,8 @@
 package `in`.testpress.store.ui.viewmodel
 
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import `in`.testpress.database.entities.DomainProduct
@@ -14,6 +16,20 @@ class ProductViewModel(private val repository: ProductDetailRepository) : ViewMo
     val product = repository.resource
     val order = repository.orderStatus
     val coupon = repository.couponStatus
+
+    var amountSaved = 100.00
+    var currentCoupon = ""
+
+    private val _isCouponApplied = MutableLiveData<Boolean>(false)
+    val isCouponApplied: LiveData<Boolean> get() = _isCouponApplied
+
+    fun applyCoupon() {
+        _isCouponApplied.value = true
+    }
+
+    fun removeCoupon() {
+        _isCouponApplied.value = false
+    }
 
     fun refresh() {
         repository.loadFromDatabase()
