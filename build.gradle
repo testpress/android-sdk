@@ -95,7 +95,6 @@ ext {
     ringProgressBar = "com.github.HotBitmapGG:RingProgressBar:V1.2.3"
     viewPager2 = "androidx.viewpager2:viewpager2:1.0.0"
     flexboxLayout = "com.google.android.flexbox:flexbox:3.0.0"
-    androidLifecycleExtensions = "androidx.lifecycle:lifecycle-extensions:2.2.0"
     androidPDFViewer = "com.github.mhiew:android-pdf-viewer:3.2.0-beta.1"
     pRDownloader = "com.github.alexto9090:PRDownloader:1.0"
     doubleTapPlayerView = "com.github.vkay94:DoubleTapPlayerView:1.0.0"
