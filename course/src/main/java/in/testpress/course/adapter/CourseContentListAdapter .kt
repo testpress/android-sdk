@@ -5,8 +5,6 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import `in`.testpress.core.TestpressSdk
-import `in`.testpress.course.R
 import `in`.testpress.course.adapter.viewholder.RunningContentItemViewHolder
 import `in`.testpress.course.adapter.viewholder.UpcomingContentItemViewHolder
 import `in`.testpress.course.databinding.RunningUpcomingListItemBinding
@@ -66,37 +64,8 @@ class CourseContentListAdapter :
 
 }
 
-open class BaseCourseContentItemViewHolder(binding: RunningUpcomingListItemBinding) :
+abstract class BaseCourseContentItemViewHolder(binding: RunningUpcomingListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
-    private val title = binding.title
-    private val path = binding.path
-    private val date = binding.date
-    private val thumbnail = binding.thumbnail
 
-    init {
-        title.typeface = TestpressSdk.getRubikMediumFont(binding.root.context)
-        path.typeface = TestpressSdk.getRubikMediumFont(binding.root.context)
-        date.typeface = TestpressSdk.getRubikMediumFont(binding.root.context)
-    }
-
-    open fun bind(content: DomainContent) {
-        showContentDetails(content)
-    }
-
-    private fun showContentDetails(content: DomainContent){
-        title.text = content.title
-        path.text = "${content.treePath}"
-        thumbnail.setImageResource(getContentImage(content.contentType))
-    }
-
-    private fun getContentImage(contentType: String?): Int {
-        return when (contentType) {
-            "Attachment" -> R.drawable.testpress_file_icon
-            "Video" -> R.drawable.testpress_video_icon
-            "Notes" -> R.drawable.testpress_notes_icon
-            "VideoConference" -> R.drawable.testpress_live_conference_icon
-            "Exam" -> R.drawable.testpress_exam_icon
-            else -> R.drawable.testpress_exam_icon
-        }
-    }
+    abstract fun bind(content: DomainContent)
 }
