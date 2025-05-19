@@ -43,73 +43,79 @@ ext {
     powermock = '2.0.5'
     constraint_layout_version = '2.0.4'
 
-    junit = 'junit:junit:4.12'
-    mockito = 'org.mockito:mockito-core:2.23.4'
-    powermockJunit = 'org.powermock:powermock-module-junit4:' + powermock
-    powermockMockio = 'org.powermock:powermock-api-mockito2:' + powermock
-    testRunner = 'androidx.test.ext:junit:1.1.3'
-    uiautomator = 'androidx.test.uiautomator:uiautomator:2.2.0'
-    espressoCore = 'androidx.test.espresso:espresso-core:3.4.0'
-    retrofit2 = 'com.squareup.retrofit2:retrofit:2.9.0'
-    gsonConverter = 'com.squareup.retrofit2:converter-gson:2.9.0'
-    httpLogInterceptor = 'com.squareup.okhttp3:logging-interceptor:3.4.1'
-    design = 'com.google.android.material:material:1.1.0'
+    //AndroidX Dependencies
+    pagingRuntime = 'androidx.paging:paging-runtime-ktx:3.3.2'
+    pagingCommon = 'androidx.paging:paging-common-ktx:3.3.2'
+    constraintLayout = 'androidx.constraintlayout:constraintlayout:' + constraint_layout_version
     cardview = 'androidx.cardview:cardview:1.0.0'
     mediarouter = 'androidx.mediarouter:mediarouter:1.0.0'
     customtabs = 'androidx.browser:browser:1.2.0'
-    universalImageLoader = 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    chart = 'com.github.testpress:MPAndroidChart:v3.0.0-beta2'
-    greendao = 'org.greenrobot:greendao:3.2.0'
-    imageCropper = 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
-    lottie = 'com.airbnb.android:lottie:2.5.4'
-    roboelectric = "org.robolectric:robolectric:4.3.1"
-    androidxCore = 'androidx.test:core:1.4.0'
-    mockServer = 'com.squareup.okhttp3:mockwebserver:3.10.0'
-    shimmer = 'com.facebook.shimmer:shimmer:0.5.0'
-    pickiT = 'com.github.HBiSoft:PickiT:0.1.14'
-    easypermissions = "pub.devrel:easypermissions:3.0.0"
-    branchAndroidSDK = "io.branch.sdk.android:library:5.0.1"
-    facebookAndroidSdk = "com.facebook.android:facebook-android-sdk:5.15.3"
-    firebaseAnalytics = "com.google.firebase:firebase-analytics:17.4.0"
     fragmentKotlinExtensions = "androidx.fragment:fragment-ktx:1.4.1"
-    powerSpinner = "com.github.skydoves:powerspinner:1.1.9"
     lifecycleViewModelKotlinExtensions = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
-    jsoup = "org.jsoup:jsoup:1.13.1"
-    sentrySDK = "io.sentry:sentry-android:6.4.2"
     androidArchRuntime = "androidx.arch.core:core-runtime:2.1.0"
     coreKotlinExtensions = "androidx.core:core-ktx:1.7.0"
-    kotlinStdlibJdk7 = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0"
     androidMultiDexLibrary = "androidx.multidex:multidex:2.0.1"
     roomRuntime = "androidx.room:room-runtime:2.4.3"
     roomKotlinExtensions = "androidx.room:room-ktx:2.4.3"
     roomPaging = "androidx.room:room-paging:2.4.3"
     roomCompiler = "androidx.room:room-compiler:2.4.3"
-    kotlinxCoroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3"
-    kotlinxCoroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.3"
-    androidCoreTesting = "androidx.arch.core:core-testing:2.1.0"
-    androidRoomTesting = "android.arch.persistence.room:testing:1.1.1"
-    jUnitJupiterAPI = "org.junit.jupiter:junit-jupiter-api:5.3.1"
-    ringProgressBar = "com.github.HotBitmapGG:RingProgressBar:V1.2.3"
     viewPager2 = "androidx.viewpager2:viewpager2:1.0.0"
-    flexboxLayout = "com.google.android.flexbox:flexbox:3.0.0"
-    androidPDFViewer = "com.github.mhiew:android-pdf-viewer:3.2.0-beta.1"
-    pRDownloader = "com.github.alexto9090:PRDownloader:1.0"
-    doubleTapPlayerView = "com.github.vkay94:DoubleTapPlayerView:1.0.0"
-    fragmentTestingExtensions = "androidx.fragment:fragment-testing:1.4.1"
-    kotlinxCoroutinesTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.3"
-    androidXTestLibrary = "androidx.test:rules:1.1.0"
+
+    // Media/Player/PDF/Image Dependencies
     exoPlayerCore = "com.google.android.exoplayer:exoplayer-core:2.17.1"
     exoPlayerUI = "com.google.android.exoplayer:exoplayer-ui:2.17.1"
     exoPlayerHLS = "com.google.android.exoplayer:exoplayer-hls:2.17.1"
     exoPlayerDash = "com.google.android.exoplayer:exoplayer-dash:2.17.1"
     exoplayerExtensionOkHttp = "com.google.android.exoplayer:extension-okhttp:2.17.1"
+    universalImageLoader = 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+    imageCropper = 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
+    lottie = 'com.airbnb.android:lottie:2.5.4'
+    shimmer = 'com.facebook.shimmer:shimmer:0.5.0'
+    ringProgressBar = "com.github.HotBitmapGG:RingProgressBar:V1.2.3"
+    androidPDFViewer = "com.github.mhiew:android-pdf-viewer:3.2.0-beta.1"
+    doubleTapPlayerView = "com.github.vkay94:DoubleTapPlayerView:1.0.0"
+    pRDownloader = "com.github.alexto9090:PRDownloader:1.0"
+
+    // Others / Network / Analytics / UI / Misc Dependencies
+    retrofit2 = 'com.squareup.retrofit2:retrofit:2.9.0'
+    gsonConverter = 'com.squareup.retrofit2:converter-gson:2.9.0'
+    httpLogInterceptor = 'com.squareup.okhttp3:logging-interceptor:3.4.1'
+    design = 'com.google.android.material:material:1.1.0'
+    chart = 'com.github.testpress:MPAndroidChart:v3.0.0-beta2'
+    greendao = 'org.greenrobot:greendao:3.2.0'
+    pickiT = 'com.github.HBiSoft:PickiT:0.1.14'
+    easypermissions = "pub.devrel:easypermissions:3.0.0"
+    branchAndroidSDK = "io.branch.sdk.android:library:5.0.1"
+    facebookAndroidSdk = "com.facebook.android:facebook-android-sdk:5.15.3"
+    firebaseAnalytics = "com.google.firebase:firebase-analytics:17.4.0"
+    powerSpinner = "com.github.skydoves:powerspinner:1.1.9"
+    jsoup = "org.jsoup:jsoup:1.13.1"
+    sentrySDK = "io.sentry:sentry-android:6.4.2"
+    kotlinStdlibJdk7 = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0"
+    kotlinxCoroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3"
+    kotlinxCoroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.3"
+    flexboxLayout = "com.google.android.flexbox:flexbox:3.0.0"
+
+    // Payment Dependencies
     payUCheckoutPro = "in.payu:payu-checkout-pro:1.8.0"
     payUGpay = "in.payu:payu-gpay:1.4.0"
     razorpayAndroidCheckoutSDK = "com.razorpay:checkout:1.6.33"
 
-    //AndroidX Dependencies
-    pagingRuntime = 'androidx.paging:paging-runtime-ktx:3.3.2'
-    pagingCommon = 'androidx.paging:paging-common-ktx:3.3.2'
-    constraintLayout = 'androidx.constraintlayout:constraintlayout:' + constraint_layout_version
-
+    // Testing Dependencies
+    testRunner = 'androidx.test.ext:junit:1.1.3'
+    uiautomator = 'androidx.test.uiautomator:uiautomator:2.2.0'
+    espressoCore = 'androidx.test.espresso:espresso-core:3.4.0'
+    androidxCore = 'androidx.test:core:1.4.0'
+    androidCoreTesting = "androidx.arch.core:core-testing:2.1.0"
+    androidRoomTesting = "android.arch.persistence.room:testing:1.1.1"
+    fragmentTestingExtensions = "androidx.fragment:fragment-testing:1.4.1"
+    kotlinxCoroutinesTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.3"
+    androidXTestLibrary = "androidx.test:rules:1.1.0"
+    junit = 'junit:junit:4.12'
+    mockito = 'org.mockito:mockito-core:2.23.4'
+    powermockJunit = 'org.powermock:powermock-module-junit4:' + powermock
+    powermockMockio = 'org.powermock:powermock-api-mockito2:' + powermock
+    jUnitJupiterAPI = "org.junit.jupiter:junit-jupiter-api:5.3.1"
+    roboelectric = "org.robolectric:robolectric:4.3.1"
+    mockServer = 'com.squareup.okhttp3:mockwebserver:3.10.0'
 }
