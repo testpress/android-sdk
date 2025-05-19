@@ -4,15 +4,20 @@ import `in`.testpress.fragments.WebViewFragment
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.webkit.*
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
 import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import java.io.File
 import java.io.IOException
@@ -41,6 +46,12 @@ class CustomWebChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
         fragment.filePathCallback?.onReceiveValue(results)
         fragment.filePathCallback = null
     }
+
+    private var customView: View? = null
+    private var customViewCallback: CustomViewCallback? = null
+    private var backCallback: OnBackPressedCallback? = null
+    private var previousOrientation: Int? = null
+    private var previousSystemUiVisibility: Int? = null
 
     private fun capturedImageNotAvailable(): Array<Uri>? {
         return if (fragment.imagePath != null) {
@@ -132,5 +143,84 @@ class CustomWebChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
         val storageDir =
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(imageFileName, ".jpg", storageDir)
+    }
+
+    override fun onShowCustomView(view: View, callback: CustomViewCallback) {
+        if (customView != null) {
+            callback.onCustomViewHidden()
+            return
+        }
+
+        customView = view
+        customViewCallback = callback
+
+        // Add the fullscreen view
+        (fragment.requireActivity().window.decorView as FrameLayout).addView(
+            view,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        )
+
+        // Remember current state and switch to landscape
+        previousOrientation = fragment.requireActivity().requestedOrientation
+        fragment.requireActivity().requestedOrientation =
+            ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+
+        previousSystemUiVisibility = fragment.requireActivity().window.decorView.systemUiVisibility
+        hideSystemUI()
+
+        fragment.webView.visibility = View.GONE
+
+        backCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (customView != null) {
+                    customViewCallback?.onCustomViewHidden()
+                } else {
+                    isEnabled = false
+                    fragment.requireActivity().onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        }
+        fragment.requireActivity().onBackPressedDispatcher.addCallback(fragment.viewLifecycleOwner, backCallback!!)
+    }
+
+
+    override fun onHideCustomView() {
+        if (customView == null) return
+
+        // Remove the fullscreen view
+        (fragment.requireActivity().window.decorView as FrameLayout).removeView(customView)
+        customView = null
+        customViewCallback?.onCustomViewHidden()
+
+        previousOrientation?.let {
+            fragment.requireActivity().requestedOrientation = it
+        }
+
+        previousSystemUiVisibility?.let {
+            fragment.requireActivity().window.decorView.systemUiVisibility = it
+        } ?: showSystemUI()
+
+        fragment.webView.visibility = View.VISIBLE
+
+        backCallback?.remove()
+        backCallback = null
+    }
+
+    private fun hideSystemUI() {
+        fragment.requireActivity().window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_FULLSCREEN
+    }
+
+    private fun showSystemUI() {
+        fragment.requireActivity().window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
     }
 }
