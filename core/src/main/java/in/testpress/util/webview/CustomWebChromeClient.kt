@@ -50,6 +50,8 @@ class CustomWebChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
     private var customView: View? = null
     private var customViewCallback: CustomViewCallback? = null
     private var backCallback: OnBackPressedCallback? = null
+    private var previousOrientation: Int? = null
+    private var previousSystemUiVisibility: Int? = null
 
     private fun capturedImageNotAvailable(): Array<Uri>? {
         return if (fragment.imagePath != null) {
@@ -161,9 +163,12 @@ class CustomWebChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
             )
         )
 
-        // Change to landscape orientation
-        fragment.requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        // Remember current state and switch to landscape
+        previousOrientation = fragment.requireActivity().requestedOrientation
+        fragment.requireActivity().requestedOrientation =
+            ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
 
+        previousSystemUiVisibility = fragment.requireActivity().window.decorView.systemUiVisibility
         hideSystemUI()
 
         fragment.webView.visibility = View.GONE
@@ -190,10 +195,13 @@ class CustomWebChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
         customView = null
         customViewCallback?.onCustomViewHidden()
 
-        // Restore to user's default orientation
-        fragment.requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        previousOrientation?.let {
+            fragment.requireActivity().requestedOrientation = it
+        }
 
-        showSystemUI()
+        previousSystemUiVisibility?.let {
+            fragment.requireActivity().window.decorView.systemUiVisibility = it
+        } ?: showSystemUI()
 
         fragment.webView.visibility = View.VISIBLE
 
