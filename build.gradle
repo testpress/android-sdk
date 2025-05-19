@@ -43,7 +43,7 @@ ext {
     //AndroidX Dependencies
     pagingRuntime = 'androidx.paging:paging-runtime-ktx:3.3.2'
     pagingCommon = 'androidx.paging:paging-common-ktx:3.3.2'
-    constraintLayout = 'androidx.constraintlayout:constraintlayout:2.0.4'
+    constraintLayout = 'androidx.constraintlayout:constraintlayout:2.1.4'
     cardview = 'androidx.cardview:cardview:1.0.0'
     mediarouter = 'androidx.mediarouter:mediarouter:1.0.0'
     customtabs = 'androidx.browser:browser:1.2.0'
