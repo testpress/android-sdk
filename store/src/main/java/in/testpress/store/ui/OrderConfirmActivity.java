@@ -278,9 +278,9 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
 
     public void showPaymentSuccessScreen() {
         Intent intent = new Intent(this, PaymentSuccessActivity.class);
+        intent.putExtras(getIntent().getExtras());
         intent.putExtra(ORDER, order);
         //noinspection ConstantConditions
-        intent.putExtras(getIntent().getExtras());
         startActivityForResult(intent, STORE_REQUEST_CODE);
     }
 
