@@ -45,7 +45,7 @@ ext {
     pagingCommon = 'androidx.paging:paging-common-ktx:3.3.2'
     constraintLayout = 'androidx.constraintlayout:constraintlayout:2.1.4'
     cardview = 'androidx.cardview:cardview:1.0.0'
-    mediarouter = 'androidx.mediarouter:mediarouter:1.0.0'
+    mediarouter = 'androidx.mediarouter:mediarouter:1.7.0'
     customtabs = 'androidx.browser:browser:1.2.0'
     fragmentKotlinExtensions = "androidx.fragment:fragment-ktx:1.4.1"
     lifecycleViewModelKotlinExtensions = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
