@@ -44,6 +44,8 @@ import in.testpress.util.TextWatcherAdapter;
 import in.testpress.util.UIUtils;
 
 import com.razorpay.PaymentResultListener;
+import com.stripe.android.PaymentConfiguration;
+import com.stripe.android.paymentsheet.*;
 
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 import static in.testpress.store.TestpressStore.PAYMENT_SUCCESS;
@@ -79,6 +81,8 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     private StoreApiClient apiClient;
     private FBEventsTrackerFacade fbEventsLogger;
     private EventsTrackerFacade eventsTrackerFacade;
+    private PaymentSheet paymentSheet;
+    private PaymentSheetResult paymentSheetResult;
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -123,6 +127,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
             // order confirmation.
             confirmOrder();
         }
+        paymentSheet = new PaymentSheet(this, result -> handleStripePaymentResult(result));
     }
 
     private int getPriceId() {
@@ -402,5 +407,24 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         logEvent(EventsTrackerFacade.CANCELLED_PAYMENT);
         progressBar.setVisibility(View.GONE);
         showPaymentFailedScreen();
+    }
+
+    public void showStripePaymentSheet(Order order) {
+        PaymentConfiguration.init(this, order.getApikey());
+        paymentSheet.presentWithPaymentIntent(
+            order.getStripeClientSecret(),
+            new PaymentSheet.Configuration("Testpress Store")
+        );
+    }
+
+    private void handleStripePaymentResult(PaymentSheetResult paymentSheetResult) {
+        if (paymentSheetResult instanceof PaymentSheetResult.Canceled) {
+            onPaymentCancel();
+        } else if (paymentSheetResult instanceof PaymentSheetResult.Failed) {
+            String error = ((PaymentSheetResult.Failed) paymentSheetResult).getError().getMessage();
+            onPaymentError(error);
+        } else if (paymentSheetResult instanceof PaymentSheetResult.Completed) {
+            onPaymentSuccess();
+        }
     }
 }
