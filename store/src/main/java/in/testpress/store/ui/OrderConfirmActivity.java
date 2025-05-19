@@ -45,6 +45,8 @@ import in.testpress.util.UIUtils;
 
 import com.razorpay.PaymentResultListener;
 import com.stripe.android.PaymentConfiguration;
+import com.stripe.android.core.StripeError;
+import com.stripe.android.core.exception.StripeException;
 import com.stripe.android.paymentsheet.*;
 
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
@@ -410,9 +412,16 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     }
 
     public void showStripePaymentSheet(Order order) {
-        PaymentConfiguration.init(this, order.getApikey());
+        String apiKey = order.getApikey();
+        String clientSecret = order.getStripeClientSecret();
+
+        if (apiKey == null || apiKey.isEmpty() || clientSecret == null || clientSecret.isEmpty()) {
+            onPaymentError("Missing Stripe payment configuration");
+            return;
+        }
+        PaymentConfiguration.init(this, apiKey);
         paymentSheet.presentWithPaymentIntent(
-            order.getStripeClientSecret(),
+            clientSecret,
             new PaymentSheet.Configuration("Testpress Store")
         );
     }
@@ -421,9 +430,25 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         if (paymentSheetResult instanceof PaymentSheetResult.Canceled) {
             onPaymentCancel();
         } else if (paymentSheetResult instanceof PaymentSheetResult.Failed) {
-            String error = ((PaymentSheetResult.Failed) paymentSheetResult).getError().getMessage();
-            onPaymentError(error);
-        } else if (paymentSheetResult instanceof PaymentSheetResult.Completed) {
+            Exception exception = (Exception) ((PaymentSheetResult.Failed) paymentSheetResult).getError();
+            if (exception instanceof StripeException) {
+                StripeError stripeError = ((StripeException) exception).getStripeError();
+                if (stripeError != null) {
+                    switch (stripeError.getCode()) {
+                        case "card_declined":
+                            onPaymentError("Your card was declined. Please use a different payment method.");
+                            return;
+                        case "incorrect_number":
+                            onPaymentError("The card number is incorrect. Please check and try again.");
+                            return;
+                        default:
+                            onPaymentError(stripeError.getMessage() != null ? stripeError.getMessage() : "An unexpected error occurred during payment.");
+                            return;
+                }
+            }
+        }
+        onPaymentError(exception.getMessage());
+} else if (paymentSheetResult instanceof PaymentSheetResult.Completed) {
             onPaymentSuccess();
         }
     }
