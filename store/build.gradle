@@ -37,7 +37,7 @@ dependencies {
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
     testImplementation rootProject.powermockJunit
-    testImplementation rootProject.roboelectric
+    testImplementation rootProject.robolectric
     testImplementation rootProject.androidxCore
     testImplementation rootProject.mockServer
     testImplementation rootProject.androidCoreTesting
