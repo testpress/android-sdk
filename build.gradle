@@ -41,7 +41,6 @@ ext {
     buildToolsVersion = '30.0.3'
     exoPlayer = '2.17.1'
     powermock = '2.0.5'
-    paging_version = "3.1.1"
     constraint_layout_version = '2.0.4'
 
     junit = 'junit:junit:4.12'
@@ -109,8 +108,8 @@ ext {
     razorpayAndroidCheckoutSDK = "com.razorpay:checkout:1.6.33"
 
     //AndroidX Dependencies
-    pagingRuntime = 'androidx.paging:paging-runtime-ktx:'+ paging_version
-    pagingCommon = 'androidx.paging:paging-common-ktx:'+ paging_version
+    pagingRuntime = 'androidx.paging:paging-runtime-ktx:3.3.2'
+    pagingCommon = 'androidx.paging:paging-common-ktx:3.3.2'
     constraintLayout = 'androidx.constraintlayout:constraintlayout:' + constraint_layout_version
 
 }
