@@ -111,6 +111,8 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         webView.settings.builtInZoomControls = false
         webView.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
         webView.settings.setSupportZoom(allowZoomControl)
+        webView.settings.mediaPlaybackRequiresUserGesture = false
+        webView.settings.setSupportMultipleWindows(true)
         webView.webViewClient = CustomWebViewClient(this)
         webView.webChromeClient = CustomWebChromeClient(this)
         webView.settings.userAgentString += CUSTOM_USER_AGENT
