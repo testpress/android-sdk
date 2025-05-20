@@ -280,7 +280,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         Intent intent = new Intent(this, PaymentSuccessActivity.class);
         intent.putExtra(ORDER, order);
         //noinspection ConstantConditions
-        intent.putExtras(getIntent().getExtras());
+        intent.putExtra(PRODUCT, product);
         startActivityForResult(intent, STORE_REQUEST_CODE);
     }
 
