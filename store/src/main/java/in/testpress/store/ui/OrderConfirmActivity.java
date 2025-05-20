@@ -422,7 +422,9 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         PaymentConfiguration.init(this, apiKey);
         paymentSheet.presentWithPaymentIntent(
             clientSecret,
-            new PaymentSheet.Configuration("Testpress Store")
+            new PaymentSheet.Configuration(
+                    this.getResources().getString(R.string.app_name)
+            )
         );
     }
 
@@ -447,8 +449,8 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
                 }
             }
         }
-        onPaymentError(exception.getMessage());
-} else if (paymentSheetResult instanceof PaymentSheetResult.Completed) {
+            onPaymentError(exception.getMessage());
+        } else if (paymentSheetResult instanceof PaymentSheetResult.Completed) {
             onPaymentSuccess();
         }
     }
