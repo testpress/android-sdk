@@ -1,7 +1,5 @@
 package `in`.testpress.models
 
-import `in`.testpress.database.entities.UserEntity
-
 data class User(
     val id: Long? = null,
     val url: String? = null,
@@ -17,8 +15,3 @@ data class User(
     val xSmallImage: String? = null,
     val miniImage: String? = null
 )
-
-
-fun User.asDatabaseModel(): UserEntity {
-    return UserEntity(id, url, username, firstName, lastName, displayName, photo, largeImage, mediumImage, mediumSmallImage, smallImage, xSmallImage, miniImage)
-}
