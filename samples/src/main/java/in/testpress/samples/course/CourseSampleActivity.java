@@ -14,7 +14,6 @@ import in.testpress.samples.BaseToolBarActivity;
 import in.testpress.samples.R;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
 import in.testpress.ui.WebViewWithSSOActivity;
-import in.testpress.ui.DiscussionActivity;
 //import in.testpress.ui.WebViewWithSSOActivity;
 import in.testpress.util.Permission;
 import in.testpress.util.ViewUtils;
@@ -53,13 +52,15 @@ public class CourseSampleActivity extends BaseToolBarActivity {
         findViewById(R.id.discussions_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (TestpressSdk.hasActiveSession(CourseSampleActivity.this)) {
-                    Intent intent = DiscussionActivity.createIntent(CourseSampleActivity.this);
-                    startActivity(intent);
-                } else {
-                    Intent intent = new Intent(CourseSampleActivity.this, TestpressCoreSampleActivity.class);
-                    startActivity(intent);
-                }
+                startActivity(WebViewWithSSOActivity.Companion.createIntent(
+                                CourseSampleActivity.this,
+                                "Discussions",
+                                session.getInstituteSettings().getDomainUrl() + "/discussions/new",
+                                true,
+                                false,
+                                WebViewWithSSOActivity.class
+                        )
+                );
             }
         });
         findViewById(R.id.gamified_course).setOnClickListener(new View.OnClickListener() {
