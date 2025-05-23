@@ -33,6 +33,7 @@ dependencies {
     api rootProject.payUCheckoutPro
     api rootProject.payUGpay
     api rootProject.razorpayAndroidCheckoutSDK
+    api rootProject.stripeAndroidSDK
 
     testImplementation rootProject.junit
     testImplementation rootProject.mockito

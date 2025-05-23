@@ -97,6 +97,7 @@ ext {
     payUCheckoutPro = "in.payu:payu-checkout-pro:1.8.0"
     payUGpay = "in.payu:payu-gpay:1.4.0"
     razorpayAndroidCheckoutSDK = "com.razorpay:checkout:1.6.33"
+    stripeAndroidSDK = "com.stripe:stripe-android:20.32.0"
 
     // Testing Dependencies
     testRunner = 'androidx.test.ext:junit:1.1.3'

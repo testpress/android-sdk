@@ -44,6 +44,10 @@ import in.testpress.util.TextWatcherAdapter;
 import in.testpress.util.UIUtils;
 
 import com.razorpay.PaymentResultListener;
+import com.stripe.android.PaymentConfiguration;
+import com.stripe.android.core.StripeError;
+import com.stripe.android.core.exception.StripeException;
+import com.stripe.android.paymentsheet.*;
 
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 import static in.testpress.store.TestpressStore.PAYMENT_SUCCESS;
@@ -79,6 +83,8 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
     private StoreApiClient apiClient;
     private FBEventsTrackerFacade fbEventsLogger;
     private EventsTrackerFacade eventsTrackerFacade;
+    private PaymentSheet paymentSheet;
+    private PaymentSheetResult paymentSheetResult;
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -123,6 +129,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
             // order confirmation.
             confirmOrder();
         }
+        paymentSheet = new PaymentSheet(this, result -> handleStripePaymentResult(result));
     }
 
     private int getPriceId() {
@@ -402,5 +409,49 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
         logEvent(EventsTrackerFacade.CANCELLED_PAYMENT);
         progressBar.setVisibility(View.GONE);
         showPaymentFailedScreen();
+    }
+
+    public void showStripePaymentSheet(Order order) {
+        String apiKey = order.getApikey();
+        String clientSecret = order.getStripeClientSecret();
+
+        if (apiKey == null || apiKey.isEmpty() || clientSecret == null || clientSecret.isEmpty()) {
+            onPaymentError("Missing Stripe payment configuration");
+            return;
+        }
+        PaymentConfiguration.init(this, apiKey);
+        paymentSheet.presentWithPaymentIntent(
+            clientSecret,
+            new PaymentSheet.Configuration(
+                    this.getResources().getString(R.string.app_name)
+            )
+        );
+    }
+
+    private void handleStripePaymentResult(PaymentSheetResult paymentSheetResult) {
+        if (paymentSheetResult instanceof PaymentSheetResult.Canceled) {
+            onPaymentCancel();
+        } else if (paymentSheetResult instanceof PaymentSheetResult.Failed) {
+            Exception exception = (Exception) ((PaymentSheetResult.Failed) paymentSheetResult).getError();
+            if (exception instanceof StripeException) {
+                StripeError stripeError = ((StripeException) exception).getStripeError();
+                if (stripeError != null) {
+                    switch (stripeError.getCode()) {
+                        case "card_declined":
+                            onPaymentError("Your card was declined. Please use a different payment method.");
+                            return;
+                        case "incorrect_number":
+                            onPaymentError("The card number is incorrect. Please check and try again.");
+                            return;
+                        default:
+                            onPaymentError(stripeError.getMessage() != null ? stripeError.getMessage() : "An unexpected error occurred during payment.");
+                            return;
+                }
+            }
+        }
+            onPaymentError(exception.getMessage());
+        } else if (paymentSheetResult instanceof PaymentSheetResult.Completed) {
+            onPaymentSuccess();
+        }
     }
 }
