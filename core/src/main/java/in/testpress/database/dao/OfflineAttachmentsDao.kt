@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface OfflineAttachmentsDao {
-    @Query("SELECT * FROM OfflineAttachment ORDER BY rowid DESC")
+    @Query("SELECT * FROM OfflineAttachment ORDER BY id DESC")
     fun getAllFiles(): Flow<List<OfflineAttachment>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -17,8 +17,11 @@ interface OfflineAttachmentsDao {
     suspend fun update(file: OfflineAttachment)
 
     @Query("UPDATE OfflineAttachment SET status = :status WHERE id = :id")
-    suspend fun updateStatus(id: String, status: OfflineAttachmentDownloadStatus)
+    suspend fun updateStatus(id: Long, status: OfflineAttachmentDownloadStatus)
 
     @Query("UPDATE OfflineAttachment SET progress = :progress WHERE id = :id")
-    suspend fun updateProgress(id: String, progress: Int)
+    suspend fun updateProgress(id: Long, progress: Int)
+
+    @Query("SELECT * FROM offlineattachment WHERE id = :id")
+    suspend fun getAttachmentById(id: Long): OfflineAttachment?
 }

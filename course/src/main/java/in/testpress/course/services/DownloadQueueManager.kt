@@ -4,7 +4,9 @@ import `in`.testpress.course.repository.OfflineAttachmentsRepository
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
 import `in`.testpress.database.entities.OfflineAttachment
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
@@ -32,7 +34,7 @@ class DownloadQueueManager(
             repo.updateStatus(next.id, OfflineAttachmentDownloadStatus.DOWNLOADING)
             try {
                 download(next)
-                repo.updateStatus(next.id, OfflineAttachmentDownloadStatus.COMPLETED)
+                repo.updateStatus(next.id, OfflineAttachmentDownloadStatus.DOWNLOADED)
             } catch (e: Exception) {
                 repo.updateStatus(next.id, OfflineAttachmentDownloadStatus.FAILED)
             }
@@ -41,23 +43,30 @@ class DownloadQueueManager(
         }
     }
 
-    private suspend fun download(file: OfflineAttachment) {
-        // Simplified download logic using OkHttp
+    private suspend fun download(file: OfflineAttachment) = withContext(Dispatchers.IO) {
         val request = Request.Builder().url(file.url).build()
         val response = OkHttpClient().newCall(request).execute()
-        val input = response.body?.byteStream() ?: return
 
+        if (!response.isSuccessful) throw Exception("Failed to download file: ${response.code}")
+
+        val input = response.body?.byteStream() ?: throw Exception("Empty response body")
         val outputFile = File(file.path)
+
         outputFile.outputStream().use { output ->
             val buffer = ByteArray(8 * 1024)
             var bytesRead: Int
             var totalBytes = 0L
+            val contentLength = response.body?.contentLength() ?: -1L
 
             while (input.read(buffer).also { bytesRead = it } >= 0) {
                 output.write(buffer, 0, bytesRead)
                 totalBytes += bytesRead
-                val progress = (totalBytes * 100 / (response.body?.contentLength() ?: 1)).toInt()
-                repo.updateProgress(file.id, progress)
+
+                // Avoid division by -1
+                if (contentLength > 0) {
+                    val progress = (totalBytes * 100 / contentLength).toInt()
+                    repo.updateProgress(file.id, progress)
+                }
             }
         }
     }

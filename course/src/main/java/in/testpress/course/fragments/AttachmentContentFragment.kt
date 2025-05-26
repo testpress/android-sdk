@@ -15,6 +15,9 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.isVisible
+import `in`.testpress.course.util.FileUtils.getFileExtensionFromUrl
+import `in`.testpress.course.viewmodels.OfflineAttachmentViewModel
 import java.io.File
 
 class AttachmentContentFragment : BaseContentDetailFragment() {
@@ -23,7 +26,14 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
     private lateinit var description: TextView
     private lateinit var titleLayout: LinearLayout
     private lateinit var downloadButton: Button
+    private lateinit var openButton: Button
     private lateinit var permissionsUtils: PermissionsUtils
+    private lateinit var offlineAttachmentViewModel: OfflineAttachmentViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        offlineAttachmentViewModel = OfflineAttachmentViewModel.get(requireActivity())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,9 +49,10 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
         titleView = view.findViewById(R.id.title)
         titleLayout = view.findViewById(R.id.title_layout)
         description = view.findViewById(R.id.description)
-        description.typeface = TestpressSdk.getRubikRegularFont(context!!)
+        description.typeface = TestpressSdk.getRubikRegularFont(requireContext())
         downloadButton = view.findViewById(R.id.download_attachment)
-        ViewUtils.setTypeface(arrayOf(titleView), TestpressSdk.getRubikMediumFont(activity!!))
+        openButton = view.findViewById(R.id.open_attachment)
+        ViewUtils.setTypeface(arrayOf(titleView), TestpressSdk.getRubikMediumFont(requireActivity()))
         ViewUtils.setLeftDrawable(context, downloadButton, R.drawable.ic_file_download_18dp)
         permissionsUtils = PermissionsUtils(requireActivity(), view)
     }
@@ -55,6 +66,22 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
             description.text = attachment.description
         }
 
+        offlineAttachmentViewModel.isAttachmentDownloaded(attachment.id).let { offlineFile ->
+            if (offlineFile != null) {
+                downloadButton.isVisible = false
+                openButton.also { button ->
+                    button.isVisible = true
+                    button.setOnClickListener {
+                        offlineAttachmentViewModel.openFile(requireContext(), offlineFile)
+                    }
+                }
+            } else {
+                downloadButton.isVisible = true
+            }
+        }
+
+
+
         downloadButton.setOnClickListener {
             onDownloadClick(attachment)
         }
@@ -62,13 +89,15 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
         viewModel.createContentAttempt(contentId)
     }
 
-    private fun onDownloadClick(attachment: DomainAttachmentContent){
-        if (permissionsUtils.isStoragePermissionGranted){
-            forceReloadContent {
-                downloadFile(attachment)
-            }
-        } else {
-            permissionsUtils.requestStoragePermissionWithSnackbar()
+    private fun onDownloadClick(attachment: DomainAttachmentContent) {
+        forceReloadContent {
+            offlineAttachmentViewModel.requestDownload(
+                attachment = attachment,
+                destinationPath = File(
+                    requireActivity().filesDir,
+                    attachment.title!!
+                ).path + getFileExtensionFromUrl(attachment.attachmentUrl)
+            )
         }
     }
 

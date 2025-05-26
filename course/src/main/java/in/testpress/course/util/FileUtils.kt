@@ -2,10 +2,13 @@ package `in`.testpress.course.util
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Environment
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import java.io.File
+import java.net.URLDecoder
+import java.util.Locale
 
 object FileUtils {
     fun getRootDirPath(context: Context): String {
@@ -22,7 +25,7 @@ object FileUtils {
 
     fun openPdf(context: Context, path: String) {
         val file = File(path)
-        val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.testpressFileProvider", file)
         val intent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uri, "application/pdf")
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -39,5 +42,38 @@ object FileUtils {
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
         context.startActivity(Intent.createChooser(intent, "Share PDF using"))
+    }
+
+    fun getFileExtensionFromUrl(url: String?): String {
+        if (url.isNullOrEmpty()) return ".pdf"
+
+        val uri = Uri.parse(url)
+
+        // Try to get filename from response-content-disposition param
+        val filename = uri.getQueryParameter("response-content-disposition")?.let { disposition ->
+            val decoded = URLDecoder.decode(disposition, "UTF-8")
+            val index = decoded.indexOf("filename=")
+            if (index != -1) {
+                decoded.substring(index + 9).trim('"', ' ', ';')
+            } else null
+        }
+
+        // Extract extension from filename if available
+        filename?.let {
+            val dotIndex = it.lastIndexOf('.')
+            if (dotIndex != -1 && dotIndex < it.length - 1) {
+                return "." + it.substring(dotIndex + 1).lowercase(Locale.getDefault())
+            }
+        }
+
+        // Fallback: Extract extension from URL path
+        uri.path?.let { path ->
+            val dotIndex = path.lastIndexOf('.')
+            if (dotIndex != -1 && dotIndex < path.length - 1) {
+                return "." + path.substring(dotIndex + 1).lowercase(Locale.getDefault())
+            }
+        }
+
+        return ".pdf"
     }
 }

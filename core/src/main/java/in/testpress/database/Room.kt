@@ -40,7 +40,7 @@ import `in`.testpress.database.roommigration.RoomMigration31To32.MIGRATION_31_32
 import `in`.testpress.database.roommigration.RoomMigration32To33.MIGRATION_32_33
 import `in`.testpress.database.roommigration.RoomMigration33To34.MIGRATION_33_34
 
-@Database(version = 34,
+@Database(version = 35,
         entities = [
             ContentEntity::class,
             OfflineVideo::class,
@@ -68,7 +68,8 @@ import `in`.testpress.database.roommigration.RoomMigration33To34.MIGRATION_33_34
             OfflineAttemptItem::class,
             ProductLiteEntity::class,
             ProductEntity::class,
-            PriceEntity::class
+            PriceEntity::class,
+            OfflineAttachment::class
         ], exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class TestpressDatabase : RoomDatabase() {

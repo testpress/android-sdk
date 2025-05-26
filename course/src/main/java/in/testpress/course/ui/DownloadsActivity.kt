@@ -6,13 +6,14 @@ import `in`.testpress.ui.BaseToolBarActivity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import `in`.testpress.course.fragments.OfflineAttachmentListFragment
 
 class DownloadsActivity: BaseToolBarActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.testpress_container_layout)
-        val fragment = DownloadsFragment()
+        val fragment = OfflineAttachmentListFragment()
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment).commitAllowingStateLoss()
     }

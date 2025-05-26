@@ -6,8 +6,8 @@ import java.util.*
 
 @Entity
 data class OfflineAttachment(
-    @PrimaryKey val id: String = UUID.randomUUID().toString(),
-    val fileName: String,
+    @PrimaryKey val id: Long,
+    val title: String,
     val url: String,
     val path: String,
     val status: OfflineAttachmentDownloadStatus,
@@ -15,5 +15,5 @@ data class OfflineAttachment(
 )
 
 enum class OfflineAttachmentDownloadStatus {
-    QUEUED, DOWNLOADING, PAUSED, COMPLETED, FAILED, CANCELED
+    QUEUED, DOWNLOADING, FAILED, DOWNLOADED
 }
