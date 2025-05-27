@@ -1,6 +1,5 @@
 package `in`.testpress.database.roommigration
 
-import `in`.testpress.database.entities.DiscussionPostEntity
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 

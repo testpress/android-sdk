@@ -39,17 +39,12 @@ import `in`.testpress.database.roommigration.RoomMigration30To31.MIGRATION_30_31
 import `in`.testpress.database.roommigration.RoomMigration31To32.MIGRATION_31_32
 import `in`.testpress.database.roommigration.RoomMigration32To33.MIGRATION_32_33
 import `in`.testpress.database.roommigration.RoomMigration33To34.MIGRATION_33_34
+import `in`.testpress.database.roommigration.RoomMigration34To35.MIGRATION_34_35
 
-@Database(version = 34,
+@Database(version = 35,
         entities = [
             ContentEntity::class,
             OfflineVideo::class,
-            CommentEntity::class,
-            DiscussionPostEntity::class,
-            LastLoadedPageData::class,
-            UserEntity::class,
-            CategoryEntity::class,
-            DiscussionThreadAnswerEntity::class,
             ProductCategoryEntity::class,
             ContentEntityLite::class,
             ContentEntityLiteRemoteKey::class,
@@ -74,11 +69,6 @@ import `in`.testpress.database.roommigration.RoomMigration33To34.MIGRATION_33_34
 abstract class TestpressDatabase : RoomDatabase() {
     abstract fun contentDao(): ContentDao
     abstract fun offlineVideoDao(): OfflineVideoDao
-    abstract fun commentDao(): CommentDao
-    abstract fun forumDao(): DiscussionPostDao
-    abstract fun lastLoadedPageDataDao(): LastLoadedPageDataDao
-    abstract fun categoryDao(): CategoryDao
-    abstract fun discussionAnswerDao(): DiscussionAnswerDao
     abstract fun productCategoryDao(): ProductCategoryDao
     abstract fun contentLiteDao(): ContentLiteDao
     abstract fun contentLiteRemoteKeyDao():ContentLiteRemoteKeyDao
@@ -105,7 +95,8 @@ abstract class TestpressDatabase : RoomDatabase() {
             MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19,
             MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24,
             MIGRATION_24_25, MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29,
-            MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33, MIGRATION_33_34
+            MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33, MIGRATION_33_34,
+            MIGRATION_34_35
         )
 
         operator fun invoke(context: Context): TestpressDatabase {
