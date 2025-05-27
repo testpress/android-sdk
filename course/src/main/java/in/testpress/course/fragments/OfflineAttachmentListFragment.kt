@@ -37,7 +37,7 @@ class OfflineAttachmentListFragment : Fragment() {
 
     private var _binding: OfflineAttachmentListFragmentBinding? = null
     private val binding: OfflineAttachmentListFragmentBinding get() = _binding!!
-    private lateinit var viewModel: OfflineAttachmentViewModel // Renamed for clarity
+    private lateinit var viewModel: OfflineAttachmentViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,7 +127,11 @@ fun OfflineAttachmentList(
                 AttachmentBottomSheet(
                     attachment = it,
                     onDeleteDownload = onDeleteDownload,
-                    onCancelDownload = onCancelDownload
+                    onCancelDownload = onCancelDownload,
+                    onDismiss = {
+                        showBottomSheet = false
+                        selectedAttachment = null
+                    }
                 )
             }
         }
@@ -145,7 +149,7 @@ fun OfflineAttachmentItem(
         modifier = Modifier
             .height(72.dp)
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(start = 16.dp, top = 8.dp, end = 4.dp, bottom = 16.dp)
             .clickable(onClick = onOpenFile),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -177,7 +181,10 @@ fun OfflineAttachmentItem(
     }
 }
 
-fun getAttachmentStatusText(attachmentStatus: OfflineAttachmentDownloadStatus,attachmentProgress: Int): String {
+fun getAttachmentStatusText(
+    attachmentStatus: OfflineAttachmentDownloadStatus,
+    attachmentProgress: Int
+): String {
     return when (attachmentStatus) {
         OfflineAttachmentDownloadStatus.DOWNLOADED -> "Tap to open"
         OfflineAttachmentDownloadStatus.FAILED -> "Download Failed"
@@ -221,7 +228,8 @@ fun EmptyState() {
 private fun AttachmentBottomSheet(
     attachment: OfflineAttachment,
     onDeleteDownload: (Long) -> Unit,
-    onCancelDownload: (Long) -> Unit
+    onCancelDownload: (Long) -> Unit,
+    onDismiss: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -231,15 +239,22 @@ private fun AttachmentBottomSheet(
         when (attachment.status) {
             OfflineAttachmentDownloadStatus.QUEUED,
             OfflineAttachmentDownloadStatus.DOWNLOADING -> {
-                TextButton(onClick = { onCancelDownload(attachment.id) }) {
+                TextButton(onClick = {
+                    onCancelDownload(attachment.id)
+                    onDismiss()
+                }) {
                     Icon(Icons.Filled.Clear, contentDescription = "Cancel", tint = Color.Black)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Cancel from Download", color = Color.Black)
                 }
             }
+
             OfflineAttachmentDownloadStatus.DOWNLOADED,
             OfflineAttachmentDownloadStatus.FAILED -> {
-                TextButton(onClick = { onDeleteDownload(attachment.id) }) {
+                TextButton(onClick = {
+                    onDeleteDownload(attachment.id)
+                    onDismiss()
+                }) {
                     Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.Black)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Delete from Download", color = Color.Black)
@@ -321,7 +336,8 @@ fun AttachmentBottomSheetForDeletePreview() {
             progress = 0
         ),
         onDeleteDownload = {},
-        onCancelDownload = {}
+        onCancelDownload = {},
+        onDismiss = {}
     )
 }
 
@@ -338,6 +354,7 @@ fun AttachmentBottomSheetForCancelPreview() {
             progress = 20
         ),
         onDeleteDownload = {},
-        onCancelDownload = {}
+        onCancelDownload = {},
+        onDismiss = {}
     )
 }
