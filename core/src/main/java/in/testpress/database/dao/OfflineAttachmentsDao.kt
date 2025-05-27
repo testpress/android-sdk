@@ -27,4 +27,7 @@ interface OfflineAttachmentsDao {
 
     @Query("SELECT * FROM offlineattachment WHERE id = :id")
     suspend fun getAttachmentById(id: Long): OfflineAttachment?
+
+    @Query("SELECT * FROM OfflineAttachment WHERE status =:status ORDER BY id DESC")
+    suspend fun getAllWithStatus(status: OfflineAttachmentDownloadStatus): List<OfflineAttachment>
 }

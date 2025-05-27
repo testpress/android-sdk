@@ -2,7 +2,6 @@ package `in`.testpress.course.viewmodels
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
@@ -23,14 +22,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(application),
-    DownloadQueueManager.Callback {
+class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(application) {
     private val dao = TestpressDatabase.invoke(application).offlineAttachmentDao()
     private val repo = OfflineAttachmentsRepository(dao)
-
-    init {
-        DownloadQueueManager.setCallback(this)
-    }
 
     val files = repo.getAllFiles().stateIn(
         viewModelScope,
@@ -53,7 +47,9 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
     }
 
     fun cancel(id: Long) {
-        DownloadQueueManager.cancelDownloadById(id)
+        viewModelScope.launch {
+            DownloadQueueManager.cancelDownloadById(id)
+        }
     }
 
     fun delete(id: Long) {
@@ -90,34 +86,5 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
                 }
             }).get(OfflineAttachmentViewModel::class.java)
         }
-    }
-
-    override fun onDownloadStarted(item: DownloadItem) {
-        viewModelScope.launch {
-            repo.updateStatus(item.id, OfflineAttachmentDownloadStatus.DOWNLOADING)
-        }
-    }
-
-    override fun onProgress(item: DownloadItem, progress: Int) {
-        viewModelScope.launch {
-            Log.d("TAG", "onProgress: $progress")
-            repo.updateProgress(item.id, progress)
-        }
-    }
-
-    override fun onDownloadCompleted(item: DownloadItem) {
-        viewModelScope.launch {
-            repo.updateStatus(item.id, OfflineAttachmentDownloadStatus.DOWNLOADED)
-        }
-    }
-
-    override fun onDownloadFailed(item: DownloadItem, error: Throwable) {
-        viewModelScope.launch {
-            repo.updateStatus(item.id, OfflineAttachmentDownloadStatus.FAILED)
-        }
-    }
-
-    override fun onDownloadCancelled(item: DownloadItem) {
-        delete(item.id)
     }
 }

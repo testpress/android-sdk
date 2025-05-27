@@ -1,6 +1,10 @@
 package `in`.testpress.course.services
 
+import android.content.Context
 import android.util.Log
+import `in`.testpress.course.repository.OfflineAttachmentsRepository
+import `in`.testpress.database.TestpressDatabase
+import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.ensureActive
 import okhttp3.OkHttpClient
@@ -14,16 +18,17 @@ data class DownloadItem(val id: Long, val url: String, val file: String)
 object DownloadQueueManager {
 
     interface Callback {
-        fun onDownloadStarted(item: DownloadItem)
-        fun onProgress(item: DownloadItem, progress: Int)
-        fun onDownloadCompleted(item: DownloadItem)
-        fun onDownloadFailed(item: DownloadItem, error: Throwable)
-        fun onDownloadCancelled(item: DownloadItem)
+        suspend fun onDownloadStarted(item: DownloadItem)
+        suspend fun onProgress(item: DownloadItem, progress: Int)
+        suspend fun onDownloadCompleted(item: DownloadItem)
+        suspend fun onDownloadFailed(item: DownloadItem, error: Throwable)
+        suspend fun onDownloadCancelled(item: DownloadItem)
     }
 
     private var callback: Callback? = null
     private val downloadQueue = CopyOnWriteArrayList<DownloadItem>()
     private val downloadScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val okHttpClient = OkHttpClient()
 
     private var isDownloading = false
     private var currentDownloadJob: Job? = null
@@ -69,55 +74,53 @@ object DownloadQueueManager {
         }
     }
 
-    private val okHttpClient = OkHttpClient()
+    private suspend fun downloadFile(item: DownloadItem) =
+        withContext(downloadScope.coroutineContext) {
+            val request = Request.Builder()
+                .url(item.url)
+                .build()
 
-    private suspend fun downloadFile(item: DownloadItem) = withContext(downloadScope.coroutineContext) {
-        val request = Request.Builder()
-            .url(item.url)
-            .build()
+            val response = okHttpClient.newCall(request).execute()
 
-        val response = okHttpClient.newCall(request).execute()
+            if (!response.isSuccessful) {
+                throw IOException("Failed to download file: ${response.code}")
+            }
 
-        if (!response.isSuccessful) {
-            throw IOException("Failed to download file: ${response.code}")
-        }
+            val body = response.body ?: throw IOException("Empty response body")
+            val contentLength = body.contentLength()
+            if (contentLength <= 0) {
+                Log.w("DownloadQueueManager", "Invalid contentLength: $contentLength")
+            }
 
-        val body = response.body ?: throw IOException("Empty response body")
-        val contentLength = body.contentLength()
-        if (contentLength <= 0) {
-            Log.w("DownloadQueueManager", "Invalid contentLength: $contentLength")
-        }
+            body.byteStream().use { input ->
+                FileOutputStream(item.file).use { output ->
+                    val buffer = ByteArray(8 * 1024)
+                    var bytesRead: Int
+                    var totalRead = 0L
+                    var lastProgress = -1
 
-        body.byteStream().use { input ->
-            FileOutputStream(item.file).use { output ->
-                val buffer = ByteArray(8 * 1024)
-                var bytesRead: Int
-                var totalRead = 0L
-                var lastProgress = -1
+                    while (input.read(buffer).also { bytesRead = it } != -1) {
+                        downloadScope.ensureActive()
+                        output.write(buffer, 0, bytesRead)
+                        totalRead += bytesRead
 
-                while (input.read(buffer).also { bytesRead = it } != -1) {
-                    downloadScope.ensureActive()
-                    output.write(buffer, 0, bytesRead)
-                    totalRead += bytesRead
-
-                    if (contentLength > 0) {
-                        val progress = (totalRead * 100 / contentLength).toInt()
-                        if (progress != lastProgress) {
-                            lastProgress = progress
-                            callback?.onProgress(item, progress)
+                        if (contentLength > 0) {
+                            val progress = (totalRead * 100 / contentLength).toInt()
+                            if (progress != lastProgress) {
+                                lastProgress = progress
+                                callback?.onProgress(item, progress)
+                            }
                         }
                     }
                 }
             }
         }
-    }
-
 
     private fun cancelCurrent() {
         currentDownloadJob?.cancel()
     }
 
-    fun cancelDownloadById(id: Long) {
+    suspend fun cancelDownloadById(id: Long) {
         val current = currentItem
         if (current?.id == id) {
             cancelCurrent()
@@ -136,5 +139,20 @@ object DownloadQueueManager {
         downloadScope.coroutineContext.cancelChildren()
         clearQueue()
         isDownloading = false
+    }
+
+    fun restartPendingDownloads(context: Context) {
+        downloadScope.launch {
+            val dao = TestpressDatabase.invoke(context.applicationContext).offlineAttachmentDao()
+            val repo = OfflineAttachmentsRepository(dao)
+            val downloadingAttachments = repo.getAllWithStatus(OfflineAttachmentDownloadStatus.DOWNLOADING)
+            val queuedAttachments = repo.getAllWithStatus(OfflineAttachmentDownloadStatus.QUEUED)
+            downloadingAttachments.forEach { attachment ->
+                enqueue(DownloadItem(attachment.id, attachment.url, attachment.path))
+            }
+            queuedAttachments.forEach { attachment ->
+                enqueue(DownloadItem(attachment.id, attachment.url, attachment.path))
+            }
+        }
     }
 }
