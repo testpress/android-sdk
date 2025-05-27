@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,6 +14,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +31,7 @@ import `in`.testpress.course.databinding.OfflineAttachmentListFragmentBinding
 import `in`.testpress.course.viewmodels.OfflineAttachmentViewModel
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
+import kotlinx.coroutines.launch
 
 class OfflineAttachmentListFragment : Fragment() {
 
@@ -77,6 +83,7 @@ fun OfflineAttachmentScreen(viewModel: OfflineAttachmentViewModel) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OfflineAttachmentList(
     attachments: List<OfflineAttachment>,
@@ -84,139 +91,98 @@ fun OfflineAttachmentList(
     onDeleteDownload: (Long) -> Unit,
     onCancelDownload: (Long) -> Unit
 ) {
+
+    val scope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState()
+    var selectedAttachment by rememberSaveable { mutableStateOf<OfflineAttachment?>(null) }
+    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(vertical = 8.dp)
     ) {
         items(attachments) { attachment ->
             OfflineAttachmentItem(
                 attachment = attachment,
-                onDeleteDownload = onDeleteDownload,
-                onCancelDownload = onCancelDownload
+                onOpenFile = { onOpenFile(attachment) },
+                onMoreClick = {
+                    showBottomSheet = !showBottomSheet
+                    selectedAttachment = attachment
+                    scope.launch { sheetState.show() }
+                }
             )
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
+
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showBottomSheet = false
+                selectedAttachment = null
+            },
+            sheetState = sheetState,
+        ) {
+            selectedAttachment?.let {
+                AttachmentBottomSheet(
+                    attachment = it,
+                    onDeleteDownload = onDeleteDownload,
+                    onCancelDownload = onCancelDownload
+                )
+            }
+        }
+    }
+
 }
 
 @Composable
 fun OfflineAttachmentItem(
     attachment: OfflineAttachment,
-    onDeleteDownload: (Long) -> Unit,
-    onCancelDownload: (Long) -> Unit
+    onOpenFile: () -> Unit,
+    onMoreClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .height(72.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable(onClick = onOpenFile),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        Column {
             Text(text = attachment.title, style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(4.dp))
-            when (attachment.status) {
-                OfflineAttachmentDownloadStatus.DOWNLOADED -> {
-                    Text(
-                        text = "Tap to open",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-                OfflineAttachmentDownloadStatus.FAILED -> {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "Download Failed",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Icon(
-                            imageVector = Icons.Filled.Warning,
-                            contentDescription = "Delete File",
-                            modifier = Modifier.size(12.dp),
-                            tint = MaterialTheme.colorScheme.error
-                        )
-                    }
-                }
-                OfflineAttachmentDownloadStatus.QUEUED -> {
-                    Text(
-                        text = "Waiting to download...",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-                OfflineAttachmentDownloadStatus.DOWNLOADING -> {
-                    Text(
-                        text = "Downloading...${attachment.progress}%",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
+            Text(
+                text = getAttachmentStatusText(attachment.status, attachment.progress),
+                style = MaterialTheme.typography.bodySmall
+            )
         }
-        Spacer(modifier = Modifier.width(8.dp))
-        if (attachment.status == OfflineAttachmentDownloadStatus.DOWNLOADING && attachment.progress > 0) {
+        Spacer(modifier = Modifier.weight(1f))
+        if (attachment.status == OfflineAttachmentDownloadStatus.DOWNLOADING) {
             CircularProgressIndicator(
                 progress = attachment.progress / 100f,
                 modifier = Modifier
-                    .size(24.dp),
-                strokeWidth = 3.dp,
+                    .size(48.0.dp)
+                    .padding(8.dp)
+                    .clickable(onClick = onMoreClick),
                 trackColor = Color.LightGray
             )
+        } else {
+            IconButton(onClick = onMoreClick) {
+                Icon(
+                    imageVector = Icons.Filled.MoreVert,
+                    contentDescription = "More"
+                )
+            }
         }
-        AttachmentActions(
-            attachmentId = attachment.id,
-            attachmentState = attachment.status,
-            onDeleteDownload = onDeleteDownload,
-            onCancelDownload = onCancelDownload
-        )
     }
 }
 
-@Composable
-fun AttachmentActions(
-    attachmentId: Long,
-    attachmentState: OfflineAttachmentDownloadStatus,
-    onDeleteDownload: (Long) -> Unit,
-    onCancelDownload: (Long) -> Unit
-) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        when (attachmentState) {
-            OfflineAttachmentDownloadStatus.DOWNLOADED -> {
-                IconButton(onClick = { onDeleteDownload(attachmentId) }) {
-                    Icon(
-                        imageVector = Icons.Filled.Delete,
-                        contentDescription = "Delete File",
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-            OfflineAttachmentDownloadStatus.FAILED -> {
-                IconButton(onClick = { onDeleteDownload(attachmentId) }) {
-                    Icon(
-                        imageVector = Icons.Filled.Delete,
-                        contentDescription = "Delete File",
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-            OfflineAttachmentDownloadStatus.QUEUED -> {
-                IconButton(onClick = { onCancelDownload(attachmentId) }) {
-                    Icon(
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = "Cancel Download",
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-            OfflineAttachmentDownloadStatus.DOWNLOADING -> {
-                IconButton(onClick = { onCancelDownload(attachmentId) }) {
-                    Icon(
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = "Cancel Download",
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-        }
+fun getAttachmentStatusText(attachmentStatus: OfflineAttachmentDownloadStatus,attachmentProgress: Int): String {
+    return when (attachmentStatus) {
+        OfflineAttachmentDownloadStatus.DOWNLOADED -> "Tap to open"
+        OfflineAttachmentDownloadStatus.FAILED -> "Download Failed"
+        OfflineAttachmentDownloadStatus.QUEUED -> "Waiting to download..."
+        OfflineAttachmentDownloadStatus.DOWNLOADING -> "Downloading...${attachmentProgress}%"
     }
 }
 
@@ -251,6 +217,39 @@ fun EmptyState() {
     }
 }
 
+@Composable
+private fun AttachmentBottomSheet(
+    attachment: OfflineAttachment,
+    onDeleteDownload: (Long) -> Unit,
+    onCancelDownload: (Long) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+    ) {
+        when (attachment.status) {
+            OfflineAttachmentDownloadStatus.QUEUED,
+            OfflineAttachmentDownloadStatus.DOWNLOADING -> {
+                TextButton(onClick = { onCancelDownload(attachment.id) }) {
+                    Icon(Icons.Filled.Clear, contentDescription = "Cancel", tint = Color.Black)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Cancel from Download", color = Color.Black)
+                }
+            }
+            OfflineAttachmentDownloadStatus.DOWNLOADED,
+            OfflineAttachmentDownloadStatus.FAILED -> {
+                TextButton(onClick = { onDeleteDownload(attachment.id) }) {
+                    Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.Black)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Delete from Download", color = Color.Black)
+                }
+            }
+        }
+    }
+}
+
+
 @Preview(showBackground = true)
 @Composable
 fun OfflineAttachmentListPreview() {
@@ -270,6 +269,14 @@ fun OfflineAttachmentListPreview() {
             path = "",
             status = OfflineAttachmentDownloadStatus.DOWNLOADING,
             progress = 50
+        ),
+        OfflineAttachment(
+            id = 3,
+            title = "Lecture Slides - Week 3",
+            url = "",
+            path = "",
+            status = OfflineAttachmentDownloadStatus.DOWNLOADING,
+            progress = 0
         ),
         OfflineAttachment(
             id = 5,
@@ -301,60 +308,10 @@ fun EmptyStatePreview() {
     EmptyState()
 }
 
-@Preview(showBackground = true, name = "Single Item - Downloaded")
+@Preview(showBackground = true, name = "Attachment Bottom Sheet - Delete")
 @Composable
-fun SingleItemDownloadedPreview() {
-    OfflineAttachmentItem(
-        attachment = OfflineAttachment(
-            id = 1,
-            title = "Downloaded File.pdf",
-            url = "",
-            path = "/path/to/file.pdf",
-            status = OfflineAttachmentDownloadStatus.DOWNLOADED
-        ),
-        onDeleteDownload = {},
-        onCancelDownload = {}
-    )
-}
-
-@Preview(showBackground = true, name = "Single Item - Downloading")
-@Composable
-fun SingleItemDownloadingPreview() {
-    OfflineAttachmentItem(
-        attachment = OfflineAttachment(
-            id = 2,
-            title = "Lecture Slides - Week 2.pdf",
-            url = "",
-            path = "",
-            status = OfflineAttachmentDownloadStatus.DOWNLOADING,
-            progress = 50
-        ),
-        onDeleteDownload = {},
-        onCancelDownload = {}
-    )
-}
-
-@Preview(showBackground = true, name = "Single Item - Queued")
-@Composable
-fun SingleItemQueuedPreview() {
-    OfflineAttachmentItem(
-        attachment = OfflineAttachment(
-            id = 2,
-            title = "Lecture Slides - Week 2.pdf",
-            url = "",
-            path = "",
-            status = OfflineAttachmentDownloadStatus.QUEUED,
-            progress = 0
-        ),
-        onDeleteDownload = {},
-        onCancelDownload = {}
-    )
-}
-
-@Preview(showBackground = true, name = "Single Item - Failed")
-@Composable
-fun SingleItemFailedPreview() {
-    OfflineAttachmentItem(
+fun AttachmentBottomSheetForDeletePreview() {
+    AttachmentBottomSheet(
         attachment = OfflineAttachment(
             id = 2,
             title = "Lecture Slides - Week 2.pdf",
@@ -362,6 +319,23 @@ fun SingleItemFailedPreview() {
             path = "",
             status = OfflineAttachmentDownloadStatus.FAILED,
             progress = 0
+        ),
+        onDeleteDownload = {},
+        onCancelDownload = {}
+    )
+}
+
+@Preview(showBackground = true, name = "Attachment Bottom Sheet - Cancel")
+@Composable
+fun AttachmentBottomSheetForCancelPreview() {
+    AttachmentBottomSheet(
+        attachment = OfflineAttachment(
+            id = 2,
+            title = "Lecture Slides - Week 2.pdf",
+            url = "",
+            path = "",
+            status = OfflineAttachmentDownloadStatus.QUEUED,
+            progress = 20
         ),
         onDeleteDownload = {},
         onCancelDownload = {}

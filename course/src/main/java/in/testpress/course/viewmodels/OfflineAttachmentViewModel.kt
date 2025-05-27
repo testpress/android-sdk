@@ -11,7 +11,6 @@ import `in`.testpress.course.domain.DomainAttachmentContent
 import `in`.testpress.course.repository.OfflineAttachmentsRepository
 import `in`.testpress.course.services.DownloadQueueManager
 import `in`.testpress.course.util.FileUtils.openPdf
-import `in`.testpress.course.util.FileUtils.sharePdf
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
@@ -46,10 +45,25 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
             queueManager.enqueue(file)
         }
     }
-    fun cancel(id: Long) = Unit
-    fun delete(id: Long) = Unit
+    fun cancel(id: Long) {
+        viewModelScope.launch {
+            val attachment = repo.getAttachmentById(id)
+            repo.delete(id)
+            attachment?.let {
+                // TODO: Add logic to cancel download
+            }
+        }
+    }
+    fun delete(id: Long) {
+        viewModelScope.launch {
+            val attachment = repo.getAttachmentById(id)
+            repo.delete(id)
+            attachment?.let {
+                // TODO: Delete file from disk
+            }
+        }
+    }
     fun openFile(context: Context, file: OfflineAttachment) = openPdf(context, file.path)
-    fun shareFile(context: Context, file: OfflineAttachment) = sharePdf(context, file.path)
 
     fun isAttachmentDownloaded(attachmentId: Long): OfflineAttachment? {
         // It's generally not recommended to block the main thread.

@@ -16,6 +16,9 @@ interface OfflineAttachmentsDao {
     @Update
     suspend fun update(file: OfflineAttachment)
 
+    @Query("DELETE FROM OfflineAttachment WHERE id = :id")
+    suspend fun deleteById(id: Long)
+
     @Query("UPDATE OfflineAttachment SET status = :status WHERE id = :id")
     suspend fun updateStatus(id: Long, status: OfflineAttachmentDownloadStatus)
 
