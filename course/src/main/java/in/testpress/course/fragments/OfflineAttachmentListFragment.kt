@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,12 +22,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import `in`.testpress.course.R
 import `in`.testpress.course.databinding.OfflineAttachmentListFragmentBinding
 import `in`.testpress.course.viewmodels.OfflineAttachmentViewModel
 import `in`.testpress.database.entities.OfflineAttachment
@@ -95,7 +99,6 @@ fun OfflineAttachmentList(
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
     var selectedAttachment by rememberSaveable { mutableStateOf<OfflineAttachment?>(null) }
-    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
 
     LazyColumn(
         modifier = Modifier
@@ -107,18 +110,20 @@ fun OfflineAttachmentList(
                 attachment = attachment,
                 onOpenFile = { onOpenFile(attachment) },
                 onMoreClick = {
-                    showBottomSheet = !showBottomSheet
                     selectedAttachment = attachment
-                    scope.launch { sheetState.show() }
                 }
             )
         }
     }
 
-    if (showBottomSheet) {
+    if (selectedAttachment != null) {
+        LaunchedEffect(selectedAttachment) {
+            sheetState.show()
+        }
+
         ModalBottomSheet(
             onDismissRequest = {
-                showBottomSheet = false
+                scope.launch { sheetState.hide() }
                 selectedAttachment = null
             },
             sheetState = sheetState,
@@ -129,7 +134,7 @@ fun OfflineAttachmentList(
                     onDeleteDownload = onDeleteDownload,
                     onCancelDownload = onCancelDownload,
                     onDismiss = {
-                        showBottomSheet = false
+                        scope.launch { sheetState.hide() }
                         selectedAttachment = null
                     }
                 )
@@ -203,12 +208,12 @@ fun EmptyState() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            imageVector = Icons.Filled.Close, // Or any relevant icon
+            imageVector = ImageVector.vectorResource(R.drawable.baseline_attach_file_24),
             contentDescription = "No Downloads",
             modifier = Modifier
                 .height(96.dp)
                 .width(96.dp),
-            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            tint = Color(0xFFE77528)
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
@@ -216,6 +221,7 @@ fun EmptyState() {
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium
         )
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Looks like you’ve not downloaded any attachments as of now.",
             style = MaterialTheme.typography.bodyMedium,
