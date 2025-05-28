@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -42,7 +43,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import `in`.testpress.course.R
-import `in`.testpress.course.databinding.OfflineAttachmentListFragmentBinding
 import `in`.testpress.course.viewmodels.OfflineAttachmentViewModel
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
@@ -50,8 +50,6 @@ import kotlinx.coroutines.launch
 
 class OfflineAttachmentListFragment : Fragment() {
 
-    private var _binding: OfflineAttachmentListFragmentBinding? = null
-    private val binding: OfflineAttachmentListFragmentBinding get() = _binding!!
     private lateinit var viewModel: OfflineAttachmentViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,20 +62,12 @@ class OfflineAttachmentListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = OfflineAttachmentListFragmentBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.offlineAttachmentComposeView.setContent {
-            OfflineAttachmentScreen(viewModel = viewModel)
+        return androidx.compose.ui.platform.ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                OfflineAttachmentScreen(viewModel = viewModel)
+            }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }
 
@@ -116,6 +106,7 @@ fun LoadingState() {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(8.dp)
     ) {
         items(repeatCount) {
@@ -193,6 +184,7 @@ fun EmptyState() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -236,6 +228,7 @@ fun OfflineAttachmentList(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(vertical = 8.dp)
     ) {
         items(attachments, key = { attachment -> attachment.id }) { attachment ->
