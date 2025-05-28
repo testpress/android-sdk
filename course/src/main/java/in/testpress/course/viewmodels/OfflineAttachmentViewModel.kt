@@ -29,7 +29,7 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
     val files = repo.getAllFiles().stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        emptyList()
+        null
     )
 
     fun requestDownload(attachment: DomainAttachmentContent, destinationPath: String) {
