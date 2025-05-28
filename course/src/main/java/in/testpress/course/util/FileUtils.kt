@@ -28,9 +28,15 @@ object FileUtils {
 
     fun openFile(context: Context, path: String) {
         val file = File(path)
+
+        if (!file.exists()) {
+            Toast.makeText(context, "File not found.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.testpressFileProvider", file)
         val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, null)
+            setDataAndType(uri, context.contentResolver.getType(uri))
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
         try {
