@@ -10,6 +10,7 @@ import kotlinx.coroutines.ensureActive
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.IOException
+import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -36,6 +37,10 @@ object DownloadQueueManager {
 
     fun setCallback(callback: Callback) {
         this.callback = callback
+    }
+
+    fun removeCallback() {
+        this.callback = null
     }
 
     fun enqueue(item: DownloadItem) {
@@ -93,7 +98,11 @@ object DownloadQueueManager {
             }
 
             body.byteStream().use { input ->
-                FileOutputStream(item.file).use { output ->
+
+                val target = File(item.file)
+                target.parentFile?.mkdirs()
+
+                FileOutputStream(target).use { output ->
                     val buffer = ByteArray(8 * 1024)
                     var bytesRead: Int
                     var totalRead = 0L

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
-import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -29,32 +28,15 @@ object FileUtils {
 
     fun openFile(context: Context, path: String) {
         val file = File(path)
-        val uri: Uri = FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.testpressFileProvider",
-            file
-        )
-
-        val mimeType = getMimeType(file) ?: "*/*"
-
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.testpressFileProvider", file)
         val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, mimeType)
+            setDataAndType(uri, null)
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
-
         try {
             context.startActivity(Intent.createChooser(intent, "Open with"))
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(context, "No app found to open this file type.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun getMimeType(file: File): String? {
-        val extension = MimeTypeMap.getFileExtensionFromUrl(file.name)?.lowercase()
-        return if (extension != null) {
-            MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
-        } else {
-            null
         }
     }
 

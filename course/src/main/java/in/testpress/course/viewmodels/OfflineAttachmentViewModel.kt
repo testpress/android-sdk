@@ -16,11 +16,9 @@ import `in`.testpress.course.util.FileUtils.openFile
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(application) {
     private val dao = TestpressDatabase.invoke(application).offlineAttachmentDao()
@@ -63,6 +61,11 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
     }
 
     fun openFile(context: Context, file: OfflineAttachment) = openFile(context, file.path)
+
+    override fun onCleared() {
+        super.onCleared()
+        repo.onClear()
+    }
 
     companion object {
         fun get(context: FragmentActivity): OfflineAttachmentViewModel {

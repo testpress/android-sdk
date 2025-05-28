@@ -98,7 +98,8 @@
 
         <androidx.appcompat.widget.AppCompatButton
             style="@style/Button"
-            android:text="Sample Offline Attachment"
+            android:layout_width="wrap_content"
+            android:text="Sample Attachment"
             android:id="@+id/sample_offline_attachment_download" />
 
     </LinearLayout>
