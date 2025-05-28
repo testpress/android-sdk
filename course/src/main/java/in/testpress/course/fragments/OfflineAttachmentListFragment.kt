@@ -1,6 +1,7 @@
 package `in`.testpress.course.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,8 +23,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -89,7 +92,11 @@ fun OfflineAttachmentScreen(viewModel: OfflineAttachmentViewModel) {
         else -> {
             OfflineAttachmentList(
                 attachments = attachments!!,
-                onOpenFile = { file -> viewModel.openFile(context, file) },
+                onOpenFile = { file ->
+                    if (file.status == OfflineAttachmentDownloadStatus.DOWNLOADED) {
+                        viewModel.openFile(context, file)
+                    }
+                },
                 onDeleteDownload = { fileId -> viewModel.delete(fileId) },
                 onCancelDownload = { fileId -> viewModel.cancel(fileId) }
             )
@@ -225,6 +232,25 @@ fun OfflineAttachmentList(
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
     var selectedAttachment by rememberSaveable { mutableStateOf<OfflineAttachment?>(null) }
+
+    val latestAttachment = if (attachments.size < 50) {
+        // Version 1: linear search
+        remember(attachments, selectedAttachment?.id) {
+            attachments.find { it.id == selectedAttachment?.id }
+        }
+    } else {
+        // Version 2: map lookup
+        val attachmentMap = remember(attachments) {
+            attachments.associateBy { it.id }
+        }
+        attachmentMap[selectedAttachment?.id]
+    }
+
+    LaunchedEffect(latestAttachment?.status) {
+        if (latestAttachment != null && latestAttachment.status != selectedAttachment?.status) {
+            selectedAttachment = latestAttachment
+        }
+    }
 
     LazyColumn(
         modifier = Modifier
