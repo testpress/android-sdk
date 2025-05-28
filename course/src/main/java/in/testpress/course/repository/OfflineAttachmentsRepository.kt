@@ -7,12 +7,14 @@ import `in`.testpress.database.dao.OfflineAttachmentsDao
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class OfflineAttachmentsRepository(
     private val dao: OfflineAttachmentsDao,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 ) :
     DownloadQueueManager.Callback {
 
@@ -33,12 +35,10 @@ class OfflineAttachmentsRepository(
 
     suspend fun getAttachmentById(id: Long) = dao.getAttachmentById(id)
 
+    fun getAttachment(id: Long) = dao.getAttachment(id)
+
     suspend fun getAllWithStatus(status: OfflineAttachmentDownloadStatus) =
         dao.getAllWithStatus(status)
-
-    fun onClear() {
-        DownloadQueueManager.removeCallback()
-    }
 
     override fun onDownloadStarted(item: DownloadItem) {
         scope.launch {

@@ -22,13 +22,15 @@ import kotlinx.coroutines.launch
 
 class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(application) {
     private val dao = TestpressDatabase.invoke(application).offlineAttachmentDao()
-    private val repo = OfflineAttachmentsRepository(dao, viewModelScope)
+    private val repo = OfflineAttachmentsRepository(dao)
 
     val files = repo.getAllFiles().stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
         null
     )
+
+    fun getOfflineAttachment(id: Long) = repo.getAttachment(id)
 
     fun requestDownload(attachment: DomainAttachmentContent, destinationPath: String) {
         if (attachment.attachmentUrl.isNullOrEmpty()) return
@@ -61,11 +63,6 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
     }
 
     fun openFile(context: Context, file: OfflineAttachment) = openFile(context, file.path)
-
-    override fun onCleared() {
-        super.onCleared()
-        repo.onClear()
-    }
 
     companion object {
         fun get(context: FragmentActivity): OfflineAttachmentViewModel {
