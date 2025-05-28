@@ -86,6 +86,13 @@
                         android:layout_gravity="center"
                         android:text="@string/testpress_download_attachment" />
 
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/open_attachment"
+                        style="@style/TestpressSmallButton"
+                        android:layout_gravity="center"
+                        android:visibility="gone"
+                        android:text="Open Attachment" />
+
                 </LinearLayout>
 
                 <!-- Empty layout to keep the navigation button in bottom -->
