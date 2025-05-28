@@ -39,10 +39,6 @@ object DownloadQueueManager {
         this.callback = callback
     }
 
-    fun removeCallback() {
-        this.callback = null
-    }
-
     fun enqueue(item: DownloadItem) {
         downloadQueue.add(item)
         processQueue()
