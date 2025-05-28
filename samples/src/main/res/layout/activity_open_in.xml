@@ -96,6 +96,12 @@
             android:text="Sample Offline Exam"
             android:id="@+id/sample_offline_exam_download" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/Button"
+            android:layout_width="wrap_content"
+            android:text="Sample Attachment"
+            android:id="@+id/sample_offline_attachment_download" />
+
     </LinearLayout>
 
     </ScrollView>

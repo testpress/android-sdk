@@ -183,6 +183,13 @@ public class CourseSampleActivity extends BaseToolBarActivity {
                 openSampleOfflineExamActivity();
             }
         });
+
+        findViewById(R.id.sample_offline_attachment_download).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openSampleOfflineAttachmentActivity();
+            }
+        });
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -308,6 +315,10 @@ public class CourseSampleActivity extends BaseToolBarActivity {
 
     private void openSampleOfflineExamActivity() {
         startActivity(new Intent(this,OfflineExamSampleActivity.class));
+    }
+
+    private void openSampleOfflineAttachmentActivity() {
+        startActivity(new Intent(this,OfflineAttachmentSampleActivity.class));
     }
 
     @Override
