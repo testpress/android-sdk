@@ -64,6 +64,11 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
 
     fun openFile(context: Context, file: OfflineAttachment) = openFile(context, file.path)
 
+    override fun onCleared() {
+        super.onCleared()
+        repo.onClear()
+    }
+
     companion object {
         fun get(context: FragmentActivity): OfflineAttachmentViewModel {
             return ViewModelProvider(context, object : ViewModelProvider.Factory {
