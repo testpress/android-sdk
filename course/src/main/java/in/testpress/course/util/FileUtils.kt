@@ -1,10 +1,13 @@
 package `in`.testpress.course.util
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
+import android.webkit.MimeTypeMap
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import java.io.File
@@ -24,14 +27,35 @@ object FileUtils {
         }
     }
 
-    fun openPdf(context: Context, path: String) {
+    fun openFile(context: Context, path: String) {
         val file = File(path)
-        val uri = FileProvider.getUriForFile(context, "${context.packageName}.testpressFileProvider", file)
+        val uri: Uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.testpressFileProvider",
+            file
+        )
+
+        val mimeType = getMimeType(file) ?: "*/*"
+
         val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, "application/pdf")
+            setDataAndType(uri, mimeType)
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
-        context.startActivity(Intent.createChooser(intent, "Open with"))
+
+        try {
+            context.startActivity(Intent.createChooser(intent, "Open with"))
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(context, "No app found to open this file type.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun getMimeType(file: File): String? {
+        val extension = MimeTypeMap.getFileExtensionFromUrl(file.name)?.lowercase()
+        return if (extension != null) {
+            MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+        } else {
+            null
+        }
     }
 
     fun deleteFile(path: String) {

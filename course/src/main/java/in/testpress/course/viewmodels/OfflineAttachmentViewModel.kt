@@ -12,7 +12,7 @@ import `in`.testpress.course.repository.OfflineAttachmentsRepository
 import `in`.testpress.course.services.DownloadItem
 import `in`.testpress.course.services.DownloadQueueManager
 import `in`.testpress.course.util.FileUtils.deleteFile
-import `in`.testpress.course.util.FileUtils.openPdf
+import `in`.testpress.course.util.FileUtils.openFile
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
@@ -33,10 +33,12 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
     )
 
     fun requestDownload(attachment: DomainAttachmentContent, destinationPath: String) {
+        if (attachment.attachmentUrl.isNullOrEmpty()) return
         val file = OfflineAttachment(
             id = attachment.id,
-            title = attachment.title!!,
-            url = attachment.attachmentUrl!!,
+            title = attachment.title ?: "attachment_${attachment.id}",
+            // If thr url is null, it will be empty string and download will be failed
+            url = attachment.attachmentUrl,
             path = destinationPath,
             status = OfflineAttachmentDownloadStatus.QUEUED
         )
@@ -60,21 +62,7 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
         }
     }
 
-    fun openFile(context: Context, file: OfflineAttachment) = openPdf(context, file.path)
-
-    fun isAttachmentDownloaded(attachmentId: Long): OfflineAttachment? {
-        // It's generally not recommended to block the main thread.
-        // Consider making this a suspend function or returning a Flow/LiveData
-        // if you need to observe the download status asynchronously.
-        return runBlocking(Dispatchers.IO) {
-            val attachment = repo.getAttachmentById(attachmentId)
-            return@runBlocking if (attachment?.status == OfflineAttachmentDownloadStatus.DOWNLOADED) {
-                attachment
-            } else {
-                null
-            }
-        }
-    }
+    fun openFile(context: Context, file: OfflineAttachment) = openFile(context, file.path)
 
     companion object {
         fun get(context: FragmentActivity): OfflineAttachmentViewModel {
