@@ -105,7 +105,7 @@ fun OfflineAttachmentList(
             .fillMaxSize()
             .padding(vertical = 8.dp)
     ) {
-        items(attachments) { attachment ->
+        items(attachments, key = { attachment -> attachment.id }) { attachment ->
             OfflineAttachmentItem(
                 attachment = attachment,
                 onOpenFile = { onOpenFile(attachment) },
