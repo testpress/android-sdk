@@ -231,24 +231,14 @@ fun OfflineAttachmentList(
 
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
-    var selectedAttachment by rememberSaveable { mutableStateOf<OfflineAttachment?>(null) }
+    var selectedAttachmentId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var selectedAttachment by remember { mutableStateOf<OfflineAttachment?>(null) }
+    var isBottomSheetOpen by rememberSaveable { mutableStateOf(false) }
 
-    val latestAttachment = if (attachments.size < 50) {
-        // Version 1: linear search
-        remember(attachments, selectedAttachment?.id) {
-            attachments.find { it.id == selectedAttachment?.id }
-        }
-    } else {
-        // Version 2: map lookup
-        val attachmentMap = remember(attachments) {
-            attachments.associateBy { it.id }
-        }
-        attachmentMap[selectedAttachment?.id]
-    }
-
-    LaunchedEffect(latestAttachment?.status) {
-        if (latestAttachment != null && latestAttachment.status != selectedAttachment?.status) {
-            selectedAttachment = latestAttachment
+    // Update the BottomSheet UI when the download status changes for the selected item
+    LaunchedEffect(attachments, selectedAttachmentId, isBottomSheetOpen) {
+        if (isBottomSheetOpen) {
+            selectedAttachment = attachments.firstOrNull { it.id == selectedAttachmentId }
         }
     }
 
@@ -258,26 +248,28 @@ fun OfflineAttachmentList(
             .background(Color.White)
             .padding(vertical = 8.dp)
     ) {
-        items(attachments, key = { attachment -> attachment.id }) { attachment ->
+        items(attachments, key = { it.id }) { attachment ->
             OfflineAttachmentItem(
                 attachment = attachment,
                 onOpenFile = { onOpenFile(attachment) },
                 onMoreClick = {
-                    selectedAttachment = attachment
+                    selectedAttachmentId = attachment.id
+                    isBottomSheetOpen = true
                 }
             )
         }
     }
 
-    if (selectedAttachment != null) {
-        LaunchedEffect(selectedAttachment) {
+    if (selectedAttachmentId != null) {
+        LaunchedEffect(selectedAttachmentId) {
             sheetState.show()
         }
 
         ModalBottomSheet(
             onDismissRequest = {
                 scope.launch { sheetState.hide() }
-                selectedAttachment = null
+                selectedAttachmentId = null
+                isBottomSheetOpen = false
             },
             containerColor = Color.White,
             sheetState = sheetState,
@@ -289,7 +281,7 @@ fun OfflineAttachmentList(
                     onCancelDownload = onCancelDownload,
                     onDismiss = {
                         scope.launch { sheetState.hide() }
-                        selectedAttachment = null
+                        selectedAttachmentId = null
                     }
                 )
             }
