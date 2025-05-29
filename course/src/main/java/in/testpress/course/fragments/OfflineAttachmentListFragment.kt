@@ -1,7 +1,6 @@
 package `in`.testpress.course.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +22,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import `in`.testpress.course.R
+import `in`.testpress.course.util.extension.debouncedClickable
 import `in`.testpress.course.viewmodels.OfflineAttachmentViewModel
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
@@ -300,7 +299,7 @@ fun OfflineAttachmentItem(
             .height(72.dp)
             .fillMaxWidth()
             .padding(start = 16.dp, top = 8.dp, end = 4.dp, bottom = 16.dp)
-            .clickable(onClick = onOpenFile),
+            .debouncedClickable(debounceDuration = 500, onClick = onOpenFile),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
@@ -358,25 +357,33 @@ private fun AttachmentBottomSheet(
         when (attachment.status) {
             OfflineAttachmentDownloadStatus.QUEUED,
             OfflineAttachmentDownloadStatus.DOWNLOADING -> {
-                TextButton(onClick = {
-                    onCancelDownload(attachment.id)
-                    onDismiss()
-                }) {
+                TextButton(
+                    onClick = {
+                        onCancelDownload(attachment.id)
+                        onDismiss()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Icon(Icons.Filled.Clear, contentDescription = "Cancel", tint = Color.Black)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Cancel from Download", color = Color.Black)
+                    Spacer(modifier = Modifier.weight(1f))
                 }
             }
 
             OfflineAttachmentDownloadStatus.DOWNLOADED,
             OfflineAttachmentDownloadStatus.FAILED -> {
-                TextButton(onClick = {
-                    onDeleteDownload(attachment.id)
-                    onDismiss()
-                }) {
+                TextButton(
+                    onClick = {
+                        onDeleteDownload(attachment.id)
+                        onDismiss()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.Black)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Delete from Download", color = Color.Black)
+                    Spacer(modifier = Modifier.weight(1f))
                 }
             }
         }
