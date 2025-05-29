@@ -19,9 +19,6 @@ import androidx.compose.ui.composed
  * @param onClick The callback to invoke when a valid (non-debounced) click occurs.
  * @return A [Modifier] that handles debounced click events.
  *
- * Example usage:
- * @sample in.testpress.course.util.extension.SampleDebouncedClickable
- *
  * [materialize] must be called to create instance-specific modifiers if you are directly
  * applying a [Modifier] to an element tree node.
  */
