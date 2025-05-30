@@ -7,7 +7,7 @@ import android.content.Context
 class VideoConferenceHandler(
     val context: Context,
     val videoConference: DomainVideoConferenceContent,
-    val profileDetails: ProfileDetails?
+    val profileDetails: ProfileDetails
 ) {
 
     private var zoomMeetHandler = ZoomMeetHandler(

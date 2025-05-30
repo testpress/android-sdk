@@ -20,7 +20,7 @@ import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_PASSWORD
 class ZoomMeetHandler(
     val context: Context,
     val videoConference: DomainVideoConferenceContent,
-    val profileDetails: ProfileDetails?
+    val profileDetails: ProfileDetails
 ) : ZoomSDKInitializeListener, MeetingCommonCallback.CommonEvent {
 
     private lateinit var zoomSDK: ZoomSDK
@@ -189,11 +189,9 @@ class ZoomMeetHandler(
         options.no_meeting_error_message = true
         options.meeting_views_options = NO_TEXT_PASSWORD + NO_TEXT_MEETING_ID
         options.no_bottom_toolbar = false
-        options.no_webinar_register_dialog = profileDetails != null && profileDetails.email.isEmailValid()
+        options.no_webinar_register_dialog = profileDetails.email.isEmailValid()
         options.no_invite = true
-        if (profileDetails != null) {
-            options.customer_key = profileDetails.username
-        }
+        options.customer_key = profileDetails.username
         return options
     }
 
@@ -205,7 +203,7 @@ class ZoomMeetHandler(
     }
 
     override fun onJoinWebinarNeedUserNameAndEmail(inMeetingEventHandler: InMeetingEventHandler) {
-        if (profileDetails != null && profileDetails.email.isEmailValid()) {
+        if (profileDetails.email.isEmailValid()) {
             val name = profileDetails.displayName ?: profileDetails.username
             inMeetingEventHandler.setRegisterWebinarInfo(name, profileDetails.email, false)
         }
