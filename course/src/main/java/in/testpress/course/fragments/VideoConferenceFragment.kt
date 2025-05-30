@@ -92,27 +92,27 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
 
     private fun initializeVideoConferenceHandler(videoConference: DomainVideoConferenceContent?) {
         showLoadingAndDisableStartButton()
-        if (profileDetails == null) {
-            loadProfileAndInitializeConference(videoConference)
-        } else {
-            initVideoConferenceHandler(videoConference)
-        }
+        profileDetails?.let {
+            initVideoConferenceHandler(videoConference, it)
+        } ?: loadProfileAndInitializeConference(videoConference)
     }
 
     private fun loadProfileAndInitializeConference(videoConference: DomainVideoConferenceContent?) {
         TestpressUserDetails.getInstance().load(requireContext(),object : TestpressCallback<ProfileDetails>(){
             override fun onSuccess(result: ProfileDetails?) {
                 profileDetails = result
-                initVideoConferenceHandler(videoConference)
+                profileDetails?.let {
+                    initVideoConferenceHandler(videoConference, it)
+                }
             }
 
-            override fun onException(exception: TestpressException?) {
-                initVideoConferenceHandler(videoConference)
+            override fun onException(exception: TestpressException) {
+                emptyViewFragment.displayError(exception)
             }
         })
     }
 
-    private fun initVideoConferenceHandler(videoConference: DomainVideoConferenceContent?) {
+    private fun initVideoConferenceHandler(videoConference: DomainVideoConferenceContent?, profileDetails: ProfileDetails) {
         try {
             videoConferenceHandler = VideoConferenceHandler(requireContext(), videoConference!!, profileDetails)
             videoConferenceHandler?.init(object : VideoConferenceInitializeListener {
