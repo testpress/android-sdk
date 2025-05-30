@@ -99,7 +99,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
 
     private fun loadProfileAndInitializeConference(videoConference: DomainVideoConferenceContent?) {
         TestpressUserDetails.getInstance().load(requireContext(),object : TestpressCallback<ProfileDetails>(){
-            override fun onSuccess(result: ProfileDetails) {
+            override fun onSuccess(result: ProfileDetails?) {
                 profileDetails = result
                 profileDetails?.let {
                     initVideoConferenceHandler(videoConference, it)
