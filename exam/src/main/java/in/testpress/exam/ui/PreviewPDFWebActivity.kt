@@ -61,7 +61,7 @@ class JavaScriptInterface(private val activity: PreviewPDFWebActivity) :
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 progressDialog.dismiss()
-                showErrorDialog("Unexpected error occurred: ${e.localizedMessage}")
+                showErrorDialog("Failed to download PDF: ${e.localizedMessage ?: "Unknown error"}")
             }
         }
     }
