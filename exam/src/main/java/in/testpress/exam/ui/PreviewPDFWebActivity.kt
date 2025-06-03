@@ -27,9 +27,16 @@ class JavaScriptInterface(private val activity: PreviewPDFWebActivity) :
 
     @JavascriptInterface
     fun openPdf(url: String, authKey: String, pdfName: String) {
+        when {
+            url.isBlank() -> showErrorDialog("URL is missing")
+            authKey.isBlank() -> showErrorDialog("Auth Key is missing")
+            else -> return
+        }
+
         activity.lifecycleScope.launch(Dispatchers.Main) {
             val progressDialog = showLoadingDialog()
-            downloadAndOpenPdf(url, authKey, pdfName, progressDialog)
+            val fileName = pdfName.ifBlank { "response.pdf" }
+            downloadAndOpenPdf(url, authKey, fileName, progressDialog)
         }
     }
 
@@ -40,24 +47,23 @@ class JavaScriptInterface(private val activity: PreviewPDFWebActivity) :
         progressDialog: ProgressDialog
     ) = withContext(Dispatchers.IO) {
         try {
-            val response = fetchPdf(url, authKey)
+            fetchPdf(url, authKey).use { response ->
+                if (!response.isSuccessful) {
+                    onDownloadFailed("Download failed with HTTP status code: ${response.code()}", progressDialog)
+                    return@withContext
+                }
 
-            if (!response.isSuccessful) {
-                onDownloadFailed("Download failed with HTTP status code: ${response.code()}", progressDialog)
-                return@withContext
+                val file = savePdfToFile(response.body()?.bytes(), pdfName)
+                if (file == null) {
+                    onDownloadFailed("Download failed: PDF content was empty.", progressDialog)
+                    return@withContext
+                }
+
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+                    openPdfFile(file)
+                }
             }
-
-            val file = savePdfToFile(response.body()?.bytes(), pdfName)
-            if (file == null) {
-                onDownloadFailed("Download failed: PDF content was empty.", progressDialog)
-                return@withContext
-            }
-
-            withContext(Dispatchers.Main) {
-                progressDialog.dismiss()
-                openPdfFile(file)
-            }
-
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 progressDialog.dismiss()
@@ -76,9 +82,13 @@ class JavaScriptInterface(private val activity: PreviewPDFWebActivity) :
 
     private fun savePdfToFile(bytes: ByteArray?, fileName: String): File? {
         if (bytes == null) return null
-        val file = File(activity.cacheDir, fileName)
-        file.writeBytes(bytes)
-        return file
+        return try {
+            val file = File(activity.cacheDir, fileName)
+            file.writeBytes(bytes)
+            file
+        } catch (e: Exception) {
+            null
+        }
     }
 
     private fun openPdfFile(file: File) {
