@@ -22,75 +22,96 @@ class PreviewPDFWebActivity : AbstractWebViewActivity() {
     }
 }
 
-class JavaScriptInterface(val activity: PreviewPDFWebActivity) : BaseJavaScriptInterface(activity) {
+class JavaScriptInterface(private val activity: PreviewPDFWebActivity) :
+    BaseJavaScriptInterface(activity) {
 
     @JavascriptInterface
     fun openPdf(url: String, authKey: String, pdfName: String) {
         activity.lifecycleScope.launch(Dispatchers.Main) {
-            val progressDialog = ProgressDialog(activity).apply {
-                setMessage("Loading PDF...")
-                setCancelable(false)
-                show()
+            val progressDialog = showLoadingDialog()
+            downloadAndOpenPdf(url, authKey, pdfName, progressDialog)
+        }
+    }
+
+    private suspend fun downloadAndOpenPdf(
+        url: String,
+        authKey: String,
+        pdfName: String,
+        progressDialog: ProgressDialog
+    ) = withContext(Dispatchers.IO) {
+        try {
+            val response = fetchPdf(url, authKey)
+
+            if (!response.isSuccessful) {
+                onDownloadFailed("Download failed with HTTP status code: ${response.code()}", progressDialog)
+                return@withContext
             }
 
-            withContext(Dispatchers.IO) {
-                try {
-                    val client = OkHttpClient()
-                    val request = Request.Builder()
-                        .url(url)
-                        .addHeader("Authorization", authKey)
-                        .build()
-
-                    val response = client.newCall(request).execute()
-
-                    if (response.isSuccessful) {
-                        val bytes = response.body()?.bytes()
-                        if (bytes != null) {
-                            val file = File(activity.cacheDir, pdfName)
-                            file.writeBytes(bytes)
-
-                            withContext(Dispatchers.Main) {
-                                progressDialog.dismiss()
-
-                                val intent = Intent(Intent.ACTION_VIEW).apply {
-                                    setDataAndType(
-                                        FileProvider.getUriForFile(
-                                            activity,
-                                            "${activity.packageName}.testpressFileProvider",
-                                            file
-                                        ),
-                                        "application/pdf"
-                                    )
-                                    flags =
-                                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NO_HISTORY
-                                }
-
-                                try {
-                                    activity.startActivity(intent)
-                                } catch (e: ActivityNotFoundException) {
-                                    showErrorDialog("No app found to open PDF.")
-                                }
-                            }
-                        } else {
-                            withContext(Dispatchers.Main) {
-                                progressDialog.dismiss()
-                                showErrorDialog("Download failed: PDF content was empty.")
-                            }
-                        }
-                    } else {
-                        withContext(Dispatchers.Main) {
-                            progressDialog.dismiss()
-                            showErrorDialog("Download failed with HTTP status code: ${response.code()}")
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    withContext(Dispatchers.Main) {
-                        progressDialog.dismiss()
-                        showErrorDialog("Unexpected error occurred: ${e.localizedMessage}")
-                    }
-                }
+            val file = savePdfToFile(response.body()?.bytes(), pdfName)
+            if (file == null) {
+                onDownloadFailed("Download failed: PDF content was empty.", progressDialog)
+                return@withContext
             }
+
+            withContext(Dispatchers.Main) {
+                progressDialog.dismiss()
+                openPdfFile(file)
+            }
+
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                progressDialog.dismiss()
+                showErrorDialog("Unexpected error occurred: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    private fun fetchPdf(url: String, authKey: String) =
+        OkHttpClient().newCall(
+            Request.Builder()
+                .url(url)
+                .addHeader("Authorization", authKey)
+                .build()
+        ).execute()
+
+    private fun savePdfToFile(bytes: ByteArray?, fileName: String): File? {
+        if (bytes == null) return null
+        val file = File(activity.cacheDir, fileName)
+        file.writeBytes(bytes)
+        return file
+    }
+
+    private fun openPdfFile(file: File) {
+        val uri = FileProvider.getUriForFile(
+            activity,
+            "${activity.packageName}.testpressFileProvider",
+            file
+        )
+
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "application/pdf")
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NO_HISTORY
+        }
+
+        try {
+            activity.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            showErrorDialog("No app found to open PDF.")
+        }
+    }
+
+    private fun onDownloadFailed(message: String, progressDialog: ProgressDialog) {
+        activity.runOnUiThread {
+            progressDialog.dismiss()
+            showErrorDialog(message)
+        }
+    }
+
+    private fun showLoadingDialog(): ProgressDialog {
+        return ProgressDialog(activity).apply {
+            setMessage("Loading PDF...")
+            setCancelable(false)
+            show()
         }
     }
 
