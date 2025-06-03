@@ -812,13 +812,13 @@ public class ReviewQuestionsFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    startActivity(WebViewWithSSOActivity.Companion.createIntent(
+                    startActivity(PreviewPDFWebActivity.Companion.createIntent(
                                     requireContext(),
                                     "PDF Preview",
                                     url,
                                     false,
                                     true,
-                                    WebViewWithSSOActivity.class
+                                    PreviewPDFWebActivity.class
                             )
                     );
                 }
