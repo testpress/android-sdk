@@ -2,12 +2,12 @@ package in.testpress.exam.ui;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-
-import android.Manifest;
+import static in.testpress.util.UIUtils.showAlert;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -46,6 +46,7 @@ import in.testpress.models.FileDetails;
 import in.testpress.models.InstituteSettings;
 import in.testpress.models.greendao.Exam;
 import in.testpress.models.greendao.Language;
+import in.testpress.util.FileUtilsKt;
 import in.testpress.util.ProgressDialog;
 import in.testpress.util.WebViewUtils;
 import in.testpress.util.extension.ActivityKt;
@@ -70,6 +71,7 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
     private TestpressExamApiClient apiClient;
     private AlertDialog progressDialog;
     PickiT pickiT;
+    private Uri selectedUriFromIntent;
     private static final String[] FILE_PERMISSIONS = new String[] {
             READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE
     };
@@ -313,7 +315,20 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
 
     @Override
     public void PickiTonCompleteListener(String path, boolean wasDriveFile, boolean wasUnknownProvider, boolean wasSuccessful, String Reason) {
-        uploadFileAndSaveURL(path);
+        if (path == null) {
+            FileUtilsKt.copyFileFromUriAndUpload(requireContext(),
+                    selectedUriFromIntent,
+                    filePath -> {
+                        uploadFileAndSaveURL(filePath);
+                        return null;
+                    },
+                    errorMessage -> {
+                        showAlert(requireContext(), "Uploading Error", errorMessage);
+                        return null;
+                    });
+        } else {
+            uploadFileAndSaveURL(path);
+        }
     }
 
     private class OptionsSelectionListener {
@@ -384,6 +399,7 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == 42 && resultCode == Activity.RESULT_OK) {
             if (data != null) {
+                selectedUriFromIntent = data.getData();
                 pickiT.getPath(data.getData(), Build.VERSION.SDK_INT);
             }
         } else {
