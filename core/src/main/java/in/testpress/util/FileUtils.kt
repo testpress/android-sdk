@@ -8,15 +8,16 @@ import java.io.InputStream
 
 fun copyFileFromUriAndUpload(
     context: Context,
-    uri: Uri,
+    uri: Uri?,
     onSuccess: (filePath: String) -> Unit,
     onError: (error: String) -> Unit
 ) {
+    if (uri == null) onError("No file selected for upload")
     var inputStream: InputStream? = null
     var outputStream: FileOutputStream? = null
 
     try {
-        inputStream = context.contentResolver.openInputStream(uri)
+        inputStream = context.contentResolver.openInputStream(uri!!)
         if (inputStream == null) {
             onError("Unable to read selected file")
             return
