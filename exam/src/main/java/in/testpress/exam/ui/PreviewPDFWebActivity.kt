@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.util.Log
 import android.webkit.JavascriptInterface
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
@@ -27,12 +28,14 @@ class JavaScriptInterface(private val activity: PreviewPDFWebActivity) :
 
     @JavascriptInterface
     fun openPdf(url: String, authKey: String, pdfName: String) {
-        when {
-            url.isBlank() -> showErrorDialog("URL is missing")
-            authKey.isBlank() -> showErrorDialog("Auth Key is missing")
-            else -> return
+        if (url.isBlank()){
+            showErrorDialog("URL is missing")
+            return
         }
-
+        if (authKey.isBlank()){
+            showErrorDialog("Auth Key is missing")
+            return
+        }
         activity.lifecycleScope.launch(Dispatchers.Main) {
             val progressDialog = showLoadingDialog()
             val fileName = pdfName.ifBlank { "response.pdf" }
