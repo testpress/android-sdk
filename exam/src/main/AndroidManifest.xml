@@ -75,6 +75,11 @@
             android:theme="@style/TestpressTheme"
             android:configChanges="orientation|keyboard|screenSize" />
 
+        <activity android:name=".ui.PreviewPDFWebActivity"
+            android:label="@string/testpress_pdf_preview"
+            android:theme="@style/TestpressTheme"
+            android:configChanges="orientation|keyboard|screenSize" />
+
         <activity android:name=".ui.ShareToUnLockActivity"
             android:label="@string/testpress_share"
             android:theme="@style/TestpressTheme"
