@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 
 fun copyFileFromUriAndUpload(
     context: Context,
@@ -11,15 +12,18 @@ fun copyFileFromUriAndUpload(
     onSuccess: (filePath: String) -> Unit,
     onError: (error: String) -> Unit
 ) {
+    var inputStream: InputStream? = null
+    var outputStream: FileOutputStream? = null
+
     try {
-        val inputStream = context.contentResolver.openInputStream(uri)
+        inputStream = context.contentResolver.openInputStream(uri)
         if (inputStream == null) {
             onError("Unable to read selected file")
             return
         }
 
         val tempFile = File(context.cacheDir, "upload_temp.pdf")
-        val outputStream = FileOutputStream(tempFile)
+        outputStream = FileOutputStream(tempFile)
 
         val buffer = ByteArray(4096)
         var bytesRead: Int
@@ -27,13 +31,13 @@ fun copyFileFromUriAndUpload(
             outputStream.write(buffer, 0, bytesRead)
         }
 
-        inputStream.close()
-        outputStream.close()
-
         onSuccess(tempFile.absolutePath)
 
     } catch (e: Exception) {
         e.printStackTrace()
         onError("Failed to copy and upload file: ${e.message}")
+    } finally {
+        inputStream?.close()
+        outputStream?.close()
     }
 }

@@ -100,6 +100,9 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
         instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
         apiClient = new TestpressExamApiClient(getContext());
         pickiT = new PickiT(requireContext(), this, requireActivity());
+        if (savedInstanceState != null) {
+            selectedUriFromIntent = savedInstanceState.getParcelable("KEY_SELECTED_URI");
+        }
     }
 
     @SuppressLint({"SetTextI18n", "AddJavascriptInterface"})
@@ -399,8 +402,13 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == 42 && resultCode == Activity.RESULT_OK) {
             if (data != null) {
-                selectedUriFromIntent = data.getData();
-                pickiT.getPath(data.getData(), Build.VERSION.SDK_INT);
+                Uri uri = data.getData();
+                if (uri != null){
+                    requireContext().getContentResolver()
+                            .takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    selectedUriFromIntent = uri;
+                }
+                pickiT.getPath(uri, Build.VERSION.SDK_INT);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -431,6 +439,11 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
         attemptItem.setUnSyncedFiles(fileURLs);
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("KEY_SELECTED_URI", selectedUriFromIntent);
+    }
 
     @Override
     public void onDestroyView() {
