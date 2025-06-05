@@ -389,7 +389,12 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
     void pickFile() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
+
         intent.setType("*/*");
+
+        String[] mimeTypes = {"image/jpeg", "application/pdf"};
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
        if(getParentFragment() != null) {
            getParentFragment().startActivityForResult(intent, 42);
