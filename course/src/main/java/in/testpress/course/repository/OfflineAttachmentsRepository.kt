@@ -2,10 +2,10 @@ package `in`.testpress.course.repository
 
 import `in`.testpress.course.services.DownloadItem
 import `in`.testpress.course.services.DownloadQueueManager
-import `in`.testpress.course.util.FileUtils.deleteFile
 import `in`.testpress.database.dao.OfflineAttachmentsDao
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
+import `in`.testpress.util.deleteFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

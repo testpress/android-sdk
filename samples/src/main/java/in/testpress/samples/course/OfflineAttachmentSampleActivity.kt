@@ -10,12 +10,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import `in`.testpress.course.domain.DomainAttachmentContent
-import `in`.testpress.course.util.FileUtils.getFileExtensionFromUrl
 import `in`.testpress.course.viewmodels.OfflineAttachmentViewModel
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
 import `in`.testpress.samples.databinding.ActivityOfflineAttachmentSampleBinding
 import `in`.testpress.samples.databinding.ListItemDownloadBinding
+import `in`.testpress.util.getFileExtensionFromUrl
 import java.io.File
 
 class OfflineAttachmentSampleActivity : AppCompatActivity() {

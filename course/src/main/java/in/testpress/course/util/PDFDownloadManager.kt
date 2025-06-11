@@ -1,12 +1,12 @@
 package `in`.testpress.course.util
 
-import `in`.testpress.course.util.FileUtils.getRootDirPath
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import com.downloader.Error
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import com.downloader.request.DownloadRequest
+import `in`.testpress.util.getRootDirPath
 import java.io.File
 
 open class PDFDownloadManager(
