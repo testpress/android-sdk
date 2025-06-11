@@ -20,6 +20,7 @@ fun copyFileFromUriAndUpload(
 
     var inputStream: InputStream? = null
     var outputStream: FileOutputStream? = null
+    var tempFile: File? = null
 
     try {
         inputStream = context.contentResolver.openInputStream(uri)
@@ -29,7 +30,7 @@ fun copyFileFromUriAndUpload(
         }
 
         val fileName = getFileNameFromUri(context, uri) ?: "upload_temp"
-        val tempFile = File(context.cacheDir, fileName)
+        tempFile = File(context.cacheDir, fileName)
 
         outputStream = FileOutputStream(tempFile)
 
@@ -39,16 +40,32 @@ fun copyFileFromUriAndUpload(
             outputStream.write(buffer, 0, bytesRead)
         }
 
-        onSuccess(tempFile.absolutePath)
+        outputStream.flush()
 
     } catch (e: Exception) {
         e.printStackTrace()
         onError("Failed to copy and upload file: ${e.message}")
+        return
     } finally {
-        inputStream?.close()
-        outputStream?.close()
+        try {
+            outputStream?.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        try {
+            inputStream?.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    tempFile?.absolutePath?.let {
+        onSuccess(it)
+    } ?: run {
+        onError("Temporary file creation failed")
     }
 }
+
 
 private fun getFileNameFromUri(context: Context, uri: Uri): String? {
     var name: String? = null
@@ -62,4 +79,18 @@ private fun getFileNameFromUri(context: Context, uri: Uri): String? {
         }
     }
     return name
+}
+
+fun deleteFileByPath(filePath: String): Boolean {
+    return try {
+        val file = File(filePath)
+        if (file.exists()) {
+            file.delete()
+        } else {
+            false
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
+    }
 }

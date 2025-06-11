@@ -428,12 +428,14 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
                         saveUploadedFileURL(fileDetails);
                         progressDialog.hide();
                         update();
+                        FileUtilsKt.deleteFileByPath(filePath);
                     }
 
                     @Override
                     public void onException(TestpressException exception) {
                         Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
                         progressDialog.hide();
+                        FileUtilsKt.deleteFileByPath(filePath);
                     }
                 });
     }
