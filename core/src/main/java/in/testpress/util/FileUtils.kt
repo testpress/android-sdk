@@ -44,6 +44,7 @@ fun copyFileFromUriAndUpload(
 
     } catch (e: Exception) {
         e.printStackTrace()
+        tempFile?.delete()
         onError("Failed to copy and upload file: ${e.message}")
         return
     } finally {
