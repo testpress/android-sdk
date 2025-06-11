@@ -11,11 +11,11 @@ import `in`.testpress.course.domain.DomainAttachmentContent
 import `in`.testpress.course.repository.OfflineAttachmentsRepository
 import `in`.testpress.course.services.DownloadItem
 import `in`.testpress.course.services.DownloadQueueManager
-import `in`.testpress.course.util.FileUtils.deleteFile
-import `in`.testpress.course.util.FileUtils.openFile
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
+import `in`.testpress.util.deleteFile
+import `in`.testpress.util.openFile
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
