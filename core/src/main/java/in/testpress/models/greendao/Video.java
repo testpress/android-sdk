@@ -280,6 +280,7 @@ public class Video implements android.os.Parcelable {
         thumbnailSmall = in.readString();
         byte tmpIsViewsExhausted = in.readByte();
         isViewsExhausted = tmpIsViewsExhausted == 0 ? null : tmpIsViewsExhausted == 1;
+        transcodingStatus = in.readString();
         streamId = in.readByte() == 0 ? null : in.readLong();
     }
 
@@ -317,6 +318,7 @@ public class Video implements android.os.Parcelable {
         dest.writeString(thumbnailMedium);
         dest.writeString(thumbnailSmall);
         dest.writeByte((byte) (isViewsExhausted == null ? 0 : isViewsExhausted ? 1 : 2));
+        dest.writeString(transcodingStatus);
         if (streamId == null) {
             dest.writeByte((byte) 0);
         } else {

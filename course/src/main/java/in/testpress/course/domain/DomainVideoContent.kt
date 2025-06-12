@@ -43,9 +43,9 @@ data class DomainVideoContent(
     }
 
     fun isTranscodingStatusComplete(): Boolean {
-        return transcodingStatus?.lowercase()
-            .equals("completed") || transcodingStatus?.lowercase()
-            .equals("not transcoded video")
+        val status = transcodingStatus ?: return false
+        return status.equals("completed", ignoreCase = true) ||
+                status.equals("not transcoded video", ignoreCase = true)
     }
 
 }

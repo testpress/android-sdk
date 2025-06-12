@@ -196,7 +196,9 @@ open class VideoContentFragment : BaseContentDetailFragment() {
     override fun display() {
         if (content.video?.isTranscodingStatusComplete() == false){
             displayTranscodingMessage()
-            menu.findItem(R.id.download).isVisible = false
+            if (::menu.isInitialized) {
+                menu.findItem(R.id.download)?.isVisible = false
+            }
             return
         }
 
