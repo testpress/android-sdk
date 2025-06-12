@@ -19,6 +19,7 @@ data class DomainVideoContent(
     val thumbnailMedium: String? = "",
     val stream: DomainVideoStream? = null,
     val isViewsExhausted: Boolean? = null,
+    val transcodingStatus: String? = null,
     val streams: List<DomainVideoStream>? = arrayListOf<DomainVideoStream>()
 ) {
     fun getPlaybackURL(): String? {
@@ -39,6 +40,12 @@ data class DomainVideoContent(
     fun isDownloadable(): Boolean {
         val type = getPlaybackURL()?.let { Util.inferContentType(it) }
         return type in arrayOf(C.TYPE_HLS, C.TYPE_DASH)
+    }
+
+    fun isTranscodingStatusComplete(): Boolean {
+        val status = transcodingStatus ?: return false
+        return status.equals("completed", ignoreCase = true) ||
+                status.equals("not transcoded video", ignoreCase = true)
     }
 
 }
@@ -65,6 +72,7 @@ fun createDomainVideoContent(video: Video): DomainVideoContent {
         thumbnailMedium = video.thumbnailMedium,
         thumbnailSmall = video.thumbnailSmall,
         isViewsExhausted = video.isViewsExhausted,
+        transcodingStatus = video.transcodingStatus,
         stream = video.stream?.asDomainStream()
     )
 }

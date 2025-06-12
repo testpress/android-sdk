@@ -97,7 +97,7 @@ class ContentLoadingFragment : Fragment(),
         if(content.isLocked == true) return false
         return when(content.contentType) {
             "Exam" -> (content.exam != null)
-            "Video" -> content.video != null && !hasCourseVideoViewsLimit(content)
+            "Video" -> content.video != null && content.video.isTranscodingStatusComplete() && !hasCourseVideoViewsLimit(content)
             "Attachment" -> content.attachment != null
             "Html", "Notes" -> content.htmlContent != null
             "Quiz" -> content.exam != null
