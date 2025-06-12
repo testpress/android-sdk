@@ -16,6 +16,7 @@ data class NetworkVideoContent(
     val thumbnailMedium: String? = "",
     val streamID: Long? = null,
     val isViewsExhausted: Boolean,
+    val transcodingStatus: String? = null,
     val streams: List<NetworkStream> = arrayListOf<NetworkStream>()
 )
 
@@ -31,6 +32,7 @@ fun NetworkVideoContent.asGreenDaoModel(): Video {
         thumbnailMedium,
         thumbnailSmall,
         this.isViewsExhausted,
+        this.transcodingStatus,
         this.streamID
     )
 }

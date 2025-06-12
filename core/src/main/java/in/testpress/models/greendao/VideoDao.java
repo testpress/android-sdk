@@ -35,7 +35,8 @@ public class VideoDao extends AbstractDao<Video, Long> {
         public final static Property ThumbnailMedium = new Property(7, String.class, "thumbnailMedium", false, "THUMBNAIL_MEDIUM");
         public final static Property ThumbnailSmall = new Property(8, String.class, "thumbnailSmall", false, "THUMBNAIL_SMALL");
         public final static Property IsViewsExhausted = new Property(9, Boolean.class, "isViewsExhausted", false, "IS_VIEWS_EXHAUSTED");
-        public final static Property StreamId = new Property(10, Long.class, "streamId", false, "STREAM_ID");
+        public final static Property TranscodingStatus = new Property(10, String.class, "transcodingStatus", false, "TRANSCODING_STATUS");
+        public final static Property StreamId = new Property(11, Long.class, "streamId", false, "STREAM_ID");
     }
 
     private DaoSession daoSession;
@@ -64,7 +65,8 @@ public class VideoDao extends AbstractDao<Video, Long> {
                 "\"THUMBNAIL_MEDIUM\" TEXT," + // 7: thumbnailMedium
                 "\"THUMBNAIL_SMALL\" TEXT," + // 8: thumbnailSmall
                 "\"IS_VIEWS_EXHAUSTED\" INTEGER," + // 9: isViewsExhausted
-                "\"STREAM_ID\" INTEGER);"); // 10: streamId
+                "\"TRANSCODING_STATUS\" TEXT," + // 10: transcodingStatus
+                "\"STREAM_ID\" INTEGER);"); // 11: streamId
     }
 
     /** Drops the underlying database table. */
@@ -127,9 +129,14 @@ public class VideoDao extends AbstractDao<Video, Long> {
             stmt.bindLong(10, isViewsExhausted ? 1L: 0L);
         }
  
+        String transcodingStatus = entity.getTranscodingStatus();
+        if (transcodingStatus != null) {
+            stmt.bindString(11, transcodingStatus);
+        }
+ 
         Long streamId = entity.getStreamId();
         if (streamId != null) {
-            stmt.bindLong(11, streamId);
+            stmt.bindLong(12, streamId);
         }
     }
 
@@ -187,9 +194,14 @@ public class VideoDao extends AbstractDao<Video, Long> {
             stmt.bindLong(10, isViewsExhausted ? 1L: 0L);
         }
  
+        String transcodingStatus = entity.getTranscodingStatus();
+        if (transcodingStatus != null) {
+            stmt.bindString(11, transcodingStatus);
+        }
+ 
         Long streamId = entity.getStreamId();
         if (streamId != null) {
-            stmt.bindLong(11, streamId);
+            stmt.bindLong(12, streamId);
         }
     }
 
@@ -217,7 +229,8 @@ public class VideoDao extends AbstractDao<Video, Long> {
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // thumbnailMedium
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // thumbnailSmall
             cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0, // isViewsExhausted
-            cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10) // streamId
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // transcodingStatus
+            cursor.isNull(offset + 11) ? null : cursor.getLong(offset + 11) // streamId
         );
         return entity;
     }
@@ -234,7 +247,8 @@ public class VideoDao extends AbstractDao<Video, Long> {
         entity.setThumbnailMedium(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setThumbnailSmall(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
         entity.setIsViewsExhausted(cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0);
-        entity.setStreamId(cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10));
+        entity.setTranscodingStatus(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setStreamId(cursor.isNull(offset + 11) ? null : cursor.getLong(offset + 11));
      }
     
     @Override

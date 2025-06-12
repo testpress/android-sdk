@@ -30,6 +30,7 @@ public class Video implements android.os.Parcelable {
     private String thumbnailMedium;
     private String thumbnailSmall;
     private Boolean isViewsExhausted;
+    private String transcodingStatus;
     private Long streamId;
 
     /** Used to resolve relations */
@@ -63,7 +64,7 @@ public class Video implements android.os.Parcelable {
     }
 
     @Generated
-    public Video(String title, String url, Long id, String embedCode, String duration, Boolean isDomainRestricted, String thumbnail, String thumbnailMedium, String thumbnailSmall, Boolean isViewsExhausted, Long streamId) {
+    public Video(String title, String url, Long id, String embedCode, String duration, Boolean isDomainRestricted, String thumbnail, String thumbnailMedium, String thumbnailSmall, Boolean isViewsExhausted, String transcodingStatus, Long streamId) {
         this.title = title;
         this.url = url;
         this.id = id;
@@ -74,6 +75,7 @@ public class Video implements android.os.Parcelable {
         this.thumbnailMedium = thumbnailMedium;
         this.thumbnailSmall = thumbnailSmall;
         this.isViewsExhausted = isViewsExhausted;
+        this.transcodingStatus = transcodingStatus;
         this.streamId = streamId;
     }
 
@@ -162,6 +164,14 @@ public class Video implements android.os.Parcelable {
 
     public void setIsViewsExhausted(Boolean isViewsExhausted) {
         this.isViewsExhausted = isViewsExhausted;
+    }
+
+    public String getTranscodingStatus() {
+        return transcodingStatus;
+    }
+
+    public void setTranscodingStatus(String transcodingStatus) {
+        this.transcodingStatus = transcodingStatus;
     }
 
     public Long getStreamId() {
