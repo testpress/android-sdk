@@ -40,6 +40,7 @@
     <string name="testpress_exam_not_available">Exam not available</string>
     <string name="testpress_exam_not_available_description">This is no longer available or not published yet.</string>
     <string name="testpress_exam_paused">Exam is paused, click resume to continue</string>
+    <string name="testpress_exam_end_due_disable_resume">You navigated away from the app, so the attempt has ended because resume is disabled for this exam.</string>
 
 
     <string name="testpress_analytics">Analytics</string>

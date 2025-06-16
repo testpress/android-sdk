@@ -96,7 +96,7 @@ class ContentLoadingFragment : Fragment(),
     private fun isContentLoaded(content: DomainContent): Boolean {
         if(content.isLocked == true) return false
         return when(content.contentType) {
-            "Exam" -> (content.exam != null)
+            "Exam" -> (content.exam != null) && content.exam?.isDetailFetched() == true
             "Video" -> content.video != null && content.video.isTranscodingStatusComplete() && !hasCourseVideoViewsLimit(content)
             "Attachment" -> content.attachment != null
             "Html", "Notes" -> content.htmlContent != null
